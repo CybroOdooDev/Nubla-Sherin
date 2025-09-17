@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="transfer_data_wizard_view_form" model="ir.actions.act_window">
+        <field name="name">Fetch Data From odoo17</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">transfer.data.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    <record id="transfer_data_wizard_view_fetching_data" model="ir.ui.view">
+        <field name="name">view.fetching.data</field>
+        <field name="model">transfer.data.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Fetch Data">
+                <group>
+                    <field name="url_db1" string="Url:" placeholder="http://localhost:8069.."/>
+                    <field name="db_1" string="Database Name:"/>
+                    <field name="username_db_1" string="User Name:"/>
+                    <field name="password_db_1" string="Password:"/>
+                </group>
+                <footer>
+                    <button string="Fetch Data" type="object" name="fetch_data" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <menuitem id="menu_purchase_orders_transfer_wizard" name="Data Fetching From Odoo17" parent="purchase.menu_purchase_root"
+              action="transfer_data_wizard_view_form"/>
+</odoo>

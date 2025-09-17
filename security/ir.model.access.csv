@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_transfer_data_wizard,access.transfer.data.wizard,purchase_orders_transfer.model_transfer_data_wizard,base.group_user,1,1,1,1
