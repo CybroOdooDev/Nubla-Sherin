@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="partner_snippet_inherit" inherit_id="website.snippets">
+        <!-- Create the custom group -->
+        <xpath expr="//snippets[@id='snippet_groups']/*[last()]" position="after">
+            <t snippet-group="partner_snippet" t-snippet="website.s_snippet_group" string="Partner Snippet" t-thumbnail="/partner_snippet/static/src/img/snipptes/partner.png"/>
+        </xpath>
+        <!-- Add the snippet to the structure category and associate with the group -->
+        <xpath expr="//snippets[@id='snippet_structure']/*[last()]" position="after">
+            <t t-snippet="partner_snippet.s_partner_picture" string="Partner Snippet" group="partner_snippet" t-thumbnail="/partner_snippet/static/src/img/snipptes/partner.png"/>
+        </xpath>
+    </template>
+</odoo>

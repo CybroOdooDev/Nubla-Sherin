@@ -1,0 +1,28 @@
+<templates xml:space="preserve">
+   <t t-name="partner_snippet.partner_dynamic_template">
+       <div class="row px-3">
+           <t t-foreach="partners" t-as="partner" t-key="partner.id">
+               <div class="col-md-6 col-lg-3 mb-4">
+                   <div class="card h-100 shadow-sm rounded-4 overflow-hidden position-relative partner-card"
+                        style="transition: transform 0.3s ease-in-out; border: 1px solid #D3D3D3;">
+                       <div class="bg-light d-flex justify-content-center align-items-center p-3" style="height: 220px;">
+                           <img t-att-src="partner.image"
+                                t-att-alt="partner.name"
+                                class="rounded-circle shadow"
+                                style="height: 180px; width: 180px; object-fit: cover;"/>
+                       </div>
+                       <div class="card-body text-center" style="border: 1px solid #D3D3D3;">
+                           <h5 class="card-title fw-bold mb-1 text-dark o_not_editable">
+                               <t t-esc="partner.name"/>
+                           </h5>
+                           <p class="text-muted small o_not_editable mb-0">
+                               <i class="fa fa-envelope me-1 text-primary"/>
+                               <t t-esc="partner.email"/>
+                           </p>
+                       </div>
+                   </div>
+               </div>
+           </t>
+       </div>
+   </t>
+</templates>

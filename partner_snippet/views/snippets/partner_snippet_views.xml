@@ -1,0 +1,17 @@
+<odoo>
+    <template id="website_partner_snippet" name="Partners">
+        <section class="oe_snippet_body o_colored_level partner-snippet-section"
+                 data-snippet="website_partner_snippet"
+                 data-name="Partners">
+            <div class="container py-5">
+                <h3 class="section_heading text-center mb-5">
+                    <span class="o_editable">Featured Partners</span>
+                </h3>
+                <div id="partner-dynamic-content-container"
+                     class="text-center text-muted">
+                    Loading partners....
+                </div>
+            </div>
+        </section>
+    </template>
+</odoo>

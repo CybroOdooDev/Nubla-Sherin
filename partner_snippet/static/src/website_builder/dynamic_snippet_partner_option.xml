@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- Add "Partners" in the dynamic snippet model selector -->
+    <t t-inherit="website.DynamicSnippetOption" t-inherit-mode="extension">
+        <xpath expr="//BuilderSelect[@id=&quot;'model_opt'&quot;]" position="inside">
+            <BuilderSelectItem actionParam="'res.partner'">Partners</BuilderSelectItem>
+        </xpath>
+    </t>
+</templates>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+<!-- Snippet -->
+<template id="s_partner" name="Partners">
+    <t t-call="website.s_dynamic_snippet_template">
+        <t t-set="snippet_name" t-value="'s_partner'"/>
+        <t t-set="snippet_classes" t-value="'s_partner_upcoming_snippet %s' % snippet_extra_classes"/>
+        <t t-set="main_page_url" t-value="'/partner'"/>
+        <section class="s_partner_snippet container">
+                <div class="row">
+                    <t t-foreach="request.env['res.partner'].sudo().search([], limit=4)" t-as="partner">
+                        <div class="col-md-3 text-center">
+                            <img t-att-src="'/web/image/res.partner/%d/image_1920' % partner.id"
+                                 class="img-fluid rounded-circle mb-2"
+                                 style="width:100px; height:100px; object-fit:cover;"/>
+                            <h5><t t-esc="partner.name"/></h5>
+                            <p><t t-esc="partner.email or ''"/></p>
+                        </div>
+                        <div class="text-center text-muted">Loading partners...</div>
+                    </t>
+                </div>
+            </section>
+    </t>
+</template>
+    <template id="s_partner_picture" name="Partner Picture">
+    <t t-set="snippet_extra_classes" t-value="'s_partner_partner_picture'"/>
+    <t t-call="partner_snippet.s_partner">
+        <t t-call="partner_snippet.partner_dynamic_template"/>
+    </t>
+</template>
+</odoo>
