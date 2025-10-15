@@ -1,0 +1,11 @@
+<odoo>
+    <!-- Register snippet groups -->
+    <template id="product_snippet_inherit" inherit_id="website.snippets">
+        <xpath expr="//snippets[@id='snippet_groups']/*[last()]" position="after">
+            <t snippet-group="product_snippet" t-snippet="website.s_snippet_group" string="Product Snippet" />
+        </xpath>
+        <xpath expr="//snippets[@id='snippet_structure']/*[last()]" position="after">
+            <t t-snippet="product_snippet.s_product" string="Product Snippet" group="product_snippet" />
+        </xpath>
+    </template>
+</odoo>

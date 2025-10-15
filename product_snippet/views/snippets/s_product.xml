@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+<!-- Snippet -->
+<template id="s_product" name="Products">
+    <t t-set="snippet_name" t-value="'s_product'"/>
+    <t t-set="snippet_classes" t-value="'s_product_upcoming_snippet %s' % snippet_extra_classes"/>
+    <t t-set="main_page_url" t-value="'/product'"/>
+    <section class="s_product_snippet container">
+        <div class="row">
+            <h3 class="section_heading text-center mb-0 mt-5">
+                    <span class="o_editable">Featured Products</span>
+                </h3>
+            <t t-foreach="request.env['product.details'].sudo().search([], limit=4)" t-as="product">
+                <div class="col-md-3 col-sm-6 mb-4 mt-5 d-flex align-items-stretch">
+                    <div class="card shadow-sm w-100">
+                        <img t-att-src="'/web/image/product.details/%d/image' % product.id"
+                             class="card-img-top rounded-circle mx-auto mt-3"
+                             style="width: 100px; height: 100px; object-fit: cover;" alt="Product Image"/>
+                        <div class="card-body text-center">
+                            <h5 class="card-title mb-1"><t t-esc="product.display_name"/></h5>
+                            <p class="card-text text-muted mb-0"><t t-esc="product.price or ''"/></p>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </section>
+</template>
+</odoo>
