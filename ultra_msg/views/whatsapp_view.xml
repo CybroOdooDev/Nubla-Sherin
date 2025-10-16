@@ -1,0 +1,39 @@
+<odoo>
+    <!-- Wizard Form View -->
+    <record id="view_whatsapp_message_form" model="ir.ui.view">
+        <field name="name">whatsapp.message.form</field>
+        <field name="model">whatsapp.message</field>
+        <field name="arch" type="xml">
+            <form string="Send WhatsApp Message">
+                <group>
+                    <field name="mobile_number"/>
+                    <field name="message" placeholder="Type your message here..."/>
+                </group>
+                <footer>
+                    <button name="action_send_message" type="object" string="Send" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_whatsapp_message" model="ir.actions.act_window">
+        <field name="name">Send WhatsApp Message</field>
+        <field name="res_model">whatsapp.message</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Main Menu -->
+    <menuitem id="menu_whatsapp_root"
+              name="WhatsApp"
+              sequence="10"/>
+
+    <!-- Submenu -->
+    <menuitem id="menu_whatsapp_send_message"
+              name="Send Message"
+              parent="menu_whatsapp_root"
+              action="action_whatsapp_message"
+              sequence="20"/>
+</odoo>
