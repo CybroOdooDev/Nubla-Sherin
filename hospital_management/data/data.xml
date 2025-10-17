@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Sample Medicine Categories -->
+        <record id="medicine_category_antibiotics" model="hospital.medicine.category">
+            <field name="name">Antibiotics</field>
+            <field name="code">ANTI</field>
+        </record>
+
+        <record id="medicine_category_analgesics" model="hospital.medicine.category">
+            <field name="name">Analgesics</field>
+            <field name="code">ANAL</field>
+        </record>
+
+        <record id="medicine_category_antipyretics" model="hospital.medicine.category">
+            <field name="name">Antipyretics</field>
+            <field name="code">APYR</field>
+        </record>
+
+        <!-- Sample Lab Test Categories -->
+        <record id="lab_category_blood_test" model="hospital.lab.test.category">
+            <field name="name">Blood Tests</field>
+            <field name="code">BLOOD</field>
+        </record>
+
+        <record id="lab_category_urine_test" model="hospital.lab.test.category">
+            <field name="name">Urine Tests</field>
+            <field name="code">URINE</field>
+        </record>
+
+        <!-- Sample Lab Tests -->
+        <record id="lab_test_cbc" model="hospital.lab.test">
+            <field name="name">Complete Blood Count (CBC)</field>
+            <field name="test_code">CBC001</field>
+            <field name="category_id" ref="lab_category_blood_test"/>
+            <field name="test_type">blood</field>
+            <field name="sample_type">Blood</field>
+            <field name="sample_quantity">5ml</field>
+            <field name="processing_time">4</field>
+            <field name="price">50.00</field>
+        </record>
+
+        <record id="lab_test_blood_sugar" model="hospital.lab.test">
+            <field name="name">Blood Sugar (Fasting)</field>
+            <field name="test_code">BS001</field>
+            <field name="category_id" ref="lab_category_blood_test"/>
+            <field name="test_type">blood</field>
+            <field name="sample_type">Blood</field>
+            <field name="sample_quantity">2ml</field>
+            <field name="processing_time">2</field>
+            <field name="price">15.00</field>
+            <field name="preparation_instructions">Patient should fast for 8-12 hours before test</field>
+        </record>
+
+        <!-- Lab Test Parameters -->
+        <record id="lab_parameter_hemoglobin" model="hospital.lab.test.parameter">
+            <field name="test_id" ref="lab_test_cbc"/>
+            <field name="name">Hemoglobin</field>
+            <field name="unit">g/dL</field>
+            <field name="normal_range_min">12.0</field>
+            <field name="normal_range_max">16.0</field>
+            <field name="reference_range">12.0 - 16.0 g/dL</field>
+        </record>
+
+        <record id="lab_parameter_wbc" model="hospital.lab.test.parameter">
+            <field name="test_id" ref="lab_test_cbc"/>
+            <field name="name">WBC Count</field>
+            <field name="unit">cells/mcL</field>
+            <field name="normal_range_min">4000</field>
+            <field name="normal_range_max">11000</field>
+            <field name="reference_range">4,000 - 11,000 cells/mcL</field>
+        </record>
+
+        <record id="lab_parameter_platelets" model="hospital.lab.test.parameter">
+            <field name="test_id" ref="lab_test_cbc"/>
+            <field name="name">Platelet Count</field>
+            <field name="unit">cells/mcL</field>
+            <field name="normal_range_min">150000</field>
+            <field name="normal_range_max">450000</field>
+            <field name="reference_range">150,000 - 450,000 cells/mcL</field>
+        </record>
+
+        <!-- Sample Departments -->
+        <record id="department_cardiology" model="hospital.department">
+            <field name="name">Cardiology</field>
+            <field name="code">CARD</field>
+            <field name="description">Heart and cardiovascular system</field>
+        </record>
+
+        <record id="department_neurology" model="hospital.department">
+            <field name="name">Neurology</field>
+            <field name="code">NEUR</field>
+            <field name="description">Brain and nervous system</field>
+        </record>
+
+        <record id="department_orthopedics" model="hospital.department">
+            <field name="name">Orthopedics</field>
+            <field name="code">ORTH</field>
+            <field name="description">Bones, joints, and muscles</field>
+        </record>
+
+        <record id="department_pediatrics" model="hospital.department">
+            <field name="name">Pediatrics</field>
+            <field name="code">PEDI</field>
+            <field name="description">Children's health</field>
+        </record>
+
+        <record id="department_general_medicine" model="hospital.department">
+            <field name="name">General Medicine</field>
+            <field name="code">GENM</field>
+            <field name="description">General medical care</field>
+        </record>
+
+    </data>
+</odoo>

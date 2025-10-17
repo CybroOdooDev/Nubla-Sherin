@@ -1,0 +1,455 @@
+/* Hospital Management Dashboard Styles */
+
+.hospital_dashboard {
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Header */
+.dashboard_header {
+    margin-bottom: 30px;
+}
+
+.dashboard_title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Statistics Cards */
+.stat_card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.stat_card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.stat_card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--card-color-1), var(--card-color-2));
+}
+
+.stat_card_primary {
+    --card-color-1: #3498db;
+    --card-color-2: #2980b9;
+}
+
+.stat_card_info {
+    --card-color-1: #00bcd4;
+    --card-color-2: #0097a7;
+}
+
+.stat_card_success {
+    --card-color-1: #4caf50;
+    --card-color-2: #388e3c;
+}
+
+.stat_card_warning {
+    --card-color-1: #ff9800;
+    --card-color-2: #f57c00;
+}
+
+.stat_card_danger {
+    --card-color-1: #f44336;
+    --card-color-2: #d32f2f;
+}
+
+.stat_card_purple {
+    --card-color-1: #9c27b0;
+    --card-color-2: #7b1fa2;
+}
+
+.stat_card_teal {
+    --card-color-1: #009688;
+    --card-color-2: #00796b;
+}
+
+.stat_card_orange {
+    --card-color-1: #ff5722;
+    --card-color-2: #e64a19;
+}
+
+.stat_icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--card-color-1), var(--card-color-2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    flex-shrink: 0;
+}
+
+.stat_icon i {
+    font-size: 28px;
+    color: #fff;
+}
+
+.stat_content {
+    flex: 1;
+}
+
+.stat_value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0 0 8px 0;
+    line-height: 1;
+}
+
+.stat_label {
+    color: #7f8c8d;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0 0 8px 0;
+}
+
+.stat_details {
+    font-size: 12px;
+    color: #95a5a6;
+}
+
+.stat_details .badge {
+    font-size: 11px;
+    padding: 3px 8px;
+}
+
+/* Dashboard Cards */
+.dashboard_card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.card_header {
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-bottom: 1px solid #e9ecef;
+}
+
+.card_header h5 {
+    margin: 0;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.card_body {
+    padding: 20px 24px;
+    flex: 1;
+    overflow-y: auto;
+    max-height: 400px;
+}
+
+/* Appointment List */
+.appointment_list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.appointment_item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.appointment_item:hover {
+    background: #e9ecef;
+    border-left-color: #3498db;
+    transform: translateX(4px);
+}
+
+.appointment_time {
+    min-width: 70px;
+    font-weight: 600;
+    color: #3498db;
+    font-size: 14px;
+}
+
+.appointment_time i {
+    margin-right: 4px;
+}
+
+.appointment_info {
+    flex: 1;
+}
+
+.patient_name,
+.doctor_name {
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.patient_name {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.patient_name i,
+.doctor_name i {
+    margin-right: 6px;
+    color: #95a5a6;
+    width: 14px;
+}
+
+.doctor_name {
+    color: #7f8c8d;
+    font-size: 13px;
+}
+
+.appointment_status {
+    min-width: 100px;
+    text-align: right;
+}
+
+/* Admission List */
+.admission_list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.admission_item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.admission_item:hover {
+    background: #e9ecef;
+    border-left-color: #4caf50;
+    transform: translateX(4px);
+}
+
+.admission_info {
+    flex: 1;
+}
+
+.admission_details,
+.admission_date {
+    margin-top: 4px;
+    color: #7f8c8d;
+}
+
+.admission_details i,
+.admission_date i {
+    margin-right: 6px;
+    width: 14px;
+}
+
+/* Critical List */
+.critical_list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.critical_item {
+    margin: 0;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.critical_item:hover {
+    transform: translateX(4px);
+}
+
+.critical_item i {
+    margin-right: 6px;
+}
+
+/* Surgery List */
+.surgery_list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.surgery_item {
+    padding: 12px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid #9c27b0;
+}
+
+.surgery_item:hover {
+    background: #e9ecef;
+    transform: translateX(4px);
+}
+
+.surgery_info i {
+    margin-right: 6px;
+    width: 14px;
+}
+
+/* Stock List */
+.stock_list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stock_item {
+    margin: 0;
+    padding: 12px;
+}
+
+.stock_item i {
+    margin-right: 6px;
+}
+
+/* Badge Styles */
+.badge {
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Progress Bar */
+.progress {
+    background-color: #e9ecef;
+    border-radius: 4px;
+}
+
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+/* Scrollbar Styling */
+.card_body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.card_body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.card_body::-webkit-scrollbar-thumb {
+    background: #bdc3c7;
+    border-radius: 10px;
+}
+
+.card_body::-webkit-scrollbar-thumb:hover {
+    background: #95a5a6;
+}
+
+/* Loading State */
+.hospital_dashboard .fa-spinner {
+    color: #3498db;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hospital_dashboard {
+        padding: 10px;
+    }
+
+    .stat_card {
+        padding: 16px;
+    }
+
+    .stat_icon {
+        width: 50px;
+        height: 50px;
+        margin-right: 16px;
+    }
+
+    .stat_icon i {
+        font-size: 24px;
+    }
+
+    .stat_value {
+        font-size: 24px;
+    }
+
+    .stat_label {
+        font-size: 12px;
+    }
+
+    .card_header h5 {
+        font-size: 16px;
+    }
+
+    .card_body {
+        padding: 16px;
+        max-height: 300px;
+    }
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stat_card,
+.dashboard_card {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Print Styles */
+@media print {
+    .hospital_dashboard {
+        background: #fff;
+    }
+
+    .dashboard_header button {
+        display: none;
+    }
+
+    .stat_card,
+    .dashboard_card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
+    }
+}

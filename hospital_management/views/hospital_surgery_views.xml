@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Surgery Tree View -->
+    <record id="view_hospital_surgery_tree" model="ir.ui.view">
+        <field name="name">hospital.surgery.tree</field>
+        <field name="model">hospital.surgery</field>
+        <field name="arch" type="xml">
+            <list string="Surgeries">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="surgery_name"/>
+                <field name="surgery_date"/>
+                <field name="ot_id"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Surgery Form View -->
+    <record id="view_hospital_surgery_form" model="ir.ui.view">
+        <field name="name">hospital.surgery.form</field>
+        <field name="model">hospital.surgery</field>
+        <field name="arch" type="xml">
+            <form string="Surgery">
+                <header>
+                    <button name="action_pre_op" string="Pre-Operative" type="object"
+                            class="oe_highlight" invisible="state != 'scheduled'"/>
+                    <button name="action_start" string="Start Surgery" type="object"
+                            class="oe_highlight" invisible="state != 'pre_op'"/>
+                    <button name="action_complete" string="Complete" type="object"
+                            class="oe_highlight" invisible="state != 'in_progress'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ['completed', 'cancelled']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="scheduled,pre_op,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Patient Information">
+                            <field name="patient_id"/>
+                            <field name="admission_id"/>
+                            <field name="surgery_name"/>
+                            <field name="surgery_type"/>
+                        </group>
+                        <group string="Schedule">
+                            <field name="surgery_date"/>
+                            <field name="duration"/>
+                            <field name="ot_id"/>
+                        </group>
+                    </group>
+
+                    <group string="Surgical Team">
+                        <group>
+                            <field name="doctor_id"/>
+                            <field name="anesthetist_id"/>
+                        </group>
+                        <group>
+                            <field name="assistant_doctor_ids" widget="many2many_tags"/>
+                            <field name="nurse_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Pre-Operative">
+                            <group>
+                                <field name="pre_operative_diagnosis" placeholder="Pre-operative diagnosis..."/>
+                                <field name="anesthesia_type"/>
+                            </group>
+                            <group>
+                                <field name="pre_operative_notes" placeholder="Pre-operative notes..."/>
+                            </group>
+                            <group string="Blood Transfusion">
+                                <group>
+                                    <field name="blood_required"/>
+                                    <field name="blood_units" invisible="not blood_required"/>
+                                </group>
+                                <group>
+                                    <field name="blood_type" invisible="not blood_required"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Intra-Operative" invisible="state in ['scheduled', 'pre_op']">
+                            <group>
+                                <group>
+                                    <field name="actual_start_time"/>
+                                    <field name="actual_end_time"/>
+                                    <field name="actual_duration"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="procedure_performed" placeholder="Procedure performed..."/>
+                                <field name="findings" placeholder="Findings..."/>
+                                <field name="complications" placeholder="Complications if any..."/>
+                            </group>
+                        </page>
+
+                        <page string="Post-Operative" invisible="state != 'completed'">
+                            <group>
+                                <field name="post_operative_diagnosis" placeholder="Post-operative diagnosis..."/>
+                                <field name="post_operative_instructions" placeholder="Post-operative instructions..."/>
+                                <field name="post_operative_notes" placeholder="Post-operative notes..."/>
+                            </group>
+                        </page>
+
+                        <page string="Equipment &amp; Consumables">
+                            <group string="Equipment Used">
+                                <field name="equipment_ids" widget="many2many_tags" nolabel="1"/>
+                            </group>
+                            <separator string="Consumables"/>
+                            <field name="consumable_ids">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_price" readonly="1"/>
+                                    <field name="total" readonly="1" sum="Total"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Billing">
+                            <group>
+                                <group>
+                                    <field name="surgery_charge"/>
+                                    <field name="ot_charge"/>
+                                    <field name="anesthesia_charge"/>
+                                </group>
+                                <group>
+                                    <field name="total_charge" widget="monetary"/>
+                                    <field name="invoice_id"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Surgery Calendar View -->
+    <record id="view_hospital_surgery_calendar" model="ir.ui.view">
+        <field name="name">hospital.surgery.calendar</field>
+        <field name="model">hospital.surgery</field>
+        <field name="arch" type="xml">
+            <calendar string="Surgeries" date_start="surgery_date"
+                      color="ot_id" mode="week">
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="surgery_name"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Surgery Action -->
+
+
+</odoo>

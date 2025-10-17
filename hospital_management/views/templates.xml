@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="hospital_management.layout_template">
+        <div class="oe_structure">
+            <section class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1>Sample Template</h1>
+                        <p>This is a sample template for the hospital_management module.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </template>
+</odoo>

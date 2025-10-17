@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- Main Dashboard Template -->
+    <t t-name="hospital_management.HospitalDashboard">
+        <div class="hospital_dashboard">
+            <!-- Header -->
+            <div class="dashboard_header">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="dashboard_title">
+                        <i class="fa fa-hospital-o me-2"/>Hospital Dashboard
+                    </h2>
+                    <button class="btn btn-primary" t-on-click="refreshDashboard">
+                        <i class="fa fa-refresh me-1"/>Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div t-if="state.isLoading" class="text-center py-5">
+                <i class="fa fa-spinner fa-spin fa-3x text-primary"/>
+                <p class="mt-3">Loading dashboard data...</p>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div t-else="">
+                <!-- Statistics Cards Row 1 - Patients & Appointments -->
+                <div class="row mb-4">
+                    <!-- Total Patients -->
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="stat_card stat_card_primary" t-on-click="openPatients">
+                            <div class="stat_icon">
+                                <i class="fa fa-users"/>
+                            </div>
+                            <div class="stat_content">
+                                <h3 class="stat_value" t-esc="state.dashboardData.total_patients"/>
+                                <p class="stat_label">Total Patients</p>
+                                <div class="stat_details">
+                                    <small>
+                                        <i class="fa fa-plus-circle"/>
+                                        <t t-esc="state.dashboardData.new_patients_today"/> today
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today's Appointments -->
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="stat_card stat_card_info" t-on-click="openTodayAppointments">
+                            <div class="stat_icon">
+                                <i class="fa fa-calendar"/>
+                            </div>
+                            <div class="stat_content">
+                                <h3 class="stat_value" t-esc="state.dashboardData.total_appointments_today"/>
+                                <p class="stat_label">Today's Appointments</p>
+                                <div class="stat_details">
+                                    <small>
+                                        <span class="badge bg-success me-1" t-esc="state.dashboardData.appointments_completed"/>
+                                        <span class="badge bg-warning" t-esc="state.dashboardData.appointments_waiting"/>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Doctors -->
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="stat_card stat_card_success" t-on-click="openDoctors">
+                            <div class="stat_icon">
+                                <i class="fa fa-user-md"/>
+                            </div>
+                            <div class="stat_content">
+                                <h3 class="stat_value" t-esc="state.dashboardData.total_doctors"/>
+                                <p class="stat_label">Total Doctors</p>
+                                <div class="stat_details">
+                                    <small>
+                                        <i class="fa fa-check-circle text-success"/>
+                                        <t t-esc="state.dashboardData.doctors_available"/> available
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bed Occupancy -->
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="stat_card stat_card_warning" t-on-click="openBeds">
+                            <div class="stat_icon">
+                                <i class="fa fa-bed"/>
+                            </div>
+                            <div class="stat_content">
+                                <h3 class="stat_value">
+                                    <t t-esc="state.dashboardData.beds_occupied"/>/<t t-esc="state.dashboardData.total_beds"/>
+                                </h3>
+                                <p class="stat_label">Bed Occupancy</p>
+                                <div class="progress mt-2" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" role="progressbar"
+                                         t-attf-style="width: {{state.dashboardData.occupancy_percentage}}%"
+                                         t-attf-aria-valuenow="{{state.dashboardData.occupancy_percentage}}"
+                                         aria-valuemin="0" aria-valuemax="100"/>
+                                </div>
+                                <div class="stat_details mt-1">
+                                    <small>
+                                        <t t-esc="Math.round(state.dashboardData.occupancy_percentage)"/>% occupied
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards Row 2 - Operations -->
+                <div class="row mb-4">
+                    <!-- Lab Tests -->
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="stat_card stat_card_danger" t-on-click="openLabTests">
+                            <div class="stat_icon">
+                                <i class="fa fa-flask"/>
+                            </div>
+                            <div class="stat_content">
+                                <h3 class="stat_value" t-esc="state.dashboardData.pending_lab_tests"/>
+                                <p class="stat_label">Pending Lab Tests</p>
+                                <div class="stat_details">
+                                    <small>
+                                        <i class="fa fa-check"/>
+                                        <t t-esc="state.dashboardData.completed_lab_tests_today"/> completed today
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Surgeries -->
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="stat_card stat_card_purple" t-on-click="openSurgeries">
+                            <div class="stat_icon">
+                                <i class="fa fa-medkit"/>
+                            </div>
+                            <div class="stat_content">
+                                <h3 class="stat_value" t-esc="state.dashboardData.pending_surgeries"/>
+                                <p class="stat_label">Upcoming Surgeries</p>
+                                <div class="stat_details">
+                                    <small>
+                                        <i class="fa fa-check"/>
+                                        <t t-esc="state.dashboardData.completed_surgeries_today"/> completed today
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue Today -->
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="stat_card stat_card_teal">
+                            <div class="stat_icon">
+                                <i class="fa fa-money"/>
+                            </div>
+                            <div class="stat_content">
+                                <h3 class="stat_value" t-esc="formatCurrency(state.dashboardData.revenue_today)"/>
+                                <p class="stat_label">Revenue Today</p>
+                                <div class="stat_details">
+                                    <small>
+                                        Week: <t t-esc="formatCurrency(state.dashboardData.revenue_week)"/>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Low Stock -->
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="stat_card stat_card_orange" t-on-click="openLowStockMedicines">
+                            <div class="stat_icon">
+                                <i class="fa fa-exclamation-triangle"/>
+                            </div>
+                            <div class="stat_content">
+                                <h3 class="stat_value" t-esc="state.lowStockMedicines.length"/>
+                                <p class="stat_label">Low Stock Items</p>
+                                <div class="stat_details">
+                                    <small>Requires attention</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Details Section -->
+                <div class="row">
+                    <!-- Today's Appointments List -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="dashboard_card">
+                            <div class="card_header">
+                                <h5>
+                                    <i class="fa fa-calendar me-2"/>Today's Appointments
+                                </h5>
+                            </div>
+                            <div class="card_body">
+                                <div t-if="state.todayAppointments.length === 0" class="text-center text-muted py-4">
+                                    <i class="fa fa-calendar-o fa-3x mb-3"/>
+                                    <p>No appointments scheduled for today</p>
+                                </div>
+                                <div t-else="" class="appointment_list">
+                                    <t t-foreach="state.todayAppointments" t-as="appointment" t-key="appointment.id">
+                                        <div class="appointment_item" t-on-click="() => this.openAppointment(appointment.id)">
+                                            <div class="appointment_time">
+                                                <i class="fa fa-clock-o"/>
+                                                <t t-esc="formatTime(appointment.appointment_time)"/>
+                                            </div>
+                                            <div class="appointment_info">
+                                                <div class="patient_name">
+                                                    <i class="fa fa-user"/>
+                                                    <t t-esc="appointment.patient_name"/>
+                                                </div>
+                                                <div class="doctor_name">
+                                                    <i class="fa fa-user-md"/>
+                                                    Dr. <t t-esc="appointment.doctor_name"/>
+                                                </div>
+                                            </div>
+                                            <div class="appointment_status">
+                                                <span t-attf-class="badge bg-{{getStateColor(appointment.state)}}">
+                                                    <t t-esc="appointment.state"/>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Admissions -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="dashboard_card">
+                            <div class="card_header">
+                                <h5>
+                                    <i class="fa fa-hospital-o me-2"/>Recent Admissions
+                                </h5>
+                            </div>
+                            <div class="card_body">
+                                <div t-if="state.recentAdmissions.length === 0" class="text-center text-muted py-4">
+                                    <i class="fa fa-bed fa-3x mb-3"/>
+                                    <p>No recent admissions</p>
+                                </div>
+                                <div t-else="" class="admission_list">
+                                    <t t-foreach="state.recentAdmissions" t-as="admission" t-key="admission.id">
+                                        <div class="admission_item" t-on-click="() => this.openAdmission(admission.id)">
+                                            <div class="admission_info">
+                                                <div class="patient_name">
+                                                    <i class="fa fa-user"/>
+                                                    <t t-esc="admission.patient_name"/>
+                                                </div>
+                                                <div class="admission_details">
+                                                    <small>
+                                                        <i class="fa fa-bed"/>
+                                                        <t t-esc="admission.ward_name"/> - Bed <t t-esc="admission.bed_number"/>
+                                                    </small>
+                                                </div>
+                                                <div class="admission_date">
+                                                    <small>
+                                                        <i class="fa fa-calendar"/>
+                                                        <t t-esc="admission.admission_date"/>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            <div class="admission_status">
+                                                <span t-attf-class="badge bg-{{getStateColor(admission.state)}}">
+                                                    <t t-esc="admission.state"/>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Details Row -->
+                <div class="row">
+                    <!-- Critical Lab Results -->
+                    <div class="col-lg-4 mb-4">
+                        <div class="dashboard_card">
+                            <div class="card_header">
+                                <h5>
+                                    <i class="fa fa-exclamation-circle me-2 text-danger"/>Critical Lab Results
+                                </h5>
+                            </div>
+                            <div class="card_body">
+                                <div t-if="state.criticalLabResults.length === 0" class="text-center text-muted py-4">
+                                    <i class="fa fa-check-circle fa-3x mb-3 text-success"/>
+                                    <p>No critical results</p>
+                                </div>
+                                <div t-else="" class="critical_list">
+                                    <t t-foreach="state.criticalLabResults" t-as="lab" t-key="lab.id">
+                                        <div class="critical_item alert alert-danger" t-on-click="() => this.openLabRequest(lab.id)">
+                                            <div class="fw-bold">
+                                                <i class="fa fa-user"/>
+                                                <t t-esc="lab.patient_name"/>
+                                            </div>
+                                            <div>
+                                                <small>
+                                                    <i class="fa fa-flask"/>
+                                                    <t t-esc="lab.test_name"/>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Surgeries -->
+                    <div class="col-lg-4 mb-4">
+                        <div class="dashboard_card">
+                            <div class="card_header">
+                                <h5>
+                                    <i class="fa fa-medkit me-2"/>Upcoming Surgeries
+                                </h5>
+                            </div>
+                            <div class="card_body">
+                                <div t-if="state.upcomingSurgeries.length === 0" class="text-center text-muted py-4">
+                                    <i class="fa fa-medkit fa-3x mb-3"/>
+                                    <p>No upcoming surgeries</p>
+                                </div>
+                                <div t-else="" class="surgery_list">
+                                    <t t-foreach="state.upcomingSurgeries" t-as="surgery" t-key="surgery.id">
+                                        <div class="surgery_item" t-on-click="() => this.openSurgery(surgery.id)">
+                                            <div class="surgery_info">
+                                                <div class="fw-bold">
+                                                    <i class="fa fa-user"/>
+                                                    <t t-esc="surgery.patient_name"/>
+                                                </div>
+                                                <div>
+                                                    <small>
+                                                        <t t-esc="surgery.surgery_name"/>
+                                                    </small>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted">
+                                                        <i class="fa fa-calendar"/>
+                                                        <t t-esc="surgery.surgery_date"/>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Low Stock Medicines -->
+                    <div class="col-lg-4 mb-4">
+                        <div class="dashboard_card">
+                            <div class="card_header">
+                                <h5>
+                                    <i class="fa fa-exclamation-triangle me-2 text-warning"/>Low Stock Alert
+                                </h5>
+                            </div>
+                            <div class="card_body">
+                                <div t-if="state.lowStockMedicines.length === 0" class="text-center text-muted py-4">
+                                    <i class="fa fa-check-circle fa-3x mb-3 text-success"/>
+                                    <p>All medicines in stock</p>
+                                </div>
+                                <div t-else="" class="stock_list">
+                                    <t t-foreach="state.lowStockMedicines" t-as="medicine" t-key="medicine.id">
+                                        <div class="stock_item alert alert-warning">
+                                            <div class="fw-bold">
+                                                <t t-esc="medicine.name"/>
+                                            </div>
+                                            <div>
+                                                <small>
+                                                    Available: <t t-esc="medicine.quantity_available"/>
+                                                    / Min: <t t-esc="medicine.min_stock_level"/>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

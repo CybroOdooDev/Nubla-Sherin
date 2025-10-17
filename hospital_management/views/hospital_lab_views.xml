@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Lab Test Tree View -->
+    <record id="view_hospital_lab_test_tree" model="ir.ui.view">
+        <field name="name">hospital.lab.test.tree</field>
+        <field name="model">hospital.lab.test</field>
+        <field name="arch" type="xml">
+            <list string="Lab Tests">
+                <field name="test_code"/>
+                <field name="name"/>
+                <field name="test_type"/>
+                <field name="category_id"/>
+                <field name="price"/>
+                <field name="processing_time"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Lab Test Form View -->
+    <record id="view_hospital_lab_test_form" model="ir.ui.view">
+        <field name="name">hospital.lab.test.form</field>
+        <field name="model">hospital.lab.test</field>
+        <field name="arch" type="xml">
+            <form string="Lab Test">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="test_code"/>
+                            <field name="category_id"/>
+                            <field name="test_type"/>
+                        </group>
+                        <group>
+                            <field name="price"/>
+                            <field name="processing_time"/>
+                            <field name="department_id"/>
+                        </group>
+                    </group>
+                    <group string="Sample Information">
+                        <field name="sample_type"/>
+                        <field name="sample_quantity"/>
+                        <field name="preparation_instructions"/>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Test Parameters">
+                            <field name="parameter_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="unit"/>
+                                    <field name="normal_range_min"/>
+                                    <field name="normal_range_max"/>
+                                    <field name="reference_range"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Lab Request Tree View -->
+    <record id="view_hospital_lab_request_tree" model="ir.ui.view">
+        <field name="name">hospital.lab.request.tree</field>
+        <field name="model">hospital.lab.request</field>
+        <field name="arch" type="xml">
+            <list string="Lab Requests" decoration-danger="is_critical">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="test_id"/>
+                <field name="request_date"/>
+                <field name="priority" widget="priority"/>
+                <field name="state" widget="badge"/>
+                <field name="is_critical" invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Lab Request Form View -->
+    <record id="view_hospital_lab_request_form" model="ir.ui.view">
+        <field name="name">hospital.lab.request.form</field>
+        <field name="model">hospital.lab.request</field>
+        <field name="arch" type="xml">
+            <form string="Lab Request">
+                <header>
+                    <button name="action_request" string="Submit Request" type="object"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_collect_sample" string="Collect Sample" type="object"
+                            class="oe_highlight" invisible="state != 'requested'"/>
+                    <button name="action_in_progress" string="Start Processing" type="object"
+                            class="oe_highlight" invisible="state != 'sample_collected'"/>
+                    <button name="action_complete" string="Complete" type="object"
+                            class="oe_highlight" invisible="state != 'in_progress'"/>
+                    <button name="action_print_report" string="Print Report" type="object"
+                            class="btn-primary" invisible="state != 'completed'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ['completed', 'cancelled']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,requested,sample_collected,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Patient Information">
+                            <field name="patient_id"/>
+                            <field name="doctor_id"/>
+                            <field name="consultation_id"/>
+                        </group>
+                        <group string="Test Information">
+                            <field name="test_id"/>
+                            <field name="request_date"/>
+                            <field name="priority"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Sample Information" invisible="state == 'draft'">
+                            <field name="sample_collected" readonly="1"/>
+                            <field name="collection_date" readonly="1"/>
+                            <field name="collected_by" readonly="1"/>
+                            <field name="sample_id"/>
+                        </group>
+                        <group string="Completion" invisible="state != 'completed'">
+                            <field name="completed_date" readonly="1"/>
+                            <field name="completed_by" readonly="1"/>
+                            <field name="verified_by"/>
+                        </group>
+                    </group>
+                    <group string="Clinical Information">
+                        <field name="clinical_notes" placeholder="Clinical notes..."/>
+                        <field name="diagnosis" placeholder="Provisional diagnosis..."/>
+                    </group>
+
+                    <notebook>
+                        <page string="Results" invisible="state in ['draft', 'requested']">
+                            <field name="result_ids">
+                                <list editable="bottom" decoration-danger="is_critical" decoration-warning="is_abnormal">
+                                    <field name="parameter_id"/>
+                                    <field name="result_value"/>
+                                    <field name="unit" readonly="1"/>
+                                    <field name="reference_range" readonly="1"/>
+                                    <field name="is_abnormal"/>
+                                    <field name="is_critical"/>
+                                    <field name="remarks"/>
+                                </list>
+                            </field>
+                            <group>
+                                <field name="final_result" placeholder="Final result summary..."/>
+                                <field name="interpretation" placeholder="Interpretation..."/>
+                            </group>
+                        </page>
+                        <page string="Critical Alert" invisible="not is_critical">
+                            <group>
+                                <field name="is_critical"/>
+                                <field name="critical_alert_sent" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Lab Request Search View -->
+    <record id="view_hospital_lab_request_search" model="ir.ui.view">
+        <field name="name">hospital.lab.request.search</field>
+        <field name="model">hospital.lab.request</field>
+        <field name="arch" type="xml">
+            <search string="Search Lab Requests">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="test_id"/>
+                <filter string="Today" name="today"
+                        domain="[('request_date', '&gt;=', datetime.datetime.now().replace(hour=0, minute=0, second=0)),
+                                ('request_date', '&lt;=', datetime.datetime.now().replace(hour=23, minute=59, second=59))]"/>
+                <filter string="Requested" name="requested" domain="[('state', '=', 'requested')]"/>
+                <filter string="Sample Collected" name="collected" domain="[('state', '=', 'sample_collected')]"/>
+                <filter string="In Progress" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Completed" name="completed" domain="[('state', '=', 'completed')]"/>
+                <separator/>
+                <filter string="Critical" name="critical" domain="[('is_critical', '=', True)]"/>
+                <filter string="Urgent" name="urgent" domain="[('priority', '=', 'urgent')]"/>
+                <filter string="STAT" name="stat" domain="[('priority', '=', 'stat')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Test" name="group_test" context="{'group_by': 'test_id'}"/>
+                    <filter string="Doctor" name="group_doctor" context="{'group_by': 'doctor_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+
+
+</odoo>

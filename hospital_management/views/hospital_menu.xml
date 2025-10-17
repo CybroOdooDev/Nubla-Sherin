@@ -1,0 +1,251 @@
+<odoo>
+    <!-- MAIN MENU ROOT -->
+    <menuitem id="menu_hospital_root"
+              name="Hospital Management"
+              sequence="1"/>
+
+
+    <!-- Patients -->
+    <record id="action_hospital_patient" model="ir.actions.act_window">
+        <field name="name">Patients</field>
+        <field name="res_model">hospital.patient</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add your first patient record</p>
+        </field>
+    </record>
+     <menuitem id="menu_hospital"
+              name="Hospital Management"
+               parent="menu_hospital_root"
+              sequence="1"/>
+
+    <menuitem id="menu_hospital_patient"
+              name="Patients"
+              parent="menu_hospital"
+              action="action_hospital_patient"
+              sequence="10"/>
+
+    <!-- Doctors -->
+    <record id="action_hospital_doctor" model="ir.actions.act_window">
+        <field name="name">Doctors</field>
+        <field name="res_model">hospital.doctor</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_available': 1}</field>
+    </record>
+
+    <menuitem id="menu_hospital_doctor"
+              name="Doctors"
+              parent="menu_hospital"
+              action="action_hospital_doctor"
+              sequence="20"/>
+
+
+    <!-- Appointments -->
+    <record id="action_hospital_appointment" model="ir.actions.act_window">
+        <field name="name">Appointments</field>
+        <field name="res_model">hospital.appointment</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="search_view_id" ref="view_hospital_appointment_search"/>
+        <field name="context">{'search_default_today': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Schedule a new appointment</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_hospital_appointment"
+              name="Appointments"
+              parent="menu_hospital"
+              action="action_hospital_appointment"
+              sequence="30"/>
+
+    <!-- Consultations -->
+    <record id="action_hospital_consultation" model="ir.actions.act_window">
+        <field name="name">Consultations</field>
+        <field name="res_model">hospital.consultation</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record a new consultation</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_hospital_consultation"
+              name="Consultations"
+              parent="menu_hospital"
+              action="action_hospital_consultation"
+              sequence="40"/>
+
+    <!-- Surgeries -->
+    <record id="action_hospital_surgery" model="ir.actions.act_window">
+        <field name="name">Surgeries</field>
+        <field name="res_model">hospital.surgery</field>
+        <field name="view_mode">list,form,calendar</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Schedule a new surgery</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_hospital_surgery"
+              name="Surgeries"
+              parent="menu_hospital_root"
+              action="action_hospital_surgery"
+              sequence="50"/>
+
+
+
+    <menuitem id="menu_hospital_admission_root"
+              name="Admissions  Wards"
+              parent="menu_hospital_root"
+              sequence="60"/>
+
+    <!-- Admissions -->
+    <record id="action_hospital_admission" model="ir.actions.act_window">
+        <field name="name">Admissions</field>
+        <field name="res_model">hospital.admission</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_hospital_admission"
+              name="Admissions"
+              parent="menu_hospital_admission_root"
+              action="action_hospital_admission"
+              sequence="10"/>
+
+    <!-- Wards -->
+    <record id="action_hospital_ward" model="ir.actions.act_window">
+        <field name="name">Wards</field>
+        <field name="res_model">hospital.ward</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_hospital_ward"
+              name="Wards"
+              parent="menu_hospital_admission_root"
+              action="action_hospital_ward"
+              sequence="20"/>
+
+    <!-- Beds -->
+    <record id="action_hospital_bed" model="ir.actions.act_window">
+        <field name="name">Beds</field>
+        <field name="res_model">hospital.bed</field>
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+
+    <menuitem id="menu_hospital_bed"
+              name="Beds"
+              parent="menu_hospital_admission_root"
+              action="action_hospital_bed"
+              sequence="30"/>
+
+
+
+    <menuitem id="menu_hospital_pharmacy_root"
+              name="Pharmacy  Lab"
+              parent="menu_hospital_root"
+              sequence="70"/>
+
+    <!-- Pharmacy -->
+    <record id="action_hospital_medicine" model="ir.actions.act_window">
+        <field name="name">Medicines</field>
+        <field name="res_model">hospital.medicine</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_hospital_medicine_search"/>
+    </record>
+
+    <menuitem id="menu_hospital_medicine"
+              name="Medicines"
+              parent="menu_hospital_pharmacy_root"
+              action="action_hospital_medicine"
+              sequence="10"/>
+
+    <!-- Prescriptions -->
+    <record id="action_hospital_prescription" model="ir.actions.act_window">
+        <field name="name">Prescriptions</field>
+        <field name="res_model">hospital.prescription</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_hospital_prescription_search"/>
+    </record>
+
+    <menuitem id="menu_hospital_prescription"
+              name="Prescriptions"
+              parent="menu_hospital_pharmacy_root"
+              action="action_hospital_prescription"
+              sequence="20"/>
+
+    <!-- Laboratory -->
+    <record id="action_hospital_lab_test" model="ir.actions.act_window">
+        <field name="name">Lab Test Catalog</field>
+        <field name="res_model">hospital.lab.test</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_hospital_lab_test"
+              name="Lab Test Catalog"
+              parent="menu_hospital_pharmacy_root"
+              action="action_hospital_lab_test"
+              sequence="30"/>
+
+    <record id="action_hospital_lab_request" model="ir.actions.act_window">
+        <field name="name">Lab Requests</field>
+        <field name="res_model">hospital.lab.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_hospital_lab_request"
+              name="Lab Requests"
+              parent="menu_hospital_pharmacy_root"
+              action="action_hospital_lab_request"
+              sequence="40"/>
+
+
+
+    <menuitem id="menu_hospital_billing_root"
+              name="Billing  Insurance"
+              parent="menu_hospital_root"
+              sequence="80"/>
+
+    <!-- Invoices -->
+    <record id="action_hospital_invoice" model="ir.actions.act_window">
+        <field name="name">Invoices</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('move_type','=','out_invoice'),('is_hospital_invoice','=',True)]</field>
+    </record>
+
+    <menuitem id="menu_hospital_invoice"
+              name="Invoices"
+              parent="menu_hospital_billing_root"
+              action="action_hospital_invoice"
+              sequence="10"/>
+
+    <!-- Insurance -->
+    <menuitem id="menu_hospital_insurance"
+              name="Insurance Companies"
+              parent="menu_hospital_billing_root"
+              action="action_hospital_insurance"
+              sequence="20"/>
+
+    <menuitem id="menu_hospital_insurance_claim"
+              name="Insurance Claims"
+              parent="menu_hospital_billing_root"
+              action="action_hospital_insurance_claim"
+              sequence="30"/>
+
+
+    <menuitem id="menu_hospital_config_root"
+              name="Configuration"
+              parent="menu_hospital_root"
+              sequence="90"/>
+
+    <!-- Departments -->
+    <record id="action_hospital_department" model="ir.actions.act_window">
+        <field name="name">Departments</field>
+        <field name="res_model">hospital.department</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_hospital_department"
+              name="Departments"
+              parent="menu_hospital_config_root"
+              action="action_hospital_department"
+              sequence="10"/>
+</odoo>

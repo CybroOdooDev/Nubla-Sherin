@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Extend the standard invoice report for hospital-specific information -->
+    <template id="report_invoice_document_hospital" inherit_id="account.report_invoice_document">
+        <xpath expr="//span[@name='payment_term']"  position="after">
+            <div t-if="o.patient_id" class="row">
+                <div class="col-12">
+                    <strong>Patient Information:</strong><br/>
+                    Patient Name: <span t-field="o.patient_id.name"/><br/>
+                    Patient ID: <span t-field="o.patient_id.patient_id"/><br/>
+                    <span t-if="o.admission_id">
+                        Admission: <span t-field="o.admission_id.name"/><br/>
+                    </span>
+                    <span t-if="o.consultation_id">
+                        Consultation: <span t-field="o.consultation_id.name"/><br/>
+                    </span>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Appointment Confirmation Email -->
+        <record id="email_template_appointment_confirmation" model="mail.template">
+            <field name="name">Appointment Confirmation</field>
+            <field name="model_id" ref="model_hospital_appointment"/>
+            <field name="subject">Appointment Confirmation - ${object.name}</field>
+            <field name="email_from">${(object.company_id.email or user.email)|safe}</field>
+            <field name="email_to">${object.patient_email}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #3498db;">Appointment Confirmation</h2>
+
+                    <p>Dear ${object.patient_id.name},</p>
+
+                    <p>Your appointment has been confirmed with the following details:</p>
+
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Appointment ID:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${object.name}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Doctor:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">Dr. ${object.doctor_id.name}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Department:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${object.department_id.name}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Date:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${object.appointment_date}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Time:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${object.appointment_time}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Queue Number:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${object.queue_number}</td>
+                        </tr>
+                    </table>
+
+                    <p><strong>Important Notes:</strong></p>
+                    <ul>
+                        <li>Please arrive 15 minutes before your appointment time</li>
+                        <li>Bring all relevant medical records and previous prescriptions</li>
+                        <li>If you need to reschedule, please contact us at least 24 hours in advance</li>
+                    </ul>
+
+                    <p>Thank you for choosing our hospital.</p>
+
+                    <p>Best regards,<br/>
+                    ${object.company_id.name}</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Lab Result Ready Email -->
+        <record id="email_template_lab_result_ready" model="mail.template">
+            <field name="name">Lab Result Ready</field>
+            <field name="model_id" ref="model_hospital_lab_request"/>
+            <field name="subject">Lab Results Ready - ${object.name}</field>
+            <field name="email_from">${(object.company_id.email or user.email)|safe}</field>
+            <field name="email_to">${object.patient_id.email}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #3498db;">Lab Results Ready</h2>
+
+                    <p>Dear ${object.patient_id.name},</p>
+
+                    <p>Your lab test results are now ready.</p>
+
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Test:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${object.test_id.name}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Request ID:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${object.name}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Test Date:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${object.collection_date}</td>
+                        </tr>
+                    </table>
+
+                    <p>Please contact your doctor to discuss the results or visit the hospital to collect your report.</p>
+
+                    <p>Best regards,<br/>
+                    ${object.company_id.name}</p>
+                </div>
+            </field>
+        </record>
+
+                <!-- Appointment Reminder (add to existing file) -->
+        <record id="email_template_appointment_reminder" model="mail.template">
+            <field name="name">Appointment Reminder</field>
+            <field name="model_id" ref="model_hospital_appointment"/>
+            <field name="subject">Appointment Reminder - Tomorrow</field>
+            <field name="email_from">${(object.company_id.email or user.email)|safe}</field>
+            <field name="email_to">${object.patient_email}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #3498db;">Appointment Reminder</h2>
+
+                    <p>Dear ${object.patient_id.name},</p>
+
+                    <p>This is a reminder for your appointment tomorrow:</p>
+
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
+                        <p style="margin: 5px 0;"><strong>Doctor:</strong> Dr. ${object.doctor_id.name}</p>
+                        <p style="margin: 5px 0;"><strong>Date:</strong> ${object.appointment_date}</p>
+                        <p style="margin: 5px 0;"><strong>Time:</strong> ${object.appointment_time}</p>
+                        <p style="margin: 5px 0;"><strong>Department:</strong> ${object.department_id.name}</p>
+                    </div>
+
+                    <p><strong>Please remember to:</strong></p>
+                    <ul>
+                        <li>Arrive 15 minutes before your appointment</li>
+                        <li>Bring your medical records</li>
+                        <li>Bring your insurance card if applicable</li>
+                    </ul>
+
+                    <p>If you need to reschedule, please contact us immediately.</p>
+
+                    <p>Best regards,<br/>
+                    ${object.company_id.name}</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Surgery Scheduled Email -->
+        <record id="email_template_surgery_scheduled" model="mail.template">
+            <field name="name">Surgery Scheduled</field>
+            <field name="model_id" ref="model_hospital_surgery"/>
+            <field name="subject">Surgery Scheduled - ${object.surgery_name}</field>
+            <field name="email_from">${(object.company_id.email or user.email)|safe}</field>
+            <field name="email_to">${object.patient_id.email}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #3498db;">Surgery Scheduled</h2>
+
+                    <p>Dear ${object.patient_id.name},</p>
+
+                    <p>Your surgery has been scheduled with the following details:</p>
+
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Surgery:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${object.surgery_name}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Surgeon:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">Dr. ${object.doctor_id.name}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Date  Time:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${object.surgery_date}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Operation Theater:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${object.ot_id.name}</td>
+                        </tr>
+                    </table>
+
+                    <div style="background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
+                        <p style="margin: 0;"><strong>Pre-operative Instructions:</strong></p>
+                        <p style="margin: 10px 0 0 0;">${object.pre_operative_notes or 'Please follow the pre-operative instructions provided by your doctor.'}</p>
+                    </div>
+
+                    <p>Please contact us if you have any questions or concerns.</p>
+
+                    <p>Best regards,<br/>
+                    ${object.company_id.name}</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Admission Notification -->
+        <record id="email_template_admission_confirmation" model="mail.template">
+            <field name="name">Admission Confirmation</field>
+            <field name="model_id" ref="model_hospital_admission"/>
+            <field name="subject">Admission Confirmation - ${object.name}</field>
+            <field name="email_from">${(object.company_id.email or user.email)|safe}</field>
+            <field name="email_to">${object.patient_id.email}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #3498db;">Admission Confirmation</h2>
+
+                    <p>Dear ${object.patient_id.name},</p>
+
+                    <p>You have been admitted to our hospital. Here are your admission details:</p>
+
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Admission ID:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${object.name}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Ward:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${object.ward_id.name}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Bed Number:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${object.bed_id.bed_number}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Attending Doctor:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">Dr. ${object.doctor_id.name}</td>
+                        </tr>
+                    </table>
+
+                    <p>Our staff will take care of you during your stay. If you have any concerns, please don't hesitate to ask.</p>
+
+                    <p>Get well soon!<br/>
+                    ${object.company_id.name}</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Prescription Ready Email -->
+        <record id="email_template_prescription_ready" model="mail.template">
+            <field name="name">Prescription Ready</field>
+            <field name="model_id" ref="model_hospital_prescription"/>
+            <field name="subject">Prescription Ready for Collection - ${object.name}</field>
+            <field name="email_from">${(object.company_id.email or user.email)|safe}</field>
+            <field name="email_to">${object.patient_id.email}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #3498db;">Prescription Ready</h2>
+
+                    <p>Dear ${object.patient_id.name},</p>
+
+                    <p>Your prescription is ready for collection at our pharmacy.</p>
+
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Prescription ID:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${object.name}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Doctor:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">Dr. ${object.doctor_id.name}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Date:</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${object.prescription_date}</td>
+                        </tr>
+                    </table>
+
+                    <p>Please bring your ID for verification when collecting your medicines.</p>
+
+                    <p>Pharmacy Hours: 8:00 AM - 8:00 PM (Monday - Saturday)</p>
+
+                    <p>Best regards,<br/>
+                    ${object.company_id.name}</p>
+                </div>
+            </field>
+        </record>
+
+    </data>
+</odoo>

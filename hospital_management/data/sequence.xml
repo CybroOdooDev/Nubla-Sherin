@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Patient Sequence -->
+        <record id="seq_hospital_patient" model="ir.sequence">
+            <field name="name">Hospital Patient</field>
+            <field name="code">hospital.patient</field>
+            <field name="prefix">PAT</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Appointment Sequence -->
+        <record id="seq_hospital_appointment" model="ir.sequence">
+            <field name="name">Hospital Appointment</field>
+            <field name="code">hospital.appointment</field>
+            <field name="prefix">APT</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Doctor Sequence -->
+        <record id="seq_hospital_doctor" model="ir.sequence">
+            <field name="name">Hospital Doctor</field>
+            <field name="code">hospital.doctor</field>
+            <field name="prefix">DOC</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Consultation Sequence -->
+        <record id="seq_hospital_consultation" model="ir.sequence">
+            <field name="name">Hospital Consultation</field>
+            <field name="code">hospital.consultation</field>
+            <field name="prefix">CON</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Prescription Sequence -->
+        <record id="seq_hospital_prescription" model="ir.sequence">
+            <field name="name">Hospital Prescription</field>
+            <field name="code">hospital.prescription</field>
+            <field name="prefix">PRE</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Lab Request Sequence -->
+        <record id="seq_hospital_lab_request" model="ir.sequence">
+            <field name="name">Lab Request</field>
+            <field name="code">hospital.lab.request</field>
+            <field name="prefix">LAB</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Admission Sequence -->
+        <record id="seq_hospital_admission" model="ir.sequence">
+            <field name="name">Hospital Admission</field>
+            <field name="code">hospital.admission</field>
+            <field name="prefix">ADM</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Surgery Sequence -->
+        <record id="seq_hospital_surgery" model="ir.sequence">
+            <field name="name">Hospital Surgery</field>
+            <field name="code">hospital.surgery</field>
+            <field name="prefix">SUR</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Insurance Claim Sequence -->
+        <record id="seq_hospital_insurance_claim" model="ir.sequence">
+            <field name="name">Insurance Claim</field>
+            <field name="code">hospital.insurance.claim</field>
+            <field name="prefix">CLM</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

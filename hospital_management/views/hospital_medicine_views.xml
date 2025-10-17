@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Medicine Tree View -->
+    <record id="view_hospital_medicine_tree" model="ir.ui.view">
+        <field name="name">hospital.medicine.tree</field>
+        <field name="model">hospital.medicine</field>
+        <field name="arch" type="xml">
+            <list string="Medicines" decoration-danger="is_below_min_stock">
+                <field name="medicine_code"/>
+                <field name="name"/>
+                <field name="generic_name"/>
+                <field name="medicine_type"/>
+                <field name="category_id"/>
+                <field name="quantity_available"/>
+                <field name="cost_price"/>
+                <field name="sale_price"/>
+                <field name="is_below_min_stock" invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Medicine Form View -->
+    <record id="view_hospital_medicine_form" model="ir.ui.view">
+        <field name="name">hospital.medicine.form</field>
+        <field name="model">hospital.medicine</field>
+        <field name="arch" type="xml">
+            <form string="Medicine">
+                <header>
+                    <button name="action_reorder" string="Reorder" type="object"
+                            class="btn-warning" invisible="not is_below_min_stock"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_batches"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-cubes">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Batches</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Medicine Name" required="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Basic Information">
+                            <field name="medicine_code"/>
+                            <field name="generic_name"/>
+                            <field name="category_id"/>
+                            <field name="medicine_type"/>
+                        </group>
+                        <group string="Manufacturer">
+                            <field name="manufacturer"/>
+                            <field name="supplier_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Strength &amp; Composition">
+                            <field name="strength"/>
+                            <field name="composition"/>
+                        </group>
+                        <group string="Stock Information">
+                            <field name="quantity_available"/>
+                            <field name="unit_of_measure"/>
+                            <field name="min_stock_level"/>
+                            <field name="reorder_level"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Pricing">
+                            <field name="cost_price"/>
+                            <field name="sale_price"/>
+                            <field name="margin"/>
+                        </group>
+                        <group string="Compliance">
+                            <field name="requires_prescription"/>
+                            <field name="controlled_substance"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Additional Information">
+                            <group>
+                                <field name="storage_condition" placeholder="Storage conditions..."/>
+                                <field name="side_effects" placeholder="Known side effects..."/>
+                                <field name="contraindications" placeholder="Contraindications..."/>
+                                <field name="usage_instructions" placeholder="Usage instructions..."/>
+                            </group>
+                        </page>
+                        <page string="Batches">
+                            <field name="batch_ids">
+                                <list decoration-danger="is_expired" decoration-warning="days_to_expiry &lt; 90">
+                                    <field name="batch_number"/>
+                                    <field name="manufacturing_date"/>
+                                    <field name="expiry_date"/>
+                                    <field name="quantity"/>
+                                    <field name="days_to_expiry"/>
+                                    <field name="is_expired" invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Medicine Search View -->
+    <record id="view_hospital_medicine_search" model="ir.ui.view">
+        <field name="name">hospital.medicine.search</field>
+        <field name="model">hospital.medicine</field>
+        <field name="arch" type="xml">
+            <search string="Search Medicines">
+                <field name="name"/>
+                <field name="generic_name"/>
+                <field name="medicine_code"/>
+                <field name="category_id"/>
+                <filter string="Low Stock" name="low_stock" domain="[('is_below_min_stock', '=', True)]"/>
+                <filter string="Requires Prescription" name="prescription" domain="[('requires_prescription', '=', True)]"/>
+                <filter string="Controlled Substance" name="controlled" domain="[('controlled_substance', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Category" name="group_category" context="{'group_by': 'category_id'}"/>
+                    <filter string="Type" name="group_type" context="{'group_by': 'medicine_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Medicine Action -->
+
+
+</odoo>

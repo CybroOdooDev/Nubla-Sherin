@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_patient_card">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Patient Information Card</h2>
+
+                        <div class="row mt32">
+                            <div class="col-8">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Patient ID:</strong></td>
+                                        <td><span t-field="o.patient_id"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Name:</strong></td>
+                                        <td><span t-field="o.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Age:</strong></td>
+                                        <td><span t-field="o.age"/> years</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Gender:</strong></td>
+                                        <td><span t-field="o.gender"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Blood Group:</strong></td>
+                                        <td><span t-field="o.blood_group"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Phone:</strong></td>
+                                        <td><span t-field="o.phone"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Email:</strong></td>
+                                        <td><span t-field="o.email"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-4">
+                                <img t-if="o.image" t-att-src="image_data_uri(o.image)"
+                                     style="max-height: 200px;" alt="Patient Photo"/>
+                            </div>
+                        </div>
+
+                        <div class="row mt32" t-if="o.allergies or o.chronic_conditions">
+                            <div class="col-12">
+                                <h4>Medical Alerts</h4>
+                                <div t-if="o.allergies" class="alert alert-danger">
+                                    <strong>Allergies:</strong> <span t-field="o.allergies"/>
+                                </div>
+                                <div t-if="o.chronic_conditions" class="alert alert-warning">
+                                    <strong>Chronic Conditions:</strong> <span t-field="o.chronic_conditions"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt32">
+                            <div class="col-12">
+                                <h4>Emergency Contact</h4>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Name:</strong></td>
+                                        <td><span t-field="o.emergency_contact_name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Phone:</strong></td>
+                                        <td><span t-field="o.emergency_contact_phone"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Relationship:</strong></td>
+                                        <td><span t-field="o.emergency_contact_relation"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

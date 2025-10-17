@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Ward Tree View -->
+    <record id="view_hospital_ward_tree" model="ir.ui.view">
+        <field name="name">hospital.ward.tree</field>
+        <field name="model">hospital.ward</field>
+        <field name="arch" type="xml">
+            <list string="Wards">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="ward_type"/>
+                <field name="department_id"/>
+                <field name="total_beds"/>
+                <field name="occupied_beds"/>
+                <field name="available_beds"/>
+                <field name="occupancy_rate" widget="progressbar"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Ward Form View -->
+    <record id="view_hospital_ward_form" model="ir.ui.view">
+        <field name="name">hospital.ward.form</field>
+        <field name="model">hospital.ward</field>
+        <field name="arch" type="xml">
+            <form string="Ward">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Ward Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="ward_type"/>
+                            <field name="department_id"/>
+                        </group>
+                        <group>
+                            <field name="floor_number"/>
+                            <field name="building"/>
+                            <field name="daily_charge"/>
+                        </group>
+                    </group>
+                    <group string="Facilities">
+                        <group>
+                            <field name="has_oxygen"/>
+                            <field name="has_monitor"/>
+                        </group>
+                        <group>
+                            <field name="has_ventilator"/>
+                            <field name="nurse_in_charge"/>
+                        </group>
+                    </group>
+                    <group string="Bed Statistics">
+                        <group>
+                            <field name="total_beds"/>
+                            <field name="occupied_beds"/>
+                        </group>
+                        <group>
+                            <field name="available_beds"/>
+                            <field name="occupancy_rate" widget="progressbar"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Beds">
+                            <field name="bed_ids">
+                                <list decoration-success="state=='available'"
+                                      decoration-danger="state=='occupied'"
+                                      decoration-warning="state=='maintenance'">
+                                    <field name="bed_number"/>
+                                    <field name="bed_type"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="current_patient_id"/>
+                                    <button name="action_set_maintenance" string="Maintenance"
+                                            type="object" icon="fa-wrench"
+                                            invisible="state != 'available'"/>
+                                    <button name="action_set_available" string="Set Available"
+                                            type="object" icon="fa-check"
+                                            invisible="state != 'maintenance'"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Bed Tree View -->
+    <record id="view_hospital_bed_tree" model="ir.ui.view">
+        <field name="name">hospital.bed.tree</field>
+        <field name="model">hospital.bed</field>
+        <field name="arch" type="xml">
+            <list string="Beds" decoration-success="state=='available'"
+                  decoration-danger="state=='occupied'">
+                <field name="bed_number"/>
+                <field name="name"/>
+                <field name="ward_id"/>
+                <field name="bed_type"/>
+                <field name="state" widget="badge"/>
+                <field name="current_patient_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Bed Kanban View -->
+    <record id="view_hospital_bed_kanban" model="ir.ui.view">
+        <field name="name">hospital.bed.kanban</field>
+        <field name="model">hospital.bed</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="ward_id">
+                <field name="name"/>
+                <field name="bed_number"/>
+                <field name="state"/>
+                <field name="current_patient_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="bed_number"/>
+                                    </strong>
+                                </div>
+                                <span t-attf-class="badge badge-#{record.state.raw_value === 'available' ? 'success' : record.state.raw_value === 'occupied' ? 'danger' : 'warning'}">
+                                    <field name="state"/>
+                                </span>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <field name="name"/>
+                                <div t-if="record.current_patient_id.value">
+                                    <i class="fa fa-user"/> <field name="current_patient_id"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Admission Tree View -->
+    <record id="view_hospital_admission_tree" model="ir.ui.view">
+        <field name="name">hospital.admission.tree</field>
+        <field name="model">hospital.admission</field>
+        <field name="arch" type="xml">
+            <list string="Admissions">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="ward_id"/>
+                <field name="bed_id"/>
+                <field name="admission_date"/>
+                <field name="discharge_date"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Admission Form View -->
+    <record id="view_hospital_admission_form" model="ir.ui.view">
+        <field name="name">hospital.admission.form</field>
+        <field name="model">hospital.admission</field>
+        <field name="arch" type="xml">
+            <form string="Admission">
+                <header>
+                    <button name="action_admit" string="Admit Patient" type="object"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_discharge" string="Discharge Patient" type="object"
+                            class="oe_highlight" invisible="state != 'admitted'"/>
+                    <button name="action_transfer_bed" string="Transfer Bed" type="object"
+                            class="btn-primary" invisible="state != 'admitted'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ['discharged', 'cancelled']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,admitted,discharged"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Patient Information">
+                            <field name="patient_id"/>
+                            <field name="doctor_id"/>
+                            <field name="admission_type"/>
+                        </group>
+                        <group string="Bed Assignment">
+                            <field name="ward_id"/>
+                            <field name="bed_id" domain="[('ward_id', '=', ward_id)]"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Admission">
+                            <field name="admission_date"/>
+                            <field name="diagnosis"/>
+                        </group>
+                        <group string="Discharge" invisible="state != 'discharged'">
+                            <field name="discharge_date"/>
+                            <field name="discharge_type"/>
+                            <field name="duration_days"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Medical Information">
+                            <group>
+                                <field name="chief_complaint" placeholder="Chief complaint..."/>
+                                <field name="medical_history" placeholder="Relevant medical history..."/>
+                            </group>
+                        </page>
+
+                        <page string="Discharge Summary" invisible="state != 'discharged'">
+                            <group>
+                                <field name="discharge_diagnosis" placeholder="Discharge diagnosis..."/>
+                                <field name="follow_up_date"/>
+                            </group>
+                            <separator string="Discharge Summary"/>
+                            <field name="discharge_summary" nolabel="1"/>
+                            <separator string="Discharge Instructions"/>
+                            <field name="discharge_instructions" nolabel="1"/>
+                        </page>
+
+                        <page string="Consultations">
+                            <field name="consultation_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="doctor_id"/>
+                                    <field name="consultation_date"/>
+                                    <field name="diagnosis"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Prescriptions">
+                            <field name="prescription_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="doctor_id"/>
+                                    <field name="prescription_date"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Invoices">
+                            <field name="invoice_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="invoice_date"/>
+                                    <field name="amount_total"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                            <group>
+                                <field name="total_amount" widget="monetary"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+               <chatter/>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Doctor Tree View -->
+    <record id="view_hospital_doctor_tree" model="ir.ui.view">
+        <field name="name">hospital.doctor.tree</field>
+        <field name="model">hospital.doctor</field>
+        <field name="arch" type="xml">
+            <list string="Doctors">
+                <field name="doctor_id"/>
+                <field name="name"/>
+                <field name="specialization"/>
+                <field name="department_id"/>
+                <field name="phone"/>
+                <field name="consultation_fee"/>
+                <field name="on_leave" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Doctor Form View -->
+    <record id="view_hospital_doctor_form" model="ir.ui.view">
+        <field name="name">hospital.doctor.form</field>
+        <field name="model">hospital.doctor</field>
+        <field name="arch" type="xml">
+            <form string="Doctor">
+                <header>
+                    <button name="action_set_leave" string="Set On Leave" type="object"
+                            class="btn-warning" invisible="on_leave"/>
+                    <button name="action_unset_leave" string="Mark Available" type="object"
+                            class="btn-success" invisible="not on_leave"/>
+                    <field name="on_leave" widget="boolean_button"
+                           options="{'terminology': {'string_true': 'On Leave', 'string_false': 'Available'}}"/>
+                </header>
+                <sheet>
+                    <field name="image" widget="image" class="oe_avatar"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_appointments"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-calendar">
+                            <field name="appointment_count" widget="statinfo" string="Appointments"/>
+                        </button>
+                        <button name="%(action_hospital_consultation)d"
+                            type="action"
+                            class="oe_stat_button"
+                            icon="fa-stethoscope"
+                            context="{'search_default_doctor_id': id}">
+
+                            <field name="consultation_count" widget="statinfo" string="Consultations"/>
+                        </button>
+                        <button name="%(action_hospital_patient)d"
+                                type="action"
+                                class="oe_stat_button"
+                                icon="fa-users">
+                            <field name="patient_count" widget="statinfo" string="Patients"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Doctor Name" required="1"/>
+                        </h1>
+                        <h3>
+                            <field name="doctor_id" readonly="1"/>
+                        </h3>
+                    </div>
+                    <group>
+                        <group string="Professional Information">
+                            <field name="user_id"/>
+                            <field name="specialization"/>
+                            <field name="department_id"/>
+                            <field name="license_number"/>
+                            <field name="experience_years"/>
+                        </group>
+                        <group string="Contact Information">
+                            <field name="email"/>
+                            <field name="phone"/>
+                            <field name="mobile"/>
+                        </group>
+                    </group>
+                    <group string="Qualifications">
+                        <field name="qualification" nolabel="1"/>
+                    </group>
+                    <group>
+                        <group string="Consultation Fees">
+                            <field name="consultation_fee"/>
+                            <field name="follow_up_fee"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Weekly Schedule">
+                            <field name="schedule_ids">
+                                <list editable="bottom">
+                                    <field name="day_of_week"/>
+                                    <field name="start_time" widget="float_time"/>
+                                    <field name="end_time" widget="float_time"/>
+                                    <field name="slot_duration"/>
+                                    <field name="max_appointments"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Appointments">
+                            <field name="appointment_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="patient_id"/>
+                                    <field name="appointment_date"/>
+                                    <field name="appointment_time" widget="float_time"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Surgeries">
+                            <field name="surgery_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="patient_id"/>
+                                    <field name="surgery_name"/>
+                                    <field name="surgery_date"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Doctor Kanban View -->
+    <record id="view_hospital_doctor_kanban" model="ir.ui.view">
+        <field name="name">hospital.doctor.kanban</field>
+        <field name="model">hospital.doctor</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id"/>
+                <field name="name"/>
+                <field name="specialization"/>
+                <field name="department_id"/>
+                <field name="on_leave"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('hospital.doctor', 'image', record.id.raw_value)" alt="Doctor"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </strong>
+                                <div class="o_kanban_record_subtitle">
+                                    <field name="specialization"/>
+                                </div>
+                                <div>
+                                    <field name="department_id"/>
+                                </div>
+                                <div t-if="record.on_leave.raw_value" class="badge badge-warning">
+                                    On Leave
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Doctor Search View -->
+    <record id="view_hospital_doctor_search" model="ir.ui.view">
+        <field name="name">hospital.doctor.search</field>
+        <field name="model">hospital.doctor</field>
+        <field name="arch" type="xml">
+            <search string="Search Doctors">
+                <field name="name"/>
+                <field name="specialization"/>
+                <field name="department_id"/>
+                <filter string="Available" name="available" domain="[('on_leave', '=', False)]"/>
+                <filter string="On Leave" name="on_leave" domain="[('on_leave', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Department" name="group_department" context="{'group_by': 'department_id'}"/>
+                    <filter string="Specialization" name="group_specialization" context="{'group_by': 'specialization'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+
+</odoo>

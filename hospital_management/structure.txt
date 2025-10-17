@@ -1,0 +1,145 @@
+hospital_management/
+├── __init__.py
+├── __manifest__.py
+├── structure.txt
+│
+├── controllers/
+│   ├── __init__.py
+│   └── portal.py
+│
+├── models/
+│   ├── __init__.py
+│   ├── hospital_patient.py
+│   ├── hospital_appointment.py
+│   ├── hospital_doctor.py
+│   ├── hospital_department.py
+│   ├── hospital_consultation.py
+│   ├── hospital_prescription.py
+│   ├── hospital_medicine.py
+│   ├── hospital_lab.py
+│   ├── hospital_ward.py
+│   ├── hospital_insurance.py
+│   ├── hospital_surgery.py
+│   └── hospital_billing.py
+│
+├── views/
+│   ├── hospital_patient_views.xml
+│   ├── hospital_appointment_views.xml
+│   ├── hospital_doctor_views.xml
+│   ├── hospital_department_views.xml
+│   ├── hospital_consultation_views.xml
+│   ├── hospital_prescription_views.xml
+│   ├── hospital_medicine_views.xml
+│   ├── hospital_lab_views.xml
+│   ├── hospital_ward_views.xml
+│   ├── hospital_insurance_views.xml
+│   ├── hospital_surgery_views.xml
+│   ├── hospital_billing_views.xml
+│   ├── portal_templates.xml
+│   ├── templates.xml
+│   ├── report.xml
+│   ├── patient_report.xml
+│   ├── prescription_report.xml
+│   ├── invoice_report.xml
+│   ├── lab_result_report.xml
+│   └── discharge_summary_report.xml
+│
+├── wizards/
+│   ├── __init__.py
+│   ├── appointment_wizard.py
+│   ├── appointment_wizard_views.xml
+│   ├── discharge_wizard.py
+│   ├── discharge_wizard_views.xml
+│   ├── billing_wizard.py
+│   ├── billing_wizard_views.xml
+│   ├── bed_transfer_wizard.py
+│   └── bed_transfer_wizard_views.xml
+│
+├── security/
+│   ├── security.xml
+│   └── ir.model.access.csv
+│
+├── data/
+│   ├── sequence.xml
+│   ├── data.xml
+│   ├── email_templates.xml
+│   └── cron_jobs.xml
+│
+├── demo/
+│   └── hospital_management_data.xml
+│
+└── static/
+    ├── description/
+    └── src/
+        ├── css/
+        │   └── hospital_dashboard.js (misplaced - should be .css)
+        ├── js/
+        │   └── hospital_dashboard.js
+        └── xml/
+            └── hospital_dashboard.xml
+
+
+===============================================
+MODULE STRUCTURE ANALYSIS
+===============================================
+
+TOTAL FILES: 57
+
+PYTHON FILES (20):
+- Root: __init__.py, __manifest__.py
+- Controllers: __init__.py, portal.py
+- Models: 13 model files (12 actual + __init__.py)
+- Wizards: 5 files (4 wizard files + __init__.py)
+
+XML/VIEW FILES (24):
+- Patient Management: hospital_patient_views.xml
+- Appointment: hospital_appointment_views.xml
+- Doctor: hospital_doctor_views.xml
+- Department: hospital_department_views.xml
+- Consultation: hospital_consultation_views.xml
+- Prescription: hospital_prescription_views.xml
+- Medicine/Pharmacy: hospital_medicine_views.xml
+- Laboratory: hospital_lab_views.xml
+- Ward/Bed: hospital_ward_views.xml
+- Insurance: hospital_insurance_views.xml
+- Surgery: hospital_surgery_views.xml
+- Billing: hospital_billing_views.xml
+- Portal: portal_templates.xml, templates.xml
+- Reports: 5 report files
+- Wizards: 4 wizard view files
+
+DATA FILES (4):
+- sequence.xml: Auto-numbering sequences
+- data.xml: Master data
+- email_templates.xml: Email notifications
+- cron_jobs.xml: Scheduled tasks
+
+SECURITY FILES (2):
+- security.xml: User groups and roles
+- ir.model.access.csv: Access rights matrix
+
+STATIC ASSETS (3):
+- CSS: hospital_dashboard.js (incorrectly named)
+- JS: hospital_dashboard.js
+- XML: hospital_dashboard.xml
+
+DEMO FILES (1):
+- hospital_management_data.xml
+
+
+===============================================
+KEY MODELS:
+===============================================
+✓ hospital.patient - Patient master records
+✓ hospital.appointment - Appointment scheduling
+✓ hospital.doctor - Doctor profiles
+✓ hospital.department - Hospital departments
+✓ hospital.consultation - Medical consultations/EMR
+✓ hospital.prescription - Prescriptions
+✓ hospital.medicine - Medicine catalog
+✓ hospital.lab - Laboratory tests
+✓ hospital.ward - Ward & bed management
+✓ hospital.insurance - Insurance management
+✓ hospital.surgery - Surgical procedures
+✓ hospital.billing - Extends account.move for billing
+✗ hospital.admission - Referenced but not implemented

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Prescription Tree View -->
+    <record id="view_hospital_prescription_tree" model="ir.ui.view">
+        <field name="name">hospital.prescription.tree</field>
+        <field name="model">hospital.prescription</field>
+        <field name="arch" type="xml">
+            <list string="Prescriptions">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="prescription_date"/>
+                <field name="state" widget="badge"
+                       decoration-info="state=='draft'"
+                       decoration-success="state=='dispensed'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Prescription Form View -->
+<record id="view_hospital_prescription_form" model="ir.ui.view">
+    <field name="name">hospital.prescription.form</field>
+    <field name="model">hospital.prescription</field>
+    <field name="arch" type="xml">
+        <form string="Prescription">
+            <header>
+                <button name="action_prescribe" string="Confirm Prescription"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'draft'"/>
+                <button name="action_dispense" string="Dispense"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'prescribed'"/>
+                <button name="action_print_prescription" string="Print"
+                        type="object" class="btn-primary"
+                        invisible="state == 'draft'"/>
+                <button name="action_cancel" string="Cancel"
+                        type="object"
+                        invisible="state in ['dispensed', 'cancelled']"/>
+                <field name="state" widget="statusbar"
+                       statusbar_visible="draft,prescribed,dispensed"/>
+            </header>
+
+            <sheet>
+                <!-- Title -->
+                <div class="oe_title">
+                    <h1>
+                        <field name="name" readonly="1"/>
+                    </h1>
+                </div>
+
+                <!-- Patient and Doctor Info -->
+                <group>
+                    <group string="Patient Information">
+                        <field name="patient_id"/>
+                        <field name="consultation_id"/>
+                    </group>
+                    <group string="Doctor  Date">
+                        <field name="doctor_id"/>
+                        <field name="prescription_date"/>
+                    </group>
+                </group>
+
+                <!-- Validity Period -->
+                <group string="Validity">
+                    <field name="valid_from"/>
+                    <field name="valid_to"/>
+                </group>
+
+                <!-- Diagnosis -->
+                <group string="Diagnosis">
+                    <field name="diagnosis" nolabel="1" placeholder="Diagnosis..."/>
+                </group>
+
+                <!-- Notebook Tabs -->
+                <notebook>
+                    <!-- Medicines -->
+                    <page string="Medicines">
+                        <field name="prescription_line_ids">
+                            <list editable="bottom">
+                                <field name="medicine_id"/>
+                                <field name="dosage"/>
+                                <field name="frequency"/>
+                                <field name="custom_frequency" invisible="frequency != 'custom'"/>
+                                <field name="duration"/>
+                                <field name="before_food" widget="boolean_toggle"/>
+                                <field name="after_food" widget="boolean_toggle"/>
+                                <field name="quantity"/>
+                                <field name="total_quantity"/>
+                                <field name="unit_price" readonly="1"/>
+                                <field name="subtotal" readonly="1" sum="Total"/>
+                            </list>
+                        </field>
+                    </page>
+
+                    <!-- Special Instructions -->
+                    <page string="Special Instructions">
+                        <field name="notes" placeholder="Special instructions for patient..."/>
+                    </page>
+
+                    <!-- Dispensing Info -->
+                    <page string="Dispensing" invisible="state == 'draft'">
+
+                        <group>
+                            <field name="dispensed_by"/>
+                            <field name="dispensed_date"/>
+                        </group>
+                    </page>
+                </notebook>
+            </sheet>
+            <chatter/>
+
+        </form>
+    </field>
+</record>
+
+    <!-- Prescription Search View -->
+    <record id="view_hospital_prescription_search" model="ir.ui.view">
+        <field name="name">hospital.prescription.search</field>
+        <field name="model">hospital.prescription</field>
+        <field name="arch" type="xml">
+            <search string="Search Prescriptions">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Prescribed" name="prescribed" domain="[('state', '=', 'prescribed')]"/>
+                <filter string="Dispensed" name="dispensed" domain="[('state', '=', 'dispensed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Patient" name="group_patient" context="{'group_by': 'patient_id'}"/>
+                    <filter string="Doctor" name="group_doctor" context="{'group_by': 'doctor_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

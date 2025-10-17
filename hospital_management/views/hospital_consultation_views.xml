@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Consultation Tree View -->
+    <record id="view_hospital_consultation_tree" model="ir.ui.view">
+        <field name="name">hospital.consultation.tree</field>
+        <field name="model">hospital.consultation</field>
+        <field name="arch" type="xml">
+            <list string="Consultations">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="consultation_date"/>
+                <field name="diagnosis"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Consultation Form View -->
+    <record id="view_hospital_consultation_form" model="ir.ui.view">
+        <field name="name">hospital.consultation.form</field>
+        <field name="model">hospital.consultation</field>
+        <field name="arch" type="xml">
+            <form string="Consultation">
+                <header>
+                    <button name="action_complete" string="Complete" type="object"
+                            class="oe_highlight" invisible="state == 'completed'"/>
+                    <button name="action_create_prescription" string="Create Prescription"
+                            type="object" class="btn-primary"/>
+                    <button name="action_request_lab_test" string="Request Lab Test"
+                            type="object" class="btn-primary"/>
+                    <button name="action_create_invoice" string="Create Invoice"
+                            type="object" class="btn-success" invisible="is_invoiced"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Patient Information">
+                            <field name="patient_id"/>
+                            <field name="appointment_id"/>
+                        </group>
+                        <group string="Consultation Details">
+                            <field name="doctor_id"/>
+                            <field name="consultation_date"/>
+                            <field name="consultation_type"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Vitals">
+                            <group>
+                                <group string="Basic Vitals">
+                                    <field name="temperature"/>
+                                    <field name="pulse"/>
+                                    <field name="respiratory_rate"/>
+                                    <field name="oxygen_saturation"/>
+                                </group>
+                                <group string="Blood Pressure &amp; Measurements">
+                                    <label for="blood_pressure_systolic" string="Blood Pressure"/>
+                                    <div class="o_row">
+                                        <field name="blood_pressure_systolic" class="oe_inline"/>
+                                        <span>/</span>
+                                        <field name="blood_pressure_diastolic" class="oe_inline"/>
+                                        <span>mmHg</span>
+                                    </div>
+                                    <field name="weight"/>
+                                    <field name="height"/>
+                                    <field name="bmi"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="History &amp; Examination">
+                            <group>
+                                <field name="chief_complaint" placeholder="Chief complaint..."/>
+                                <field name="history_present_illness" placeholder="History of present illness..."/>
+                                <field name="physical_examination" placeholder="Physical examination findings..."/>
+                            </group>
+                        </page>
+
+                        <page string="Diagnosis &amp; Treatment">
+                            <group>
+                                <group>
+                                    <field name="provisional_diagnosis" placeholder="Provisional diagnosis..."/>
+                                    <field name="diagnosis" placeholder="Final diagnosis..."/>
+                                    <field name="icd10_code"/>
+                                </group>
+                                <group>
+                                    <field name="differential_diagnosis" placeholder="Differential diagnosis..."/>
+                                </group>
+                            </group>
+                            <separator string="Treatment Plan"/>
+                            <field name="treatment_plan" placeholder="Treatment plan and recommendations..."/>
+                            <separator string="Advice"/>
+                            <field name="advice" placeholder="Advice to patient..."/>
+                        </page>
+
+                        <page string="Follow-up">
+                            <group>
+                                <field name="follow_up_date"/>
+                                <field name="follow_up_instructions" placeholder="Follow-up instructions..."/>
+                            </group>
+                        </page>
+
+                        <page string="Prescriptions">
+                            <field name="prescription_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="prescription_date"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Lab Requests">
+                            <field name="lab_request_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="test_id"/>
+                                    <field name="request_date"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Attachments">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+
+                        <page string="Progress Notes">
+                            <field name="progress_notes" placeholder="Progress notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Consultation Search View -->
+    <record id="view_hospital_consultation_search" model="ir.ui.view">
+        <field name="name">hospital.consultation.search</field>
+        <field name="model">hospital.consultation</field>
+        <field name="arch" type="xml">
+            <search string="Search Consultations">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <filter string="Today" name="today"
+                        domain="[('consultation_date', '&gt;=', datetime.datetime.now().replace(hour=0, minute=0, second=0)),
+                                ('consultation_date', '&lt;=', datetime.datetime.now().replace(hour=23, minute=59, second=59))]"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="In Progress" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Completed" name="completed" domain="[('state', '=', 'completed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Patient" name="group_patient" context="{'group_by': 'patient_id'}"/>
+                    <filter string="Doctor" name="group_doctor" context="{'group_by': 'doctor_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'consultation_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

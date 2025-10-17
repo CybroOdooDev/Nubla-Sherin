@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_hospital_discharge_wizard_form" model="ir.ui.view">
+        <field name="name">hospital.discharge.wizard.form</field>
+        <field name="model">hospital.discharge.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Discharge Patient">
+                <group>
+                    <field name="admission_id" invisible="1"/>
+                    <field name="discharge_date"/>
+                    <field name="discharge_type"/>
+                </group>
+                <group>
+                    <field name="discharge_diagnosis"/>
+                    <field name="follow_up_date"/>
+                </group>
+                <group>
+                    <field name="discharge_summary"/>
+                    <field name="discharge_instructions"/>
+                    <field name="medications_to_continue"/>
+                </group>
+                <group>
+                    <field name="create_final_bill"/>
+                </group>
+                <footer>
+                    <button string="Discharge Patient" type="object"
+                            name="action_discharge_patient" class="oe_highlight"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_lab_result">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="text-center">
+                            <h2>LABORATORY REPORT</h2>
+                        </div>
+
+                        <div class="row mt32">
+                            <div class="col-6">
+                                <strong>Patient Name:</strong> <span t-field="o.patient_id.name"/><br/>
+                                <strong>Patient ID:</strong> <span t-field="o.patient_id.patient_id"/><br/>
+                                <strong>Age/Gender:</strong> <span t-field="o.patient_id.age"/> / <span t-field="o.patient_id.gender"/><br/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Report ID:</strong> <span t-field="o.name"/><br/>
+                                <strong>Collection Date:</strong> <span t-field="o.collection_date"/><br/>
+                                <strong>Report Date:</strong> <span t-field="o.completed_date"/><br/>
+                            </div>
+                        </div>
+
+                        <div class="row mt16">
+                            <div class="col-12">
+                                <strong>Referring Doctor:</strong> Dr. <span t-field="o.doctor_id.name"/><br/>
+                                <strong>Test:</strong> <span t-field="o.test_id.name"/><br/>
+                            </div>
+                        </div>
+
+                        <div class="row mt32">
+                            <div class="col-12">
+                                <h4>Test Results</h4>
+                                <table class="table table-bordered">
+                                    <thead style="background-color: #f5f5f5;">
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th>Result</th>
+                                            <th>Unit</th>
+                                            <th>Reference Range</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="o.result_ids" t-as="result">
+                                            <td><span t-field="result.parameter_id.name"/></td>
+                                            <td>
+                                                <strong t-if="result.is_abnormal or result.is_critical"
+                                                        t-attf-style="color: #{result.is_critical and 'red' or 'orange'};">
+                                                    <span t-field="result.result_value"/>
+                                                </strong>
+                                                <span t-else="" t-field="result.result_value"/>
+                                            </td>
+                                            <td><span t-field="result.unit"/></td>
+                                            <td><span t-field="result.reference_range"/></td>
+                                            <td>
+                                                <span t-if="result.is_critical" class="text-danger">
+                                                    <strong>CRITICAL</strong>
+                                                </span>
+                                                <span t-elif="result.is_abnormal" class="text-warning">
+                                                    <strong>Abnormal</strong>
+                                                </span>
+                                                <span t-else="" class="text-success">Normal</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="row mt16" t-if="o.interpretation">
+                            <div class="col-12">
+                                <h4>Interpretation</h4>
+                                <p t-field="o.interpretation"/>
+                            </div>
+                        </div>
+
+                        <div class="row mt16" t-if="o.is_critical">
+                            <div class="col-12">
+                                <div class="alert alert-danger">
+                                    <strong>CRITICAL RESULTS - Immediate attention required</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt64">
+                            <div class="col-6">
+                                <p>
+                                    ______________________________<br/>
+                                    Verified By: <span t-field="o.verified_by.name"/><br/>
+                                    Lab Technician
+                                </p>
+                            </div>
+                            <div class="col-6 text-right">
+                                <p>
+                                    Date: <span t-field="o.completed_date"/>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="row mt16">
+                            <div class="col-12 text-center">
+                                <small class="text-muted">
+                                    * This is a computer-generated report and is valid without signature.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

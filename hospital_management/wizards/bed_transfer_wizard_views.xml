@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_hospital_bed_transfer_wizard_form" model="ir.ui.view">
+        <field name="name">hospital.bed.transfer.wizard.form</field>
+        <field name="model">hospital.bed.transfer.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Transfer Bed">
+                <group>
+                    <field name="admission_id" invisible="1"/>
+                    <group string="Current Location">
+                        <field name="current_ward_id" readonly="1"/>
+                        <field name="current_bed_id" readonly="1"/>
+                    </group>
+                    <group string="New Location">
+                        <field name="new_ward_id"/>
+                        <field name="new_bed_id" domain="[('ward_id', '=', new_ward_id), ('state', '=', 'available')]"/>
+                    </group>
+                </group>
+                <group>
+                    <field name="transfer_date"/>
+                    <field name="transfer_reason" placeholder="Reason for transfer..."/>
+                </group>
+                <footer>
+                    <button string="Transfer" type="object"
+                            name="action_transfer_bed" class="oe_highlight"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

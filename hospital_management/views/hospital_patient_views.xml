@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Patient Tree View -->
+    <record id="view_hospital_patient_tree" model="ir.ui.view">
+        <field name="name">hospital.patient.tree</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <list string="Patients">
+                <field name="patient_id"/>
+                <field name="name"/>
+                <field name="age"/>
+                <field name="gender"/>
+                <field name="blood_group"/>
+                <field name="phone"/>
+                <field name="email"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Patient Form View -->
+    <record id="view_hospital_patient_form" model="ir.ui.view">
+        <field name="name">hospital.patient.form</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <form string="Patient">
+                <header>
+                    <button name="create_portal_user" string="Create Portal User"
+                            type="object" class="oe_highlight"
+                            invisible="user_id"/>
+                </header>
+                <sheet>
+                    <field name="image" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Patient Name" required="1"/>
+                        </h1>
+                        <h3>
+                            <field name="patient_id" readonly="1"/>
+                        </h3>
+                    </div>
+                    <group>
+                        <group string="Personal Information">
+                            <field name="date_of_birth"/>
+                            <field name="age"/>
+                            <field name="gender"/>
+                            <field name="blood_group"/>
+                            <field name="marital_status"/>
+                        </group>
+                        <group string="Contact Information">
+                            <field name="phone"/>
+                            <field name="mobile"/>
+                            <field name="email" widget="email"/>
+                        </group>
+                    </group>
+                    <group string="Address">
+                        <group>
+                            <field name="street"/>
+                            <field name="street2"/>
+                            <field name="city"/>
+                        </group>
+                        <group>
+                            <field name="state_id"/>
+                            <field name="country_id"/>
+                            <field name="zip"/>
+                        </group>
+                    </group>
+                    <group string="Emergency Contact">
+                        <group>
+                            <field name="emergency_contact_name"/>
+                            <field name="emergency_contact_phone"/>
+                        </group>
+                        <group>
+                            <field name="emergency_contact_relation"/>
+                        </group>
+                    </group>
+                    <group string="Insurance Information">
+                        <group>
+                            <field name="insurance_id"/>
+                            <field name="insurance_number"/>
+                        </group>
+                        <group>
+                            <field name="insurance_expiry"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Medical Information">
+                            <group>
+                                <field name="allergies" placeholder="List any known allergies..."/>
+                                <field name="chronic_conditions" placeholder="List chronic conditions..."/>
+                                <field name="current_medications" placeholder="List current medications..."/>
+                            </group>
+                            <separator string="Medical History"/>
+                            <field name="medical_history"/>
+                        </page>
+                        <page string="Appointments">
+                            <field name="appointment_ids"/>
+                        </page>
+                        <page string="Consultations">
+                            <field name="consultation_ids">
+                                <list string="Consultations">
+                                    <field name="name"/>
+                                    <field name="consultation_date"/>
+                                    <field name="doctor_id"/>
+                                    <field name="diagnosis"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+
+                        </page>
+                        <page string="Prescriptions">
+                            <field name="prescription_ids">
+                                <list string="Prescriptions">
+                                    <field name="name"/>
+                                    <field name="prescription_date"/>
+                                    <field name="doctor_id"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+
+                        </page>
+                        <page string="Admissions">
+                            <field name="admission_ids">
+                                <list string="Admissions">
+                                    <field name="name"/>
+                                    <field name="admission_date"/>
+                                    <field name="discharge_date"/>
+                                    <field name="ward_id"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+
+                        </page>
+                        <page string="Invoices">
+                            <field name="invoice_ids">
+                                <list string="Invoices">
+                                    <field name="name"/>
+                                    <field name="invoice_date"/>
+                                    <field name="amount_total"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Patient Kanban View -->
+    <record id="view_hospital_patient_kanban" model="ir.ui.view">
+        <field name="name">hospital.patient.kanban</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id"/>
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="age"/>
+                <field name="gender"/>
+                <field name="phone"/>
+                <templates>
+                <t t-name="card">
+                    <div class="oe_kanban_global_click o_kanban_card">
+
+                        <div class="oe_kanban_details mt-2">
+                            <strong class="o_kanban_record_title">
+                                <field name="name"/>
+                            </strong>
+                            <div class="o_kanban_record_subtitle text-muted">
+                                <field name="patient_id"/>
+                            </div>
+                            <ul class="list-unstyled mt-2">
+                                <li><field name="age"/> years, <field name="gender"/></li>
+                                <li><i class="fa fa-phone me-1"/> <field name="phone"/></li>
+                            </ul>
+                        </div>
+                    </div>
+                </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Patient Search View -->
+    <record id="view_hospital_patient_search" model="ir.ui.view">
+        <field name="name">hospital.patient.search</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <search string="Search Patients">
+                <field name="name" filter_domain="['|', ('name', 'ilike', self), ('patient_id', 'ilike', self)]"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="blood_group"/>
+                <filter string="Male" name="male" domain="[('gender', '=', 'male')]"/>
+                <filter string="Female" name="female" domain="[('gender', '=', 'female')]"/>
+                <separator/>
+                <filter string="Has Insurance" name="has_insurance" domain="[('insurance_id', '!=', False)]"/>
+                <separator/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Gender" name="group_gender" context="{'group_by': 'gender'}"/>
+                    <filter string="Blood Group" name="group_blood" context="{'group_by': 'blood_group'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Patient Action -->
+    <record id="action_hospital_patient" model="ir.actions.act_window">
+        <field name="name">Patients</field>
+        <field name="res_model">hospital.patient</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_hospital_patient_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Register a new patient
+            </p>
+        </field>
+    </record>
+
+</odoo>

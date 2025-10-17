@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_prescription">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="text-center">
+                            <h2>PRESCRIPTION</h2>
+                        </div>
+
+                        <div class="row mt32">
+                            <div class="col-6">
+                                <strong>Patient:</strong> <span t-field="o.patient_id.name"/><br/>
+                                <strong>Patient ID:</strong> <span t-field="o.patient_id.patient_id"/><br/>
+                                <strong>Age/Gender:</strong> <span t-field="o.patient_id.age"/> / <span t-field="o.patient_id.gender"/><br/>
+                            </div>
+                            <div class="col-6 text-right">
+                                <strong>Date:</strong> <span t-field="o.prescription_date"/><br/>
+                                <strong>Prescription No:</strong> <span t-field="o.name"/><br/>
+                            </div>
+                        </div>
+
+                        <div class="row mt16">
+                            <div class="col-12">
+                                <strong>Doctor:</strong> Dr. <span t-field="o.doctor_id.name"/><br/>
+                                <strong>Specialization:</strong> <span t-field="o.doctor_id.specialization"/><br/>
+                            </div>
+                        </div>
+
+                        <div class="row mt16" t-if="o.diagnosis">
+                            <div class="col-12">
+                                <strong>Diagnosis:</strong> <span t-field="o.diagnosis"/>
+                            </div>
+                        </div>
+
+                        <div class="row mt32">
+                            <div class="col-12">
+                                <h4>Rx</h4>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Medicine</th>
+                                            <th>Dosage</th>
+                                            <th>Frequency</th>
+                                            <th>Duration</th>
+                                            <th>Quantity</th>
+                                            <th>Instructions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="o.prescription_line_ids" t-as="line">
+                                            <td><span t-field="line.medicine_id.name"/></td>
+                                            <td><span t-field="line.dosage"/></td>
+                                            <td><span t-field="line.frequency"/></td>
+                                            <td><span t-field="line.duration"/> days</td>
+                                            <td><span t-field="line.total_quantity"/></td>
+                                            <td>
+                                                <span t-if="line.before_food">Before Food</span>
+                                                <span t-if="line.after_food">After Food</span>
+                                                <span t-if="line.special_instructions" t-field="line.special_instructions"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="row mt32" t-if="o.notes">
+                            <div class="col-12">
+                                <strong>Special Instructions:</strong><br/>
+                                <span t-field="o.notes"/>
+                            </div>
+                        </div>
+
+                        <div class="row mt64">
+                            <div class="col-12 text-right">
+                                <p>
+                                    ______________________________<br/>
+                                    Dr. <span t-field="o.doctor_id.name"/><br/>
+                                    <span t-field="o.doctor_id.license_number"/>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

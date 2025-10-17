@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_hospital_billing_wizard_form" model="ir.ui.view">
+        <field name="name">hospital.billing.wizard.form</field>
+        <field name="model">hospital.billing.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create Invoice">
+                <group>
+                    <field name="patient_id"/>
+                </group>
+                <notebook>
+                    <page string="Consultations">
+                        <field name="consultation_ids">
+
+                        </field>
+                    </page>
+                    <page string="Prescriptions">
+                        <field name="prescription_ids"  widget="many2many" mode="tree,kanban" views="[(tree, view_hospital_lab_request_tree)]"/>
+
+                    </page>
+                    <page string="Lab Tests">
+    <field name="lab_request_ids" widget="many2many" mode="tree,kanban" views="[(tree, view_hospital_lab_request_tree)]"/>
+        </page>
+
+
+                </notebook>
+                <group>
+                    <field name="total_amount" widget="monetary"/>
+                </group>
+                <footer>
+                    <button string="Create Invoice" type="object"
+                            name="action_create_invoice" class="oe_highlight"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

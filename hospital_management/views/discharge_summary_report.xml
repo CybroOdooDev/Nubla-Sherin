@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_discharge_summary">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="text-center">
+                            <h2>DISCHARGE SUMMARY</h2>
+                        </div>
+
+                        <div class="row mt32">
+                            <div class="col-6">
+                                <strong>Patient Name:</strong> <span t-field="o.patient_id.name"/><br/>
+                                <strong>Patient ID:</strong> <span t-field="o.patient_id.patient_id"/><br/>
+                                <strong>Age/Gender:</strong> <span t-field="o.patient_id.age"/> / <span t-field="o.patient_id.gender"/><br/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Admission ID:</strong> <span t-field="o.name"/><br/>
+                                <strong>Admission Date:</strong> <span t-field="o.admission_date"/><br/>
+                                <strong>Discharge Date:</strong> <span t-field="o.discharge_date"/><br/>
+                            </div>
+                        </div>
+
+                        <div class="row mt16">
+                            <div class="col-12">
+                                <strong>Attending Doctor:</strong> Dr. <span t-field="o.doctor_id.name"/><br/>
+                                <strong>Ward/Bed:</strong> <span t-field="o.ward_id.name"/> - Bed <span t-field="o.bed_id.bed_number"/><br/>
+                                <strong>Duration of Stay:</strong> <span t-field="o.duration_days"/> days<br/>
+                            </div>
+                        </div>
+
+                        <div class="row mt32">
+                            <div class="col-12">
+                                <h4>Admission Diagnosis</h4>
+                                <p t-field="o.diagnosis"/>
+                            </div>
+                        </div>
+
+                        <div class="row mt16">
+                            <div class="col-12">
+                                <h4>Discharge Diagnosis</h4>
+                                <p t-field="o.discharge_diagnosis"/>
+                            </div>
+                        </div>
+
+                        <div class="row mt16">
+                            <div class="col-12">
+                                <h4>Discharge Summary</h4>
+                                <div t-field="o.discharge_summary"/>
+                            </div>
+                        </div>
+
+                        <div class="row mt16">
+                            <div class="col-12">
+                                <h4>Discharge Instructions</h4>
+                                <p t-field="o.discharge_instructions"/>
+                            </div>
+                        </div>
+
+                        <div class="row mt16" t-if="o.follow_up_date">
+                            <div class="col-12">
+                                <h4>Follow-up</h4>
+                                <p><strong>Follow-up Date:</strong> <span t-field="o.follow_up_date"/></p>
+                            </div>
+                        </div>
+
+                        <div class="row mt64">
+                            <div class="col-6">
+                                <p>
+                                    ______________________________<br/>
+                                    Dr. <span t-field="o.doctor_id.name"/><br/>
+                                    Attending Physician
+                                </p>
+                            </div>
+                            <div class="col-6 text-right">
+                                <p>
+                                    Date: <span t-field="o.discharge_date"/>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>
