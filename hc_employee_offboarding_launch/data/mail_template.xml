@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Employee Offboarding Notification Email Template -->
+        <record id="employee_offboarding_email_template" model="mail.template">
+            <field name="name">Employee Offboarding - Manager Notification</field>
+            <field name="model_id" ref="hr.model_hr_plan_wizard"/>
+            <field name="email_from">{{ (object.company_id.email_formatted or user.email_formatted) }}</field>
+
+            <!-- Send notification to Manager -->
+            <field name="email_to">
+                <t t-if="object.employee_ids and object.employee_ids[0].parent_id and object.employee_ids[0].parent_id.work_email">
+                    <t t-out="object.employee_ids[0].parent_id.work_email"/>
+                </t>
+                <t t-else="">hr@example.com</t>
+            </field>
+
+            <field name="subject">
+                Offboarding Plan Initiated for
+                <t t-if="object.employee_ids">
+                    <t t-out="object.employee_ids[0].name"/>
+                </t>
+            </field>
+
+            <field name="body_html" type="html">
+                <div style="margin:0; padding:0; font-size:13px;">
+                    <p>Dear <t t-out="object.employee_ids[0].parent_id.name or 'Manager'"/>,</p>
+
+                    <p>
+                        The offboarding plan has been initiated for your team member
+                        <t t-out="object.employee_ids[0].name"/>. Please find the relevant details below:
+                    </p>
+
+                    <div style="margin-top:10px;margin-bottom:10px;">
+                        <p><strong>Employee Name:</strong> <t t-out="object.employee_ids[0].name"/></p>
+                        <p><strong>Employee ID:</strong> <t t-out="object.employee_ids[0].barcode or 'N/A'"/></p>
+                        <p><strong>Department:</strong> <t t-out="object.employee_ids[0].department_id.name or 'N/A'"/></p>
+                        <p><strong>Job Position:</strong> <t t-out="object.employee_ids[0].job_id.name or 'N/A'"/></p>
+                        <p><strong>Work Email:</strong> <t t-out="object.employee_ids[0].work_email or 'N/A'"/></p>
+                        <p><strong>Last Working Date:</strong>
+                            <t t-if="object.last_day">
+                                <t t-out="object.last_day.strftime('%d/%m/%Y')"/>
+                            </t>
+                            <t t-else="">N/A</t>
+                        </p>
+                    </div>
+
+                    <p>
+                        You can log in to the HR portal to review and complete all offboarding responsibilities.
+                    </p>
+
+                    <p style="margin-top:15px;">
+                        Thank you,<br/>HR Department
+                    </p>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>
