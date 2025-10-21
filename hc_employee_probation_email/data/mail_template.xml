@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="employee_probation_email_template" model="mail.template">
+            <field name="name">Employee Probation Email</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="subject">{{object.name}} 入职已满一个月</field>
+            <field name="email_from">${(object.company_id.email')}</field>
+            <field name="email_to">{{ object.parent_id.work_email }},{{object.hr_responsible_id.work_email}}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        <p>Dear
+                            <t t-out="object.parent_id.name"/>
+                        </p>
+                        <br/>
+                        <p>
+                            <t t-out="object.name"/>
+                            入职已满一个月，建議直属主管与员工进行首次面谈，了解員工在開展工作上是否順利，及您對員工的表現是否滿意。
+                            以便早期发现问题、给予支持及改善。
+                        </p>
+                        <br/>
+                    </p>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>
