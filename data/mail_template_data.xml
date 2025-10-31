@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--   Email template for membership expiry. -->
+        <record id="email_template_membership_expiry" model="mail.template">
+            <field name="name">Reminder Membership Renewal</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="email_from">{{ user.email_formatted }}</field>
+            <field name="partner_to">{{ object.id }}</field>
+            <field name="subject">Membership Expiry Reminder</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">{{ object.lang }}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <strong>Dear <span t-out="object.name or ''">Member</span>,
+                    </strong>
+                    <br/>
+                    <br/>
+                    Your library membership
+                    <b>
+                        <span t-out="object.membership_type_id.membership_name"/>
+                    </b>
+                    has been expired
+                    on
+                    <b>
+                        <span t-out="object.membership_expiry_date"/>
+                    </b>
+                    , Please renew the membership.
+                    <br/>
+                    <br/>
+                    Thank you,
+                    <br/>
+                </div>
+            </field>
+        </record>
+
+        <!--   Email template for book issue expiry    -->
+        <record id="email_template_book_expiry" model="mail.template">
+            <field name="name">Reminder Book Expiry</field>
+            <field name="model_id" ref="library_management_system.model_book_register"/>
+            <field name="email_from">{{ user.email_formatted }}</field>
+            <field name="partner_to">{{ object.register_member_id.id }}</field>
+            <field name="subject">Book Expiry Reminder</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">{{ object.register_member_id.lang }}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <strong>Dear
+                        <span t-out="object.register_member_id.name or ''">Member</span>
+                    </strong>
+                    <br/>
+                    <br/>
+                    The book
+                    <b>"<span t-out="object.book_id.name"/>"
+                    </b>
+                    which is issued on
+                    <b>
+                        <span t-out="object.issued_date"/>
+                    </b>
+                    will be expired on
+                    <b>
+                        <span t-out="object.calc_return_date"/>
+                    </b>
+                    , Please return or renew the book to avoid due.
+                    <br/>
+                    <br/>
+                    Thank you,
+                    <br/>
+                </div>
+            </field>
+        </record>
+
+        <!--   Email template for library fine    -->
+        <record id="email_template_library_fine" model="mail.template">
+            <field name="name">Library Fine Notification</field>
+            <field name="model_id" ref="library_management_system.model_library_fine"/>
+            <field name="email_from">{{ user.email_formatted }}</field>
+            <field name="partner_to">{{ object.member_id.id }}</field>
+            <field name="subject">Library Fine Notification</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">{{ object.member_id.lang }}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <strong>Dear <span t-out="object.member_id.name or ''">Member</span>,
+                    </strong>
+                    <br/>
+                    <br/>
+                    A fine has been generated for late return of the book:
+                    <b>
+                        <span t-out="object.book_register_id.book_id.name"/>
+                    </b>.
+                    <br/>
+                    <br/>
+                    Fine Amount:
+                    <b>
+                        <span t-out="object.adjusted_amount"/>
+                        <span t-out="object.currency_id.symbol"/>
+                    </b>
+                    <br/>
+                    <br/>
+                    Please settle this fine at the earliest.
+                    <br/>
+                    <br/>
+                    Thank you,
+                    <br/>
+                </div>
+            </field>
+        </record>
+
+        <!--   Email template for auto membership renewal    -->
+        <record id="mail_template_auto_membership_renewal" model="mail.template">
+            <field name="name">Auto Membership Renewal Notification</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.id }}</field>
+            <field name="subject">Your Membership has been Renewed</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">{{ object.lang }}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p>
+                        <strong>Dear <span t-out="object.name or ''">Member</span>,</strong>
+                    </p>
+                    <br/>
+                    <p>
+                        Your membership has been successfully renewed on
+                        <b>
+                            <span t-out="object.last_renewal_date"/>
+                        </b>.
+                    </p>
+                    <br/>
+                    <p>
+                        New expiry date:
+                        <b>
+                            <span t-out="object.membership_expiry_date"/>
+                        </b>
+                    </p>
+                    <br/>
+                    <p>
+                        Invoice Reference:
+                        <b>
+                            <span t-out="object.member_sequence or ''"/>
+                        </b>
+                    </p>
+                    <br/>
+                    <p>Thank you for staying with us!</p>
+                    <br/>
+                    <p>
+                        Best regards,<br/>
+                        <span t-out="object.company_id.name"/>
+                    </p>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

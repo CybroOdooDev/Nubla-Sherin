@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="book_issue_report" model="ir.actions.report">
+            <field name="name">Issued Book Report</field>
+            <field name="model">issued.book.report</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">library_management_system.issued_book_report</field>
+            <field name="report_file">library_management_system.issued_book_report</field>
+    </record>
+    <!--  pdf report template  -->
+    <template id="issued_book_report">
+        <t t-name="library_management_system.issued_book_report">
+            <t t-call="web.external_layout">
+                <t t-call="web.html_container">
+                    <table style="width: 100%;margin-top:10%;">
+                        <tr style="text-align: center;font-size: 25px;font-weight: bold;">
+                            <td colspan="4" style="padding-bottom: 30px;">Book Register Report</td>
+                        </tr>
+                        <tr style="">
+                            <td colspan="2">
+                              <div t-if="start_date">
+                                <div style="display:inline-block;text-align: left;font-weight: bold;margin-right: 10px;">Date From:</div>
+                                <div style="display:inline-block;"><t t-esc="start_date"/></div>
+                              </div>
+                            </td>
+                            <td colspan="2">
+                              <div t-if="date_end">
+                                <div style="display:inline-block;text-align: left;font-weight: bold;margin-right: 10px;">Date To:</div>
+                                <div style="display:inline-block;"><t t-esc="date_end"/></div>
+                              </div>
+                            </td>
+                        </tr>
+                        <tr style="">
+                            <td>
+                              <div t-if="book_name_id">
+                                <div style="display:inline-block;text-align: left;font-weight: bold;margin-right: 10px;">Book Name:</div>
+                                <div style="display:inline-block;"><t t-esc="book_name_id"/></div>
+                              </div>
+                            </td>
+                            <td>
+                              <div t-if="status">
+                                <div style="display:inline-block;text-align: left;font-weight: bold;margin-right: 10px;">Status:</div>
+                                <div style="display:inline-block;"><t t-esc="status"/></div>
+                              </div>
+                            </td>
+                            <td>
+                              <div t-if="member_id">
+                                <div style="display:inline-block;text-align: left;font-weight: bold;margin-right: 10px;">Member:</div>
+                                <div style="display:inline-block;"><t t-esc="member_id"/></div>
+                              </div>
+                            </td>
+                            <td>
+                              <div t-if="responsive">
+                                <div style="display:inline-block;text-align: left;font-weight: bold;margin-right: 10px;">Responsive:</div>
+                                <div style="display:inline-block;"><t t-esc="responsive"/></div>
+                              </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table table-condensed" style="margin-top:5%;;width:100%;line-height:2;text-align:center;">
+                        <thead>
+                            <th>Reg No</th>
+                            <th>Book</th>
+                            <th>ISBN 10</th>
+                            <th>ISBN 13</th>
+                            <th>Member</th>
+                            <th>Issued Date</th>
+                            <th>Exp Return</th>
+                            <th>Status</th>
+                            <th>Responsible</th>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="values" t-as="doc">
+                                <td align="left">
+                                    <span t-esc="doc['reg_seq']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="doc['book_name']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="doc['isbn_10']"/>
+                                </td>
+
+                                <td align="left">
+                                    <span t-esc="doc['isbn_13']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="doc['member_name']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="doc['issue_date']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="doc['exp_ret']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="doc['status']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="doc['responsible']"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

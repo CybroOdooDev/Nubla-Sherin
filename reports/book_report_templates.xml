@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--  pdf report  -->
+    <record id="book_report_id" model="ir.actions.report">
+            <field name="name">Book Report</field>
+            <field name="model">book.report</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">library_management_system.book_report</field>
+            <field name="report_file">library_management_system.book_report</field>
+    </record>
+    <!--  pdf report template  -->
+    <template id="book_report">
+        <t t-name="book_report">
+            <t t-log="values"/>
+            <t t-call="web.external_layout">
+                <t t-call="web.html_container">
+                    <table style="width: 100%;margin-top:10%;">
+                        <tr style="text-align: center;font-size: 25px;font-weight: bold;">
+                            <td colspan="4" style="padding-bottom: 30px;">Books Report</td>
+                        </tr>
+                        <tr style="">
+                            <td colspan="2">
+                              <div t-if="rep_date">
+                                <div style="display:inline-block;text-align: left;font-weight: bold;margin-right: 10px;">Report Date:</div>
+                                <div style="display:inline-block;"><t t-esc="rep_date"/></div>
+                              </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table table-condensed" style="margin-top:5%;;width:100%;line-height:2;text-align:center;">
+                        <thead>
+                            <th>Sl No.</th>
+                            <th>Book Name</th>
+                            <th>Authors</th>
+                            <th>Publisher</th>
+                            <th>ISBN 10</th>
+                            <th>ISBN 10</th>
+                            <th>Category</th>
+                            <th>On Hand</th>
+                        </thead>
+                        <tbody>
+                            <t t-log="values"></t>
+                            <tr t-foreach="values" t-as="doc">
+                                <td align="left">
+                                    <span t-esc="doc['sl_no']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="doc['book_name_id']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="doc['authors']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="doc['publisher_id']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="doc['isbn_10']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="doc['isbn_13']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="doc['category']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="doc['on_hand']"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

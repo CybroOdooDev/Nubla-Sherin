@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Main Menu for Library -->
+    <menuitem id="library_main_menu"
+              web_icon="library_management_system,static/description/icon.png"
+              name="Library" sequence="10"
+              groups="library_group_manager,library_group_librarian">
+        <!--    Menu item for book register model.-->
+        <menuitem action="library_dashboard_action" id="library_management_dashboard"
+                  name="Dashboard" sequence="1"/>
+        <!--    Menu item for book register model.-->
+        <menuitem action="book_register_action" id="library_management_register"
+                  name="Issue Book" sequence="2"/>
+        <!--   Main menu.-->
+        <menuitem id="library_management_members_menu"
+                  name="Members" sequence="3">
+            <!--    Sub menu.-->
+            <menuitem action="res_partner_action" id="library_members_list"
+                      name="Members" sequence="1"/>
+            <!--    Menu for displaying late members.-->
+            <menuitem action="res_partner_server_action" id="library_late_members"
+                      name="Late Members" sequence="2"/>
+        </menuitem>
+        <menuitem id="library_management_fine_menu"
+                  name="Fine" sequence="3">
+            <!--    Sub menu.-->
+            <menuitem action="action_library_fine_rule" id="library_fine_list"
+                      name="Fine Rules" sequence="1"/>
+            <menuitem action="action_fine" id="library_fine"
+                      name="Fine" sequence="1"/>
+        </menuitem>
+        <!-- Submenu for Books under Library -->
+        <menuitem id="library_management_book_menu"
+                  name="Books" sequence="4">
+            <!-- Submenu item for Books Action -->
+            <menuitem id="library_management_books"
+                      action="product_template_action"
+                      name="Books" sequence="1"/>
+            <!--This record defines a menu item for navigating to the book authors view-->
+            <menuitem id="library_management_authors"
+                      action="book_authors_action"
+                      name="Authors" sequence="2"/>
+            <!--Menu  for book publisher view.-->
+            <menuitem id="library_management_publishers"
+                      action="book_publisher_action"
+                      name="Publishers" sequence="3"/>
+        </menuitem>
+        <!--    Menu for import book.-->
+        <menuitem id="import_book_menu"
+                  name="Import Book" action="import_book_action"
+                  sequence="5" groups="library_group_manager"/>
+        <!--    Defines a menu structure for 'Issued Books Reports' in the library management system.-->
+        <menuitem id="issued_books_reports_menu" name="Reports"
+                  groups="library_group_manager" sequence="6">
+            <!--    Sub menu.-->
+            <menuitem id="library_issued_book_report" name="Issued Book"
+                      action="issued_books_report_action" sequence="1"/>
+            <!--    Menu for member report model view.-->
+            <menuitem id="member_report_menu" name="Member Report"
+                      action="member_report_action" sequence="2"/>
+            <!--Menu for book report view.-->
+            <menuitem id="books_report_menu" name="Book Report(PDF)"
+                      action="books_report_action" sequence="3"/>
+            <menuitem id="menu_library_fine_report"
+                      name="Fines  Fees"
+                      action="action_library_fine_report"/>
+        </menuitem>
+        <!--    Configuration Menu.-->
+        <menuitem id="library_configuration_menu" name="Configuration"
+                  sequence="7">
+            <!--    Submenu in configuration.-->
+            <menuitem id="library_settings_menu" name="Settings" sequence="1"
+                      action="res_config_settings_action"
+                      groups="library_group_manager"/>
+            <!--This record defines a menu item for navigating to the membership types section!-->
+            <menuitem id="membership_types_menu" name="Membership Types"
+                      action="membership_types_action" sequence="2"/>
+            <!--This record defines a menu item for navigating to the awards section in the library configuration.-->
+            <menuitem id="library_awards_menu" name="Awards"
+                      action="library_awards_action" sequence="3"/>
+        </menuitem>
+    </menuitem>
+</odoo>

@@ -1,0 +1,54 @@
+<odoo>
+
+    <record id="action_library_fine_rule" model="ir.actions.act_window">
+        <field name="name">Library Fines</field>
+        <field name="res_model">library.fine.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="help">Track library fines and penalties</field>
+    </record>
+
+
+
+    <!-- ================= Tree View ================= -->
+    <record id="view_library_fine_list" model="ir.ui.view">
+        <field name="name">library.fine.list</field>
+        <field name="model">library.fine.rule</field>
+        <field name="arch" type="xml">
+            <list string="Library Fines">
+                <field name="name"/>
+                <field name="fine_type"/>
+                <field name="amount_type"/>
+                <field name="fine_amount"/>
+                <field name="active"/>
+
+            </list>
+        </field>
+    </record>
+
+    <!-- ================= Form View ================= -->
+    <record id="view_library_fine_form" model="ir.ui.view">
+        <field name="name">library.fine.form</field>
+        <field name="model">library.fine.rule</field>
+        <field name="arch" type="xml">
+            <form string="Library Fine" version="7.0">
+
+                <sheet>
+                    <group>
+                        <group>
+                           <field name="name"/>
+                <field name="fine_type"/>
+                <field name="amount_type"/>
+
+                        </group>
+                        <group>
+                             <field name="fine_amount"/>
+                <field name="active"/>
+
+                        </group>
+                    </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

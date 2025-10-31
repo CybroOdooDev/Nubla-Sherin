@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Define the form view for Membership Types -->
+    <record id="membership_types_view_form" model="ir.ui.view">
+        <field name="name">membership.type.view.form</field>
+        <field name="model">membership.type</field>
+        <field name="arch" type="xml">
+            <form string="Membership Types">
+                <sheet>
+                    <field name="membership_name" invisible="1"/>
+                    <div class="oe_title">
+                        <label class="oe_edit_only" for="membership_name"
+                               string="Membership Type"/>
+                        <h1>
+                            <field name="membership_name" placeholder="Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Renewal Details">
+                            <field name="renewal_amount" widget="monetary"/>
+                            <field name="expires_in"
+                                   required="is_do_not_expire ==False"/>
+                            <field name="membership_product_id"/>
+                        </group>
+                        <group string="Expiry action">
+                            <field name="is_do_not_expire"/>
+                            <field name="is_expiry_email"
+                                   invisible="is_do_not_expire==True"/>
+                            <field name="email_template_id" readonly="1"
+                                   invisible="is_expiry_email == False"
+                                   required="is_expiry_email==False"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Book details">
+                            <field name="is_restrict_books"/>
+                            <field name="no_of_books"
+                                   invisible="is_restrict_books==False"/>
+                        </group>
+                    </group>
+                    <group string="Terms and Conditions">
+                        <field name="terms_conditions_ids" nolabel="1" colspan="2">
+                            <list editable="bottom">
+                                <field name="terms"/>
+                            </list>
+                        </field>
+                    </group>
+                    <group string="Notes">
+                        <field name="note"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- Define the list view for Membership Types -->
+    <record id="membership_type_view_list" model="ir.ui.view">
+        <field name="name">membership.type.view.list</field>
+        <field name="model">membership.type</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="membership_name"/>
+                <field name="no_of_books"/>
+                <field name="is_do_not_expire"/>
+                <field name="is_expiry_email"/>
+                <field name="expires_in"/>
+                <field name="renewal_amount"/>
+                <field name="note"/>
+            </list>
+        </field>
+    </record>
+    <!-- Define the action for Membership Types -->
+    <record id="membership_types_action" model="ir.actions.act_window">
+        <field name="name">Membership Types</field>
+        <field name="res_model">membership.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to define a new membership types.
+            </p>
+        </field>
+        <field name="binding_view_types">kanban</field>
+    </record>
+</odoo>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Cron job book expiry status update -->
+        <record id="library_mark_expired_items"
+                model="ir.cron" forcecreate="True">
+            <field name="name">Library - mark expired register</field>
+            <field eval="True" name="active"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="state">code</field>
+            <field name="binding_model_id" ref="model_book_register"/>
+            <field name="model_id" ref="model_book_register"/>
+            <field name="code">model._cron_mark_expired_register()</field>
+            <field name="priority">10</field>
+        </record>
+        <!-- Cron job membership expiry status update -->
+        <record id="library_mark_expired_members"
+                model="ir.cron" forcecreate="True">
+            <field name="name">Library - membership expiry</field>
+            <field eval="True" name="active"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="state">code</field>
+            <field name="model_id" ref="model_res_partner"/>
+            <field name="code">model._cron_mark_expired_members()</field>
+            <field name="priority">10</field>
+        </record>
+                <record id="library_membership_renewal"
+                model="ir.cron" forcecreate="True">
+            <field name="name">Library - membership renewal</field>
+            <field eval="True" name="active"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="state">code</field>
+            <field name="model_id" ref="model_res_partner"/>
+            <field name="code">model._cron_auto_membership_renewal()</field>
+            <field name="priority">10</field>
+        </record>
+
+
+        <record id="ir_cron_auto_generate_late_fines" model="ir.cron">
+            <field name="name">Generate Late Return Fines</field>
+            <field name="model_id" ref="library_management_system.model_library_fine"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_generate_late_fines()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

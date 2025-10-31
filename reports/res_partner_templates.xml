@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="library_membership_card" model="ir.actions.report">
+        <field name="name">Print Membership Card</field>
+        <field name="model">res.partner</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">library_management_system.print_membership_card</field>
+        <field name="report_file">library_management_system.print_membership_card</field>
+        <field name="binding_model_id" ref="model_res_partner"/>
+        <field name="binding_type">report</field>
+    </record>
+    <!--   Paper format for  id card    -->
+    <record id="membership_card_paper" model="report.paperformat">
+        <field name="name">Membership Card</field>
+        <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="page_height">30</field>
+        <field name="page_width">50</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">1</field>
+        <field name="margin_bottom">0</field>
+        <field name="margin_left">0</field>
+        <field name="margin_right">0</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">35</field>
+        <field name="dpi">90</field>
+    </record>
+    <record id="library_membership_card" model="ir.actions.report">
+        <field name="paperformat_id"
+               ref="library_management_system.membership_card_paper"/>
+    </record>
+    <template id="print_membership_card">
+        <t t-name="library_management_system.print_membership_card">
+            <t t-call="web.basic_layout">
+                <div class="page">
+                    <t t-foreach="docs" t-as="member">
+                        <div class="col-md-6" style="margin-top: 10px;">
+                            <table style="margin-top:10px;width:235pt; height:145pt; border: 1pt solid #a2c8be;border-collapse:separate;border-radius:8pt; margin:5pt;padding: 4px 22px 4px 22px;">
+                                <tr>
+                                    <td style="padding:0px; width: 100px;z-index:10;height:101px;">
+                                        <div style="padding: 2px;overflow: hidden;width: 100px;position: absolute;left: 38px;top: 11px;">
+                                            <t t-if="member.image_1920">
+                                                <img t-if="member.image_1920"
+                                                     t-att-src="image_data_uri(member.image_1920)"
+                                                     style="height: 101px;width: 94px;border-top-right-radius: 7px;border-bottom-left-radius: 7px;"
+                                                     alt="Member Image"/>
+                                            </t>
+                                            <t t-else="">
+                                                <img src="/library_management_system/static/description/user.jpg"
+                                                     style="height: 101px;width: 94px;border-top-right-radius: 7px;border-bottom-left-radius: 7px;"
+                                                     alt="Member Image"/>
+                                            </t>
+                                            <t t-if="member">
+                                                <t t-set="barcodeb_size"
+                                                   t-value="'width:130px;height:25px'"/>
+                                                <span t-field="member.name"
+                                                     t-options="{'widget': 'barcode', 'symbology': 'EAN13', 'img_style': barcodeb_size}"
+                                                     style="margin-top: 2px; margin-left: -19px; width: 130px; height: 25px;">
+                                                </span>
+                                            </t>
+                                        </div>
+                                    </td>
+                                    <td style="padding:10px;padding-top: 10px;">
+                                        <div style="padding: 5px;">
+                                            <div style="border-radius:3px; font-size: 13px;width: 100%;height: 33px;text-align: center;padding: 7px 1px 1px 1px;background-color: #a2c8be;                                                             color: #fff;font-weight: bold;">
+                                                MEMBERSHIP CARD
+                                            </div>
+                                            <span style="display:block;">
+                                                <t t-esc="member.name"/>
+                                            </span>
+                                            <span style="display:block;font-size:10px;font-weight:bold;">
+                                                <t t-esc="member.member_sequence"/>
+                                            </span>
+                                            <hr style="margin-top: 5px;margin-bottom: 10px;"/>
+                                            <span style="text-transform: uppercase;display:block;font-size:9px;">
+                                                <t t-esc="member.sex"/>
+                                            </span>
+                                            <span style="display:block;font-size:9px;">
+                                                <t t-esc="member.membership_type_id.membership_name"/>
+                                            </span>
+                                            <span style="font-size:9px; font-weight:bold;display:block;">
+                                                <span style="color:#8a8a8a;">
+                                                    Expiry Date
+                                                </span>
+                                                <span style="color: #ca2323;"
+                                                      t-esc="member.membership_expiry_date"/>
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <div class="row"
+                                             style="background-color: #a2c8be;border-radius: 3px;color: #fff;margin-top:5px;">
+                                            <div class="col-md-5"
+                                                 style="font-size:10px; text-align:left;padding: 3px 0px 3px 12px;">
+                                                <span style="display:block; font-weight:bold;">
+                                                    <t t-esc="member.company_id.name"/>
+                                                </span>
+                                                <span style="display:block;">
+                                                    <t t-esc="member.company_id.email"/>
+                                                </span>
+                                            </div>
+                                            <div class="col-md-7"
+                                                 style="padding:0px">
+                                                <img t-if="member.company_id.logo"
+                                                     t-att-src="image_data_uri(member.company_id.logo)"
+                                                     style="height: 60px;max-width: 60px; position: absolute;right: 3px;bottom: 3px;"
+                                                     alt="Company Logo"/>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <p style="page-break-after: always;"/>
+                        <div class="col-md-6" style="margin-top: 10px;">
+                            <table style="margin-top:10px;width:235pt; height:145pt; border: 1pt solid #a2c8be;border-collapse:separate; border-radius:8pt; margin:5pt;padding:6px 22px 6px 22px;">
+                                <tr>
+                                    <td>
+                                        <div style="border-radius: 3px;font-size: 10px;width: 100%;height: 22px;text-align: center;padding: 4px 1px 1px 1px;background-color: #a2c8be;color: #fff;font-weight: bold;">
+                                            Terms and Conditions
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: top;">
+                                        <ul style="font-size:8px; padding:0px;list-style-type: none;max-height:110px; overflow: hidden;">
+                                            <t t-foreach="member.membership_type_id.terms_conditions_ids"
+                                               t-as="terms">
+                                                <li>
+                                                    <i class="fa fa-arrow-circle-right"
+                                                       style="margin-right:3px;"/>
+                                                    <t t-esc="terms.terms"/>
+                                                </li>
+                                            </t>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <hr style="border-color: #a2c8be;margin:0px;"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="height:20px">
+                                        <div class="row"
+                                             style="padding: 0px 15px 0px 15px;">
+                                            <div class="col-10"
+                                                 style="padding:0px; font-size: 7px">
+                                                <span t-esc="member.company_id.name"/>
+                                                ,
+                                                <span t-esc="member.company_id.phone"/>
+                                                ,
+                                                <span t-esc="member.company_id.street"/>
+                                                <span style="display:block ;">
+                                                    Please keep the library
+                                                    card
+                                                    safely.
+                                                </span>
+                                            </div>
+                                            <div class="col-2"
+                                                 style="padding:0px;text-align:right;font-size: 7px;color: #827a7a;">
+                                                Signature
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
