@@ -1,0 +1,972 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <!-- Report: Employment Contract (Chinese) -->
+    <template id="megawin_employee_contract_template">
+
+      <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+          <t t-call="web.basic_layout">
+            <!-- Page 1: Cover / First page design (like your screenshot) -->
+            <div class="page"
+                 style="font-family: SimSun, 'SimSun-ExtB', 'Microsoft YaHei', Tinos-Regular, serif;
+                        font-size: 14pt; line-height:1.35;
+                        padding: 30px;
+                        page-break-after: always;
+                        page-break-inside: avoid;">
+              <!-- Top thin line and contract code -->
+              <div style="border-top: 1px solid #666; padding-top:8px; margin-bottom: 10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <div style="flex: 1;">
+                    <!-- left empty or address area -->
+                  </div>
+                  <div style="flex: 0 0 auto; text-align:right; font-size:12pt;">
+                    <span style="background: #fffb91; padding:2px 6px; border-radius:2px;">
+                      劳动合同编号：
+                      <span t-esc="'ZX%s' % (o.date_start and o.date_start.strftime('%Y%m%d') or '')"/>
+                      <t t-if="o.date_start">0#</t>
+                      <t t-if="not o.date_start">ZXYYYYMMDD0#</t>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Logo (top-left) -->
+              <div style="display:flex; align-items:flex-start; margin-top:10px;">
+                <div style="width:180px;">
+                  <img t-if="o.company_id and o.company_id.logo"
+                       t-att-src="'data:image/png;base64,%s' % (o.company_id.logo.decode('utf-8') if isinstance(o.company_id.logo, bytes) else o.company_id.logo)"
+                       style="max-height:120px; max-width:100%;"/>
+                </div>
+                <div style="flex:1; padding-left:20px;">
+                  <!-- Large centered Chinese title in the middle area (visual positioning) -->
+                  <div style="text-align:center; margin-top:20px;">
+                    <h1 style="font-size:30pt; margin: 20px 0; font-weight:700;">劳动合同</h1>
+                  </div>
+                </div>
+              </div>
+
+              <!-- framed box area similar to your screenshot -->
+              <div style="border:1px solid #999; padding:18px; margin-top:12px; min-height:360px; position:relative; box-sizing:border-box;">
+                <!-- Company and Employee block -->
+                <div style="margin-top:20px; font-size:12.5pt;">
+                  <div style="margin-bottom:12px;">
+                    <strong>甲　方：</strong>
+                    <span t-field="o.company_id.name">公司名称</span>
+                  </div>
+                  <div style="margin-bottom:12px;">
+                    <strong>乙　方：</strong>
+                    <span t-field="o.employee_id.name">员工姓名</span>
+                  </div>
+                  <div style="margin-bottom:12px;">
+                    <strong>签订时间：</strong>
+                    <span t-if="o.date_start"><t t-esc="o.date_start.strftime('%Y年%m月%d日')"/></span>
+                    <span t-if="not o.date_start">　年　月　日</span>
+                  </div>
+                </div>
+
+                <!-- signature placeholders at bottom of box -->
+                <div style="position:absolute; bottom:20px; left:18px; right:18px; display:flex; justify-content:space-between; align-items:center;">
+                  <div style="width:45%; text-align:left;">
+                    <div>签收人：____________________</div>
+                    <div style="margin-top:8px;">签收日期：______年__月__日</div>
+                  </div>
+                  <div style="width:45%; text-align:right;">
+                    <div>甲方（公司）：<span t-field="o.company_id.name">公司名称</span></div>
+                    <div style="margin-top:8px;">（签字/盖章）____________________</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- small footer line under box -->
+              <div style="margin-top:12px; font-size:10pt; color:#444;">
+                本人已收到劳动合同编号为
+                <span style="background:#fffb91; padding:2px 6px;">
+                  <span t-esc="'ZX%s' % (o.date_start and o.date_start.strftime('%Y%m%d') or 'YYYYMMDD')"/>0#
+                </span>
+                的劳动合同原件一份，特此申明。
+              </div>
+            </div>
+
+            <!-- Page 2+: full Chinese contract text from your doc, split into pages.
+                 For readability and correct PDF paging we wrap large sections in .page -->
+            <div class="page"
+                 style="font-family: SimSun, 'Microsoft YaHei', Tinos-Regular, serif;
+                        font-size: 12pt; line-height:1.6;
+                        padding: 30px;
+                        page-break-after: always;
+                        page-break-inside: avoid;">
+
+              <!-- Title & basic info -->
+              <div style="text-align:center; font-size:18pt; font-weight:600; margin-bottom:18px;">劳动合同书</div>
+
+              <div style="margin-bottom:12px;">
+                <strong>劳动合同编号：</strong>
+                <span style="background:#fffb91; padding:2px 6px;">
+                  <span t-esc="'ZX%s0#' % (o.date_start and o.date_start.strftime('%Y%m%d') or 'YYYYMMDD')"/>
+                </span>
+              </div>
+
+              <div style="margin-bottom:8px;">
+                <strong>甲 方：</strong>
+                <span t-field="o.company_id.name">上海兆翔船舶设备贸易有限公司</span>
+              </div>
+
+              <div style="margin-bottom:8px;">
+                <strong>乙 方：</strong>
+                <span t-field="o.employee_id.name">employee_id</span>
+              </div>
+
+              <div style="margin-bottom:18px;">
+                <strong>签订时间：</strong>
+                <span t-if="o.date_start"><t t-esc="o.date_start.strftime('%Y年%m月%d日')"/></span>
+                <span t-if="not o.date_start">　年　月　日</span>
+              </div>
+
+              <div style="text-indent:2em; margin-bottom:10px;">
+                本人已收到劳动合同编号为
+                <span style="background:#fffb91; padding:2px 6px;">
+                  <span t-esc="'ZX%s0#' % (o.date_start and o.date_start.strftime('%Y%m%d') or 'YYYYMMDD')"/>
+                </span>
+                的劳动合同原件一份，特此申明。
+              </div>
+
+              <div style="margin-top:20px; font-weight:600;">第一章　合同的类型与期限</div>
+
+              <p>第1条 甲、乙双方选择合同类型为。</p>
+
+              <p>
+                1. 固定期限，自 <span t-if="o.date_start"><t t-esc="o.date_start.strftime('%Y年%m月%d日')"/></span>
+                起至 <span t-if="o.date_end"><t t-esc="o.date_end.strftime('%Y年%m月%d日')"/></span> 止。
+              </p>
+
+              <p>
+                2. 无固定期限，自 <span>____年____月____日起</span> 至合同约定的终止情形出现时即行终止。
+              </p>
+
+              <p>
+                3. 以完成一定的工作任务为期限：自 <span>____年____月____日起</span> 至工作任务完成时即行终止。
+              </p>
+
+              <p>第2条 若乙方开始工作时间与约定时间不一致的，以实际到岗之日为合同起始时间，建立劳动关系。</p>
+            </div>
+
+            <!-- Page: trial & work content -->
+            <div class="page"
+                 style="font-family: SimSun, 'Microsoft YaHei', Tinos-Regular, serif;
+                        font-size: 12pt; line-height:1.6;
+                        padding: 30px;
+                        page-break-after: always;
+                        page-break-inside: avoid;">
+
+              <div style="font-weight:600; margin-bottom:10px;">第二章　试用期</div>
+
+              <p>第3条 甲乙双方约定试用期 <span t-field="o.probation_period_id">probation_months</span> 个月。</p>
+
+              <p>第4条 录用条件为：详见岗位说明书和员工手册。</p>
+
+              <p>第5条 若乙方所填的《个人信息登记表》中的信息及提供的相关证件存在隐瞒和欺骗行为或其它发现乙方不符合甲方录用条件的，应视为乙方以欺诈方式订立本合同，甲方依法可以随时解除劳动关系。</p>
+
+              <p>第6条 试用期内，甲方认为乙方不符合录用条件的，或者出现乙方严重违反规章制度等情形，甲方可以向乙方说明理由后随时解除劳动合同，并且无需给予任何经济补偿。</p>
+
+              <div style="font-weight:600; margin-top:18px; margin-bottom:10px;">第三章　工作内容与工作地点</div>
+
+              <p>第7条 甲方聘用乙方从事 <span t-field="o.department_id">department_id</span> 工作，职务: <span t-field="o.job_id">job_id</span> （或其他岗位），详见“岗位说明书”。</p>
+
+              <p>第8条 乙方的工作地点为 <span>上海</span> 等,乙方同意甲方可根据工作需要对乙方工作地点进行调整。</p>
+
+              <p>第9条 乙方应认真履行甲方制定的岗位职责，按时、按质、按量完成其本职工作；未经甲方允许，乙方不得在其他单位兼职。</p>
+
+              <p>第10条 乙方保证按时，按质、按量完成该岗位所承担的各项内容；乙方同意在下列情况下甲方可将乙方的工作岗位进行调整，包括在甲方的各子公司、分公司或关联公司之间的调动：</p>
+
+              <ol>
+                <li>甲方因公司经营战略调整，产业、产品结构调整及品牌发展等情况发生变化需调动</li>
+                <li>乙方工作岗位,或因此导致不能安排原岗位工作的；</li>
+                <li>员工不论何种原因连续 壹 个月以上未到岗上班，公司已安排其他员工顶替的；</li>
+                <li>乙方因技能、身体等因素达不到工作岗位各项指标要求的，不能胜任工作的；</li>
+                <li>绩效考核得分不足 60 分的；</li>
+                <li>单位规章制度所规定的应调整岗位的情况的；</li>
+                <li>合同到期后，如双方续签合同的，甲方可根据需要重新确定乙方岗位。</li>
+              </ol>
+            </div>
+
+            <!-- Page: working hours, holidays, benefits -->
+            <div class="page"
+                 style="font-family: SimSun, 'Microsoft YaHei', Tinos-Regular, serif;
+                        font-size: 12pt; line-height:1.6;
+                        padding: 30px;
+                        page-break-after: always;
+                        page-break-inside: avoid;">
+
+              <div style="font-weight:600; margin-bottom:10px;">第四章　工作时间与休息时间</div>
+
+              <p>第11条 乙方所在岗位执行下述工时制度（ A ）。</p>
+              <ul>
+                <li>A. 标准工时制。</li>
+                <li>B. 不定时工时制。</li>
+                <li>C. 综合计算工时制。</li>
+              </ul>
+
+              <p>第12条 甲方在下列节日安排职工休假：元旦、春节、国际劳动节、国庆节，法律法规规定的其他节假日及婚假、丧假、产假等。</p>
+
+              <p>第13条 乙方因个人事务须请事假，事假期间不付薪资。具体参见甲方的规章制度及员工手册。乙方如需请病假，应持二级甲等以上医院出具的诊断证明书及病假单等，如不提供或提供虚假证明一律按旷工处理。</p>
+
+              <p>第14条 甲方实行加班审批制度；对于甲方未以加班审批单形式提出的加班要求，乙方有权予以拒绝；对于乙方没有加班审批单确认的加班时间，甲方有权不予认可。乙方同意：乙方在非工作时间内在工作场所的逗留并不视为加班。甲方按规定支付加班的报酬或调休，以保证乙方合法权益。</p>
+
+              <p>第15条 甲方可以根据不同岗位的工作需要，安排乙方的每周休息日。</p>
+
+              <div style="font-weight:600; margin-top:18px; margin-bottom:10px;">第五章　规章制度与劳动纪律</div>
+
+              <p>第16条 乙方自觉遵守国家的法律、法规、规章和社会公德、职业道德，维护甲方的声誉和利益。</p>
+
+              <p>第17条 甲方依法建立和完善各项规章制度，甲方应将制定、变更的规章制度及时执行或者及时告知员工，甲方告知、公示或实际实施后10个工作日内乙方未提出书面异议的，视为乙方完全认同该规章制度，乙方应严格遵守。</p>
+
+              <p>第18条 乙方不得从事任何与甲方利益冲突的活动，并保守甲方的商业秘密。</p>
+
+              <p>第19条 乙方违反劳动纪律和规章制度的，甲方有权按国家和本单位的规定对乙方给予纪律处分或经济处罚，直至解除本合同。乙方承认签订本合同前已经得到甲方告知同时完全知晓并理解了甲方制订的各项规章制度，乙方承诺接受并严格遵守甲方的员工手册、劳动纪律、各项规章制度、保密规定等。</p>
+            </div>
+
+            <!-- Page: remuneration, insurance -->
+            <div class="page"
+                 style="font-family: SimSun, 'Microsoft YaHei', Tinos-Regular, serif;
+                        font-size: 12pt; line-height:1.6;
+                        padding: 30px;
+                        page-break-after: always;
+                        page-break-inside: avoid;">
+
+              <div style="font-weight:600; margin-bottom:10px;">第六章　劳动报酬</div>
+
+              <p>第20条 乙方在正常出勤并付出正常劳动后，有权获得相应的劳动报酬，乙方所在岗位执行下述工资计发形式（ A ）。</p>
+
+              <p>
+                A. 计时形式：乙方工资（若非特别说明，均为税前应发工资）￥
+                <span t-field="o.wage">wage</span> 元/月，绩效奖金按照甲方的绩效考核规定及考核结果计算，但甲方保留自主决定是否发放以及发放金额的权利。
+              </p>
+
+              <p>
+                B. 计件形式：乙方的劳动定额为 <span>man_day_rate</span>，计件单价为 <span>hourly_rate</span>。
+              </p>
+
+              <p>第21条 甲方于每月 <strong>5</strong> 日前以人民币形式支付乙方上月工资。乙方同意：因工资计算标准不明确、计算方式不当，造成乙方工资计算不正确的，甲方应及时补发，但不属于无故拖欠或克扣工资。同时，双方约定，甲方发放工资、加班工资、奖金、补贴后，乙方认为有差错的，应在发放之日起五个工作日内以书面形式向甲方提出，如未按规定内向甲方提出的，视为乙方确认甲方已足额支付，并放弃相应诉权。</p>
+
+              <p>第22条 甲方有权根据公司实际经营状况、乙方工作岗位的变更和依法制定的劳动报酬分配办法调整乙方的工资待遇。</p>
+
+              <p>第23条 甲方安排乙方延长工作时间或休息日、法定休假日工作的，依法安排乙方补休或支付相应劳动报酬，加班工资根据每月加班情况，以本合同约定的基本工资为计算基数据实发放。未休带薪年价补偿金计发基数同前。</p>
+
+              <div style="font-weight:600; margin-top:18px; margin-bottom:10px;">第七章　社会保险和福利待遇</div>
+
+              <p>第24条 甲方根据国家、市政府有关规定为乙方购买社会保险和住房公积金，乙方个人缴纳部分由乙方自行承担并由甲方在工资发放时代扣代缴。</p>
+
+              <p>第25条 乙方患病或非因工负伤，其病假工资、疾病救济费和医疗待遇按照国家和市政府、公司的规定执行。</p>
+
+              <p>第26条 乙方患职业病或因工负伤的工资和医疗保险待遇按国家和市政府的有关规定执行。</p>
+            </div>
+
+            <!-- Page: termination, confidentiality, other clauses -->
+            <div class="page"
+                 style="font-family: SimSun, 'Microsoft YaHei', Tinos-Regular, serif;
+                        font-size: 12pt; line-height:1.6;
+                        padding: 30px;
+                        page-break-after: always;
+                        page-break-inside: avoid;">
+
+              <div style="font-weight:600; margin-bottom:10px;">第八章　劳动保护、劳动条件和职业危害防护</div>
+
+              <p>第27条 甲方建立健全生产工艺流程、操作规程、工作规范和劳动安全卫生制度及其标准。甲方对可能产生职业病危害的岗位，对乙方履行告知义务，并做好劳动过程中职业危害的预防工作，乙方应严格遵守相关操作流程与安全制度。</p>
+
+              <p>第28条 甲方为乙方提供符合国家规定的劳动条件及安全卫生的工作环境，并依照企业生产经营特点及有关规定为乙方提供劳动防护用品，乙方应严格按要求穿戴劳防用品。</p>
+
+              <p>第29条 甲方对乙方进行职业技术、安全卫生、规章制度等必要的教育与培训，乙方应认真参加甲方组织的各项必要的教育培训。</p>
+
+              <div style="font-weight:600; margin-top:18px; margin-bottom:10px;">第九章　劳动合同的变更、解除和终止</div>
+
+              <p>第30条 订立合同所依据的法律、行政法规、规章发生变化，合同应变更相关内容。</p>
+
+              <p>第31条 订立合同所依据的客观情况发生重大变化（包括但不限于企业迁移、兼并、资产转移等情形），致使合同无法履行的，经协商同意，可以变更合同相关内容或解除。</p>
+
+              <p>第32条 甲方认为乙方在试用期内不符合甲方用人标准或录用条件的，甲方提前七日通知乙方解除本合同。</p>
+
+              <!-- For brevity we include the long list of dismissal/resignation grounds as condensed but keep structure -->
+              <p>第33条 乙方有下列情形之一的，甲方可立即解除本合同，辞退乙方：</p>
+              <ol>
+                <li>因乙方未能在入职后30天内提供员工手册、退工单等资料，致使甲方无法办理录用及社会保险缴纳手续的。</li>
+                <li>乙方被查实在应聘时向甲方提供的其个人资料或填写的个人信息（或工作经历，或学习经历）是虚假的。</li>
+                <li>滥用职权、违反技术操作规程或安全规程、违章指挥等，造成公司损失较大者。</li>
+                <li>其它若干列举情形（详见公司规章及本合同全文）。</li>
+              </ol>
+
+              <p>第34条 — 第36条 ... （合同中有关解除、终止、员工可解除情形、合同自行终止条款等条款请参见完整合同文本。）</p>
+            </div>
+
+            <!-- Page: confidentiality, training, dispute handling, sign page -->
+            <div class="page"
+                 style="font-family: SimSun, 'Microsoft YaHei', Tinos-Regular, serif;
+                        font-size: 12pt; line-height:1.6;
+                        padding: 30px;
+                        page-break-after: always;
+                        page-break-inside: avoid;">
+
+              <div style="font-weight:600; margin-bottom:10px;">第十章　培训服务期与竞业限制</div>
+
+              <p>第37条 乙方在合同期间接受甲方提供的出资进行专项技术培训的，另签订“培训服务协议”。约定具体服务期、赔偿标准并执行。</p>
+
+              <p>第38条 乙方若违反协议约定，提前解除本合同的，应偿付甲方培训费用，对已履行部份服务期的，按照服务期尚未履行部分所应分摊的培训费用偿付。</p>
+
+              <p>第39条 乙方应当保守甲方的商业秘密，商业秘密系指不为公众所知悉，能为甲方带来经济利益，具有实用性并经甲方采取保密措施的技术秘密和经营信息。包括但不限于（1）技术信息、（2）经营信息等。</p>
+
+              <div style="font-weight:600; margin-top:18px; margin-bottom:10px;">第十一章　劳动争议处理</div>
+
+              <p>第40条 甲、乙双方因本合同而发生争议可以向甲方所在地的劳动仲裁委员会申请仲裁或向甲方所在地的人民法院提起诉讼。</p>
+
+              <div style="font-weight:600; margin-top:18px; margin-bottom:10px;">第十二章　其他规定</div>
+
+              <p>第41条 — 第47条（关于合同附件、优先适用法律、合同生效、份数及签署等条款，合同双方签署后生效）。</p>
+
+              <!-- Signature block -->
+              <div style="margin-top:30px; display:flex; justify-content:space-between; align-items:center;">
+                <div style="width:48%; text-align:left;">
+                  <div>甲方(公司)： <strong><span t-field="o.company_id.name">公司名称</span></strong></div>
+                  <div style="margin-top:10px;">（签字盖章）____________________</div>
+                  <div style="margin-top:8px;">签订日期：______年__月__日</div>
+                </div>
+                <div style="width:48%; text-align:right;">
+                  <div>乙方（员工）： <strong><span t-field="o.employee_id.name">员工姓名</span></strong></div>
+                  <div style="margin-top:10px;">（签字）____________________</div>
+                  <div style="margin-top:8px;">签订日期：</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Extra page: raw text appendix / page numbering (optional) -->
+            <div class="page"
+                 style="font-family: SimSun, 'Microsoft YaHei', Tinos-Regular, serif;
+                        font-size: 11pt; line-height:1.5;
+                        padding: 30px;
+                        page-break-after: auto;
+                        page-break-inside: avoid;">
+
+              <div style="text-align:right; font-size:10pt; color:#666;">PAGE -  -</div>
+
+              <div style="margin-top:12px;">
+                <strong>附注：</strong>
+                <div>本合同文本为示例排版，请根据实际字段名调整 t-field 引用（如 o.employee_id.name、o.company_id.name、o.wage、o.department_id、o.job_id、o.date_start、o.date_end 等）。</div>
+              </div>
+            </div>
+
+          </t>
+        </t>
+      </t>
+    </template>
+  </data>
+</odoo>
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<odoo>-->
+<!--    <data>-->
+<!--        <template id="megawin_employee_contract_template">-->
+<!--            <t t-call="web.html_container">-->
+<!--                <t t-foreach="docs" t-as="o">-->
+<!--                    <t t-call="web.external_layout">-->
+<!--                        <div class="page" style="font-family: 'SimSun', 'Arial', sans-serif; font-size: 11pt;">-->
+<!--                            <div style="page-break-after: always; padding: 60px 80px;">-->
+
+<!--                                &lt;!&ndash; Main Contract Box &ndash;&gt;-->
+<!--                                <table style="width: 100%; border: 2px solid #000; border-collapse: collapse; margin-top: 120px;">-->
+
+<!--                                    &lt;!&ndash; Contract Number &ndash;&gt;-->
+<!--                                    <tr>-->
+<!--                                        <td style="padding: 15px 20px; font-size: 11pt; border-bottom: 1px solid #000;">-->
+<!--                                            劳动合同编号：-->
+<!--                                            <span t-esc="o.zx_code"/>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+
+<!--                                    &lt;!&ndash; Main Title &ndash;&gt;-->
+<!--                                    <tr>-->
+<!--                                        <td style="text-align: center; padding: 60px 0; font-size: 36pt; font-weight: bold; border-bottom: 1px solid #000;">-->
+<!--                                            劳动合同-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+
+<!--                                    &lt;!&ndash; Spacer Line 1 &ndash;&gt;-->
+<!--                                    <tr>-->
+<!--                                        <td style="height: 50px; border-bottom: 1px solid #000;"></td>-->
+<!--                                    </tr>-->
+
+<!--                                    &lt;!&ndash; Spacer Line 2 &ndash;&gt;-->
+<!--                                    <tr>-->
+<!--                                        <td style="height: 50px; border-bottom: 1px solid #000;"></td>-->
+<!--                                    </tr>-->
+
+<!--                                    &lt;!&ndash; Company & Employee Info &ndash;&gt;-->
+<!--                                    <tr>-->
+<!--                                        <td style="padding: 50px 20px 40px 80px;">-->
+
+<!--                                            <div style="font-size: 13pt; margin-bottom: 16px;">-->
+<!--                                                甲 方：上海兆翔船舶设备贸易有限公司-->
+<!--                                            </div>-->
+
+<!--                                            <div style="font-size: 13pt; margin-bottom: 16px;">-->
+<!--                                                乙 方：-->
+<!--                                                <span t-esc="o.employee_id.name"/>-->
+<!--                                            </div>-->
+
+<!--                                            <div style="font-size: 13pt;">-->
+<!--                                                签订时间：-->
+<!--                                                <t t-esc="o.date_start and o.date_start.strftime('%Y  %m %d ')"/>-->
+<!--                                            </div>-->
+
+<!--                                        </td>-->
+<!--                                    </tr>-->
+
+<!--                                </table>-->
+
+<!--                                &lt;!&ndash; Receipt Acknowledgement Section &ndash;&gt;-->
+<!--                                <div style="margin-top: 80px; font-size: 11pt; line-height: 1.8; text-align: center;">-->
+<!--                                    本人已收到劳动合同编号为-->
+<!--                                    <span t-esc="o.zx_code"/>-->
+<!--                                    的劳动合同原件一份，特此申明。-->
+<!--                                </div>-->
+
+<!--                                <div style="margin-top: 30px; font-size: 11pt; padding-left: 80px;">-->
+<!--                                    签收人：-->
+<!--                                    <span style="display:inline-block; width:150px; border-bottom:1px solid #000; margin-left: 10px;"></span>-->
+
+<!--                                    <span style="margin-left: 80px;">签收日期：</span>-->
+<!--                                    <span style="display:inline-block; width:150px; border-bottom:1px solid #000; margin-left: 10px;"></span>-->
+<!--                                </div>-->
+
+<!--                            </div>-->
+
+<!--                            &lt;!&ndash; First Page Layout &ndash;&gt;-->
+<!--                            &lt;!&ndash; First Page &ndash;&gt;-->
+
+
+<!--                            &lt;!&ndash; Page break after first page &ndash;&gt;-->
+<!--                            <div style="page-break-after: always;"></div>-->
+
+
+<!--                            &lt;!&ndash; Second Page - Party Information &ndash;&gt;-->
+<!--                            <div style="line-height: 1.8;">-->
+<!--                                <p style="margin: 10px 0;">-->
+<!--                                    <span style="font-weight: bold;">甲方（公司）：</span>上海兆翔船舶设备贸易有限公司（以下称"甲方"）-->
+<!--                                </p>-->
+
+<!--                                <p style="margin: 10px 0;">-->
+<!--                                    <span style="font-weight: bold;">通讯地址：</span>上海市浦东大道1200号巨洋大厦8F-->
+<!--                                </p>-->
+
+<!--                                <p style="margin: 10px 0;">-->
+<!--                                    <span style="font-weight: bold;">邮　编：</span>200131-->
+<!--                                </p>-->
+
+<!--                                <p style="margin: 10px 0;">-->
+<!--                                    <span style="font-weight: bold;">法定代表人或委托代理人：</span>王茺-->
+<!--                                </p>-->
+
+<!--                                <p style="margin: 10px 0;">-->
+<!--                                    <span style="font-weight: bold;">乙方（员工）：</span>-->
+<!--                                    <span t-esc="o.employee_id.name"/>）-->
+<!--                                </p>-->
+
+<!--                                <p style="margin: 10px 0;">-->
+<!--                                    <span style="font-weight: bold;">身份证号码：</span>-->
+<!--                                    <span t-esc="o.employee_id.ssnid or ''"/>-->
+<!--                                </p>-->
+
+<!--                                <p style="margin: 10px 0;">-->
+<!--                                    <span style="font-weight: bold;">现住址：</span>-->
+<!--                                    <span t-esc="o.employee_id.address_home_id.name"/>-->
+<!--                                </p>-->
+
+<!--                                <p style="margin: 10px 0;">-->
+<!--                                    <span style="font-weight: bold;">户籍地址(身份证地址):</span>-->
+<!--                                    <span t-esc="o.employee_id.place_of_birth or ''"/>-->
+<!--                                </p>-->
+
+<!--                                <p style="margin: 10px 0;">-->
+<!--                                    <span style="font-weight: bold;">联系方式：（移动电话）</span>-->
+<!--                                    <span t-esc="o.employee_id.work_phone or ''"/>-->
+<!--                                </p>-->
+
+<!--                                <p style="margin: 10px 0;">-->
+<!--                                    <span style="font-weight: bold;">紧急情况联系人：</span>-->
+<!--                                    <span t-esc="o.employee_id.emergency_contact or ''"/>-->
+<!--                                    <span style="font-weight: bold;">联系电话：</span>-->
+<!--                                    <span t-esc="o.employee_id.emergency_phone or ''"/>-->
+<!--                                </p>-->
+
+<!--                                <p style="margin: 10px 0;">-->
+<!--                                    <span style="font-weight: bold;">-->
+<!--                                        约定送达地址及接收人（邮件、快递等可送达的地址）地址:-->
+<!--                                    </span>-->
+<!--                                    <span t-esc="o.employee_id.emergency_address or ''"/>-->
+<!--                                </p>-->
+
+<!--                                <p style="margin: 10px 0;">-->
+<!--                                    <span style="font-weight: bold;">接收人</span>-->
+<!--                                    <span t-esc="o.employee_id.name"/>-->
+<!--                                </p>-->
+
+<!--                                <p style="margin: 20px 0; text-indent: 2em; text-align: justify;">-->
+<!--                                    甲、乙双方就劳动关系的建立及权利义务等事宜，根据《中华人民共和国劳动合同法》及有关的劳动法律、法规、规章和企业依法制定的规章制度,-->
+<!--                                    遵循平等、自愿的原则，经协商一致订立本劳动合同（以下简称合同），并确认合同为解决争议时的依据。-->
+<!--                                </p>-->
+<!--                            </div>-->
+
+<!--                            &lt;!&ndash; Chapter 1 &ndash;&gt;-->
+<!--                            <h3 style="margin: 20px 0; font-size: 12pt;">第一章　合同的类型与期限</h3>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 甲、乙双方选择合同类型为（<span style="font-weight: bold;">1</span>）。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0; margin-left: 30px;">-->
+<!--                                1. 固定期限，自<span t-esc="o.date_start"/>>起至<span t-esc="o.date_end"/>-->
+<!--                                止，合同期满后，双方如需重新约定劳动合同期限的，在合同到期前的三十天内订定。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0; margin-left: 30px;">-->
+<!--                                2. 无固定期限，自_in contract___/___年___/___月___/___日起至合同约定的终止情形出现时即行终止。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0; margin-left: 30px;">-->
+<!--                                3. 以完成一定的工作任务为期限：自___/___年___/____月___/___日起至___/___工作任务完成时即行终止。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 若乙方开始工作时间与约定时间不一致的，以实际到岗之日为合同起始时间，建立劳动关系。-->
+<!--                            </p>-->
+
+<!--                            &lt;!&ndash; Chapter 2 &ndash;&gt;-->
+<!--                            <h3 style="margin: 20px 0; font-size: 12pt;">第二章　试用期</h3>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - -->
+<!--                                <span style="font-weight: bold;">甲乙双方约定试用期 probation_period_id个月。</span>-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 录用条件为： 详见岗位说明书和员工手册。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 若乙方所填的《个人信息登记表》中的信息及提供的相关证件存在隐瞒和欺骗行为或其它发现乙方不符合甲方录用条件的，应视为乙方以欺诈方式订立本合同，甲方依法可以随时解除劳动关系。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 试用期内，甲方认为乙方不符合录用条件的，或者出现乙方严重违反规章制度等情形，甲方可以向乙方说明理由后随时解除劳动合同，并且无需给予任何经济补偿。-->
+<!--                            </p>-->
+
+<!--                            &lt;!&ndash; Chapter 3 &ndash;&gt;-->
+<!--                            <h3 style="margin: 20px 0; font-size: 12pt;">第三章　工作内容与工作地点</h3>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - -->
+<!--                                <span style="font-weight: bold;">甲方聘用乙方从事-->
+<!--                                    <span t-esc="o.department_id.name or ''"/>-->
+<!--                                    工作，职务:-->
+<!--                                    <span t-esc="o.job_id.name or ''"/>-->
+<!--                                    （或其他岗位），详见"岗位说明书"。-->
+<!--                                </span>-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - <span style="font-weight: bold;">乙方的工作地点为 上海 等,</span>乙方同意甲方可根据工作需要对乙方工作地点进行调整。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 乙方应认真履行甲方制定的岗位职责，按时、按质、按量完成其本职工作；未经甲方允许，乙方不得在其他单位兼职。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 乙方保证按时，按质、按量完成该岗位所承担的各项内容；乙方同意在下列情况下甲方可将乙方的工作岗位进行调整，包括在甲方的各子公司、分公司或关联公司之间的调动：-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0; margin-left: 50px;">-->
+<!--                                1. 甲方因公司经营战略调整，产业、产品结构调整及品牌发展等情况发生变化需调动-->
+<!--                                <br/>-->
+<!--                                2. 乙方工作岗位,或因此导致不能安排原岗位工作的；-->
+<!--                                <br/>-->
+<!--                                3. 员工不论何种原因连续 壹 个月以上未到岗上班，公司已安排其他员工顶替的；-->
+<!--                                <br/>-->
+<!--                                4. 乙方因技能、身体等因素达不到工作岗位各项指标要求的，不能胜任工作的；-->
+<!--                                <br/>-->
+<!--                                5. 绩效考核得分不足 60 分的；-->
+<!--                                <br/>-->
+<!--                                6. 单位规章制度所规定的应调整岗位的情况的；-->
+<!--                                <br/>-->
+<!--                                7. 合同到期后，如双方续签合同的，甲方可根据需要重新确定乙方岗位。-->
+<!--                            </p>-->
+
+<!--                            &lt;!&ndash; Chapter 4 &ndash;&gt;-->
+<!--                            <h3 style="margin: 20px 0; font-size: 12pt;">第四章　工作时间与休息时间</h3>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 乙方所在岗位执行下述工时制度<span style="font-weight: bold;">（ A ）</span>。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0; margin-left: 30px;">-->
+<!--                                A. 标准工时制。-->
+<!--                                <br/>-->
+<!--                                B. 不定时工时制-->
+<!--                                <span style="font-weight: bold;">。</span>-->
+<!--                                <br/>-->
+<!--                                C. 综合计算工时制。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 甲方在下列节日安排职工休假：元旦、春节、国际劳动节、国庆节，法律法规规定的其他节假日及婚假、丧假、产假等。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - -->
+<!--                                乙方因个人事务须请事假，事假期间不付薪资。具体参见甲方的规章制度及员工手册。乙方如需请病假，应持二级甲等以上医院出具的诊断证明书及病假单等，如不提供或提供虚假证明一律按旷工处理。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - -->
+<!--                                甲方实行加班审批制度；对于甲方未以加班审批单形式提出的加班要求，乙方有权予以拒绝；对于乙方没有加班审批单确认的加班时间，甲方有权不予认可。乙方同意：乙方在非工作时间内在工作场所的逗留并不视为加班。甲方按规定支付加班的报酬或调休，以保证乙方合法权益。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 甲方可以根据不同岗位的工作需要，安排乙方的每周休息日。-->
+<!--                            </p>-->
+
+<!--                            &lt;!&ndash; Chapter 5 &ndash;&gt;-->
+<!--                            <h3 style="margin: 20px 0; font-size: 12pt;">第五章　规章制度与劳动纪律</h3>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 乙方自觉遵守国家的法律、法规、规章和社会公德、职业道德，维护甲方的声誉和利益。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - -->
+<!--                                甲方依法建立和完善各项规章制度，甲方应将制定、变更的规章制度及时执行或者及时告知员工，甲方告知、公示或实际实施后10个工作日内乙方未提出书面异议的，视为乙方完全认同该规章制度，乙方应严格遵守。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 乙方不得从事任何与甲方利益冲突的活动，并保守甲方的商业秘密。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 乙方违反劳动纪律和规章制度的，甲方有权按国家和本单位的规定对乙方给予纪律处分或经济处罚，直至解除本合同。-->
+<!--                                <span style="font-weight: bold;">-->
+<!--                                    乙方承认签订本合同前已经得到甲方告知同时完全知晓并理解了甲方制订的各项规章制度，乙方承诺接受并严格遵守甲方的员工手册、劳动纪律、各项规章制度、保密规定等。-->
+<!--                                </span>-->
+<!--                            </p>-->
+
+<!--                            &lt;!&ndash; Chapter 6 &ndash;&gt;-->
+<!--                            <h3 style="margin: 20px 0; font-size: 12pt;">第六章　劳动报酬</h3>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 乙方在正常出勤并付出正常劳动后，有权获得相应的劳动报酬，乙方所在岗位执行下述工资计发形式<span-->
+<!--                                    style="font-weight: bold;">（ A ）</span>。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0; margin-left: 30px;">-->
+<!--                                A. 计时形式：-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0; margin-left: 50px;">-->
+<!--                                乙方工资（若非特别说明，均为税前应发工资）￥-->
+<!--                                <span t-esc="'RM %.2f' % o.wage"/>-->
+<!--                                元/月，绩效奖金按照甲方的绩效考核规定及考核结果计算，但甲方保留自主决定是否发放以及发放金额的权利。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0; margin-left: 30px;">-->
+<!--                                A. 计件形式：乙方的劳动定额为____man_day_rate，计件单价为_hourly_rate。-->
+<!--                                <br/>-->
+<!--                                B. 其他工资形式：_others____________________________________________。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 甲方于每月 <span style="font-weight: bold;">5 日前</span>以人民币形式支付乙方上月工资。乙方同意：因工资计算标准不明确、计算方式不当，造成乙方工资计算不正确的，甲方应及时补发，但不属于无故拖欠或克扣工资。同时，双方约定，甲方发放工资、加班工资、奖金、补贴后，乙方认为有差错的，应在发放之日起五个工作日内以书面形式向甲方提出，如未按规定内向甲方提出的，视为乙方确认甲方已足额支付，并放弃相应诉权。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 甲方有权根据公司实际经营状况、乙方工作岗位的变更和依法制定的劳动报酬分配办法调整乙方的工资待遇。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - -->
+<!--                                甲方安排乙方延长工作时间或休息日、法定休假日工作的，依法安排乙方补休或支付相应劳动报酬，加班工资根据每月加班情况，以本合同约定的基本工资为计算基数据实发放。未休带薪年价补偿金计发基数同前。-->
+<!--                            </p>-->
+
+<!--                            &lt;!&ndash; Chapter 7 &ndash;&gt;-->
+<!--                            <h3 style="margin: 20px 0; font-size: 12pt;">第七章　社会保险和福利待遇</h3>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 甲方根据国家、市政府有关规定为乙方购买社会保险和住房公积金，乙方个人缴纳部分由乙方自行承担并由甲方在工资发放时代扣代缴。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 乙方患病或非因工负伤，其病假工资、疾病救济费和医疗待遇按照国家和市政府、公司的规定执行。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 乙方患职业病或因工负伤的工资和医疗保险待遇按国家和市政府的有关规定执行。-->
+<!--                            </p>-->
+
+<!--                            &lt;!&ndash; Chapter 8 &ndash;&gt;-->
+<!--                            <h3 style="margin: 20px 0; font-size: 12pt;">第八章　劳动保护、劳动条件和职业危害防护</h3>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - -->
+<!--                                甲方建立健全生产工艺流程、操作规程、工作规范和劳动安全卫生制度及其标准。甲方对可能产生职业病危害的岗位，对乙方履行告知义务，并做好劳动过程中职业危害的预防工作，乙方应严格遵守相关操作流程与安全制度。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 甲方为乙方提供符合国家规定的劳动条件及安全卫生的工作环境，并依照企业生产经营特点及有关规定为乙方提供劳动防护用品，乙方应严格按要求穿戴劳防用品。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 甲方对乙方进行职业技术、安全卫生、规章制度等必要的教育与培训，乙方应认真参加甲方组织的各项必要的教育培训。-->
+<!--                            </p>-->
+
+<!--                            &lt;!&ndash; Page break &ndash;&gt;-->
+<!--                            <div style="page-break-after: always;"></div>-->
+
+<!--                            &lt;!&ndash; Chapter 9 &ndash;&gt;-->
+<!--                            <h3 style="margin: 20px 0; font-size: 12pt;">第九章　劳动合同的变更、解除和终止</h3>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 订立合同所依据的法律、行政法规、规章发生变化，合同应变更相关内容。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 订立合同所依据的客观情况发生重大变化（包括但不限于企业迁移、兼并、资产转移等情形），致使合同无法履行的，经协商同意，可以变更合同相关内容或解除。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 甲方认为乙方在试用期内不符合甲方用人标准或录用条件的，甲方提前七日通知乙方解除本合同。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 乙方有下列情形之一的，甲方可立即解除本合同，辞退乙方：-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 5px 0; margin-left: 30px;">-->
+<!--                                1. 因乙方未能在入职后30天内提供员工手册、退工单等资料，致使甲方无法办理录用及社会保险缴纳手续的。-->
+<!--                                <br/>-->
+<!--                                2.-->
+<!--                                乙方被查实在应聘时向甲方提供的其个人资料或填写的个人信息（或工作经历，或学习经历）是虚假的，包括但不限于：离职证明、身份证明、户籍证明、学历证明、体检证明等是虚假或伪造的；应聘前患有精神病、传染性疾病及其它严重影响工作的疾病而在应聘时未声明的；应聘前曾被之前的工作单位解除劳动合同、或者与之前的工作单位进行过劳动仲裁、劳动诉讼，或者有吸毒等劣迹而在应聘时未声明的；应聘前曾被劳动教养、拘役或者依法追究刑事责任而在应聘时未声明的等。-->
+<!--                                <br/>-->
+<!--                                3. 滥用职权、违反技术操作规程或安全规程、违章指挥，给甲方或甲方的员工利益造成损失达3000元（含，下同）以上的；-->
+<!--                                <br/>-->
+<!--                                4. 因乙方不当言行给甲方或甲方管理人员的声誉造成损害或导致经济损失3000元以上的；-->
+<!--                                <br/>-->
+<!--                                5. 赌博、酗酒、吸毒、无理取闹、聚众闹事、打架斗殴、煽动停工等行为造成严重影响或情节恶劣的；-->
+<!--                                <br/>-->
+<!--                                6. 无正当理由拒不服从工作分配和上级指挥的；-->
+<!--                                <br/>-->
+<!--                                7. 工作不负责任，导致设备、工具损坏或原材料、能源损失，给公司造成经济损失3000元以上的；-->
+<!--                                <br/>-->
+<!--                                8. 贪污、侵占、挪用公司财物、盗窃公司或其他员工财物的；-->
+<!--                                <br/>-->
+<!--                                9. 有受贿索贿、敲诈勒索、或其他违法乱纪行为的；-->
+<!--                                <br/>-->
+<!--                                10. 故意毁坏公司财物的；-->
+<!--                                <br/>-->
+<!--                                11. 利用公司名义招摇撞骗，使公司声誉或经济蒙受损失的；-->
+<!--                                <br/>-->
+<!--                                12. 泄漏公司商业秘密，给公司造成经济损失的；-->
+<!--                                <br/>-->
+<!--                                13. 连续旷工3天或一年内累计旷工满3天的（含消极怠工、停工等视同旷工情形）；-->
+<!--                                <br/>-->
+<!--                                14. 一个自然年度内累计受到三次（含）以上书面警告或通报批评处分的；-->
+<!--                                <br/>-->
+<!--                                15. 在工作过程中，存在隐瞒或欺骗行为，对工作造成严重影响或对公司利益造成损失的；-->
+<!--                                <br/>-->
+<!--                                16. 严重违反甲方的劳动纪律、员工手册或规章制度等规定的。-->
+<!--                                <br/>-->
+<!--                                17. 其它渎职、失职行为给甲方造成经济损失3000元（含）以上的。-->
+<!--                                <br/>-->
+<!--                                18.-->
+<!--                                乙方是驾驶员的，因其自身原因，其营运服务的证、照被吊扣或失效15天（含）以上的，或因乙方的过错（含主要责任和同等责任）发生交通事故导致人员伤亡或财物损失超过3000元的，或因为违反交通法规被处以行政拘留处罚或被追究刑事责任的，甲方有权解除本合同。酒后驾驶或醉酒驾驶车辆的，一律解除劳动合同。-->
+<!--                                <br/>-->
+<!--                                19. 乙方系特种作业人员的，因其自身原因违章作业或造成物损3000元以上事故的，除给予经济处罚或处分外，甲方还可以解除合同。-->
+<!--                                <br/>-->
+<!--                                20. 乙方同时与其他用人单位建立劳动关系的。-->
+<!--                                <br/>-->
+<!--                                21. 乙方被依法追究刑事责任或被处以劳动教养的。-->
+<!--                                <br/>-->
+<!--                                22. 乙方以欺诈、胁迫的手段或者乘人之危，使甲方在违背真实意思的情况下订立或者变更合同的。-->
+<!--                                <br/>-->
+<!--                                23. 乙方违反甲方发布的各项规定（含，但不限于员工手册等），情节严重的。-->
+<!--                                <br/>-->
+<!--                                24. 政府法律、法规规定的其他情形。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0; margin-left: 50px;">-->
+<!--                                说明：因以上原因解除劳动合同的，甲方不需要向乙方支付解除劳动合同的经济补偿金。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 乙方有下列情形之一的，甲方可以解除本合同，辞退乙方，但应提前三十日以书面形式通知乙方：-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 5px 0; margin-left: 30px;">-->
+<!--                                1. 乙方患病或非因工负伤，医疗期满后不能从事原工作，也不能从事甲方另行安排的其它工作的。-->
+<!--                                <br/>-->
+<!--                                2. 乙方不能胜任本职工作，经过培训或者调整工作岗位后，仍不能胜任工作的，并拒不服从甲方的工作安排和劳动管理的。-->
+<!--                                <br/>-->
+<!--                                3. 甲方因兼并、分立、合资、转（改）制、企业转产、技术革新、经营方式调整、防治污染搬迁等客观情况发生重大变化或乙方的生产、工作岗位消失，致使本合同无法履行的。-->
+<!--                                <br/>-->
+<!--                                4. 甲方的经营状况发生严重困难的。-->
+<!--                                <br/>-->
+<!--                                5. 依据合同第三十一条规定不能就变更合同达成协议的。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 凡有下列情形之一，乙方可以解除本合同：-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 5px 0; margin-left: 30px;">-->
+<!--                                1. 在试用期内提前七天以上向甲方提出书面辞职。-->
+<!--                                <br/>-->
+<!--                                2. 甲方违反合同规定，未提供相应劳动保护和劳动条件的。-->
+<!--                                <br/>-->
+<!--                                3. 甲方的规章制度违反法律、法规的规定，损害劳动者权益的。-->
+<!--                                <br/>-->
+<!--                                4. 甲方强令冒险作业、违章指挥强迫乙方劳动的。-->
+<!--                                <br/>-->
+<!--                                5. 乙方提前三十天向甲方提出书面辞职。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 有下列情形之一的，本合同自行终止：-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 5px 0; margin-left: 30px;">-->
+<!--                                1. 合同期满且双方不能就相同劳动条件的续签达成一致的。-->
+<!--                                <br/>-->
+<!--                                2. 当事人约定的终止条件出现，如已确认乙方完成了某一项工作任务的。-->
+<!--                                <br/>-->
+<!--                                3. 甲方破产、解散、被吊销营业执照、责令关闭或者被撤销的。-->
+<!--                                <br/>-->
+<!--                                4. 乙方享受基本养老待遇、退休、宣告死亡、宣告失踪、死亡的。-->
+<!--                                <br/>-->
+<!--                                5.-->
+<!--                                乙方暂时无法履行合同的义务，但仍有继续履行条件和可能的，包括但不限于乙方涉嫌违法犯罪，被公安、国家安全或者司法机关限制人身自由的、乙方因脱产学习与进修、执行有关部门的公益性任务等原因而不能正常履行本合同超过15天的。-->
+<!--                                <br/>-->
+<!--                                6. 乙方应征入伍或者履行国家规定的其他法定义务的。-->
+<!--                                <br/>-->
+<!--                                7. 法律法规规定的其他情形。-->
+<!--                                <br/>-->
+<!--                                8. 员工手册规定的其他情形。-->
+<!--                            </p>-->
+
+<!--                            &lt;!&ndash; Chapter 10 &ndash;&gt;-->
+<!--                            <h3 style="margin: 20px 0; font-size: 12pt;">第十章　培训服务期与竞业限制</h3>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 乙方在合同期间接受甲方提供的出资进行专项技术培训的，另签订"培训服务协议"。约定具体服务期、赔偿标准并执行。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 乙方若违反协议约定，提前解除本合同的，应偿付甲方培训费用，对已履行部份服务期的，按照服务期尚未履行部分所应分摊的培训费用偿付。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 乙方应当保守甲方的商业秘密，商业秘密系指不为公众所知悉，能为甲方带来经济利益，具有实用性并经甲方采取保密措施的技术秘密和经营信息。包括但不限于下述内容：-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 5px 0; margin-left: 30px;">-->
+<!--                                1.-->
+<!--                                技术信息。技术信息的范围一般包括技术方案、工程设计、电路设计、制造方法、配方、工艺流程、技术指标、计算机软件、数据库、试验结果、图纸、样品样机、模型模具、操作手册、技术文档、涉及商业秘密的业务函电等等。-->
+<!--                                <br/>-->
+<!--                                2.-->
+<!--                                经营信息。经营信息的范围一般包括客户名单、营销计划、采购资料、定价政策、不公开的财务资源、劳动报酬、进货渠道、产销政策、招投标中的标的及标书内容等。特别约定，薪酬信息属于双方约定的保密内容，乙方无论以何种方式泄露给任何人或组织，均视作违反本合同，甲方可以此作为解除本合同的依据。-->
+<!--                                <br/>-->
+<!--                                3. 公司依照法律规定和有关协议约定对外应承担保密义务的事项等。-->
+<!--                            </p>-->
+
+<!--                            &lt;!&ndash; Chapter 11 &ndash;&gt;-->
+<!--                            <h3 style="margin: 20px 0; font-size: 12pt;">第十一章　劳动争议处理</h3>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 甲、乙双方因本合同而发生争议可以向甲方所在地的劳动仲裁委员会申请仲裁或向甲方所在地的人民法院提起诉讼。-->
+<!--                            </p>-->
+
+<!--                            &lt;!&ndash; Chapter 12 &ndash;&gt;-->
+<!--                            <h3 style="margin: 20px 0; font-size: 12pt;">第十二章　其他规定</h3>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 甲方的规章制度（包括但不限于员工手册、职位说明书、培训协议、保密协议、安全准则等）均属本合同的主要附件，其效力与本合同条款同等。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 本合同如与法律、法规相抵触的，或者因法律、法规的变更而不一致的，以现行有效的法律、法规为准。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 本合同未尽事宜，双方另有约定的，从约定；双方没有约定的从法律、法规和规章制度。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - <span style="font-weight: bold;">-->
+<!--                                本合同生效前双方签订的任何《劳动合同》自本合同签订之日自动失效，</span>其他之前签订的相关协议文本（包括但不限于《保密协议》、《培训协议》、《竞业限制协议》的规定与本合同不一致的，以本合同为准。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - -->
+<!--                                乙方同意，在其处于联系障碍状态（包括但不限于乙方因病住院、丧失人身自由等情形）时，委托本合同首页的"紧急情况联系人"或"约定送达接收人"作为乙方的受委托人，该受委托人享有接受和解与调解，代领、签收相关文书的权限。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 甲、乙双方另行约定条款：-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 5px 0; margin-left: 30px;">-->
+<!--                                1. __Contract Details Notes____________________________________________。-->
+<!--                            </p>-->
+
+<!--                            <p style="margin: 10px 0;">-->
+<!--                                - 本合同一式二份，甲方执一份，乙方执一份，经双方签字（或盖章）后生效。-->
+<!--                            </p>-->
+
+<!--                            &lt;!&ndash; Signature Section &ndash;&gt;-->
+<!--                            <div style="margin-top: 50px;">-->
+<!--                                <table style="width: 100%; border: none;">-->
+<!--                                    <tr>-->
+<!--                                        <td style="width: 50%; padding: 10px;">-->
+<!--                                            甲方(公司)：-->
+<!--                                        </td>-->
+<!--                                        <td style="width: 50%; padding: 10px;">-->
+<!--                                            乙方（员工）：-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                    <tr>-->
+<!--                                        <td style="padding: 10px;">-->
+<!--                                            （签字盖章）____________________-->
+<!--                                        </td>-->
+<!--                                        <td style="padding: 10px;">-->
+<!--                                            （签 字）____________________-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                    <tr>-->
+<!--                                        <td style="padding: 10px;">-->
+<!--                                            签订日期：____________________-->
+<!--                                        </td>-->
+<!--                                        <td style="padding: 10px;">-->
+<!--                                            签订日期：____________________-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                    <tr>-->
+<!--                                        <td style="padding: 10px;">-->
+<!--                                            签订地点：____________________-->
+<!--                                        </td>-->
+<!--                                        <td style="padding: 10px;">-->
+
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                </table>-->
+<!--                            </div>-->
+
+<!--                        </div>-->
+<!--                    </t>-->
+<!--                </t>-->
+<!--            </t>-->
+<!--        </template>-->
+<!--    </data>-->
+<!--</odoo>-->

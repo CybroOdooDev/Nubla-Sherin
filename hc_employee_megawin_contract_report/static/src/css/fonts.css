@@ -1,0 +1,11 @@
+@font-face {
+    font-family: 'Tinos-Regular';
+    src: url(/hc_employment_contract_report/static/src/fonts/Tinos/Tinos-Regular.ttf) format('truetype');
+
+}
+
+@font-face {
+    font-family: 'Tinos-Bold.ttf';
+    src: url(/hc_employment_contract_report/static/src/fonts/Tinos/Tinos-Bold.ttf) format('truetype');
+
+}
