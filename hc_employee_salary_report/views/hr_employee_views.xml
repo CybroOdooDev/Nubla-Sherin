@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_salary_report_tree" model="ir.ui.view">
+        <field name="name">salary.report.tree</field>
+        <field name="model">salary.history</field>
+        <field name="arch" type="xml">
+            <tree string="Salary Report" default_order="effective_date desc">
+                <field name="employee_id"/>
+
+                <field name="revised_date"/>
+                <field name="reason"/>
+                <field name="effective_date"/>
+                <field name="salary"/>
+                <field name="salary_increment"/>
+                <field name="allowance"/>
+                <field name="allowance_increment"/>
+                <field name="percentage"/>
+                <field name="total"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_salary_report_search" model="ir.ui.view">
+        <field name="name">salary.report.search</field>
+        <field name="model">salary.history</field>
+        <field name="arch" type="xml">
+            <search string="Salary Report">
+
+                <!-- Searchable Fields -->
+                <field name="employee_id"/>
+                <field name="reason"/>
+                <field name="revised_date"/>
+                <field name="effective_date"/>
+                <field name="salary"/>
+                <field name="percentage"/>
+
+                <!-- FILTERS -->
+                <filter name="rev_date" string="Revised Date" date="revised_date"/>
+                <filter name="eff_date" string="Effective Date" date="effective_date"/>
+
+
+                <!-- GROUP BY -->
+                <group expand="0" string="Group By">
+
+                    <filter name="grp_employee"
+                            string="Employee"
+                            context="{'group_by': 'employee_id'}"/>
+
+                    <filter name="grp_effective"
+                            string="Effective Date"
+                            context="{'group_by': 'effective_date'}"/>
+
+                    <filter name="grp_revised"
+                            string="Revised Date"
+                            context="{'group_by': 'revised_date'}"/>
+
+                    <filter name="grp_reason"
+                            string="Reason"
+                            context="{'group_by': 'reason'}"/>
+
+                </group>
+
+            </search>
+        </field>
+    </record>
+
+
+    <record id="action_salary_report" model="ir.actions.act_window">
+        <field name="name">Salary</field>
+        <field name="res_model">salary.history</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_salary_report_tree"/>
+        <field name="search_view_id" ref="view_salary_report_search"/>
+    </record>
+
+    <menuitem id="menu_salary_report"
+              name="Salary"
+              parent="hc_employee_retirement_report.menu_hr_reporting_root"
+              action="action_salary_report"
+              groups="hr_contract.group_hr_contract_manager"
+    />
+</odoo>
