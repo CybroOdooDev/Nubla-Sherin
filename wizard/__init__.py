@@ -1,0 +1,1 @@
+from . import rental_tenure_wizard
