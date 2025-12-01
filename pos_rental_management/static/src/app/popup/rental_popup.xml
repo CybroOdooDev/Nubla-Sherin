@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="pos_rental_management.RentalSelectionPopup">
+        <Dialog title="dialogTitle">
+
+            <div class="text-center pt-2 pb-3">
+                <h3 t-if="!this.state.selectedTenureId" class="text-primary">
+                    Select a Tenure
+                </h3>
+                <h3 t-else="" class="text-primary">
+                    Selected:
+                    <t t-out="tenures.find(t => t.id === this.state.selectedTenureId).name"/>
+                </h3>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+
+                        <t t-foreach="tenures" t-as="tenure" t-key="tenure.id">
+                            <button type="button"
+                                class="o_rental_tenure_btn btn btn-sm btn-secondary px-3 py-2"
+                                t-att-data-id="tenure.id"
+                                t-on-click="selectTenure">
+
+                                <span t-out="tenure.name"/>
+                            </button>
+                        </t>
+
+                    </div>
+                </div>
+            </div>
+
+            <t t-set-slot="footer">
+                <button class="btn btn-secondary" t-on-click="cancel">Cancel</button>
+                <button class="btn btn-primary" t-on-click="confirmSelection">Confirm</button>
+            </t>
+
+        </Dialog>
+    </t>
+
+</templates>

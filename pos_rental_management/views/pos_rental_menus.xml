@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Action to show ONLY rental products -->
+    <record id="action_rental_products" model="ir.actions.act_window">
+        <field name="name">Rental Products</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_rental', '=', True)]</field>
+        <field name="context">{'default_is_rental': True}</field>
+    </record>
+
+    <!-- Menu under Point of Sale -> Products -->
+    <menuitem id="menu_rental_products"
+              name="Rental Products"
+              parent="point_of_sale.menu_pos_products"
+              action="action_rental_products"
+              sequence="15"/>
+</odoo>
