@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_megawin_employee_contract" model="ir.actions.report">
+        <field name="name">Megawin Employee Contract </field>
+        <field name="model">hr.contract</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">hc_employee_megawin_contract_report.megawin_employee_contract_template</field>
+        <field name="report_file">hc_employee_megawin_contract_report.megawin_employee_contract_template</field>
+        <field name="print_report_name">'Employment Contract - %s' % (object.employee_id.name)</field>
+        <field name="binding_model_id" ref="hr_contract.model_hr_contract"/>
+        <field name="paperformat_id" ref="hc_employee_megawin_contract_report.paperformat_megawin_contract_report"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

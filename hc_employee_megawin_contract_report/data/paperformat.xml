@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="paperformat_megawin_contract_report" model="report.paperformat">
+            <field name="name">Megawin Contract Paperformat</field>
+            <field name="format">A4</field>
+
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+
+            <!-- Word Margins converted to mm -->
+            <field name="margin_top">20</field>      <!-- 3.81 cm -->
+            <field name="margin_bottom">15</field>     <!-- 1.5 cm -->
+            <field name="margin_left">16</field>     <!-- 2.49 cm -->
+            <field name="margin_right">16</field>    <!-- 2.54 cm -->
+
+            <field name="header_spacing">10</field>
+            <field name="header_line" eval="False"/>
+                        <field name="dpi">96</field>
+        </record>
+    </data>
+</odoo>

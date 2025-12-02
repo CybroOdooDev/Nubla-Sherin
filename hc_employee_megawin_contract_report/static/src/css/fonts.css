@@ -1,0 +1,26 @@
+@font-face {
+    font-family: 'SimSun';
+    src: url('/hc_employee_megawin_contract_report/static/src/fonts/simsun/SIMSUN.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+/* Apply SimSun to EVERYTHING inside PDF reports */
+body, div, p, span, table, td, th, h1, h2, h3, h4, h5, h6 {
+    font-family: 'SimSun' !important;
+}
+
+/* FIX THE SPACING ISSUES */
+
+.big-section p,
+.big-section span,
+.big-section td,
+.big-section li {
+    font-size: 18pt !important;   /* or any size you want */
+    line-height: 1.8 !important;
+}
+.medium-section {
+    font-size: 15pt !important;
+    line-height: 1.8 !important;
+}
+
+
