@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Action: Rental Products -->
+    <record id="action_rental_products" model="ir.actions.act_window">
+        <field name="name">Rental Products</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_rental', '=', True)]</field>
+        <field name="context">{'default_is_rental': True}</field>
+    </record>
+
+    <!-- Action: Rental Orders -->
+    <record id="action_pos_rental_orders" model="ir.actions.act_window">
+        <field name="name">Rental Orders</field>
+        <field name="res_model">pos.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('lines.product_id.is_rental', '=', True)]</field>
+    </record>
+
+    <!-- Rental Products Menu -->
+    <menuitem id="menu_rental_products"
+              name="Rental Products"
+              parent="point_of_sale.pos_config_menu_catalog"
+              action="action_rental_products"
+              sequence="15"/>
+
+    <!-- Rental Orders Menu -->
+    <menuitem id="menu_pos_rental_orders"
+              name="Rental Orders"
+              parent="point_of_sale.pos_config_menu_catalog"
+              action="action_pos_rental_orders"
+              sequence="20"/>
+
+</odoo>

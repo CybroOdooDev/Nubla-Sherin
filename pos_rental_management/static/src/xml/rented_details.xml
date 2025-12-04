@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="pos_rental_management.SimpleButton"
+       t-inherit="point_of_sale.ControlButtons"
+       t-inherit-mode="extension">
+        <xpath expr="//t[@t-if='props.showRemainingButtons']/div" position="inside">
+            <button class="btn btn-outline-primary control-button me-2"
+                    t-on-click="() => this.onClickRentedProductList()">
+                <i class="fa fa-list me-1"/> Rented Orders
+            </button>
+        </xpath>
+    </t>
+</templates>

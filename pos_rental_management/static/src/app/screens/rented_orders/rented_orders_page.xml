@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="pos_rental_management.RentedProductDetailsScreen">
+    <div class="rented-details-screen">
+
+        <!-- Top Header -->
+        <div class="screen-header">
+            <button class="btn-back" t-on-click="onClickBack">« Back</button>
+            <input type="text" class="search-box" placeholder="Search Orders"/>
+            <h2>Rented Product Details</h2>
+            <button class="btn-return" t-on-click="onClickReturnRefund">Return/Refund</button>
+            <button class="btn-close" t-on-click="onClickClose">✕</button>
+        </div>
+
+        <!-- Order Info Section -->
+        <div class="order-info">
+
+            <div class="info-left">
+                <p><strong>Name :</strong> <t t-esc="state.selected?.name"/></p>
+                <p><strong>Security Amount :</strong> $ <t t-esc="state.selected?.security_amount"/></p>
+                <p><strong>Order Date :</strong> <t t-esc="state.selected?.order_date"/></p>
+                <p><strong>Selected Tenure :</strong> <t t-esc="state.selected?.tenure"/></p>
+            </div>
+
+            <div class="info-right">
+                <p><strong>Customer :</strong> <t t-esc="state.selected?.customer"/></p>
+                <p><strong>Price Unit :</strong> $ <t t-esc="state.selected?.price_unit"/></p>
+                <p><strong>Status :</strong> <span class="badge-rented">Rented</span></p>
+                <p><strong>Subtotal :</strong> $ <t t-esc="state.selected?.subtotal"/></p>
+            </div>
+
+        </div>
+
+        <!-- Product Table -->
+        <table class="order-table">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Order Ref</th>
+                    <th>Customer</th>
+                    <th>Order Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <t t-foreach="state.filteredOrders" t-as="order" t-key="order.id">
+                    <tr>
+                        <td><t t-esc="order.name"/></td>
+                        <td><t t-esc="order.order_ref"/></td>
+                        <td><t t-esc="order.customer || '-'"/></td>
+                        <td><t t-esc="order.date"/></td>
+                        <td><span class="badge-rented">Rented</span></td>
+                    </tr>
+                </t>
+            </tbody>
+        </table>
+
+    </div>
+</t>
+
+</templates>

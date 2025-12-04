@@ -1,0 +1,47 @@
+<odoo>
+    <!-- Rental Product Tenure Form View -->
+    <record id="view_rental_product_tenure_form" model="ir.ui.view">
+        <field name="name">rental.product.tenure.form</field>
+        <field name="model">rental.product.tenure</field>
+        <field name="arch" type="xml">
+            <form string="Create Rental Product Tenure">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="duration_uom"/>
+                        </group>
+                        <group>
+                            <field name="range_start"/>
+                            <field name="range_end"/>
+                        </group>
+                        <group>
+                            <field name="amount"/>
+                        </group>
+                        <!-- Hidden field -->
+                        <field name="product_tmpl_id" invisible="1"/>
+                    </group>
+                </sheet>
+
+                <footer>
+                    <button name="action_save_close"
+                            string="Save  Close"
+                            type="object"
+                            class="btn-primary"/>
+
+                    <button name="action_save_new"
+                            string="Save New"
+                            type="object"
+                            class="btn-secondary"/>
+
+                    <button string="Discard"
+                            special="cancel"
+                            class="btn-link"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Optional action for popup -->
+
+</odoo>

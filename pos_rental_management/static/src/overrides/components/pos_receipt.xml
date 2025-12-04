@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    <!-- Correct template name for POS SCREEN orderline -->
+    <t t-name="pos_rental.OrderlineExtraInfo"
+       t-inherit="point_of_sale.OrderlineContent"
+       t-inherit-mode="extension">
+
+        <!-- Correct OWL XPath selector -->
+        <xpath expr="//div[hasclass('orderline')]" position="inside">
+
+            <!-- Rental Info -->
+            <t t-if="line.rental_info">
+                <div style="color:#0a8a0a; font-size:14px; margin-top:4px;">
+                    <t t-esc="line.rental_info.tenure_name"/>
+                    @ $<t t-esc="line.rental_info.rate"/> /
+                    <t t-esc="line.rental_info.uom"/>
+                    × <t t-esc="line.rental_info.duration"/> Day(s)
+                </div>
+            </t>
+
+            <!-- Security Info -->
+            <t t-if="line.security_label">
+                <div style="color:#0077cc; font-size:14px; margin-top:4px;">
+                    <t t-esc="line.security_label"/>
+                </div>
+            </t>
+
+        </xpath>
+
+    </t>
+</templates>

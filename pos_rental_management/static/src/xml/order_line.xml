@@ -1,0 +1,28 @@
+<t t-name="pos_rental_management.OrderLine"
+   t-inherit="point_of_sale.Orderline"
+   t-inherit-mode="extension">
+
+    <xpath expr="//div[hasclass('d-flex')]" position="after">
+
+        <!-- BADGE 1: RENTAL TENURE -->
+        <t t-if="line.rental_info">
+            <div class="badge bg-primary mt-1"
+                 style="font-size:12px;padding:3px 6px;border-radius:6px;display:inline-block;">
+                <t t-esc="line.rental_info.tenure_name"/> @
+                <t t-esc="line.rental_info.price_per_unit"/> /
+                <t t-esc="line.rental_info.uom"/>
+                (<t t-esc="line.rental_info.duration"/>)
+            </div>
+        </t>
+
+        <!-- BADGE 2: SECURITY PRODUCT NAME -->
+        <t t-if="line.is_security">
+            <div class="badge bg-success mt-1"
+                 style="font-size:12px;padding:3px 6px;border-radius:6px;display:inline-block;">
+                Security Amount Product (<t t-esc="line.main_product_name"/>)
+            </div>
+        </t>
+
+    </xpath>
+
+</t>

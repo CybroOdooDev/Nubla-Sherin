@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+<t t-name="pos_rental_management.RentConfigurationPopup">
+    <Dialog title="'Rent Configuration'">
+
+        <div class="text-center">
+            <img src="/pos_rental_management/static/img/rent.png" style="width:70px"/>
+            <h3 class="mt-2">Rent Configuration</h3>
+        </div>
+
+        <div class="row mt-4 px-4">
+            <div class="col-6">
+                <strong>Selected Tenure</strong><br/>
+                <t t-out="`${props.tenure.name} @$ ${props.tenure.amount}/${props.tenure.duration_uom}`"/>
+            </div>
+            <div class="col-6 text-end">
+                <strong>Minimum</strong>
+                <t t-out="props.tenure.min_count"/>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <label>Tenure Count</label>
+            <input type="number" class="form-control" t-model="state.count"/>
+
+            <div class="text-center my-3">OR</div>
+
+            <div class="row">
+                <div class="col-6">
+                    <label>Start Date</label>
+                    <input type="date" class="form-control" t-model="state.start_date"/>
+                </div>
+                <div class="col-6">
+                    <label>End Date</label>
+                    <input type="date" class="form-control" t-model="state.end_date"/>
+                </div>
+            </div>
+
+            <label class="mt-3">Description</label>
+            <textarea class="form-control" t-model="state.note"/>
+        </div>
+
+        <t t-set-slot="footer">
+            <button class="btn btn-secondary" t-on-click="props.close">Cancel</button>
+            <button class="btn btn-success" t-on-click="proceed">PROCEED</button>
+        </t>
+
+    </Dialog>
+</t>
+
+
+
+</templates>
+

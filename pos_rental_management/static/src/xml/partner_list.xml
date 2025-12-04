@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="pos_loyalty.PartnerLine" t-inherit="point_of_sale.PartnerLine" t-inherit-mode="extension">
+        <xpath expr="//tr[contains(@class,'partner-line')]/td[@class='partner-line-balance']" position="after">
+            <td class="text-center px-3 py-2 partner-assign-points" style="vertical-align: middle;">
+
+                <!-- 1. Checkbox is UNCHECKED (False) -> Show Button -->
+
+                     <button class="btn btn-primary btn-sm" t-on-click="() => this.onClickViewRentalProducts()"
+                            >
+                     View Rental Product
+                    </button>
+            </td>
+        </xpath>
+    </t>
+</templates>
