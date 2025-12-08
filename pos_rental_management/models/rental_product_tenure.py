@@ -18,7 +18,6 @@ class RentalProductTenure(models.Model):
     range_start = fields.Integer(required=True)
     range_end = fields.Integer(required=True)
     amount = fields.Float(required=True)
-
     product_tmpl_id = fields.Many2one('product.template')
 
     @api.model

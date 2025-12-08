@@ -26,7 +26,6 @@ export class RentalSelectionPopup extends Component {
         return _t("Select rental tenure for %s", this.props.product.name);
     }
 
-    /** List of tenures */
     get tenures() {
         return this.props.product.rental_tenure_ids || [];
         console.log("dgssssssssssss",this.props.product.rental_tenure_ids)
@@ -37,7 +36,6 @@ export class RentalSelectionPopup extends Component {
 
         console.log(ev,"dddd")
 
-        // highlight selected button
         document.querySelectorAll(".o_rental_tenure_btn").forEach((btn) => {
             btn.classList.replace("btn-primary", "btn-secondary");
         });
@@ -57,15 +55,13 @@ export class RentalSelectionPopup extends Component {
         const selectedTenure = this.tenures.find(
             (t) => t.id === this.state.selectedTenureId
         );
-
-        // Instead of closing → open 2nd popup
+        this.props.close();
         this.dialog.add(RentConfigurationPopup, {
             product: this.props.product,
             tenure: selectedTenure,
             close: this.props.close,
             confirm: this.props.confirm,
         });
-
     }
 
     cancel() {

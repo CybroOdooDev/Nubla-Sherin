@@ -8,8 +8,3 @@ class PosSession(models.Model):
         models = super()._load_pos_data_models(config)
         models.append("rental.product.tenure")
         return models
-
-
-
-
-

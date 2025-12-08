@@ -24,21 +24,31 @@ patch(ProductScreen.prototype, {
             product,
 
             confirm: async (tenure) => {
+               console.log("KKKKKKKKKKKKKKk",tenure)
+               const tenureRecord = tenure.tenure.raw;
 
-                // 1) Add rental product
+               const tenureName = tenureRecord.name;
+               console.log("KKKKKKKKKKKKKKk",tenureName)
+
+
                 const rentalLine = await this.pos.addLineToCurrentOrder(
                     { product_tmpl_id: product },
                     {
                         is_rental: true,
+                        rental_tenure_id: tenureName,
                         rental_info: {
-                            tenure_name: tenure.name,
+                            tenure_name: tenureName,
                             duration: `${tenure.range_start} - ${tenure.range_end} ${tenure.duration_uom}`,
                             amount: tenure.amount,
                         },
                     }
                 );
+                rentalLine.setUnitPrice(tenure.total_price);
 
-                // 2) Load security product
+                rentalLine.is_rented = true;
+                rentalLine.rental_tenure_name = tenureName;
+                console.log("LINEEEEEEEE,",rentalLine.is_rented)
+
                 const secId = this.pos.config.raw.rental_security_product_id;
                 if (!secId) {
                     console.warn("No security product configured.");
@@ -51,16 +61,21 @@ patch(ProductScreen.prototype, {
                     return;
                 }
 
-                // 3) Add security product line
                 const securityLine = await this.pos.addLineToCurrentOrder(
                     { product_tmpl_id: securityProduct },
                     {
                         is_security: true,
-                        linked_rental_uuid: rentalLine?.id,
+                        is_rental: false,
+                        rental_tenure_name: false,
+                        linked_rental_uuid: rentalLine.id,
                     }
                 );
+                securityLine.setUnitPrice(tenure.security_amount);
+                securityLine.is_security = true;
+                securityLine.is_rental = false;
+                securityLine.rental_tenure_name = false;
 
-                // 4) Link back
+
                 if (rentalLine && securityLine) {
                     rentalLine.security_line_id = securityLine.id;
                     securityLine.rental_line_id = rentalLine.id;

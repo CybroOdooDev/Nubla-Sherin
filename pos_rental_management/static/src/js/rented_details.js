@@ -5,6 +5,7 @@ import { patch } from "@web/core/utils/patch";
 
 patch(ControlButtons.prototype, {
     onClickRentedProductList() {
+        print("hdddddddddddd")
         this.pos.navigate("RentedProductDetailsScreen", {
             stateOverride: {
             },

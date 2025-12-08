@@ -19,6 +19,16 @@
             </div>
         </div>
 
+        <div class="row mt-3 px-4">
+    <div class="col-12 text-end">
+        <strong>Security Amount:</strong>
+        <span class="text-success fw-bold">
+            $ <t t-out="securityAmount"/>
+
+        </span>
+    </div>
+</div>
+
         <div class="p-4">
             <label>Tenure Count</label>
             <input type="number" class="form-control" t-model="state.count"/>

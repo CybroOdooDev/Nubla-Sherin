@@ -27,13 +27,23 @@
             'pos_rental_management/static/src/app/popup/rent_configuration_popup.js',
             'pos_rental_management/static/src/app/popup/rent_configuration_popup.xml',
             'pos_rental_management/static/src/js/rented_details.js',
+            'pos_rental_management/static/src/app/screens/partner_list/partner_rental_details_button.js',
             'pos_rental_management/static/src/xml/rented_details.xml',
             'pos_rental_management/static/src/xml/partner_list.xml',
             'pos_rental_management/static/src/css/rented_details.css',
             'pos_rental_management/static/src/app/screens/rented_orders/rented_orders_page.js',
             'pos_rental_management/static/src/app/screens/rented_orders/rented_orders_page.xml',
-            # 'pos_rental_management/static/src/js/order_line.js',
-            # 'pos_rental_management/static/src/xml/order_line.xml',
+            'pos_rental_management/static/src/js/refund_return_popup.js',
+            'pos_rental_management/static/src/xml/refund_return_popup.xml',
+            'pos_rental_management/static/src/css/rental_badge.css',
+            'pos_rental_management/static/src/overrides/models/pos_order_line.js',
+            'pos_rental_management/static/src/overrides/components/pos_orderline.xml',
+            'pos_rental_management/static/src/js/partial_payment_validation.js',
+            'pos_rental_management/static/src/js/payment_screen_validate_patch.js',
+
+            'pos_rental_management/static/src/xml/enable_validate_on_partial.xml'
+
+
 
 
         ],

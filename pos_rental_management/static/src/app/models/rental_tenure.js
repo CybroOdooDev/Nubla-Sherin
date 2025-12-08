@@ -6,7 +6,10 @@ patch(PosStore.prototype, {
     async processServerData() {
         await super.processServerData();
         console.log(this.data.models)
-        const tenureModel = this.models["rental.product.tenure"];
-        console.log(tenureModel)
+        const posOrderModel = this.models["pos.order"];
+        console.log("",posOrderModel)
+        const allOrders = Array.from(posOrderModel.records.values());
+        console.log("Total orders loaded in POS:", allOrders.length);
+        console.log("First 5:", allOrders.slice(0, 5));
     },
 });

@@ -7,29 +7,47 @@
         <!-- Top Header -->
         <div class="screen-header">
             <button class="btn-back" t-on-click="onClickBack">« Back</button>
-            <input type="text" class="search-box" placeholder="Search Orders"/>
+            <input type="text" class="search-box" placeholder="Search Orders" t-on-input="onSearchOrder"/>
             <h2>Rented Product Details</h2>
             <button class="btn-return" t-on-click="onClickReturnRefund">Return/Refund</button>
-            <button class="btn-close" t-on-click="onClickClose">✕</button>
+            <button class="btn-close" t-on-click="onClickBack">✕</button>
         </div>
 
         <!-- Order Info Section -->
-        <div class="order-info">
+        <div class="order-info" t-if="state.selectedOrder">
 
             <div class="info-left">
-                <p><strong>Name :</strong> <t t-esc="state.selected?.name"/></p>
-                <p><strong>Security Amount :</strong> $ <t t-esc="state.selected?.security_amount"/></p>
-                <p><strong>Order Date :</strong> <t t-esc="state.selected?.order_date"/></p>
-                <p><strong>Selected Tenure :</strong> <t t-esc="state.selected?.tenure"/></p>
+                <p><strong>Products :</strong> <t t-esc="state.selectedOrder.products"/></p>
+                <p><strong>Security Amount :</strong> $ <t t-esc="state.selectedOrder.security_amount || '0.00'"/></p>
+                <p><strong>Order Date :</strong> <t t-esc="state.selectedOrder.date"/></p>
+                <p><strong>Selected Tenure :</strong> <t t-esc="state.selectedOrder.tenure_name || '-'"/></p>
             </div>
 
             <div class="info-right">
-                <p><strong>Customer :</strong> <t t-esc="state.selected?.customer"/></p>
-                <p><strong>Price Unit :</strong> $ <t t-esc="state.selected?.price_unit"/></p>
+                <p><strong>Customer :</strong> <t t-esc="state.selectedOrder.customer"/></p>
+                <p><strong>Price Unit :</strong> $ <t t-esc="state.selectedOrder.price_unit || '0.00'"/></p>
                 <p><strong>Status :</strong> <span class="badge-rented">Rented</span></p>
-                <p><strong>Subtotal :</strong> $ <t t-esc="state.selected?.subtotal"/></p>
+                <p><strong>Subtotal :</strong> $ <t t-esc="state.selectedOrder.amount || '0.00'"/></p>
             </div>
 
+        </div>
+
+        <!-- Show message if no order selected -->
+        <div class="order-info" t-else="">
+            <p class="text-center text-muted">Please select an order from the table below to view details</p>
+        </div>
+
+        <!-- Tenure Details Section (if available) -->
+        <div class="tenure-details" t-if="state.selectedOrder and state.selectedOrder.tenures.length > 0">
+            <h3>Available Tenures</h3>
+            <t t-foreach="state.selectedOrder.tenures" t-as="tenure" t-key="tenure.id">
+                <div class="tenure-item">
+                    <strong><t t-esc="tenure.product_name"/></strong> -
+                    <t t-esc="tenure.name"/>
+                    (<t t-esc="tenure.range_start"/> - <t t-esc="tenure.range_end"/> <t t-esc="tenure.duration_uom"/>)
+                    - $<t t-esc="tenure.amount"/>
+                </div>
+            </t>
         </div>
 
         <!-- Product Table -->
@@ -45,13 +63,22 @@
             </thead>
 
             <tbody>
-                <t t-foreach="state.filteredOrders" t-as="order" t-key="order.id">
+                <t t-if="state.filteredOrders.length > 0">
+                    <t t-foreach="state.filteredOrders" t-as="order" t-key="order.id">
+                        <tr t-on-click="() => this.onSelectOrder(order)"
+                            t-att-class="state.selectedOrder?.id === order.id ? 'selected-row' : ''"
+                            class="clickable-row">
+                            <td><t t-esc="order.products"/></td>
+                            <td><t t-esc="order.order_ref"/></td>
+                            <td><t t-esc="order.customer || '-'"/></td>
+                            <td><t t-esc="order.date"/></td>
+                            <td><span class="badge-rented">Rented</span></td>
+                        </tr>
+                    </t>
+                </t>
+                <t t-else="">
                     <tr>
-                        <td><t t-esc="order.name"/></td>
-                        <td><t t-esc="order.order_ref"/></td>
-                        <td><t t-esc="order.customer || '-'"/></td>
-                        <td><t t-esc="order.date"/></td>
-                        <td><span class="badge-rented">Rented</span></td>
+                        <td colspan="5" class="text-center text-muted">No rented orders found</td>
                     </tr>
                 </t>
             </tbody>

@@ -10,6 +10,11 @@ class PosConfig(models.Model):
         domain=[('type', '=', 'service'),('available_in_pos', '=', True)],
     )
 
+    allow_partial_payment = fields.Boolean(
+        string="Allow Partial Payment",
+        config_parameter='pos_rental.allow_partial_payment'
+    )
+
 
 
 

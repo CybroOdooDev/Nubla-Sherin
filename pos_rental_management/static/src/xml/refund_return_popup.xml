@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+<t t-name="pos_rental_management.RefundReturnPopup">
+    <Dialog title="'Return Rented Products (In $)'">
+
+        <div class="p-4">
+
+            <!-- Refund Security Amount -->
+            <div class="row mb-3">
+                <div class="col-6"><strong>Refund Security Amount:</strong></div>
+                <div class="col-6">
+                    <input type="number" class="form-control"
+                           t-model="state.refund_security_amount"/>
+                </div>
+            </div>
+
+            <!-- Extra Refund Amount -->
+            <div class="row mb-3">
+                <div class="col-6"><strong>Extra Refund Amount:</strong></div>
+                <div class="col-6">
+                    <input type="number" class="form-control"
+                           t-model="state.extra_refund_amount"/>
+                </div>
+            </div>
+
+            <!-- Deduction Amount -->
+            <div class="row mb-3">
+                <div class="col-6"><strong>Deduction Amount:</strong></div>
+                <div class="col-6">
+                    <input type="number" class="form-control"
+                           t-model="state.deduction_amount"/>
+                </div>
+            </div>
+
+        </div>
+
+        <t t-set-slot="footer">
+            <button class="btn btn-secondary" t-on-click="props.close">Cancel</button>
+            <button class="btn btn-success" t-on-click="proceed">Return</button>
+        </t>
+
+    </Dialog>
+</t>
+
+</templates>

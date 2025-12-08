@@ -13,6 +13,15 @@
                     </div>
                 </div>
             </xpath>
+            <xpath expr="//setting[@id='other_devices']" position="inside">
+                <div class="row mt16 o_settings_container">
+                        <label class="col-lg-3" for="allow_partial_payment"/>
+                    <div class="content-group mt16">
+                            <field name="allow_partial_payment" nolabel="1"/>
+                    </div>
+                </div>
+            </xpath>
+
         </field>
     </record>
 </odoo>
