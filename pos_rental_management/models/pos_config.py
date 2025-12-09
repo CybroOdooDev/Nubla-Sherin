@@ -14,7 +14,3 @@ class PosConfig(models.Model):
         string="Allow Partial Payment",
         config_parameter='pos_rental.allow_partial_payment'
     )
-
-
-
-

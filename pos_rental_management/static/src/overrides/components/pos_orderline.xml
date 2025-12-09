@@ -1,14 +1,17 @@
-<t t-inherit="point_of_sale.Orderline" t-inherit-mode="extension">
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="point_of_sale.Orderline" t-inherit-mode="extension">
 
-    <xpath expr="//span[@class='text-wrap d-inline']" position="after">
-
-        <t t-log="props.line"/>
-        <t t-if="props.line.is_rental or props.line.rental_tenure_name">
-            <div class="rental-tenure-badge">
-                <t t-esc="props.line.rental_tenure_name"/>
-            </div>
-        </t>
-
-    </xpath>
+<xpath expr="//span[@class='text-wrap d-inline']" position="after">
+    <t t-if="props.line.is_rental or props.line.rental_tenure_name">
+        <div class="rental-tenure-badge">
+            <t t-esc="props.line.rental_tenure_name"/>
+        </div>
+    </t>
+</xpath>
 
 </t>
+
+
+
+</templates>

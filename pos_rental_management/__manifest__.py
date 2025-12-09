@@ -39,9 +39,13 @@
             'pos_rental_management/static/src/overrides/models/pos_order_line.js',
             'pos_rental_management/static/src/overrides/components/pos_orderline.xml',
             'pos_rental_management/static/src/js/partial_payment_validation.js',
-            'pos_rental_management/static/src/js/payment_screen_validate_patch.js',
-
-            'pos_rental_management/static/src/xml/enable_validate_on_partial.xml'
+            'pos_rental_management/static/src/js/payment_screen_is_order_valid.js',
+            # 'pos_rental_management/static/src/js/payment_screen_validate_patch.js',
+            'pos_rental_management/static/src/xml/enable_validate_on_partial.xml',
+            # 'pos_rental_management/static/src/js/payment_screen_button.js',
+            # 'pos_rental_management/static/src/xml/payment_screen_button.xml',
+            'pos_rental_management/static/src/js/order_finalize_partial_patch.js',
+            'pos_rental_management/static/src/xml/receipt_partial_warning.xml'
 
 
 

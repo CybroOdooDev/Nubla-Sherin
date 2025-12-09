@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-inherit="point_of_sale.ReceiptScreen" t-inherit-mode="extension">
+
+        <xpath expr="//div[contains(@class,'o_payment_successful')]//div[contains(@class,'fs-4')]" position="after">
+            <div t-if="currentOrder.is_partial_payment"
+                 class="alert alert-warning text-center fw-bold mt-2">
+                ⚠ Remaining amount must be paid within <b>10 days</b>.
+            </div>
+        </xpath>
+
+    </t>
+
+</templates>

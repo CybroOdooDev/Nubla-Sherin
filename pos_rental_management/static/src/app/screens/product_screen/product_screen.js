@@ -47,6 +47,9 @@ patch(ProductScreen.prototype, {
 
                 rentalLine.is_rented = true;
                 rentalLine.rental_tenure_name = tenureName;
+                this.pos.getOrder().is_rented = true;
+                console.log("")
+
                 console.log("LINEEEEEEEE,",rentalLine.is_rented)
 
                 const secId = this.pos.config.raw.rental_security_product_id;

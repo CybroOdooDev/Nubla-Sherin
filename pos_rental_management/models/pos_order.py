@@ -9,6 +9,14 @@ class PosOrder(models.Model):
         store=True
     )
 
+    is_partial_payment = fields.Boolean(
+        string="Is Partial Payment",
+    )
+    state = fields.Selection(
+        selection_add=[('partial', 'Partially Paid')],
+        ondelete={'partial': 'set default'}
+    )
+
     @api.depends('lines.product_id')
     def _compute_is_rented(self):
         for order in self:
@@ -30,6 +38,14 @@ class PosOrderLine(models.Model):
         compute='_compute_rental_tenure_name',
         store=True
     )
+
+    is_partial_payment = fields.Boolean('Partial Payment')
+    partial_invoice_id = fields.Many2one('account.move', 'Partial Invoice')
+    remaining_amount = fields.Float('Remaining Amount', compute='_compute_remaining')
+
+    def _compute_remaining(self):
+        for order in self:
+            order.remaining_amount = order.amount_total - order.amount_paid
 
     @api.depends('rental_tenure_id.name')
     def _compute_rental_tenure_name(self):

@@ -3,49 +3,68 @@
 import OrderPaymentValidation from "@point_of_sale/app/utils/order_payment_validation";
 import { patch } from "@web/core/utils/patch";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { _t } from "@web/core/l10n/translation";
 
 patch(OrderPaymentValidation.prototype, {
+    async validateOrder(isForceValidate) {
+        const order = this.order;
 
-    async validateOrder(isForceValidate = false) {
-        const order = this.pos.getOrder();
+        console.log("✅ OrderPaymentValidation.validateOrder TRIGGERED");
+
+        // ✅ ✅ CORRECT TOTAL & PAID VALUES
+        const total = order.getTotalWithTax();
+        const paid = order.getTotalPaid();
+        const remaining = total - paid;
+
+        console.log("TOTAL:", total, "PAID:", paid, "REMAINING:", remaining);
+
+        // ✅ Blackbox Check (unchanged)
+        if (this.pos.useBlackBoxBe && this.pos.useBlackBoxBe() && !this.pos.userSessionStatus) {
+            this.pos.env.services.dialog.add(AlertDialog, {
+                title: _t("POS Error"),
+                body: _t(
+                    "The government's Fiscal Data Module requires every user to Clock In."
+                ),
+            });
+            throw new Error("Blackbox not clocked in");
+        }
 
         if (!order) {
-            console.error("❌ No active order");
-            return false;
+            return await super.validateOrder(isForceValidate);
         }
 
-        const remaining = order.getDue();
-        const total = order.getTotalDue();
-        const paid = total - remaining;
-        const allowPartial = this.pos.config.allow_partial_payment;
+        // ✅ Normal orders → default flow
+        if (!order.is_partial_payment) {
+            return await super.validateOrder(isForceValidate);
+        }
 
-        console.log("TOTAL:", total);
-        console.log("PAID:", paid);
-        console.log("REMAINING:", remaining);
-        console.log("ALLOW PARTIAL:", allowPartial);
-
-        // ❌ Block when partial disabled
-        if (!allowPartial && remaining > 0) {
-            await this.popup.add(AlertDialog, {
-                title: "Partial Payment Disabled",
-                body: "You must collect the full amount before validating.",
+        // ✅ Customer restriction
+        if (order.getPartner()?.prevent_partial_payment) {
+            this.pos.env.services.dialog.add(AlertDialog, {
+                title: _t("Partial Payment Not Allowed"),
+                body: _t("This customer is not allowed to use Partial Payments."),
             });
-            return false;   // ❌ STOP VALIDATION
+            throw new Error("Partial payment blocked");
         }
 
-        // ✅ ✅ ✅ PARTIAL PAYMENT → JUST SAY "VALID"
-        if (allowPartial && paid > 0 && remaining > 0) {
-            order.rental_paid_amount = paid;
-            order.rental_due_amount = remaining;
-
-            console.log("✅ PARTIAL PAYMENT ACCEPTED → RETURN TRUE ONLY");
-
-            // ✅ CRITICAL: DO NOT call super here
-            return true;
+        // ✅ Invoice rule (only if you still want it)
+        if (!order.isToInvoice()) {
+            this.pos.env.services.dialog.add(AlertDialog, {
+                title: _t("Invoice Required"),
+                body: _t("Enable Invoice for Partial Payments."),
+            });
+            throw new Error("Invoice required");
         }
 
-        // ✅ Full payment → normal validation
+        // ✅ ✅ FIXED: Real payment validation (NO RANDOM FAIL ANYMORE)
+        if (paid <= 0) {
+            this.pos.env.services.dialog.add(AlertDialog, {
+                title: _t("No Payment"),
+                body: _t("Please add a payment before validating."),
+            });
+            throw new Error("No payment entered");
+        }
+
         return await super.validateOrder(isForceValidate);
-    }
-
+    },
 });
