@@ -14,7 +14,8 @@
         'views/rental_product_tenure_views.xml',
         'views/pos_rental_res_config_settings_view.xml',
         'views/pos_order_views.xml',
-        'views/pos_config_views.xml'
+        'views/pos_config_views.xml',
+        'views/res_partner_views.xml'
 
     ],
 
@@ -28,6 +29,9 @@
             'pos_rental_management/static/src/app/popup/rent_configuration_popup.xml',
             'pos_rental_management/static/src/js/rented_details.js',
             'pos_rental_management/static/src/app/screens/partner_list/partner_rental_details_button.js',
+            'pos_rental_management/static/src/app/screens/partner_list/customer_rented_orders_screen.js',
+            'pos_rental_management/static/src/app/screens/partner_list/customer_rented_orders_screen.xml',
+            'pos_rental_management/static/src/css/partner_rented_order.css',
             'pos_rental_management/static/src/xml/rented_details.xml',
             'pos_rental_management/static/src/xml/partner_list.xml',
             'pos_rental_management/static/src/css/rented_details.css',
@@ -42,8 +46,10 @@
             'pos_rental_management/static/src/js/payment_screen_is_order_valid.js',
             # 'pos_rental_management/static/src/js/payment_screen_validate_patch.js',
             'pos_rental_management/static/src/xml/enable_validate_on_partial.xml',
-            # 'pos_rental_management/static/src/js/payment_screen_button.js',
-            # 'pos_rental_management/static/src/xml/payment_screen_button.xml',
+            'pos_rental_management/static/src/js/payment_screen_button.js',
+            'pos_rental_management/static/src/js/models.js',
+            'pos_rental_management/static/src/js/ticket_screen.js',
+            'pos_rental_management/static/src/xml/payment_screen_button.xml',
             'pos_rental_management/static/src/js/order_finalize_partial_patch.js',
             'pos_rental_management/static/src/xml/receipt_partial_warning.xml'
 

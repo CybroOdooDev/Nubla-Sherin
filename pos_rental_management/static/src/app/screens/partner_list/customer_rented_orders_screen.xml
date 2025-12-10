@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="pos_rental_management.CustomerRentedOrdersScreen" owl="1">
+        <div class="customer-rented-screen">
+            <!-- Header -->
+            <div class="screen-header">
+                <button class="btn btn-secondary back-button" t-on-click="back">
+                    <i class="fa fa-arrow-left"/> Back
+                </button>
+                <h2>Customer Rented Orders</h2>
+            </div>
+
+            <!-- Loading State -->
+            <div t-if="state.loading" class="loading-container">
+                <i class="fa fa-spinner fa-spin fa-3x"/>
+                <p>Loading order details...</p>
+            </div>
+
+            <!-- Order Details -->
+            <div t-elif="state.orderData" class="order-details-container">
+                <!-- Customer Info -->
+                <div class="info-section">
+                    <h3>Customer Information</h3>
+                    <div class="info-row">
+                        <span class="label">Customer:</span>
+                        <span class="value" t-esc="state.partner_name"/>
+                    </div>
+                </div>
+
+                <!-- Order Header -->
+                <div class="info-section">
+                    <h3>Order Information</h3>
+                    <div class="info-row">
+                        <span class="label">Order Number:</span>
+                        <span class="value" t-esc="state.orderData.name"/>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Date:</span>
+                        <span class="value" t-esc="formatDate(state.orderData.date_order)"/>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Status:</span>
+                        <span class="value badge" t-att-class="'badge-' + state.orderData.state" t-esc="state.orderData.state"/>
+                    </div>
+                    <div class="info-row" t-if="state.orderData.user_id">
+                        <span class="label">Salesperson:</span>
+                        <span class="value" t-esc="state.orderData.user_id[1]"/>
+                    </div>
+                    <div class="info-row" t-if="state.orderData.session_id">
+                        <span class="label">Session:</span>
+                        <span class="value" t-esc="state.orderData.session_id[1]"/>
+                    </div>
+                </div>
+
+                <!-- Order Lines -->
+                <div class="info-section">
+                    <h3>Order Lines</h3>
+                    <table class="order-lines-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th class="text-right">Qty</th>
+                                <th class="text-right">Unit Price</th>
+                                <th class="text-right">Discount</th>
+                                <th class="text-right">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.orderData.lines" t-as="line" t-key="line.id">
+                                <tr>
+                                    <td>
+                                        <span t-esc="line.full_product_name || line.product_id[1]"/>
+                                    </td>
+                                    <td class="text-right" t-esc="line.qty"/>
+                                    <td class="text-right" t-esc="formatCurrency(line.price_unit)"/>
+                                    <td class="text-right">
+                                        <span t-if="line.discount > 0" t-esc="line.discount + '%'"/>
+                                        <span t-else="">-</span>
+                                    </td>
+                                    <td class="text-right" t-esc="formatCurrency(line.price_subtotal_incl)"/>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Order Totals -->
+                <div class="info-section totals-section">
+                    <div class="info-row">
+                        <span class="label">Subtotal:</span>
+                        <span class="value" t-esc="formatCurrency(state.orderData.amount_total - state.orderData.amount_tax)"/>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Tax:</span>
+                        <span class="value" t-esc="formatCurrency(state.orderData.amount_tax)"/>
+                    </div>
+                    <div class="info-row total-row">
+                        <span class="label">Total:</span>
+                        <span class="value" t-esc="formatCurrency(state.orderData.amount_total)"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- No Data State -->
+            <div t-else="" class="no-data-container">
+                <i class="fa fa-inbox fa-3x"/>
+                <p>No order data available</p>
+            </div>
+        </div>
+    </t>
+</templates>

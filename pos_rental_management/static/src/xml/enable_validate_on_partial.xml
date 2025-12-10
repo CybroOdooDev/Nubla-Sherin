@@ -1,24 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
 
-    <!-- ✅ OVERRIDE VALIDATE BUTTON LOGIC -->
     <t t-inherit="point_of_sale.PaymentScreenValidate" t-inherit-mode="extension">
 
-        <!-- ✅ DESKTOP BUTTON -->
-        <xpath expr="//button[hasclass('validation')]" position="attributes">
-            <attribute name="t-attf-class">
-                button next validation btn btn-primary btn-lg w-50 py-3 lh-lg
-                {{
-                    (currentOrder.isPaid() or env.pos.config.allow_partial_payment)
-                    and currentOrder._isValidEmptyOrder()
-                    and !currentOrder.isRefundInProcess()
-                    ? 'highlight'
-                    : 'disabled'
-                }}
-            </attribute>
-        </xpath>
-
-        <!-- ✅ MOBILE BUTTON -->
+        <!-- ✅ MOBILE VALIDATE BUTTON -->
         <xpath expr="//button[hasclass('validation-button')]" position="attributes">
             <attribute name="t-att-class">
                 {
@@ -31,11 +16,37 @@
                     'py-3': true,
                     'lh-lg': true,
                     'secondary': !(
-                        (currentOrder.isPaid() or env.pos.config.allow_partial_payment)
+                        (
+                            currentOrder.isPaid()
+                            or (
+                                currentOrder.is_partial_payment
+                                and currentOrder.get_total_paid() > 0
+                            )
+                        )
                         and currentOrder._isValidEmptyOrder()
                         and !currentOrder.isRefundInProcess()
                     )
                 }
+            </attribute>
+        </xpath>
+
+        <!-- ✅ DESKTOP VALIDATE BUTTON -->
+        <xpath expr="//button[hasclass('validation')]" position="attributes">
+            <attribute name="t-attf-class">
+                button next validation btn btn-primary btn-lg w-50 py-3 lh-lg
+                {{
+                    (
+                        currentOrder.isPaid()
+                        or (
+                            currentOrder.is_partial_payment
+                            and currentOrder.get_total_paid() > 0
+                        )
+                    )
+                    and currentOrder._isValidEmptyOrder()
+                    and !currentOrder.isRefundInProcess()
+                    ? 'highlight'
+                    : 'disabled'
+                }}
             </attribute>
         </xpath>
 

@@ -14,3 +14,4 @@ class PosSession(models.Model):
         result['search_params']['fields'].append('allow_partial_payment')
         return result
 
+

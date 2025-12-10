@@ -1,0 +1,155 @@
+.customer-rented-screen {
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+}
+
+.screen-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.back-button {
+    padding: 10px 20px;
+    font-size: 14px;
+}
+
+.screen-header h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+}
+
+.loading-container,
+.no-data-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    color: #6c757d;
+}
+
+.loading-container i,
+.no-data-container i {
+    margin-bottom: 20px;
+    color: #6c757d;
+}
+
+.order-details-container {
+    max-width: 1200px;
+}
+
+.info-section {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.info-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: #495057;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 10px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f3f5;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row .label {
+    font-weight: 600;
+    color: #495057;
+    min-width: 150px;
+}
+
+.info-row .value {
+    color: #212529;
+    text-align: right;
+    flex: 1;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-paid,
+.badge-done,
+.badge-invoiced {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.badge-draft {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.order-lines-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.order-lines-table thead {
+    background-color: #f8f9fa;
+}
+
+.order-lines-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.order-lines-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.order-lines-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+.totals-section {
+    background-color: #f8f9fa;
+}
+
+.totals-section .info-row {
+    font-size: 16px;
+}
+
+.total-row {
+    font-size: 18px;
+    font-weight: 700;
+    color: #212529;
+    padding-top: 15px;
+    margin-top: 10px;
+    border-top: 2px solid #dee2e6 !important;
+}

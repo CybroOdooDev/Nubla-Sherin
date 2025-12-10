@@ -18,22 +18,19 @@ patch(OrderPaymentValidation.prototype, {
             hasPayments: hasPayments,
         });
 
-        // ❌ BLOCK EVERYTHING if no payment at all
         if (!hasPayments) {
             this.pos.notification.add(_t("Please enter at least one payment."));
             return false;
         }
 
-        // ✅ ✅ ONLY RENTAL PRODUCTS → ALLOW PARTIAL
         if (isPartialAllowed && isRentalOrder && !this.order.isPaid()) {
-            console.log("✅ PARTIAL PAYMENT ALLOWED (RENTAL ONLY)");
+            console.log("PARTIAL PAYMENT ALLOWED (RENTAL ONLY)");
             this.order.is_partial_payment = true;
             return true;
         }
 
-        // ❌ ✅ ALL NON-RENTAL PRODUCTS → FULL PAYMENT REQUIRED
         if (!this.order.isPaid()) {
-            console.log("❌ FULL PAYMENT REQUIRED (NON-RENTAL)");
+            console.log("FULL PAYMENT REQUIRED (NON-RENTAL)");
             return false;
         }
 
