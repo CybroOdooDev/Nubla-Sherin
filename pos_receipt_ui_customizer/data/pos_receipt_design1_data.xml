@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="pos_receipt_design1" model="pos.receipt">
+        <field name="name">Design 1</field>
+        <field name="design_receipt"><![CDATA[
+        <div class="pos-receipt">
+            <div style="border-radius: inherit;">
+
+                <!-- LOGO -->
+                <div style="text-align:center;">
+                    <t t-if="env.services.pos.config.logo">
+                        <img t-att-src="'data:image/png;base64,' + env.services.pos.config.logo"
+                              class="pos-receipt-logo" />
+                        <br />
+                    </t>
+                </div>
+
+                <!-- COMPANY DETAILS -->
+                <div class="pos-receipt-contact">
+                    <div style="text-align:center; font-size:13px; height: 90px;">
+                        <div>
+                            Name :
+                            <span class="placeholder-span">[[ company.name ]]</span>
+                        </div>
+                        <div>
+                            Phone :
+                            <span class="placeholder-span">[[ company.phone ]]</span>
+                        </div>
+                        <div>
+                            Email :
+                            <span class="placeholder-span">[[ company.email ]]</span>
+                        </div>
+                        <div>
+                            Website :
+                            <span class="placeholder-span">[[ company.website ]]</span>
+                        </div>
+                    </div>
+                </div>
+
+                <br/><br/><br/>
+            </div>
+
+            <div class="drop-area"></div>
+
+            <!-- ORDERLINES TABLE -->
+            <div>
+               <table class="receipt-orderlines"
+       style="width:100%; border-collapse:collapse; font-size:15px; margin-top:10px;">
+    <thead>
+        <tr style="border-bottom:1px dashed black;">
+            <th style="text-align:left; padding:4px; width:40%;">Product</th>
+            <th style="text-align:left; padding:4px; width:10%;">Qty</th>
+            <th style="text-align:left; padding:4px; width:15%;">Amount</th>
+            <!-- Add headers for dynamic fields -->
+            <t t-foreach="props.receipt.dynamic_fields || []"
+               t-as="field"
+               t-key="field">
+                <th style="text-align:left; padding:4px;">
+                    <t t-esc="field"/>
+                </th>
+            </t>
+        </tr>
+    </thead>
+    <tbody>
+        <t t-if="props.orderlines and props.orderlines.length">
+            <tr t-foreach="props.orderlines" t-as="orderline" t-key="orderline_index">
+                <td style="padding:4px; text-align:left; word-break:break-word;">
+                    <t t-esc="orderline.productName"/>
+                </td>
+                <td style="padding:4px; text-align:left; font-size:14px;">
+                    <t t-esc="orderline.qty"/>
+                </td>
+                <td style="padding:4px; text-align:left; font-size:14px;">
+                    <t t-esc="orderline.price"/>
+                </td>
+                <!-- Dynamic field values for this orderline -->
+                <t t-foreach="props.receipt.dynamic_fields || []" t-as="field">
+                    <td>
+                        <t t-esc="orderline[field] || ''"/>
+                    </td>
+                </t>
+            </tr>
+        </t>
+    </tbody>
+</table>
+            </div>
+
+            <br/><br/>
+
+            <!-- TOTALS -->
+            <div id="subtotalDiv" class="selectable-box"
+                 style="font-weight:700; justify-content:center;">
+                Subtotal :
+                <span class="placeholder-span">[[ receipt.total_without_tax ]]</span>
+            </div>
+
+            <br/>
+
+            <div id="totalDiv" class="selectable-box"
+                 style="font-weight:700; justify-content:center;">
+                TOTAL :
+                <span class="placeholder-span">[[ receipt.amount_total ]]</span>
+            </div>
+
+            <div class="before-footer"></div>
+            <br/><br/>
+
+            <!-- DYNAMIC QR -->
+            <div id="receipt_dynamic_qr"
+                 style="justify-content:center; display:flex; margin-bottom:3rem;">
+            </div>
+
+            <!-- FOOTER -->
+            <div style="font-size:14px; text-align:center;">
+                Thank You... Please Visit Again ...
+            </div>
+        </div>
+        ]]></field>
+    </record>
+</odoo>
