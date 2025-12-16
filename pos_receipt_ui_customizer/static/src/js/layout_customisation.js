@@ -433,67 +433,78 @@ class PosReceiptLayoutClientAction extends Component {
         this.state.popup.selectedField = ev.target.value || "";
     }
 
-   onAddColumnClick() {
-        const fieldName = this.state.popup.selectedField;
-        console.log("Selected field:", fieldName);
+  async onAddColumnClick() {
+    const fieldName = this.state.popup.selectedField;
+    console.log("Selected field:", fieldName);
 
-        if (!fieldName) {
-            this.notification.add("Please select a field.", { type: "warning" });
-            return;
-        }
-        if (!this.lastClickedTable) {
-            this.notification.add("Click a table first.", { type: "danger" });
-            return;
-        }
-
-        const table = this.lastClickedTable;
-        let headerRow = table.querySelector("thead tr") || table.querySelector("tr");
-        if (!headerRow) return;
-
-        let bodyRows = table.querySelectorAll("tbody tr");
-        if (!bodyRows.length) {
-            const allRows = table.querySelectorAll("tr");
-            bodyRows = Array.from(allRows).slice(1);
-        }
-
-        const insertIndex =
-            typeof this.state.popup.columnIndex === "number"
-                ? this.state.popup.columnIndex + 1
-                : headerRow.children.length;
-
-        // Get label
-        const fieldObj = this.state.productFields.find(f => f.name === fieldName);
-        const label = fieldObj?.label || fieldName;
-        console.log("Label:", label);
-
-        if (!this.selectedProductFields.includes(fieldName)) {
-            this.selectedProductFields.push(fieldName);
-            console.log("✅ Added to selected fields:", this.selectedProductFields);
-        }
-
-        // HEADER
-        const th = document.createElement("th");
-        th.textContent = label;
-        th.setAttribute('data-field', fieldName);  // ✅ Store field name
-        headerRow.insertBefore(th, headerRow.children[insertIndex] || null);
-
-        // BODY ROWS
-        bodyRows.forEach((row) => {
-            const td = document.createElement("td");
-            td.style.padding = "4px 2px";
-            td.style.whiteSpace = "nowrap";
-            td.setAttribute('data-field', fieldName);  // ✅ Store field name
-
-            const span = document.createElement("span");
-            span.classList.add("placeholder-span");
-            span.textContent = `[[ orderline.${fieldName} ]]`;
-
-            td.appendChild(span);
-            row.insertBefore(td, row.children[insertIndex] || null);
-        });
-
-        this.hidePopup();
+    if (!fieldName) {
+        this.notification.add("Please select a field.", { type: "warning" });
+        return;
     }
+    if (!this.lastClickedTable) {
+        this.notification.add("Click a table first.", { type: "danger" });
+        return;
+    }
+    if (!this.receipt_id) {
+        this.notification.add("Receipt ID not found", { type: "danger" });
+        return;
+    }
+
+    const table = this.lastClickedTable;
+    let headerRow = table.querySelector("thead tr") || table.querySelector("tr");
+    if (!headerRow) return;
+
+    let bodyRows = table.querySelectorAll("tbody tr");
+    if (!bodyRows.length) {
+        bodyRows = Array.from(table.querySelectorAll("tr")).slice(1);
+    }
+
+    const insertIndex =
+        typeof this.state.popup.columnIndex === "number"
+            ? this.state.popup.columnIndex + 1
+            : headerRow.children.length;
+
+            const fieldObj = this.state.productFields.find(f => f.name === fieldName);
+            const label = fieldObj?.label || fieldName;
+
+            if (!this.selectedProductFields.includes(fieldName)) {
+                this.selectedProductFields.push(fieldName);
+            }
+
+            const th = document.createElement("th");
+            th.textContent = label;
+            th.setAttribute("data-field", fieldName);
+            headerRow.insertBefore(th, headerRow.children[insertIndex] || null);
+
+            bodyRows.forEach((row) => {
+                const td = document.createElement("td");
+                td.setAttribute("data-field", fieldName);
+                td.style.padding = "4px";
+
+                const span = document.createElement("span");
+//                span.textContent = `[[ orderline.${fieldName} ]]`;
+//                span.setAttribute("t-esc", `orderline.${fieldName}`);
+
+                td.appendChild(span);
+
+                row.insertBefore(td, row.children[insertIndex] || null);
+            });
+
+            await this.orm.write("pos.receipt", [this.receipt_id], {
+                selected_product_fields: JSON.stringify(this.selectedProductFields),
+            });
+
+            console.log(" Saved fields:", this.selectedProductFields);
+
+            const result = await this.orm.read(
+            "pos.receipt",
+            [this.receipt_id],
+            ["selected_product_fields"]
+         );
+
+        console.log("DB value:", result[0].selected_product_fields);
+            this.hidePopup();
+        }
 
     saveDesignToConfig() {
         const receiptDiv = document.querySelector('.pos-receipt');
@@ -540,6 +551,45 @@ class PosReceiptLayoutClientAction extends Component {
         }
 
         return Array.from(fields);
+    }
+    onRemoveColumnClick() {
+        if (!this.lastClickedTable) {
+            this.notification.add("No table selected.", { type: "danger" });
+            this.hidePopup();
+            return;
+        }
+
+        const table = this.lastClickedTable;
+        const theadRow = table.querySelector("thead tr");
+        const bodyRows = table.querySelectorAll("tbody tr");
+        if (!theadRow) {
+            this.notification.add("Table does not have a header row.", {
+                type: "danger",
+            });
+            this.hidePopup();
+            return;
+        }
+
+        const colIndex = this.state.popup.columnIndex;
+        if (colIndex == null || colIndex < 0) {
+            this.notification.add("Invalid column selection.", { type: "danger" });
+            this.hidePopup();
+            return;
+        }
+
+        // Remove header cell
+        if (theadRow.children[colIndex]) {
+            theadRow.removeChild(theadRow.children[colIndex]);
+        }
+
+        // Remove body cells
+        bodyRows.forEach((row) => {
+            if (row.children[colIndex]) {
+                row.removeChild(row.children[colIndex]);
+            }
+        });
+
+        this.hidePopup();
     }
 
 

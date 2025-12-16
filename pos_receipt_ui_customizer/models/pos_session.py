@@ -1,6 +1,4 @@
-# models/pos_session.py
-from odoo import models,api
-import json
+from odoo import models
 
 
 class PosSession(models.Model):

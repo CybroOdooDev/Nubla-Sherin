@@ -61,27 +61,31 @@
             </t>
         </tr>
     </thead>
-    <tbody>
-        <t t-if="props.orderlines and props.orderlines.length">
-            <tr t-foreach="props.orderlines" t-as="orderline" t-key="orderline_index">
-                <td style="padding:4px; text-align:left; word-break:break-word;">
-                    <t t-esc="orderline.productName"/>
-                </td>
+   <tbody>
+    <t t-if="props.orderlines and props.orderlines.length">
+        <tr t-foreach="props.orderlines" t-as="orderline" t-key="orderline_index">
+            <td style="padding:4px; text-align:left; word-break:break-word;">
+                <t t-esc="orderline.productName"/>
+            </td>
+
+            <td style="padding:4px; text-align:left; font-size:14px;">
+                <t t-esc="orderline.qty"/>
+            </td>
+
+            <td style="padding:4px; text-align:left; font-size:14px;">
+                <t t-esc="orderline.price"/>
+            </td>
+
+            <!-- ✅ Dynamic columns -->
+            <t t-foreach="props.dynamic_fields or []" t-as="field">
                 <td style="padding:4px; text-align:left; font-size:14px;">
-                    <t t-esc="orderline.qty"/>
+                    <t t-esc="orderline[field] or ''"/>
                 </td>
-                <td style="padding:4px; text-align:left; font-size:14px;">
-                    <t t-esc="orderline.price"/>
-                </td>
-                <!-- Dynamic field values for this orderline -->
-                <t t-foreach="props.receipt.dynamic_fields || []" t-as="field">
-                    <td>
-                        <t t-esc="orderline[field] || ''"/>
-                    </td>
-                </t>
-            </tr>
-        </t>
-    </tbody>
+            </t>
+        </tr>
+    </t>
+</tbody>
+
 </table>
             </div>
 

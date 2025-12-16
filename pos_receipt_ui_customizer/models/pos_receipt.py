@@ -39,6 +39,11 @@ class PosReceipt(models.Model):
     company_id = fields.Many2one('res.company', string='Company', readonly=True, index=True, required=True,
                                  default=lambda self: self.env.company)
     logo = fields.Binary(string='Logo', default=lambda self: self.env.company.logo)
+    selected_product_fields = fields.Text(
+        string="Selected Product Fields",
+        help="JSON list of product fields to show as receipt columns",
+        default='[]'
+    )
 
 
 

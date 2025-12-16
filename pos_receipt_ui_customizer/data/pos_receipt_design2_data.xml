@@ -28,27 +28,45 @@
                     </div>
 
                     <table style="width:100%; border-collapse:collapse; margin-top:6px; font-size:14px;">
-                        <tr style="border-bottom:1px dashed #555;">
-                            <th style="text-align:left; padding:4px;">Product</th>
-                            <th style="text-align:center; padding:4px;">Qty</th>
-                            <th style="text-align:right; padding:4px;">Amount</th>
-                        </tr>
+    <thead>
+        <tr style="border-bottom:1px dashed #555;">
+            <th style="text-align:left; padding:4px;">Product</th>
+            <th style="text-align:center; padding:4px;">Qty</th>
+            <th style="text-align:right; padding:4px;">Amount</th>
+            <!-- Dynamic headers -->
+            <t t-foreach="props.dynamic_fields" t-as="field" t-key="field">
+                <th style="text-align:center; padding:4px;">
+                    <t t-esc="field"/>
+                </th>
+            </t>
+        </tr>
+    </thead>
+    <tbody>
+    <t t-if="props.orderlines and props.orderlines.length">
+        <tr t-foreach="props.orderlines" t-as="orderline" t-key="orderline_index"
+            style="border-bottom:1px dotted #ccc;">
+            <td style="padding:4px; width:60%; word-break:break-word;">
+                <t t-esc="orderline.productName"/>
+            </td>
+            <td style="padding:4px; text-align:center; width:20%;">
+                <t t-esc="orderline.qty"/>
+            </td>
+            <td style="padding:4px; text-align:right; width:20%;">
+                <t t-esc="orderline.price"/>
+            </td>
+            <!-- Dynamic values -->
+            <t t-foreach="props.dynamic_fields" t-as="dynField" t-key="dynField_index">
+                <td style="text-align:center; padding:4px;">
+                <t t-log="props.dynamic_fields">
+                     <t t-log="dynField">
+                    <t t-esc="orderline._dynamicValues[dynField] || '123'"/>
+                </td>
+            </t>
+        </tr>
+    </t>
+</tbody>
+</table>
 
-                        <t t-if="props.orderlines and props.orderlines.length">
-                            <tr t-foreach="props.orderlines" t-as="orderline" t-key="orderline_index"
-                                style="border-bottom:1px dotted #ccc;">
-                                <td style="padding:4px; width:60%; word-break:break-word;">
-                                    <t t-esc="orderline.productName"/>
-                                </td>
-                                <td style="padding:4px; text-align:center; width:20%;">
-                                    <t t-esc="orderline.qty"/>
-                                </td>
-                                <td style="padding:4px; text-align:right; width:20%;">
-                                    <t t-esc="orderline.price"/>
-                                </td>
-                            </tr>
-                        </t>
-                    </table>
                 </div>
 
                 <!-- TOTAL SECTION BOX -->

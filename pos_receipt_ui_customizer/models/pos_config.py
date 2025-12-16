@@ -20,7 +20,7 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 ################################################################################
-from odoo import fields, models
+from odoo import fields, models,api
 
 class PosConfig(models.Model):
     """
@@ -42,13 +42,24 @@ class PosConfig(models.Model):
         related='receipt_design_id.design_receipt_font_style',
         string='Receipt Font Style'
     )
+
     selected_product_fields = fields.Text(
-        string='Selected Product Fields',
-        help='JSON array of product fields to include in receipt',
-        default='[]'
+        compute="_compute_selected_product_fields",
+        store=True
     )
 
 
+
+    @api.depends('receipt_design_id', 'receipt_design_id.selected_product_fields')
+    def _compute_selected_product_fields(self):
+        for rec in self:
+            if rec.receipt_design_id and rec.receipt_design_id.selected_product_fields:
+                rec.selected_product_fields = rec.receipt_design_id.selected_product_fields
+                print("dhhhhhhhhhhhhhhhhhllll")
+
+            else:
+                rec.selected_product_fields = '[]'
+                print("dhhhhhhhhhhhhhhhhhllll")
 
     def action_open_receipt_editor(self):
         self.ensure_one()

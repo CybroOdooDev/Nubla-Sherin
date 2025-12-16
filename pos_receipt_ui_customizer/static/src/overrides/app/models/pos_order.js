@@ -5,52 +5,48 @@ import { patch } from "@web/core/utils/patch";
 patch(PosOrder.prototype, {
     export_for_printing() {
         const res = super.export_for_printing(...arguments);
-        const jsLines = this.lines || [];
-
-        const config = this.config;
-        const receiptId = config.receipt_id?.id;
-        console.log("RECEIPT ID",receiptId)
-        const receipt = this.models["pos.receipt"]?.records.find(r => r.id === receiptId);
 
         let fields = [];
         try {
-            fields = JSON.parse(receipt?.selected_product_fields || "[]");
-        } catch (e) {
-            console.warn("Failed to parse selected_product_fields", e);
+            fields = JSON.parse(this.config.selected_product_fields || "[]");
+        } catch {
             fields = [];
         }
 
-        fields = Array.isArray(fields) ? fields : [];
         res.dynamic_fields = fields;
 
-        res.orderlines = (res.orderlines || []).map((line, i) => {
-    const enriched = { ...line };
-    const jsLine = jsLines[i];
-    const product = jsLine?.product_id;
+        const jsLines = this.lines || [];
 
-    console.log("Processing line:", i);
-    console.log("Fields to add:", fields);
-    console.log("Product object:", product);
+        res.orderlines = (res.orderlines || []).map((line, index) => {
+            const enriched = { ...line };
 
-    fields.forEach((fieldName) => {
-        enriched[fieldName] = "";
-    });
+            // ✅ Match by index (SAFE)
+            const jsLine = jsLines[index];
+            const product = jsLine?.product_id;
 
-    if (product) {
-        fields.forEach((fieldName) => {
-            if (fieldName in product && product[fieldName] !== undefined && product[fieldName] !== null) {
-                enriched[fieldName] = product[fieldName];
-                console.log(`Set ${fieldName} =`, product[fieldName]);
-            } else {
-                console.log(`Field ${fieldName} not found in product`);
+            // Initialize fields
+            fields.forEach(f => enriched[f] = "");
+
+            if (product) {
+                fields.forEach(f => {
+                    let value = product[f];
+
+                    if (value === undefined || value === null) {
+                        value = "";
+                    } else if (typeof value === "object") {
+                        value = value.display_name || value.name || "";
+                    } else {
+                        value = String(value);
+                    }
+
+                    enriched[f] = value;
+                });
             }
-        });
-    }
 
-    console.log("Final enriched line:", enriched);
-    return enriched;
-});
+            return enriched;
+        });
 
         return res;
     },
 });
+
