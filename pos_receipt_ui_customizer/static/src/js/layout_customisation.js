@@ -359,41 +359,55 @@ class PosReceiptLayoutClientAction extends Component {
 
 
     onReceiptClick(ev) {
-        // Only care about clicks inside tables in the editor
-        const td = ev.target.closest("td");
-        const th = ev.target.closest("th");
-        const table = ev.target.closest("table");
+    const td = ev.target.closest("td");
+    const th = ev.target.closest("th");
+    const table = ev.target.closest("table");
 
-        // Clicked somewhere in the editor but not on a table
-        if (!table) {
-            this.hidePopup();
-            this.lastClickedCell = null;
-            this.lastClickedTable = null;
-            return;
-        }
-
-        // Remember the clicked table so we edit the right one
-        this.lastClickedTable = table;
-
-        // Header cell → column mode
-        if (th) {
-            const index = Array.from(th.parentNode.children).indexOf(th);
-            this.lastClickedCell = null;
-            this.showPopup("column", ev.clientX, ev.clientY, index);
-            return;
-        }
-
-        // Body cell → cell mode
-        if (td) {
-            const index = Array.from(td.parentNode.children).indexOf(td);
-            this.lastClickedCell = td;
-            this.showPopup("cell", ev.clientX, ev.clientY, index);
-            return;
-        }
-
-        // Clicked table but not on td/th
+    if (!table) {
         this.hidePopup();
+        this.lastClickedCell = null;
+        this.lastClickedTable = null;
+        return;
     }
+
+    this.lastClickedTable = table;
+
+    const headerRow = table.querySelector("thead tr") || table.querySelector("tr");
+    if (!headerRow) {
+        this.hidePopup();
+        return;
+    }
+
+    const clicked = th || td;
+    if (!clicked) {
+        this.hidePopup();
+        return;
+    }
+
+    const colIndex = Array.from(clicked.parentNode.children).indexOf(clicked);
+    const isLastColumn = colIndex === headerRow.children.length - 1;
+
+    if (!isLastColumn) {
+        this.hidePopup();
+        this.notification.add("You can edit only the last column.", { type: "info" });
+        return;
+    }
+
+
+    if (th) {
+        this.lastClickedCell = null;
+        this.showPopup("column", ev.clientX, ev.clientY, colIndex);
+        return;
+    }
+    if (td) {
+        this.lastClickedCell = td;
+        this.showPopup("cell", ev.clientX, ev.clientY, colIndex);
+        return;
+    }
+
+    this.hidePopup();
+}
+
 
     showPopup(type, x, y, columnIndex) {
         this.state.popup.visible = true;
@@ -408,12 +422,6 @@ class PosReceiptLayoutClientAction extends Component {
         this.state.popup.type = null;
         this.state.popup.columnIndex = null;
     }
-
-
-
-
-
-
 
     async loadProductFields() {
     const fields = await this.orm.call("product.product", "fields_get", [], {});
@@ -459,52 +467,41 @@ class PosReceiptLayoutClientAction extends Component {
         bodyRows = Array.from(table.querySelectorAll("tr")).slice(1);
     }
 
-    const insertIndex =
-        typeof this.state.popup.columnIndex === "number"
-            ? this.state.popup.columnIndex + 1
-            : headerRow.children.length;
+    const insertIndex = headerRow.children.length;
 
-            const fieldObj = this.state.productFields.find(f => f.name === fieldName);
-            const label = fieldObj?.label || fieldName;
+    const fieldObj = this.state.productFields.find(f => f.name === fieldName);
+    const label = fieldObj?.label || fieldName;
 
-            if (!this.selectedProductFields.includes(fieldName)) {
-                this.selectedProductFields.push(fieldName);
-            }
+    if (!this.selectedProductFields.includes(fieldName)) {
+        this.selectedProductFields.push(fieldName);
+    }
 
-            const th = document.createElement("th");
-            th.textContent = label;
-            th.setAttribute("data-field", fieldName);
-            headerRow.insertBefore(th, headerRow.children[insertIndex] || null);
+    const th = document.createElement("th");
+    th.textContent = label;
+    th.setAttribute("data-field", fieldName);
+    headerRow.appendChild(th);   // end
 
-            bodyRows.forEach((row) => {
-                const td = document.createElement("td");
-                td.setAttribute("data-field", fieldName);
-                td.style.padding = "4px";
+    bodyRows.forEach((row) => {
+        const td = document.createElement("td");
+        td.setAttribute("data-field", fieldName);
+        td.style.padding = "4px";
 
-                const span = document.createElement("span");
-//                span.textContent = `[[ orderline.${fieldName} ]]`;
-//                span.setAttribute("t-esc", `orderline.${fieldName}`);
+        const span = document.createElement("span");
+        // span.textContent = `[[ orderline.${fieldName} ]]`;
+        // span.setAttribute("t-esc", `orderline.${fieldName}`);
 
-                td.appendChild(span);
+        td.appendChild(span);
+        row.appendChild(td);     // end
+    });
 
-                row.insertBefore(td, row.children[insertIndex] || null);
-            });
+    await this.orm.write("pos.receipt", [this.receipt_id], {
+        selected_product_fields: JSON.stringify(this.selectedProductFields),
+    });
 
-            await this.orm.write("pos.receipt", [this.receipt_id], {
-                selected_product_fields: JSON.stringify(this.selectedProductFields),
-            });
+    console.log("Saved fields:", this.selectedProductFields);
+    this.hidePopup();
+}
 
-            console.log(" Saved fields:", this.selectedProductFields);
-
-            const result = await this.orm.read(
-            "pos.receipt",
-            [this.receipt_id],
-            ["selected_product_fields"]
-         );
-
-        console.log("DB value:", result[0].selected_product_fields);
-            this.hidePopup();
-        }
 
     saveDesignToConfig() {
         const receiptDiv = document.querySelector('.pos-receipt');
@@ -529,7 +526,7 @@ class PosReceiptLayoutClientAction extends Component {
         this.orm
             .call('pos.receipt', 'write', [[this.receipt_id], {
                 design_receipt: updatedDesign,
-                selected_product_fields: JSON.stringify(selectedFields),  // ✅ Save fields
+                selected_product_fields: JSON.stringify(selectedFields),
             }])
             .then(() => {
                 this.notification.add("Design saved successfully!", { type: "success" });
@@ -591,7 +588,6 @@ class PosReceiptLayoutClientAction extends Component {
 
         this.hidePopup();
     }
-
 
     onInsertFieldClick() {
         const fieldTechnical = this.state.popup.selectedField;

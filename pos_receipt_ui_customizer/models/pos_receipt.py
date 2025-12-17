@@ -44,6 +44,10 @@ class PosReceipt(models.Model):
         help="JSON list of product fields to show as receipt columns",
         default='[]'
     )
+    selected_columns_config = fields.Text(
+        default="[]",
+        help="Receipt column layout configuration"
+    )
 
 
 

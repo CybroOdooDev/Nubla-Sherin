@@ -14,17 +14,14 @@ patch(PosOrder.prototype, {
         }
 
         res.dynamic_fields = fields;
-
         const jsLines = this.lines || [];
 
         res.orderlines = (res.orderlines || []).map((line, index) => {
             const enriched = { ...line };
 
-            // ✅ Match by index (SAFE)
             const jsLine = jsLines[index];
             const product = jsLine?.product_id;
 
-            // Initialize fields
             fields.forEach(f => enriched[f] = "");
 
             if (product) {
@@ -38,11 +35,9 @@ patch(PosOrder.prototype, {
                     } else {
                         value = String(value);
                     }
-
                     enriched[f] = value;
                 });
             }
-
             return enriched;
         });
 

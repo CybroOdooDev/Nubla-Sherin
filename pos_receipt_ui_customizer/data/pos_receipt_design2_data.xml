@@ -36,6 +36,7 @@
             <!-- Dynamic headers -->
             <t t-foreach="props.dynamic_fields" t-as="field" t-key="field">
                 <th style="text-align:center; padding:4px;">
+
                     <t t-esc="field"/>
                 </th>
             </t>
@@ -54,15 +55,17 @@
             <td style="padding:4px; text-align:right; width:20%;">
                 <t t-esc="orderline.price"/>
             </td>
-            <!-- Dynamic values -->
-            <t t-foreach="props.dynamic_fields" t-as="dynField" t-key="dynField_index">
-                <td style="text-align:center; padding:4px;">
-                <t t-log="props.dynamic_fields">
-                     <t t-log="dynField">
-                    <t t-esc="orderline._dynamicValues[dynField] || '123'"/>
-                </td>
-            </t>
-        </tr>
+
+            <t t-log="props"/>
+             <td>
+                    <t t-log="Object.values(orderline._dynamicValues)"/>
+                    <t t-esc="Object.values(orderline._dynamicValues)[0]"/>
+
+                    </td>
+
+        </t>
+        </t>
+         </tr>
     </t>
 </tbody>
 </table>
@@ -73,7 +76,7 @@
                 <div style="margin-top:18px; padding:10px; border:2px dashed #555; border-radius:6px;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
                         <span style="font-weight:600;">Subtotal</span>
-                        <span class="placeholder-span">[[ receipt.total_without_tax ]]</span>
+                            <span class="placeholder-span">[[ receipt.total_without_tax ]]</span>
                     </div>
 
                     <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:700;">
@@ -99,3 +102,5 @@
     </record>
 
 </odoo>
+
+

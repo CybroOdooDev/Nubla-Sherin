@@ -54,54 +54,88 @@ patch(OrderReceipt.prototype, {
                 value = company?.[path.slice(8)];
             }
 
-            // ✅ KEEP dynamic placeholders
             return value ? value : match;
         }
     );
 
     return replaced;
 },
-    get templateProps() {
+get templateProps() {
     const order = this.pos.get_order();
+
+    if (!order) {
+        return {
+            data: this.props.data,
+            order: null,
+            receipt: {},
+            orderlines: [],
+            paymentlines: [],
+            dynamic_fields: [],
+        };
+    }
+
     const receipt = order.export_for_printing();
 
-    const dynamicFields = (receipt.dynamic_fields || [])
-        .map(f => {
-            if (typeof f === 'string') return f.trim();
-            if (typeof f === 'object') return f.name;
-            return '';
-        })
-        .filter(Boolean);
+    const dynamicFields = [
+        ...new Set(
+            (receipt.dynamic_fields || [])
+                .map(f => {
+                    if (typeof f === 'string') return f.trim();
+                    if (typeof f === 'object' && f.name) return f.name.trim();
+                    return null;
+                })
+                .filter(Boolean)
+        )
+    ];
+
+    const jsOrderlines = order.get_orderlines() || [];
 
     const orderlines = (receipt.orderlines || []).map(line => {
+        let currentOrderline = jsOrderlines.find(ol => ol.cid === line.cid);
+
+        if (!currentOrderline && line.product_id) {
+            currentOrderline = jsOrderlines.find(ol =>
+                ol.product?.id === line.product_id
+            );
+        }
+
+        const product = currentOrderline?.product ||
+                       currentOrderline?.get_product?.() ||
+                       this.pos.db.get_product_by_id(line.product_id);
+
         const dynamicValues = {};
         dynamicFields.forEach(field => {
-            dynamicValues[field] = line[field] ?? '';
+            dynamicValues[field] =
+                line[field] ||
+                currentOrderline?.[field] ||
+                product?.[field] ||
+                '';
         });
+
         return {
             ...line,
+            product,
             _dynamicValues: dynamicValues,
         };
     });
 
     console.log("Dynamic fields:", dynamicFields);
-    console.log("Orderlines (enriched):", orderlines[0].barcode);
+    console.log("Orderlines count:", orderlines.length);
+    console.log(" First orderline:", orderlines);
 
     return {
         data: this.props.data,
         order,
         receipt,
         orderlines,
-        paymentlines: receipt.paymentlines,
+        paymentlines: receipt.paymentlines || [],
         dynamic_fields: dynamicFields,
     };
 },
-
     get templateComponent() {
         const design = this.pos.config?.design_receipt || "";
         const xmlString = this.sanitizeReceiptXml(design);
 
-        // ✅ Fixed typo: xm -> xml
         return class extends Component {
             static template = xml`${xmlString}`;
             static props = {
