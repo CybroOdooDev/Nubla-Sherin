@@ -47,6 +47,16 @@ class PosReceiptLayoutClientAction extends Component {
 
 
     }
+    async getPosConfig() {
+    const [config] = await this.orm.searchRead(
+        "pos.config",
+        [],
+        ["id", "selected_product_fields"],
+        { limit: 1 }
+    );
+    return config;
+}
+
 
     async mediumEditor() {
         this.editor = new MediumEditor(this.receiptContentRef.el, {
@@ -310,6 +320,32 @@ class PosReceiptLayoutClientAction extends Component {
             this.state.showSection1 = false;
         }
 
+//       async get_receipt_render_env() {
+//        const env = await super.get_receipt_render_env();
+//
+//        console.log("{{{{{{{{{{{{{{{{{{{{{")
+//
+//        console.log("ENVVVVV",env)
+//        const order = env.order;
+//        console.log("ORDER",order)
+//
+//        let qrText = `Order: ${order.name}\n`;
+//        qrText += `Total: ${order.get_total_with_tax().toFixed(2)}\n\n`;
+//
+//        order.get_orderlines().forEach(line => {
+//            qrText += `${line.product.display_name} - ${line.quantity} x ${line.price}\n`;
+//        });
+//
+//        qrText = qrText.slice(0, 300);
+//
+//        env.qrDataUrl = await QRCode.toDataURL(qrText, {
+//            width: 180,
+//            margin: 1,
+//        });
+//
+//        return env;
+//    }
+
         submitValue() {
             const value = this.inputRef.el.value;
 
@@ -344,25 +380,20 @@ class PosReceiptLayoutClientAction extends Component {
             // 7. Add to editor
             targetArea.appendChild(qrDiv);
 
-            // 8. Generate QR code
             new QRCode(qrBox, {
                 text: value,
                 width: 120,
                 height: 120,
             });
 
-            // OPTIONAL: Hide input section after submitting
             this.state.showSection = false;
             this.state.showSection1 = true;
         }
 
 
 
-    onReceiptClick(ev) {
-    const td = ev.target.closest("td");
-    const th = ev.target.closest("th");
+   onReceiptClick(ev) {
     const table = ev.target.closest("table");
-
     if (!table) {
         this.hidePopup();
         this.lastClickedCell = null;
@@ -378,7 +409,11 @@ class PosReceiptLayoutClientAction extends Component {
         return;
     }
 
+    const th = ev.target.closest("th");
+    const td = ev.target.closest("td");
+
     const clicked = th || td;
+
     if (!clicked) {
         this.hidePopup();
         return;
@@ -387,12 +422,15 @@ class PosReceiptLayoutClientAction extends Component {
     const colIndex = Array.from(clicked.parentNode.children).indexOf(clicked);
     const isLastColumn = colIndex === headerRow.children.length - 1;
 
-    if (!isLastColumn) {
+    const isAddColumnHeader =
+        clicked.classList.contains("add-column-header") ||
+        ev.target.closest(".add-column-btn");
+
+    if (!isLastColumn && !isAddColumnHeader) {
         this.hidePopup();
         this.notification.add("You can edit only the last column.", { type: "info" });
         return;
     }
-
 
     if (th) {
         this.lastClickedCell = null;
@@ -408,7 +446,6 @@ class PosReceiptLayoutClientAction extends Component {
     this.hidePopup();
 }
 
-
     showPopup(type, x, y, columnIndex) {
         this.state.popup.visible = true;
         this.state.popup.x = x;
@@ -423,6 +460,10 @@ class PosReceiptLayoutClientAction extends Component {
         this.state.popup.columnIndex = null;
     }
 
+
+
+
+
     async loadProductFields() {
     const fields = await this.orm.call("product.product", "fields_get", [], {});
 
@@ -433,9 +474,6 @@ class PosReceiptLayoutClientAction extends Component {
             label: fields[k].string || k,
         }));
 }
-
-
-
 
     onPopupFieldChange(ev) {
         this.state.popup.selectedField = ev.target.value || "";
@@ -491,7 +529,7 @@ class PosReceiptLayoutClientAction extends Component {
         // span.setAttribute("t-esc", `orderline.${fieldName}`);
 
         td.appendChild(span);
-        row.appendChild(td);     // end
+        row.appendChild(td);
     });
 
     await this.orm.write("pos.receipt", [this.receipt_id], {
@@ -520,7 +558,6 @@ class PosReceiptLayoutClientAction extends Component {
                 return '';
             });
 
-        // ✅ Extract selected fields from the design
         const selectedFields = this.extractFieldsFromDesign(updatedDesign);
 
         this.orm
@@ -537,7 +574,6 @@ class PosReceiptLayoutClientAction extends Component {
             });
     }
 
-    // ✅ Extract fields from design HTML
     extractFieldsFromDesign(html) {
         const fields = new Set();
         const regex = /\[\[\s*orderline\.([\w_]+)\s*\]\]/g;
@@ -549,45 +585,82 @@ class PosReceiptLayoutClientAction extends Component {
 
         return Array.from(fields);
     }
-    onRemoveColumnClick() {
-        if (!this.lastClickedTable) {
-            this.notification.add("No table selected.", { type: "danger" });
-            this.hidePopup();
-            return;
-        }
-
-        const table = this.lastClickedTable;
-        const theadRow = table.querySelector("thead tr");
-        const bodyRows = table.querySelectorAll("tbody tr");
-        if (!theadRow) {
-            this.notification.add("Table does not have a header row.", {
-                type: "danger",
-            });
-            this.hidePopup();
-            return;
-        }
-
-        const colIndex = this.state.popup.columnIndex;
-        if (colIndex == null || colIndex < 0) {
-            this.notification.add("Invalid column selection.", { type: "danger" });
-            this.hidePopup();
-            return;
-        }
-
-        // Remove header cell
-        if (theadRow.children[colIndex]) {
-            theadRow.removeChild(theadRow.children[colIndex]);
-        }
-
-        // Remove body cells
-        bodyRows.forEach((row) => {
-            if (row.children[colIndex]) {
-                row.removeChild(row.children[colIndex]);
-            }
-        });
-
-        this.hidePopup();
+async onRemoveColumnClick() {
+    if (!this.lastClickedTable) {
+        this.notification.add("No table selected.", { type: "danger" });
+        return;
     }
+
+    const table = this.lastClickedTable;
+    const theadRow = table.querySelector("thead tr");
+    const bodyRows = table.querySelectorAll("tbody tr");
+
+    if (!theadRow) {
+        this.notification.add("Table does not have a header row.", {
+            type: "danger",
+        });
+        return;
+    }
+
+    const colIndex = this.state.popup.columnIndex;
+    const STATIC_COL_COUNT = 3;
+
+    if (colIndex == null || colIndex < STATIC_COL_COUNT) {
+        this.notification.add("You cannot remove default columns.", {
+            type: "warning",
+        });
+        return;
+    }
+
+    const th = theadRow.children[colIndex];
+    const fieldName = th?.dataset?.field;
+
+    if (!fieldName) {
+        this.notification.add("This column is not removable.", {
+            type: "warning",
+        });
+        return;
+    }
+
+    const [receipt] = await this.orm.searchRead(
+        "pos.receipt",
+        [["id", "=", this.receipt_id]],
+        ["id", "selected_product_fields"],
+        { limit: 1 }
+    );
+
+    if (!receipt) {
+        this.notification.add("Receipt not found.", { type: "danger" });
+        return;
+    }
+
+    let fields = [];
+    try {
+        fields = JSON.parse(receipt.selected_product_fields || "[]");
+    } catch {
+        fields = [];
+    }
+
+
+    const updatedFields = fields.filter(f => f !== fieldName);
+
+    await this.orm.write("pos.receipt", [receipt.id], {
+        selected_product_fields: JSON.stringify(updatedFields),
+    });
+
+
+    th.remove();
+    bodyRows.forEach(row => row.children[colIndex]?.remove());
+
+    this.notification.add(
+        `Column "${fieldName}" removed successfully`,
+        { type: "success" }
+    );
+
+    this.hidePopup();
+}
+
+
 
     onInsertFieldClick() {
         const fieldTechnical = this.state.popup.selectedField;
@@ -607,7 +680,6 @@ class PosReceiptLayoutClientAction extends Component {
 
         const cell = this.lastClickedCell;
 
-        // If cell only has spaces/newlines, clear it
         if (!cell.textContent.trim()) {
             cell.innerHTML = "";
         }

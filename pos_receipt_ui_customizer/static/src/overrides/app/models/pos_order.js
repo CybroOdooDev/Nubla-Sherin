@@ -9,6 +9,7 @@ patch(PosOrder.prototype, {
         let fields = [];
         try {
             fields = JSON.parse(this.config.selected_product_fields || "[]");
+            console.log("FIELDS",fields)
         } catch {
             fields = [];
         }

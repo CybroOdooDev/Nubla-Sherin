@@ -116,6 +116,7 @@ get templateProps() {
             ...line,
             product,
             _dynamicValues: dynamicValues,
+
         };
     });
 
@@ -148,6 +149,8 @@ get templateProps() {
             };
         };
     },
+
+
 
     get isFalse() {
         return !this.pos.config.is_custom_receipt;

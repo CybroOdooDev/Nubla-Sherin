@@ -127,6 +127,8 @@
                             </div>
                         </div>
                     </t>
+
+
                     <!-- Footer -->
                     <div t-if="props.data.footer"
                          class="pos-receipt-center-align"

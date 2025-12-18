@@ -33,13 +33,17 @@
             <th style="text-align:left; padding:4px;">Product</th>
             <th style="text-align:center; padding:4px;">Qty</th>
             <th style="text-align:right; padding:4px;">Amount</th>
-            <!-- Dynamic headers -->
-            <t t-foreach="props.dynamic_fields" t-as="field" t-key="field">
-                <th style="text-align:center; padding:4px;">
 
-                    <t t-esc="field"/>
-                </th>
-            </t>
+
+
+
+            <!-- Dynamic headers -->
+<!--            <t t-foreach="props.dynamic_fields" t-as="field" t-key="field">-->
+<!--                <th style="text-align:center; padding:4px;">-->
+
+<!--                    <t t-esc="field"/>-->
+<!--                </th>-->
+<!--            </t>-->
         </tr>
     </thead>
     <tbody>
@@ -57,11 +61,25 @@
             </td>
 
             <t t-log="props"/>
-             <td>
-                    <t t-log="Object.values(orderline._dynamicValues)"/>
-                    <t t-esc="Object.values(orderline._dynamicValues)[0]"/>
+            <td style="text-align:center; padding:4px 8px; min-width:40px;">
+                <t t-esc="Object.values(orderline._dynamicValues)[0]"/>
+            </td>
 
-                    </td>
+            <td style="text-align:center; padding:4px 8px; min-width:40px;">
+                <t t-esc="Object.values(orderline._dynamicValues)[1] || ''"/>
+            </td>
+
+            <td style="text-align:center; padding:4px 8px; min-width:40px;">
+                <t t-esc="Object.values(orderline._dynamicValues)[2] || ''"/>
+            </td>
+
+            <td style="text-align:center; padding:4px 8px; min-width:40px;">
+                <t t-esc="Object.values(orderline._dynamicValues)[3] || ''"/>
+            </td>
+
+            <td style="text-align:center; padding:4px 8px; min-width:40px;">
+                <t t-esc="Object.values(orderline._dynamicValues)[4] || ''"/>
+            </td>
 
         </t>
         </t>
@@ -85,6 +103,18 @@
                     </div>
                 </div>
 
+              <!-- QR Code with Receipt Content -->
+
+    <div style="text-align:center; margin-top:15px; padding:10px; border-top:1px dashed #000;">
+        <img t-att-src="props.data.qrDataUrl"
+             style="width:150px; height:150px; display:block; margin:0 auto;"
+             alt="Receipt QR Code"/>
+        <div style="font-size:11px; margin-top:8px; color:#666;">
+            Scan to view receipt details
+        </div>
+    </div>
+
+
                 <!-- RECEIPT INFO -->
                 <div style="text-align:center; margin-top:20px; font-size:14px;">
                     <div><t t-esc="props.receipt.name"/></div>
@@ -98,6 +128,7 @@
                 <div style="text-align:center; font-size:14px; margin-top:10px;">
                     Thank you for shopping with us!
                 </div>
+
         </div>]]></field>
     </record>
 
