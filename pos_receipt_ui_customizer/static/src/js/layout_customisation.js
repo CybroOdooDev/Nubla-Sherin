@@ -346,6 +346,7 @@ class PosReceiptLayoutClientAction extends Component {
 //        return env;
 //    }
 
+
         submitValue() {
             const value = this.inputRef.el.value;
 
@@ -389,6 +390,14 @@ class PosReceiptLayoutClientAction extends Component {
             this.state.showSection = false;
             this.state.showSection1 = true;
         }
+
+
+
+
+
+
+
+
 
 
 
