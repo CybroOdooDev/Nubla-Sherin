@@ -5,17 +5,15 @@ import { patch } from "@web/core/utils/patch";
 import { qrCodeSrc } from "@point_of_sale/utils";
 
 patch(PosOrder.prototype, {
-
     export_for_printing() {
         const res = super.export_for_printing(...arguments);
-
+        const config = this.config || {};
         let fields = [];
         try {
-            fields = JSON.parse(this.config.selected_product_fields || "[]");
+            fields = JSON.parse(config.selected_product_fields || "[]");
         } catch {
             fields = [];
         }
-
         res.dynamic_fields = fields;
 
         const jsLines = this.lines || [];
@@ -29,9 +27,8 @@ patch(PosOrder.prototype, {
             if (product) {
                 fields.forEach(f => {
                     let value = product[f];
-                    if (value === undefined || value === null) {
-                        value = "";
-                    } else if (typeof value === "object") {
+                    if (value == null) value = "";
+                    else if (typeof value === "object") {
                         value = value.display_name || value.name || "";
                     } else {
                         value = String(value);
@@ -43,118 +40,23 @@ patch(PosOrder.prototype, {
         });
 
 
-        const qrText = this.buildReceiptText();
+        if (!config.enable_qr) {
+            console.log("dhhhdhhdhdhlf")
+            res.qr_src = null;
+            return res;
+        }
+
+        const qrText =
+    `ORDER=${this.name}` +
+    `,DATE=${res.date}` +
+    `,TOTAL=${this.get_total_with_tax().toFixed(2)}` +
+    `,TAX=${res.amount_tax?.toFixed(2) || "0.00"}` +
+    `,PAYMENT=${res.paymentlines?.[0]?.name || ""}` +
+    `,ITEMS=${res.orderlines.length}`;
 
         res.qr_src = qrCodeSrc(qrText);
-        console.log("Qr code src ",res.qr_src)
 
-        const relativeQr = qrCodeSrc(qrText);
-        res.qr_src = new URL(relativeQr, window.location.origin).href;
         return res;
     },
-
-//    buildMinimalReceiptText() {
-//        const company = this.pos.company || {};
-//        const receipt = this.export_for_printing();
-//
-//        const orderName = this.name || "";
-//        const date = receipt.date || "";
-//        const seller =
-//            company.name +
-//            (company.city ? ` (${company.city})` : "");
-//
-//        const vat = company.vat || "N/A";
-//
-//        const amountBeforeTax = (
-//            receipt.total_without_tax || 0
-//        ).toFixed(2);
-//
-//        const vatAmount = (
-//            receipt.amount_tax || 0
-//        ).toFixed(2);
-//
-//        return (
-//            `# : ${orderName}\n` +
-//            `Date : ${date}\n` +
-//            `Seller : ${seller}\n` +
-//            `VAT : ${vat}\n` +
-//            `Amount Before Tax : ${amountBeforeTax} $\n` +
-//            `Amount VAT : ${vatAmount} $`
-//        );
-//    },
-
-    buildReceiptText() {
-        const lines = this.get_orderlines()
-            .map(line => {
-                const product = line.product || line.product_id;
-                if (!product) return null;
-
-                const name = product.display_name || product.name || "Item";
-                const qty = line.get_quantity();
-                const price = line.get_unit_price();
-
-                return `${name}: ${qty} x ${price.toFixed(2)}`;
-            })
-            .filter(Boolean)
-            .join("\n");
-
-        return (
-            `Order: ${this.name}\n` +
-            `Date: ${this.date_order}\n\n` +
-            `${lines}\n\n` +
-            `Total: ${this.get_total_with_tax().toFixed(2)}`
-        );
-    },
 });
-
-
-
-
-
-//import { PosOrder } from "@point_of_sale/app/models/pos_order";
-//import { patch } from "@web/core/utils/patch";
-//
-//patch(PosOrder.prototype, {
-//    export_for_printing() {
-//        const res = super.export_for_printing(...arguments);
-//
-//        let fields = [];
-//        try {
-//            fields = JSON.parse(this.config.selected_product_fields || "[]");
-//            console.log("FIELDS",fields)
-//        } catch {
-//            fields = [];
-//        }
-//
-//        res.dynamic_fields = fields;
-//        const jsLines = this.lines || [];
-//
-//        res.orderlines = (res.orderlines || []).map((line, index) => {
-//            const enriched = { ...line };
-//
-//            const jsLine = jsLines[index];
-//            const product = jsLine?.product_id;
-//
-//            fields.forEach(f => enriched[f] = "");
-//
-//            if (product) {
-//                fields.forEach(f => {
-//                    let value = product[f];
-//
-//                    if (value === undefined || value === null) {
-//                        value = "";
-//                    } else if (typeof value === "object") {
-//                        value = value.display_name || value.name || "";
-//                    } else {
-//                        value = String(value);
-//                    }
-//                    enriched[f] = value;
-//                });
-//            }
-//            return enriched;
-//        });
-//
-//        return res;
-//    },
-//});
 

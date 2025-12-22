@@ -3,7 +3,7 @@
     <record id="pos_receipt_design2" model="pos.receipt">
         <field name="name">Design 2</field>
         <field name="design_receipt"><![CDATA[
-            <div class="pos-receipt"  padding: 8px;">
+            <div class="pos-receipt" >
 
                 <!-- HEADER -->
                 <div style="text-align:center; padding:10px 0; border-bottom:2px solid #000;">
@@ -103,31 +103,12 @@
                     </div>
                 </div>
 
-              <!-- QR Code with Receipt Content -->
-
-              <!-- QR Code with Receipt Content -->
-                <!-- QR Code with Receipt Content -->
-<!--            <img t-if="props.data.qr_code"-->
-<!--                 t-att-src="props.data.qr_code"-->
-<!--                 style="width:150px; height:150px; display:block; margin:0 auto;"/>-->
-
-<!--                 <t t-if="props.receipt">-->
-<!--                   <t t-log="props.receipt.qr_src">-->
-
-<!--                     <t t-if="props.receipt.qr_src">-->
-<!--                    <div style="text-align:center; margin-top:10px;">-->
-<!--                        <img-->
-<!--                            t-att-src="props.receipt.qr_src"-->
-<!--                            style="width:120px; height:120px;"-->
-<!--                        />-->
-<!--                    </div>-->
-<!--                    </t>-->
-
-<!--            </t>-->
-
-
-
-
+                <t t-if="props.receipt.qr_src">
+    <div style="text-align:center; margin-top:12px;">
+        <img t-att-src="props.receipt.qr_src"
+             style="width:120px; height:120px;" />
+    </div>
+</t>
 
 
                 <!-- RECEIPT INFO -->

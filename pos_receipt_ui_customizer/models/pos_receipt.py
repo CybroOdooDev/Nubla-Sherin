@@ -49,5 +49,11 @@ class PosReceipt(models.Model):
         help="Receipt column layout configuration"
     )
 
+    enable_qr = fields.Boolean(
+        string="Enable Receipt QR",
+        default=False
+    )
+
+
 
 

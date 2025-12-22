@@ -47,8 +47,18 @@ class PosConfig(models.Model):
         compute="_compute_selected_product_fields",
         store=True
     )
+    enable_qr = fields.Boolean(
+        "Enable Receipt QR",
+        compute="_compute_enable_qr",
+        store=True,
+        default=True,
+    )
 
-
+    @api.depends("enable_qr")
+    def _compute_enable_qr(self):
+        print("dhhhhhhhhhhhhhhhhhhhhbw")
+        for rec in self:
+            rec.enable_qr = bool(rec.receipt_design_id.enable_qr)
 
     @api.depends('receipt_design_id', 'receipt_design_id.selected_product_fields')
     def _compute_selected_product_fields(self):
@@ -56,7 +66,6 @@ class PosConfig(models.Model):
             if rec.receipt_design_id and rec.receipt_design_id.selected_product_fields:
                 rec.selected_product_fields = rec.receipt_design_id.selected_product_fields
                 print("dhhhhhhhhhhhhhhhhhllll")
-
             else:
                 rec.selected_product_fields = '[]'
                 print("dhhhhhhhhhhhhhhhhhllll")

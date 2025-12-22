@@ -1,16 +1,22 @@
 /** @odoo-module **/
-import { registry } from "@web/core/registry";
-import { Component, useState, useRef, onMounted,onWillStart } from "@odoo/owl";
-import { useService } from "@web/core/utils/hooks";
+import {registry} from "@web/core/registry";
+import {Component, useState, useRef, onMounted, onWillStart} from "@odoo/owl";
+import {useService} from "@web/core/utils/hooks";
 
 class PosReceiptLayoutClientAction extends Component {
     static template = "custom_receipt_for_pos.client_layout_customisation_template";
+
     setup() {
         this.orm = useService("orm");
         this.notification = useService("notification");
         this.receiptContentRef = useRef("ReceiptContent");
         this.inputRef = useRef("userInput");
         this.selectedProductFields = [];
+        this.config_id =
+            this.props.action?.params?.config_id ||
+            this.props.action?.context?.pos_config_id ||
+            this.props.action?.context?.active_id;
+
 
         this.receipt_id = this.props.action?.params?.receipt_id || this.props.action?.context?.active_id;
 //        this.receipt_id = this.props.action.context.active_id;
@@ -24,19 +30,21 @@ class PosReceiptLayoutClientAction extends Component {
             model: '',
             showSection: false,
             showSection1: true,
-// ✅ NEW: popup state
-    popup: {
-        visible: false,
-        x: 0,
-        y: 0,
-        type: null,          // "column" or "cell"
-        columnIndex: null,   // clicked column index
-        selectedField: "",   // e.g. "order.amount_total"
-    },
+
+            popup: {
+                visible: false,
+                x: 0,
+                y: 0,
+                type: null,          // "column" or "cell"
+                columnIndex: null,   // clicked column index
+                selectedField: "",   // e.g. "order.amount_total"
+            },
         });
-           onWillStart(async () => {
-    await this.loadProductFields();
-});
+        onWillStart(async () => {
+            await this.loadProductFields();
+            await this.loadPosConfigId();
+            await this.loadEnableQr();
+        });
 
         onMounted(async () => {
             await this.loadReceipt();
@@ -47,15 +55,43 @@ class PosReceiptLayoutClientAction extends Component {
 
 
     }
+
     async getPosConfig() {
-    const [config] = await this.orm.searchRead(
-        "pos.config",
-        [],
-        ["id", "selected_product_fields"],
-        { limit: 1 }
-    );
-    return config;
-}
+        const [config] = await this.orm.searchRead(
+            "pos.config",
+            [],
+            ["id", "selected_product_fields"],
+            {limit: 1}
+        );
+        return config;
+    }
+
+    async loadPosConfigId() {
+        const [config] = await this.orm.searchRead(
+            "pos.config",
+            [["receipt_design_id", "=", this.receipt_id]],
+            ["id"],
+            {limit: 1}
+        );
+
+        if (!config) {
+            throw new Error("POS Config not found for this receipt");
+        }
+
+        this.config_id = config.id;
+        console.log("POS CONFIG ID:", this.config_id);
+    }
+
+    async loadEnableQr() {
+        const [config] = await this.orm.read(
+            "pos.config",
+            [this.config_id],
+            ["enable_qr"]
+        );
+
+        this.state.enableQr = !!config.enable_qr;
+        console.log("Loaded enable_qr into state:", this.state.enableQr);
+    }
 
 
     async mediumEditor() {
@@ -69,7 +105,7 @@ class PosReceiptLayoutClientAction extends Component {
         });
     }
 
-    async allowSpace(){
+    async allowSpace() {
         this.receiptContentRef.el.addEventListener("keydown", (ev) => {
             if (ev.key === " " || ev.keyCode === 32) {
                 const sel = window.getSelection();
@@ -103,7 +139,7 @@ class PosReceiptLayoutClientAction extends Component {
         });
     }
 
-    async loadReceipt(reset=false) {
+    async loadReceipt(reset = false) {
         const [receipt] = await this.orm.searchRead(
             "pos.receipt",
             [["id", "=", this.receipt_id]],
@@ -114,8 +150,7 @@ class PosReceiptLayoutClientAction extends Component {
         this.state.logo = receipt.logo
         if (!reset && this.receiptContentRef.el?.innerHTML) {
             this.state.receipt = this.receiptContentRef.el.innerHTML;
-        }
-        else {
+        } else {
             this.state.receipt = receipt.design_receipt;
         }
         let html = this.state.receipt
@@ -140,7 +175,6 @@ class PosReceiptLayoutClientAction extends Component {
                 <img src="data:image/png;base64,${logo}"
                      class="receipt-logo" style="max-width:150px;height:auto;"/>
                 </t>`
-
             );
         }
         this.receiptContentRef.el.innerHTML = html;
@@ -159,7 +193,7 @@ class PosReceiptLayoutClientAction extends Component {
             this.state.receipt = this.receiptContentRef.el.innerHTML;
             this.state.prev_logo = this.state.logo;
             this.state.prev_receipt = this.state.receipt;
-            await this.orm.write("pos.receipt", [this.receipt_id], { logo: base64 });
+            await this.orm.write("pos.receipt", [this.receipt_id], {logo: base64});
             this.state.logo = base64;
             await this.loadReceipt();
             this.notification.add("✅ Receipt Logo Updated!", {
@@ -170,29 +204,37 @@ class PosReceiptLayoutClientAction extends Component {
     }
 
     async saveEditedReceipt() {
-        this.state.receipt = this.receiptContentRef.el.innerHTML
-        this.state.prev_logo = this.state.logo
-        this.state.prev_receipt = this.state.receipt
-        const html = this.state.receipt
+        this.state.receipt = this.receiptContentRef.el.innerHTML;
+        this.state.prev_logo = this.state.logo;
+        this.state.prev_receipt = this.state.receipt;
+
         await this.orm.write("pos.receipt", [this.receipt_id], {
-            design_receipt: html,
+            design_receipt: this.state.receipt,
             design_receipt_font_style: this.state.fontStyle,
             logo: this.state.logo,
         });
-        this.notification.add("✅ Receipt Successfully Updated!", {
-                type: "success",
-            });
+
+        await this.orm.write("pos.config", [this.config_id], {
+            enable_qr: !!this.state.enableQr,
+        });
+
+        this.notification.add("Receipt Successfully Updated!", {
+            type: "success",
+        });
+
+        setTimeout(() => window.location.reload(), 800);
     }
 
-    async resetEditedReceipt(){
+
+    async resetEditedReceipt() {
         if (this.state.prev_receipt) {
             this.state.receipt = this.state.prev_receipt;
             this.receiptContentRef.el.innerHTML = this.state.receipt;
         }
-       await this.loadReceipt(true);
-       this.notification.add("🔄 Receipt Reset Completed!", {
-           type: "success",
-       });
+        await this.loadReceipt(true);
+        this.notification.add("🔄 Receipt Reset Completed!", {
+            type: "success",
+        });
     }
 
     onFontChange(ev) {
@@ -203,16 +245,16 @@ class PosReceiptLayoutClientAction extends Component {
         const model = ev.target.value;
         this.state.model = model
         if (!model) return (this.state.fields = []);
-            const fields = await this.orm.call(model, "fields_get", [], {});
-            this.state.fieldsInfo = fields;
-            const prefix = model === "pos.order" ? "order" :
-                           model === "res.partner" ? "partner" : model;
-            this.state.fields = Object.keys(fields).filter(key => !/(_ids?$|\d+$)/.test(key)).map((key) => ({
-                technical: `${prefix}.${key}`,
-                label: odoo.debug
-                    ? `${fields[key].string || key} (${prefix}.${key})`
-                    : fields[key].string || key,
-            }));
+        const fields = await this.orm.call(model, "fields_get", [], {});
+        this.state.fieldsInfo = fields;
+        const prefix = model === "pos.order" ? "order" :
+            model === "res.partner" ? "partner" : model;
+        this.state.fields = Object.keys(fields).filter(key => !/(_ids?$|\d+$)/.test(key)).map((key) => ({
+            technical: `${prefix}.${key}`,
+            label: odoo.debug
+                ? `${fields[key].string || key} (${prefix}.${key})`
+                : fields[key].string || key,
+        }));
     }
 
     onDragStart(ev) {
@@ -240,9 +282,9 @@ class PosReceiptLayoutClientAction extends Component {
     }
 
     onDragEnd() {
-            this.receiptContentRef.el.classList.remove("dragging");
-            this.receiptContentRef.el.classList.remove("drop-highlight");
-        }
+        this.receiptContentRef.el.classList.remove("dragging");
+        this.receiptContentRef.el.classList.remove("drop-highlight");
+    }
 
     onDrop(ev) {
         ev.preventDefault();
@@ -270,8 +312,7 @@ class PosReceiptLayoutClientAction extends Component {
         }
         if (range) {
             range.insertNode(span);
-        }
-        else {
+        } else {
             let targetArea = editor.querySelector(".drop-area")
             if (targetArea) {
                 targetArea.appendChild(span);
@@ -315,145 +356,111 @@ class PosReceiptLayoutClientAction extends Component {
 //	    });
 //
 //	}
-        showInput() {
-            this.state.showSection = true;
-            this.state.showSection1 = false;
+    showInput() {
+        this.state.showSection = true;
+        this.state.showSection1 = false;
+    }
+
+
+    submitValue() {
+        const value = this.inputRef.el.value;
+        console.log("URL RECEIPT QRCODDEEEEEEEE")
+
+        if (!value) {
+            this.notification.add("Please enter a value!", {type: "warning"});
+            return;
         }
 
-//       async get_receipt_render_env() {
-//        const env = await super.get_receipt_render_env();
-//
-//        console.log("{{{{{{{{{{{{{{{{{{{{{")
-//
-//        console.log("ENVVVVV",env)
-//        const order = env.order;
-//        console.log("ORDER",order)
-//
-//        let qrText = `Order: ${order.name}\n`;
-//        qrText += `Total: ${order.get_total_with_tax().toFixed(2)}\n\n`;
-//
-//        order.get_orderlines().forEach(line => {
-//            qrText += `${line.product.display_name} - ${line.quantity} x ${line.price}\n`;
-//        });
-//
-//        qrText = qrText.slice(0, 300);
-//
-//        env.qrDataUrl = await QRCode.toDataURL(qrText, {
-//            width: 180,
-//            margin: 1,
-//        });
-//
-//        return env;
-//    }
+        const editor = this.receiptContentRef.el;
 
-
-        submitValue() {
-            const value = this.inputRef.el.value;
-
-            if (!value) {
-                this.notification.add("Please enter a value!", { type: "warning" });
-                return;
-            }
-
-            const editor = this.receiptContentRef.el;
-
-            const oldQR = editor.querySelector(".qr-placeholder");
-            if (oldQR) {
-                oldQR.remove();
-            }
-
-            let targetArea = editor.querySelector(".qrArea");
-            if (!targetArea) {
-                this.notification.add("No target area found!", { type: "danger" });
-                return;
-            }
-
-            const qrDiv = document.createElement("div");
-            qrDiv.classList.add("qr-placeholder");
-            qrDiv.style.textAlign = "center";
-            qrDiv.style.marginTop = "10px";
-
-            // 6. Inner div for QR
-            const qrBox = document.createElement("div");
-            qrBox.id = "qr_" + Date.now();   // unique ID
-            qrDiv.appendChild(qrBox);
-
-            // 7. Add to editor
-            targetArea.appendChild(qrDiv);
-
-            new QRCode(qrBox, {
-                text: value,
-                width: 120,
-                height: 120,
-            });
-
-            this.state.showSection = false;
-            this.state.showSection1 = true;
+        const oldQR = editor.querySelector(".qr-placeholder");
+        if (oldQR) {
+            oldQR.remove();
         }
 
+        let targetArea = editor.querySelector(".qrArea");
+        if (!targetArea) {
+            this.notification.add("No target area found!", {type: "danger"});
+            return;
+        }
+
+        const qrDiv = document.createElement("div");
+        qrDiv.classList.add("qr-placeholder");
+        qrDiv.style.textAlign = "center";
+        qrDiv.style.marginTop = "10px";
+
+        // 6. Inner div for QR
+        const qrBox = document.createElement("div");
+        qrBox.id = "qr_" + Date.now();   // unique ID
+        qrDiv.appendChild(qrBox);
+
+        // 7. Add to editor
+        targetArea.appendChild(qrDiv);
+
+        new QRCode(qrBox, {
+            text: value,
+            width: 120,
+            height: 120,
+        });
+
+        this.state.showSection = false;
+        this.state.showSection1 = true;
+    }
 
 
+    onReceiptClick(ev) {
+        const table = ev.target.closest("table");
+        if (!table) {
+            this.hidePopup();
+            this.lastClickedCell = null;
+            this.lastClickedTable = null;
+            return;
+        }
 
+        this.lastClickedTable = table;
 
+        const headerRow = table.querySelector("thead tr") || table.querySelector("tr");
+        if (!headerRow) {
+            this.hidePopup();
+            return;
+        }
 
+        const th = ev.target.closest("th");
+        const td = ev.target.closest("td");
 
+        const clicked = th || td;
 
+        if (!clicked) {
+            this.hidePopup();
+            return;
+        }
 
+        const colIndex = Array.from(clicked.parentNode.children).indexOf(clicked);
+        const isLastColumn = colIndex === headerRow.children.length - 1;
 
+        const isAddColumnHeader =
+            clicked.classList.contains("add-column-header") ||
+            ev.target.closest(".add-column-btn");
 
-   onReceiptClick(ev) {
-    const table = ev.target.closest("table");
-    if (!table) {
+        if (!isLastColumn && !isAddColumnHeader) {
+            this.hidePopup();
+            this.notification.add("You can edit only the last column.", {type: "info"});
+            return;
+        }
+
+        if (th) {
+            this.lastClickedCell = null;
+            this.showPopup("column", ev.clientX, ev.clientY, colIndex);
+            return;
+        }
+        if (td) {
+            this.lastClickedCell = td;
+            this.showPopup("cell", ev.clientX, ev.clientY, colIndex);
+            return;
+        }
+
         this.hidePopup();
-        this.lastClickedCell = null;
-        this.lastClickedTable = null;
-        return;
     }
-
-    this.lastClickedTable = table;
-
-    const headerRow = table.querySelector("thead tr") || table.querySelector("tr");
-    if (!headerRow) {
-        this.hidePopup();
-        return;
-    }
-
-    const th = ev.target.closest("th");
-    const td = ev.target.closest("td");
-
-    const clicked = th || td;
-
-    if (!clicked) {
-        this.hidePopup();
-        return;
-    }
-
-    const colIndex = Array.from(clicked.parentNode.children).indexOf(clicked);
-    const isLastColumn = colIndex === headerRow.children.length - 1;
-
-    const isAddColumnHeader =
-        clicked.classList.contains("add-column-header") ||
-        ev.target.closest(".add-column-btn");
-
-    if (!isLastColumn && !isAddColumnHeader) {
-        this.hidePopup();
-        this.notification.add("You can edit only the last column.", { type: "info" });
-        return;
-    }
-
-    if (th) {
-        this.lastClickedCell = null;
-        this.showPopup("column", ev.clientX, ev.clientY, colIndex);
-        return;
-    }
-    if (td) {
-        this.lastClickedCell = td;
-        this.showPopup("cell", ev.clientX, ev.clientY, colIndex);
-        return;
-    }
-
-    this.hidePopup();
-}
 
     showPopup(type, x, y, columnIndex) {
         this.state.popup.visible = true;
@@ -470,84 +477,81 @@ class PosReceiptLayoutClientAction extends Component {
     }
 
 
-
-
-
     async loadProductFields() {
-    const fields = await this.orm.call("product.product", "fields_get", [], {});
+        const fields = await this.orm.call("product.product", "fields_get", [], {});
 
-    this.state.productFields = Object.keys(fields)
-        .filter(k => !/(_ids?$|\d+$)/.test(k))
-        .map(k => ({
-            name: k,
-            label: fields[k].string || k,
-        }));
-}
+        this.state.productFields = Object.keys(fields)
+            .filter(k => !/(_ids?$|\d+$)/.test(k))
+            .map(k => ({
+                name: k,
+                label: fields[k].string || k,
+            }));
+    }
 
     onPopupFieldChange(ev) {
         this.state.popup.selectedField = ev.target.value || "";
     }
 
-  async onAddColumnClick() {
-    const fieldName = this.state.popup.selectedField;
-    console.log("Selected field:", fieldName);
+    async onAddColumnClick() {
+        const fieldName = this.state.popup.selectedField;
+        console.log("Selected field:", fieldName);
 
-    if (!fieldName) {
-        this.notification.add("Please select a field.", { type: "warning" });
-        return;
+        if (!fieldName) {
+            this.notification.add("Please select a field.", {type: "warning"});
+            return;
+        }
+        if (!this.lastClickedTable) {
+            this.notification.add("Click a table first.", {type: "danger"});
+            return;
+        }
+        if (!this.receipt_id) {
+            this.notification.add("Receipt ID not found", {type: "danger"});
+            return;
+        }
+
+        const table = this.lastClickedTable;
+        let headerRow = table.querySelector("thead tr") || table.querySelector("tr");
+        if (!headerRow) return;
+
+        let bodyRows = table.querySelectorAll("tbody tr");
+        if (!bodyRows.length) {
+            bodyRows = Array.from(table.querySelectorAll("tr")).slice(1);
+        }
+
+        const insertIndex = headerRow.children.length;
+
+        const fieldObj = this.state.productFields.find(f => f.name === fieldName);
+        const label = fieldObj?.label || fieldName;
+
+        if (!this.selectedProductFields.includes(fieldName)) {
+            this.selectedProductFields.push(fieldName);
+        }
+
+        const th = document.createElement("th");
+        th.textContent = label;
+        th.setAttribute("data-field", fieldName);
+        headerRow.appendChild(th);   // end
+
+        bodyRows.forEach((row) => {
+            const td = document.createElement("td");
+            td.setAttribute("data-field", fieldName);
+            td.style.padding = "4px";
+
+            const span = document.createElement("span");
+            // span.textContent = `[[ orderline.${fieldName} ]]`;
+            // span.setAttribute("t-esc", `orderline.${fieldName}`);
+
+            td.appendChild(span);
+            row.appendChild(td);
+        });
+
+        await this.orm.write("pos.receipt", [this.receipt_id], {
+            selected_product_fields: JSON.stringify(this.selectedProductFields),
+        });
+
+        console.log("Saved fields:", this.selectedProductFields);
+        this.hidePopup();
     }
-    if (!this.lastClickedTable) {
-        this.notification.add("Click a table first.", { type: "danger" });
-        return;
-    }
-    if (!this.receipt_id) {
-        this.notification.add("Receipt ID not found", { type: "danger" });
-        return;
-    }
-
-    const table = this.lastClickedTable;
-    let headerRow = table.querySelector("thead tr") || table.querySelector("tr");
-    if (!headerRow) return;
-
-    let bodyRows = table.querySelectorAll("tbody tr");
-    if (!bodyRows.length) {
-        bodyRows = Array.from(table.querySelectorAll("tr")).slice(1);
-    }
-
-    const insertIndex = headerRow.children.length;
-
-    const fieldObj = this.state.productFields.find(f => f.name === fieldName);
-    const label = fieldObj?.label || fieldName;
-
-    if (!this.selectedProductFields.includes(fieldName)) {
-        this.selectedProductFields.push(fieldName);
-    }
-
-    const th = document.createElement("th");
-    th.textContent = label;
-    th.setAttribute("data-field", fieldName);
-    headerRow.appendChild(th);   // end
-
-    bodyRows.forEach((row) => {
-        const td = document.createElement("td");
-        td.setAttribute("data-field", fieldName);
-        td.style.padding = "4px";
-
-        const span = document.createElement("span");
-        // span.textContent = `[[ orderline.${fieldName} ]]`;
-        // span.setAttribute("t-esc", `orderline.${fieldName}`);
-
-        td.appendChild(span);
-        row.appendChild(td);
-    });
-
-    await this.orm.write("pos.receipt", [this.receipt_id], {
-        selected_product_fields: JSON.stringify(this.selectedProductFields),
-    });
-
-    console.log("Saved fields:", this.selectedProductFields);
-    this.hidePopup();
-}
 
 
     saveDesignToConfig() {
@@ -575,11 +579,11 @@ class PosReceiptLayoutClientAction extends Component {
                 selected_product_fields: JSON.stringify(selectedFields),
             }])
             .then(() => {
-                this.notification.add("Design saved successfully!", { type: "success" });
+                this.notification.add("Design saved successfully!", {type: "success"});
             })
             .catch((error) => {
                 console.error("Save error:", error);
-                this.notification.add("Failed to save", { type: "danger" });
+                this.notification.add("Failed to save", {type: "danger"});
             });
     }
 
@@ -594,81 +598,81 @@ class PosReceiptLayoutClientAction extends Component {
 
         return Array.from(fields);
     }
-async onRemoveColumnClick() {
-    if (!this.lastClickedTable) {
-        this.notification.add("No table selected.", { type: "danger" });
-        return;
-    }
 
-    const table = this.lastClickedTable;
-    const theadRow = table.querySelector("thead tr");
-    const bodyRows = table.querySelectorAll("tbody tr");
+    async onRemoveColumnClick() {
+        if (!this.lastClickedTable) {
+            this.notification.add("No table selected.", {type: "danger"});
+            return;
+        }
 
-    if (!theadRow) {
-        this.notification.add("Table does not have a header row.", {
-            type: "danger",
+        const table = this.lastClickedTable;
+        const theadRow = table.querySelector("thead tr");
+        const bodyRows = table.querySelectorAll("tbody tr");
+
+        if (!theadRow) {
+            this.notification.add("Table does not have a header row.", {
+                type: "danger",
+            });
+            return;
+        }
+
+        const colIndex = this.state.popup.columnIndex;
+        const STATIC_COL_COUNT = 3;
+
+        if (colIndex == null || colIndex < STATIC_COL_COUNT) {
+            this.notification.add("You cannot remove default columns.", {
+                type: "warning",
+            });
+            return;
+        }
+
+        const th = theadRow.children[colIndex];
+        const fieldName = th?.dataset?.field;
+
+        if (!fieldName) {
+            this.notification.add("This column is not removable.", {
+                type: "warning",
+            });
+            return;
+        }
+
+        const [receipt] = await this.orm.searchRead(
+            "pos.receipt",
+            [["id", "=", this.receipt_id]],
+            ["id", "selected_product_fields"],
+            {limit: 1}
+        );
+
+        if (!receipt) {
+            this.notification.add("Receipt not found.", {type: "danger"});
+            return;
+        }
+
+        let fields = [];
+        try {
+            fields = JSON.parse(receipt.selected_product_fields || "[]");
+        } catch {
+            fields = [];
+        }
+
+
+        const updatedFields = fields.filter(f => f !== fieldName);
+
+        await this.orm.write("pos.receipt", [receipt.id], {
+            selected_product_fields: JSON.stringify(updatedFields),
         });
-        return;
+
+
+        th.remove();
+        bodyRows.forEach(row => row.children[colIndex]?.remove());
+
+        this.notification.add(
+            `Column "${fieldName}" removed successfully`,
+            {type: "success"}
+        );
+
+        this.hidePopup();
     }
-
-    const colIndex = this.state.popup.columnIndex;
-    const STATIC_COL_COUNT = 3;
-
-    if (colIndex == null || colIndex < STATIC_COL_COUNT) {
-        this.notification.add("You cannot remove default columns.", {
-            type: "warning",
-        });
-        return;
-    }
-
-    const th = theadRow.children[colIndex];
-    const fieldName = th?.dataset?.field;
-
-    if (!fieldName) {
-        this.notification.add("This column is not removable.", {
-            type: "warning",
-        });
-        return;
-    }
-
-    const [receipt] = await this.orm.searchRead(
-        "pos.receipt",
-        [["id", "=", this.receipt_id]],
-        ["id", "selected_product_fields"],
-        { limit: 1 }
-    );
-
-    if (!receipt) {
-        this.notification.add("Receipt not found.", { type: "danger" });
-        return;
-    }
-
-    let fields = [];
-    try {
-        fields = JSON.parse(receipt.selected_product_fields || "[]");
-    } catch {
-        fields = [];
-    }
-
-
-    const updatedFields = fields.filter(f => f !== fieldName);
-
-    await this.orm.write("pos.receipt", [receipt.id], {
-        selected_product_fields: JSON.stringify(updatedFields),
-    });
-
-
-    th.remove();
-    bodyRows.forEach(row => row.children[colIndex]?.remove());
-
-    this.notification.add(
-        `Column "${fieldName}" removed successfully`,
-        { type: "success" }
-    );
-
-    this.hidePopup();
-}
-
 
 
     onInsertFieldClick() {
@@ -710,4 +714,5 @@ async onRemoveColumnClick() {
     }
 
 }
+
 registry.category("actions").add("pos_receipt_layout_client_action", PosReceiptLayoutClientAction);
