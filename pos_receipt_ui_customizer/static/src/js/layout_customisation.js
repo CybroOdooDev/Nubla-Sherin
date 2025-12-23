@@ -30,6 +30,8 @@ class PosReceiptLayoutClientAction extends Component {
             model: '',
             showSection: false,
             showSection1: true,
+            headerFields: [],
+            draggedField: null,
 
             popup: {
                 visible: false,
@@ -280,6 +282,26 @@ class PosReceiptLayoutClientAction extends Component {
         this.receiptContentRef.el.classList.add("dragging");
         this.receiptContentRef.el.classList.add("drop-highlight");
     }
+    onDropToHeader(ev) {
+    ev.preventDefault();
+
+    // get dragged field name back
+    const raw = ev.dataTransfer.getData("text/plain");
+    if (!raw) return;
+
+    // remove [[ ]]
+    const fieldName = raw.replace(/\[\[|\]\]/g, "");
+
+    // store ONLY selected fields
+    if (!this.state.headerFields.includes(fieldName)) {
+        this.state.headerFields.push(fieldName);
+    }
+
+    // cleanup UI
+    this.receiptContentRef.el.classList.remove("dragging");
+    this.receiptContentRef.el.classList.remove("drop-highlight");
+}
+
 
     onDragEnd() {
         this.receiptContentRef.el.classList.remove("dragging");

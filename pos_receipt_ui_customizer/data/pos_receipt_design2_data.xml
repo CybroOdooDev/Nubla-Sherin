@@ -34,57 +34,60 @@
             <th style="text-align:center; padding:4px;">Qty</th>
             <th style="text-align:right; padding:4px;">Amount</th>
 
-
-
-
-            <!-- Dynamic headers -->
-<!--            <t t-foreach="props.dynamic_fields" t-as="field" t-key="field">-->
-<!--                <th style="text-align:center; padding:4px;">-->
-
-<!--                    <t t-esc="field"/>-->
-<!--                </th>-->
-<!--            </t>-->
         </tr>
     </thead>
     <tbody>
-    <t t-if="props.orderlines and props.orderlines.length">
-        <tr t-foreach="props.orderlines" t-as="orderline" t-key="orderline_index"
-            style="border-bottom:1px dotted #ccc;">
-            <td style="padding:4px; width:60%; word-break:break-word;">
-                <t t-esc="orderline.productName"/>
-            </td>
-            <td style="padding:4px; text-align:center; width:20%;">
-                <t t-esc="orderline.qty"/>
-            </td>
-            <td style="padding:4px; text-align:right; width:20%;">
-                <t t-esc="orderline.price"/>
-            </td>
+        <t t-if="props.orderlines and props.orderlines.length">
+            <tr t-foreach="props.orderlines" t-as="orderline" t-key="orderline_index"
+                style="border-bottom:1px dotted #ccc;">
+                <td style="padding:4px; width:60%; word-break:break-word;">
+                    <t t-log="orderline"/>
+                    <t t-log="orderline_index"/>
+                    <t t-log="props.orderlines"/>
 
-            <t t-log="props"/>
-            <td style="text-align:center; padding:4px 8px; min-width:40px;">
-                <t t-esc="Object.values(orderline._dynamicValues)[0]"/>
-            </td>
+                    <t t-esc="orderline.productName"/>
+                </td>
+                <td style="padding:4px; text-align:center; width:20%;">
+                    <t t-esc="orderline.qty"/>
+                </td>
+                <td style="padding:4px; text-align:right; width:20%;">
+                    <t t-esc="orderline.price"/>
+                </td>
 
-            <td style="text-align:center; padding:4px 8px; min-width:40px;">
-                <t t-esc="Object.values(orderline._dynamicValues)[1] || ''"/>
-            </td>
+                <t t-if="orderline and orderline._dynamicValues">
+                    <t t-foreach="orderline._dynamicValues" t-as="val" t-key="val[0]">
+                        <td style="text-align:center; padding:4px 8px; min-width:40px;">
+                        <t t-log="val"/>
+                        <t t-log="val"/>
+                            <t t-esc="val"/>
+                        </td>
+                    </t>
+                </t>
 
-            <td style="text-align:center; padding:4px 8px; min-width:40px;">
-                <t t-esc="Object.values(orderline._dynamicValues)[2] || ''"/>
-            </td>
+                <td style="text-align:center; padding:4px 8px; min-width:40px;">
+                    <t t-esc="Object.values(orderline._dynamicValues)[0]"/>
+                </td>
 
-            <td style="text-align:center; padding:4px 8px; min-width:40px;">
-                <t t-esc="Object.values(orderline._dynamicValues)[3] || ''"/>
-            </td>
+                <td style="text-align:center; padding:4px 8px; min-width:40px;">
+                    <t t-esc="Object.values(orderline._dynamicValues)[1] || ''"/>
+                </td>
 
-            <td style="text-align:center; padding:4px 8px; min-width:40px;">
-                <t t-esc="Object.values(orderline._dynamicValues)[4] || ''"/>
-            </td>
+                <td style="text-align:center; padding:4px 8px; min-width:40px;">
+                    <t t-esc="Object.values(orderline._dynamicValues)[2] || ''"/>
+                </td>
 
+                <td style="text-align:center; padding:4px 8px; min-width:40px;">
+                    <t t-esc="Object.values(orderline._dynamicValues)[3] || ''"/>
+                </td>
+
+                <td style="text-align:center; padding:4px 8px; min-width:40px;">
+                    <t t-esc="Object.values(orderline._dynamicValues)[4] || ''"/>
+                </td>
+
+            </t>
+            </t>
+             </tr>
         </t>
-        </t>
-         </tr>
-    </t>
 </tbody>
 </table>
 

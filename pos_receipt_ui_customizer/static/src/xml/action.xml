@@ -88,6 +88,34 @@
                                 </div>
                             </t>
                         </div>
+                        <div>
+    <select class="form-select form-select-sm"
+            t-model="state.popup.selectedField">
+        <option value="">-- Select Product Field --</option>
+        <t t-foreach="state.productFields" t-as="f" t-key="f.name">
+            <option t-att-value="f.name">
+
+                <t t-esc="f.label"/> (<t t-esc="f.name"/>)
+            </option>
+        </t>
+    </select>
+
+    <div class="field-drag-list mt-2 field-list-container">
+        <t t-foreach="state.productFields" t-as="f" t-key="'drag-'+f.name">
+            <div class="field-chip"
+                 draggable="true"
+                 t-att-data-field="f.name"
+                 t-on-dragstart="onDragStart">
+                <t t-log="f"/>
+                <t t-log="f.name"/>
+                <t t-log="f.label"/>
+
+                <t t-esc="f.label"/>
+            </div>
+        </t>
+    </div>
+</div>
+
                     </div>
                     <!-- Receipt Preview -->
                     <div class="receipt_content " t-ref="ReceiptContent" t-on-click="onReceiptClick"
