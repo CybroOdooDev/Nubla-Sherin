@@ -69,20 +69,35 @@ class PosReceiptLayoutClientAction extends Component {
     }
 
     async loadPosConfigId() {
-        const [config] = await this.orm.searchRead(
-            "pos.config",
-            [["receipt_design_id", "=", this.receipt_id]],
-            ["id"],
-            {limit: 1}
+    if (!this.receipt_id) {
+        this.notification.add(
+            "Receipt ID not found. Please open this from a receipt record.",
+            { type: "danger" }
         );
-
-        if (!config) {
-            throw new Error("POS Config not found for this receipt");
-        }
-
-        this.config_id = config.id;
-        console.log("POS CONFIG ID:", this.config_id);
+        return;
     }
+
+    const configs = await this.orm.searchRead(
+        "pos.config",
+        [["receipt_design_id", "=", this.receipt_id]],
+        ["id"],
+        { limit: 1 }
+    );
+
+    const config = configs[0];
+
+    if (!config) {
+        this.notification.add(
+            "POS Config not found for this receipt. Please link a POS configuration.",
+            { type: "warning" }
+        );
+        return;
+    }
+
+    this.config_id = config.id;
+    console.log("POS CONFIG ID:", this.config_id);
+}
+
 
     async loadEnableQr() {
         const [config] = await this.orm.read(
@@ -234,7 +249,7 @@ class PosReceiptLayoutClientAction extends Component {
             this.receiptContentRef.el.innerHTML = this.state.receipt;
         }
         await this.loadReceipt(true);
-        this.notification.add("🔄 Receipt Reset Completed!", {
+        this.notification.add(" Receipt Reset Completed!", {
             type: "success",
         });
     }
@@ -282,25 +297,7 @@ class PosReceiptLayoutClientAction extends Component {
         this.receiptContentRef.el.classList.add("dragging");
         this.receiptContentRef.el.classList.add("drop-highlight");
     }
-    onDropToHeader(ev) {
-    ev.preventDefault();
 
-    // get dragged field name back
-    const raw = ev.dataTransfer.getData("text/plain");
-    if (!raw) return;
-
-    // remove [[ ]]
-    const fieldName = raw.replace(/\[\[|\]\]/g, "");
-
-    // store ONLY selected fields
-    if (!this.state.headerFields.includes(fieldName)) {
-        this.state.headerFields.push(fieldName);
-    }
-
-    // cleanup UI
-    this.receiptContentRef.el.classList.remove("dragging");
-    this.receiptContentRef.el.classList.remove("drop-highlight");
-}
 
 
     onDragEnd() {
@@ -734,7 +731,6 @@ class PosReceiptLayoutClientAction extends Component {
 
         this.hidePopup();
     }
-
 }
 
 registry.category("actions").add("pos_receipt_layout_client_action", PosReceiptLayoutClientAction);

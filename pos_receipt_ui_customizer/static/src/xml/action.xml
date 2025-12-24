@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
     <t t-name="custom_receipt_for_pos.client_layout_customisation_template">
+
         <div class="vh-100 overflow-auto bg-muted">
             <div class="o_pos_receipt_layout_client_action p-4">
                 <div class="container-class">
@@ -89,32 +90,46 @@
                             </t>
                         </div>
                         <div>
-    <select class="form-select form-select-sm"
-            t-model="state.popup.selectedField">
-        <option value="">-- Select Product Field --</option>
-        <t t-foreach="state.productFields" t-as="f" t-key="f.name">
-            <option t-att-value="f.name">
+                            <div class="field-selector">
 
-                <t t-esc="f.label"/> (<t t-esc="f.name"/>)
-            </option>
-        </t>
-    </select>
+                                <select class="form-select form-select-sm"
+                                        t-model="state.popup.selectedField">
+                                    <option value="">-- Select Product Field --</option>
+                                    <t t-foreach="state.productFields" t-as="f" t-key="f.name">
+                                        <option t-att-value="f.name">
+                                            <t t-esc="f.label"/> (<t t-esc="f.name"/>)
+                                        </option>
+                                    </t>
+                                </select>
 
-    <div class="field-drag-list mt-2 field-list-container">
-        <t t-foreach="state.productFields" t-as="f" t-key="'drag-'+f.name">
-            <div class="field-chip"
-                 draggable="true"
-                 t-att-data-field="f.name"
-                 t-on-dragstart="onDragStart">
-                <t t-log="f"/>
-                <t t-log="f.name"/>
-                <t t-log="f.label"/>
+                                <!-- Reserved space -->
+                                <div class="field-drag-list mt-2 field-list-container">
+                                <t t-if="state.popup.selectedField">
+                                    <t t-foreach="state.productFields.filter(
+                                        f => f.name === state.popup.selectedField
+                                    )"
+                                       t-as="f"
+                                       t-key="'drag-'+f.name">
+                                        <div class="field-chip"
+                                             draggable="true"
+                                             t-att-data-field="f.name"
+                                             t-on-dragstart="onDragStart">
+                                            <t t-esc="f.label"/>
+                                        </div>
+                                    </t>
+                                </t>
 
-                <t t-esc="f.label"/>
-            </div>
-        </t>
-    </div>
-</div>
+                                <t t-if="!state.popup.selectedField">
+                                    <div class="text-muted small">
+                                        Select a product field to display
+                                    </div>
+                                </t>
+                            </div>
+
+                            </div>
+
+                            </div>
+
 
                     </div>
                     <!-- Receipt Preview -->
@@ -127,7 +142,7 @@
                     <button id="resetButton" class="btn btn-outline-secondary"
                             t-on-click="resetEditedReceipt">Reset</button>
                 </div>
-               <t t-if="state.popup.visible">
+                <t t-if="state.popup.visible">
     <div class="receipt-popup-menu shadow-sm border bg-white rounded"
          t-att-style="'position:fixed; z-index:9999; top:' + state.popup.y + 'px; left:' + state.popup.x + 'px; padding:8px; min-width:200px;'">
 
@@ -141,7 +156,8 @@
 
                 <t t-foreach="state.productFields" t-as="f" t-key="f.name">
                     <option t-att-value="f.name">
-                        <t t-esc="f.label"/> (<t t-esc="f.name"/>)
+                        <t t-esc="f.label"/>
+                        (<t t-esc="f.name"/>)
                     </option>
                 </t>
             </select>
