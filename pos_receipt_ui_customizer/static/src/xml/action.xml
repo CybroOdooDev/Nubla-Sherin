@@ -45,20 +45,37 @@
                                 Add QR
                             </button>
 
+                            <div class="form-check mb-2">
+                               <input type="checkbox"
+                                   t-on-change="onToggleQr"
+                                   t-model="state.showSection"/>
+
+                                <label class="form-check-label" for="enableQrSection">
+                                    Enable QR code URL
+                                </label>
+                            </div>
+
+
                             <!-- Hidden section -->
                             <div t-if="state.showSection" class="mt-3">
-                                <input type="text" placeholder="Enter your url..." t-ref="userInput"
-                                       class="form-control"/>
+                            <input type="text"
+                                   placeholder="Enter your url..."
+                                   t-ref="userInput"
+                                   class="form-control"/>
 
-                                <button class="btn btn-primary mt-2" t-on-click="submitValue">
-                                    Generate QR
-                                </button>
-                            </div>
+                            <button class="btn btn-primary mt-2"
+                                    t-on-click="submitValue">
+                                Generate QR
+                            </button>
+                        </div>
+
                         </div>
                         <div class="form-check">
                             <input type="checkbox"
                                    class="form-check-input"
                                    t-model="state.enableQr"
+                                   t-on-change="onToggleReceiptQr"
+
                                    id="enableQr"/>
                             <label class="form-check-label" for="enableQr">
                                 Show QR code on receipt
@@ -89,46 +106,46 @@
                                 </div>
                             </t>
                         </div>
-                        <div>
-                            <div class="field-selector">
+<!--                        <div>-->
+<!--                            <div class="field-selector">-->
 
-                                <select class="form-select form-select-sm"
-                                        t-model="state.popup.selectedField">
-                                    <option value="">-- Select Product Field --</option>
-                                    <t t-foreach="state.productFields" t-as="f" t-key="f.name">
-                                        <option t-att-value="f.name">
-                                            <t t-esc="f.label"/> (<t t-esc="f.name"/>)
-                                        </option>
-                                    </t>
-                                </select>
+<!--                                <select class="form-select form-select-sm"-->
+<!--                                        t-model="state.popup.selectedField">-->
+<!--                                    <option value="">&#45;&#45; Select Product Field &#45;&#45;</option>-->
+<!--                                    <t t-foreach="state.productFields" t-as="f" t-key="f.name">-->
+<!--                                        <option t-att-value="f.name">-->
+<!--                                            <t t-esc="f.label"/> (<t t-esc="f.name"/>)-->
+<!--                                        </option>-->
+<!--                                    </t>-->
+<!--                                </select>-->
 
-                                <!-- Reserved space -->
-                                <div class="field-drag-list mt-2 field-list-container">
-                                <t t-if="state.popup.selectedField">
-                                    <t t-foreach="state.productFields.filter(
-                                        f => f.name === state.popup.selectedField
-                                    )"
-                                       t-as="f"
-                                       t-key="'drag-'+f.name">
-                                        <div class="field-chip"
-                                             draggable="true"
-                                             t-att-data-field="f.name"
-                                             t-on-dragstart="onDragStart">
-                                            <t t-esc="f.label"/>
-                                        </div>
-                                    </t>
-                                </t>
+<!--                                &lt;!&ndash; Reserved space &ndash;&gt;-->
+<!--                                <div class="field-drag-list mt-2 field-list-container">-->
+<!--                                <t t-if="state.popup.selectedField">-->
+<!--                                    <t t-foreach="state.productFields.filter(-->
+<!--                                        f => f.name === state.popup.selectedField-->
+<!--                                    )"-->
+<!--                                       t-as="f"-->
+<!--                                       t-key="'drag-'+f.name">-->
+<!--                                        <div class="field-chip"-->
+<!--                                             draggable="true"-->
+<!--                                             t-att-data-field="f.name"-->
+<!--                                             t-on-dragstart="onDragStart">-->
+<!--                                            <t t-esc="f.label"/>-->
+<!--                                        </div>-->
+<!--                                    </t>-->
+<!--                                </t>-->
 
-                                <t t-if="!state.popup.selectedField">
-                                    <div class="text-muted small">
-                                        Select a product field to display
-                                    </div>
-                                </t>
-                            </div>
+<!--                                <t t-if="!state.popup.selectedField">-->
+<!--                                    <div class="text-muted small">-->
+<!--                                        Select a product field to display-->
+<!--                                    </div>-->
+<!--                                </t>-->
+<!--                            </div>-->
 
-                            </div>
+<!--                            </div>-->
 
-                            </div>
+<!--                            </div>-->
 
 
                     </div>

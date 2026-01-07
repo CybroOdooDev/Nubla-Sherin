@@ -43,6 +43,7 @@ class PosReceiptLayoutClientAction extends Component {
             },
         });
         onWillStart(async () => {
+
             await this.loadProductFields();
             await this.loadPosConfigId();
             await this.loadEnableQr();
@@ -100,15 +101,21 @@ class PosReceiptLayoutClientAction extends Component {
 
 
     async loadEnableQr() {
-        const [config] = await this.orm.read(
-            "pos.config",
-            [this.config_id],
-            ["enable_qr"]
-        );
+    const [config] = await this.orm.read(
+        "pos.config",
+        [this.config_id],
+        ["enable_qr", "enable_qr_section"]
+    );
 
-        this.state.enableQr = !!config.enable_qr;
-        console.log("Loaded enable_qr into state:", this.state.enableQr);
-    }
+    this.state.enableQr = !!config.enable_qr;
+    this.state.showSection = !!config.enable_qr_section;
+
+    console.log("Loaded enable_qr:", this.state.enableQr);
+    console.log("Loaded enable_qr_section:", this.state.showSection);
+}
+
+
+
 
 
     async mediumEditor() {
@@ -213,7 +220,7 @@ class PosReceiptLayoutClientAction extends Component {
             await this.orm.write("pos.receipt", [this.receipt_id], {logo: base64});
             this.state.logo = base64;
             await this.loadReceipt();
-            this.notification.add("✅ Receipt Logo Updated!", {
+            this.notification.add("Receipt Logo Updated!", {
                 type: "success",
             });
         };
@@ -233,6 +240,7 @@ class PosReceiptLayoutClientAction extends Component {
 
         await this.orm.write("pos.config", [this.config_id], {
             enable_qr: !!this.state.enableQr,
+            enable_qr_section: !!this.state.showSection,
         });
 
         this.notification.add("Receipt Successfully Updated!", {
@@ -382,49 +390,75 @@ class PosReceiptLayoutClientAction extends Component {
 
 
     submitValue() {
-        const value = this.inputRef.el.value;
-        console.log("URL RECEIPT QRCODDEEEEEEEE")
+    if (!this.state.showSection) return;
 
-        if (!value) {
-            this.notification.add("Please enter a value!", {type: "warning"});
-            return;
-        }
-
-        const editor = this.receiptContentRef.el;
-
-        const oldQR = editor.querySelector(".qr-placeholder");
-        if (oldQR) {
-            oldQR.remove();
-        }
-
-        let targetArea = editor.querySelector(".qrArea");
-        if (!targetArea) {
-            this.notification.add("No target area found!", {type: "danger"});
-            return;
-        }
-
-        const qrDiv = document.createElement("div");
-        qrDiv.classList.add("qr-placeholder");
-        qrDiv.style.textAlign = "center";
-        qrDiv.style.marginTop = "10px";
-
-        // 6. Inner div for QR
-        const qrBox = document.createElement("div");
-        qrBox.id = "qr_" + Date.now();   // unique ID
-        qrDiv.appendChild(qrBox);
-
-        // 7. Add to editor
-        targetArea.appendChild(qrDiv);
-
-        new QRCode(qrBox, {
-            text: value,
-            width: 120,
-            height: 120,
-        });
-
-        this.state.showSection = false;
-        this.state.showSection1 = true;
+    const value = this.inputRef.el?.value?.trim();
+    if (!value) {
+        this.notification.add("Please enter a value!", { type: "warning" });
+        return;
     }
+
+    const editor = this.receiptContentRef.el;
+    const targetArea = editor?.querySelector(".qrArea");
+
+    if (!targetArea) {
+        this.notification.add("No target area found!", { type: "danger" });
+        return;
+    }
+
+    editor.querySelector(".qr-placeholder")?.remove();
+
+    const qrDiv = document.createElement("div");
+    qrDiv.className = "qr-placeholder";
+    qrDiv.style.textAlign = "center";
+
+    const qrBox = document.createElement("div");
+    qrDiv.appendChild(qrBox);
+    targetArea.appendChild(qrDiv);
+
+    new QRCode(qrBox, {
+        text: value,
+        width: 120,
+        height: 120,
+    });
+}
+
+onToggleQr(ev) {
+    const checked = ev.target.checked;
+
+    const editor = this.receiptContentRef.el;
+    const targetArea = editor?.querySelector(".qrArea");
+
+    if (!targetArea) return;
+
+    if (!checked) {
+        // Checkbox OFF → remove QR
+        targetArea.querySelector(".qr-placeholder")?.remove();
+    } else {
+        // Checkbox ON → regenerate demo QR
+        this.submitValue();
+    }
+}
+
+onToggleReceiptQr(ev) {
+    const checked = ev.target.checked;
+    this.state.enableQr = checked;
+
+    if (!checked) {
+        const editor = this.receiptContentRef.el;
+        editor
+            ?.querySelector(".receipt-qr-wrapper .qr-placeholder")
+            ?.remove();
+    }
+
+    this.submitValue();
+}
+
+
+
+
+
+
 
 
     onReceiptClick(ev) {

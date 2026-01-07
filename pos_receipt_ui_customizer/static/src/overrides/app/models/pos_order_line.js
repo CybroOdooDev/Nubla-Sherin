@@ -12,7 +12,7 @@ patch(PosOrderline.prototype,
             const json = super.export_for_printing(...arguments);
             console.log(json,"JSON")
 
-            const product = this.product_id;   //correct
+            const product = this.product_id;
 
             json.volume = product?.volume || "";
             json.product_name = product?.display_name || "";

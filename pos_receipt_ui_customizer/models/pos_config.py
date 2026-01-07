@@ -53,6 +53,10 @@ class PosConfig(models.Model):
         store=True,
         default=True,
     )
+    enable_qr_section = fields.Boolean(
+        string="Enable QR Section",
+        default=False,
+    )
 
     @api.depends("enable_qr")
     def _compute_enable_qr(self):
