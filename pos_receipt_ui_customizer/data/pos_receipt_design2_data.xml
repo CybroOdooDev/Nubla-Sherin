@@ -21,7 +21,7 @@
                     </div>
                 </div>
 
-                <!-- ORDERLINES SECTION -->
+                <!-- ORDER LINES SECTION -->
                 <div style="margin-top:15px;">
                     <div style="font-weight:700; border-bottom:1px solid #000; padding-bottom:5px;">
                         Order Details
@@ -77,13 +77,14 @@
                 </div>
 
                     <div class="receipt-qr-wrapper">
-                        <t t-if="props.receipt.qr_src and props.receipt.enable_qr">
-                            <div class="qr-placeholder" style="text-align:center; margin-top:12px;">
-                                <img t-att-src="props.receipt.qr_src"
-                                     style="width:120px; height:120px;" />
-                            </div>
-                        </t>
+                        <div class="receipt-qr-template"
+                             style="display:none;">
+                            <img t-att-src="props.receipt.qr_src"
+                                 style="width:120px; height:120px;" />
+                        </div>
                     </div>
+
+
 
 
 
@@ -94,7 +95,12 @@
                 </div>
 
                 <!-- QR AREA -->
-                <div class="qrArea" style="display:flex; justify-content:center; margin:25px 0;"></div>
+
+                <div class="qrArea"
+     style="display:flex; justify-content:center; margin:25px 0;">
+    <!-- JS QR goes here -->
+</div>
+
 
                 <!-- FOOTER -->
                 <div style="text-align:center; font-size:14px; margin-top:10px;">

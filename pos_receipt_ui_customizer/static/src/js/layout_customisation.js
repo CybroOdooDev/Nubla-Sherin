@@ -291,7 +291,7 @@ class PosReceiptLayoutClientAction extends Component {
         ghost.style.padding = "6px 12px";
         ghost.style.fontSize = "12px";
         ghost.style.fontWeight = "400";
-        ghost.style.background = "#e8f1ff";
+        ghost.style.background = "#000000";
         ghost.style.color = "black";
         ghost.style.borderRadius = "20px";
         ghost.style.boxShadow = "0 2px 6px rgba(0,0,0,0.15)";
@@ -389,7 +389,7 @@ class PosReceiptLayoutClientAction extends Component {
     }
 
 
-    submitValue() {
+  submitValue() {
     if (!this.state.showSection) return;
 
     const value = this.inputRef.el?.value?.trim();
@@ -400,16 +400,13 @@ class PosReceiptLayoutClientAction extends Component {
 
     const editor = this.receiptContentRef.el;
     const targetArea = editor?.querySelector(".qrArea");
+    if (!targetArea) return;
 
-    if (!targetArea) {
-        this.notification.add("No target area found!", { type: "danger" });
-        return;
-    }
-
-    editor.querySelector(".qr-placeholder")?.remove();
+    // ❌ DO NOT touch receipt QR
+    targetArea.querySelector(".custom-qr-placeholder")?.remove();
 
     const qrDiv = document.createElement("div");
-    qrDiv.className = "qr-placeholder";
+    qrDiv.className = "custom-qr-placeholder";
     qrDiv.style.textAlign = "center";
 
     const qrBox = document.createElement("div");
@@ -423,36 +420,60 @@ class PosReceiptLayoutClientAction extends Component {
     });
 }
 
+
 onToggleQr(ev) {
     const checked = ev.target.checked;
-
     const editor = this.receiptContentRef.el;
-    const targetArea = editor?.querySelector(".qrArea");
-
-    if (!targetArea) return;
+    const target = editor?.querySelector(".qrArea");
 
     if (!checked) {
-        // Checkbox OFF → remove QR
-        targetArea.querySelector(".qr-placeholder")?.remove();
-    } else {
-        // Checkbox ON → regenerate demo QR
-        this.submitValue();
+        target?.querySelector(".custom-qr-placeholder")?.remove();
+        return;
     }
+
+    this.submitValue(); // recreate URL QR
 }
+
+
 
 onToggleReceiptQr(ev) {
     const checked = ev.target.checked;
     this.state.enableQr = checked;
 
-    if (!checked) {
-        const editor = this.receiptContentRef.el;
-        editor
-            ?.querySelector(".receipt-qr-wrapper .qr-placeholder")
-            ?.remove();
-    }
+    const editor = this.receiptContentRef.el;
+    const wrapper = editor?.querySelector(".receipt-qr-wrapper");
 
-    this.submitValue();
+    if (!wrapper) return;
+
+    // Remove only ACTIVE QR
+    wrapper.querySelector(".receipt-qr-placeholder")?.remove();
+
+    // Disable → stop
+    if (!checked) return;
+
+    // Clone from hidden template
+    const templateImg = wrapper.querySelector(
+        ".receipt-qr-template img"
+    );
+
+    if (!templateImg) return;
+
+    const qrDiv = document.createElement("div");
+    qrDiv.className = "receipt-qr-placeholder";
+    qrDiv.style.textAlign = "center";
+    qrDiv.style.marginTop = "12px";
+
+    const img = templateImg.cloneNode(true);
+    img.style.width = "120px";
+    img.style.height = "120px";
+
+    qrDiv.appendChild(img);
+    wrapper.appendChild(qrDiv);
 }
+
+
+
+
 
 
 
