@@ -33,7 +33,6 @@
                             <input type="file" id="imageUpload" accept="image/*" style="display:none"
                                    t-on-change="insertImage"/>
                         </div>
-                        <!-- NEW BUTTON TO INSERT DEMO QR -->
 
                         <div class="editor_panel_section">
                             <h5 class="d-flex align-items-center gap-2">
@@ -125,21 +124,32 @@
 
     <!-- Scrollable drag container -->
     <div class="field-drag-list mt-2">
-        <t t-if="state.popup.selectedField">
-            <t t-foreach="state.productFields.filter(
-                f => f.name === state.popup.selectedField
-            )"
-               t-as="f"
-               t-key="'drag-'+f.name">
+       <t t-foreach="state.productFields.filter(
+    f => f.name === state.popup.selectedField
+)"
+   t-as="f"
+   t-key="'drag-'+f.name">
 
-                <div class="field-chip"
-                     draggable="true"
-                     t-att-data-field="f.name"
-                     t-on-dragstart="onDragStart">
-                    <t t-esc="f.label"/>
-                </div>
-            </t>
-        </t>
+    <!-- TEXT PLACEHOLDER -->
+    <div class="field-chip text-chip"
+         draggable="true"
+         t-att-data-field="f.name"
+         t-on-dragstart="onDragStart">
+        <t t-esc="f.label"/>
+    </div>
+
+
+    <!-- COLUMN DRAG -->
+    <div class="field-chip column-chip mt-1"
+         draggable="true"
+         t-att-data-field="f.name"
+         t-on-dragstart="onColumnDragStart">
+        <i class="fa fa-columns me-1"/>
+        <t t-esc="f.label"/>
+    </div>
+
+</t>
+
 
         <t t-if="!state.popup.selectedField">
             <div class="text-muted small">

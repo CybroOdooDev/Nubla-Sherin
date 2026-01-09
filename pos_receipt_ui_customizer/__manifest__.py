@@ -42,6 +42,9 @@
         'data/pos_receipt_design3_data.xml',
         'views/pos_receipt_views.xml',
         'views/pos_config_views.xml',
+        'views/website_menu.xml',
+        'views/portal_templates.xml',
+        # 'views/receipt_template.xml'
     ],
     'assets': {
         'point_of_sale._assets_pos': [
@@ -53,9 +56,11 @@
             'pos_receipt_ui_customizer/static/src/js/layout_customisation.js',
             'pos_receipt_ui_customizer/static/src/xml/action.xml',
             'pos_receipt_ui_customizer/static/src/css/style.css',
+            'pos_receipt_ui_customizer/static/src/css/pos_receipt_print.css',
             'https://cdn.jsdelivr.net/npm/medium-editor@5.23.3/dist/js/medium-editor.min.js',
             'https://cdn.jsdelivr.net/npm/medium-editor@5.23.3/dist/css/medium-editor.min.css',
             'https://cdn.jsdelivr.net/npm/medium-editor@5.23.3/dist/css/themes/default.min.css',
+            ''
             'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
         ],
     },

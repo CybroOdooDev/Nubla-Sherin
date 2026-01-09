@@ -96,3 +96,26 @@
     0% { transform: scale(1.2); }
     100% { transform: scale(1); }
 }
+
+/* Increase POS receipt paper width */
+.pos-receipt,
+.pos-receipt-container,
+.pos-receipt-print,
+.pos-receipt .pos-receipt {
+    width: 110mm !important;      /* you can try 100mm, 110mm, 120mm */
+    max-width: 110mm !important;
+}
+
+/* Prevent table from shrinking */
+.pos-receipt table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+/* Control column sizing */
+.pos-receipt th,
+.pos-receipt td {
+    white-space: nowrap;
+    font-size: 12px;
+    padding: 4px 6px;
+}

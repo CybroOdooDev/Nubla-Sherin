@@ -54,10 +54,48 @@ class PosReceiptLayoutClientAction extends Component {
             this.mediumEditor();
             this.preventPartialSelection();
             this.allowSpace();
+             this.enableColumnDropZones();
+        });
+    }
+
+
+enableColumnDropZones() {
+    const table = this.receiptContentRef.el.querySelector(".receipt-table");
+    if (!table) return;
+
+    const headers = table.querySelectorAll(
+        ".receipt-header-dropzone th"
+    );
+
+    headers.forEach((th, index) => {
+
+        // Allow drag
+        th.addEventListener("dragover", (ev) => {
+            if (ev.dataTransfer.types.includes("application/x-pos-column")) {
+                ev.preventDefault(); // REQUIRED
+                th.classList.add("column-hover");
+            }
         });
 
+        th.addEventListener("dragleave", () => {
+            th.classList.remove("column-hover");
+        });
 
-    }
+        // Handle drop
+        th.addEventListener("drop", (ev) => {
+            ev.preventDefault();
+            th.classList.remove("column-hover");
+
+            const fieldName = ev.dataTransfer.getData(
+                "application/x-pos-column"
+            );
+
+            if (!fieldName) return;
+
+            this.addColumnAtIndex(fieldName, index);
+        });
+    });
+}
 
     async getPosConfig() {
         const [config] = await this.orm.searchRead(
@@ -313,43 +351,126 @@ class PosReceiptLayoutClientAction extends Component {
         this.receiptContentRef.el.classList.remove("drop-highlight");
     }
 
-    onDrop(ev) {
-        ev.preventDefault();
-        const editor = this.receiptContentRef.el;
-        const fieldText = ev.dataTransfer.getData("text/plain");
-        if (!fieldText) return;
-        const span = document.createElement("span");
-        span.textContent = fieldText;
-        span.classList.add("placeholder-span");
-        const placeholder = ev.target.closest(".placeholder-span");
-        if (placeholder) {
-            placeholder.insertAdjacentElement("afterend", span);
-            return;
-        }
-        let range = null;
-        if (document.caretRangeFromPoint) {
-            range = document.caretRangeFromPoint(ev.clientX, ev.clientY);
-        } else if (document.caretPositionFromPoint) {
-            const pos = document.caretPositionFromPoint(ev.clientX, ev.clientY);
-            if (pos?.offsetNode) {
-                range = document.createRange();
-                range.setStart(pos.offsetNode, pos.offset);
-                range.collapse(true);
-            }
-        }
-        if (range) {
-            range.insertNode(span);
-        } else {
-            let targetArea = editor.querySelector(".drop-area")
-            if (targetArea) {
-                targetArea.appendChild(span);
-            }
-        }
-        this.receiptContentRef.el.classList.remove("dragging");
-        this.receiptContentRef.el.classList.remove("drop-highlight");
-        span.classList.add("added");
-        setTimeout(() => span.classList.remove("added"), 400);
+   onDrop(ev) {
+    ev.preventDefault();
+
+    /* ❌ BLOCK COLUMN DROPS HERE */
+    if (ev.dataTransfer.types.includes("application/x-pos-column")) {
+        return;
     }
+
+    const editor = this.receiptContentRef.el;
+
+    /* ✅ TEXT PLACEHOLDER DROP */
+    const fieldText = ev.dataTransfer.getData("text/plain");
+    if (!fieldText) return;
+
+    const span = document.createElement("span");
+    span.textContent = fieldText;
+    span.classList.add("placeholder-span");
+
+    const placeholder = ev.target.closest(".placeholder-span");
+    if (placeholder) {
+        placeholder.insertAdjacentElement("afterend", span);
+        return;
+    }
+
+    let range = null;
+    if (document.caretRangeFromPoint) {
+        range = document.caretRangeFromPoint(ev.clientX, ev.clientY);
+    } else if (document.caretPositionFromPoint) {
+        const pos = document.caretPositionFromPoint(ev.clientX, ev.clientY);
+        if (pos?.offsetNode) {
+            range = document.createRange();
+            range.setStart(pos.offsetNode, pos.offset);
+            range.collapse(true);
+        }
+    }
+
+    if (range) {
+        range.insertNode(span);
+    } else {
+        const targetArea = editor.querySelector(".drop-area");
+        if (targetArea) {
+            targetArea.appendChild(span);
+        }
+    }
+
+    this.receiptContentRef.el.classList.remove("dragging");
+    this.receiptContentRef.el.classList.remove("drop-highlight");
+
+    span.classList.add("added");
+    setTimeout(() => span.classList.remove("added"), 400);
+}
+
+
+    onColumnDragStart(ev) {
+    ev.stopPropagation();
+    ev.dataTransfer.setData(
+        "application/x-pos-column",
+        ev.target.dataset.field
+    );
+    ev.dataTransfer.effectAllowed = "copy";
+    this.receiptContentRef.el.classList.add("column-dragging");
+}
+
+
+addColumnAtIndex(fieldName, index) {
+    const table = this.receiptContentRef.el.querySelector(".receipt-table");
+    if (!table) return;
+
+    const headerRow = table.querySelector("thead tr");
+    const bodyRows = table.querySelectorAll("tbody tr");
+
+    if (headerRow.querySelector(`[data-field="${fieldName}"]`)) {
+        this.notification.add("Column already added", { type: "warning" });
+        return;
+    }
+
+    const th = document.createElement("th");
+    th.dataset.field = fieldName;
+    th.textContent = fieldName.replaceAll("_", " ").toUpperCase();
+    headerRow.insertBefore(th, headerRow.children[index + 1] || null);
+
+    bodyRows.forEach(row => {
+        const td = document.createElement("td");
+        td.dataset.field = fieldName;
+        td.innerHTML = `<span class="dynamic-cell"></span>`;
+        row.insertBefore(td, row.children[index + 1] || null);
+    });
+
+    this.saveSelectedColumns();
+}
+saveSelectedColumns() {
+    const table = this.receiptContentRef.el.querySelector(".receipt-table");
+    if (!table) return;
+
+    const headerRow = table.querySelector("thead tr");
+    if (!headerRow) return;
+
+    // collect columns in visual order
+    const fields = [];
+
+    [...headerRow.children].forEach(th => {
+        const field = th.dataset.field;
+        if (field) {
+            fields.push(field);
+        }
+    });
+
+    this.selectedProductFields = fields;
+
+    // Optional: persist immediately
+    if (this.receipt_id) {
+        this.orm.write("pos.receipt", [this.receipt_id], {
+            selected_product_fields: JSON.stringify(fields),
+        });
+    }
+
+    console.log("Saved receipt columns:", fields);
+}
+
+
 
 
 //    insertDemoQR() {
@@ -483,72 +604,52 @@ onToggleReceiptQr(ev) {
 
 
     onReceiptClick(ev) {
-        const table = ev.target.closest("table");
-        if (!table) {
-            this.hidePopup();
-            this.lastClickedCell = null;
-            this.lastClickedTable = null;
-            return;
-        }
+        if (this.receiptContentRef.el.classList.contains("column-dragging")) {
+        return;
+    }
 
-        this.lastClickedTable = table;
-
-        const headerRow = table.querySelector("thead tr") || table.querySelector("tr");
-        if (!headerRow) {
-            this.hidePopup();
-            return;
-        }
-
-        const th = ev.target.closest("th");
-        const td = ev.target.closest("td");
-
-        const clicked = th || td;
-
-        if (!clicked) {
-            this.hidePopup();
-            return;
-        }
-
-        const colIndex = Array.from(clicked.parentNode.children).indexOf(clicked);
-        const isLastColumn = colIndex === headerRow.children.length - 1;
-
-        const isAddColumnHeader =
-            clicked.classList.contains("add-column-header") ||
-            ev.target.closest(".add-column-btn");
-
-        if (!isLastColumn && !isAddColumnHeader) {
-            this.hidePopup();
-            this.notification.add("You can edit only the last column.", {type: "info"});
-            return;
-        }
-
-        if (th) {
-            this.lastClickedCell = null;
-            this.showPopup("column", ev.clientX, ev.clientY, colIndex);
-            return;
-        }
-        if (td) {
-            this.lastClickedCell = td;
-            this.showPopup("cell", ev.clientX, ev.clientY, colIndex);
-            return;
-        }
-
+    const table = ev.target.closest("table");
+    if (!table) {
         this.hidePopup();
+        this.lastClickedCell = null;
+        this.lastClickedTable = null;
+        return;
     }
 
-    showPopup(type, x, y, columnIndex) {
-        this.state.popup.visible = true;
-        this.state.popup.x = x;
-        this.state.popup.y = y;
-        this.state.popup.type = type;
-        this.state.popup.columnIndex = columnIndex;
+    this.lastClickedTable = table;
+
+    const headerRow = table.querySelector("thead tr") || table.querySelector("tr");
+    if (!headerRow) {
+        this.hidePopup();
+        return;
     }
 
-    hidePopup() {
-        this.state.popup.visible = false;
-        this.state.popup.type = null;
-        this.state.popup.columnIndex = null;
+    const th = ev.target.closest("th");
+    const td = ev.target.closest("td");
+    const clicked = th || td;
+
+    if (!clicked) {
+        this.hidePopup();
+        return;
     }
+
+    const colIndex = Array.from(clicked.parentNode.children).indexOf(clicked);
+
+    if (th) {
+        this.lastClickedCell = null;
+        this.showPopup("column", ev.clientX, ev.clientY, colIndex);
+        return;
+    }
+
+    if (td) {
+        this.lastClickedCell = td;
+        this.showPopup("cell", ev.clientX, ev.clientY, colIndex);
+        return;
+    }
+
+    this.hidePopup();
+}
+
 
 
     async loadProductFields() {

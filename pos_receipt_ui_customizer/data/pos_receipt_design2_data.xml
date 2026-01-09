@@ -27,14 +27,15 @@
                         Order Details
                 </div>
 
-                    <table style="width:100%; border-collapse:collapse; margin-top:6px; font-size:14px;">
+                    <table class="receipt-table" style="width:100%; border-collapse:collapse; margin-top:6px; font-size:14px;">
                             <thead>
-                                <tr style="border-bottom:1px dashed #555;">
-                                    <th style="text-align:left; padding:4px;">Product</th>
-                                    <th style="text-align:center; padding:4px;">Qty</th>
-                                    <th style="text-align:right; padding:4px;">Amount</th>
+                                <tr class="receipt-header-dropzone">
+                                    <th>Product</th>
+                                    <th>Qty</th>
+                                    <th>Amount</th>
                                 </tr>
                             </thead>
+
                             <tbody>
                                 <t t-if="props.orderlines and props.orderlines.length">
                                     <tr t-foreach="props.orderlines" t-as="orderline" t-key="orderline_index"
@@ -48,8 +49,6 @@
                                         <td style="padding:4px; text-align:right; width:20%;">
                                             <t t-esc="orderline.price"/>
                                         </td>
-
-                                        <!-- Loop through dynamic values with safety check -->
                                         <td t-foreach="Object.values(orderline._dynamicValues || {})"
                                             t-as="value"
                                             t-key="value_index"
@@ -60,7 +59,6 @@
                                 </t>
                             </tbody>
                         </table>
-
                 </div>
 
                 <!-- TOTAL SECTION BOX -->
@@ -84,10 +82,6 @@
                         </div>
                     </div>
 
-
-
-
-
                 <!-- RECEIPT INFO -->
                 <div style="text-align:center; margin-top:20px; font-size:14px;">
                     <div><t t-esc="props.receipt.name"/></div>
@@ -97,9 +91,9 @@
                 <!-- QR AREA -->
 
                 <div class="qrArea"
-     style="display:flex; justify-content:center; margin:25px 0;">
-    <!-- JS QR goes here -->
-</div>
+                     style="display:flex; justify-content:center; margin:25px 0;">
+                    <!-- JS QR goes here -->
+                </div>
 
 
                 <!-- FOOTER -->
