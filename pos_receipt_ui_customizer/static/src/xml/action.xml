@@ -35,14 +35,14 @@
                         </div>
 
                         <div class="editor_panel_section">
-                            <h5 class="d-flex align-items-center gap-2">
-                                <i class="fa fa-qrcode"/>
-                                Add QR code
-                            </h5>
-                            <!-- Button to show fields -->
-                            <button t-if="state.showSection1" class="btn btn-outline-primary" t-on-click="showInput">
-                                Add QR
-                            </button>
+<!--                            <h5 class="d-flex align-items-center gap-2">-->
+<!--                                <i class="fa fa-qrcode"/>-->
+<!--                                Add QR code-->
+<!--                            </h5>-->
+<!--                            &lt;!&ndash; Button to show fields &ndash;&gt;-->
+<!--                            <button t-if="state.showSection1" class="btn btn-outline-primary" t-on-click="showInput">-->
+<!--                                Add QR-->
+<!--                            </button>-->
 
                             <div class="form-check mb-2">
                                <input type="checkbox"
@@ -69,17 +69,19 @@
                         </div>
 
                         </div>
-                        <div class="form-check">
-                            <input type="checkbox"
-                                   class="form-check-input"
-                                   t-model="state.enableQr"
-                                   t-on-change="onToggleReceiptQr"
+                        <div class="editor_panel_section">
+                                <div class="form-check">
+                                    <input type="checkbox"
+                                           class="form-check-input"
+                                           t-model="state.enableQr"
+                                           t-on-change="onToggleReceiptQr"
 
-                                   id="enableQr"/>
-                            <label class="form-check-label" for="enableQr">
-                                Show QR code on receipt
-                            </label>
-                        </div>
+                                           id="enableQr"/>
+                                    <label class="form-check-label" for="enableQr">
+                                        Enable Receipt View QR
+                                    </label>
+                                </div>
+                       </div>
 
 
                         <!-- Draggable Fields -->
@@ -105,64 +107,62 @@
                                 </div>
                             </t>
                         </div>
+                <div class="editor_panel_section">
+
+                  <div class="field-selector">
+
+                    <select class="form-select form-select-sm"
+                            t-model="state.popup.selectedField">
+                        <option value="">-- Select Product Field --</option>
+                        <t t-foreach="state.productFields" t-as="f" t-key="f.name">
+                            <option t-att-value="f.name">
+                                <t t-esc="f.label"/> (<t t-esc="f.name"/>)
+                            </option>
+                        </t>
+                    </select>
+
+                    <!-- Scrollable drag container -->
+                    <div class="field-drag-list mt-2">
+                       <t t-foreach="state.productFields.filter(
+                    f => f.name === state.popup.selectedField
+                )"
+                   t-as="f"
+                   t-key="'drag-'+f.name">
+
+                    <!-- TEXT PLACEHOLDER -->
+                    <div class="field-chip text-chip"
+                         draggable="true"
+                         t-att-data-field="f.name"
+                         t-on-dragstart="onDragStart">
+                        <t t-esc="f.label"/>
+                    </div>
 
 
+                    <!-- COLUMN DRAG -->
+                    <div class="field-chip column-chip mt-1"
+                         draggable="true"
+                         t-att-data-field="f.name"
+                         t-on-dragstart="onColumnDragStart">
+                        <i class="fa fa-columns me-1"/>
+                        <t t-esc="f.label"/>
+                    </div>
+
+                </t>
 
 
+                        <t t-if="!state.popup.selectedField">
+                            <div class="text-muted small">
+                                Select a product field to display
+                            </div>
+                        </t>
+                    </div>
 
-                        <div class="field-selector">
-
-    <select class="form-select form-select-sm"
-            t-model="state.popup.selectedField">
-        <option value="">-- Select Product Field --</option>
-        <t t-foreach="state.productFields" t-as="f" t-key="f.name">
-            <option t-att-value="f.name">
-                <t t-esc="f.label"/> (<t t-esc="f.name"/>)
-            </option>
-        </t>
-    </select>
-
-    <!-- Scrollable drag container -->
-    <div class="field-drag-list mt-2">
-       <t t-foreach="state.productFields.filter(
-    f => f.name === state.popup.selectedField
-)"
-   t-as="f"
-   t-key="'drag-'+f.name">
-
-    <!-- TEXT PLACEHOLDER -->
-    <div class="field-chip text-chip"
-         draggable="true"
-         t-att-data-field="f.name"
-         t-on-dragstart="onDragStart">
-        <t t-esc="f.label"/>
-    </div>
-
-
-    <!-- COLUMN DRAG -->
-    <div class="field-chip column-chip mt-1"
-         draggable="true"
-         t-att-data-field="f.name"
-         t-on-dragstart="onColumnDragStart">
-        <i class="fa fa-columns me-1"/>
-        <t t-esc="f.label"/>
-    </div>
-
-</t>
-
-
-        <t t-if="!state.popup.selectedField">
-            <div class="text-muted small">
-                Select a product field to display
-            </div>
-        </t>
-    </div>
-
-</div>
+                </div>
 
 
 
                     </div>
+            </div>
                     <!-- Receipt Preview -->
                     <div class="receipt_content " t-ref="ReceiptContent" t-on-click="onReceiptClick"
                          t-att-style="'font-family:' + state.fontStyle" contenteditable="true" t-on-drop="onDrop"/>

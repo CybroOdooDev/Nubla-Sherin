@@ -60,7 +60,6 @@
             'https://cdn.jsdelivr.net/npm/medium-editor@5.23.3/dist/js/medium-editor.min.js',
             'https://cdn.jsdelivr.net/npm/medium-editor@5.23.3/dist/css/medium-editor.min.css',
             'https://cdn.jsdelivr.net/npm/medium-editor@5.23.3/dist/css/themes/default.min.css',
-            ''
             'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
         ],
     },

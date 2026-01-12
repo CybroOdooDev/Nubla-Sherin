@@ -1,29 +1,63 @@
+/* Only POS — not backend preview */
+.pos .pos-receipt {
+    width: 480px !important;
+    max-width: 480px !important;
+    min-width: 480px !important;
+}
+
+/* Container that printer uses */
+.pos .pos-receipt-container {
+    width: 480px !important;
+    max-width: 480px !important;
+    min-width: 480px !important;
+}
+
+/* Make content stretch */
+.pos .pos-receipt table {
+    width: 100% !important;
+    table-layout: fixed;
+}
+
+/* Keep columns readable */
+.pos .pos-receipt td,
+.pos .pos-receipt th,
+.pos .pos-receipt span,
+.pos .pos-receipt div {
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+/* CRITICAL PRINT SETTINGS */
 @media print {
-
     @page {
-        size: 110mm 297mm;   /* Thermal width */
-        margin: 0;
+        size: 80mm auto; /* Force 80mm width paper */
+        margin: 0mm;
     }
 
-    html, body {
-        width: 110mm !important;
-        max-width: 110mm !important;
+    body, html {
+        width: 80mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
-    .pos-receipt {
-        width: 110mm !important;
-        max-width: 110mm !important;
+    /* Force receipt to maintain size when printing */
+    .pos .pos-receipt {
+        width: 480px !important;
+        max-width: 480px !important;
+        min-width: 480px !important;
+        margin: 0 !important;
+        padding: 10px !important;
     }
 
-    .pos-receipt table {
-        width: 100% !important;
-        table-layout: fixed;
+    .pos .pos-receipt-container {
+        width: 480px !important;
+        max-width: 480px !important;
+        min-width: 480px !important;
     }
 
-    .pos-receipt th,
-    .pos-receipt td {
-        white-space: nowrap;
-        font-size: 12px;
-        padding: 4px 6px;
+    /* Prevent browser from auto-scaling */
+    .pos .pos-receipt * {
+        print-color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
     }
 }
