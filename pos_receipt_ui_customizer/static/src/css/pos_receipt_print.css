@@ -1,0 +1,62 @@
+/* Only POS — not backend preview */
+.pos .pos-receipt {
+    width: 480px !important;
+    min-width: 480px !important;
+}
+
+/* Container that printer uses */
+.pos .pos-receipt-container {
+    width: 480px !important;
+
+    min-width: 480px !important;
+}
+
+/* Make content stretch */
+.pos .pos-receipt table {
+    width: 100% !important;
+    table-layout: fixed;
+}
+
+/* Keep columns readable */
+.pos .pos-receipt td,
+.pos .pos-receipt th,
+.pos .pos-receipt span,
+.pos .pos-receipt div {
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+/* CRITICAL PRINT SETTINGS */
+@media print {
+    @page {
+        size: 80mm auto; /* Force 80mm width paper */
+        margin: 0mm;
+    }
+
+    body, html {
+        width: 80mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Force receipt to maintain size when printing */
+    .pos .pos-receipt {
+        width: 480px !important;
+
+        min-width: 480px !important;
+        margin: 0 !important;
+        padding: 10px !important;
+    }
+
+    .pos .pos-receipt-container {
+        width: 480px !important;
+        max-width: 480px !important;
+        min-width: 480px !important;
+    }
+
+    /* Prevent browser from auto-scaling */
+    .pos .pos-receipt * {
+        print-color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+    }
+}

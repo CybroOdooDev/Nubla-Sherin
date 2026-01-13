@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit POS Receipt to add QR Code -->
+    <template id="pos_receipt_qr" inherit_id="point_of_sale.receipt">
+        <xpath expr="//div[hasclass('pos-receipt')]" position="inside">
+            <br/>
+            <div class="text-center mt-3" style="page-break-inside: avoid;">
+                <hr/>
+                <p style="margin: 10px 0 5px 0; font-weight: bold;">View Online Receipt:</p>
+                <img t-if="receipt.order.get_receipt_qr_code()"
+                     t-att-src="receipt.order.get_receipt_qr_code()"
+                     style="max-width: 120px; margin: 10px 0;"/>
+                <p style="font-size: 10px; margin: 5px 0;">
+                    Scan QR code or visit:<br/>
+                    <span style="word-break: break-all;" t-esc="receipt.order.get_receipt_url()"/>
+                </p>
+                <hr/>
+            </div>
+        </xpath>
+    </template>
+</odoo>

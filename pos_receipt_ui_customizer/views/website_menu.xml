@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add Menu Item in Website Header -->
+    <record id="menu_my_receipts" model="website.menu">
+        <field name="name">My Receipts</field>
+        <field name="url">/my/receipts</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence">50</field>
+    </record>
+</odoo>
