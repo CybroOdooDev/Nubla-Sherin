@@ -449,19 +449,59 @@ closePopup() {
     ev.dataTransfer.effectAllowed = "copy";
     this.receiptContentRef.el.classList.add("column-dragging");
 }
+// addColumnAtIndex(fieldName, index) {
+//     const table = this.receiptContentRef.el.querySelector(".receipt-table");
+//     if (!table) return;
+//
+//     const headerRow = table.querySelector("thead tr");
+//
+//     if (headerRow.querySelector(`[data-field="${fieldName}"]`)) {
+//         this.notification.add("Column already added", { type: "warning" });
+//         return;
+//     }
+//
+//     if (headerRow.querySelectorAll("th[data-field]").length >= 1) {
+//         this.notification.add("Only one column is allowed", { type: "warning" });
+//         return;
+//     }
+//
+//     const th = document.createElement("th");
+//     th.dataset.field = fieldName;
+//     th.textContent = fieldName.replaceAll("_", " ").toUpperCase();
+//     th.style.textAlign = "center";
+//     th.style.width = "15%";
+//
+//     headerRow.insertBefore(th, headerRow.children[index + 1] || null);
+//
+//     this.saveSelectedColumns();
+//
+//     // Re-render designer preview
+//     this.render();
+// }
+
+
+
+
 addColumnAtIndex(fieldName, index) {
     const table = this.receiptContentRef.el.querySelector(".receipt-table");
     if (!table) return;
 
     const headerRow = table.querySelector("thead tr");
+    const bodyRows = table.querySelectorAll("tbody tr");
 
+    /* ❌ Prevent duplicate header */
     if (headerRow.querySelector(`[data-field="${fieldName}"]`)) {
         this.notification.add("Column already added", { type: "warning" });
         return;
     }
 
-    if (headerRow.querySelectorAll("th[data-field]").length >= 1) {
-        this.notification.add("Only one column is allowed", { type: "warning" });
+
+    const existingDynamicColumns = headerRow.querySelectorAll("th[data-field]");
+    if (existingDynamicColumns.length >= 1) {
+        this.notification.add(
+            "Only one additional column is allowed. Please remove the existing column first.",
+            { type: "warning" }
+        );
         return;
     }
 
@@ -470,95 +510,52 @@ addColumnAtIndex(fieldName, index) {
     th.textContent = fieldName.replaceAll("_", " ").toUpperCase();
     th.style.textAlign = "center";
     th.style.width = "15%";
+    th.style.padding = "4px";
+    th.style.whiteSpace = "nowrap";
 
     headerRow.insertBefore(th, headerRow.children[index + 1] || null);
 
+    /* =========================
+       BODY
+    ========================= */
+    const lines =
+        this.props.lines ||
+        this.props.order?.get_orderlines?.() ||
+        [];
+
+    bodyRows.forEach((row, rowIndex) => {
+        /* ❌ Prevent duplicate td in this row */
+        if (row.querySelector(`td[data-field="${fieldName}"]`)) return;
+
+        const td = document.createElement("td");
+        td.dataset.field = fieldName;
+        td.style.padding = "4px";
+        td.style.textAlign = "center";
+        td.style.width = "15%";
+        td.style.whiteSpace = "nowrap";
+        td.style.verticalAlign = "top";
+
+        const span = document.createElement("span");
+        span.className = "dynamic-cell";
+        span.style.display = "inline-block";
+        span.style.width = "100%";
+        span.style.textAlign = "center";
+
+        const line = lines[rowIndex];
+        let value = "";
+
+        /* 🟢 ONLY safe source */
+        if (line && line._dynamicValues && fieldName in line._dynamicValues) {
+            value = line._dynamicValues[fieldName];
+        }
+
+        span.textContent = value || "";
+        td.appendChild(span);
+        row.insertBefore(td, row.children[index + 1] || null);
+    });
+
     this.saveSelectedColumns();
-
-    // Re-render designer preview
-    this.render();
 }
-
-
-
-
-// addColumnAtIndex(fieldName, index) {
-//     const table = this.receiptContentRef.el.querySelector(".receipt-table");
-//     if (!table) return;
-//
-//     const headerRow = table.querySelector("thead tr");
-//     const bodyRows = table.querySelectorAll("tbody tr");
-//
-//     /* ❌ Prevent duplicate header */
-//     if (headerRow.querySelector(`[data-field="${fieldName}"]`)) {
-//         this.notification.add("Column already added", { type: "warning" });
-//         return;
-//     }
-//
-//     /* 🚫 Allow only ONE dynamic column */
-//     const existingDynamicColumns = headerRow.querySelectorAll("th[data-field]");
-//     if (existingDynamicColumns.length >= 1) {
-//         this.notification.add(
-//             "Only one additional column is allowed. Please remove the existing column first.",
-//             { type: "warning" }
-//         );
-//         return;
-//     }
-//
-//     /* =========================
-//        HEADER
-//     ========================= */
-//     const th = document.createElement("th");
-//     th.dataset.field = fieldName;
-//     th.textContent = fieldName.replaceAll("_", " ").toUpperCase();
-//     th.style.textAlign = "center";
-//     th.style.width = "15%";
-//     th.style.padding = "4px";
-//     th.style.whiteSpace = "nowrap";
-//
-//     headerRow.insertBefore(th, headerRow.children[index + 1] || null);
-//
-//     /* =========================
-//        BODY
-//     ========================= */
-//     const lines =
-//         this.props.lines ||
-//         this.props.order?.get_orderlines?.() ||
-//         [];
-//
-//     bodyRows.forEach((row, rowIndex) => {
-//         /* ❌ Prevent duplicate td in this row */
-//         if (row.querySelector(`td[data-field="${fieldName}"]`)) return;
-//
-//         const td = document.createElement("td");
-//         td.dataset.field = fieldName;
-//         td.style.padding = "4px";
-//         td.style.textAlign = "center";
-//         td.style.width = "15%";
-//         td.style.whiteSpace = "nowrap";
-//         td.style.verticalAlign = "top";
-//
-//         const span = document.createElement("span");
-//         span.className = "dynamic-cell";
-//         span.style.display = "inline-block";
-//         span.style.width = "100%";
-//         span.style.textAlign = "center";
-//
-//         const line = lines[rowIndex];
-//         let value = "";
-//
-//         /* 🟢 ONLY safe source */
-//         if (line && line._dynamicValues && fieldName in line._dynamicValues) {
-//             value = line._dynamicValues[fieldName];
-//         }
-//
-//         span.textContent = value || "";
-//         td.appendChild(span);
-//         row.insertBefore(td, row.children[index + 1] || null);
-//     });
-//
-//     this.saveSelectedColumns();
-// }
 
 saveSelectedColumns() {
     const table = this.receiptContentRef.el.querySelector(".receipt-table");

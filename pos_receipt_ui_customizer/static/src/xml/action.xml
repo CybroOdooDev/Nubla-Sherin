@@ -28,7 +28,7 @@
                                 Change Your Logo
                             </h5>
                             <button class="btn btn-outline-primary" t-on-click="triggerImageUpload">
-                                Select  Logo
+                                Select Logo
                             </button>
                             <input type="file" id="imageUpload" accept="image/*" style="display:none"
                                    t-on-change="insertImage"/>
