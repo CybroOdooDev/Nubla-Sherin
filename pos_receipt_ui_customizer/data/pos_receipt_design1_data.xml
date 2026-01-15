@@ -51,14 +51,7 @@
             <th style="text-align:left; padding:4px; width:40%;">Product</th>
             <th style="text-align:left; padding:4px; width:10%;">Qty</th>
             <th style="text-align:left; padding:4px; width:15%;">Amount</th>
-            <!-- Add headers for dynamic fields -->
-            <t t-foreach="props.receipt.dynamic_fields || []"
-               t-as="field"
-               t-key="field">
-                <th style="text-align:left; padding:4px;">
-                    <t t-esc="field"/>
-                </th>
-            </t>
+
         </tr>
     </thead>
    <tbody>
@@ -75,13 +68,6 @@
             <td style="padding:4px; text-align:left; font-size:14px;">
                 <t t-esc="orderline.price"/>
             </td>
-
-            <!-- ✅ Dynamic columns -->
-            <t t-foreach="props.dynamic_fields or []" t-as="field">
-                <td style="padding:4px; text-align:left; font-size:14px;">
-                    <t t-esc="orderline[field] or ''"/>
-                </td>
-            </t>
         </tr>
     </t>
 </tbody>

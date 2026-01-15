@@ -1,21 +1,83 @@
-<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Inherit POS Receipt to add QR Code -->
-    <template id="pos_receipt_qr" inherit_id="point_of_sale.receipt">
-        <xpath expr="//div[hasclass('pos-receipt')]" position="inside">
-            <br/>
-            <div class="text-center mt-3" style="page-break-inside: avoid;">
-                <hr/>
-                <p style="margin: 10px 0 5px 0; font-weight: bold;">View Online Receipt:</p>
-                <img t-if="receipt.order.get_receipt_qr_code()"
-                     t-att-src="receipt.order.get_receipt_qr_code()"
-                     style="max-width: 120px; margin: 10px 0;"/>
-                <p style="font-size: 10px; margin: 5px 0;">
-                    Scan QR code or visit:<br/>
-                    <span style="word-break: break-all;" t-esc="receipt.order.get_receipt_url()"/>
-                </p>
-                <hr/>
+    <template id="custom_pos_receipt">
+        <t t-call="web.basic_layout">
+            <t t-set="o" t-value="order"/>
+            <t t-set="company" t-value="o.company_id"/>
+
+            <div style="max-width:380px; margin:auto; font-family:Arial, Helvetica, sans-serif; font-size:13px;">
+
+                <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:10px;">
+                    <t t-if="company.logo">
+                        <img t-att-src="'data:image/png;base64,' + company.logo.decode()"
+                             style="max-height:70px; margin-bottom:5px;"/>
+                    </t>
+
+                    <div style="font-size:18px; font-weight:700;">
+                        <t t-esc="company.name"/>
+                    </div>
+                    <div style="margin-top:4px;">
+                        <t t-if="company.phone">
+                            Phone: <t t-esc="company.phone"/><br/>
+                        </t>
+                        <t t-if="company.email">
+                            Email: <t t-esc="company.email"/><br/>
+                        </t>
+                        <t t-if="company.website">
+                            Website: <t t-esc="company.website"/>
+                        </t>
+                    </div>
+                </div>
+                <div style="margin-top:10px; border-bottom:1px solid #000; padding-bottom:8px;">
+                    <div>Order: <t t-esc="o.name"/></div>
+                    <div>Date: <t t-esc="o.date_order"/></div>
+                </div>
+
+                <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+                    <thead>
+                        <tr style="border-bottom:2px solid #000;">
+                            <th align="left">Product</th>
+                            <th align="center">Qty</th>
+                            <th align="center">Amount</th>
+                            <t t-foreach="dynamic_fields" t-as="field">
+                                <th align="right">
+                                    <t t-esc="field.replace('_',' ').upper()"/>
+                                </th>
+                            </t>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="o.lines" t-as="line">
+                            <tr style="border-bottom:1px dotted #ccc;">
+                                <td t-esc="line.product_id.display_name"/>
+                                <td align="center" t-esc="line.qty"/>
+                                <td align="right">
+                                    <t t-esc="line.price_subtotal_incl"/>
+                                </td>
+                                 <t t-foreach="dynamic_fields" t-as="field">
+                                    <td align="center">
+                                        <t t-esc="line.product_id[field] if field in line.product_id else ''"/>
+                                    </td>
+                                </t>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+                <div style="margin-top:15px; border:2px dashed #444; padding:10px;">
+                    <div style="display:flex; justify-content:space-between; font-weight:700; font-size:16px; margin-top:5px;">
+                        <span>Total</span>
+                        <span><t t-esc="o.amount_total"/></span>
+                    </div>
+                </div>
+                <div style="text-align:center; margin-top:20px;">
+                    <div>Thank you for shopping with us!</div>
+                </div>
+                <div style="text-align:center; margin-top:15px;">
+                    <a t-att-href="'/my/receipt/pdf/%s?t=%s' % (o.id, o.custom_receipt_token)"
+                       style="padding:8px 14px; background:#000; color:#fff; text-decoration:none; border-radius:6px;">
+                        Download Receipt (PDF)
+                    </a>
+                </div>
             </div>
-        </xpath>
+        </t>
     </template>
 </odoo>

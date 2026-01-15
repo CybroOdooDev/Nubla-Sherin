@@ -1,44 +1,51 @@
-from odoo import models, fields,api
+import qrcode
+import base64
+from io import BytesIO
 import uuid
+from odoo import models, fields
+import io
 
 
 class PosOrder(models.Model):
-    _inherit = "pos.order"
+    _inherit = 'pos.order'
 
-    receipt_token = fields.Char(
-        string='Receipt Token',
-        readonly=True,
-        copy=False,
-        index=True
-    )
+    custom_qr_image = fields.Binary("Custom Receipt QR")
+    custom_receipt_token = fields.Char("Receipt Token")
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        for vals in vals_list:
-            if not vals.get('receipt_token'):
-                vals['receipt_token'] = str(uuid.uuid4())
-        return super(PosOrder, self).create(vals_list)
-
-    def get_receipt_url(self):
+    def generate_custom_qr(self):
         base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
-        return f"{base_url}/my/receipt/{self.receipt_token}"
 
-    def get_receipt_qr_code(self):
-        """Generate QR code for receipt URL"""
-        try:
-            import qrcode
-            import base64
-            from io import BytesIO
+        for order in self:
+            token = str(uuid.uuid4())
+            qr_data = f"{base_url}/my/receipt/{order.id}?t={token}"
+            print("qr_data", qr_data)
 
-            qr = qrcode.QRCode(version=1, box_size=10, border=5)
-            qr.add_data(self.get_receipt_url())
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_M,
+                box_size=8,
+                border=3,
+            )
+            print("qr",qr)
+            qr.add_data(qr_data)
             qr.make(fit=True)
 
-            img = qr.make_image(fill_color="black", back_color="white")
-            buffer = BytesIO()
-            img.save(buffer, format='PNG')
-            img_str = base64.b64encode(buffer.getvalue()).decode()
+            img = qr.make_image(fill_color="black", back_color="white").convert("RGB")
+            print("order", order)
+            print("order", order.name)
 
-            return f"data:image/png;base64,{img_str}"
-        except ImportError:
-            return False
+
+            buf = io.BytesIO()
+            img.save(buf, format="PNG")
+
+            order.custom_receipt_token = token
+            print("order.custom_receipt_token", order.custom_receipt_token)
+            order.custom_qr_image = base64.b64encode(buf.getvalue()).decode()
+            print("order.custom_qr_image", order.custom_qr_image)
+
+    def action_pos_order_paid(self):
+        res = super().action_pos_order_paid()
+        print("res", res)
+        print("ssssssssssss")
+        self.generate_custom_qr()
+        return res

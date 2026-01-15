@@ -8,6 +8,10 @@ patch(PosOrder.prototype, {
     export_for_printing() {
         const res = super.export_for_printing(...arguments);
         const config = this.config || {};
+        // console.log(res,"RESSSSSSSSSSSSSSSSSS")
+        // console.log(this.custom_qr_image,"SHHHHHHHHH")
+        // console.log(this.custom_receipt_token,"SHHHHHHHHH")
+
 
         let fields = [];
         try {
@@ -16,6 +20,8 @@ patch(PosOrder.prototype, {
             fields = [];
         }
         res.dynamic_fields = fields;
+        res.custom_qr_image = this.custom_qr_image || null;
+        res.custom_receipt_token = this.custom_receipt_token || null;
 
         const jsLines = this.lines || [];
         res.orderlines = (res.orderlines || []).map((line, index) => {

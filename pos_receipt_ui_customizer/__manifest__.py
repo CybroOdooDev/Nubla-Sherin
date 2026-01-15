@@ -42,9 +42,8 @@
         'data/pos_receipt_design3_data.xml',
         'views/pos_receipt_views.xml',
         'views/pos_config_views.xml',
-        # 'views/website_menu.xml',
-        # 'views/portal_templates.xml',
-        # 'views/receipt_template.xml'
+        'views/receipt_template.xml',
+        'report/receipt_report.xml',
     ],
     'assets': {
         'point_of_sale._assets_pos': [

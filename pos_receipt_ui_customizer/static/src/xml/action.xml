@@ -47,7 +47,9 @@
                             <div class="form-check mb-2">
                                <input type="checkbox"
                                    t-on-change="onToggleQr"
-                                   t-model="state.showSection"/>
+                                   t-model="state.showSection"
+                                   class="form-check-input"
+                               />
 
                                 <label class="form-check-label" for="enableQrSection">
                                     Enable QR code URL
@@ -78,7 +80,7 @@
 
                                            id="enableQr"/>
                                     <label class="form-check-label" for="enableQr">
-                                        Enable Receipt View QR
+                                        Full Receipt QR
                                     </label>
                                 </div>
                        </div>

@@ -3,7 +3,7 @@
     <record id="pos_receipt_design3" model="pos.receipt">
         <field name="name">Design 3</field>
         <field name="design_receipt"><![CDATA[
-            <div class="pos-receipt" padding:20px; line-height:1.5; max-width:320px; margin:0 auto;">
+            <div class="pos-receipt" style="padding:20px; line-height:1.5; max-width:320px; margin:0 auto;">
 
                 <!-- HEADER -->
                 <div style="text-align:center; padding-bottom:16px; border-bottom:2px solid #000;">

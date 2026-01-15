@@ -64,9 +64,32 @@ class PosReceiptLayoutClientAction extends Component {
             this.preventPartialSelection();
             this.allowSpace();
              this.enableColumnDropZones();
+             this.restoreSavedColumns();
         });
 
     }
+
+    async restoreSavedColumns() {
+    if (!this.receipt_id) return;
+
+    const rec = await this.orm.read("pos.receipt", [this.receipt_id], ["selected_product_fields"]);
+    const fields = JSON.parse(rec[0]?.selected_product_fields || "[]");
+
+    if (!fields.length) return;
+
+    const table = this.receiptContentRef.el.querySelector(".receipt-table");
+    const headerRow = table.querySelector("thead tr");
+
+    // clean broken layout
+    headerRow.querySelectorAll("th[data-field]").forEach(th => th.remove());
+    table.querySelectorAll("td[data-field]").forEach(td => td.remove());
+
+    // rebuild correctly
+    fields.forEach(field => {
+        this.addColumnAtIndex(field, 2); // after Amount
+    });
+}
+
 
 
 
@@ -390,14 +413,14 @@ closePopup() {
    onDrop(ev) {
     ev.preventDefault();
 
-    /* ❌ BLOCK COLUMN DROPS HERE */
+
     if (ev.dataTransfer.types.includes("application/x-pos-column")) {
         return;
     }
 
     const editor = this.receiptContentRef.el;
 
-    /* ✅ TEXT PLACEHOLDER DROP */
+
     const fieldText = ev.dataTransfer.getData("text/plain");
     if (!fieldText) return;
 
@@ -507,24 +530,26 @@ addColumnAtIndex(fieldName, index) {
 
     const th = document.createElement("th");
     th.dataset.field = fieldName;
-    th.textContent = fieldName.replaceAll("_", " ").toUpperCase();
+    th.textContent = fieldName
+    .replaceAll("_", " ")
+    .toLowerCase()
+    .replace(/\b\w/g, c => c.toUpperCase());
+
     th.style.textAlign = "center";
     th.style.width = "15%";
     th.style.padding = "4px";
     th.style.whiteSpace = "nowrap";
+    th.style.fontFamily = "inherit";
+
 
     headerRow.insertBefore(th, headerRow.children[index + 1] || null);
 
-    /* =========================
-       BODY
-    ========================= */
     const lines =
         this.props.lines ||
         this.props.order?.get_orderlines?.() ||
         [];
 
     bodyRows.forEach((row, rowIndex) => {
-        /* ❌ Prevent duplicate td in this row */
         if (row.querySelector(`td[data-field="${fieldName}"]`)) return;
 
         const td = document.createElement("td");
@@ -534,17 +559,19 @@ addColumnAtIndex(fieldName, index) {
         td.style.width = "15%";
         td.style.whiteSpace = "nowrap";
         td.style.verticalAlign = "top";
+        td.style.fontFamily = "inherit";
+
 
         const span = document.createElement("span");
         span.className = "dynamic-cell";
         span.style.display = "inline-block";
         span.style.width = "100%";
         span.style.textAlign = "center";
+        span.style.fontFamily = "inherit";
 
         const line = lines[rowIndex];
         let value = "";
 
-        /* 🟢 ONLY safe source */
         if (line && line._dynamicValues && fieldName in line._dynamicValues) {
             value = line._dynamicValues[fieldName];
         }
@@ -564,7 +591,6 @@ saveSelectedColumns() {
     const headerRow = table.querySelector("thead tr");
     if (!headerRow) return;
 
-    // collect columns in visual order
     const fields = [];
 
     [...headerRow.children].forEach(th => {
@@ -576,7 +602,6 @@ saveSelectedColumns() {
 
     this.selectedProductFields = fields;
 
-    // Optional: persist immediately
     if (this.receipt_id) {
         this.orm.write("pos.receipt", [this.receipt_id], {
             selected_product_fields: JSON.stringify(fields),
@@ -688,7 +713,6 @@ onToggleReceiptQr(ev) {
     // Disable → stop
     if (!checked) return;
 
-    // Clone from hidden template
     const templateImg = wrapper.querySelector(
         ".receipt-qr-template img"
     );
@@ -707,17 +731,6 @@ onToggleReceiptQr(ev) {
     qrDiv.appendChild(img);
     wrapper.appendChild(qrDiv);
 }
-
-
-
-
-
-
-
-
-
-
-
 
    async onReceiptClick(ev) {
     if (this.receiptContentRef.el.classList.contains("column-dragging")) {
@@ -874,9 +887,9 @@ onToggleReceiptQr(ev) {
         return Array.from(fields);
     }
 
-    async onRemoveColumnClick(colIndex = null) {
+  async onRemoveColumnClick(colIndex = null) {
     if (!this.lastClickedTable) {
-        this.notification.add("No table selected.", {type: "danger"});
+        this.notification.add("No table selected.", { type: "danger" });
         return;
     }
 
@@ -884,68 +897,54 @@ onToggleReceiptQr(ev) {
     const theadRow = table.querySelector("thead tr");
     const bodyRows = table.querySelectorAll("tbody tr");
 
-    if (!theadRow) {
-        this.notification.add("Table does not have a header row.", {
-            type: "danger",
-        });
-        return;
-    }
-
-    const columnIndex = colIndex !== null ? colIndex : this.lastClickedColumnIndex;
-    const STATIC_COL_COUNT = 3; // Product, Qty, Amount
+    const STATIC_COL_COUNT = 3;
+    const columnIndex = colIndex ?? this.lastClickedColumnIndex;
 
     if (columnIndex == null || columnIndex < STATIC_COL_COUNT) {
-        this.notification.add("You cannot remove default columns.", {
-            type: "warning",
-        });
+        this.notification.add("You cannot remove default columns.", { type: "warning" });
         return;
     }
 
     const th = theadRow.children[columnIndex];
     const fieldName = th?.dataset?.field;
+    if (!fieldName) return;
 
-    if (!fieldName) {
-        this.notification.add("This column is not removable.", {
-            type: "warning",
-        });
-        return;
-    }
-
+    /* ===============================
+       1) Update DB
+    =============================== */
     const [receipt] = await this.orm.searchRead(
         "pos.receipt",
         [["id", "=", this.receipt_id]],
-        ["id", "selected_product_fields"],
-        {limit: 1}
+        ["selected_product_fields"],
+        { limit: 1 }
     );
 
-    if (!receipt) {
-        this.notification.add("Receipt not found.", {type: "danger"});
-        return;
-    }
+    let fields = JSON.parse(receipt?.selected_product_fields || "[]");
+    fields = fields.filter(f => f !== fieldName);
 
-    let fields = [];
-    try {
-        fields = JSON.parse(receipt.selected_product_fields || "[]");
-    } catch {
-        fields = [];
-    }
-
-    const updatedFields = fields.filter(f => f !== fieldName);
-
-    await this.orm.write("pos.receipt", [receipt.id], {
-        selected_product_fields: JSON.stringify(updatedFields),
+    await this.orm.write("pos.receipt", [this.receipt_id], {
+        selected_product_fields: JSON.stringify(fields),
     });
 
-    // Remove column from DOM
+    /* ===============================
+       2) Remove header & cells
+    =============================== */
     th.remove();
     bodyRows.forEach(row => row.children[columnIndex]?.remove());
 
-    this.notification.add(
-        `Column "${fieldName}" removed successfully`,
-        {type: "success"}
-    );
+    /* ===============================
+       3) 🔥 CRITICAL: remove data from orderlines
+    =============================== */
+    const lines = this.props.order?.get_orderlines?.() || this.props.lines || [];
 
-    // Clear tracking
+    lines.forEach(line => {
+        if (line._dynamicValues) {
+            delete line._dynamicValues[fieldName];
+        }
+    });
+
+    this.notification.add(`Column "${fieldName}" removed`, { type: "success" });
+
     this.lastClickedTable = null;
     this.lastClickedColumnIndex = null;
 }
