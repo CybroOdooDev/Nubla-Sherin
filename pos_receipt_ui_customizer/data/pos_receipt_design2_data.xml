@@ -6,29 +6,29 @@
             <div class="pos-receipt" >
 
                 <!-- HEADER -->
-                <div style="text-align:center; padding:10px 0; border-bottom:2px solid #000;">
-                    <t t-if="env.services.pos.config.logo">
-                        <img t-att-src="'data:image/png;base64,' + env.services.pos.config.logo"
-                             style="max-width:120px; margin-bottom:5px;"/>
-                    </t>
-                    <div style="font-size:18px; font-weight:700; margin-top:6px;">
-                        [[ company.name ]]
-                    </div>
-                    <div style="font-size:13px; margin-top:4px;">
-                        <div>Phone: <span class="placeholder-span">[[ company.phone ]]</span></div>
-                        <div>Email: <span class="placeholder-span">[[ company.email ]]</span></div>
-                        <div>Website: <span class="placeholder-span">[[ company.website ]]</span></div>
-                    </div>
-                </div>
+                        <div class="receipt-header no-drop-zone" style="text-align:center; padding:10px 0; border-bottom:2px solid #000;" >
+                            <t t-if="env.services.pos.config.logo">
+                                <img t-att-src="'data:image/png;base64,' + env.services.pos.config.logo"
+                                     style="max-width:120px; margin-bottom:5px;"/>
+                            </t>
+                            <div style="font-size:18px; font-weight:700; margin-top:6px;">
+                                [[ company.name ]]
+                            </div>
+                            <div style="font-size:13px; margin-top:4px;">
+                                <div>Phone: <span class="placeholder-span">[[ company.phone ]]</span></div>
+                                <div>Email: <span class="placeholder-span">[[ company.email ]]</span></div>
+                                <div>Website: <span class="placeholder-span">[[ company.website ]]</span></div>
+                            </div>
+                        </div>
 
                 <!-- ORDER LINES SECTION -->
-                <div style="margin-top:15px;">
+                <div style="margin-top:15px;" class="no-drop-zone">
                     <div style="font-weight:700; border-bottom:1px solid #000; padding-bottom:5px;">
                         Order Details
                 </div>
 
                     <table class="receipt-table" style="width:100%; border-collapse:collapse; margin-top:6px; font-size:14px;">
-                    <thead>
+                    <thead class="no-drop-zone">
                         <tr class="receipt-header-dropzone" style="border-bottom:2px solid #000;">
                             <th style="width:45%; text-align:left; padding:4px;">Product</th>
                             <th style="width:15%; text-align:center; padding:4px;">Qty</th>
@@ -63,27 +63,27 @@
                 </table>
                 </div>
 
-                <!-- TOTAL SECTION BOX -->
-                <div style="margin-top:18px; padding:10px; border:2px dashed #555; border-radius:6px;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                        <span style="font-weight:600;">Subtotal</span>
-                            <span class="placeholder-span">[[ receipt.total_without_tax ]]</span>
-                    </div>
+                        <!-- TOTAL SECTION BOX -->
+                        <div style="margin-top:18px; padding:10px; border:2px dashed #555; border-radius:6px;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                                <span style="font-weight:600;">Subtotal</span>
+                                    <span class="placeholder-span">[[ receipt.total_without_tax ]]</span>
+                            </div>
 
-                    <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:700;">
-                        <span>Total</span>
-                        <span class="placeholder-span">[[ receipt.amount_total ]]</span>
-                    </div>
-                </div>
-                        <div class="receipt-qr-wrapper">
-                        <div class="receipt-qr-template"
-                             style="display:none;">
-                                <t t-if="props.data.custom_qr_image">
-                                    <img t-att-src="'data:image/png;base64,' + props.data.custom_qr_image"
-                                         style="width:120px; height:120px; margin:10px auto; display:block;"/>
-                                </t>
+                            <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:700;">
+                                <span>Total</span>
+                                <span class="placeholder-span">[[ receipt.amount_total ]]</span>
+                            </div>
                         </div>
-                    </div>
+                        <div class="receipt-qr-wrapper">
+                                <div class="receipt-qr-template"
+                                     style="display:none;">
+                                        <t t-if="props.data.custom_qr_image">
+                                            <img t-att-src="'data:image/png;base64,' + props.data.custom_qr_image"
+                                                 style="width:120px; height:120px; margin:10px auto; display:block;"/>
+                                        </t>
+                                </div>
+                         </div>
 
 
                 <!-- RECEIPT INFO -->

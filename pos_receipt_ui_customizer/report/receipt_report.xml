@@ -10,116 +10,174 @@
         <field name="report_file">pos_receipt_ui_customizer.pos_receipt_pdf</field>
     </record>
 
-            <template id="pos_receipt_pdf">
-                    <t t-name="pos_receipt_ui_customizer.pos_receipt_pdf">
-                      <t t-call="web.html_container">
+                <template id="pos_receipt_pdf">
+                        <t t-name="pos_receipt_ui_customizer.pos_receipt_pdf">
+                            <t t-call="web.html_container">
 
-                    <style>
-                    .page {
-                        margin: 0 !important;
-                        padding: 0 !important;
-                    }
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                    }
-                    th, td {
-                        padding: 2px 6px;
-                        font-size: 10.5px;
-                        white-space: nowrap;
-                    }
-                    th {
-                        border-bottom: 1px dashed #000;
-                    }
-                    </style>
+                                <style>
+                                    /* Page reset */
+                                    .page {
+                                        margin: 0 !important;
+                                        padding: 0 !important;
+                                    }
 
-                            <div style="width:80mm; margin:auto; font-family:monospace; font-size:11px;">
+                                    /* Receipt container */
+                                    .receipt {
+                                        width: 80mm;
+                                        margin: auto;
+                                        font-family: monospace;
+                                        font-size: 11px;
+                                    }
 
-                                <div style="text-align:center; font-weight:bold; font-size:16px;">
-                                    <t t-esc="values['company_name']"/>
-                                </div>
+                                    /* Table base */
+                                    table {
+                                        width: 100%;
+                                        border-collapse: collapse;
+                                    }
 
-                                <div style="text-align:center;">
-                                    <t t-esc="values['phone']"/>
-                                </div>
+                                    /* Cell spacing */
+                                    th, td {
+                                        padding: 4px 6px;
+                                        font-size: 10.5px;
+                                        line-height: 1.4;
+                                    }
 
-                                <div style="border-bottom:1px dashed #000; margin:6px 0;"></div>
+                                    th {
+                                        border-bottom: 1px dashed #000;
+                                        font-weight: bold;
+                                    }
 
-                                <div>Receipt: <t t-esc="values['order_name']"/></div>
-                                <div>Date: <t t-esc="values['date']"/></div>
+                                    /* Product column wrapping */
+                                    td.product {
+                                        white-space: normal;
+                                        word-break: break-word;
+                                    }
 
-                                <div style="border-bottom:1px dashed #000; margin:6px 0;"></div>
+                                    /* Alignment helpers */
+                                    .text-left { text-align: left; }
+                                    .text-center { text-align: center; }
+                                    .text-right { text-align: right; }
 
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align:left; width:35%;">Product</th>
-                                            <th style="text-align:center; width:10%;">Qty</th>
-                                            <th style="text-align:right; width:20%;">Amount</th>
+                                    /* Separators */
+                                    .separator {
+                                        border-bottom: 1px dashed #000;
+                                        margin: 6px 0;
+                                    }
 
-                                            <t t-foreach="values['dynamic_fields']" t-as="f">
-                                                <th style="text-align:right;">
-                                                    <t t-esc="f.replace('_',' ').upper()"/>
-                                                </th>
-                                            </t>
-                                        </tr>
-                                    </thead>
+                                    /* Totals */
+                                    .row-between {
+                                        display: flex;
+                                        justify-content: space-between;
+                                    }
 
-                                    <tbody>
-                                        <tr t-foreach="values['lines']" t-as="l">
-                                            <td style="text-align:left;">
-                                                <t t-esc="l['product']"/>
-                                            </td>
+                                    .bold {
+                                        font-weight: bold;
+                                    }
+                                </style>
 
-                                            <td style="text-align:center;">
-                                                <t t-esc="l['qty']"/>
-                                            </td>
+                                <div class="receipt">
 
-                                            <td style="text-align:right;">
-                                                <t t-esc="l['total']"/>
-                                            </td>
-
-                                            <t t-foreach="values['dynamic_fields']" t-as="f">
-                                                <td style="text-align:right;">
-                                                    <t t-esc="l.get(f, '')"/>
-                                                </td>
-                                            </t>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                                <div style="border-bottom:1px dashed #000; margin:6px 0;"></div>
-
-                                <div style="display:flex; justify-content:space-between;">
-                                    <span>Tax</span>
-                                    <span><t t-esc="values['tax']"/></span>
-                                </div>
-
-                                <div style="display:flex; justify-content:space-between; font-weight:bold;">
-                                    <span>Total</span>
-                                    <span><t t-esc="values['total']"/></span>
-                                </div>
-
-                                <div style="border-bottom:1px dashed #000; margin:6px 0;"></div>
-
-                                <t t-if="values.get('qr')">
-                                    <div style="text-align:center; margin-top:8px;">
-                                        <img t-att-src="'data:image/png;base64,' + values['qr']"
-                                             style="width:120px;"/>
-                                        <div style="font-size:11px; margin-top:4px;">
-                                            Scan to view full receipt
+                                        <t t-if="company and company.logo">
+                                        <div class="text-center" style="margin-bottom:6px;">
+                                            <img t-att-src="'data:image/png;base64,' + company.logo.decode('utf-8')"
+                                                 style="max-height:70px; max-width:100%;"/>
                                         </div>
+                                    </t>
+
+
+                                    <!-- HEADER -->
+                                    <div class="text-center bold" style="font-size:16px;">
+                                        <t t-esc="values['company_name']"/>
                                     </div>
-                                </t>
 
-                                <div style="text-align:center; margin-top:10px;">
-                                    Thank you for shopping!
+                                    <div class="text-center">
+                                        <t t-esc="values['phone']"/>
+                                    </div>
+
+                                    <div class="separator"/>
+
+                                    <!-- ORDER INFO -->
+                                    <div>Receipt: <t t-esc="values['order_name']"/></div>
+                                    <div>Date: <t t-esc="values['date']"/></div>
+
+                                    <div class="separator"/>
+
+                                    <!-- ORDER LINES -->
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th class="text-left" style="width:36%;">Product</th>
+                                                <th class="text-center" style="width:10%;">Qty</th>
+                                                <th class="text-right" style="width:18%;">Amount</th>
+
+                                                <t t-foreach="values['dynamic_fields']" t-as="f">
+                                                    <th class="text-right" style="min-width:45px;">
+                                                        <t t-esc="f.replace('_',' ').title()"/>
+                                                    </th>
+
+                                                </t>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr t-foreach="values['lines']" t-as="l"
+                                                style="border-bottom:1px dotted #ccc;">
+
+                                                <td class="product text-left">
+                                                    <t t-esc="l['product']"/>
+                                                </td>
+
+                                                <td class="text-center">
+                                                    <t t-esc="l['qty']"/>
+                                                </td>
+
+                                                <td class="text-right">
+                                                    <t t-esc="l['total']"/>
+                                                </td>
+
+                                                <t t-foreach="values['dynamic_fields']" t-as="f">
+                                                    <td class="text-right">
+                                                        <t t-esc="l.get(f, '')"/>
+                                                    </td>
+                                                </t>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <div class="separator"/>
+
+                                    <!-- TOTALS -->
+                                    <div class="row-between">
+                                        <span>Tax</span>
+                                        <span><t t-esc="values['tax']"/></span>
+                                    </div>
+
+                                    <div class="row-between bold">
+                                        <span>Total</span>
+                                        <span><t t-esc="values['total']"/></span>
+                                    </div>
+
+                                    <div class="separator"/>
+
+                                    <!-- QR CODE -->
+                                    <t t-if="values.get('qr')">
+                                        <div class="text-center" style="margin-top:8px;">
+                                            <img t-att-src="'data:image/png;base64,' + values['qr']"
+                                                 style="width:120px;"/>
+                                            <div style="font-size:11px; margin-top:4px;">
+                                                Scan to view full receipt
+                                            </div>
+                                        </div>
+                                    </t>
+
+                                    <!-- FOOTER -->
+                                    <div class="text-center" style="margin-top:10px;">
+                                        Thank you for shopping!
+                                    </div>
+
                                 </div>
-
-                            </div>
-
                             </t>
-                         </t>
+                        </t>
                     </template>
 
-</odoo>
+            </odoo>

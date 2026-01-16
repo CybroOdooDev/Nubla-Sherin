@@ -35,26 +35,35 @@
                 <table style="width:100%; border-collapse:collapse; margin-top:10px;">
                     <thead>
                         <tr style="border-bottom:2px solid #000;">
-                            <th align="left">Product</th>
-                            <th align="center">Qty</th>
-                            <th align="center">Amount</th>
+                            <th style="padding:6px 8px; text-align:left;">Product</th>
+                            <th style="padding:6px 8px; text-align:center; min-width:40px;">Qty</th>
+                            <th style="padding:6px 8px; text-align:right; min-width:70px;">Amount</th>
+
                             <t t-foreach="dynamic_fields" t-as="field">
-                                <th align="right">
-                                    <t t-esc="field.replace('_',' ').upper()"/>
+                                <th style="padding:6px 8px; text-align:center; min-width:80px;">
+                                    <t t-esc="field.replace('_',' ').title()"/>
                                 </th>
                             </t>
                         </tr>
                     </thead>
+
                     <tbody>
                         <t t-foreach="o.lines" t-as="line">
                             <tr style="border-bottom:1px dotted #ccc;">
-                                <td t-esc="line.product_id.display_name"/>
-                                <td align="center" t-esc="line.qty"/>
-                                <td align="right">
+                                <td style="padding:6px 8px; text-align:left;">
+                                    <t t-esc="line.product_id.display_name"/>
+                                </td>
+
+                                <td style="padding:6px 8px; text-align:center;">
+                                    <t t-esc="line.qty"/>
+                                </td>
+
+                                <td style="padding:6px 8px; text-align:right;">
                                     <t t-esc="line.price_subtotal_incl"/>
                                 </td>
-                                 <t t-foreach="dynamic_fields" t-as="field">
-                                    <td align="center">
+
+                                <t t-foreach="dynamic_fields" t-as="field">
+                                    <td style="padding:6px 8px; text-align:center;">
                                         <t t-esc="line.product_id[field] if field in line.product_id else ''"/>
                                     </td>
                                 </t>

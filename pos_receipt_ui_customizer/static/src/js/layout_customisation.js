@@ -42,9 +42,9 @@ class PosReceiptLayoutClientAction extends Component {
                 visible: false,
                 x: 0,
                 y: 0,
-                type: null,          // "column" or "cell"
-                columnIndex: null,   // clicked column index
-                selectedField: "",   // e.g. "order.amount_total"
+                type: null,
+                columnIndex: null,
+                selectedField: "",
             },
 
         });
@@ -65,9 +65,99 @@ class PosReceiptLayoutClientAction extends Component {
             this.allowSpace();
              this.enableColumnDropZones();
              this.restoreSavedColumns();
+             if (this.state.enableQr) {
+            this.renderReceiptQr();
+                }
         });
 
     }
+
+
+
+
+        renderReceiptQr() {
+    if (!this.state.enableQr) return;
+
+    const editor = this.receiptContentRef.el;
+    if (!editor) return;
+
+    const wrapper = editor.querySelector(".receipt-qr-wrapper");
+    if (!wrapper) return;
+
+    wrapper.querySelector(".receipt-qr-placeholder")?.remove();
+
+    const templateImg = wrapper.querySelector(".receipt-qr-template img");
+    if (!templateImg) return;
+
+    const qrDiv = document.createElement("div");
+    qrDiv.className = "receipt-qr-placeholder";
+    qrDiv.style.textAlign = "center";
+    qrDiv.style.marginTop = "12px";
+
+    const img = templateImg.cloneNode(true);
+    img.style.width = "120px";
+    img.style.height = "120px";
+
+    if (!this.props.data?.custom_qr_image) {
+        const tempContainer = document.createElement('div');
+        tempContainer.style.position = 'absolute';
+        tempContainer.style.left = '-9999px';  // Hide off-screen
+        tempContainer.style.width = '120px';
+        tempContainer.style.height = '120px';
+        document.body.appendChild(tempContainer);
+
+        new QRCode(tempContainer, {
+            text: "Demo Receipt QR",
+            width: 120,
+            height: 120,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        const qrCanvas = tempContainer.querySelector('canvas');
+        const demoSrc = qrCanvas ? qrCanvas.toDataURL('image/png') : '';
+        img.setAttribute('src', demoSrc);
+
+        document.body.removeChild(tempContainer);
+    }
+
+    qrDiv.appendChild(img);
+    wrapper.appendChild(qrDiv);
+}
+
+
+//     renderReceiptQr() {
+//     if (!this.state.enableQr) return;
+//
+//     const editor = this.receiptContentRef.el;
+//     if (!editor) return;
+//
+//     const wrapper = editor.querySelector(".receipt-qr-wrapper");
+//     if (!wrapper) return;
+//
+//     // remove existing
+//     wrapper.querySelector(".receipt-qr-placeholder")?.remove();
+//
+//     const templateImg = wrapper.querySelector(
+//         ".receipt-qr-template img"
+//     );
+//     if (!templateImg) return;
+//
+//     const qrDiv = document.createElement("div");
+//     qrDiv.className = "receipt-qr-placeholder";
+//     qrDiv.style.textAlign = "center";
+//     qrDiv.style.marginTop = "12px";
+//
+//     const img = templateImg.cloneNode(true);
+//     img.style.width = "120px";
+//     img.style.height = "120px";
+//
+//     qrDiv.appendChild(img);
+//     wrapper.appendChild(qrDiv);
+// }
+
+
 
     async restoreSavedColumns() {
     if (!this.receipt_id) return;
@@ -80,11 +170,9 @@ class PosReceiptLayoutClientAction extends Component {
     const table = this.receiptContentRef.el.querySelector(".receipt-table");
     const headerRow = table.querySelector("thead tr");
 
-    // clean broken layout
     headerRow.querySelectorAll("th[data-field]").forEach(th => th.remove());
     table.querySelectorAll("td[data-field]").forEach(td => td.remove());
 
-    // rebuild correctly
     fields.forEach(field => {
         this.addColumnAtIndex(field, 2); // after Amount
     });
@@ -417,6 +505,10 @@ closePopup() {
     if (ev.dataTransfer.types.includes("application/x-pos-column")) {
         return;
     }
+    if (ev.target.closest(".no-drop-zone, .receipt-header")) {
+        console.warn("Drop blocked in receipt header");
+        return;
+    }
 
     const editor = this.receiptContentRef.el;
 
@@ -699,38 +791,19 @@ onToggleQr(ev) {
 
 
 onToggleReceiptQr(ev) {
-    const checked = ev.target.checked;
-    this.state.enableQr = checked;
+    this.state.enableQr = ev.target.checked;
 
     const editor = this.receiptContentRef.el;
     const wrapper = editor?.querySelector(".receipt-qr-wrapper");
-
     if (!wrapper) return;
 
-    // Remove only ACTIVE QR
     wrapper.querySelector(".receipt-qr-placeholder")?.remove();
 
-    // Disable → stop
-    if (!checked) return;
-
-    const templateImg = wrapper.querySelector(
-        ".receipt-qr-template img"
-    );
-
-    if (!templateImg) return;
-
-    const qrDiv = document.createElement("div");
-    qrDiv.className = "receipt-qr-placeholder";
-    qrDiv.style.textAlign = "center";
-    qrDiv.style.marginTop = "12px";
-
-    const img = templateImg.cloneNode(true);
-    img.style.width = "120px";
-    img.style.height = "120px";
-
-    qrDiv.appendChild(img);
-    wrapper.appendChild(qrDiv);
+    if (this.state.enableQr) {
+        this.renderReceiptQr();
+    }
 }
+
 
    async onReceiptClick(ev) {
     if (this.receiptContentRef.el.classList.contains("column-dragging")) {
@@ -754,7 +827,6 @@ onToggleReceiptQr(ev) {
     this.lastClickedTable = table;
     this.lastClickedColumnIndex = colIndex;
 
-    // Show simple confirmation dialog
     this.dialog.add(ConfirmationDialog, {
         title: "Remove Column",
         body: `Remove column "${fieldName}"?`,
@@ -909,9 +981,7 @@ onToggleReceiptQr(ev) {
     const fieldName = th?.dataset?.field;
     if (!fieldName) return;
 
-    /* ===============================
-       1) Update DB
-    =============================== */
+
     const [receipt] = await this.orm.searchRead(
         "pos.receipt",
         [["id", "=", this.receipt_id]],
@@ -926,15 +996,11 @@ onToggleReceiptQr(ev) {
         selected_product_fields: JSON.stringify(fields),
     });
 
-    /* ===============================
-       2) Remove header & cells
-    =============================== */
+
     th.remove();
     bodyRows.forEach(row => row.children[columnIndex]?.remove());
 
-    /* ===============================
-       3) 🔥 CRITICAL: remove data from orderlines
-    =============================== */
+
     const lines = this.props.order?.get_orderlines?.() || this.props.lines || [];
 
     lines.forEach(line => {

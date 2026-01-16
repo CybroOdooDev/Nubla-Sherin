@@ -112,10 +112,15 @@
                 <div class="editor_panel_section">
 
                   <div class="field-selector">
+                      <h5 class="d-flex align-items-center gap-2">
+                                <i class="fa fa-arrows"/>
+                                Drag and Drop Column
+                            </h5>
 
                     <select class="form-select form-select-sm"
                             t-model="state.popup.selectedField">
-                        <option value="">-- Select Product Field --</option>
+
+                        <option value=""> Select Product Field </option>
                         <t t-foreach="state.productFields" t-as="f" t-key="f.name">
                             <option t-att-value="f.name">
                                 <t t-esc="f.label"/> (<t t-esc="f.name"/>)

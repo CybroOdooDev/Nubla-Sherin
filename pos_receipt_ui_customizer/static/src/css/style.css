@@ -119,3 +119,12 @@
     font-size: 12px;
     padding: 4px 6px;
 }
+
+.no-drop-zone {
+    cursor: not-allowed;
+}
+
+.no-drop-zone * {
+    cursor: not-allowed;
+}
+
