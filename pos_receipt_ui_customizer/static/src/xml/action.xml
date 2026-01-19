@@ -153,9 +153,7 @@
                         <i class="fa fa-columns me-1"/>
                         <t t-esc="f.label"/>
                     </div>
-
                 </t>
-
 
                         <t t-if="!state.popup.selectedField">
                             <div class="text-muted small">
@@ -170,6 +168,24 @@
 
                     </div>
             </div>
+                    <div class="editor_panel_section">
+                        <h5 class="d-flex align-items-center gap-2">
+                            <i class="fa fa-paint-brush"/>
+                            Receipt Colors
+                        </h5>
+
+                        <t t-if="state.colors">
+                            <label class="form-label">Receipt Background</label>
+                            <ColorPicker
+                                color="state.colors.receipt_bg"
+                                t-on-color-change="(ev) => onColorPickerChange('receipt_bg', ev.detail.color)"
+                            />
+                        </t>
+                    </div>
+
+
+
+
                     <!-- Receipt Preview -->
                     <div class="receipt_content " t-ref="ReceiptContent" t-on-click="onReceiptClick"
                          t-att-style="'font-family:' + state.fontStyle" contenteditable="true" t-on-drop="onDrop"/>

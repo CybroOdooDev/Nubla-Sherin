@@ -50,16 +50,21 @@
             'pos_receipt_ui_customizer/static/src/js/receipt_design.js',
             'pos_receipt_ui_customizer/static/src/xml/order_receipt.xml',
             'pos_receipt_ui_customizer/static/src/overrides/app/models/pos_order.js',
+            'pos_receipt_ui_customizer/static/src/css/style.css',
+
         ],
         'web.assets_backend': [
             'pos_receipt_ui_customizer/static/src/js/layout_customisation.js',
             'pos_receipt_ui_customizer/static/src/xml/action.xml',
             'pos_receipt_ui_customizer/static/src/css/style.css',
-            'pos_receipt_ui_customizer/static/src/css/pos_receipt_print.css',
             'https://cdn.jsdelivr.net/npm/medium-editor@5.23.3/dist/js/medium-editor.min.js',
             'https://cdn.jsdelivr.net/npm/medium-editor@5.23.3/dist/css/medium-editor.min.css',
             'https://cdn.jsdelivr.net/npm/medium-editor@5.23.3/dist/css/themes/default.min.css',
             'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
+            # 'pos_receipt_ui_customizer/static/src/js/color_picker_wrapper.js'
+        ],
+        'point_of_sale.assets_print': [
+            'pos_receipt_ui_customizer/static/src/css/style.css',
         ],
     },
     'images': ['static/description/banner.png'],

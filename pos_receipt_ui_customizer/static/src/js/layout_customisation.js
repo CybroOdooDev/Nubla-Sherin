@@ -8,6 +8,7 @@ import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_d
 class PosReceiptLayoutClientAction extends Component {
     static template = "custom_receipt_for_pos.client_layout_customisation_template";
 
+
     setup() {
         this.orm = useService("orm");
         this.notification = useService("notification");
@@ -47,9 +48,8 @@ class PosReceiptLayoutClientAction extends Component {
                 selectedField: "",
             },
 
+
         });
-
-
 
         onWillStart(async () => {
 
@@ -71,9 +71,6 @@ class PosReceiptLayoutClientAction extends Component {
         });
 
     }
-
-
-
 
         renderReceiptQr() {
     if (!this.state.enableQr) return;
@@ -702,6 +699,8 @@ saveSelectedColumns() {
 
     console.log("Saved receipt columns:", fields);
 }
+
+
 
 
 

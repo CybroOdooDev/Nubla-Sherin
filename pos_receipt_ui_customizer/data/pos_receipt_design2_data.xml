@@ -3,10 +3,14 @@
     <record id="pos_receipt_design2" model="pos.receipt">
         <field name="name">Design 2</field>
         <field name="design_receipt"><![CDATA[
-            <div class="pos-receipt" >
+            <div class="pos-receipt custom-pos-receipt" >
 
                 <!-- HEADER -->
-                        <div class="receipt-header no-drop-zone" style="text-align:center; padding:10px 0; border-bottom:2px solid #000;" >
+                            <div class="receipt-header no-drop-zone"
+                         style="
+                            text-align:center;
+                            padding:10px 0;
+                         ">
                             <t t-if="env.services.pos.config.logo">
                                 <img t-att-src="'data:image/png;base64,' + env.services.pos.config.logo"
                                      style="max-width:120px; margin-bottom:5px;"/>
@@ -63,7 +67,7 @@
                 </table>
                 </div>
 
-                        <!-- TOTAL SECTION BOX -->
+                        <!-- TOTAL SEassets_printCTION BOX -->
                         <div style="margin-top:18px; padding:10px; border:2px dashed #555; border-radius:6px;">
                             <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
                                 <span style="font-weight:600;">Subtotal</span>
@@ -84,6 +88,7 @@
                                         </t>
                                 </div>
                          </div>
+
 
 
                 <!-- RECEIPT INFO -->

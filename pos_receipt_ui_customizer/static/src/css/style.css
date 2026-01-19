@@ -127,4 +127,64 @@
 .no-drop-zone * {
     cursor: not-allowed;
 }
+ /**  ODOO 18 POS RECEIPT – CUSTOM RECEIPT ONLY (FIXED)*/
+
+
+/* Default receipt stays transparent */
+.pos-receipt {
+    background-color: transparent !important;
+}
+
+/* Custom receipt ONLY */
+.pos-receipt.custom-pos-receipt {
+    background-color: #abc64b !important;
+    padding: 10px;
+    min-height: 100%;
+}
+
+
+/* Header */
+.custom-pos-receipt .receipt-header {
+    background-color: #64752c !important;
+    color: #ffffff !important;
+    padding: 12px 10px !important;
+    border-bottom: 2px solid #b6e654 !important;
+}
+
+/* Header text safety */
+.custom-pos-receipt .receipt-header * {
+    color: #ffffff !important;
+}
+
+/* Tables */
+.custom-pos-receipt table {
+    background-color: transparent;
+}
+
+/* FORCE PRINT BACKGROUND COLORS */
+@media print {
+    .custom-pos-receipt,
+    .custom-pos-receipt * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Header must repeat background explicitly */
+    .custom-pos-receipt .receipt-header {
+        background-color: #64752c !important;
+        color: #ffffff !important;
+    }
+
+    /* Receipt background */
+    .custom-pos-receipt {
+        background-color: #abc64b !important;
+    }
+}
+
+
+
+
+
+
+
 
