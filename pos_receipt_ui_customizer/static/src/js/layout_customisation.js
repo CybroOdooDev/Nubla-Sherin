@@ -28,6 +28,10 @@ class PosReceiptLayoutClientAction extends Component {
 //        this.receipt_id = this.props.action.context.active_id;
         this.state = useState({
             fontStyle: "Arial",
+            colors: {
+                receipt_bg: '#abc64k',
+            },
+            bgImage: null,
             fields: [],
             logo: '',
             prev_logo: '',
@@ -56,23 +60,53 @@ class PosReceiptLayoutClientAction extends Component {
             await this.loadProductFields();
             await this.loadPosConfigId();
             await this.loadEnableQr();
+            await this.loadReceiptBgColor();
         });
 
         onMounted(async () => {
-            await this.loadReceipt();
-            this.mediumEditor();
-            this.preventPartialSelection();
-            this.allowSpace();
-             this.enableColumnDropZones();
-             this.restoreSavedColumns();
-             if (this.state.enableQr) {
-            this.renderReceiptQr();
-                }
-        });
+    await this.loadReceipt();
+
+
+    document.documentElement.style.setProperty(
+        "--receipt-bg-color",
+        this.state.colors.receipt_bg
+    );
+
+    this.mediumEditor();
+    this.preventPartialSelection();
+    this.allowSpace();
+    this.enableColumnDropZones();
+    this.restoreSavedColumns();
+
+    if (this.state.enableQr) {
+        this.renderReceiptQr();
+    }
+    });
+
 
     }
 
-        renderReceiptQr() {
+    async loadReceiptBgColor() {
+    if (!this.config_id) return;
+
+    const [config] = await this.orm.read(
+        "pos.config",
+        [this.config_id],
+        ["receipt_bg_color"]
+    );
+
+
+
+    if (config?.receipt_bg_color) {
+        this.state.colors.receipt_bg = config.receipt_bg_color;
+        console.log("BACKGROUND COLOR",this.state.colors.receipt_bg)
+    }
+}
+
+
+
+
+    renderReceiptQr() {
     if (!this.state.enableQr) return;
 
     const editor = this.receiptContentRef.el;
@@ -410,27 +444,28 @@ closePopup() {
     }
 
     async saveEditedReceipt() {
-        this.state.receipt = this.receiptContentRef.el.innerHTML;
-        this.state.prev_logo = this.state.logo;
-        this.state.prev_receipt = this.state.receipt;
+    this.state.receipt = this.receiptContentRef.el.innerHTML;
 
-        await this.orm.write("pos.receipt", [this.receipt_id], {
-            design_receipt: this.state.receipt,
-            design_receipt_font_style: this.state.fontStyle,
-            logo: this.state.logo,
-        });
+    await this.orm.write("pos.receipt", [this.receipt_id], {
+        design_receipt: this.state.receipt,
+        design_receipt_font_style: this.state.fontStyle,
+        logo: this.state.logo,
+    });
 
-        await this.orm.write("pos.config", [this.config_id], {
-            enable_qr: !!this.state.enableQr,
-            enable_qr_section: !!this.state.showSection,
-        });
+    await this.orm.write("pos.config", [this.config_id], {
+        enable_qr: !!this.state.enableQr,
+        enable_qr_section: !!this.state.showSection,
+        receipt_bg_color: this.state.colors.receipt_bg,
+    });
+    console.log("this.state.colors.receipt_bg",this.state.colors.receipt_bg)
 
-        this.notification.add("Receipt Successfully Updated!", {
-            type: "success",
-        });
+    this.notification.add("Receipt Successfully Updated!", {
+        type: "success",
+    });
 
-        setTimeout(() => window.location.reload(), 800);
-    }
+    setTimeout(() => window.location.reload(), 800);
+}
+
 
 
     async resetEditedReceipt() {
@@ -443,6 +478,20 @@ closePopup() {
             type: "success",
         });
     }
+    onColorChange(ev) {
+    const color = ev.target.value;
+    console.log("COLOR",color)
+    this.state.colors.receipt_bg = color;
+    console.log("COLOR NAME",this.state.colors.receipt_bg)
+    document.documentElement.style.setProperty(
+        "--receipt-bg-color",
+        color
+    );
+    console.log("ocument.documentElement.style",document.documentElement.style)
+}
+
+
+
 
     onFontChange(ev) {
         this.state.fontStyle = ev.target.value;

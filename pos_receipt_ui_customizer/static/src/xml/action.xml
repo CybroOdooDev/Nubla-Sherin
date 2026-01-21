@@ -164,24 +164,65 @@
 
                 </div>
 
+                    <div class="editor_panel_section">
+    <h5 class="d-flex align-items-center gap-2">
+        <i class="fa fa-paint-brush"/>
+        Receipt Background
+    </h5>
+
+    <!-- Mode Selection -->
+    <div class="mb-2">
+        <label class="form-label small">Background Type</label>
+        <div class="d-flex gap-3">
+            <label>
+                <input type="radio"
+                    name="receipt_bg_mode"
+                    value="color"
+                    t-model="state.bgMode"/>
+                Color
+            </label>
+            <label>
+                <input type="radio"
+                    name="receipt_bg_mode"
+                    value="image"
+                    t-model="state.bgMode"/>
+                Image
+            </label>
+        </div>
+    </div>
+
+    <!-- Background Color -->
+    <t t-if="state.bgMode === 'color'">
+        <label class="form-label small">Background Color</label>
+        <input type="color"
+            class="form-control form-control-color mb-2"
+            t-model="state.colors.receipt_bg"
+            t-on-change="onColorChange"/>
+    </t>
+
+    <!-- Background Image -->
+    <t t-if="state.bgMode === 'image'">
+        <label class="form-label small">Background Image</label>
+        <input type="file"
+            class="form-control mb-2"
+            accept="image/*"
+            t-on-change="onBgImageChange"/>
+
+        <button t-if="state.bgImage"
+            class="btn btn-sm btn-outline-danger"
+            t-on-click="removeBgImage">
+            Remove Background Image
+        </button>
+    </t>
+</div>
+
+
+
 
 
                     </div>
             </div>
-                    <div class="editor_panel_section">
-                        <h5 class="d-flex align-items-center gap-2">
-                            <i class="fa fa-paint-brush"/>
-                            Receipt Colors
-                        </h5>
 
-                        <t t-if="state.colors">
-                            <label class="form-label">Receipt Background</label>
-                            <ColorPicker
-                                color="state.colors.receipt_bg"
-                                t-on-color-change="(ev) => onColorPickerChange('receipt_bg', ev.detail.color)"
-                            />
-                        </t>
-                    </div>
 
 
 

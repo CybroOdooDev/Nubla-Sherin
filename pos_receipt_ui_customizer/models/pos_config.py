@@ -58,6 +58,12 @@ class PosConfig(models.Model):
         default=False,
     )
 
+    receipt_bg_color = fields.Char(
+        string="Receipt Background Color",
+        default="#abc64b"
+    )
+    receipt_bg_image = fields.Binary("Receipt Background Image")
+
     @api.depends("enable_qr")
     def _compute_enable_qr(self):
         print("dhhhhhhhhhhhhhhhhhhhhbw")

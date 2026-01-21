@@ -97,29 +97,6 @@
     100% { transform: scale(1); }
 }
 
-/* Increase POS receipt paper width */
-.pos-receipt,
-.pos-receipt-container,
-.pos-receipt-print,
-.pos-receipt .pos-receipt {
-    width: 110mm !important;      /* you can try 100mm, 110mm, 120mm */
-    max-width: 110mm !important;
-}
-
-/* Prevent table from shrinking */
-.pos-receipt table {
-    width: 100%;
-    table-layout: fixed;
-}
-
-/* Control column sizing */
-.pos-receipt th,
-.pos-receipt td {
-    white-space: nowrap;
-    font-size: 12px;
-    padding: 4px 6px;
-}
-
 .no-drop-zone {
     cursor: not-allowed;
 }
@@ -127,20 +104,119 @@
 .no-drop-zone * {
     cursor: not-allowed;
 }
- /**  ODOO 18 POS RECEIPT – CUSTOM RECEIPT ONLY (FIXED)*/
 
+/* ========================================
+   RECEIPT PREVIEW (RIGHT SIDE) - NO SCROLL
+   ======================================== */
 
-/* Default receipt stays transparent */
+/* Main receipt container - must allow natural height */
+.pos-receipt-container {
+    width: 100% !important;
+    max-width: 400px !important;
+    margin: 0 auto !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+}
+
+/* Background view container */
+.pos-receipt-container > .bg-view {
+    width: 100% !important;
+    max-width: 400px !important;
+    margin: 0 auto !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+}
+
+/* Remove w-50 constraint */
+.pos-receipt-container > .bg-view.w-50 {
+    width: 100% !important;
+    max-width: 400px !important;
+}
+
+/* Receipt itself - NO SCROLL, FULL HEIGHT */
 .pos-receipt {
+    width: 100% !important;
+    max-width: 360px !important;
+    margin: 0 auto !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
     background-color: transparent !important;
+}
+
+/* Prevent table from shrinking */
+.pos-receipt table {
+    width: 100% !important;
+    table-layout: fixed;
+}
+
+/* Control column sizing */
+.pos-receipt th,
+.pos-receipt td {
+    font-size: 11px;
+    padding: 3px 4px;
+    word-wrap: break-word;
+    white-space: normal !important;
+    vertical-align: top;
+}
+
+/* Fix for text displaying vertically */
+.pos-receipt table th,
+.pos-receipt table td {
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+    text-overflow: clip !important;
+}
+
+/* Ensure proper column widths */
+.pos-receipt table {
+    border-collapse: collapse;
+}
+
+.pos-receipt table td:first-child,
+.pos-receipt table th:first-child {
+    width: 45% !important;
+}
+
+.pos-receipt table td:nth-child(2),
+.pos-receipt table th:nth-child(2) {
+    width: 15% !important;
+    text-align: center;
+}
+
+.pos-receipt table td:nth-child(3),
+.pos-receipt table th:nth-child(3) {
+    width: 20% !important;
+    text-align: right;
+}
+
+.pos-receipt table td:nth-child(4),
+.pos-receipt table th:nth-child(4) {
+    width: 20% !important;
+    text-align: right;
+}
+
+/* ========================================
+   CUSTOM RECEIPT STYLES
+   ======================================== */
+
+   :root {
+    --receipt-bg-color: #abc64b; /* default */
 }
 
 /* Custom receipt ONLY */
 .pos-receipt.custom-pos-receipt {
-    background-color: #abc64b !important;
+    background-color: var(--receipt-bg-color) !important;
     padding: 10px;
-    min-height: 100%;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
 }
+
+
 
 
 /* Header */
@@ -161,8 +237,18 @@
     background-color: transparent;
 }
 
-/* FORCE PRINT BACKGROUND COLORS */
+/* Order Details section */
+.custom-pos-receipt .order-details,
+.custom-pos-receipt [class*="order"] {
+    overflow: visible !important;
+}
+
+/* ========================================
+   PRINT STYLES - FULL RECEIPT PRINTING
+   ======================================== */
+
 @media print {
+    /* Force color printing */
     .custom-pos-receipt,
     .custom-pos-receipt * {
         -webkit-print-color-adjust: exact !important;
@@ -175,16 +261,50 @@
         color: #ffffff !important;
     }
 
-    /* Receipt background */
-    .custom-pos-receipt {
-        background-color: #abc64b !important;
+
+
+    /* Receipt container - NO OVERFLOW */
+    .pos-receipt-container,
+    .pos-receipt-container > .bg-view {
+        width: 80mm !important;
+        max-width: 80mm !important;
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
+    }
+
+    /* Receipt itself - NO SCROLL, FULL HEIGHT */
+    .pos-receipt {
+        width: 80mm !important;
+        max-width: 80mm !important;
+        margin: 0 auto !important;
+        overflow: visible !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        background-color: var(--receipt-bg-color) !important;
+    }
+
+    /* Page setup for thermal printer */
+    @page {
+        size: 80mm auto;
+        margin: 0;
+    }
+
+    /* Remove any scroll bars */
+    body {
+        overflow: visible !important;
+    }
+
+    /* Ensure all content is visible */
+    * {
+        overflow: visible !important;
+    }
+
+    @media print {
+    .pos-receipt {
+        background-color: var(--receipt-bg-color) !important;
     }
 }
 
-
-
-
-
-
-
-
+}
