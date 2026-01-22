@@ -6,11 +6,7 @@
             <div class="pos-receipt custom-pos-receipt" >
 
                 <!-- HEADER -->
-                            <div class="receipt-header no-drop-zone"
-                         style="
-                            text-align:center;
-                            padding:10px 0;
-                         ">
+                            <div class="receipt-header no-drop-zone" style="text-align:center; padding:10px 0;">
                             <t t-if="env.services.pos.config.logo">
                                 <img t-att-src="'data:image/png;base64,' + env.services.pos.config.logo"
                                      style="max-width:120px; margin-bottom:5px;"/>
@@ -34,9 +30,9 @@
                     <table class="receipt-table" style="width:100%; border-collapse:collapse; margin-top:6px; font-size:14px;">
                     <thead class="no-drop-zone">
                         <tr class="receipt-header-dropzone" style="border-bottom:2px solid #000;">
-                            <th style="width:45%; text-align:left; padding:4px;">Product</th>
-                            <th style="width:15%; text-align:center; padding:4px;">Qty</th>
-                            <th style="width:20%; text-align:right; padding:4px;">Amount</th>
+                            <th style="width:45%; text-align:left; font-size:12px; padding:4px;">Product</th>
+                            <th style="width:15%; text-align:center; font-size:12px; padding:4px;">Qty</th>
+                            <th style="width:20%; text-align:right; font-size:12px; padding:4px;">Amount</th>
                         </tr>
                     </thead>
                     <tbody>

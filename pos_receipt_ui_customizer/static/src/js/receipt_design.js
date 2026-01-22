@@ -153,6 +153,7 @@ get templateProps() {
 
 
     get isFalse() {
-        return !this.pos.config.is_custom_receipt;
-    },
+    const design = this.pos.config.design_receipt;
+    return !this.pos.config.is_custom_receipt || !design || !design.trim();
+},
 });

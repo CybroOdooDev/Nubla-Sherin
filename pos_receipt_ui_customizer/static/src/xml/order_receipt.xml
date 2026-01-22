@@ -168,7 +168,9 @@
                     </div>
                 </t>
                 <t t-else="">
+                    <t t-if="props and props.data">
                         <t t-component="templateComponent" t-props="templateProps"/>
+                    </t>
                 </t>
             </div>
         </xpath>

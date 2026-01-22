@@ -28,10 +28,7 @@ class PosReceiptLayoutClientAction extends Component {
 //        this.receipt_id = this.props.action.context.active_id;
         this.state = useState({
             fontStyle: "Arial",
-            colors: {
-                receipt_bg: '#abc64k',
-            },
-            bgImage: null,
+
             fields: [],
             logo: '',
             prev_logo: '',
@@ -60,17 +57,12 @@ class PosReceiptLayoutClientAction extends Component {
             await this.loadProductFields();
             await this.loadPosConfigId();
             await this.loadEnableQr();
-            await this.loadReceiptBgColor();
+
         });
 
         onMounted(async () => {
     await this.loadReceipt();
 
-
-    document.documentElement.style.setProperty(
-        "--receipt-bg-color",
-        this.state.colors.receipt_bg
-    );
 
     this.mediumEditor();
     this.preventPartialSelection();
@@ -86,22 +78,7 @@ class PosReceiptLayoutClientAction extends Component {
 
     }
 
-    async loadReceiptBgColor() {
-    if (!this.config_id) return;
 
-    const [config] = await this.orm.read(
-        "pos.config",
-        [this.config_id],
-        ["receipt_bg_color"]
-    );
-
-
-
-    if (config?.receipt_bg_color) {
-        this.state.colors.receipt_bg = config.receipt_bg_color;
-        console.log("BACKGROUND COLOR",this.state.colors.receipt_bg)
-    }
-}
 
 
 
@@ -198,15 +175,40 @@ class PosReceiptLayoutClientAction extends Component {
 
     if (!fields.length) return;
 
+    // Get mock data for preview
+    const mockData = await this.getMockProductData(fields);
+
     const table = this.receiptContentRef.el.querySelector(".receipt-table");
     const headerRow = table.querySelector("thead tr");
 
+    // Remove existing dynamic columns (both header and cells)
     headerRow.querySelectorAll("th[data-field]").forEach(th => th.remove());
     table.querySelectorAll("td[data-field]").forEach(td => td.remove());
 
+    // Add columns back with mock data
     fields.forEach(field => {
-        this.addColumnAtIndex(field, 2); // after Amount
+        this.addColumnAtIndex(field, 2, mockData);
     });
+}
+
+async getMockProductData(fields) {
+    if (!fields.length) return [];
+
+    try {
+        // Fetch 2 sample products with the selected fields
+        const products = await this.orm.searchRead(
+            "product.product",
+            [],
+            ["name", ...fields], // Include 'name' for context
+            { limit: 2 }
+        );
+
+        console.log("Mock product data:", products);
+        return products;
+    } catch (error) {
+        console.error("Error fetching mock product data:", error);
+        return [];
+    }
 }
 
 
@@ -455,9 +457,8 @@ closePopup() {
     await this.orm.write("pos.config", [this.config_id], {
         enable_qr: !!this.state.enableQr,
         enable_qr_section: !!this.state.showSection,
-        receipt_bg_color: this.state.colors.receipt_bg,
+
     });
-    console.log("this.state.colors.receipt_bg",this.state.colors.receipt_bg)
 
     this.notification.add("Receipt Successfully Updated!", {
         type: "success",
@@ -478,17 +479,7 @@ closePopup() {
             type: "success",
         });
     }
-    onColorChange(ev) {
-    const color = ev.target.value;
-    console.log("COLOR",color)
-    this.state.colors.receipt_bg = color;
-    console.log("COLOR NAME",this.state.colors.receipt_bg)
-    document.documentElement.style.setProperty(
-        "--receipt-bg-color",
-        color
-    );
-    console.log("ocument.documentElement.style",document.documentElement.style)
-}
+
 
 
 
@@ -642,20 +633,98 @@ closePopup() {
 
 
 
-
-addColumnAtIndex(fieldName, index) {
+//
+//addColumnAtIndex(fieldName, index) {
+//    const table = this.receiptContentRef.el.querySelector(".receipt-table");
+//    if (!table) return;
+//
+//    const headerRow = table.querySelector("thead tr");
+//    const bodyRows = table.querySelectorAll("tbody tr");
+//
+//    /* ❌ Prevent duplicate header */
+//    if (headerRow.querySelector(`[data-field="${fieldName}"]`)) {
+//        this.notification.add("Column already added", { type: "warning" });
+//        return;
+//    }
+//
+//
+//    const existingDynamicColumns = headerRow.querySelectorAll("th[data-field]");
+//    if (existingDynamicColumns.length >= 1) {
+//        this.notification.add(
+//            "Only one additional column is allowed. Please remove the existing column first.",
+//            { type: "warning" }
+//        );
+//        return;
+//    }
+//
+//    const th = document.createElement("th");
+//    th.dataset.field = fieldName;
+//    th.textContent = fieldName
+//    .replaceAll("_", " ")
+//    .toLowerCase()
+//    .replace(/\b\w/g, c => c.toUpperCase());
+//
+//    th.style.textAlign = "center";
+//    th.style.width = "15%";
+//    th.style.padding = "4px";
+//    th.style.whiteSpace = "nowrap";
+//    th.style.fontFamily = "inherit";
+//
+//
+//    headerRow.insertBefore(th, headerRow.children[index + 1] || null);
+//
+//    const lines =
+//        this.props.lines ||
+//        this.props.order?.get_orderlines?.() ||
+//        [];
+//
+//    bodyRows.forEach((row, rowIndex) => {
+//        if (row.querySelector(`td[data-field="${fieldName}"]`)) return;
+//
+//        const td = document.createElement("td");
+//        td.dataset.field = fieldName;
+//        td.style.padding = "4px";
+//        td.style.textAlign = "center";
+//        td.style.width = "15%";
+//        td.style.whiteSpace = "nowrap";
+//        td.style.verticalAlign = "top";
+//        td.style.fontFamily = "inherit";
+//
+//
+//        const span = document.createElement("span");
+//        span.className = "dynamic-cell";
+//        span.style.display = "inline-block";
+//        span.style.width = "100%";
+//        span.style.textAlign = "center";
+//        span.style.fontFamily = "inherit";
+//
+//        const line = lines[rowIndex];
+//        let value = "";
+//
+//        if (line && line._dynamicValues && fieldName in line._dynamicValues) {
+//            value = line._dynamicValues[fieldName];
+//        }
+//
+//        span.textContent = value || "";
+//        td.appendChild(span);
+//        row.insertBefore(td, row.children[index + 1] || null);
+//    });
+//
+//    this.saveSelectedColumns();
+//}
+//
+addColumnAtIndex(fieldName, index, mockData = null) {
     const table = this.receiptContentRef.el.querySelector(".receipt-table");
     if (!table) return;
 
     const headerRow = table.querySelector("thead tr");
     const bodyRows = table.querySelectorAll("tbody tr");
 
-    /* ❌ Prevent duplicate header */
+    // Prevent duplicate header
     if (headerRow.querySelector(`[data-field="${fieldName}"]`)) {
         this.notification.add("Column already added", { type: "warning" });
         return;
     }
-
 
     const existingDynamicColumns = headerRow.querySelectorAll("th[data-field]");
     if (existingDynamicColumns.length >= 1) {
@@ -666,57 +735,85 @@ addColumnAtIndex(fieldName, index) {
         return;
     }
 
+    // Adjust static column widths
+    const staticHeaders = headerRow.querySelectorAll("th:not([data-field])");
+    if (staticHeaders.length >= 3) {
+        staticHeaders[0].style.width = "35%"; // Product
+        staticHeaders[1].style.width = "12%"; // Qty
+        staticHeaders[2].style.width = "18%"; // Amount
+    }
+
+    // Add header
     const th = document.createElement("th");
     th.dataset.field = fieldName;
-    th.textContent = fieldName
-    .replaceAll("_", " ")
-    .toLowerCase()
-    .replace(/\b\w/g, c => c.toUpperCase());
+
+    const fieldObj = this.state.productFields?.find(f => f.name === fieldName);
+    th.textContent = fieldObj?.label || fieldName
+        .replaceAll("_", " ")
+        .toLowerCase()
+        .replace(/\b\w/g, c => c.toUpperCase());
 
     th.style.textAlign = "center";
-    th.style.width = "15%";
+    th.style.width = "35%";
     th.style.padding = "4px";
     th.style.whiteSpace = "nowrap";
     th.style.fontFamily = "inherit";
+    th.style.overflow = "visible";
+    th.style.fontSize = "12px";
 
 
-    headerRow.insertBefore(th, headerRow.children[index + 1] || null);
+    headerRow.appendChild(th);
 
-    const lines =
-        this.props.lines ||
-        this.props.order?.get_orderlines?.() ||
-        [];
-
+    // Add cells to each row
     bodyRows.forEach((row, rowIndex) => {
+        // Adjust static cell widths
+        const staticCells = row.querySelectorAll("td:not([data-field])");
+        if (staticCells.length >= 3) {
+            staticCells[0].style.width = "35%";
+            staticCells[1].style.width = "12%";
+            staticCells[2].style.width = "18%";
+        }
+
+        // Skip if cell already exists
         if (row.querySelector(`td[data-field="${fieldName}"]`)) return;
 
         const td = document.createElement("td");
         td.dataset.field = fieldName;
         td.style.padding = "4px";
         td.style.textAlign = "center";
-        td.style.width = "15%";
+        td.style.width = "35%";
         td.style.whiteSpace = "nowrap";
         td.style.verticalAlign = "top";
         td.style.fontFamily = "inherit";
+        td.style.overflow = "visible";
 
-
-        const span = document.createElement("span");
-        span.className = "dynamic-cell";
-        span.style.display = "inline-block";
-        span.style.width = "100%";
-        span.style.textAlign = "center";
-        span.style.fontFamily = "inherit";
-
-        const line = lines[rowIndex];
         let value = "";
 
-        if (line && line._dynamicValues && fieldName in line._dynamicValues) {
-            value = line._dynamicValues[fieldName];
+        // **DESIGNER MODE: Use mock data**
+        if (mockData && Array.isArray(mockData) && mockData[rowIndex]) {
+            value = mockData[rowIndex][fieldName] || "";
+
+            // Format based on field type
+            if (typeof value === 'number') {
+                value = value.toFixed(2);
+            } else if (Array.isArray(value)) {
+                value = value[1] || value[0] || ""; // Many2one field [id, name]
+            } else if (typeof value === 'boolean') {
+                value = value ? 'Yes' : 'No';
+            }
+        }
+        // **POS MODE: Use _dynamicValues from orderlines**
+        else {
+            const lines = this.props.orderlines || this.props.lines || [];
+            const line = lines[rowIndex];
+
+            if (line && line._dynamicValues && fieldName in line._dynamicValues) {
+                value = line._dynamicValues[fieldName];
+            }
         }
 
-        span.textContent = value || "";
-        td.appendChild(span);
-        row.insertBefore(td, row.children[index + 1] || null);
+        td.textContent = " " || " ";
+        row.appendChild(td);
     });
 
     this.saveSelectedColumns();
@@ -1006,8 +1103,7 @@ onToggleReceiptQr(ev) {
 
         return Array.from(fields);
     }
-
-  async onRemoveColumnClick(colIndex = null) {
+async onRemoveColumnClick(colIndex = null) {
     if (!this.lastClickedTable) {
         this.notification.add("No table selected.", { type: "danger" });
         return;
@@ -1017,7 +1113,7 @@ onToggleReceiptQr(ev) {
     const theadRow = table.querySelector("thead tr");
     const bodyRows = table.querySelectorAll("tbody tr");
 
-    const STATIC_COL_COUNT = 3;
+    const STATIC_COL_COUNT = 3; // Product, Qty, Amount
     const columnIndex = colIndex ?? this.lastClickedColumnIndex;
 
     if (columnIndex == null || columnIndex < STATIC_COL_COUNT) {
@@ -1029,7 +1125,7 @@ onToggleReceiptQr(ev) {
     const fieldName = th?.dataset?.field;
     if (!fieldName) return;
 
-
+    // Update database
     const [receipt] = await this.orm.searchRead(
         "pos.receipt",
         [["id", "=", this.receipt_id]],
@@ -1044,17 +1140,13 @@ onToggleReceiptQr(ev) {
         selected_product_fields: JSON.stringify(fields),
     });
 
-
+    // Remove header
     th.remove();
-    bodyRows.forEach(row => row.children[columnIndex]?.remove());
 
-
-    const lines = this.props.order?.get_orderlines?.() || this.props.lines || [];
-
-    lines.forEach(line => {
-        if (line._dynamicValues) {
-            delete line._dynamicValues[fieldName];
-        }
+    // Remove ALL cells with this field name (not just by index)
+    bodyRows.forEach(row => {
+        const cell = row.querySelector(`td[data-field="${fieldName}"]`);
+        if (cell) cell.remove();
     });
 
     this.notification.add(`Column "${fieldName}" removed`, { type: "success" });
