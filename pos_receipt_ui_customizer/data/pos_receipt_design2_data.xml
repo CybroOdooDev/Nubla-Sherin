@@ -20,7 +20,6 @@
                                 <div>Website: <span class="placeholder-span">[[ company.website ]]</span></div>
                             </div>
                         </div>
-
                 <!-- ORDER LINES SECTION -->
                 <div style="margin-top:15px;" class="no-drop-zone">
                     <div style="font-weight:700; border-bottom:1px solid #000; padding-bottom:5px;">
@@ -62,7 +61,6 @@
                     </tbody>
                 </table>
                 </div>
-
                         <!-- TOTAL SEassets_printCTION BOX -->
                         <div style="margin-top:18px; padding:10px; border:2px dashed #555; border-radius:6px;">
                             <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
@@ -85,15 +83,11 @@
                                 </div>
                          </div>
 
-
-
                 <!-- RECEIPT INFO -->
                 <div style="text-align:center; margin-top:20px; font-size:14px;">
                     <div><t t-esc="props.receipt.name"/></div>
                     <div><t t-esc="props.receipt.date"/></div>
                 </div>
-
-
 
                 <!-- QR AREA -->
 
@@ -101,9 +95,6 @@
                      style="display:flex; justify-content:center; margin:25px 0;">
                     <!-- JS QR goes here -->
                 </div>
-
-
-
 
                 <!-- FOOTER -->
                 <div style="text-align:center; font-size:14px; margin-top:10px;">

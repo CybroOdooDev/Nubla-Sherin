@@ -110,7 +110,6 @@
                             </t>
                         </div>
                 <div class="editor_panel_section">
-
                   <div class="field-selector">
                       <h5 class="d-flex align-items-center gap-2">
                                 <i class="fa fa-arrows"/>
@@ -161,21 +160,9 @@
                             </div>
                         </t>
                     </div>
-
+                  </div>
                 </div>
-
-
-
-
-
-
-
-                    </div>
             </div>
-
-
-
-
 
                     <!-- Receipt Preview -->
                     <div class="receipt_content " t-ref="ReceiptContent" t-on-click="onReceiptClick"
@@ -188,39 +175,39 @@
                             t-on-click="resetEditedReceipt">Reset</button>
                 </div>
                 <t t-if="state.popup.visible">
-    <div class="receipt-popup-menu shadow-sm border bg-white rounded"
-         t-att-style="'position:fixed; z-index:9999; top:' + state.popup.y + 'px; left:' + state.popup.x + 'px; padding:8px; min-width:200px;'">
+                    <div class="receipt-popup-menu shadow-sm border bg-white rounded"
+                         t-att-style="'position:fixed; z-index:9999; top:' + state.popup.y + 'px; left:' + state.popup.x + 'px; padding:8px; min-width:200px;'">
 
-        <div class="mb-2">
-            <label class="form-label mb-1" style="font-size:12px;">Select Product Field</label>
+                        <div class="mb-2">
+                            <label class="form-label mb-1" style="font-size:12px;">Select Product Field</label>
 
-            <!-- NEW DROPDOWN -->
-            <select class="form-select form-select-sm"
-                    t-model="state.popup.selectedField">
-                <option value="">-- Select Product Field --</option>
+                            <!-- NEW DROPDOWN -->
+                            <select class="form-select form-select-sm"
+                                    t-model="state.popup.selectedField">
+                                <option value="">-- Select Product Field --</option>
 
-                <t t-foreach="state.productFields" t-as="f" t-key="f.name">
-                    <option t-att-value="f.name">
-                        <t t-esc="f.label"/>
-                        (<t t-esc="f.name"/>)
-                    </option>
+                                <t t-foreach="state.productFields" t-as="f" t-key="f.name">
+                                    <option t-att-value="f.name">
+                                        <t t-esc="f.label"/>
+                                        (<t t-esc="f.name"/>)
+                                    </option>
+                                </t>
+                            </select>
+                        </div>
+
+                        <t t-if="state.popup.type === 'column'">
+                            <button class="btn btn-sm btn-outline-primary w-100 mb-1"
+                                    t-on-click="onAddColumnClick">
+                                Add Column
+                            </button>
+
+                            <button class="btn btn-sm btn-outline-danger w-100"
+                                    t-on-click="onRemoveColumnClick">
+                                Remove Column
+                            </button>
+                        </t>
+                    </div>
                 </t>
-            </select>
-        </div>
-
-        <t t-if="state.popup.type === 'column'">
-            <button class="btn btn-sm btn-outline-primary w-100 mb-1"
-                    t-on-click="onAddColumnClick">
-                Add Column
-            </button>
-
-            <button class="btn btn-sm btn-outline-danger w-100"
-                    t-on-click="onRemoveColumnClick">
-                Remove Column
-            </button>
-        </t>
-    </div>
-</t>
             </div>
         </div>
     </t>

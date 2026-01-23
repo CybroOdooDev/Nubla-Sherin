@@ -1,7 +1,7 @@
 /** @odoo-module **/
-import {registry} from "@web/core/registry";
-import {Component, useState, useRef, onMounted, onWillStart} from "@odoo/owl";
-import {useService} from "@web/core/utils/hooks";
+import { registry } from "@web/core/registry";
+import { Component, useState, useRef, onMounted, onWillStart } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 
 
@@ -21,11 +21,11 @@ class PosReceiptLayoutClientAction extends Component {
             this.props.action?.context?.active_id;
         this.dialog = useService("dialog");
         this.lastClickedTable = null;
-    this.lastClickedColumnIndex = null;
+        this.lastClickedColumnIndex = null;
 
 
         this.receipt_id = this.props.action?.params?.receipt_id || this.props.action?.context?.active_id;
-//        this.receipt_id = this.props.action.context.active_id;
+        //        this.receipt_id = this.props.action.context.active_id;
         this.state = useState({
             fontStyle: "Arial",
 
@@ -61,220 +61,323 @@ class PosReceiptLayoutClientAction extends Component {
         });
 
         onMounted(async () => {
-    await this.loadReceipt();
+            await this.loadReceipt();
 
+            await this.restoreSavedColumnsUniversal();
+            await this.restoreSavedColumnsMaster();
 
-    this.mediumEditor();
-    this.preventPartialSelection();
-    this.allowSpace();
-    this.enableColumnDropZones();
-    this.restoreSavedColumns();
+            this.mediumEditor();
+            this.preventPartialSelection();
+            this.allowSpace();
 
-    if (this.state.enableQr) {
-        this.renderReceiptQr();
-    }
-    });
-
-
-    }
-
-
-
-
-
-
-    renderReceiptQr() {
-    if (!this.state.enableQr) return;
-
-    const editor = this.receiptContentRef.el;
-    if (!editor) return;
-
-    const wrapper = editor.querySelector(".receipt-qr-wrapper");
-    if (!wrapper) return;
-
-    wrapper.querySelector(".receipt-qr-placeholder")?.remove();
-
-    const templateImg = wrapper.querySelector(".receipt-qr-template img");
-    if (!templateImg) return;
-
-    const qrDiv = document.createElement("div");
-    qrDiv.className = "receipt-qr-placeholder";
-    qrDiv.style.textAlign = "center";
-    qrDiv.style.marginTop = "12px";
-
-    const img = templateImg.cloneNode(true);
-    img.style.width = "120px";
-    img.style.height = "120px";
-
-    if (!this.props.data?.custom_qr_image) {
-        const tempContainer = document.createElement('div');
-        tempContainer.style.position = 'absolute';
-        tempContainer.style.left = '-9999px';  // Hide off-screen
-        tempContainer.style.width = '120px';
-        tempContainer.style.height = '120px';
-        document.body.appendChild(tempContainer);
-
-        new QRCode(tempContainer, {
-            text: "Demo Receipt QR",
-            width: 120,
-            height: 120,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
+            if (this.state.enableQr) {
+                this.renderReceiptQr();
+            }
         });
 
-        const qrCanvas = tempContainer.querySelector('canvas');
-        const demoSrc = qrCanvas ? qrCanvas.toDataURL('image/png') : '';
-        img.setAttribute('src', demoSrc);
-
-        document.body.removeChild(tempContainer);
     }
 
-    qrDiv.appendChild(img);
-    wrapper.appendChild(qrDiv);
-}
+    async onProductFieldChange(ev) {
+        const fieldName = ev.target.value;
+        if (!fieldName) return;
 
 
-//     renderReceiptQr() {
-//     if (!this.state.enableQr) return;
-//
-//     const editor = this.receiptContentRef.el;
-//     if (!editor) return;
-//
-//     const wrapper = editor.querySelector(".receipt-qr-wrapper");
-//     if (!wrapper) return;
-//
-//     // remove existing
-//     wrapper.querySelector(".receipt-qr-placeholder")?.remove();
-//
-//     const templateImg = wrapper.querySelector(
-//         ".receipt-qr-template img"
-//     );
-//     if (!templateImg) return;
-//
-//     const qrDiv = document.createElement("div");
-//     qrDiv.className = "receipt-qr-placeholder";
-//     qrDiv.style.textAlign = "center";
-//     qrDiv.style.marginTop = "12px";
-//
-//     const img = templateImg.cloneNode(true);
-//     img.style.width = "120px";
-//     img.style.height = "120px";
-//
-//     qrDiv.appendChild(img);
-//     wrapper.appendChild(qrDiv);
-// }
+        const mockData = await this.getMockProductData([fieldName]);
+
+        this.addColumnAtIndexUniversal(fieldName, 0, mockData);
+    }
+
+    renderReceiptQr() {
+        if (!this.state.enableQr) return;
+
+        const editor = this.receiptContentRef.el;
+        if (!editor) return;
+
+        const wrapper = editor.querySelector(".receipt-qr-wrapper");
+        if (!wrapper) return;
+
+        wrapper.querySelector(".receipt-qr-placeholder")?.remove();
+
+        const templateImg = wrapper.querySelector(".receipt-qr-template img");
+        if (!templateImg) return;
+
+        const qrDiv = document.createElement("div");
+        qrDiv.className = "receipt-qr-placeholder";
+        qrDiv.style.textAlign = "center";
+        qrDiv.style.marginTop = "12px";
+
+        const img = templateImg.cloneNode(true);
+        img.style.width = "120px";
+        img.style.height = "120px";
+
+        if (!this.props.data?.custom_qr_image) {
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.left = '-9999px';  // Hide off-screen
+            tempContainer.style.width = '120px';
+            tempContainer.style.height = '120px';
+            document.body.appendChild(tempContainer);
+
+            new QRCode(tempContainer, {
+                text: "Demo Receipt QR",
+                width: 120,
+                height: 120,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            const qrCanvas = tempContainer.querySelector('canvas');
+            const demoSrc = qrCanvas ? qrCanvas.toDataURL('image/png') : '';
+            img.setAttribute('src', demoSrc);
+
+            document.body.removeChild(tempContainer);
+        }
+
+        qrDiv.appendChild(img);
+        wrapper.appendChild(qrDiv);
+    }
 
 
 
     async restoreSavedColumns() {
-    if (!this.receipt_id) return;
-
-    const rec = await this.orm.read("pos.receipt", [this.receipt_id], ["selected_product_fields"]);
-    const fields = JSON.parse(rec[0]?.selected_product_fields || "[]");
-
-    if (!fields.length) return;
-
-    // Get mock data for preview
-    const mockData = await this.getMockProductData(fields);
-
-    const table = this.receiptContentRef.el.querySelector(".receipt-table");
-    const headerRow = table.querySelector("thead tr");
-
-    // Remove existing dynamic columns (both header and cells)
-    headerRow.querySelectorAll("th[data-field]").forEach(th => th.remove());
-    table.querySelectorAll("td[data-field]").forEach(td => td.remove());
-
-    // Add columns back with mock data
-    fields.forEach(field => {
-        this.addColumnAtIndex(field, 2, mockData);
-    });
-}
-
-async getMockProductData(fields) {
-    if (!fields.length) return [];
-
-    try {
-        // Fetch 2 sample products with the selected fields
-        const products = await this.orm.searchRead(
-            "product.product",
-            [],
-            ["name", ...fields], // Include 'name' for context
-            { limit: 2 }
-        );
-
-        console.log("Mock product data:", products);
-        return products;
-    } catch (error) {
-        console.error("Error fetching mock product data:", error);
-        return [];
-    }
-}
-
-
-
-
-
-enableColumnDropZones() {
-    const table = this.receiptContentRef.el.querySelector(".receipt-table");
-    if (!table) return;
-
-    const headers = table.querySelectorAll(
-        ".receipt-header-dropzone th"
-    );
-
-    headers.forEach((th, index) => {
-
-        // Allow drag
-        th.addEventListener("dragover", (ev) => {
-            if (ev.dataTransfer.types.includes("application/x-pos-column")) {
-                ev.preventDefault(); // REQUIRED
-                th.classList.add("column-hover");
+        try {
+            if (!this.receipt_id) {
+                console.log("No receipt_id, skipping restore");
+                return;
             }
+
+            // Wait for receipt content to load
+            let retries = 0;
+            const maxRetries = 10;
+            while (!this.receiptContentRef?.el && retries < maxRetries) {
+                console.log(`Waiting for receipt content... (${retries + 1}/${maxRetries})`);
+                await new Promise(resolve => setTimeout(resolve, 200));
+                retries++;
+            }
+
+            if (!this.receiptContentRef?.el) {
+                console.error("Receipt content not loaded after waiting");
+                return;
+            }
+
+            const isDesign3 = this.isDesign3();
+
+            if (isDesign3) {
+                console.log("Design 3 detected - using row layout restore");
+                return await this.restoreSavedColumnsDesign3();
+            }
+
+            console.log(" Table design detected - using table restore");
+
+            const rec = await this.orm.read("pos.receipt", [this.receipt_id], ["selected_product_fields"]);
+            const fields = JSON.parse(rec[0]?.selected_product_fields || "[]");
+
+            if (!fields.length) {
+                console.log("No fields to restore");
+                return;
+            }
+
+            const mockData = await this.getMockProductData(fields);
+
+            const table = this.receiptContentRef.el.querySelector(".receipt-table");
+
+            if (!table) {
+                console.error("No table found - cannot restore columns for table design");
+                return;
+            }
+
+            const headerRow = table.querySelector("thead tr");
+
+            if (!headerRow) {
+                console.error("No header row found in table");
+                return;
+            }
+
+            headerRow.querySelectorAll("th[data-field]").forEach(th => th.remove());
+            table.querySelectorAll("td[data-field]").forEach(td => td.remove());
+
+            fields.forEach(field => {
+                this.addColumnAtIndex(field, 2, mockData);
+            });
+
+            console.log("Table columns restored successfully");
+
+        } catch (error) {
+            console.error("Error restoring columns:", error);
+        }
+    }
+
+    async restoreSavedColumnsTable() {
+        if (!this.receipt_id) return;
+
+        let retries = 0;
+        while (!this.receiptContentRef?.el?.querySelector(".receipt-table") && retries < 10) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+            retries++;
+        }
+
+        const table = this.receiptContentRef.el?.querySelector(".receipt-table");
+        if (!table) {
+            console.error("Table not found");
+            return;
+        }
+
+        const rec = await this.orm.read("pos.receipt", [this.receipt_id], ["selected_product_fields"]);
+        const fields = JSON.parse(rec[0]?.selected_product_fields || "[]");
+
+        if (!fields.length) return;
+
+        const mockData = await this.getMockProductData(fields);
+
+        const headerRow = table.querySelector("thead tr");
+
+        headerRow.querySelectorAll("th[data-field]").forEach(th => th.remove());
+        table.querySelectorAll("td[data-field]").forEach(td => td.remove());
+
+        fields.forEach(field => {
+            this.addColumnAtIndex(field, 2, mockData);
         });
+    }
 
-        th.addEventListener("dragleave", () => {
-            th.classList.remove("column-hover");
-        });
+    async restoreSavedColumnsMaster() {
+        try {
+            await new Promise(resolve => setTimeout(resolve, 100));
 
-        // Handle drop
-        th.addEventListener("drop", (ev) => {
-            ev.preventDefault();
-            th.classList.remove("column-hover");
+            if (this.isDesign3()) {
+                console.log("Restoring Design 3 columns...");
+                await this.restoreSavedColumnsDesign3();
+            } else {
+                console.log("Restoring table columns...");
+                await this.restoreSavedColumnsTable();
+            }
+        } catch (error) {
+            console.error("Error in master restore:", error);
+        }
+    }
+    async getMockProductData(fields = []) {
+        if (!Array.isArray(fields) || fields.length === 0) {
+            console.warn("getMockProductData: no fields provided, using fallback");
 
-            const fieldName = ev.dataTransfer.getData(
-                "application/x-pos-column"
+            return [{
+                name: "Sample Product",
+                qty: 1,
+                price: 0,
+            }];
+        }
+
+        try {
+            const products = await this.orm.searchRead(
+                "product.product",
+                [],
+                ["name", ...fields],
+                { limit: 2 }
             );
 
-            if (!fieldName) return;
-
-            this.addColumnAtIndex(fieldName, index);
-        });
-    });
-}
-
-        showPopup(type, x, y, colIndex) {
-    this.closePopup();
-
-    this.currentDialog = this.dialog.add(
-        this.constructor.components.ColumnCellPopup,
-        {
-            type,
-            colIndex,
-            table: this.lastClickedTable,
-            cell: this.lastClickedCell,
-            x,
-            y,
+            console.log("Mock product data:", products);
+            return products;
+        } catch (error) {
+            console.error("Error fetching mock product data:", error);
+            return [];
         }
-    );
-}
-
-closePopup() {
-    if (this.currentDialog) {
-        this.currentDialog.close();
-        this.currentDialog = null;
     }
-}
+
+
+
+
+
+    enableColumnDropZones() {
+        const table = this.receiptContentRef.el.querySelector(".receipt-table");
+
+        if (this.isDesign3()) {
+            this.enableColumnDropZonesDesign3();
+            return;
+        }
+
+        if (!table) return;
+
+        const headers = table.querySelectorAll(
+            ".receipt-header-dropzone th"
+        );
+
+        headers.forEach((th, index) => {
+
+            // Allow drag
+            th.addEventListener("dragover", (ev) => {
+                if (ev.dataTransfer.types.includes("application/x-pos-column")) {
+                    ev.preventDefault(); // REQUIRED
+                    th.classList.add("column-hover");
+                }
+            });
+
+            th.addEventListener("dragleave", () => {
+                th.classList.remove("column-hover");
+            });
+
+            // Handle drop
+            th.addEventListener("drop", (ev) => {
+                ev.preventDefault();
+                th.classList.remove("column-hover");
+
+                const fieldName = ev.dataTransfer.getData(
+                    "application/x-pos-column"
+                );
+
+                if (!fieldName) return;
+
+                this.addColumnAtIndex(fieldName, index);
+            });
+        });
+    }
+
+    enableColumnDropZonesDesign3() {
+        const dropzones = this.receiptContentRef.el.querySelectorAll(".receipt-header-dropzone");
+        if (!dropzones) return;
+
+        dropzones.forEach(zone => {
+            zone.addEventListener("dragover", (ev) => {
+                if (ev.dataTransfer.types.includes("application/x-pos-column")) {
+                    ev.preventDefault();
+                    zone.style.backgroundColor = "rgba(0, 123, 255, 0.1)";
+                    zone.style.border = "2px dashed #007bff";
+                }
+            });
+
+            zone.addEventListener("dragleave", () => {
+                zone.style.backgroundColor = "";
+                zone.style.border = "2px dashed #bbb";
+            });
+
+            zone.addEventListener("drop", (ev) => {
+                zone.style.backgroundColor = "";
+                zone.style.border = "2px dashed #bbb";
+                this.onColumnDropDesign3(ev);
+            });
+        });
+    }
+
+    showPopup(type, x, y, colIndex) {
+        this.closePopup();
+
+        this.currentDialog = this.dialog.add(
+            this.constructor.components.ColumnCellPopup,
+            {
+                type,
+                colIndex,
+                table: this.lastClickedTable,
+                cell: this.lastClickedCell,
+                x,
+                y,
+            }
+        );
+    }
+
+    closePopup() {
+        if (this.currentDialog) {
+            this.currentDialog.close();
+            this.currentDialog = null;
+        }
+    }
 
 
     async getPosConfig() {
@@ -282,59 +385,55 @@ closePopup() {
             "pos.config",
             [],
             ["id", "selected_product_fields"],
-            {limit: 1}
+            { limit: 1 }
         );
         return config;
     }
 
     async loadPosConfigId() {
-    if (!this.receipt_id) {
-        this.notification.add(
-            "Receipt ID not found. Please open this from a receipt record.",
-            { type: "danger" }
+        if (!this.receipt_id) {
+            this.notification.add(
+                "Receipt ID not found. Please open this from a receipt record.",
+                { type: "danger" }
+            );
+            return;
+        }
+
+        const configs = await this.orm.searchRead(
+            "pos.config",
+            [["receipt_design_id", "=", this.receipt_id]],
+            ["id"],
+            { limit: 1 }
         );
-        return;
+
+        const config = configs[0];
+
+        if (!config) {
+            this.notification.add(
+                "POS Config not found for this receipt. Please link a POS configuration.",
+                { type: "warning" }
+            );
+            return;
+        }
+
+        this.config_id = config.id;
+        console.log("POS CONFIG ID:", this.config_id);
     }
-
-    const configs = await this.orm.searchRead(
-        "pos.config",
-        [["receipt_design_id", "=", this.receipt_id]],
-        ["id"],
-        { limit: 1 }
-    );
-
-    const config = configs[0];
-
-    if (!config) {
-        this.notification.add(
-            "POS Config not found for this receipt. Please link a POS configuration.",
-            { type: "warning" }
-        );
-        return;
-    }
-
-    this.config_id = config.id;
-    console.log("POS CONFIG ID:", this.config_id);
-}
 
 
     async loadEnableQr() {
-    const [config] = await this.orm.read(
-        "pos.config",
-        [this.config_id],
-        ["enable_qr", "enable_qr_section"]
-    );
+        const [config] = await this.orm.read(
+            "pos.config",
+            [this.config_id],
+            ["enable_qr", "enable_qr_section"]
+        );
 
-    this.state.enableQr = !!config.enable_qr;
-    this.state.showSection = !!config.enable_qr_section;
+        this.state.enableQr = !!config.enable_qr;
+        this.state.showSection = !!config.enable_qr_section;
 
-    console.log("Loaded enable_qr:", this.state.enableQr);
-    console.log("Loaded enable_qr_section:", this.state.showSection);
-}
-
-
-
-
+        console.log("Loaded enable_qr:", this.state.enableQr);
+        console.log("Loaded enable_qr_section:", this.state.showSection);
+    }
 
     async mediumEditor() {
         this.editor = new MediumEditor(this.receiptContentRef.el, {
@@ -420,6 +519,7 @@ closePopup() {
             );
         }
         this.receiptContentRef.el.innerHTML = html;
+        this.enableColumnDropZones();
     }
 
     triggerImageUpload() {
@@ -435,7 +535,7 @@ closePopup() {
             this.state.receipt = this.receiptContentRef.el.innerHTML;
             this.state.prev_logo = this.state.logo;
             this.state.prev_receipt = this.state.receipt;
-            await this.orm.write("pos.receipt", [this.receipt_id], {logo: base64});
+            await this.orm.write("pos.receipt", [this.receipt_id], { logo: base64 });
             this.state.logo = base64;
             await this.loadReceipt();
             this.notification.add("Receipt Logo Updated!", {
@@ -446,26 +546,27 @@ closePopup() {
     }
 
     async saveEditedReceipt() {
-    this.state.receipt = this.receiptContentRef.el.innerHTML;
+        this.state.receipt = this.receiptContentRef.el.innerHTML;
 
-    await this.orm.write("pos.receipt", [this.receipt_id], {
-        design_receipt: this.state.receipt,
-        design_receipt_font_style: this.state.fontStyle,
-        logo: this.state.logo,
-    });
+        await this.orm.write("pos.receipt", [this.receipt_id], {
+            design_receipt: this.state.receipt,
+            design_receipt_font_style: this.state.fontStyle,
+            logo: this.state.logo,
+        });
+        console.log("FONTSTYLE",this.state.fontStyle)
 
-    await this.orm.write("pos.config", [this.config_id], {
-        enable_qr: !!this.state.enableQr,
-        enable_qr_section: !!this.state.showSection,
+        await this.orm.write("pos.config", [this.config_id], {
+            enable_qr: !!this.state.enableQr,
+            enable_qr_section: !!this.state.showSection,
 
-    });
+        });
 
-    this.notification.add("Receipt Successfully Updated!", {
-        type: "success",
-    });
+        this.notification.add("Receipt Successfully Updated!", {
+            type: "success",
+        });
 
-    setTimeout(() => window.location.reload(), 800);
-}
+        setTimeout(() => window.location.reload(), 800);
+    }
 
 
 
@@ -505,6 +606,7 @@ closePopup() {
     }
 
     onDragStart(ev) {
+        console.log("DARG!!!!")
         const field = `[[${ev.target.dataset.field}]]`;
         ev.dataTransfer.setData("text/plain", field);
         ev.dataTransfer.effectAllowed = "copy";
@@ -532,453 +634,320 @@ closePopup() {
 
     onDragEnd() {
         this.receiptContentRef.el.classList.remove("dragging");
+        console.log("DAGGEDEND!!!!1")
         this.receiptContentRef.el.classList.remove("drop-highlight");
     }
 
-   onDrop(ev) {
-    ev.preventDefault();
+    onDrop(ev) {
+        ev.preventDefault();
+        console.log("DROP!@#$")
 
 
-    if (ev.dataTransfer.types.includes("application/x-pos-column")) {
-        return;
-    }
-    if (ev.target.closest(".no-drop-zone, .receipt-header")) {
-        console.warn("Drop blocked in receipt header");
-        return;
-    }
-
-    const editor = this.receiptContentRef.el;
-
-
-    const fieldText = ev.dataTransfer.getData("text/plain");
-    if (!fieldText) return;
-
-    const span = document.createElement("span");
-    span.textContent = fieldText;
-    span.classList.add("placeholder-span");
-
-    const placeholder = ev.target.closest(".placeholder-span");
-    if (placeholder) {
-        placeholder.insertAdjacentElement("afterend", span);
-        return;
-    }
-
-    let range = null;
-    if (document.caretRangeFromPoint) {
-        range = document.caretRangeFromPoint(ev.clientX, ev.clientY);
-    } else if (document.caretPositionFromPoint) {
-        const pos = document.caretPositionFromPoint(ev.clientX, ev.clientY);
-        if (pos?.offsetNode) {
-            range = document.createRange();
-            range.setStart(pos.offsetNode, pos.offset);
-            range.collapse(true);
+        if (ev.dataTransfer.types.includes("application/x-pos-column")) {
+            return;
         }
-    }
-
-    if (range) {
-        range.insertNode(span);
-    } else {
-        const targetArea = editor.querySelector(".drop-area");
-        if (targetArea) {
-            targetArea.appendChild(span);
+        if (ev.target.closest(".no-drop-zone, .receipt-header")) {
+            console.warn("Drop blocked in receipt header");
+            return;
         }
+
+
+        const editor = this.receiptContentRef.el;
+        console.log("EDITOR", editor)
+
+
+        const fieldText = ev.dataTransfer.getData("text/plain");
+        if (!fieldText) return;
+
+        const span = document.createElement("span");
+        span.textContent = fieldText;
+        span.classList.add("placeholder-span");
+
+        const placeholder = ev.target.closest(".placeholder-span");
+        if (placeholder) {
+            placeholder.insertAdjacentElement("afterend", span);
+            return;
+        }
+
+        let range = null;
+        if (document.caretRangeFromPoint) {
+            range = document.caretRangeFromPoint(ev.clientX, ev.clientY);
+        } else if (document.caretPositionFromPoint) {
+            const pos = document.caretPositionFromPoint(ev.clientX, ev.clientY);
+            if (pos?.offsetNode) {
+                range = document.createRange();
+                range.setStart(pos.offsetNode, pos.offset);
+                range.collapse(true);
+            }
+        }
+
+        if (range) {
+            range.insertNode(span);
+        } else {
+            const targetArea = editor.querySelector(".drop-area");
+            if (targetArea) {
+                targetArea.appendChild(span);
+            }
+        }
+
+        this.receiptContentRef.el.classList.remove("dragging");
+        this.receiptContentRef.el.classList.remove("drop-highlight");
+
+        span.classList.add("added");
+        setTimeout(() => span.classList.remove("added"), 400);
     }
-
-    this.receiptContentRef.el.classList.remove("dragging");
-    this.receiptContentRef.el.classList.remove("drop-highlight");
-
-    span.classList.add("added");
-    setTimeout(() => span.classList.remove("added"), 400);
-}
 
 
     onColumnDragStart(ev) {
-    ev.stopPropagation();
-    ev.dataTransfer.setData(
-        "application/x-pos-column",
-        ev.target.dataset.field
-    );
-    ev.dataTransfer.effectAllowed = "copy";
-    this.receiptContentRef.el.classList.add("column-dragging");
-}
-// addColumnAtIndex(fieldName, index) {
-//     const table = this.receiptContentRef.el.querySelector(".receipt-table");
-//     if (!table) return;
-//
-//     const headerRow = table.querySelector("thead tr");
-//
-//     if (headerRow.querySelector(`[data-field="${fieldName}"]`)) {
-//         this.notification.add("Column already added", { type: "warning" });
-//         return;
-//     }
-//
-//     if (headerRow.querySelectorAll("th[data-field]").length >= 1) {
-//         this.notification.add("Only one column is allowed", { type: "warning" });
-//         return;
-//     }
-//
-//     const th = document.createElement("th");
-//     th.dataset.field = fieldName;
-//     th.textContent = fieldName.replaceAll("_", " ").toUpperCase();
-//     th.style.textAlign = "center";
-//     th.style.width = "15%";
-//
-//     headerRow.insertBefore(th, headerRow.children[index + 1] || null);
-//
-//     this.saveSelectedColumns();
-//
-//     // Re-render designer preview
-//     this.render();
-// }
-
-
-
-//
-//addColumnAtIndex(fieldName, index) {
-//    const table = this.receiptContentRef.el.querySelector(".receipt-table");
-//    if (!table) return;
-//
-//    const headerRow = table.querySelector("thead tr");
-//    const bodyRows = table.querySelectorAll("tbody tr");
-//
-//    /* ❌ Prevent duplicate header */
-//    if (headerRow.querySelector(`[data-field="${fieldName}"]`)) {
-//        this.notification.add("Column already added", { type: "warning" });
-//        return;
-//    }
-//
-//
-//    const existingDynamicColumns = headerRow.querySelectorAll("th[data-field]");
-//    if (existingDynamicColumns.length >= 1) {
-//        this.notification.add(
-//            "Only one additional column is allowed. Please remove the existing column first.",
-//            { type: "warning" }
-//        );
-//        return;
-//    }
-//
-//    const th = document.createElement("th");
-//    th.dataset.field = fieldName;
-//    th.textContent = fieldName
-//    .replaceAll("_", " ")
-//    .toLowerCase()
-//    .replace(/\b\w/g, c => c.toUpperCase());
-//
-//    th.style.textAlign = "center";
-//    th.style.width = "15%";
-//    th.style.padding = "4px";
-//    th.style.whiteSpace = "nowrap";
-//    th.style.fontFamily = "inherit";
-//
-//
-//    headerRow.insertBefore(th, headerRow.children[index + 1] || null);
-//
-//    const lines =
-//        this.props.lines ||
-//        this.props.order?.get_orderlines?.() ||
-//        [];
-//
-//    bodyRows.forEach((row, rowIndex) => {
-//        if (row.querySelector(`td[data-field="${fieldName}"]`)) return;
-//
-//        const td = document.createElement("td");
-//        td.dataset.field = fieldName;
-//        td.style.padding = "4px";
-//        td.style.textAlign = "center";
-//        td.style.width = "15%";
-//        td.style.whiteSpace = "nowrap";
-//        td.style.verticalAlign = "top";
-//        td.style.fontFamily = "inherit";
-//
-//
-//        const span = document.createElement("span");
-//        span.className = "dynamic-cell";
-//        span.style.display = "inline-block";
-//        span.style.width = "100%";
-//        span.style.textAlign = "center";
-//        span.style.fontFamily = "inherit";
-//
-//        const line = lines[rowIndex];
-//        let value = "";
-//
-//        if (line && line._dynamicValues && fieldName in line._dynamicValues) {
-//            value = line._dynamicValues[fieldName];
-//        }
-//
-//        span.textContent = value || "";
-//        td.appendChild(span);
-//        row.insertBefore(td, row.children[index + 1] || null);
-//    });
-//
-//    this.saveSelectedColumns();
-//}
-//
-addColumnAtIndex(fieldName, index, mockData = null) {
-    const table = this.receiptContentRef.el.querySelector(".receipt-table");
-    if (!table) return;
-
-    const headerRow = table.querySelector("thead tr");
-    const bodyRows = table.querySelectorAll("tbody tr");
-
-    // Prevent duplicate header
-    if (headerRow.querySelector(`[data-field="${fieldName}"]`)) {
-        this.notification.add("Column already added", { type: "warning" });
-        return;
-    }
-
-    const existingDynamicColumns = headerRow.querySelectorAll("th[data-field]");
-    if (existingDynamicColumns.length >= 1) {
-        this.notification.add(
-            "Only one additional column is allowed. Please remove the existing column first.",
-            { type: "warning" }
+        ev.stopPropagation();
+        ev.dataTransfer.setData(
+            "application/x-pos-column",
+            ev.target.dataset.field
         );
-        return;
+        ev.dataTransfer.effectAllowed = "copy";
+        this.receiptContentRef.el.classList.add("column-dragging");
     }
 
-    // Adjust static column widths
-    const staticHeaders = headerRow.querySelectorAll("th:not([data-field])");
-    if (staticHeaders.length >= 3) {
-        staticHeaders[0].style.width = "35%"; // Product
-        staticHeaders[1].style.width = "12%"; // Qty
-        staticHeaders[2].style.width = "18%"; // Amount
-    }
+    addColumnAtIndex(fieldName, index, mockData = null) {
+        const table = this.receiptContentRef.el.querySelector(".receipt-table");
+        if (!table) return;
 
-    // Add header
-    const th = document.createElement("th");
-    th.dataset.field = fieldName;
+        const headerRow = table.querySelector("thead tr");
+        const bodyRows = table.querySelectorAll("tbody tr");
 
-    const fieldObj = this.state.productFields?.find(f => f.name === fieldName);
-    th.textContent = fieldObj?.label || fieldName
-        .replaceAll("_", " ")
-        .toLowerCase()
-        .replace(/\b\w/g, c => c.toUpperCase());
-
-    th.style.textAlign = "center";
-    th.style.width = "35%";
-    th.style.padding = "4px";
-    th.style.whiteSpace = "nowrap";
-    th.style.fontFamily = "inherit";
-    th.style.overflow = "visible";
-    th.style.fontSize = "12px";
-
-
-    headerRow.appendChild(th);
-
-    // Add cells to each row
-    bodyRows.forEach((row, rowIndex) => {
-        // Adjust static cell widths
-        const staticCells = row.querySelectorAll("td:not([data-field])");
-        if (staticCells.length >= 3) {
-            staticCells[0].style.width = "35%";
-            staticCells[1].style.width = "12%";
-            staticCells[2].style.width = "18%";
+        // Prevent duplicate header
+        if (headerRow.querySelector(`[data-field="${fieldName}"]`)) {
+            this.notification.add("Column already added", { type: "warning" });
+            return;
         }
 
-        // Skip if cell already exists
-        if (row.querySelector(`td[data-field="${fieldName}"]`)) return;
+        const existingDynamicColumns = headerRow.querySelectorAll("th[data-field]");
+        if (existingDynamicColumns.length >= 1) {
+            this.notification.add(
+                "Only one additional column is allowed. Please remove the existing column first.",
+                { type: "warning" }
+            );
+            return;
+        }
 
-        const td = document.createElement("td");
-        td.dataset.field = fieldName;
-        td.style.padding = "4px";
-        td.style.textAlign = "center";
-        td.style.width = "35%";
-        td.style.whiteSpace = "nowrap";
-        td.style.verticalAlign = "top";
-        td.style.fontFamily = "inherit";
-        td.style.overflow = "visible";
+        // Adjust static column widths
+        const staticHeaders = headerRow.querySelectorAll("th:not([data-field])");
+        if (staticHeaders.length >= 3) {
+            staticHeaders[0].style.width = "35%"; // Product
+            staticHeaders[1].style.width = "12%"; // Qty
+            staticHeaders[2].style.width = "18%"; // Amount
+        }
 
-        let value = "";
+        const th = document.createElement("th");
+        th.dataset.field = fieldName;
 
-        // **DESIGNER MODE: Use mock data**
-        if (mockData && Array.isArray(mockData) && mockData[rowIndex]) {
-            value = mockData[rowIndex][fieldName] || "";
+        const fieldObj = this.state.productFields?.find(f => f.name === fieldName);
+        th.textContent = fieldObj?.label || fieldName
+            .replaceAll("_", " ")
+            .toLowerCase()
+            .replace(/\b\w/g, c => c.toUpperCase());
 
-            // Format based on field type
-            if (typeof value === 'number') {
-                value = value.toFixed(2);
-            } else if (Array.isArray(value)) {
-                value = value[1] || value[0] || ""; // Many2one field [id, name]
-            } else if (typeof value === 'boolean') {
-                value = value ? 'Yes' : 'No';
+        th.style.textAlign = "center";
+        th.style.width = "35%";
+        th.style.padding = "4px";
+        th.style.whiteSpace = "nowrap";
+        th.style.fontFamily = "inherit";
+        th.style.overflow = "visible";
+        th.style.fontSize = "12px";
+
+
+        headerRow.appendChild(th);
+
+        bodyRows.forEach((row, rowIndex) => {
+            const staticCells = row.querySelectorAll("td:not([data-field])");
+            if (staticCells.length >= 3) {
+                staticCells[0].style.width = "35%";
+                staticCells[1].style.width = "12%";
+                staticCells[2].style.width = "18%";
             }
-        }
-        // **POS MODE: Use _dynamicValues from orderlines**
-        else {
-            const lines = this.props.orderlines || this.props.lines || [];
-            const line = lines[rowIndex];
 
-            if (line && line._dynamicValues && fieldName in line._dynamicValues) {
-                value = line._dynamicValues[fieldName];
+            if (row.querySelector(`td[data-field="${fieldName}"]`)) return;
+
+            const td = document.createElement("td");
+            td.dataset.field = fieldName;
+            td.style.padding = "4px";
+            td.style.textAlign = "center";
+            td.style.width = "35%";
+            td.style.whiteSpace = "nowrap";
+            td.style.verticalAlign = "top";
+            td.style.fontFamily = "inherit";
+            td.style.overflow = "visible";
+
+            let value = "";
+
+            if (mockData && Array.isArray(mockData) && mockData[rowIndex]) {
+                value = mockData[rowIndex][fieldName] || "";
+
+                // Format based on field type
+                if (typeof value === 'number') {
+                    value = value.toFixed(2);
+                } else if (Array.isArray(value)) {
+                    value = value[1] || value[0] || ""; // Many2one field [id, name]
+                } else if (typeof value === 'boolean') {
+                    value = value ? 'Yes' : 'No';
+                }
             }
-        }
 
-        td.textContent = " " || " ";
-        row.appendChild(td);
-    });
+            else {
+                const lines = this.props.orderlines || this.props.lines || [];
+                const line = lines[rowIndex];
 
-    this.saveSelectedColumns();
-}
+                if (line && line._dynamicValues && fieldName in line._dynamicValues) {
+                    value = line._dynamicValues[fieldName];
+                }
+            }
 
-saveSelectedColumns() {
-    const table = this.receiptContentRef.el.querySelector(".receipt-table");
-    if (!table) return;
-
-    const headerRow = table.querySelector("thead tr");
-    if (!headerRow) return;
-
-    const fields = [];
-
-    [...headerRow.children].forEach(th => {
-        const field = th.dataset.field;
-        if (field) {
-            fields.push(field);
-        }
-    });
-
-    this.selectedProductFields = fields;
-
-    if (this.receipt_id) {
-        this.orm.write("pos.receipt", [this.receipt_id], {
-            selected_product_fields: JSON.stringify(fields),
+            td.textContent = " " || " ";
+            row.appendChild(td);
         });
+
+        this.saveSelectedColumns();
     }
 
-    console.log("Saved receipt columns:", fields);
-}
+    saveSelectedColumns() {
+        const table = this.receiptContentRef.el.querySelector(".receipt-table");
+        if (!table) return;
+
+        const headerRow = table.querySelector("thead tr");
+        if (!headerRow) return;
+
+        const fields = [];
+
+        [...headerRow.children].forEach(th => {
+            const field = th.dataset.field;
+            if (field) {
+                fields.push(field);
+            }
+        });
+
+        this.selectedProductFields = fields;
+
+        if (this.receipt_id) {
+            this.orm.write("pos.receipt", [this.receipt_id], {
+                selected_product_fields: JSON.stringify(fields),
+            });
+        }
+
+        console.log("Saved receipt columns:", fields);
+    }
 
 
-
-
-
-
-//    insertDemoQR() {
-//	    const editor = this.receiptContentRef.el;
-//
-//	    // Prevent multiple QR codes
-//	    if (editor.querySelector(".qr-placeholder")) {
-//		this.notification.add("A QR code already exists!", { type: "warning" });
-//		return;
-//	    }
-//	    let targetArea = editor.querySelector(".qrArea")
-//
-//	    // Create wrapper
-//	    const qrDiv = document.createElement("div");
-//	    qrDiv.classList.add("qr-placeholder");
-//	    qrDiv.style.textAlign = "center";
-//	    qrDiv.style.marginTop = "10px";
-//
-//	    // Create inner div for QR generation
-//	    const qrBox = document.createElement("div");
-//	    qrBox.id = "qr_" + Date.now();  // unique ID
-//	    qrDiv.appendChild(qrBox);
-//
-//	    // Add to editor
-//	    targetArea.appendChild(qrDiv);
-//
-//	    new QRCode(qrBox, {
-//		text: "Demo QR",
-//		width: 120,
-//		height: 120,
-//	    });
-//
-//	}
     showInput() {
         this.state.showSection = true;
         this.state.showSection1 = false;
     }
 
 
-  submitValue() {
-    if (!this.state.showSection) return;
+    submitValue() {
+        if (!this.state.showSection) return;
 
-    const value = this.inputRef.el?.value?.trim();
-    if (!value) {
-        this.notification.add("Please enter a value!", { type: "warning" });
-        return;
+        const value = this.inputRef.el?.value?.trim();
+        if (!value) {
+            this.notification.add("Please enter a value!", { type: "warning" });
+            return;
+        }
+
+        const editor = this.receiptContentRef.el;
+        const targetArea = editor?.querySelector(".qrArea");
+        if (!targetArea) return;
+
+        // ❌ DO NOT touch receipt QR
+        targetArea.querySelector(".custom-qr-placeholder")?.remove();
+
+        const qrDiv = document.createElement("div");
+        qrDiv.className = "custom-qr-placeholder";
+        qrDiv.style.textAlign = "center";
+
+        const qrBox = document.createElement("div");
+        qrDiv.appendChild(qrBox);
+        targetArea.appendChild(qrDiv);
+
+        new QRCode(qrBox, {
+            text: value,
+            width: 120,
+            height: 120,
+        });
     }
 
-    const editor = this.receiptContentRef.el;
-    const targetArea = editor?.querySelector(".qrArea");
-    if (!targetArea) return;
 
-    // ❌ DO NOT touch receipt QR
-    targetArea.querySelector(".custom-qr-placeholder")?.remove();
+    onToggleQr(ev) {
+        const checked = ev.target.checked;
+        const editor = this.receiptContentRef.el;
+        const target = editor?.querySelector(".qrArea");
 
-    const qrDiv = document.createElement("div");
-    qrDiv.className = "custom-qr-placeholder";
-    qrDiv.style.textAlign = "center";
+        if (!checked) {
+            target?.querySelector(".custom-qr-placeholder")?.remove();
+            return;
+        }
 
-    const qrBox = document.createElement("div");
-    qrDiv.appendChild(qrBox);
-    targetArea.appendChild(qrDiv);
-
-    new QRCode(qrBox, {
-        text: value,
-        width: 120,
-        height: 120,
-    });
-}
-
-
-onToggleQr(ev) {
-    const checked = ev.target.checked;
-    const editor = this.receiptContentRef.el;
-    const target = editor?.querySelector(".qrArea");
-
-    if (!checked) {
-        target?.querySelector(".custom-qr-placeholder")?.remove();
-        return;
+        this.submitValue(); // recreate URL QR
     }
 
-    this.submitValue(); // recreate URL QR
-}
 
 
+    onToggleReceiptQr(ev) {
+        this.state.enableQr = ev.target.checked;
 
-onToggleReceiptQr(ev) {
-    this.state.enableQr = ev.target.checked;
+        const editor = this.receiptContentRef.el;
+        const wrapper = editor?.querySelector(".receipt-qr-wrapper");
+        if (!wrapper) return;
 
-    const editor = this.receiptContentRef.el;
-    const wrapper = editor?.querySelector(".receipt-qr-wrapper");
-    if (!wrapper) return;
+        wrapper.querySelector(".receipt-qr-placeholder")?.remove();
 
-    wrapper.querySelector(".receipt-qr-placeholder")?.remove();
-
-    if (this.state.enableQr) {
-        this.renderReceiptQr();
-    }
-}
-
-
-   async onReceiptClick(ev) {
-    if (this.receiptContentRef.el.classList.contains("column-dragging")) {
-        return;
+        if (this.state.enableQr) {
+            this.renderReceiptQr();
+        }
     }
 
-    const table = ev.target.closest("table");
-    if (!table) return;
 
-    const th = ev.target.closest("th");
-    if (!th) return;
+    async onReceiptClick(ev) {
+        if (this.receiptContentRef.el.classList.contains("column-dragging")) {
+            return;
+        }
 
-    const colIndex = Array.from(th.parentNode.children).indexOf(th);
-    const fieldName = th?.dataset?.field;
+        if (this.isDesign3()) {
+            const fieldEl = ev.target.closest(".design3-row-layout [data-field]");
+            if (fieldEl) {
+                const fieldName = fieldEl.dataset.field;
+                this.dialog.add(ConfirmationDialog, {
+                    title: "Remove Field",
+                    body: `Remove field "${fieldName}"?`,
+                    confirm: () => this.removeColumnDesign3(fieldName),
+                    cancel: () => { },
+                });
+            }
+            return;
+        }
 
-    if (!fieldName || colIndex < 3) {
-        this.notification.add("Cannot remove this column.", {type: "warning"});
-        return;
+        const table = ev.target.closest("table");
+        if (!table) return;
+
+        const th = ev.target.closest("th");
+        if (!th) return;
+
+        const colIndex = Array.from(th.parentNode.children).indexOf(th);
+        const fieldName = th?.dataset?.field;
+
+        if (!fieldName || colIndex < 3) {
+            this.notification.add("Cannot remove this column.", { type: "warning" });
+            return;
+        }
+
+        this.lastClickedTable = table;
+        this.lastClickedColumnIndex = colIndex;
+
+        this.dialog.add(ConfirmationDialog, {
+            title: "Remove Column",
+            body: `Remove column "${fieldName}"?`,
+            confirm: () => this.onRemoveColumnClick(colIndex),
+            cancel: () => { },
+        });
     }
-
-    this.lastClickedTable = table;
-    this.lastClickedColumnIndex = colIndex;
-
-    this.dialog.add(ConfirmationDialog, {
-        title: "Remove Column",
-        body: `Remove column "${fieldName}"?`,
-        confirm: () => this.onRemoveColumnClick(colIndex),
-        cancel: () => {},
-    });
-}
 
 
 
@@ -1002,15 +971,15 @@ onToggleReceiptQr(ev) {
         console.log("Selected field:", fieldName);
 
         if (!fieldName) {
-            this.notification.add("Please select a field.", {type: "warning"});
+            this.notification.add("Please select a field.", { type: "warning" });
             return;
         }
         if (!this.lastClickedTable) {
-            this.notification.add("Click a table first.", {type: "danger"});
+            this.notification.add("Click a table first.", { type: "danger" });
             return;
         }
         if (!this.receipt_id) {
-            this.notification.add("Receipt ID not found", {type: "danger"});
+            this.notification.add("Receipt ID not found", { type: "danger" });
             return;
         }
 
@@ -1084,11 +1053,11 @@ onToggleReceiptQr(ev) {
                 selected_product_fields: JSON.stringify(selectedFields),
             }])
             .then(() => {
-                this.notification.add("Design saved successfully!", {type: "success"});
+                this.notification.add("Design saved successfully!", { type: "success" });
             })
             .catch((error) => {
                 console.error("Save error:", error);
-                this.notification.add("Failed to save", {type: "danger"});
+                this.notification.add("Failed to save", { type: "danger" });
             });
     }
 
@@ -1103,57 +1072,57 @@ onToggleReceiptQr(ev) {
 
         return Array.from(fields);
     }
-async onRemoveColumnClick(colIndex = null) {
-    if (!this.lastClickedTable) {
-        this.notification.add("No table selected.", { type: "danger" });
-        return;
+    async onRemoveColumnClick(colIndex = null) {
+        if (!this.lastClickedTable) {
+            this.notification.add("No table selected.", { type: "danger" });
+            return;
+        }
+
+        const table = this.lastClickedTable;
+        const theadRow = table.querySelector("thead tr");
+        const bodyRows = table.querySelectorAll("tbody tr");
+
+        const STATIC_COL_COUNT = 3; // Product, Qty, Amount
+        const columnIndex = colIndex ?? this.lastClickedColumnIndex;
+
+        if (columnIndex == null || columnIndex < STATIC_COL_COUNT) {
+            this.notification.add("You cannot remove default columns.", { type: "warning" });
+            return;
+        }
+
+        const th = theadRow.children[columnIndex];
+        const fieldName = th?.dataset?.field;
+        if (!fieldName) return;
+
+        // Update database
+        const [receipt] = await this.orm.searchRead(
+            "pos.receipt",
+            [["id", "=", this.receipt_id]],
+            ["selected_product_fields"],
+            { limit: 1 }
+        );
+
+        let fields = JSON.parse(receipt?.selected_product_fields || "[]");
+        fields = fields.filter(f => f !== fieldName);
+
+        await this.orm.write("pos.receipt", [this.receipt_id], {
+            selected_product_fields: JSON.stringify(fields),
+        });
+
+        // Remove header
+        th.remove();
+
+        // Remove ALL cells with this field name (not just by index)
+        bodyRows.forEach(row => {
+            const cell = row.querySelector(`td[data-field="${fieldName}"]`);
+            if (cell) cell.remove();
+        });
+
+        this.notification.add(`Column "${fieldName}" removed`, { type: "success" });
+
+        this.lastClickedTable = null;
+        this.lastClickedColumnIndex = null;
     }
-
-    const table = this.lastClickedTable;
-    const theadRow = table.querySelector("thead tr");
-    const bodyRows = table.querySelectorAll("tbody tr");
-
-    const STATIC_COL_COUNT = 3; // Product, Qty, Amount
-    const columnIndex = colIndex ?? this.lastClickedColumnIndex;
-
-    if (columnIndex == null || columnIndex < STATIC_COL_COUNT) {
-        this.notification.add("You cannot remove default columns.", { type: "warning" });
-        return;
-    }
-
-    const th = theadRow.children[columnIndex];
-    const fieldName = th?.dataset?.field;
-    if (!fieldName) return;
-
-    // Update database
-    const [receipt] = await this.orm.searchRead(
-        "pos.receipt",
-        [["id", "=", this.receipt_id]],
-        ["selected_product_fields"],
-        { limit: 1 }
-    );
-
-    let fields = JSON.parse(receipt?.selected_product_fields || "[]");
-    fields = fields.filter(f => f !== fieldName);
-
-    await this.orm.write("pos.receipt", [this.receipt_id], {
-        selected_product_fields: JSON.stringify(fields),
-    });
-
-    // Remove header
-    th.remove();
-
-    // Remove ALL cells with this field name (not just by index)
-    bodyRows.forEach(row => {
-        const cell = row.querySelector(`td[data-field="${fieldName}"]`);
-        if (cell) cell.remove();
-    });
-
-    this.notification.add(`Column "${fieldName}" removed`, { type: "success" });
-
-    this.lastClickedTable = null;
-    this.lastClickedColumnIndex = null;
-}
 
 
     onInsertFieldClick() {
@@ -1193,6 +1162,425 @@ async onRemoveColumnClick(colIndex = null) {
 
         this.hidePopup();
     }
+    isDesign3() {
+        const el = this.receiptContentRef?.el;
+        if (!el) {
+            return false;
+        }
+
+        return !!el.querySelector(".design3-row-layout");
+    }
+
+
+
+    addColumnAtIndexDesign3(fieldName, index, mockData = null) {
+        try {
+            if (!this.receiptContentRef?.el) {
+                console.error("Receipt content ref not available");
+                return;
+            }
+
+            const dropzones = this.receiptContentRef.el.querySelectorAll(".receipt-header-dropzone");
+
+            if (!dropzones || dropzones.length === 0) {
+                console.warn("No dropzones found in Design 3");
+                this.notification?.add?.("This receipt design doesn't support dynamic fields", {
+                    type: "warning"
+                });
+                return;
+            }
+
+            const existing = this.receiptContentRef.el.querySelector(`.receipt-header-dropzone [data-field="${fieldName}"]`);
+            if (existing) {
+                this.notification?.add?.("Field already added", { type: "warning" });
+                return;
+            }
+
+            const existingFieldCount = this.receiptContentRef.el.querySelectorAll(".receipt-header-dropzone [data-field]").length;
+
+            if (existingFieldCount >= 3) {
+                this.notification?.add?.(
+                    "Maximum 3 additional fields allowed. Remove existing fields first.",
+                    { type: "warning" }
+                );
+                return;
+            }
+
+            const fieldObj = this.state.productFields?.find(f => f.name === fieldName);
+            const fieldLabel = fieldObj?.label || fieldName
+                .replaceAll("_", " ")
+                .toLowerCase()
+                .replace(/\b\w/g, c => c.toUpperCase());
+
+            dropzones.forEach((dropzone, rowIndex) => {
+                if (dropzone.querySelector(`[data-field="${fieldName}"]`)) {
+                    return;
+                }
+
+                const fieldDiv = document.createElement("div");
+                fieldDiv.dataset.field = fieldName;
+                fieldDiv.style.cssText = `
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                font-size: 13px;
+                margin-bottom: 6px;
+                padding: 4px 0;
+                cursor: pointer;
+            `;
+                fieldDiv.title = "Click to remove";
+
+                const labelSpan = document.createElement("span");
+                labelSpan.style.cssText = "opacity: 0.7; font-weight: 500;";
+                labelSpan.textContent = fieldLabel;
+
+                const valueSpan = document.createElement("span");
+                valueSpan.style.cssText = "font-weight: 600; text-align: right; word-break: break-word; max-width: 60%;";
+                valueSpan.classList.add("placeholder-span");
+
+                let value = "";
+
+                if (mockData && Array.isArray(mockData) && mockData[rowIndex]) {
+                    value = mockData[rowIndex][fieldName] || "";
+
+                    // Format based on field type
+                    if (typeof value === 'number') {
+                        value = value.toFixed(2);
+                    } else if (Array.isArray(value)) {
+                        value = value[1] || value[0] || "";
+                    } else if (typeof value === 'boolean') {
+                        value = value ? 'Yes' : 'No';
+                    }
+
+                    valueSpan.textContent = " " || " ";
+                } else {
+                    const lines = this.props?.orderlines || this.props?.lines || [];
+                    const line = lines[rowIndex];
+
+                    if (line && line._dynamicValues && fieldName in line._dynamicValues) {
+                        value = line._dynamicValues[fieldName];
+                        valueSpan.textContent = value;
+                    } else {
+                        valueSpan.textContent = `[[ orderline.${fieldName} ]]`;
+                    }
+                }
+
+                fieldDiv.appendChild(labelSpan);
+                fieldDiv.appendChild(valueSpan);
+                dropzone.appendChild(fieldDiv);
+            });
+
+            this.saveSelectedColumnsDesign3();
+
+            this.notification?.add?.(`Field "${fieldLabel}" added successfully`, {
+                type: "success"
+            });
+        } catch (error) {
+            console.error("Error adding Design 3 column:", error);
+            this.notification?.add?.("Failed to add field", { type: "danger" });
+        }
+    }
+
+
+    saveSelectedColumnsDesign3() {
+        try {
+            if (!this.receiptContentRef?.el) {
+                console.warn("Receipt content not available for saving");
+                return;
+            }
+
+            const dropzones = this.receiptContentRef.el.querySelectorAll(".receipt-header-dropzone");
+            if (!dropzones || dropzones.length === 0) {
+                console.warn("No dropzones found for saving");
+                return;
+            }
+
+            const fields = [];
+
+            dropzones.forEach(dropzone => {
+                const fieldElements = dropzone.querySelectorAll("[data-field]");
+                fieldElements.forEach(elem => {
+                    const field = elem.dataset.field;
+                    if (field && !fields.includes(field)) {
+                        fields.push(field);
+                    }
+                });
+            });
+
+            this.selectedProductFields = fields;
+
+            if (this.receipt_id && this.orm) {
+                this.orm.write("pos.receipt", [this.receipt_id], {
+                    selected_product_fields: JSON.stringify(fields),
+                });
+            }
+
+            console.log(" Saved Design 3 fields:", fields);
+        } catch (error) {
+            console.error("Error saving Design 3 columns:", error);
+        }
+    }
+
+    async restoreSavedColumnsDesign3() {
+        try {
+            console.log("Starting Design 3 column restoration...");
+
+            if (!this.receipt_id) {
+                console.warn("No receipt_id for restoring");
+                return;
+            }
+
+            let retries = 0;
+            const maxRetries = 10;
+            while ((!this.receiptContentRef?.el || !this.receiptContentRef.el.querySelector(".receipt-header-dropzone")) && retries < maxRetries) {
+                console.log(`Waiting for receipt content... (${retries + 1}/${maxRetries})`);
+                await new Promise(resolve => setTimeout(resolve, 200));
+                retries++;
+            }
+
+            if (!this.receiptContentRef?.el) {
+                console.error("Receipt content still not available after waiting");
+                return;
+            }
+
+            const dropzones = this.receiptContentRef.el.querySelectorAll(".receipt-header-dropzone");
+            if (!dropzones || dropzones.length === 0) {
+                console.error("No dropzones found after waiting");
+                return;
+            }
+
+            console.log("Receipt content loaded, dropzones found:", dropzones.length);
+
+            const receipt = await this.orm.read("pos.receipt", [this.receipt_id], [
+                "selected_product_fields",
+            ]);
+
+            if (!receipt || !receipt[0]?.selected_product_fields) {
+                console.log("No saved fields to restore");
+                return;
+            }
+
+            let fields = [];
+            try {
+                fields = JSON.parse(receipt[0].selected_product_fields);
+            } catch (e) {
+                console.error("Failed to parse saved fields:", e);
+                return;
+            }
+
+            if (!Array.isArray(fields) || fields.length === 0) {
+                console.log("No fields in saved data");
+                return;
+            }
+
+            console.log("Restoring Design 3 fields:", fields);
+
+            const mockData = await this.getMockProductData(fields);
+
+            for (const field of fields) {
+                this.addColumnAtIndexDesign3(field, 0, mockData);
+            }
+
+            console.log("Design 3 fields restored successfully");
+        } catch (error) {
+            console.error("Error restoring Design 3 columns:", error);
+        }
+    }
+    removeColumnDesign3(fieldName) {
+        try {
+            if (!this.receiptContentRef?.el) {
+                console.error("Receipt content not available");
+                return;
+            }
+
+            const fieldsToRemove = this.receiptContentRef.el.querySelectorAll(
+                `.receipt-header-dropzone [data-field="${fieldName}"]`
+            );
+
+            if (fieldsToRemove.length === 0) {
+                this.notification?.add?.("Field not found", { type: "warning" });
+                return;
+            }
+
+            fieldsToRemove.forEach(elem => elem.remove());
+
+            this.saveSelectedColumnsDesign3();
+
+            const fieldObj = this.state.productFields?.find(f => f.name === fieldName);
+            const fieldLabel = fieldObj?.label || fieldName;
+
+            this.notification?.add?.(`Field "${fieldLabel}" removed`, { type: "success" });
+        } catch (error) {
+            console.error("Error removing Design 3 column:", error);
+            this.notification?.add?.("Failed to remove field", { type: "danger" });
+        }
+    }
+
+    onColumnDragStartDesign3(ev) {
+        try {
+            ev.stopPropagation();
+            const dragEl = ev.target.closest("[data-field]");
+            const fieldName = dragEl?.dataset.field;
+            console.log("FIELDNAME", fieldName)
+
+            if (!fieldName) {
+                console.warn("No field name found on drag element");
+                return;
+            }
+
+
+
+            if (!fieldName) {
+                console.warn("No field name found on drag element");
+                return;
+            }
+
+            ev.dataTransfer.setData("application/x-pos-column", fieldName);
+            ev.dataTransfer.effectAllowed = "copy";
+
+            if (!this.receiptContentRef?.el) return;
+
+            this.receiptContentRef.el.classList.add("column-dragging");
+
+            const dropzones = this.receiptContentRef.el.querySelectorAll(".receipt-header-dropzone");
+            dropzones.forEach(zone => {
+                zone.style.border = "2px dashed #007bff";
+                zone.style.minHeight = "40px";
+                zone.style.backgroundColor = "rgba(0, 123, 255, 0.05)";
+                zone.style.transition = "all 0.3s ease";
+            });
+        } catch (error) {
+            console.error("Error on drag start:", error);
+        }
+    }
+
+    onColumnDragEndDesign3(ev) {
+    try {
+        if (!this.receiptContentRef?.el) return;
+
+        this.receiptContentRef.el.classList.remove("column-dragging");
+
+        const dropzones = this.receiptContentRef.el.querySelectorAll(".receipt-header-dropzone");
+
+        dropzones.forEach(zone => {
+            zone.style.border = "";
+            zone.style.minHeight = "";
+            zone.style.backgroundColor = "";
+            zone.style.transition = "";
+        });
+
+    } catch (error) {
+        console.error("Error on drag end:", error);
+    }
+}
+
+
+    async onColumnDropDesign3(ev) {
+        try {
+            ev.preventDefault();
+            ev.stopPropagation();
+
+            const fieldName = ev.dataTransfer.getData("application/x-pos-column");
+            if (!fieldName) return;
+
+            const dropzone = ev.target.closest(".receipt-header-dropzone");
+            if (!dropzone) return;
+
+            const rowIndex = parseInt(dropzone.dataset.rowIndex, 10);
+
+            let mockData = null;
+            try {
+                mockData = await this.getMockProductData([fieldName]);
+            } catch { }
+
+            this.addColumnAtIndexDesign3(fieldName, rowIndex, mockData);
+
+            this.onColumnDragEndDesign3(ev);
+
+        } catch (error) {
+            console.error("Error on column drop:", error);
+        }
+    }
+
+
+
+    async restoreSavedColumnsUniversal() {
+        try {
+            console.log("Detecting design type...");
+
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            if (this.isDesign3()) {
+                console.log("Design 3 detected");
+                return await this.restoreSavedColumnsDesign3();
+            } else {
+                console.log("Table design detected");
+                if (typeof this.restoreSavedColumns === 'function') {
+                    return await this.restoreSavedColumns();
+                } else {
+                    console.warn("restoreSavedColumns function not found");
+                }
+            }
+        } catch (error) {
+            console.error("Error in universal restore:", error);
+        }
+    }
+
+
+    addColumnAtIndexUniversal(fieldName, index = 0, mockData = null) {
+        try {
+            if (!fieldName) {
+                console.warn("addColumnAtIndexUniversal: fieldName missing");
+                return;
+            }
+
+            if (!this.receiptContentRef?.el) {
+                console.warn("Receipt DOM not ready yet");
+                return;
+            }
+
+            if (this.isDesign3()) {
+                console.log(" Adding column  Design 3 (row layout)");
+                return this.addColumnAtIndexDesign3(fieldName, index, mockData);
+            }
+
+            if (typeof this.addColumnAtIndex === "function") {
+                console.log(" Adding column  Table design (Design 1 / 2)");
+                return this.addColumnAtIndex(fieldName, index, mockData);
+            }
+
+            console.warn("addColumnAtIndex not implemented for table designs");
+
+        } catch (error) {
+            console.error("Error in addColumnAtIndexUniversal:", error);
+        }
+    }
+
+    saveSelectedColumnsUniversal() {
+        try {
+            if (!this.receiptContentRef?.el) {
+                console.warn("Receipt DOM not ready for saving");
+                return;
+            }
+
+            if (this.isDesign3()) {
+                console.log("Saving columns → Design 3");
+                return this.saveSelectedColumnsDesign3();
+            }
+
+            if (typeof this.saveSelectedColumns === "function") {
+                console.log("Saving columns  Table design (Design 1 / 2)");
+                return this.saveSelectedColumns();
+            }
+
+            console.warn("saveSelectedColumns not implemented for table designs");
+
+        } catch (error) {
+            console.error(" Error in saveSelectedColumnsUniversal:", error);
+        }
+    }
+
+
 }
 
 registry.category("actions").add("pos_receipt_layout_client_action", PosReceiptLayoutClientAction);

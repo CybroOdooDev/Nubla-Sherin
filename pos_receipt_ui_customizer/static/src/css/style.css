@@ -32,7 +32,7 @@
     border-radius: 8px;
     padding: 2rem;
     box-shadow: 0 0px 20px rgb(0 0 0 / 6%);
-    font-family: 'Arial', sans-serif;
+
 }
 /* While dragging */
 .receipt_content.dragging {
