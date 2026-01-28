@@ -21,6 +21,7 @@
     'maintainer': 'Cats and Dogs Solutions',
     'data': [
         'views/sale_report.xml',
+
     ],
 
     'license': 'OPL-1',

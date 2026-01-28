@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sale Order: Replace totals layout (uses global CSS) -->
+    <template id="sale_report_totals_detached"
+              inherit_id="sale.report_saleorder_document">
+
+        <xpath expr="//div[@name='so_total_summary']" position="replace">
+            <!-- Separator line after order lines (hidden) -->
+            <div class="so_totals_separator" style="height: 0; border: none; margin: 0; padding: 0;"/>
+
+            <!-- Right-aligned totals box -->
+            <div class="so_totals_wrapper">
+                <table class="o_total_table">
+                    <t t-call="sale.document_tax_totals">
+                        <t t-set="tax_totals" t-value="doc.tax_totals"/>
+                        <t t-set="currency" t-value="doc.currency_id"/>
+                    </t>
+                </table>
+            </div>
+        </xpath>
+    </template>
+    <template id="invoice_report_totals_detached"
+              inherit_id="account.report_invoice_document">
+
+        <xpath expr="//div[@id='total']" position="replace">
+            <div class="so_totals_wrapper">
+                <table class="o_total_table">
+                    <t t-call="account.document_tax_totals">
+                        <t t-set="tax_totals" t-value="o.tax_totals"/>
+                        <t t-set="currency" t-value="o.currency_id"/>
+                    </t>
+                </table>
+            </div>
+        </xpath>
+    </template>
+</odoo>

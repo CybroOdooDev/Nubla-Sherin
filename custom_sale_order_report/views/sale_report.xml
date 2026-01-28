@@ -1,120 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <template id="global_report_styles"
+              name="Global Report Styles"
+              inherit_id="web.minimal_layout">
+
+        <xpath expr="//head" position="inside">
+ <style>
+
+
+
+            /* Keep full grid */
+            table.o_main_table {
+                border-collapse: collapse !important;
+            }
+
+            table.o_main_table th,
+            table.o_main_table td {
+                border: 1px solid #9da3a6 !important;
+            }
+
+            /* STOP vertical border after last column */
+            table.o_main_table th:last-child,
+            table.o_main_table td:last-child {
+                border-right: 0 !important;
+            }
+
+            /* STOP bottom border bleed */
+            table.o_main_table tbody tr:last-child td {
+                border-bottom: 0 !important;
+            }
+
+
+
+            .so_totals_wrapper {
+                width: 45%;
+                margin-left: auto;
+                margin-top: 8px;
+                page-break-inside: avoid;
+            }
+
+            .so_totals_wrapper .o_total_table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 13px;
+            }
+
+            .so_totals_wrapper .o_total_table td {
+                border: 1px solid #9da3a6 !important;
+                padding: 6px 8px;
+                background: #ffffff;
+                color: #000;
+            }
+
+            .so_totals_wrapper .o_total_table td:last-child {
+                text-align: right;
+            }
+
+            /* SUCCESS total row */
+            .so_totals_wrapper .o_total_table tr.o_total td,
+            .so_totals_wrapper .o_total_table tr:last-child td {
+                background-color: #7fb52c !important; /* success */
+                color: #ffffff !important;
+                font-weight: 600;
+                border-color: #28a745 !important;
+            }
+
+            .so_totals_wrapper .o_total_table tr.o_total td *,
+            .so_totals_wrapper .o_total_table tr:last-child td * {
+                color: #ffffff !important;
+            }
+
+
+            .so_totals_wrapper {
+                width: 48% !important;
+                min-width: 320px !important;
+                margin-left: auto !important;
+            }
+
+            /* Make rows visually taller */
+            .so_totals_wrapper .o_total_table {
+                width: 100% !important;
+                table-layout: fixed !important;
+            }
+
+            /* Increase cell size */
+            .so_totals_wrapper .o_total_table td {
+                padding: 9px 12px !important;
+                font-size: 15px !important;
+                line-height: 1.45 !important;
+            }
+
+            /* Make TOTAL row slightly stronger */
+            .so_totals_wrapper .o_total_table tr:last-child td {
+                padding-top: 10px !important;
+                padding-bottom: 10px !important;
+            }
+
+
+
+
+        </style>
+        </xpath>
+    </template>
+
 
     <template id="sale_report_totals_detached"
               inherit_id="sale.report_saleorder_document">
 
-
-        <!-- Replace the totals container -->
         <xpath expr="//div[@name='so_total_summary']" position="replace">
-            <style>
-                /* Prevent order lines table from breaking and leaving borders */
-                table[name="sales_order_line_table"],
-                .table-responsive table {
-                    page-break-after: auto;
-                }
-
-                /* Last row of order lines table should not show bottom border on break */
-                table[name="sales_order_line_table"] tbody tr:last-child td,
-                .table-responsive table tbody tr:last-child td {
-                    border-bottom: none;
-                }
-
-                /* Totals wrapper */
-                .so_totals_wrapper {
-                    width: 45%;
-                    margin-left: auto;
-                    margin-top: 8px;
-                    page-break-inside: avoid;
-                    page-break-before: auto;
-                }
-
-                /* Totals table */
-                .so_totals_wrapper .o_total_table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    font-size: 13px;
-                    border: none;
-                }
-
-                /* All table cells - default styling */
-                .so_totals_wrapper .o_total_table td {
-                    border-left: 1px solid #9da3a6;
-                    border-right: 1px solid #9da3a6;
-                    border-top: 1px solid #9da3a6;
-                    border-bottom: 1px solid #9da3a6;
-                    padding: 6px 8px;
-                    background-color: #ffffff;
-                    color: #000000;
-                }
-
-                /* Prevent border showing on page break */
-                .so_totals_wrapper .o_total_table tr {
-                    page-break-inside: avoid;
-                }
-
-                /* Right align values */
-                .so_totals_wrapper .o_total_table td:last-child {
-                    text-align: right;
-                }
-
-                /* TOTAL row — purple background with white text */
-                .so_totals_wrapper .o_total_table tr.o_total td,
-                .so_totals_wrapper .o_total_table tr[name="total"] td,
-                .so_totals_wrapper table tr:last-child td {
-                    background-color: #714B67 !important;
-                    color: #ffffff !important;
-                    font-weight: 600 !important;
-                    border-color: #714B67 !important;
-                }
-
-                /* Ensure all text inside total row cells is white */
-                .so_totals_wrapper .o_total_table tr.o_total td *,
-                .so_totals_wrapper .o_total_table tr[name="total"] td *,
-                .so_totals_wrapper table tr:last-child td *,
-                .so_totals_wrapper table tr:last-child td span {
-                    color: #ffffff !important;
-                }
-
-                /* Remove any separator lines */
-                .so_totals_separator {
-                    display: none;
-                }
-
-                /* Print-specific fixes */
-                @media print {
-                    /* Remove borders from order lines table at page break */
-                    table tbody tr td {
-                        border-bottom-width: 1px !important;
-                    }
-
-                    table tbody tr:last-child td {
-                        border-bottom: none !important;
-                    }
-
-                    /* Ensure totals wrapper doesn't orphan */
-                    .so_totals_wrapper {
-                        page-break-inside: avoid !important;
-                    }
-
-                    .so_totals_wrapper .o_total_table {
-                        border: none !important;
-                    }
-
-                    .so_totals_wrapper .o_total_table tbody {
-                        page-break-before: avoid;
-                    }
-                }
-            </style>
-
-            <!-- Separator line after order lines (hidden) -->
-            <div class="so_totals_separator" style="height: 0; border: none; margin: 0; padding: 0;"/>
-
             <!-- Right-aligned totals box -->
             <div class="so_totals_wrapper">
                 <table class="o_total_table">
                     <t t-call="sale.document_tax_totals">
                         <t t-set="tax_totals" t-value="doc.tax_totals"/>
                         <t t-set="currency" t-value="doc.currency_id"/>
+                    </t>
+                </table>
+            </div>
+        </xpath>
+    </template>
+
+
+    <template id="invoice_report_totals_detached"
+              inherit_id="account.report_invoice_document">
+
+        <xpath expr="//div[@id='total']" position="replace">
+            <div class="so_totals_wrapper">
+                <table class="o_total_table">
+                    <t t-call="account.document_tax_totals">
+                        <t t-set="tax_totals" t-value="o.tax_totals"/>
+                        <t t-set="currency" t-value="o.currency_id"/>
+                    </t>
+                </table>
+            </div>
+        </xpath>
+    </template>
+
+
+    <template id="purchase_report_totals_detached"
+              inherit_id="purchase.report_purchaseorder_document">
+
+        <xpath expr="//div[@id='total']" position="replace">
+            <div class="so_totals_wrapper">
+                <table class="o_total_table">
+                    <t t-call="purchase.document_tax_totals">
+                        <t t-set="tax_totals" t-value="o.tax_totals"/>
+                        <t t-set="currency" t-value="o.currency_id"/>
                     </t>
                 </table>
             </div>
