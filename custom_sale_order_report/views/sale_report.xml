@@ -1,6 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- =====================================================
+         GLOBAL REPORT STYLES (MATCH ODOO DEFAULT)
+    ====================================================== -->
     <template id="global_report_styles"
               name="Global Report Styles"
               inherit_id="web.minimal_layout">
@@ -8,47 +10,112 @@
         <xpath expr="//head" position="inside">
             <style>
 
-            /* Keep full grid */
-            table.o_main_table {
-                border-collapse: collapse !important;
-            }
+<!--            /* ===============================-->
+<!--               MAIN ORDER TABLE-->
+<!--            =============================== */-->
 
-            table.o_main_table th,
-            table.o_main_table td {
-                border: 1px solid #9da3a6 !important;
-            }
+<!--            table.o_main_table {-->
+<!--                width: 100%;-->
+<!--                table-layout: fixed;-->
+<!--                border-collapse: collapse;-->
+<!--                font-size: 13px; /* Odoo default */-->
+<!--            }-->
 
-            /* STOP vertical border after last column */
-            table.o_main_table th:last-child,
-            table.o_main_table td:last-child {
-                border-right: 0 !important;
-            }
+<!--            table.o_main_table thead {-->
+<!--                display: table-header-group;-->
+<!--            }-->
 
-            /* STOP bottom border bleed on page 1 table */
-            table.o_main_table_page1 tbody tr:last-child td {
-                border-bottom: 0 !important;
-            }
+<!--            table.o_main_table th,-->
+<!--            table.o_main_table td {-->
+<!--                border: 1px solid #9da3a6;-->
+<!--                padding: 8px 10px;-->
+<!--                line-height: 1.6;-->
+<!--                vertical-align: top;-->
+<!--            }-->
 
-            table.o_main_table_page1 {
-                border-bottom: 0 !important;
-            }
+<!--            table.o_main_table tr {-->
+<!--                page-break-inside: avoid;-->
+<!--            }-->
 
-            /* Page 2 table starts fresh */
-            table.o_main_table_page2 {
-                margin-top: 0 !important;
-            }
+           /* ===============================
+   SALE ORDER TABLE ONLY
+=============================== */
 
-            /* Clean page break */
-            .page-break-table {
-                page-break-after: always !important;
-                height: 0;
-                margin: 0;
-                padding: 0;
-                border: none;
-                clear: both;
-            }
+.sale-order-report table.o_main_table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 14px;
+}
 
-            .so_totals_wrapper {
+.sale-order-report table.o_main_table th,
+.sale-order-report table.o_main_table td {
+    border: 1px solid #9da3a6;
+    padding: 8px 10px;
+    line-height: 1.6;
+    vertical-align: top;
+}
+
+.sale-order-report table.o_main_table tr {
+<!--    page-break-inside: avoid;-->
+                page-break-inside: auto;
+}
+
+/* COLUMN WIDTHS */
+.sale-order-report table.o_main_table th:nth-child(1),
+.sale-order-report table.o_main_table td:nth-child(1) { width: 12%; }
+
+.sale-order-report table.o_main_table th:nth-child(2),
+.sale-order-report table.o_main_table td:nth-child(2) { width: 38%; }
+
+.sale-order-report table.o_main_table th:nth-child(3),
+.sale-order-report table.o_main_table td:nth-child(3) {
+    width: 10%;
+    white-space: nowrap;
+}
+
+.sale-order-report table.o_main_table th:nth-child(4),
+.sale-order-report table.o_main_table td:nth-child(4) {
+    width: 10%;
+    white-space: nowrap;
+}
+
+.sale-order-report table.o_main_table th:nth-child(5),
+.sale-order-report table.o_main_table td:nth-child(5) {
+    width: 8%;
+    white-space: nowrap;
+}
+
+.sale-order-report table.o_main_table th:nth-child(6),
+.sale-order-report table.o_main_table td:nth-child(6) {
+    width: 8%;
+    white-space: nowrap;
+}
+
+.sale-order-report table.o_main_table th:nth-child(7),
+.sale-order-report table.o_main_table td:nth-child(7) {
+    width: 14%;
+    white-space: nowrap;
+    text-align: right;
+}
+
+/* Prevent ugly word breaking */
+.sale-order-report table.o_main_table td:nth-child(2) {
+    word-break: normal;
+    overflow-wrap: normal;
+    white-space: normal;
+}
+                .sale-order-report table.o_main_table thead th {
+    font-weight: 800 !important;
+                font-size: 14px;
+}
+
+
+            /* ===============================
+               TOTALS TABLE
+            =============================== */
+
+             .so_totals_wrapper {
                 width: 45%;
                 margin-left: auto;
                 margin-top: 8px;
@@ -77,7 +144,7 @@
             .so_totals_wrapper .o_total_table tr:last-child td {
                 background-color: #7fb52c !important; /* success */
                 color: #ffffff !important;
-                font-weight: 600;
+                font-weight: 700;
                 border-color: #28a745 !important;
             }
 
@@ -85,6 +152,7 @@
             .so_totals_wrapper .o_total_table tr:last-child td * {
                 color: #ffffff !important;
             }
+
 
             .so_totals_wrapper {
                 width: 48% !important;
@@ -115,143 +183,16 @@
         </xpath>
     </template>
 
-
+    <!-- =====================================================
+         SALE ORDER REPORT
+    ====================================================== -->
     <template id="sale_report_totals_detached"
               inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[@class='page']" position="attributes">
+        <attribute name="class">page sale-order-report</attribute>
+    </xpath>
 
-        <!-- Replace the main table with split tables -->
-        <xpath expr="//table[contains(@class,'o_main_table')]" position="replace">
-
-            <!-- Calculate split point -->
-            <t t-set="total_lines" t-value="len(lines_to_report)"/>
-            <t t-set="split_at" t-value="int(total_lines * 0.9) if total_lines > 10 else total_lines"/>
-
-            <!-- PAGE 1 TABLE -->
-            <table class="o_has_total_table table o_main_table o_main_table_page1 table-borderless">
-                <thead style="display: table-row-group">
-                    <tr>
-                        <th name="th_description" class="text-start">Description</th>
-                        <th name="th_quantity" class="text-end text-nowrap">Quantity</th>
-                        <th name="th_priceunit" class="text-end text-nowrap">Unit Price</th>
-                        <th name="th_discount" t-if="display_discount" class="text-end">
-                            <span>Disc.%</span>
-                        </th>
-                        <th name="th_taxes" class="text-end">Taxes</th>
-                        <th name="th_subtotal" class="text-end">
-                            <span>Amount</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="sale_tbody">
-                    <t t-set="current_subtotal" t-value="0"/>
-
-                    <t t-foreach="lines_to_report[:split_at]" t-as="line">
-                        <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal"/>
-
-                        <tr t-att-class="'fw-bold o_line_section' if (line.display_type == 'line_section' or line.product_type == 'combo') else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
-                            <t t-if="not line.display_type and line.product_type != 'combo'">
-                                <td name="td_name"><span t-field="line.name">Bacon Burger</span></td>
-                                <td name="td_quantity" class="o_td_quantity text-end">
-                                    <span t-field="line.product_uom_qty" class="text-nowrap">3</span>
-                                    <span t-field="line.product_uom">units</span>
-                                    <span t-if="line.product_packaging_id">
-                                        (<span t-field="line.product_packaging_qty" t-options='{"widget": "integer"}'/> <span t-field="line.product_packaging_id"/>)
-                                    </span>
-                                </td>
-                                <td name="td_priceunit" class="text-end text-nowrap">
-                                    <span t-field="line.price_unit">3</span>
-                                </td>
-                                <td t-if="display_discount" class="text-end">
-                                    <span t-field="line.discount">-</span>
-                                </td>
-                                <t t-set="taxes" t-value="', '.join([(tax.invoice_label or tax.name) for tax in line.tax_id])"/>
-                                <td name="td_taxes" t-attf-class="text-end {{ 'text-nowrap' if len(taxes) &lt; 10 else '' }}">
-                                    <span t-out="taxes">Tax 15%</span>
-                                </td>
-                                <td t-if="not line.is_downpayment" name="td_subtotal" class="text-end o_price_total">
-                                    <span t-field="line.price_subtotal">27.00</span>
-                                </td>
-                            </t>
-                            <t t-elif="line.display_type == 'line_section' or line.product_type == 'combo'">
-                                <td name="td_section_line" colspan="99">
-                                    <span t-field="line.name">A section title</span>
-                                </td>
-                            </t>
-                            <t t-elif="line.display_type == 'line_note'">
-                                <td name="td_note_line" colspan="99">
-                                    <span t-field="line.name">A note</span>
-                                </td>
-                            </t>
-                        </tr>
-                    </t>
-                </tbody>
-            </table>
-
-            <!-- PAGE BREAK (only if we have more lines) -->
-            <t t-if="split_at &lt; total_lines">
-                <div class="page-break-table"></div>
-
-                <!-- PAGE 2 TABLE -->
-                <table class="o_has_total_table table o_main_table o_main_table_page2 table-borderless">
-                    <thead style="display: table-row-group">
-                        <tr>
-                            <th name="th_description" class="text-start">Description</th>
-                            <th name="th_quantity" class="text-end text-nowrap">Quantity</th>
-                            <th name="th_priceunit" class="text-end text-nowrap">Unit Price</th>
-                            <th name="th_discount" t-if="display_discount" class="text-end">
-                                <span>Disc.%</span>
-                            </th>
-                            <th name="th_taxes" class="text-end">Taxes</th>
-                            <th name="th_subtotal" class="text-end">
-                                <span>Amount</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="sale_tbody">
-                        <t t-foreach="lines_to_report[split_at:]" t-as="line">
-                            <tr t-att-class="'fw-bold o_line_section' if (line.display_type == 'line_section' or line.product_type == 'combo') else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
-                                <t t-if="not line.display_type and line.product_type != 'combo'">
-                                    <td name="td_name"><span t-field="line.name">Bacon Burger</span></td>
-                                    <td name="td_quantity" class="o_td_quantity text-end">
-                                        <span t-field="line.product_uom_qty" class="text-nowrap">3</span>
-                                        <span t-field="line.product_uom">units</span>
-                                        <span t-if="line.product_packaging_id">
-                                            (<span t-field="line.product_packaging_qty" t-options='{"widget": "integer"}'/> <span t-field="line.product_packaging_id"/>)
-                                        </span>
-                                    </td>
-                                    <td name="td_priceunit" class="text-end text-nowrap">
-                                        <span t-field="line.price_unit">3</span>
-                                    </td>
-                                    <td t-if="display_discount" class="text-end">
-                                        <span t-field="line.discount">-</span>
-                                    </td>
-                                    <t t-set="taxes" t-value="', '.join([(tax.invoice_label or tax.name) for tax in line.tax_id])"/>
-                                    <td name="td_taxes" t-attf-class="text-end {{ 'text-nowrap' if len(taxes) &lt; 10 else '' }}">
-                                        <span t-out="taxes">Tax 15%</span>
-                                    </td>
-                                    <td t-if="not line.is_downpayment" name="td_subtotal" class="text-end o_price_total">
-                                        <span t-field="line.price_subtotal">27.00</span>
-                                    </td>
-                                </t>
-                                <t t-elif="line.display_type == 'line_section' or line.product_type == 'combo'">
-                                    <td name="td_section_line" colspan="99">
-                                        <span t-field="line.name">A section title</span>
-                                    </td>
-                                </t>
-                                <t t-elif="line.display_type == 'line_note'">
-                                    <td name="td_note_line" colspan="99">
-                                        <span t-field="line.name">A note</span>
-                                    </td>
-                                </t>
-                            </tr>
-                        </t>
-                    </tbody>
-                </table>
-            </t>
-
-        </xpath>
-
-        <!-- Replace totals section with right-aligned wrapper -->
+        <!-- Totals -->
         <xpath expr="//div[@class='clearfix'][@name='so_total_summary']" position="replace">
             <div class="so_totals_wrapper">
                 <table class="o_total_table">
@@ -263,10 +204,88 @@
             </div>
         </xpath>
 
+        <!-- MAIN TABLE -->
+        <xpath expr="//table[contains(@class, 'o_main_table')]" position="replace">
+
+            <t t-set="lines" t-value="lines_to_report"/>
+            <t t-set="first_page_rows" t-value="8"/>
+            <t t-set="other_page_rows" t-value="18"/>
+
+            <!-- ================= PAGE 1 ================= -->
+            <table class="o_main_table">
+                <thead>
+                    <tr>
+                        <th>Referentie</th>
+                        <th>Omschrijving</th>
+                        <th class="text-end">Aantal</th>
+                        <th class="text-end">Prijs</th>
+                        <th class="text-end">Kort.%</th>
+                        <th class="text-end">BTW</th>
+                        <th class="text-end">Bedrag</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lines[:first_page_rows]" t-as="line">
+                        <tr>
+                            <td><span t-field="line.product_id.default_code"/></td>
+                            <td><span t-field="line.name"/></td>
+                            <td class="text-end"><span t-field="line.product_uom_qty"/></td>
+                            <td class="text-end"><span t-field="line.price_unit"/></td>
+                            <td class="text-end"><span t-field="line.discount"/></td>
+                            <td class="text-end">
+                                <span t-esc="', '.join([tax.name for tax in line.tax_id])"/>
+                            </td>
+                            <td class="text-end"><span t-field="line.price_subtotal"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+
+            <t t-if="len(lines) &gt; first_page_rows">
+                <div style="page-break-after: always;"></div>
+            </t>
+
+            <!-- ================= PAGE 2+ ================= -->
+            <t t-foreach="range(first_page_rows, len(lines), other_page_rows)" t-as="page_start">
+
+                <table class="o_main_table">
+                    <thead>
+                        <tr>
+                            <th>Referentie</th>
+                            <th>Omschrijving</th>
+                            <th class="text-end">Aantal</th>
+                            <th class="text-end">Prijs</th>
+                            <th class="text-end">Kort.%</th>
+                            <th class="text-end">BTW</th>
+                            <th class="text-end">Bedrag</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="lines[page_start:page_start + other_page_rows]" t-as="line">
+                            <tr>
+                                <td><span t-field="line.product_id.default_code"/></td>
+                                <td><span t-field="line.name"/></td>
+                                <td class="text-end"><span t-field="line.product_uom_qty"/></td>
+                                <td class="text-end"><span t-field="line.price_unit"/></td>
+                                <td class="text-end"><span t-field="line.discount"/></td>
+                                <td class="text-end">
+                                    <span t-esc="', '.join([tax.name for tax in line.tax_id])"/>
+                                </td>
+                                <td class="text-end"><span t-field="line.price_subtotal"/></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <t t-if="page_start + other_page_rows &lt; len(lines)">
+                    <div style="page-break-after: always;"></div>
+                </t>
+
+            </t>
+
+        </xpath>
     </template>
-
-
-    <template id="invoice_report_totals_detached"
+      <template id="invoice_report_totals_detached"
               inherit_id="account.report_invoice_document">
 
         <xpath expr="//div[@id='total']" position="replace">
@@ -296,8 +315,10 @@
             </div>
         </xpath>
     </template>
+</odoo>
 
-</odoo><?xml version="1.0" encoding="utf-8"?>
+
+<!--<?xml version="1.0" encoding="utf-8"?>-->
 <!--<odoo>-->
 
 <!--    <template id="global_report_styles"-->
@@ -305,7 +326,9 @@
 <!--              inherit_id="web.minimal_layout">-->
 
 <!--        <xpath expr="//head" position="inside">-->
-<!--            <style>-->
+<!-- <style>-->
+
+
 
 <!--            /* Keep full grid */-->
 <!--            table.o_main_table {-->
@@ -323,29 +346,14 @@
 <!--                border-right: 0 !important;-->
 <!--            }-->
 
-<!--            /* STOP bottom border bleed on page 1 table */-->
-<!--            table.o_main_table_page1 tbody tr:last-child td {-->
+<!--           -->
+
+<!--            /* STOP bottom border bleed */-->
+<!--            table.o_main_table tbody tr:last-child td {-->
 <!--                border-bottom: 0 !important;-->
 <!--            }-->
 
-<!--            table.o_main_table_page1 {-->
-<!--                border-bottom: 0 !important;-->
-<!--            }-->
 
-<!--            /* Page 2 table starts fresh */-->
-<!--            table.o_main_table_page2 {-->
-<!--                margin-top: 0 !important;-->
-<!--            }-->
-
-<!--            /* Clean page break */-->
-<!--            .page-break-table {-->
-<!--                page-break-after: always !important;-->
-<!--                height: 0;-->
-<!--                margin: 0;-->
-<!--                padding: 0;-->
-<!--                border: none;-->
-<!--                clear: both;-->
-<!--            }-->
 
 <!--            .so_totals_wrapper {-->
 <!--                width: 45%;-->
@@ -385,6 +393,7 @@
 <!--                color: #ffffff !important;-->
 <!--            }-->
 
+
 <!--            .so_totals_wrapper {-->
 <!--                width: 48% !important;-->
 <!--                min-width: 320px !important;-->
@@ -410,7 +419,10 @@
 <!--                padding-bottom: 10px !important;-->
 <!--            }-->
 
-<!--            </style>-->
+
+
+
+<!--        </style>-->
 <!--        </xpath>-->
 <!--    </template>-->
 
@@ -418,140 +430,8 @@
 <!--    <template id="sale_report_totals_detached"-->
 <!--              inherit_id="sale.report_saleorder_document">-->
 
-<!--        &lt;!&ndash; Replace the main table with split tables &ndash;&gt;-->
-<!--        <xpath expr="//table[contains(@class,'o_main_table')]" position="replace">-->
-
-<!--            &lt;!&ndash; Calculate split point &ndash;&gt;-->
-<!--            <t t-set="total_lines" t-value="len(lines_to_report)"/>-->
-<!--            <t t-set="split_at" t-value="int(total_lines * 0.9) if total_lines > 10 else total_lines"/>-->
-
-<!--            &lt;!&ndash; PAGE 1 TABLE &ndash;&gt;-->
-<!--            <table class="o_has_total_table table o_main_table o_main_table_page1 table-borderless">-->
-<!--                <thead style="display: table-row-group">-->
-<!--                    <tr>-->
-<!--                        <th name="th_description" class="text-start">Description</th>-->
-<!--                        <th name="th_quantity" class="text-end text-nowrap">Quantity</th>-->
-<!--                        <th name="th_priceunit" class="text-end text-nowrap">Unit Price</th>-->
-<!--                        <th name="th_discount" t-if="display_discount" class="text-end">-->
-<!--                            <span>Disc.%</span>-->
-<!--                        </th>-->
-<!--                        <th name="th_taxes" class="text-end">Taxes</th>-->
-<!--                        <th name="th_subtotal" class="text-end">-->
-<!--                            <span>Amount</span>-->
-<!--                        </th>-->
-<!--                    </tr>-->
-<!--                </thead>-->
-<!--                <tbody class="sale_tbody">-->
-<!--                    <t t-set="current_subtotal" t-value="0"/>-->
-
-<!--                    <t t-foreach="lines_to_report[:split_at]" t-as="line">-->
-<!--                        <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal"/>-->
-
-<!--                        <tr t-att-class="'fw-bold o_line_section' if (line.display_type == 'line_section' or line.product_type == 'combo') else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">-->
-<!--                            <t t-if="not line.display_type and line.product_type != 'combo'">-->
-<!--                                <td name="td_name"><span t-field="line.name">Bacon Burger</span></td>-->
-<!--                                <td name="td_quantity" class="o_td_quantity text-end">-->
-<!--                                    <span t-field="line.product_uom_qty" class="text-nowrap">3</span>-->
-<!--                                    <span t-field="line.product_uom">units</span>-->
-<!--                                    <span t-if="line.product_packaging_id">-->
-<!--                                        (<span t-field="line.product_packaging_qty" t-options='{"widget": "integer"}'/> <span t-field="line.product_packaging_id"/>)-->
-<!--                                    </span>-->
-<!--                                </td>-->
-<!--                                <td name="td_priceunit" class="text-end text-nowrap">-->
-<!--                                    <span t-field="line.price_unit">3</span>-->
-<!--                                </td>-->
-<!--                                <td t-if="display_discount" class="text-end">-->
-<!--                                    <span t-field="line.discount">-</span>-->
-<!--                                </td>-->
-<!--                                <t t-set="taxes" t-value="', '.join([(tax.invoice_label or tax.name) for tax in line.tax_id])"/>-->
-<!--                                <td name="td_taxes" t-attf-class="text-end {{ 'text-nowrap' if len(taxes) &lt; 10 else '' }}">-->
-<!--                                    <span t-out="taxes">Tax 15%</span>-->
-<!--                                </td>-->
-<!--                                <td t-if="not line.is_downpayment" name="td_subtotal" class="text-end o_price_total">-->
-<!--                                    <span t-field="line.price_subtotal">27.00</span>-->
-<!--                                </td>-->
-<!--                            </t>-->
-<!--                            <t t-elif="line.display_type == 'line_section' or line.product_type == 'combo'">-->
-<!--                                <td name="td_section_line" colspan="99">-->
-<!--                                    <span t-field="line.name">A section title</span>-->
-<!--                                </td>-->
-<!--                            </t>-->
-<!--                            <t t-elif="line.display_type == 'line_note'">-->
-<!--                                <td name="td_note_line" colspan="99">-->
-<!--                                    <span t-field="line.name">A note</span>-->
-<!--                                </td>-->
-<!--                            </t>-->
-<!--                        </tr>-->
-<!--                    </t>-->
-<!--                </tbody>-->
-<!--            </table>-->
-
-<!--            &lt;!&ndash; PAGE BREAK (only if we have more lines) &ndash;&gt;-->
-<!--            <t t-if="split_at &lt; total_lines">-->
-<!--                <div class="page-break-table"></div>-->
-
-<!--                &lt;!&ndash; PAGE 2 TABLE &ndash;&gt;-->
-<!--                <table class="o_has_total_table table o_main_table o_main_table_page2 table-borderless">-->
-<!--                    <thead style="display: table-row-group">-->
-<!--                        <tr>-->
-<!--                            <th name="th_description" class="text-start">Description</th>-->
-<!--                            <th name="th_quantity" class="text-end text-nowrap">Quantity</th>-->
-<!--                            <th name="th_priceunit" class="text-end text-nowrap">Unit Price</th>-->
-<!--                            <th name="th_discount" t-if="display_discount" class="text-end">-->
-<!--                                <span>Disc.%</span>-->
-<!--                            </th>-->
-<!--                            <th name="th_taxes" class="text-end">Taxes</th>-->
-<!--                            <th name="th_subtotal" class="text-end">-->
-<!--                                <span>Amount</span>-->
-<!--                            </th>-->
-<!--                        </tr>-->
-<!--                    </thead>-->
-<!--                    <tbody class="sale_tbody">-->
-<!--                        <t t-foreach="lines_to_report[split_at:]" t-as="line">-->
-<!--                            <tr t-att-class="'fw-bold o_line_section' if (line.display_type == 'line_section' or line.product_type == 'combo') else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">-->
-<!--                                <t t-if="not line.display_type and line.product_type != 'combo'">-->
-<!--                                    <td name="td_name"><span t-field="line.name">Bacon Burger</span></td>-->
-<!--                                    <td name="td_quantity" class="o_td_quantity text-end">-->
-<!--                                        <span t-field="line.product_uom_qty" class="text-nowrap">3</span>-->
-<!--                                        <span t-field="line.product_uom">units</span>-->
-<!--                                        <span t-if="line.product_packaging_id">-->
-<!--                                            (<span t-field="line.product_packaging_qty" t-options='{"widget": "integer"}'/> <span t-field="line.product_packaging_id"/>)-->
-<!--                                        </span>-->
-<!--                                    </td>-->
-<!--                                    <td name="td_priceunit" class="text-end text-nowrap">-->
-<!--                                        <span t-field="line.price_unit">3</span>-->
-<!--                                    </td>-->
-<!--                                    <td t-if="display_discount" class="text-end">-->
-<!--                                        <span t-field="line.discount">-</span>-->
-<!--                                    </td>-->
-<!--                                    <t t-set="taxes" t-value="', '.join([(tax.invoice_label or tax.name) for tax in line.tax_id])"/>-->
-<!--                                    <td name="td_taxes" t-attf-class="text-end {{ 'text-nowrap' if len(taxes) &lt; 10 else '' }}">-->
-<!--                                        <span t-out="taxes">Tax 15%</span>-->
-<!--                                    </td>-->
-<!--                                    <td t-if="not line.is_downpayment" name="td_subtotal" class="text-end o_price_total">-->
-<!--                                        <span t-field="line.price_subtotal">27.00</span>-->
-<!--                                    </td>-->
-<!--                                </t>-->
-<!--                                <t t-elif="line.display_type == 'line_section' or line.product_type == 'combo'">-->
-<!--                                    <td name="td_section_line" colspan="99">-->
-<!--                                        <span t-field="line.name">A section title</span>-->
-<!--                                    </td>-->
-<!--                                </t>-->
-<!--                                <t t-elif="line.display_type == 'line_note'">-->
-<!--                                    <td name="td_note_line" colspan="99">-->
-<!--                                        <span t-field="line.name">A note</span>-->
-<!--                                    </td>-->
-<!--                                </t>-->
-<!--                            </tr>-->
-<!--                        </t>-->
-<!--                    </tbody>-->
-<!--                </table>-->
-<!--            </t>-->
-
-<!--        </xpath>-->
-
-<!--        &lt;!&ndash; Replace totals section with right-aligned wrapper &ndash;&gt;-->
-<!--        <xpath expr="//div[@class='clearfix'][@name='so_total_summary']" position="replace">-->
+<!--        <xpath expr="//div[@name='so_total_summary']" position="replace">-->
+<!--            &lt;!&ndash; Right-aligned totals box &ndash;&gt;-->
 <!--            <div class="so_totals_wrapper">-->
 <!--                <table class="o_total_table">-->
 <!--                    <t t-call="sale.document_tax_totals">-->
@@ -561,7 +441,6 @@
 <!--                </table>-->
 <!--            </div>-->
 <!--        </xpath>-->
-
 <!--    </template>-->
 
 
