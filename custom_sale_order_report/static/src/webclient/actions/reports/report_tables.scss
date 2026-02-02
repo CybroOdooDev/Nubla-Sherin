@@ -1,0 +1,19 @@
+
+.o_table_boxed,
+.o_table_boxed-rounded {
+
+    table:not(.o_ignore_layout_styling) {
+        page-break-inside: auto !important;
+
+        tr {
+            page-break-inside: avoid !important;
+        }
+
+        &::before {
+            bottom: auto;
+        }
+        tbody tr:last-child td {
+            border-bottom: 0 !important;
+        }
+    }
+}

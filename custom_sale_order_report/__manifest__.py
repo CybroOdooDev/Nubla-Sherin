@@ -22,6 +22,13 @@
     'data': [
         'views/sale_report.xml',
     ],
+'assets': {
+   'web.report_assets_common': [
+       'custom_sale_order_report/static/src/webclient/actions/reports/report_tables.scss',
+
+   ],
+
+},
 
     'license': 'OPL-1',
     'installable': True,
