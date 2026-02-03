@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="report_picking_inherit" inherit_id="stock.report_picking">
+
+        <xpath expr="//div[@class='page o_report_stockpicking_operations']" position="before">
+            <style>
+                /* TABLE HEADER REPEAT */
+
+                table.table.table-borderless thead {
+                    display: table-header-group;
+                }
+
+                table.table.table-borderless thead th {
+                    border-top: 1px solid #000;
+                }
+
+
+                /* PICKING OPERATIONS TABLE */
+
+                .o_report_stockpicking_operations table.table-borderless {
+                    border-collapse: collapse !important;
+                }
+
+                /* Vertical borders */
+                .o_report_stockpicking_operations table.table-borderless th,
+                .o_report_stockpicking_operations table.table-borderless td {
+                    border-left: 1px solid #000 !important;
+                    border-right: 1px solid #000 !important;
+                }
+
+                /* Header bottom line */
+                .o_report_stockpicking_operations table.table-borderless thead th {
+                    border-bottom: 1px solid #000 !important;
+                }
+
+                /* Bottom border on last row */
+                .o_report_stockpicking_operations
+                table.table-borderless tbody tr:last-child td {
+                    border-bottom: 1px solid #000 !important;
+                }
+
+                /* Override Odoo boxed layout */
+                .o_table_boxed .o_report_stockpicking_operations
+                table.table-borderless tbody tr:last-child td,
+                .o_table_boxed-rounded .o_report_stockpicking_operations
+                table.table-borderless tbody tr:last-child td {
+                    border-bottom: 1px solid #000 !important;
+                }
+
+                /* Prevent row splitting */
+                .o_report_stockpicking_operations table.table-borderless tr {
+                    page-break-inside: avoid;
+                }
+
+
+
+
+            </style>
+        </xpath>
+
+        <!-- Your existing header modification -->
+        <xpath expr="//div[contains(@class, 'row') and contains(@class, 'mt16') and contains(@class, 'mb16')]" position="replace">
+            <div class="row mt16 mb16 align-items-center justify-content-between">
+                <div class="col-6 d-flex align-items-center">
+                    <h5 class="m-0" style="color: black; font-weight: bold;">Picking Operation:
+                        <span t-field="o.name"/>
+                    </h5>
+                </div>
+                <div class="col-6 d-flex justify-content-end">
+                    <div t-field="o.name" t-options="{'widget': 'barcode', 'width': 600, 'height': 100, 'img_style': 'width:300px;height:50px;'}">
+                        <div class="bg-light border-1 rounded d-flex flex-column align-items-center justify-content-center p-3 opacity-75 text-muted text-center">
+                            (document barcode)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

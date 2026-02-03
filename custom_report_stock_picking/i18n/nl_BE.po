@@ -1,0 +1,133 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* custom_report_stock_picking
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-14 10:20+0000\n"
+"PO-Revision-Date: 2026-01-14 10:20+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_picking_inherit
+msgid "(document barcode)"
+msgstr "(barcode document)"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_deliveryslip_inherit
+msgid "3.00"
+msgstr ""
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_deliveryslip_inherit
+msgid "<strong>Customer Reference</strong>"
+msgstr "Klantreferentie"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_deliveryslip_inherit
+msgid "<strong>Delivery Information</strong>"
+msgstr "<strong>Levering Info</strong>"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_deliveryslip_inherit
+msgid "<strong>Order</strong>"
+msgstr "Bestel"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_deliveryslip_inherit
+msgid "<strong>Shipping Date</strong>"
+msgstr "Verzenddatum"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_deliveryslip_inherit
+msgid "Delivered"
+msgstr "GELEVERD"
+
+#. module: custom_report_stock_picking
+#: model:ir.model.fields,field_description:custom_report_stock_picking.field_sale_order__delivery_info
+#: model:ir.model.fields,field_description:custom_report_stock_picking.field_stock_picking__delivery_info
+msgid "Delivery Info"
+msgstr "Levering Info"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_deliveryslip_inherit
+msgid "Delivery Slip:"
+msgstr "Leveringsbon:"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_invoice_document_split_description
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_saleorder_document_split_description
+msgid "Description"
+msgstr "Omschrijving"
+
+#. module: custom_report_stock_picking
+#: model:ir.model.fields,help:custom_report_stock_picking.field_product_product__keep_description
+#: model:ir.model.fields,help:custom_report_stock_picking.field_product_template__keep_description
+msgid "If enabled, Keep description from sales order upon the delivery slips."
+msgstr "Houd de omschrijving van de verkooporder op de leverbonnen"
+
+#. module: custom_report_stock_picking
+#: model:ir.model.fields,field_description:custom_report_stock_picking.field_product_product__keep_description
+#: model:ir.model.fields,field_description:custom_report_stock_picking.field_product_template__keep_description
+msgid "Keep Description"
+msgstr "Houd Omschrijving"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_deliveryslip_inherit
+msgid "Lot/Serial Number"
+msgstr ""
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_deliveryslip_inherit
+msgid "Ordered"
+msgstr "BESTELD"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.external_layout_boxed_custom
+msgid "Page <span class=\"page\"/> / <span class=\"topage\"/>"
+msgstr ""
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_picking_inherit
+msgid "Picking Operation:"
+msgstr "Pickbewerkingen:"
+
+#. module: custom_report_stock_picking
+#: model:ir.model,name:custom_report_stock_picking.model_product_template
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_deliveryslip_inherit
+msgid "Product"
+msgstr ""
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_mrporder_inherit
+msgid "Production Order:"
+msgstr "Productieorder:"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_deliveryslip_inherit
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_invoice_document_split_description
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_saleorder_document_split_description
+msgid "Reference"
+msgstr "Referentie"
+
+#. module: custom_report_stock_picking
+#: model:ir.model,name:custom_report_stock_picking.model_sale_order
+msgid "Sales Order"
+msgstr "Verkooporder"
+
+#. module: custom_report_stock_picking
+#: model:ir.model,name:custom_report_stock_picking.model_stock_picking
+msgid "Transfer"
+msgstr "Verplaatsing"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_deliveryslip_inherit
+msgid "units"
+msgstr ""

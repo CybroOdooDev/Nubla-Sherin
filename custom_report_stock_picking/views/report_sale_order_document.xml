@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <template id="report_saleorder_document_split_description" inherit_id="sale.report_saleorder_document">
+
+    <xpath expr="//thead/tr/th[@name='th_description']" position="replace">
+      <th name="th_reference" class="text-start">Reference</th>
+      <th name="th_description" class="text-start">Description</th>
+    </xpath>
+
+    <xpath expr="//tbody[@class='sale_tbody']//td[@name='td_name']" position="replace">
+      <!-- Product Internal Reference -->
+      <td name="td_reference" class="text-start">
+        <span t-esc="line.product_id.default_code or ''"/>
+      </td>
+
+      <td name="td_description" class="text-start">
+        <span t-esc="line.name.split(']', 1)[-1].strip() if ']' in line.name else line.name"/>
+      </td>
+    </xpath>
+
+  </template>
+</odoo>

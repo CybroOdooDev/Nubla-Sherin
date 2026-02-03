@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+     <template id="report_deliveryslip_inherit" inherit_id="stock.report_delivery_document">
+         <xpath expr="//div[@class='page']" position="before">
+    <style>
+        /* Repeat header on page break */
+        table.delivery-table thead {
+            display: table-header-group;
+        }
+
+        /* Avoid row splitting */
+        table.delivery-table tr {
+            page-break-inside: avoid;
+        }
+
+        /* Border visible when table continues on next page */
+        table.delivery-table thead th {
+<!--            border-top: 1px solid #000 !important;-->
+            border-bottom: 1px solid #000 !important;
+        }
+
+        table.delivery-table td,
+        table.delivery-table th {
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+        }
+
+        table.delivery-table tbody tr:last-child td {
+            border-bottom: 1px solid #000;
+        }
+        table[name="stock_move_line_table"] tbody td {
+                font-size: 14px !important;
+        }
+        table[name="stock_move_table"] tbody td {
+                font-size: 14px !important;
+        }
+
+<!--        table[name="stock_backorder_table"] thead {-->
+<!--            display: table-row-group !important;-->
+<!--        }-->
+        table[name="stock_backorder_table"] thead th {
+            border-top: 1px solid #000 !important;
+            border-bottom: 1px solid #000 !important;
+        }
+        /* BACKORDER TABLE BORDERS */
+
+        table[name="stock_backorder_table"] {
+            border-collapse: collapse !important;
+        }
+
+        /* Left Right borders */
+        table[name="stock_backorder_table"] th,
+        table[name="stock_backorder_table"] td {
+            border-left: 1px solid #000 !important;
+            border-right: 1px solid #000 !important;
+        }
+
+        /* Header separator */
+        table[name="stock_backorder_table"] thead th {
+            border-bottom: 1px solid #000 !important;
+        }
+
+        /* Bottom border on last row */
+        table[name="stock_backorder_table"] tbody tr:last-child td {
+            border-bottom: 1px solid #000 !important;
+        }
+
+        /* Prevent row splitting in PDF */
+        table[name="stock_backorder_table"] tr {
+            page-break-inside: avoid;
+        }
+
+
+    </style>
+</xpath>
+
+        <xpath expr="//table[@name='stock_move_line_table']" position="after" style="font-size: 13px;">
+            <br/>
+            <div t-if="o.delivery_info" class="col-12 mw-100 mb-2">
+                <strong>Delivery Information</strong>
+                <div t-field="o.delivery_info" class="m-0"/>
+            </div>
+        </xpath>
+         <xpath expr="//div[@id='informations']" position="replace">
+            <div id="informations" class="report-wrapping-flexbox clearfix row mb-4">
+
+                <!-- Order/Sale Reference -->
+                <div t-if="o.origin" class="col col-3 mw-100 mb-2" name="div_origin" style="font-size: 13px;">
+                    <strong>Order</strong>
+                    <div t-field="o.origin" class="m-0"/>
+                </div>
+
+                <!-- Customer Reference (from Partner) -->
+                <div t-if="o.sudo().sale_id.client_order_ref"
+                     class="col col-3 mw-100 mb-2"
+                     name="div_customer_reference"
+                     style="font-size: 13px;">
+                    <strong>Customer Reference</strong>
+                    <div class="m-0">
+                        <span t-field="o.sudo().sale_id.client_order_ref"/>
+                    </div>
+                </div>
+
+                <!-- Shipping Date -->
+                <div t-if="o.state" class="col col-3 mw-100 mb-2" name="div_sched_date" style="font-size: 13px;">
+                    <strong>Shipping Date</strong>
+                    <div t-if="o.state == 'done'" t-field="o.date_done" class="m-0"/>
+                    <div t-else="" t-field="o.scheduled_date" class="m-0"/>
+                </div>
+
+            </div>
+        </xpath>
+
+
+                 <xpath expr="//h2/span[@t-field='o.name']" position="replace">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <h5 class="m-0" style="color: black;">Delivery Slip:
+                        <span t-field="o.name"/>
+                    </h5>
+                </div>
+            </div>
+        </xpath>
+
+
+           <xpath expr="//table[@name='stock_move_table']" position="replace">
+            <table class="table table-borderless delivery-table" t-if="o.state!='done'" name="stock_move_table">
+                        <thead>
+                            <tr>
+                                <th name="th_sm_reference">Reference</th>
+                                <th name="th_sm_product">Product</th>
+                                <th name="th_sm_ordered" class="text-end">Ordered</th>
+                                <th name="th_sm_quantity" class="text-end">Delivered</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="lines" t-value="o.move_ids.filtered(lambda x: x.product_uom_qty)"/>
+                            <tr t-foreach="lines" t-as="move">
+                                  <td>
+                            <span t-esc="move.product_id.default_code or ''"/>
+                        </td>
+                                <td>
+                                <t t-if="move.product_id.product_tmpl_id.keep_description and  move.sale_line_id and move.sale_line_id.delivery_description">
+                                    <span t-esc="move.sale_line_id.delivery_description"/>
+                                </t>
+                                    <t t-else="">
+                                        <span t-esc="move.product_id.name"/>
+                                    </t>
+                                </td>
+                                <td class="text-end">
+                                    <span t-field="move.product_uom_qty">3.00</span>
+                                    <span t-field="move.product_uom" groups="uom.group_uom">units</span>
+                                    <span t-if="move.product_packaging_id">
+                                        (<span t-field="move.product_packaging_qty" t-options='{"widget": "integer"}'/> <span t-field="move.product_packaging_id"/>)
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <span t-field="move.quantity">3.00</span>
+                                    <span t-field="move.product_uom" groups="uom.group_uom">units</span>
+                                    <span t-if="move.product_packaging_id">
+                                        (<span t-field="move.product_packaging_quantity" t-options='{"widget": "integer"}'/> <span t-field="move.product_packaging_id"/>)
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+           </xpath>
+
+         <xpath expr="//table[@name='stock_move_line_table']"
+                position="replace">
+             <table class="table table-borderless mt48 delivery-table"
+                    t-elif="o.move_line_ids and o.state=='done'"
+                    name="stock_move_line_table">
+                 <t t-set="has_serial_number" t-value="False"/>
+                 <t t-set="has_serial_number"
+                    t-value="o.move_line_ids.mapped('lot_id')"
+                    groups="stock.group_lot_on_delivery_slip"/>
+                 <thead>
+                     <tr>
+                         <th name="th_sml_reference">Reference</th>
+                         <th name="th_sml_product">Product</th>
+                         <th name="th_sml_qty_ordered" class="text-center"
+                             t-if="not has_serial_number">Ordered
+                         </th>
+                         <th name="lot_serial" t-else="">Lot/Serial Number</th>
+                         <th name="th_sml_quantity" class="text-center">
+                             Delivered
+                         </th>
+                     </tr>
+                 </thead>
+                 <tbody>
+                     <!-- This part gets complicated with different use cases (additional use cases in extensions of this report):
+                             1. If serial numbers are used and set to print on delivery slip => print lines as is, otherwise group them by overlapping
+                                 product + description + uom combinations
+                             2. If any packages are assigned => split products up by package (or non-package) and then apply use case 1 -->
+                     <!-- If has destination packages => create sections of corresponding products -->
+                     <t t-if="o.has_packages" name="has_packages">
+                         <t t-set="packages"
+                            t-value="o.move_line_ids.mapped('result_package_id')"/>
+                         <t t-foreach="packages" t-as="package">
+                             <t t-call="stock.stock_report_delivery_package_section_line"/>
+                             <t t-set="package_move_lines"
+                                t-value="o.move_line_ids.filtered(lambda l: l.result_package_id == package)"/>
+                             <!-- If printing lots/serial numbers => keep products in original lines -->
+                             <t t-if="has_serial_number">
+                                 <tr t-foreach="package_move_lines"
+                                     t-as="move_line">
+                                     <t t-call="stock.stock_report_delivery_has_serial_move_line"/>
+                                 </tr>
+                             </t>
+                             <!-- If not printing lots/serial numbers => merge lines with same product+description+uom -->
+                             <t t-else="">
+                                 <t t-set="aggregated_lines"
+                                    t-value="package_move_lines._get_aggregated_product_quantities(strict=True)"/>
+                                 <t t-call="stock.stock_report_delivery_aggregated_move_lines"/>
+                             </t>
+                         </t>
+                         <!-- Make sure we do another section for package-less products if they exist -->
+                         <t t-set="move_lines"
+                            t-value="o.move_line_ids.filtered(lambda l: not l.result_package_id)"/>
+                         <t t-set="aggregated_lines"
+                            t-value="o.move_line_ids._get_aggregated_product_quantities(except_package=True)"/>
+                         <t t-if="move_lines or aggregated_lines"
+                            name="no_package_move_lines">
+                             <t t-call="stock.stock_report_delivery_no_package_section_line"
+                                name="no_package_section"/>
+                             <t t-if="has_serial_number">
+                                 <tr t-foreach="move_lines" t-as="move_line">
+                                     <t t-call="stock.stock_report_delivery_has_serial_move_line"/>
+                                 </tr>
+                             </t>
+                             <t t-elif="aggregated_lines">
+                                 <t t-call="stock.stock_report_delivery_aggregated_move_lines"/>
+                             </t>
+                         </t>
+                     </t>
+                     <!-- No destination packages -->
+                     <t t-else="">
+                         <!-- If printing lots/serial numbers => keep products in original lines -->
+                         <t t-if="has_serial_number">
+                             <tr t-foreach="o.move_line_ids" t-as="move_line">
+                                 <t t-call="stock.stock_report_delivery_has_serial_move_line"/>
+                             </tr>
+                         </t>
+                         <!-- If not printing lots/serial numbers => merge lines with same product -->
+                         <!--                                <t t-else="" name="aggregated_move_lines">-->
+                         <!--                                    <t t-set="aggregated_lines" t-value="o.move_line_ids._get_aggregated_product_quantities()"/>-->
+                         <!--                                    <t t-call="stock.stock_report_delivery_aggregated_move_lines"/>-->
+                         <!--                                </t>-->
+                         <t t-else="" name="aggregated_move_lines">
+
+                             <!-- If any product keeps description -->
+                             <t t-set="has_keep_description"
+                                t-value="o.move_line_ids.filtered(
+           lambda l: l.product_id.product_tmpl_id.keep_description
+       )"/>
+
+                             <!-- Print all move lines separately -->
+                             <t t-if="has_keep_description">
+                                 <tr t-foreach="o.move_line_ids"
+                                     t-as="move_line">
+                                     <!-- Reference -->
+                                     <td>
+                                         <span t-esc="move_line.product_id.default_code or ''"/>
+                                     </td>
+
+                                     <!-- Product / Description -->
+                                     <td>
+                                         <t t-if="
+                    move_line.product_id.product_tmpl_id.keep_description
+                    and move_line.move_id.sale_line_id
+                    and move_line.move_id.sale_line_id.delivery_description
+                ">
+                                             <span t-esc="move_line.move_id.sale_line_id.delivery_description"
+                                                   t-options="{'widget': 'text'}"/>
+                                         </t>
+                                         <t t-else="">
+                                             <span t-esc="move_line.product_id.name"/>
+                                         </t>
+                                     </td>
+
+                                     <!-- Ordered -->
+                                     <td class="text-center">
+                                         <span t-field="move_line.move_id.product_uom_qty"/>
+                                         <span t-field="move_line.product_uom_id"/>
+                                     </td>
+
+                                     <!-- Delivered -->
+                                     <td class="text-center">
+                                         <span t-field="move_line.quantity"/>
+                                         <span t-field="move_line.product_uom_id"/>
+                                     </td>
+                                 </tr>
+                             </t>
+
+                             <!-- Default Odoo aggregation -->
+                             <t t-else="">
+                                 <t t-set="aggregated_lines"
+                                    t-value="o.move_line_ids._get_aggregated_product_quantities()"/>
+                                 <t t-call="stock.stock_report_delivery_aggregated_move_lines"/>
+                             </t>
+
+                         </t>
+
+                     </t>
+                 </tbody>
+             </table>
+
+         </xpath>
+
+     </template>
+
+    <template id="report_delivery_document_aggregated_inherit"
+              inherit_id="stock.stock_report_delivery_aggregated_move_lines">
+
+        <xpath expr="." position="replace">
+            <tr t-foreach="aggregated_lines" t-as="line">
+                <!-- Reference -->
+                <td>
+                    <span t-esc="aggregated_lines[line]['product'].default_code or ''"/>
+                </td>
+                <!-- Product (only name) -->
+                <td>
+                <t t-if="
+        aggregated_lines[line]['product'].product_tmpl_id.keep_description
+        and aggregated_lines[line]['move'].sale_line_id.delivery_description
+    ">
+                    <span t-esc="aggregated_lines[line]['move'].sale_line_id.delivery_description"
+                          t-options="{'widget': 'text'}"/>
+                </t>
+                <t t-else="">
+                    <span t-esc="aggregated_lines[line]['product'].name"/>
+                </t>
+            </td>
+            <td class="text-center" name="move_line_aggregated_qty_ordered">
+                <span t-esc="aggregated_lines[line]['qty_ordered']"
+                    t-options="{'widget': 'float', 'decimal_precision': 'Product Unit of Measure'}"/>
+                <span t-esc="aggregated_lines[line]['product_uom'].name"/>
+                <span t-if="aggregated_lines[line]['packaging'].name">
+                    (<span t-out="aggregated_lines[line]['packaging_qty']" t-options='{"widget": "integer"}'/> <span t-out="aggregated_lines[line]['packaging'].name"/>)
+                </span>
+            </td>
+            <td class="text-center" name="move_line_aggregated_quantity">
+                <t t-if="aggregated_lines[line]['quantity']">
+                    <span t-esc="aggregated_lines[line]['quantity']"
+                        t-options="{'widget': 'float', 'decimal_precision': 'Product Unit of Measure'}"/>
+                    <span t-esc="aggregated_lines[line]['product_uom'].name"/>
+                    <span t-if="aggregated_lines[line]['packaging'].name">
+                        (<span t-out="aggregated_lines[line]['packaging_quantity']" t-options='{"widget": "integer"}'/> <span t-out="aggregated_lines[line]['packaging'].name"/>)
+                    </span>
+                </t>
+            </td>
+        </tr>
+            </xpath>
+
+    </template>
+
+</odoo>

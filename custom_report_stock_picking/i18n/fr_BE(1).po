@@ -1,0 +1,51 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* custom_report_stock_picking
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-06-20 09:20+0000\n"
+"PO-Revision-Date: 2025-06-20 09:20+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_picking_inherit
+msgid "(document barcode)"
+msgstr "(code-barres document)"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_deliveryslip_inherit
+msgid "<strong>Customer Reference</strong>"
+msgstr "Référence client"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_deliveryslip_inherit
+msgid "<strong>Order</strong>"
+msgstr ""
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_deliveryslip_inherit
+msgid "<strong>Shipping Date</strong>"
+msgstr ""
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_deliveryslip_inherit
+msgid "Delivery Slip:"
+msgstr "Bon de livraison"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_picking_inherit
+msgid "Picking Operation:"
+msgstr "Opérations de transfert:"
+
+#. module: custom_report_stock_picking
+#: model_terms:ir.ui.view,arch_db:custom_report_stock_picking.report_mrporder_inherit
+msgid "Production Order:"
+msgstr "Ordre de production:"

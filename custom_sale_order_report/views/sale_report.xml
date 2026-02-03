@@ -6,9 +6,7 @@
               inherit_id="web.minimal_layout">
 
         <xpath expr="//head" position="inside">
- <style>
-
-
+        <style>
 
             table.o_main_table {
                 border-collapse: collapse !important;
@@ -40,8 +38,6 @@
             table.o_main_table {
                 border-bottom: 1px solid #9da3a6 !important;
             }
-
-
 
             .so_totals_wrapper {
                 width: 45%;
@@ -110,8 +106,13 @@
             .so_totals_wrapper .o_total_table tbody tr:last-child td {
                 border-bottom: 1px solid #9da3a6 !important;
             }
+<!--            .page {-->
+<!--        padding-bottom: 25mm !important;-->
+<!--    }-->
 
-
+<!--            table.o_main_table tbody tr:last-child td {-->
+<!--    border-bottom: 3px solid #000 !important;-->
+<!--}-->
 
 
         </style>
@@ -166,6 +167,45 @@
             </div>
         </xpath>
     </template>
+    <template id="report_purchasequotation_document_inherit_borders"
+              inherit_id="purchase.report_purchasequotation_document">
+
+        <!-- Inject CSS before the page content -->
+        <xpath expr="//div[@class='page']" position="before">
+            <style>
+
+                /* PURCHASE QUOTATION TABLE BORDERS */
+
+                table.table-borderless {
+                    border-collapse: collapse !important;
+                }
+
+                /* Cell borders (left, right, inside) */
+                table.table-borderless th,
+                table.table-borderless td {
+                    border: 1px solid #9da3a6 !important;
+                }
+
+                /* Header separator */
+                table.table-borderless thead th {
+                    border-bottom: 1px solid #9da3a6 !important;
+                }
+
+                /* Bottom border for last row */
+                table.table-borderless tbody tr:last-child td {
+                    border-bottom: 1px solid #9da3a6 !important;
+                }
+
+                /* Prevent row splitting in PDF */
+                table.table-borderless tr {
+                    page-break-inside: avoid;
+                }
+
+            </style>
+        </xpath>
+
+    </template>
+
 
 </odoo>
 
