@@ -31,7 +31,6 @@
 
                             <condition invisible="not receipt_design_id"/>
                         </button>
-
                     </div>
 
                 </setting>

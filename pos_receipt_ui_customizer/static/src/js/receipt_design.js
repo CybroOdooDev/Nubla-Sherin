@@ -13,52 +13,90 @@ patch(OrderReceipt.prototype, {
     },
 
     sanitizeReceiptXml(xmlString) {
-        const parser = new DOMParser();
-        const parsed = parser.parseFromString(xmlString, "text/html");
-        let html = parsed.body.innerHTML
-            .replace(/<br\s*>/gi, "<br/>")
-            .replace(/<hr\s*>/gi, "<hr/>")
-            .replace(/&nbsp;|\u00A0/g, " ")
-            .replace(/<img([^>]*)>/gi, "<img$1/>")
-            .replace(/&(?!amp;|lt;|gt;|quot;|apos;|#\d+;)/g, "&amp;")
-            .trim();
+        if (!xmlString) return "";
+        try {
+            const parser = new DOMParser();
+            const parsed = parser.parseFromString(xmlString, "text/html");
 
-        const font = this.pos.config.design_receipt_font_style || "Arial";
-        html = html.replace(/<div([^>]*class="pos-receipt"[^>]*)>/i,
-            (m, attrs) =>
-                `<div ${attrs.replace(/\s*style="[^"]*"/gi, "")} style="font-family:${font};">`
-        );
-
-        const order = this.pos.get_order();
-        const receipt = order.export_for_printing();
-        const partner = order.get_partner();
-        const company = this.pos.company;
-
-        html = html
-            .replaceAll('[[ receipt.total_without_tax ]]',
-                this.env.utils.formatCurrency(receipt.total_without_tax || 0))
-            .replaceAll('[[ receipt.amount_total ]]',
-                this.env.utils.formatCurrency(receipt.amount_total || 0));
-
-        const replaced = html.replace(
-            /\[\[\s*([\w.\s]+)\s*\]\]/g,
-            (match, fieldPath) => {
-                const path = fieldPath.trim().replace(/\s+/g, "");
-                let value = "";
-
-                if (path.startsWith("order.")) {
-                    value = order?.[path.slice(6)];
-                } else if (path.startsWith("partner.")) {
-                    value = partner?.[path.slice(8)];
-                } else if (path.startsWith("company.")) {
-                    value = company?.[path.slice(8)];
-                }
-
-                return value ? value : match;
+            // If the design HTML is reset (e.g. after upgrade), but the config still says
+            // we have extra columns, we re-inject them on the fly.
+            const selectedFieldsStr = this.pos.config?.selected_product_fields || "[]";
+            let selectedFields = [];
+            try {
+                selectedFields = JSON.parse(selectedFieldsStr);
+            } catch (e) {
+                selectedFields = [];
             }
-        );
 
-        return replaced;
+            if (selectedFields.length > 0) {
+                const table = parsed.querySelector(".receipt-table");
+                const headerRow = table?.querySelector("thead tr");
+                if (headerRow) {
+                    selectedFields.forEach(field => {
+                        // Only add if not already there
+                        if (!headerRow.querySelector(`th[data-field="${field}"]`)) {
+                            const th = document.createElement("th");
+                            th.setAttribute("data-field", field);
+                            th.style.textAlign = "center";
+                            th.style.fontSize = "12px";
+                            th.style.padding = "4px";
+                            // Auto-generate label: product_code -> Product Code
+                            th.textContent = field.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                            headerRow.appendChild(th);
+                        }
+                    });
+                }
+            }
+            // ---------------------------
+
+            let html = parsed.body.innerHTML
+                .replace(/<br\s*>/gi, "<br/>")
+                .replace(/<hr\s*>/gi, "<hr/>")
+                .replace(/&nbsp;|\u00A0/g, " ")
+                .replace(/<img([^>]*)>/gi, "<img$1/>")
+                .replace(/&(?!amp;|lt;|gt;|quot;|apos;|#\d+;)/g, "&amp;")
+                .trim();
+
+            const font = this.pos.config?.design_receipt_font_style || "Arial";
+            html = html.replace(/<div([^>]*class="pos-receipt"[^>]*)>/i,
+                (m, attrs) =>
+                    `<div ${attrs.replace(/\s*style="[^"]*"/gi, "")} style="font-family:${font};">`
+            );
+
+            const order = this.pos.get_order();
+            const receipt = order?.export_for_printing?.() || {};
+            const partner = order?.get_partner?.();
+            const company = this.pos.company;
+
+            html = html
+                .replaceAll('[[ receipt.total_without_tax ]]',
+                    this.env.utils.formatCurrency(receipt.total_without_tax || 0))
+                .replaceAll('[[ receipt.amount_total ]]',
+                    this.env.utils.formatCurrency(receipt.amount_total || 0));
+
+            const replaced = html.replace(
+                /\[\[\s*([\w.\s]+)\s*\]\]/g,
+                (match, fieldPath) => {
+                    const path = fieldPath.trim().replace(/\s+/g, "");
+                    let value = "";
+
+                    if (path.startsWith("order.")) {
+                        value = order?.[path.slice(6)];
+                    } else if (path.startsWith("partner.")) {
+                        value = partner?.[path.slice(8)];
+                    } else if (path.startsWith("company.")) {
+                        value = company?.[path.slice(8)];
+                    }
+
+                    return value ? value : match;
+                }
+            );
+
+            return replaced;
+        } catch (error) {
+            console.error("Error sanitizing receipt XML:", error);
+            return "";
+        }
     },
     get templateProps() {
         const order = this.pos.get_order();
@@ -120,10 +158,6 @@ patch(OrderReceipt.prototype, {
             };
         });
 
-        console.log("Dynamic fields:", dynamicFields);
-        console.log("Orderlines count:", orderlines.length);
-        console.log(" First orderline:", orderlines);
-
         return {
             data: this.props.data,
             order,
@@ -134,26 +168,38 @@ patch(OrderReceipt.prototype, {
         };
     },
     get templateComponent() {
-        const design = this.pos.config?.design_receipt || "";
-        const xmlString = this.sanitizeReceiptXml(design);
+        try {
+            const design = this.pos.config?.design_receipt || "";
+            if (!design) return null;
 
-        return class extends Component {
-            static template = xml`${xmlString}`;
-            static props = {
-                data: { type: Object, optional: true },
-                order: { type: Object, optional: true },
-                receipt: { type: Object, optional: true },
-                orderlines: { type: Array, optional: true },
-                paymentlines: { type: Array, optional: true },
-                dynamic_fields: { type: Array, optional: true },
+            const xmlString = this.sanitizeReceiptXml(design);
+            if (!xmlString) return null;
+
+            return class extends Component {
+                static template = xml`${xmlString}`;
+                static props = {
+                    data: { type: Object, optional: true },
+                    order: { type: Object, optional: true },
+                    receipt: { type: Object, optional: true },
+                    orderlines: { type: Array, optional: true },
+                    paymentlines: { type: Array, optional: true },
+                    dynamic_fields: { type: Array, optional: true },
+                };
             };
-        };
+        } catch (error) {
+            console.error("Error creating receipt component:", error);
+            return null;
+        }
     },
 
-
-
     get isFalse() {
-        const design = this.pos.config.design_receipt;
-        return !this.pos.config.is_custom_receipt || !design || !design.trim();
+        const config = this.pos.config;
+        if (!config) return true;
+
+        const isCustom = config.is_custom_receipt;
+        const design = config.design_receipt;
+
+        // Return true (show standard) IF custom is disabled OR design is missing
+        return !isCustom || !design || !design.trim();
     },
 });

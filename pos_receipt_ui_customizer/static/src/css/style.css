@@ -36,7 +36,6 @@
     border-radius: 8px;
     padding: 2rem;
     box-shadow: 0 0px 20px rgb(0 0 0 / 6%);
-
 }
 
 /* While dragging */
@@ -125,9 +124,7 @@
     cursor: not-allowed;
 }
 
-/* RECEIPT PREVIEW (RIGHT SIDE) - NO SCROLL */
-
-/* Main receipt container - must allow natural height */
+/* RECEIPT PREVIEW (RIGHT SIDE) - AUTO SIZING */
 .pos-receipt-container {
     width: 100% !important;
     max-width: 400px !important;
@@ -137,7 +134,11 @@
     max-height: none !important;
 }
 
-/* Background view container */
+/* Specific sizing for the actual POS Receipt Screen (not in customizer) */
+body:not(.o_pos_receipt_layout_client_action) .pos-receipt-container {
+    max-width: 280px !important;
+}
+
 .pos-receipt-container>.bg-view {
     width: 100% !important;
     max-width: 400px !important;
@@ -147,13 +148,14 @@
     max-height: none !important;
 }
 
-/* Remove w-50 constraint */
-.pos-receipt-container>.bg-view.w-50 {
-    width: 100% !important;
-    max-width: 400px !important;
+body:not(.o_pos_receipt_layout_client_action) .pos-receipt-container>.bg-view {
+    max-width: 280px !important;
 }
 
-/* Receipt itself - NO SCROLL, FULL HEIGHT */
+.pos-receipt-container>.bg-view.w-50 {
+    max-width: 280px !important;
+}
+
 .pos-receipt {
     width: 100% !important;
     max-width: 360px !important;
@@ -165,13 +167,15 @@
     background-color: transparent !important;
 }
 
-/* Prevent table from shrinking */
+body:not(.o_pos_receipt_layout_client_action) .pos-receipt {
+    max-width: 280px !important;
+}
+
 .pos-receipt table {
     width: 100% !important;
     table-layout: fixed;
 }
 
-/* Control column sizing */
 .pos-receipt th,
 .pos-receipt td {
     font-size: 11px;
@@ -181,7 +185,6 @@
     vertical-align: top;
 }
 
-/* Fix for text displaying vertically */
 .pos-receipt table th,
 .pos-receipt table td {
     word-break: normal !important;
@@ -189,7 +192,6 @@
     text-overflow: clip !important;
 }
 
-/* Ensure proper column widths */
 .pos-receipt table {
     border-collapse: collapse;
 }
@@ -217,61 +219,125 @@
     text-align: right;
 }
 
+/* EDITOR MODE - DROPZONES AND FIELD INDICATORS VISIBLE */
 
-
-
-}
-
-/* Hide editor-only indicators from printed receipts */
-@media print {
-    .field-indicator-editor-only,
-    .editor-only-element {
-        display: none !important;
-    }
-}
-
-/* Visual styling for dropzones when fields are added */
+/* Dropzone styling - HIDDEN by default */
 .receipt-header-dropzone {
-    min-height: 30px;
-    padding: 4px;
-    border: 2px dashed #bbb;
-    border-radius: 4px;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    border: none !important;
+    background-color: transparent;
     transition: all 0.3s ease;
+    display: block;
 }
 
-.receipt-header-dropzone:hover {
-    background-color: rgba(33, 150, 243, 0.05);
-    border-color: #2196f3;
+/* Visible ONLY in Design 3 when inside the Editor */
+.o_pos_receipt_layout_client_action .design3-row-layout .receipt-header-dropzone {
+    min-height: 40px;
+    padding: 8px;
+    margin: 4px 0;
+    border: 2px dashed #bbb !important;
+    border-radius: 4px;
+    background-color: rgba(200, 200, 200, 0.03);
 }
 
-/* Style for field indicators in editor */
+.o_pos_receipt_layout_client_action .receipt-header-dropzone:hover {
+    background-color: rgba(33, 150, 243, 0.08);
+    border-color: #2196f3 !important;
+}
+
+/* Field indicators - visible ONLY in editor */
 .field-indicator-editor-only {
-    display: inline-block;
+    display: none !important;
+}
+
+.o_pos_receipt_layout_client_action .field-indicator-editor-only {
+    display: inline-block !important;
     background: #e3f2fd;
     border: 1px solid #2196f3;
     border-radius: 4px;
-    padding: 2px 8px;
-    margin: 2px;
+    padding: 4px 10px;
+    margin: 3px;
     font-size: 11px;
     color: #1976d2;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
+.o_pos_receipt_layout_client_action .field-indicator-editor-only:hover {
+    background: #bbdefb;
+    border-color: #1976d2;
+    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+}
+
 .field-indicator-editor-only:hover {
     background: #bbdefb;
     border-color: #1976d2;
-    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2);
+    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
 }
 
-/* Invisible marker - never shown */
-.field-marker-design3 {
-    display: none !important;
+/* Column dragging visual feedback */
+.column-dragging .receipt-header-dropzone {
+    border-color: #007bff !important;
+    background-color: rgba(0, 123, 255, 0.05) !important;
 }
 
-/* Dropzone active state during drag */
-.receipt-header-dropzone.drag-over {
-    background-color: rgba(0, 123, 255, 0.1);
-    border-color: #007bff;
-    border-style: solid;
+/* PRINT MODE - HIDE ALL EDITOR ELEMENTS COMPLETELY*/
+
+@media print {
+
+    /* CRITICAL: Hide all editor-only elements when printing */
+    .receipt-header-dropzone,
+    .field-indicator-editor-only,
+    .editor-only-element,
+    .field-marker-design3,
+    .customizer-only-text {
+        display: none !important;
+        visibility: hidden !important;
+        position: absolute !important;
+        left: -9999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        background: none !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
+    }
+
+    /* Ensure dropzone children are also hidden */
+    .receipt-header-dropzone * {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    /* Only actual receipt content should print */
+    .pos-receipt {
+        background: white !important;
+    }
+
+    /* Ensure clean receipt layout */
+    .pos-receipt * {
+        page-break-inside: avoid;
+    }
+}
+
+/* ================================================================
+   SCREEN ONLY - ENSURE DROPZONES ARE VISIBLE
+   ================================================================ */
+
+@media screen {
+
+    /* Explicitly show dropzones and field indicators in editor */
+    .receipt-header-dropzone {
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    .field-indicator-editor-only {
+        display: inline-block !important;
+        visibility: visible !important;
+    }
 }

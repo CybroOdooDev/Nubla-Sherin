@@ -48,9 +48,9 @@
                     style="width:100%; border-collapse:collapse; font-size:15px; margin-top:10px;">
                     <thead class="no-drop-zone">
                         <tr style="border-bottom:1px dashed black;" class="receipt-header-dropzone">
-                            <th style="text-align:left; padding:4px; font-size:12px; width:40%;">Product</th>
-                            <th style="text-align:left; padding:4px; font-size:12px; width:10%;">Qty</th>
-                            <th style="text-align:left; padding:4px; font-size:12px; width:15%;">Amount</th>
+                            <th style="text-align:left; padding:10px; font-size:15px; width:40%;">Product</th>
+                            <th style="text-align:center; padding:10px; font-size:15px; width:10%;">Qty</th>
+                            <th style="text-align:right; padding:10px; font-size:15px; width:15%;">Amount</th>
                         </tr>
                     </thead>
                    <tbody>
@@ -83,20 +83,28 @@
             <br/><br/>
 
 
-            <!-- TOTALS -->
-            <div id="subtotalDiv" class="selectable-box"
-                 style="font-weight:700; justify-content:center;">
-                Subtotal :
-                <span class="placeholder-span">[[ receipt.total_without_tax ]]</span>
-            </div>
+                    <!-- TOTALS -->
+                    <div style="width:100%; display:flex; justify-content:center; margin-top:20px;">
 
-            <br/>
+                        <div style="text-align:left; font-weight:700;">
 
-            <div id="totalDiv" class="selectable-box"
-                 style="font-weight:700; justify-content:center;">
-                TOTAL :
-                <span class="placeholder-span">[[ receipt.amount_total ]]</span>
-            </div>
+                            <div id="subtotalDiv"
+                                 style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                                <span>Subtotal :</span>
+                                <span class="placeholder-span">[[ receipt.total_without_tax ]]</span>
+                            </div>
+
+                            <div id="totalDiv"
+                                 style="display:flex; align-items:center; gap:6px; font-size:16px;">
+                                <span>TOTAL :</span>
+                                <span class="placeholder-span">[[ receipt.amount_total ]]</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
              <br/>
               <br/>
 
