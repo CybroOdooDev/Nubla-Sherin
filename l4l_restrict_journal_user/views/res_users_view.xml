@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="access_restrict_journal_user_view_form" model="ir.ui.view">
+        <field name="name">access.restrict.journal.user.view.form</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[1]/field[@name='partner_id']" position="after">
+                <field name="restrict_journal_enabled" invisible="1"/>
+                <field name="allowed_journal_ids" widget="many2many_tags"
+                       options="{'no_create': True}" invisible="not restrict_journal_enabled"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="access_restrict_journal_user_view_tree" model="ir.ui.view">
+        <field name="name">access.restrict.journal.user.view.tree</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id']" position="after">
+                <field name="allowed_journal_ids" widget="many2many_tags" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

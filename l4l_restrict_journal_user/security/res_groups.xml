@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <data noupdate="1">
+        <record id="access_restrict_user_for_journal" model="res.groups">
+            <field name="name">Restrict Journal</field>
+        </record>
+    </data>
+</odoo>
