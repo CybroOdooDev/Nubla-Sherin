@@ -35,74 +35,95 @@
                     </div>
 
                     <!-- Compact orderlines -->
-                    <div class="orderlines-container" style="margin-top:8px;">
-                        <t t-if="props.orderlines and props.orderlines.length">
-                            <div t-foreach="props.orderlines"
-                                     t-as="orderline"
-                                     t-key="orderline_index"
-                                     class="orderline-row"
-                                     style="padding:6px 8px; margin-bottom:6px;">
+                   <div class="orderlines-container" style="margin-top:8px;">
+    <t t-if="props.orderlines and props.orderlines.length">
+        <div t-foreach="props.orderlines"
+             t-as="orderline"
+             t-key="orderline_index"
+             class="orderline-row"
+             style="padding:6px 8px; margin-bottom:10px;">
 
-                                    <!-- Product Name -->
-                                    <div style="font-size:12px;
-                                                font-weight:600;
-                                                color:#333;
-                                                word-break:break-word;">
-                                        <t t-esc="orderline.productName"/>
-                                    </div>
+            <!-- PRODUCT NAME -->
+            <div style="
+                display:grid;
+                grid-template-columns: 120px 1fr;
+                font-size:11px;
+                margin-top:4px;
+            ">
+                <span>
+                    Product Name:
+                </span>
+                <span style="font-weight:600; text-align:right;">
+                    <t t-esc="orderline.productName"/>
+                </span>
+            </div>
 
-                                    <!-- ✅ Dynamic Fields UNDER product name -->
-                                    <t t-if="orderline._dynamicValues">
-                                        <div t-foreach="Object.entries(orderline._dynamicValues)"
-                                             t-as="entry"
-                                             t-key="entry[0]"
-                                             style="display:flex;
-                                                    justify-content:space-between;
-                                                    font-size:10px;
-                                                    margin-top:2px;
-                                                    padding-left:6px;
-                                                    color:#555;">
-                                            <span style="opacity:0.6;">
-                                                <t t-esc="entry[0]"/>
-                                            </span>
-                                            <span style="font-weight:600;">
-                                                <t t-esc="entry[1] || ''"/>
-                                            </span>
-                                        </div>
-                                    </t>
-
-                                    <!-- Qty + Price row -->
-                                    <div style="display:flex;
-                                                justify-content:space-between;
-                                                align-items:center;
-                                                margin-top:4px;
-                                                font-size:11px;">
-                                        <span style="opacity:0.7;">
-                                            Qty: <t t-esc="orderline.qty"/>
-                                        </span>
-                                        <span style="font-size:13px; font-weight:700; color:#000;">
-                                            <t t-esc="orderline.price"/>
-                                        </span>
-                                    </div>
-
-                                    <!-- DROP ZONE -->
-                                    <div class="design3-order-dropzone receipt-header-dropzone"
-                                         data-zone="order"
-                                         t-on-dragover.prevent
-                                         t-on-drop="onColumnDropUniversal"
-                                         style="margin-top:4px;
-                                                padding:3px;
-                                                min-height:18px;
-                                                text-align:center;
-                                                font-size:9px;
-                                                color:#888;">
-                                        <span class="customizer-only-text"></span>
-                                    </div>
-                                </div>
-
-                        </t>
-                    </div>
+            <!-- DYNAMIC FIELDS (Default code etc.) -->
+            <t t-if="orderline._dynamicValues">
+                <div t-foreach="Object.entries(orderline._dynamicValues)"
+                     t-as="entry"
+                     t-key="entry[0]"
+                     style="
+                        display:grid;
+                        grid-template-columns: 120px 1fr;
+                        font-size:12px;
+                        margin-top:2px;
+                        color:#000;
+                     ">
+                    <span>
+                        <t t-esc="entry[0]"/>:
+                    </span>
+                    <span style="font-weight:600; text-align:right;">
+                        <t t-esc="entry[1] || ''"/>
+                    </span>
                 </div>
+            </t>
+
+            <!-- QTY -->
+            <div style="
+                display:grid;
+                grid-template-columns: 120px 1fr;
+                font-size:11px;
+                margin-top:2px;
+            ">
+                <span>
+                    Qty:
+                </span>
+                <span style="text-align:right;">
+                    <t t-esc="orderline.qty"/>
+                </span>
+            </div>
+
+            <!-- PRICE (UNIT PRICE, RIGHT SIDE, UNDER QTY) -->
+            <div style="
+                display:grid;
+                grid-template-columns: 120px 1fr;
+                font-size:13px;
+                margin-top:2px;
+            ">
+                <span></span>
+                <span style="text-align:right; font-weight:700; color:#000;">
+                    <t t-esc="orderline.price"/>
+                </span>
+            </div>
+
+            <!-- DROP ZONE -->
+            <div class="design3-order-dropzone receipt-header-dropzone"
+                 data-zone="order"
+                 t-on-dragover.prevent
+                 t-on-drop="onColumnDropUniversal"
+                 style="margin-top:4px;
+                        padding:3px;
+                        min-height:18px;
+                        text-align:center;
+                        font-size:12px;
+                        color:#888;">
+                <span class="customizer-only-text"></span>
+            </div>
+        </div>
+    </t>
+</div>
+
 
                 <!-- TOTALS SECTION - COMPACT -->
                 <div class="receipt-totals" style="margin-top:15px; padding:10px; border:2px solid #000;">

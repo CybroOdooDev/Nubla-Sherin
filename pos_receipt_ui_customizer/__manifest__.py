@@ -50,6 +50,7 @@
             'pos_receipt_ui_customizer/static/src/js/receipt_design.js',
             'pos_receipt_ui_customizer/static/src/xml/order_receipt.xml',
             'pos_receipt_ui_customizer/static/src/overrides/app/models/pos_order.js',
+
         ],
         'web.assets_backend': [
             'pos_receipt_ui_customizer/static/src/js/layout_customisation.js',

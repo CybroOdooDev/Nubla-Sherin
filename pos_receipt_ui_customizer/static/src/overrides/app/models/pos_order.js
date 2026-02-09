@@ -24,29 +24,24 @@ patch(PosOrder.prototype, {
         res.custom_receipt_token = this.custom_receipt_token || null;
 
         const jsLines = this.lines || [];
-        const isCustom = config.is_custom_receipt;
-
         res.orderlines = (res.orderlines || []).map((line, index) => {
             const enriched = { ...line };
+            const jsLine = jsLines[index];
+            const product = jsLine?.product_id;
 
-            if (isCustom) {
-                const jsLine = jsLines[index];
-                const product = jsLine?.product_id;
+            fields.forEach(f => enriched[f] = "");
 
-                fields.forEach(f => enriched[f] = "");
-
-                if (product) {
-                    fields.forEach(f => {
-                        let value = product[f];
-                        if (value == null) value = "";
-                        else if (typeof value === "object") {
-                            value = value.display_name || value.name || "";
-                        } else {
-                            value = String(value);
-                        }
-                        enriched[f] = value;
-                    });
-                }
+            if (product) {
+                fields.forEach(f => {
+                    let value = product[f];
+                    if (value == null) value = "";
+                    else if (typeof value === "object") {
+                        value = value.display_name || value.name || "";
+                    } else {
+                        value = String(value);
+                    }
+                    enriched[f] = value;
+                });
             }
             return enriched;
         });

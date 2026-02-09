@@ -262,7 +262,7 @@ body:not(.o_pos_receipt_layout_client_action) .pos-receipt {
     font-size: 11px;
     color: #1976d2;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s ease;8
 }
 
 .o_pos_receipt_layout_client_action .field-indicator-editor-only:hover {

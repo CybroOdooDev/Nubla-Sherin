@@ -10,25 +10,10 @@ class PosSession(models.Model):
             res.append('pos.receipt')
         return res
 
-    def _loader_params_pos_config(self):
-        res = super()._loader_params_pos_config()
-        res['search_params']['fields'].extend([
-            'is_custom_receipt',
-            'receipt_design_id',
-            'design_receipt',
-            'design_receipt_font_style',
-            'selected_product_fields',
-            'selected_columns_config'
-        ])
-        return res
-
     def _loader_params_pos_receipt(self):
         return {
             'search_params': {
-                'fields': [
-                    'id', 'design_receipt', 'design_receipt_font_style', 
-                    'is_custom_receipt', 'selected_product_fields', 'selected_columns_config'
-                ],
+                'fields': ['id', 'design_receipt', 'design_receipt_font_style'],
             }
         }
 

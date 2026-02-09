@@ -57,3 +57,4 @@ class PosReceipt(models.Model):
 
 
 
+

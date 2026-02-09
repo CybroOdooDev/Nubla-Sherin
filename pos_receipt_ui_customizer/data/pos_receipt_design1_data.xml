@@ -48,9 +48,17 @@
                     style="width:100%; border-collapse:collapse; font-size:15px; margin-top:10px;">
                     <thead class="no-drop-zone">
                         <tr style="border-bottom:1px dashed black;" class="receipt-header-dropzone">
-                            <th style="text-align:left; padding:10px; font-size:15px; width:40%;">Product</th>
-                            <th style="text-align:center; padding:10px; font-size:15px; width:10%;">Qty</th>
-                            <th style="text-align:right; padding:10px; font-size:15px; width:15%;">Amount</th>
+                            <th style="text-align:left; padding:4px; font-size:12px; width:40%;">Product</th>
+                            <th style="text-align:left; padding:4px; font-size:12px; width:10%;">Qty</th>
+                            <th style="text-align:left; padding:4px; font-size:12px; width:15%;">Amount</th>
+                            
+                            <!-- Dynamic column headers -->
+                            <t t-if="props.dynamic_fields and props.dynamic_fields.length">
+                                <th t-foreach="props.dynamic_fields" t-as="field" t-key="field"
+                                    style="text-align:center; font-size:12px; padding:4px; white-space:nowrap;">
+                                    <t t-esc="field.replace('_', ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')"/>
+                                </th>
+                            </t>
                         </tr>
                     </thead>
                    <tbody>
@@ -67,10 +75,12 @@
                             <td style="padding:4px; text-align:left; font-size:14px;">
                                 <t t-esc="orderline.price"/>
                             </td>
+                            
+                            <!-- Dynamic column values -->
                             <td t-foreach="Object.values(orderline._dynamicValues || {})"
                                     t-as="value"
                                     t-key="value_index"
-                                    style="text-align:center; vertical-align:center;">
+                                    style="text-align:center; vertical-align:center; padding:4px; white-space:nowrap;">
                                     <t t-esc="value || ''"/>
                                 </td>
                             </tr>
@@ -83,28 +93,20 @@
             <br/><br/>
 
 
-                    <!-- TOTALS -->
-                    <div style="width:100%; display:flex; justify-content:center; margin-top:20px;">
+            <!-- TOTALS -->
+            <div id="subtotalDiv" class="selectable-box"
+                 style="font-weight:700; justify-content:center;">
+                Subtotal :
+                <span class="placeholder-span">[[ receipt.total_without_tax ]]</span>
+            </div>
 
-                        <div style="text-align:left; font-weight:700;">
+            <br/>
 
-                            <div id="subtotalDiv"
-                                 style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
-                                <span>Subtotal :</span>
-                                <span class="placeholder-span">[[ receipt.total_without_tax ]]</span>
-                            </div>
-
-                            <div id="totalDiv"
-                                 style="display:flex; align-items:center; gap:6px; font-size:16px;">
-                                <span>TOTAL :</span>
-                                <span class="placeholder-span">[[ receipt.amount_total ]]</span>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
+            <div id="totalDiv" class="selectable-box"
+                 style="font-weight:700; justify-content:center;">
+                TOTAL :
+                <span class="placeholder-span">[[ receipt.amount_total ]]</span>
+            </div>
              <br/>
               <br/>
 
