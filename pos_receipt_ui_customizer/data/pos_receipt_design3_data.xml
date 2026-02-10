@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <data noupdate="0">
     <record id="pos_receipt_design3" model="pos.receipt">
         <field name="name">Design 3 - Row Layout</field>
         <field name="design_receipt"><![CDATA[
@@ -70,8 +71,8 @@
                         margin-top:2px;
                         color:#000;
                      ">
-                    <span>
-                        <t t-esc="entry[0]"/>:
+                    <span style="text-transform: capitalize;">
+                        <t t-esc="entry[0].replace('_', ' ')"/>:
                     </span>
                     <span style="font-weight:600; text-align:right;">
                         <t t-esc="entry[1] || ''"/>
@@ -163,4 +164,5 @@
             </div>
         ]]></field>
     </record>
+    </data>
 </odoo>

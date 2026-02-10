@@ -33,8 +33,6 @@ class PosOrder(models.Model):
             img = qr.make_image(fill_color="black", back_color="white").convert("RGB")
             print("order", order)
             print("order", order.name)
-
-
             buf = io.BytesIO()
             img.save(buf, format="PNG")
 

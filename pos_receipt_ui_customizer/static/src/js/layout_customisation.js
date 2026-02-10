@@ -431,14 +431,14 @@ class PosReceiptLayoutClientAction extends Component {
 
 
     async loadEnableQr() {
-        const [config] = await this.orm.read(
-            "pos.config",
-            [this.config_id],
+        const [receipt] = await this.orm.read(
+            "pos.receipt",
+            [this.receipt_id],
             ["enable_qr", "enable_qr_section"]
         );
 
-        this.state.enableQr = !!config.enable_qr;
-        this.state.showSection = !!config.enable_qr_section;
+        this.state.enableQr = !!receipt.enable_qr;
+        this.state.showSection = !!receipt.enable_qr_section;
 
         console.log("Loaded enable_qr:", this.state.enableQr);
         console.log("Loaded enable_qr_section:", this.state.showSection);
@@ -559,7 +559,20 @@ class PosReceiptLayoutClientAction extends Component {
     }
 
     async saveEditedReceipt() {
-        this.state.receipt = this.receiptContentRef.el.innerHTML;
+        // Clone the element to avoid modifying the visual editor
+        const clone = this.receiptContentRef.el.cloneNode(true);
+
+        // For Design 3, clean the dropzones (remove JS-added visual elements)
+        // The XML loop handles the actual printing based on selected_product_fields
+        if (this.isDesign3()) {
+            const dropzones = clone.querySelectorAll(".receipt-header-dropzone");
+            dropzones.forEach(dz => {
+                // Restore to default empty state
+                dz.innerHTML = '<span class="customizer-only-text"></span>';
+            });
+        }
+
+        this.state.receipt = clone.innerHTML;
 
         // Remove hardcoded "Display Name" labels before saving
         this.state.receipt = this.state.receipt.replace(/Display Name/gi, "");
@@ -569,14 +582,10 @@ class PosReceiptLayoutClientAction extends Component {
             design_receipt: this.state.receipt,
             design_receipt_font_style: this.state.fontStyle,
             logo: this.state.logo,
-        });
-        console.log("FONTSTYLE", this.state.fontStyle)
-
-        await this.orm.write("pos.config", [this.config_id], {
             enable_qr: !!this.state.enableQr,
             enable_qr_section: !!this.state.showSection,
-
         });
+        console.log("FONTSTYLE", this.state.fontStyle)
 
         this.notification.add("Receipt Successfully Updated!", {
             type: "success",
@@ -768,7 +777,7 @@ class PosReceiptLayoutClientAction extends Component {
 
         th.style.textAlign = "center";
         th.style.width = "35%";
-        th.style.padding = "4px";
+        th.style.padding = "12px";
         th.style.whiteSpace = "nowrap";
         th.style.fontFamily = "inherit";
         th.style.overflow = "visible";

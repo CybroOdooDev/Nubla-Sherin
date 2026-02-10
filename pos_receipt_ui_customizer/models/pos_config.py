@@ -48,14 +48,16 @@ class PosConfig(models.Model):
         store=True
     )
     enable_qr = fields.Boolean(
-        "Enable Receipt QR",
-        compute="_compute_enable_qr",
+        string="Enable Receipt QR",
+        related='receipt_design_id.enable_qr',
+        readonly=False,
         store=True,
-        default=True,
     )
     enable_qr_section = fields.Boolean(
         string="Enable QR Section",
-        default=False,
+        related='receipt_design_id.enable_qr_section',
+        readonly=False,
+        store=True,
     )
 
     receipt_bg_color = fields.Char(
@@ -63,12 +65,6 @@ class PosConfig(models.Model):
         default="#abc64b"
     )
     receipt_bg_image = fields.Binary("Receipt Background Image")
-
-    @api.depends("enable_qr")
-    def _compute_enable_qr(self):
-        print("dhhhhhhhhhhhhhhhhhhhhbw")
-        for rec in self:
-            rec.enable_qr = bool(rec.receipt_design_id.enable_qr)
 
     @api.depends('receipt_design_id', 'receipt_design_id.selected_product_fields')
     def _compute_selected_product_fields(self):

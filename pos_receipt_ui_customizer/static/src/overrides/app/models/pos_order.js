@@ -14,10 +14,12 @@ patch(PosOrder.prototype, {
 
 
         let fields = [];
-        try {
-            fields = JSON.parse(config.selected_product_fields || "[]");
-        } catch {
-            fields = [];
+        if (config.is_custom_receipt) {
+            try {
+                fields = JSON.parse(config.selected_product_fields || "[]");
+            } catch {
+                fields = [];
+            }
         }
         res.dynamic_fields = fields;
         res.custom_qr_image = this.custom_qr_image || null;

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <data noupdate="1">
     <record id="pos_receipt_design1" model="pos.receipt">
         <field name="name">Design 1</field>
         <field name="design_receipt"><![CDATA[
@@ -48,17 +49,10 @@
                     style="width:100%; border-collapse:collapse; font-size:15px; margin-top:10px;">
                     <thead class="no-drop-zone">
                         <tr style="border-bottom:1px dashed black;" class="receipt-header-dropzone">
-                            <th style="text-align:left; padding:4px; font-size:12px; width:40%;">Product</th>
-                            <th style="text-align:left; padding:4px; font-size:12px; width:10%;">Qty</th>
-                            <th style="text-align:left; padding:4px; font-size:12px; width:15%;">Amount</th>
-                            
-                            <!-- Dynamic column headers -->
-                            <t t-if="props.dynamic_fields and props.dynamic_fields.length">
-                                <th t-foreach="props.dynamic_fields" t-as="field" t-key="field"
-                                    style="text-align:center; font-size:12px; padding:4px; white-space:nowrap;">
-                                    <t t-esc="field.replace('_', ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')"/>
-                                </th>
-                            </t>
+                            <th style="text-align:left; padding:13px; font-size:12px; width:40%;">Product</th>
+                            <th style="text-align:left; padding:13px; font-size:12px; width:10%;">Qty</th>
+                            <th style="text-align:left; padding:13px; font-size:12px; width:15%;">Amount</th>
+
                         </tr>
                     </thead>
                    <tbody>
@@ -87,7 +81,7 @@
                         </t>
                     </tbody>
 
-                    </table>
+                 </table>
             </div>
 
             <br/><br/>
@@ -140,4 +134,5 @@
         </div>
         ]]></field>
     </record>
+    </data>
 </odoo>

@@ -53,6 +53,10 @@ class PosReceipt(models.Model):
         string="Enable Receipt QR",
         default=False
     )
+    enable_qr_section = fields.Boolean(
+        string="Enable QR Section",
+        default=False
+    )
 
 
 
