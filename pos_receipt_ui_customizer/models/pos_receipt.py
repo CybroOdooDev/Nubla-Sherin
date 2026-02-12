@@ -58,7 +58,44 @@ class PosReceipt(models.Model):
         default=False
     )
 
+    qr_size = fields.Integer(
+        string='URL QR Code Size',
+        default=120,
+        help='Size of the URL QR code in pixels (80-300px)'
+    )
+
+    qr_position = fields.Selection([
+        ('left', 'Left'),
+        ('center', 'Center'),
+        ('right', 'Right')
+    ], string='URL QR Position', default='center',
+        help='Alignment position for the URL QR code')
+
+    receipt_qr_size = fields.Integer(
+        string='Receipt QR Code Size',
+        default=120,
+        help='Size of the receipt QR code in pixels (80-300px)'
+    )
+
+    receipt_qr_position = fields.Selection([
+        ('left', 'Left'),
+        ('center', 'Center'),
+        ('right', 'Right')
+    ], string='Receipt QR Position', default='center',
+        help='Alignment position for the receipt QR code')
 
 
 
 
+
+
+    def action_open_receipt_layout(self):
+        self.ensure_one()
+        return {
+            "type": "ir.actions.client",
+            "tag": "pos_receipt_layout_client_action",
+            "target": "current",
+            "params": {
+                "receipt_id": self.id,
+            }
+        }

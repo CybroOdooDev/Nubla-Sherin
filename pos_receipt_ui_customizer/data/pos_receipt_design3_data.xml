@@ -36,12 +36,12 @@
                     </div>
 
                     <!-- Compact orderlines -->
-                   <div class="orderlines-container" style="margin-top:8px;">
+                   <div class="orderlines-container no-drop-zone" style="margin-top:8px;">
     <t t-if="props.orderlines and props.orderlines.length">
         <div t-foreach="props.orderlines"
              t-as="orderline"
              t-key="orderline_index"
-             class="orderline-row"
+             class="orderline-row no-drop-zone"
              style="padding:6px 8px; margin-bottom:10px;">
 
             <!-- PRODUCT NAME -->
@@ -72,7 +72,7 @@
                         color:#000;
                      ">
                     <span style="text-transform: capitalize;">
-                        <t t-esc="entry[0].replace('_', ' ')"/>:
+                        <t t-esc="entry[0].replace('_', ' ')"/>
                     </span>
                     <span style="font-weight:600; text-align:right;">
                         <t t-esc="entry[1] || ''"/>
@@ -86,44 +86,44 @@
                 grid-template-columns: 120px 1fr;
                 font-size:11px;
                 margin-top:2px;
-            ">
-                <span>
-                    Qty:
-                </span>
-                <span style="text-align:right;">
-                    <t t-esc="orderline.qty"/>
-                </span>
-            </div>
+                " class="no-drop-zone">
+                            <span>
+                                Qty:
+                            </span>
+                            <span style="text-align:right;">
+                                <t t-esc="orderline.qty"/>
+                            </span>
+                        </div>
 
-            <!-- PRICE (UNIT PRICE, RIGHT SIDE, UNDER QTY) -->
-            <div style="
-                display:grid;
-                grid-template-columns: 120px 1fr;
-                font-size:13px;
-                margin-top:2px;
-            ">
-                <span></span>
-                <span style="text-align:right; font-weight:700; color:#000;">
-                    <t t-esc="orderline.price"/>
-                </span>
-            </div>
+                        <!-- PRICE (UNIT PRICE, RIGHT SIDE, UNDER QTY) -->
+                        <div style="
+                            display:grid;
+                            grid-template-columns: 120px 1fr;
+                            font-size:13px;
+                            margin-top:2px;
+                        " class ="no-drop-zone">
+                            <span></span>
+                            <span style="text-align:right; font-weight:700; color:#000;">
+                                <t t-esc="orderline.price"/>
+                            </span>
+                        </div>
 
-            <!-- DROP ZONE -->
-            <div class="design3-order-dropzone receipt-header-dropzone"
+                        <!-- DROP ZONE -->
+                       <div class="design3-order-dropzone receipt-header-dropzone no-drop-zone"
                  data-zone="order"
-                 t-on-dragover.prevent
-                 t-on-drop="onColumnDropUniversal"
+
                  style="margin-top:4px;
                         padding:3px;
                         min-height:18px;
                         text-align:center;
                         font-size:12px;
                         color:#888;">
-                <span class="customizer-only-text"></span>
+                        <span class="customizer-only-text"></span>
+                    </div>
+
+                    </div>
+                </t>
             </div>
-        </div>
-    </t>
-</div>
 
 
                 <!-- TOTALS SECTION - COMPACT -->

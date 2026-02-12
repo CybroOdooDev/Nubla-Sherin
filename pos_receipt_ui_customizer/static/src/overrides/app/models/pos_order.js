@@ -8,9 +8,7 @@ patch(PosOrder.prototype, {
     export_for_printing() {
         const res = super.export_for_printing(...arguments);
         const config = this.config || {};
-        // console.log(res,"RESSSSSSSSSSSSSSSSSS")
-        // console.log(this.custom_qr_image,"SHHHHHHHHH")
-        // console.log(this.custom_receipt_token,"SHHHHHHHHH")
+
 
 
         let fields = [];

@@ -25,10 +25,9 @@ class PosReceiptLayoutClientAction extends Component {
 
 
         this.receipt_id = this.props.action?.params?.receipt_id || this.props.action?.context?.active_id;
-        //        this.receipt_id = this.props.action.context.active_id;
+
         this.state = useState({
             fontStyle: "Arial",
-
             fields: [],
             logo: '',
             prev_logo: '',
@@ -40,6 +39,12 @@ class PosReceiptLayoutClientAction extends Component {
             headerFields: [],
             draggedField: null,
 
+            // NEW: QR Code settings
+            qrSize: 120,
+            qrPosition: "center",
+            receiptQrSize: 120,
+            receiptQrPosition: "center",
+
             popup: {
                 visible: false,
                 x: 0,
@@ -48,24 +53,19 @@ class PosReceiptLayoutClientAction extends Component {
                 columnIndex: null,
                 selectedField: "",
             },
-
-
         });
 
         onWillStart(async () => {
-
             await this.loadProductFields();
             await this.loadPosConfigId();
             await this.loadEnableQr();
-
+            await this.loadQrSettings(); // NEW: Load QR settings
         });
 
         onMounted(async () => {
             await this.loadReceipt();
-
             await this.restoreSavedColumnsUniversal();
             await this.restoreSavedColumnsMaster();
-
             this.mediumEditor();
             this.preventPartialSelection();
             this.allowSpace();
@@ -74,7 +74,94 @@ class PosReceiptLayoutClientAction extends Component {
                 this.renderReceiptQr();
             }
         });
+    }
 
+    // NEW: Load QR settings from database
+    async loadQrSettings() {
+        if (!this.receipt_id) return;
+
+        try {
+            const [receipt] = await this.orm.read(
+                "pos.receipt",
+                [this.receipt_id],
+                ["qr_size", "qr_position", "receipt_qr_size", "receipt_qr_position"]
+            );
+
+            if (receipt) {
+                this.state.qrSize = receipt.qr_size || 120;
+                this.state.qrPosition = receipt.qr_position || "center";
+                this.state.receiptQrSize = receipt.receipt_qr_size || 120;
+                this.state.receiptQrPosition = receipt.receipt_qr_position || "center";
+            }
+        } catch (error) {
+            // Fields don't exist yet - use defaults
+            console.log("QR settings fields not found, using defaults");
+            this.state.qrSize = 120;
+            this.state.qrPosition = "center";
+            this.state.receiptQrSize = 120;
+            this.state.receiptQrPosition = "center";
+        }
+    }
+
+    // NEW: Handle URL QR size change
+    onQrSizeChange(ev) {
+        this.state.qrSize = parseInt(ev.target.value);
+        this.updateCustomQr();
+    }
+
+    // NEW: Handle URL QR position change
+    onQrPositionChange(ev) {
+        this.state.qrPosition = ev.target.value;
+        this.updateCustomQr();
+    }
+
+    // NEW: Handle Receipt QR size change
+    onReceiptQrSizeChange(ev) {
+        this.state.receiptQrSize = parseInt(ev.target.value);
+        this.renderReceiptQr();
+    }
+
+    // NEW: Handle Receipt QR position change
+    onReceiptQrPositionChange(ev) {
+        this.state.receiptQrPosition = ev.target.value;
+        this.renderReceiptQr();
+    }
+
+    // NEW: Update custom URL QR appearance
+    updateCustomQr() {
+        const editor = this.receiptContentRef.el;
+        if (!editor) return;
+
+        const targetArea = editor.querySelector(".qrArea");
+        if (!targetArea) return;
+
+        const qrPlaceholder = targetArea.querySelector(".custom-qr-placeholder");
+        if (!qrPlaceholder) return;
+
+        // Apply positioning
+        const alignmentMap = {
+            left: "flex-start",
+            center: "center",
+            right: "flex-end"
+        };
+        targetArea.style.display = "flex";
+        targetArea.style.justifyContent = alignmentMap[this.state.qrPosition] || "center";
+
+        // Apply size to QR
+        const qrBox = qrPlaceholder.querySelector("div");
+        if (qrBox) {
+            const canvas = qrBox.querySelector("canvas");
+            const img = qrBox.querySelector("img");
+
+            if (canvas) {
+                canvas.style.width = `${this.state.qrSize}px`;
+                canvas.style.height = `${this.state.qrSize}px`;
+            }
+            if (img) {
+                img.style.width = `${this.state.qrSize}px`;
+                img.style.height = `${this.state.qrSize}px`;
+            }
+        }
     }
 
     applyFontStyle() {
@@ -90,12 +177,11 @@ class PosReceiptLayoutClientAction extends Component {
         const fieldName = ev.target.value;
         if (!fieldName) return;
 
-
         const mockData = await this.getMockProductData([fieldName]);
-
         this.addColumnAtIndexUniversal(fieldName, 0, mockData);
     }
 
+    // UPDATED: Apply size and position settings
     renderReceiptQr() {
         if (!this.state.enableQr) return;
 
@@ -112,25 +198,34 @@ class PosReceiptLayoutClientAction extends Component {
 
         const qrDiv = document.createElement("div");
         qrDiv.className = "receipt-qr-placeholder";
-        qrDiv.style.textAlign = "center";
+
+        // NEW: Apply positioning
+        const alignmentMap = {
+            left: "flex-start",
+            center: "center",
+            right: "flex-end"
+        };
+
+        qrDiv.style.display = "flex";
+        qrDiv.style.justifyContent = alignmentMap[this.state.receiptQrPosition] || "center";
         qrDiv.style.marginTop = "12px";
 
         const img = templateImg.cloneNode(true);
-        img.style.width = "120px";
-        img.style.height = "120px";
+        // NEW: Apply size
+        img.style.width = `${this.state.receiptQrSize}px`;
+        img.style.height = `${this.state.receiptQrSize}px`;
+        img.style.margin = "0"; // Reset margin to allow flex positioning
 
         if (!this.props.data?.custom_qr_image) {
             const tempContainer = document.createElement('div');
             tempContainer.style.position = 'absolute';
-            tempContainer.style.left = '-9999px';  // Hide off-screen
-            tempContainer.style.width = '120px';
-            tempContainer.style.height = '120px';
+            tempContainer.style.left = '-9999px';
             document.body.appendChild(tempContainer);
 
             new QRCode(tempContainer, {
                 text: "Demo Receipt QR",
-                width: 120,
-                height: 120,
+                width: this.state.receiptQrSize, // NEW: Use dynamic size
+                height: this.state.receiptQrSize, // NEW: Use dynamic size
                 colorDark: "#000000",
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
@@ -147,8 +242,6 @@ class PosReceiptLayoutClientAction extends Component {
         wrapper.appendChild(qrDiv);
     }
 
-
-
     async restoreSavedColumns() {
         try {
             if (!this.receipt_id) {
@@ -156,7 +249,6 @@ class PosReceiptLayoutClientAction extends Component {
                 return;
             }
 
-            // Wait for receipt content to load
             let retries = 0;
             const maxRetries = 10;
             while (!this.receiptContentRef?.el && retries < maxRetries) {
@@ -264,6 +356,7 @@ class PosReceiptLayoutClientAction extends Component {
             console.error("Error in master restore:", error);
         }
     }
+
     async getMockProductData(fields = []) {
         if (!Array.isArray(fields) || fields.length === 0) {
             console.warn("getMockProductData: no fields provided, using fallback");
@@ -291,10 +384,6 @@ class PosReceiptLayoutClientAction extends Component {
         }
     }
 
-
-
-
-
     enableColumnDropZones() {
         const table = this.receiptContentRef.el.querySelector(".receipt-table");
 
@@ -310,11 +399,9 @@ class PosReceiptLayoutClientAction extends Component {
         );
 
         headers.forEach((th, index) => {
-
-            // Allow drag
             th.addEventListener("dragover", (ev) => {
                 if (ev.dataTransfer.types.includes("application/x-pos-column")) {
-                    ev.preventDefault(); // REQUIRED
+                    ev.preventDefault();
                     th.classList.add("column-hover");
                 }
             });
@@ -323,7 +410,6 @@ class PosReceiptLayoutClientAction extends Component {
                 th.classList.remove("column-hover");
             });
 
-            // Handle drop
             th.addEventListener("drop", (ev) => {
                 ev.preventDefault();
                 th.classList.remove("column-hover");
@@ -388,7 +474,6 @@ class PosReceiptLayoutClientAction extends Component {
         }
     }
 
-
     async getPosConfig() {
         const [config] = await this.orm.searchRead(
             "pos.config",
@@ -429,19 +514,24 @@ class PosReceiptLayoutClientAction extends Component {
         console.log("POS CONFIG ID:", this.config_id);
     }
 
-
     async loadEnableQr() {
-        const [receipt] = await this.orm.read(
-            "pos.receipt",
-            [this.receipt_id],
-            ["enable_qr", "enable_qr_section"]
-        );
+        try {
+            const [receipt] = await this.orm.read(
+                "pos.receipt",
+                [this.receipt_id],
+                ["enable_qr", "enable_qr_section"]
+            );
 
-        this.state.enableQr = !!receipt.enable_qr;
-        this.state.showSection = !!receipt.enable_qr_section;
+            this.state.enableQr = !!receipt?.enable_qr;
+            this.state.showSection = !!receipt?.enable_qr_section;
 
-        console.log("Loaded enable_qr:", this.state.enableQr);
-        console.log("Loaded enable_qr_section:", this.state.showSection);
+            console.log("Loaded enable_qr:", this.state.enableQr);
+            console.log("Loaded enable_qr_section:", this.state.showSection);
+        } catch (error) {
+            console.warn("Could not load QR enable fields:", error);
+            this.state.enableQr = false;
+            this.state.showSection = false;
+        }
     }
 
     async mediumEditor() {
@@ -456,6 +546,7 @@ class PosReceiptLayoutClientAction extends Component {
     }
 
     async allowSpace() {
+        if (!this.receiptContentRef.el) return;
         this.receiptContentRef.el.addEventListener("keydown", (ev) => {
             if (ev.key === " " || ev.keyCode === 32) {
                 const sel = window.getSelection();
@@ -504,6 +595,17 @@ class PosReceiptLayoutClientAction extends Component {
             this.state.receipt = receipt.design_receipt;
         }
         let html = this.state.receipt
+
+        // Fix for "html.replace is not a function" crash
+        if (typeof html !== 'string') {
+            if (html === null || html === undefined || html === false) {
+                html = "";
+            } else {
+                this.notification.add(`Invalid receipt design format (${typeof html}). Expected XML string.`, { type: 'warning' });
+                html = String(html);
+            }
+        }
+
         let logo;
         if (reset === false || !this.state.prev_logo) {
             logo = this.state.logo;
@@ -528,10 +630,7 @@ class PosReceiptLayoutClientAction extends Component {
             );
         }
         this.receiptContentRef.el.innerHTML = html;
-
-        // FIXED: Apply font style after loading receipt
         this.applyFontStyle();
-
         this.enableColumnDropZones();
     }
 
@@ -558,33 +657,49 @@ class PosReceiptLayoutClientAction extends Component {
         reader.readAsDataURL(file);
     }
 
+    // UPDATED: Save QR settings
     async saveEditedReceipt() {
-        // Clone the element to avoid modifying the visual editor
         const clone = this.receiptContentRef.el.cloneNode(true);
 
-        // For Design 3, clean the dropzones (remove JS-added visual elements)
-        // The XML loop handles the actual printing based on selected_product_fields
         if (this.isDesign3()) {
             const dropzones = clone.querySelectorAll(".receipt-header-dropzone");
             dropzones.forEach(dz => {
-                // Restore to default empty state
                 dz.innerHTML = '<span class="customizer-only-text"></span>';
             });
         }
 
         this.state.receipt = clone.innerHTML;
-
-        // Remove hardcoded "Display Name" labels before saving
         this.state.receipt = this.state.receipt.replace(/Display Name/gi, "");
         this.state.receipt = this.state.receipt.replace(/display_name/gi, "");
 
-        await this.orm.write("pos.receipt", [this.receipt_id], {
+        // Prepare data to save
+        const dataToSave = {
             design_receipt: this.state.receipt,
             design_receipt_font_style: this.state.fontStyle,
             logo: this.state.logo,
             enable_qr: !!this.state.enableQr,
             enable_qr_section: !!this.state.showSection,
-        });
+        };
+
+        // Try to save QR settings - only if fields exist in model
+        try {
+            dataToSave.qr_size = this.state.qrSize;
+            dataToSave.qr_position = this.state.qrPosition;
+            dataToSave.receipt_qr_size = this.state.receiptQrSize;
+            dataToSave.receipt_qr_position = this.state.receiptQrPosition;
+
+            await this.orm.write("pos.receipt", [this.receipt_id], dataToSave);
+        } catch (error) {
+            // If QR fields don't exist, save without them
+            console.log("QR settings fields not available, saving without them");
+            delete dataToSave.qr_size;
+            delete dataToSave.qr_position;
+            delete dataToSave.receipt_qr_size;
+            delete dataToSave.receipt_qr_position;
+
+            await this.orm.write("pos.receipt", [this.receipt_id], dataToSave);
+        }
+
         console.log("FONTSTYLE", this.state.fontStyle)
 
         this.notification.add("Receipt Successfully Updated!", {
@@ -593,8 +708,6 @@ class PosReceiptLayoutClientAction extends Component {
 
         setTimeout(() => window.location.reload(), 800);
     }
-
-
 
     async resetEditedReceipt() {
         if (this.state.prev_receipt) {
@@ -607,14 +720,9 @@ class PosReceiptLayoutClientAction extends Component {
         });
     }
 
-
-
-
-
-    // FIXED: Update font style when changed and apply immediately
     onFontChange(ev) {
         this.state.fontStyle = ev.target.value;
-        this.applyFontStyle(); // Apply immediately to preview
+        this.applyFontStyle();
     }
 
     async onModelChange(ev) {
@@ -658,8 +766,6 @@ class PosReceiptLayoutClientAction extends Component {
         this.receiptContentRef.el.classList.add("drop-highlight");
     }
 
-
-
     onDragEnd() {
         this.receiptContentRef.el.classList.remove("dragging");
         console.log("DAGGEDEND!!!!1")
@@ -670,19 +776,28 @@ class PosReceiptLayoutClientAction extends Component {
         ev.preventDefault();
         console.log("DROP!@#$")
 
-
         if (ev.dataTransfer.types.includes("application/x-pos-column")) {
             return;
         }
-        if (ev.target.closest(".no-drop-zone, .receipt-header")) {
+
+        // UPDATED: Enhanced no-drop-zone check for Design 3
+        const noDropZone = ev.target.closest(".no-drop-zone");
+        if (noDropZone) {
+            console.warn("Drop blocked in protected area (no-drop-zone)");
+            this.notification.add("Cannot drop fields in this area. Use designated drop zones only.", {
+                type: "warning"
+            });
+            return;
+        }
+
+        // Original check for receipt header
+        if (ev.target.closest(".receipt-header")) {
             console.warn("Drop blocked in receipt header");
             return;
         }
 
-
         const editor = this.receiptContentRef.el;
         console.log("EDITOR", editor)
-
 
         const fieldText = ev.dataTransfer.getData("text/plain");
         if (!fieldText) return;
@@ -725,7 +840,6 @@ class PosReceiptLayoutClientAction extends Component {
         setTimeout(() => span.classList.remove("added"), 400);
     }
 
-
     onColumnDragStart(ev) {
         ev.stopPropagation();
         ev.dataTransfer.setData(
@@ -743,7 +857,6 @@ class PosReceiptLayoutClientAction extends Component {
         const headerRow = table.querySelector("thead tr");
         const bodyRows = table.querySelectorAll("tbody tr");
 
-        // Prevent duplicate header
         if (headerRow.querySelector(`[data-field="${fieldName}"]`)) {
             this.notification.add("Column already added", { type: "warning" });
             return;
@@ -758,12 +871,11 @@ class PosReceiptLayoutClientAction extends Component {
             return;
         }
 
-        // Adjust static column widths
         const staticHeaders = headerRow.querySelectorAll("th:not([data-field])");
         if (staticHeaders.length >= 3) {
-            staticHeaders[0].style.width = "35%"; // Product
-            staticHeaders[1].style.width = "12%"; // Qty
-            staticHeaders[2].style.width = "18%"; // Amount
+            staticHeaders[0].style.width = "35%";
+            staticHeaders[1].style.width = "12%";
+            staticHeaders[2].style.width = "18%";
         }
 
         const th = document.createElement("th");
@@ -782,7 +894,6 @@ class PosReceiptLayoutClientAction extends Component {
         th.style.fontFamily = "inherit";
         th.style.overflow = "visible";
         th.style.fontSize = "12px";
-
 
         headerRow.appendChild(th);
 
@@ -811,16 +922,14 @@ class PosReceiptLayoutClientAction extends Component {
             if (mockData && Array.isArray(mockData) && mockData[rowIndex]) {
                 value = mockData[rowIndex][fieldName] || "";
 
-                // Format based on field type
                 if (typeof value === 'number') {
                     value = value.toFixed(2);
                 } else if (Array.isArray(value)) {
-                    value = value[1] || value[0] || ""; // Many2one field [id, name]
+                    value = value[1] || value[0] || "";
                 } else if (typeof value === 'boolean') {
                     value = value ? 'Yes' : 'No';
                 }
             }
-
             else {
                 const lines = this.props.orderlines || this.props.lines || [];
                 const line = lines[rowIndex];
@@ -864,13 +973,12 @@ class PosReceiptLayoutClientAction extends Component {
         console.log("Saved receipt columns:", fields);
     }
 
-
     showInput() {
         this.state.showSection = true;
         this.state.showSection1 = false;
     }
 
-
+    // UPDATED: Apply size and position settings
     submitValue() {
         if (!this.state.showSection) return;
 
@@ -884,12 +992,10 @@ class PosReceiptLayoutClientAction extends Component {
         const targetArea = editor?.querySelector(".qrArea");
         if (!targetArea) return;
 
-        // ❌ DO NOT touch receipt QR
         targetArea.querySelector(".custom-qr-placeholder")?.remove();
 
         const qrDiv = document.createElement("div");
         qrDiv.className = "custom-qr-placeholder";
-        qrDiv.style.textAlign = "center";
 
         const qrBox = document.createElement("div");
         qrDiv.appendChild(qrBox);
@@ -897,11 +1003,13 @@ class PosReceiptLayoutClientAction extends Component {
 
         new QRCode(qrBox, {
             text: value,
-            width: 120,
-            height: 120,
+            width: this.state.qrSize, // NEW: Use dynamic size
+            height: this.state.qrSize, // NEW: Use dynamic size
         });
-    }
 
+        // NEW: Apply positioning
+        this.updateCustomQr();
+    }
 
     onToggleQr(ev) {
         const checked = ev.target.checked;
@@ -913,10 +1021,8 @@ class PosReceiptLayoutClientAction extends Component {
             return;
         }
 
-        this.submitValue(); // recreate URL QR
+        this.submitValue();
     }
-
-
 
     onToggleReceiptQr(ev) {
         this.state.enableQr = ev.target.checked;
@@ -931,7 +1037,6 @@ class PosReceiptLayoutClientAction extends Component {
             this.renderReceiptQr();
         }
     }
-
 
     async onReceiptClick(ev) {
         if (this.receiptContentRef.el.classList.contains("column-dragging")) {
@@ -976,8 +1081,6 @@ class PosReceiptLayoutClientAction extends Component {
             cancel: () => { },
         });
     }
-
-
 
     async loadProductFields() {
         const fields = await this.orm.call("product.product", "fields_get", [], {});
@@ -1032,7 +1135,7 @@ class PosReceiptLayoutClientAction extends Component {
         const th = document.createElement("th");
         th.textContent = label;
         th.setAttribute("data-field", fieldName);
-        headerRow.appendChild(th);   // end
+        headerRow.appendChild(th);
 
         bodyRows.forEach((row) => {
             const td = document.createElement("td");
@@ -1040,9 +1143,6 @@ class PosReceiptLayoutClientAction extends Component {
             td.style.padding = "4px";
 
             const span = document.createElement("span");
-            // span.textContent = `[[ orderline.${fieldName} ]]`;
-            // span.setAttribute("t-esc", `orderline.${fieldName}`);
-
             td.appendChild(span);
             row.appendChild(td);
         });
@@ -1054,7 +1154,6 @@ class PosReceiptLayoutClientAction extends Component {
         console.log("Saved fields:", this.selectedProductFields);
         this.hidePopup();
     }
-
 
     saveDesignToConfig() {
         const receiptDiv = document.querySelector('.pos-receipt');
@@ -1100,6 +1199,7 @@ class PosReceiptLayoutClientAction extends Component {
 
         return Array.from(fields);
     }
+
     async onRemoveColumnClick(colIndex = null) {
         if (!this.lastClickedTable) {
             this.notification.add("No table selected.", { type: "danger" });
@@ -1110,7 +1210,7 @@ class PosReceiptLayoutClientAction extends Component {
         const theadRow = table.querySelector("thead tr");
         const bodyRows = table.querySelectorAll("tbody tr");
 
-        const STATIC_COL_COUNT = 3; // Product, Qty, Amount
+        const STATIC_COL_COUNT = 3;
         const columnIndex = colIndex ?? this.lastClickedColumnIndex;
 
         if (columnIndex == null || columnIndex < STATIC_COL_COUNT) {
@@ -1122,7 +1222,6 @@ class PosReceiptLayoutClientAction extends Component {
         const fieldName = th?.dataset?.field;
         if (!fieldName) return;
 
-        // Update database
         const [receipt] = await this.orm.searchRead(
             "pos.receipt",
             [["id", "=", this.receipt_id]],
@@ -1137,10 +1236,8 @@ class PosReceiptLayoutClientAction extends Component {
             selected_product_fields: JSON.stringify(fields),
         });
 
-        // Remove header
         th.remove();
 
-        // Remove ALL cells with this field name (not just by index)
         bodyRows.forEach(row => {
             const cell = row.querySelector(`td[data-field="${fieldName}"]`);
             if (cell) cell.remove();
@@ -1151,7 +1248,6 @@ class PosReceiptLayoutClientAction extends Component {
         this.lastClickedTable = null;
         this.lastClickedColumnIndex = null;
     }
-
 
     onInsertFieldClick() {
         const fieldTechnical = this.state.popup.selectedField;
@@ -1190,6 +1286,7 @@ class PosReceiptLayoutClientAction extends Component {
 
         this.hidePopup();
     }
+
     isDesign3() {
         const el = this.receiptContentRef?.el;
         if (!el) {
@@ -1198,8 +1295,6 @@ class PosReceiptLayoutClientAction extends Component {
 
         return !!el.querySelector(".design3-row-layout");
     }
-
-
 
     addColumnAtIndexDesign3(fieldName, index, mockData = null) {
         try {
@@ -1270,7 +1365,6 @@ class PosReceiptLayoutClientAction extends Component {
                 if (mockData && Array.isArray(mockData) && mockData[rowIndex]) {
                     value = mockData[rowIndex][fieldName] || "";
 
-                    // Format based on field type
                     if (typeof value === 'number') {
                         value = value.toFixed(2);
                     } else if (Array.isArray(value)) {
@@ -1307,7 +1401,6 @@ class PosReceiptLayoutClientAction extends Component {
             this.notification?.add?.("Failed to add field", { type: "danger" });
         }
     }
-
 
     saveSelectedColumnsDesign3() {
         try {
@@ -1413,6 +1506,7 @@ class PosReceiptLayoutClientAction extends Component {
             console.error("Error restoring Design 3 columns:", error);
         }
     }
+
     removeColumnDesign3(fieldName) {
         try {
             if (!this.receiptContentRef?.el) {
@@ -1449,13 +1543,6 @@ class PosReceiptLayoutClientAction extends Component {
             const dragEl = ev.target.closest("[data-field]");
             const fieldName = dragEl?.dataset.field;
             console.log("FIELDNAME", fieldName)
-
-            if (!fieldName) {
-                console.warn("No field name found on drag element");
-                return;
-            }
-
-
 
             if (!fieldName) {
                 console.warn("No field name found on drag element");
@@ -1501,7 +1588,6 @@ class PosReceiptLayoutClientAction extends Component {
         }
     }
 
-
     async onColumnDropDesign3(ev) {
         try {
             ev.preventDefault();
@@ -1529,8 +1615,6 @@ class PosReceiptLayoutClientAction extends Component {
         }
     }
 
-
-
     async restoreSavedColumnsUniversal() {
         try {
             console.log("Detecting design type...");
@@ -1552,7 +1636,6 @@ class PosReceiptLayoutClientAction extends Component {
             console.error("Error in universal restore:", error);
         }
     }
-
 
     addColumnAtIndexUniversal(fieldName, index = 0, mockData = null) {
         try {

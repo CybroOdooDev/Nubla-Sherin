@@ -229,6 +229,11 @@ body:not(.o_pos_receipt_layout_client_action) .pos-receipt {
     border: none !important;
     background-color: transparent;
     transition: all 0.3s ease;
+    display: none;
+}
+
+/* Show in Customizer */
+.o_pos_receipt_layout_client_action .receipt-header-dropzone {
     display: block;
 }
 
@@ -262,7 +267,7 @@ body:not(.o_pos_receipt_layout_client_action) .pos-receipt {
     font-size: 11px;
     color: #1976d2;
     cursor: pointer;
-    transition: all 0.2s ease;8
+    transition: all 0.2s ease;
 }
 
 .o_pos_receipt_layout_client_action .field-indicator-editor-only:hover {
@@ -324,14 +329,12 @@ body:not(.o_pos_receipt_layout_client_action) .pos-receipt {
     }
 }
 
-/* ================================================================
-   SCREEN ONLY - ENSURE DROPZONES ARE VISIBLE
-   ================================================================ */
+/* SCREEN ONLY - ENSURE DROPZONES ARE VISIBLE */
 
 @media screen {
 
     /* Explicitly show dropzones and field indicators in editor */
-    .receipt-header-dropzone {
+    .o_pos_receipt_layout_client_action .receipt-header-dropzone {
         display: block !important;
         visibility: visible !important;
     }

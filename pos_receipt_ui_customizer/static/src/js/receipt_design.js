@@ -2,7 +2,7 @@
 import { OrderReceipt } from "@point_of_sale/app/screens/receipt_screen/receipt/order_receipt";
 import { patch } from "@web/core/utils/patch";
 import { useService } from "@web/core/utils/hooks";
-import { useState, Component, xml } from "@odoo/owl";
+import { useState, Component, xml, useRef, onMounted } from "@odoo/owl";
 
 patch(OrderReceipt.prototype, {
     setup() {
@@ -90,7 +90,7 @@ patch(OrderReceipt.prototype, {
                         value = company?.[path.slice(8)];
                     }
 
-                    return value ? value : match;
+                    return (value !== false && value !== null && value !== undefined) ? value : match;
                 }
             );
 
@@ -187,6 +187,130 @@ patch(OrderReceipt.prototype, {
                     paymentlines: { type: Array, optional: true },
                     dynamic_fields: { type: Array, optional: true },
                 };
+
+                setup() {
+                    this.root = useRef("root");
+                    this.pos = useService("pos");
+
+                    onMounted(() => {
+                        const el = this.root.el;
+                        if (!el) return;
+
+                        const config = this.pos.config || {};
+
+                        // 1. Handle Full Receipt QR (Receipt Content QR)
+                        let fullQrContainer = el.querySelector(".receipt-qr-placeholder") || el.querySelector("#receipt_dynamic_qr");
+                        let wrapper = el.querySelector(".receipt-qr-wrapper");
+
+                        // If enable_qr is true but containers don't exist, create them
+                        if (config.enable_qr && !wrapper) {
+                            // Create wrapper if it doesn't exist
+                            wrapper = document.createElement("div");
+                            wrapper.className = "receipt-qr-wrapper";
+
+                            // Insert before footer or at the end
+                            const footer = el.querySelector(".before-footer");
+                            if (footer) {
+                                footer.parentNode.insertBefore(wrapper, footer);
+                            } else {
+                                // Try to insert before the last div (usually footer)
+                                const lastDiv = el.querySelector("div:last-child");
+                                if (lastDiv) {
+                                    lastDiv.parentNode.insertBefore(wrapper, lastDiv);
+                                } else {
+                                    el.appendChild(wrapper);
+                                }
+                            }
+                        }
+
+                        // If wrapper exists but placeholder doesn't, create it
+                        if (config.enable_qr && wrapper && !fullQrContainer) {
+                            fullQrContainer = document.createElement("div");
+                            fullQrContainer.className = "receipt-qr-placeholder";
+                            fullQrContainer.style.display = "flex";
+                            fullQrContainer.style.marginTop = "10px";
+                            wrapper.appendChild(fullQrContainer);
+                        }
+
+                        // Render the QR code if enabled and we have the data
+                        if (config.enable_qr && fullQrContainer && this.props.receipt.qr_src) {
+                            // Ensure container is visible
+                            fullQrContainer.style.display = "flex";
+
+                            // Apply alignment from config
+                            const position = config.receipt_qr_position || 'center';
+                            const flexMap = {
+                                'left': 'flex-start',
+                                'center': 'center',
+                                'right': 'flex-end'
+                            };
+                            fullQrContainer.style.justifyContent = flexMap[position];
+
+                            // Clear existing content
+                            fullQrContainer.innerHTML = "";
+
+                            const img = document.createElement("img");
+                            img.src = this.props.receipt.qr_src;
+
+                            // Apply size from config
+                            const size = config.receipt_qr_size || 120;
+                            img.style.width = `${size}px`;
+                            img.style.height = `${size}px`;
+
+                            fullQrContainer.appendChild(img);
+                        } else if (fullQrContainer && !config.enable_qr) {
+                            // If QR is disabled in config, hide it
+                            fullQrContainer.style.display = "none";
+                        }
+
+                        // 2. Handle URL QR Code (Custom QR Section)
+                        let qrArea = el.querySelector(".qrArea");
+
+                        // If enable_qr_section is true but qrArea doesn't exist, create it
+                        if (config.enable_qr_section && !qrArea) {
+                            qrArea = document.createElement("div");
+                            qrArea.className = "qrArea";
+                            qrArea.style.display = "flex";
+                            qrArea.style.justifyContent = "center";
+                            qrArea.style.margin = "25px 0";
+
+                            // Insert before receipt-qr-wrapper or before footer
+                            if (wrapper) {
+                                wrapper.parentNode.insertBefore(qrArea, wrapper);
+                            } else {
+                                const footer = el.querySelector(".before-footer");
+                                if (footer) {
+                                    footer.parentNode.insertBefore(qrArea, footer);
+                                } else {
+                                    const lastDiv = el.querySelector("div:last-child");
+                                    if (lastDiv) {
+                                        lastDiv.parentNode.insertBefore(qrArea, lastDiv);
+                                    } else {
+                                        el.appendChild(qrArea);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Handle URL QR visibility based on enable_qr_section
+                        if (qrArea) {
+                            if (!config.enable_qr_section) {
+                                qrArea.style.display = "none";
+                            } else {
+                                qrArea.style.display = "flex";
+
+                                // Apply alignment from config
+                                const position = config.qr_position || 'center';
+                                const flexMap = {
+                                    'left': 'flex-start',
+                                    'center': 'center',
+                                    'right': 'flex-end'
+                                };
+                                qrArea.style.justifyContent = flexMap[position];
+                            }
+                        }
+                    });
+                }
             };
         } catch (error) {
             console.error("Error creating receipt component:", error);

@@ -60,6 +60,20 @@ class PosConfig(models.Model):
         store=True,
     )
 
+    receipt_qr_size = fields.Integer(
+        string='Receipt QR Code Size',
+        related='receipt_design_id.receipt_qr_size',
+        readonly=False,
+        store=True,
+    )
+
+    receipt_qr_position = fields.Selection(
+        string='Receipt QR Position',
+        related='receipt_design_id.receipt_qr_position',
+        readonly=False,
+        store=True,
+    )
+
     receipt_bg_color = fields.Char(
         string="Receipt Background Color",
         default="#abc64b"

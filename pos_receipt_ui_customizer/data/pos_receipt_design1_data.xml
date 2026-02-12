@@ -106,14 +106,13 @@
 
 
             <div class="before-footer"></div>
-             <div class="receipt-qr-wrapper">
-                                <div class="receipt-qr-template"
-                                     style="display:none;">
-                                        <t t-if="props.data.custom_qr_image">
-                                            <img t-att-src="'data:image/png;base64,' + props.data.custom_qr_image"
-                                                 style="width:120px; height:120px; margin:10px auto; display:block;"/>
-                                        </t>
-                                </div>
+                         <div class="receipt-qr-wrapper">
+                                            <div class="receipt-qr-template" style="display:none;">
+                                                    <t t-if="props.data.custom_qr_image">
+                                                        <img t-att-src="'data:image/png;base64,' + props.data.custom_qr_image"
+                                                             style="width:120px; height:120px; margin:10px auto; display:block;"/>
+                                                    </t>
+                                            </div>
                          </div>
 
                          <div class="qrArea"
