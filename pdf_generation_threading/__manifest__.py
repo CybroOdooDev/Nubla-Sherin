@@ -8,17 +8,16 @@
     'maintainer': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'depends': ['web'],
+    'depends': ['base','account','stock'],
     'data': [
     ],
-        'assets': {
+    'assets': {
         'web.assets_backend': [
             'pdf_generation_threading/static/src/js/report_notification.js',
         ],
     },
-
     'license': 'AGPL-3',
     'auto_install': False,
     'installable': True,
-    'application': False,
+    'application': True,
 }
