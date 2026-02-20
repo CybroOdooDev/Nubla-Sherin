@@ -50,11 +50,12 @@ class IrActionsReport(models.Model):
                     elif record._name == "account.move":
                         filename = f"{clean_name}.pdf"
 
-                    elif record._name == "stock.picking":
-                        filename = f"Picking - {clean_name}.pdf"
-
                     else:
                         filename = f"{clean_name}.pdf"
+
+                    attach_in_chatter = env['ir.config_parameter'].sudo().get_param(
+                        'custom_report.attach_pdf_in_chatter'
+                    )
 
                     attachment = env['ir.attachment'].create({
                         'name': filename,
@@ -65,10 +66,11 @@ class IrActionsReport(models.Model):
                         'mimetype': 'application/pdf',
                     })
 
-                    record.message_post(
-                        body="PDF generated successfully.",
-                        attachment_ids=[attachment.id],
-                    )
+                    if attach_in_chatter == 'True':
+                        record.message_post(
+                            body="PDF generated successfully.",
+                            attachment_ids=[attachment.id],
+                        )
 
                     download_url = f"/web/content/{attachment.id}?download=true"
                     print("DOWNLOAD URL", download_url)
