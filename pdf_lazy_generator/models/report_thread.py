@@ -1,3 +1,24 @@
+# -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 import threading
 import base64
 from odoo import models, api
@@ -7,20 +28,28 @@ from odoo.modules.registry import Registry
 class IrActionsReport(models.Model):
     _inherit = "ir.actions.report"
 
-    def generate_in_background(self, report_name, docids):
+    def generate_in_background(self, report_name, docids, request_id=False):
+        """
+            Start PDF generation in a background thread.
+            This method creates a new daemon thread that calls
+            `_generate_pdf_thread` to render the report PDF
+            without blocking the main user request.
+         """
         thread = threading.Thread(
             target=self._generate_pdf_thread,
-            args=(report_name, docids),
+            args=(report_name, docids, None, request_id),
         )
         thread.daemon = True
         thread.start()
 
-    def _generate_pdf_thread(self, report_ref, res_ids, data=None):
+    def _generate_pdf_thread(self, report_ref, res_ids, data=None, request_id=False):
+        """
+            Generate the PDF in a background thread using a new database cursor,
+            create it as an attachment, and send a notification for download.
+        """
         db_name = self.env.cr.dbname
         uid = self.env.uid
 
-        print("THREAD STARTED")
-        print("RES IDS:", res_ids)
 
         with Registry(db_name).cursor() as new_cr:
             env = api.Environment(new_cr, uid, {})
@@ -73,7 +102,6 @@ class IrActionsReport(models.Model):
                         )
 
                     download_url = f"/web/content/{attachment.id}?download=true"
-                    print("DOWNLOAD URL", download_url)
 
                     env['bus.bus']._sendone(
                         env.user.partner_id,
@@ -82,12 +110,11 @@ class IrActionsReport(models.Model):
                             "url": download_url,
                             "name": attachment.name,
                             "order_ref": record.name,
+                            "request_id": request_id,
                         }
                     )
 
                 new_cr.commit()
-                print("PDF ATTACHED AND BUS NOTIFICATION SENT")
 
             except Exception as e:
                 new_cr.rollback()
-                print("THREAD ERROR:", e)
