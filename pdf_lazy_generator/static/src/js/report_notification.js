@@ -5,34 +5,98 @@ import { rpc } from "@web/core/network/rpc";
 import { patch } from "@web/core/utils/patch";
 import { ViewButton } from "@web/views/view_button/view_button";
 
-const pendingPdfRequests = new Set();
+
+async function getReportInfo(actionId) {
+    if (!isNaN(parseInt(actionId))) {
+        const data = await rpc("/web/dataset/call_kw", {
+            model: "ir.actions.report",
+            method: "search_read",
+            args: [[["id", "=", parseInt(actionId)]]],
+            kwargs: { fields: ["report_name", "report_type"], limit: 1 },
+        });
+        return data.length ? data[0] : null;
+    }
+
+    if (typeof actionId === "string" && actionId.includes(".")) {
+        const data = await rpc("/web/dataset/call_kw", {
+            model: "ir.actions.report",
+            method: "search_read",
+            args: [[["report_name", "like", actionId.split(".")[1]]]],
+            kwargs: { fields: ["report_name", "report_type"], limit: 1 },
+        });
+        if (data.length) return data[0];
+
+        const action = await rpc("/web/action/load", {
+            action_id: actionId,
+        });
+        if (action?.report_type === "qweb-pdf") {
+            return { report_name: action.report_name, report_type: action.report_type };
+        }
+    }
+
+    return null;
+}
+
 
 patch(ViewButton.prototype, {
     async onClick(ev) {
         const clickParams = this.props.clickParams;
         const resId = this.props.record?.resId || null;
-        const actionId = clickParams?.name ? parseInt(clickParams.name, 10) : null;
+        const resModel = this.props.record?.resModel || null;
+        const actionId = clickParams?.name || null;
 
-        if (actionId && resId && clickParams?.type === "action") {
+        if (clickParams?.type === "object" && resId && resModel && actionId) {
             try {
-                const data = await rpc("/web/dataset/call_kw", {
-                    model: "ir.actions.report",
-                    method: "search_read",
-                    args: [[["id", "=", actionId]]],
-                    kwargs: { fields: ["report_name", "report_type"], limit: 1 },
+                const result = await rpc("/web/dataset/call_kw", {
+                    model: resModel,
+                    method: actionId,
+                    args: [[resId]],
+                    kwargs: {},
                 });
 
-                if (data.length && data[0].report_type === "qweb-pdf") {
+                if (result?.type === "ir.actions.report" && result?.report_type === "qweb-pdf") {
                     ev.preventDefault();
                     ev.stopPropagation();
 
-                    const reqId = Date.now().toString(36) + Math.random().toString(36).substr(2);
-                    pendingPdfRequests.add(reqId);
+                    await rpc("/report/background_generate", {
+                        report_name: result.report_name,
+                        docids: [resId],
+                    });
+
+                    this.env.services.notification.add(
+                        "PDF generating in background...",
+                        { title: "Success", type: "success" }
+                    );
+                    return;
+                }
+
+                if (result) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    await this.env.services.action.doAction(result);
+                    return;
+                }
+
+                ev.preventDefault();
+                ev.stopPropagation();
+                return;
+
+            } catch (e) {
+                console.warn("ViewButton object patch error:", e);
+            }
+        }
+
+        if (actionId && resId && clickParams?.type === "action") {
+            try {
+                const report = await getReportInfo(actionId);
+
+                if (report?.report_type === "qweb-pdf") {
+                    ev.preventDefault();
+                    ev.stopPropagation();
 
                     await rpc("/report/background_generate", {
-                        report_name: data[0].report_name,
+                        report_name: report.report_name,
                         docids: [resId],
-                        request_id: reqId,
                     });
 
                     this.env.services.notification.add(
@@ -42,7 +106,7 @@ patch(ViewButton.prototype, {
                     return;
                 }
             } catch (e) {
-                console.warn("doAction patch error:", e);
+                console.warn("ViewButton action patch error:", e);
             }
         }
 
@@ -50,20 +114,13 @@ patch(ViewButton.prototype, {
     }
 });
 
+
 registry.category("services").add("custom_report_patch", {
     dependencies: ["action", "notification", "bus_service"],
     async start(env, { action, notification, bus_service }) {
 
         bus_service.subscribe("pdf_download", (payload) => {
             if (!payload?.url) return;
-
-            // Core duplicate prevention logic
-            if (payload.request_id) {
-                if (!pendingPdfRequests.has(payload.request_id)) {
-                    return; // Ignore duplicate or already-handled downloads
-                }
-                pendingPdfRequests.delete(payload.request_id);
-            }
 
             const orderRef = payload.order_ref || "Document";
 
@@ -94,15 +151,19 @@ registry.category("services").add("custom_report_patch", {
                     if (act.report_type === "qweb-pdf") {
                         reportName = act.report_name;
                         activeIds = act.context?.active_ids ||
-                            options?.additionalContext?.active_ids ||
-                            (act.context?.active_id ? [act.context.active_id] : []);
+                                    options?.additionalContext?.active_ids ||
+                                    (act.context?.active_id ? [act.context.active_id] : []);
                     }
                 }
 
-                if (!reportName && (typeof act === "number" || typeof act === "string")) {
-                    const actionId = parseInt(act, 10);
-                    if (!isNaN(actionId)) {
+                if (!reportName) {
+                    const isNumeric = typeof act === "number" ||
+                                      (typeof act === "string" && !isNaN(parseInt(act)) && !act.includes("."));
+                    const isXmlId = typeof act === "string" && act.includes(".");
+
+                    if (isNumeric || isXmlId) {
                         const controller = env.services.action.currentController;
+
                         if (options?.additionalContext?.active_ids?.length) {
                             activeIds = options.additionalContext.active_ids;
                         } else if (controller?.model?.root?.selection?.length) {
@@ -112,27 +173,18 @@ registry.category("services").add("custom_report_patch", {
                         }
 
                         if (activeIds.length) {
-                            const data = await rpc("/web/dataset/call_kw", {
-                                model: "ir.actions.report",
-                                method: "search_read",
-                                args: [[["id", "=", actionId]]],
-                                kwargs: { fields: ["report_name", "report_type"], limit: 1 },
-                            });
-                            if (data.length && data[0].report_type === "qweb-pdf") {
-                                reportName = data[0].report_name;
+                            const report = await getReportInfo(act);
+                            if (report?.report_type === "qweb-pdf") {
+                                reportName = report.report_name;
                             }
                         }
                     }
                 }
 
                 if (reportName && activeIds.length) {
-                    const reqId = Date.now().toString(36) + Math.random().toString(36).substr(2);
-                    pendingPdfRequests.add(reqId);
-
                     await rpc("/report/background_generate", {
                         report_name: reportName,
                         docids: activeIds,
-                        request_id: reqId,
                     });
 
                     notification.add("PDF generation started in background.", {

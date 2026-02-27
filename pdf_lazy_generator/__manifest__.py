@@ -29,17 +29,20 @@
     'maintainer': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'depends': ['base','account',"purchase"],
+    'depends': ['base','account'],
     'data': [
-        'views/res_config_settings_views.xml'
+        'views/menus.xml',
+        'views/res_config_settings_views.xml',
     ],
     'assets': {
         'web.assets_backend': [
             'pdf_lazy_generator/static/src/js/report_notification.js',
+            'pdf_lazy_generator/static/src/js/accounting_report.js'
         ],
     },
 'images': [
         'static/description/banner.jpg',
+
     ],
     'license': 'AGPL-3',
     'auto_install': False,

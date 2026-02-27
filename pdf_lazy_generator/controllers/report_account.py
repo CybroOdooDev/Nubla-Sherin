@@ -21,21 +21,26 @@
 #############################################################################
 from odoo import http
 from odoo.http import request
+class BackgroundAccountingReportController(http.Controller):
 
-class BackgroundReportController(http.Controller):
+    @http.route("/report/background_generate_accounting", type="json", auth="user")
+    def background_generate_accounting(self, options=None, request_id=False):
+        """
+        Called from the JS fetch interceptor when the user clicks
+        'Print PDF' on an enterprise accounting report.
 
-    @http.route('/report/background_generate', type='json', auth='user')
-    def background_generate(self, report_name, docids, request_id=False):
+        `options` is the full options dict that the JS would normally
+        POST to /account_reports/export — it includes:
+            - report_id
+            - date.date_from / date.date_to
+            - comparison, filters, column_groups, etc.
         """
-            Start report PDF generation in the background.
-            This controller route is called from the frontend to
-            trigger background report generation without blocking
-            the user interface.
-        """
-        print("Background Report")
-        request.env['ir.actions.report'].generate_in_background(
-            report_name,
-            docids,
-            request_id=request_id
+        if not options or not options.get("report_id"):
+            return {"status": "error", "message": "Missing report_id in options"}
+        print("options", options)
+
+        request.env["account.report"].generate_in_background(
+            options,
+            request_id=request_id,
         )
         return {"status": "started"}
