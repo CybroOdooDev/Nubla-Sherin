@@ -92,6 +92,7 @@ class IrActionsReport(models.Model):
                         'res_model': record._name,
                         'res_id': record.id,
                         'mimetype': 'application/pdf',
+                        "is_background_pdf": True
                     })
 
                     if attach_in_chatter == 'True':
@@ -116,3 +117,15 @@ class IrActionsReport(models.Model):
 
             except Exception as e:
                 new_cr.rollback()
+                error_msg = str(e)
+                if hasattr(e, 'name'):
+                    error_msg = e.name
+                
+                env['bus.bus']._sendone(
+                    env.user.partner_id,
+                    "pdf_error",
+                    {
+                        "message": error_msg,
+                        "title": "PDF Generation Failed"
+                    }
+                )

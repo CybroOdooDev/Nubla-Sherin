@@ -65,7 +65,7 @@ patch(ViewButton.prototype, {
 
                     this.env.services.notification.add(
                         "PDF generating in background...",
-                        { title: "Success", type: "success" }
+                        { title: "Processing PDF...", type: "info" }
                     );
                     return;
                 }
@@ -101,7 +101,7 @@ patch(ViewButton.prototype, {
 
                     this.env.services.notification.add(
                         "PDF generating in background...",
-                        { title: "Success", type: "success" }
+                        { title: "Processing PDF...", type: "info" }
                     );
                     return;
                 }
@@ -140,6 +140,13 @@ registry.category("services").add("custom_report_patch", {
             });
         });
 
+        bus_service.subscribe("pdf_error", (payload) => {
+            notification.add(payload.message || "An error occurred during PDF generation.", {
+                title: payload.title || "PDF Generation Failed",
+                type: "warning",
+            });
+        });
+
         const originalDoAction = action.doAction.bind(action);
 
         action.doAction = async function (act, options = {}) {
@@ -151,14 +158,14 @@ registry.category("services").add("custom_report_patch", {
                     if (act.report_type === "qweb-pdf") {
                         reportName = act.report_name;
                         activeIds = act.context?.active_ids ||
-                                    options?.additionalContext?.active_ids ||
-                                    (act.context?.active_id ? [act.context.active_id] : []);
+                            options?.additionalContext?.active_ids ||
+                            (act.context?.active_id ? [act.context.active_id] : []);
                     }
                 }
 
                 if (!reportName) {
                     const isNumeric = typeof act === "number" ||
-                                      (typeof act === "string" && !isNaN(parseInt(act)) && !act.includes("."));
+                        (typeof act === "string" && !isNaN(parseInt(act)) && !act.includes("."));
                     const isXmlId = typeof act === "string" && act.includes(".");
 
                     if (isNumeric || isXmlId) {

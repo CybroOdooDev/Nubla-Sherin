@@ -19,31 +19,27 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-{
-    'name': 'PDF Lazy Generator',
-    'version': '19.0.1.0.0',
-    'summary': 'PDF Generation Using Thread',
-    'description': "PDF Generation Using Thread",
-    'author': 'Cybrosys Techno Solutions',
-    'maintainer': 'Cybrosys Techno Solutions',
-    'company': 'Cybrosys Techno Solutions',
-    'website': 'https://www.cybrosys.com',
-    'depends': ['base','account'],
-    'data': [
-        'views/menus.xml',
-        'views/res_config_settings_views.xml'
-    ],
-    'assets': {
-        'web.assets_backend': [
-            'pdf_lazy_generator/static/src/js/report_notification.js',
-            'pdf_lazy_generator/static/src/js/accounting_report.js'
-        ],
-    },
-    'images': [
-            'static/description/banner.jpg',
-        ],
-    'license': 'AGPL-3',
-    'auto_install': False,
-    'installable': True,
-    'application': True,
-}
+from odoo import models, fields
+from odoo.exceptions import UserError
+
+
+class IrAttachment(models.Model):
+    _inherit = 'ir.attachment'
+
+    is_background_pdf = fields.Boolean(
+        string="Is Background PDF",
+        default=False,
+        help="Flag to identify PDFs generated in the background."
+    )
+
+    def action_download_pdf(self):
+        """Download the PDF attachment."""
+        self.ensure_one()
+        if not self.datas:
+            raise UserError("No file content found for this attachment.")
+
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{self.id}?download=true',
+            'target': 'self',
+        }

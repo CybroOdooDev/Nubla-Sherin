@@ -21,3 +21,5 @@
 #############################################################################
 from . import report_thread
 from . import res_config_settings
+from . import ir_attachment
+from . import account_report
