@@ -4,6 +4,12 @@ import { registry } from "@web/core/registry";
 import { rpc } from "@web/core/network/rpc";
 import { patch } from "@web/core/utils/patch";
 import { ViewButton } from "@web/views/view_button/view_button";
+import { browser } from "@web/core/browser/browser";
+
+if (!window.customReportTabId) {
+    window.customReportTabId = Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+}
+const UNIQUE_TAB_ID = window.customReportTabId;
 
 
 async function getReportInfo(actionId) {
@@ -61,6 +67,7 @@ patch(ViewButton.prototype, {
                     await rpc("/report/background_generate", {
                         report_name: result.report_name,
                         docids: [resId],
+                        tab_id: UNIQUE_TAB_ID,
                     });
 
                     this.env.services.notification.add(
@@ -97,6 +104,7 @@ patch(ViewButton.prototype, {
                     await rpc("/report/background_generate", {
                         report_name: report.report_name,
                         docids: [resId],
+                        tab_id: UNIQUE_TAB_ID,
                     });
 
                     this.env.services.notification.add(
@@ -121,6 +129,7 @@ registry.category("services").add("custom_report_patch", {
 
         bus_service.subscribe("pdf_download", (payload) => {
             if (!payload?.url) return;
+            if (payload.tab_id && payload.tab_id !== UNIQUE_TAB_ID) return;
 
             const orderRef = payload.order_ref || "Document";
 

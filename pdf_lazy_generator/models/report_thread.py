@@ -23,12 +23,15 @@ import threading
 import base64
 from odoo import models, api
 from odoo.modules.registry import Registry
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class IrActionsReport(models.Model):
     _inherit = "ir.actions.report"
 
-    def generate_in_background(self, report_name, docids, request_id=False):
+    def generate_in_background(self, report_name, docids, request_id=False,tab_id=False):
         """
             Start PDF generation in a background thread.
             This method creates a new daemon thread that calls
@@ -42,7 +45,7 @@ class IrActionsReport(models.Model):
         thread.daemon = True
         thread.start()
 
-    def _generate_pdf_thread(self, report_ref, res_ids, data=None, request_id=False):
+    def _generate_pdf_thread(self, report_ref, res_ids, data=None, request_id=False, tab_id=False):
         """
             Generate the PDF in a background thread using a new database cursor,
             create it as an attachment, and send a notification for download.
@@ -50,12 +53,12 @@ class IrActionsReport(models.Model):
         db_name = self.env.cr.dbname
         uid = self.env.uid
 
-
         with Registry(db_name).cursor() as new_cr:
             env = api.Environment(new_cr, uid, {})
 
             try:
                 report = env['ir.actions.report']._get_report_from_name(report_ref)
+
 
                 pdf_content, _ = report._render_qweb_pdf(
                     report_ref,
@@ -93,6 +96,7 @@ class IrActionsReport(models.Model):
                         'res_model': record._name,
                         'res_id': record.id,
                         'mimetype': 'application/pdf',
+                        'is_background_pdf': True,
                     })
 
                     if attach_in_chatter == 'True':
@@ -116,5 +120,19 @@ class IrActionsReport(models.Model):
 
                 new_cr.commit()
 
+
+
             except Exception as e:
                 new_cr.rollback()
+                error_msg = str(e)
+                if hasattr(e, 'name'):
+                    error_msg = e.name
+                env['bus.bus']._sendone(
+                    env.user.partner_id,
+                    "pdf_error",
+                    {
+                        "message": error_msg,
+                        "title": "PDF Generation Failed",
+                        "tab_id": tab_id,
+                    }
+                )

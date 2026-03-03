@@ -19,24 +19,27 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import http
-from odoo.http import request
+from odoo import models, fields
+from odoo.exceptions import UserError
 
-class BackgroundReportController(http.Controller):
 
-    @http.route('/report/background_generate', type='json', auth='user')
-    def background_generate(self, report_name, docids, request_id=False, tab_id=False):
-        """
-            Start report PDF generation in the background.
-            This controller route is called from the frontend to
-            trigger background report generation without blocking
-            the user interface.
-        """
-        print("Background Report")
-        request.env['ir.actions.report'].generate_in_background(
-            report_name,
-            docids,
-            request_id=request_id,
-            tab_id=tab_id,
-        )
-        return {"status": "started"}
+class IrAttachment(models.Model):
+    _inherit = 'ir.attachment'
+
+    is_background_pdf = fields.Boolean(
+        string="Is Background PDF",
+        default=False,
+        help="Flag to identify PDFs generated in the background."
+    )
+
+    def action_download_pdf(self):
+        """Download the PDF attachment."""
+        self.ensure_one()
+        if not self.datas:
+            raise UserError("No file content found for this attachment.")
+
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{self.id}?download=true',
+            'target': 'self',
+        }
