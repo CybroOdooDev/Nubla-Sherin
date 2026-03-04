@@ -4,7 +4,12 @@ import { registry } from "@web/core/registry";
 import { rpc } from "@web/core/network/rpc";
 import { patch } from "@web/core/utils/patch";
 import { ViewButton } from "@web/views/view_button/view_button";
+import { browser } from "@web/core/browser/browser";
 
+if (!window.customReportTabId) {
+    window.customReportTabId = Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+}
+const UNIQUE_TAB_ID = window.customReportTabId;
 
 async function getReportInfo(actionId) {
     if (!isNaN(parseInt(actionId))) {
@@ -33,7 +38,6 @@ async function getReportInfo(actionId) {
             return { report_name: action.report_name, report_type: action.report_type };
         }
     }
-
     return null;
 }
 
@@ -61,11 +65,12 @@ patch(ViewButton.prototype, {
                     await rpc("/report/background_generate", {
                         report_name: result.report_name,
                         docids: [resId],
+                        tab_id: UNIQUE_TAB_ID,
                     });
 
                     this.env.services.notification.add(
-                        "PDF generating in background...",
-                        { title: "Processing PDF...", type: "info" }
+                        "PDF generating in background.",
+                        { title: "Processing PDF.", type: "success" }
                     );
                     return;
                 }
@@ -97,11 +102,12 @@ patch(ViewButton.prototype, {
                     await rpc("/report/background_generate", {
                         report_name: report.report_name,
                         docids: [resId],
+                        tab_id: UNIQUE_TAB_ID,
                     });
 
                     this.env.services.notification.add(
                         "PDF generating in background...",
-                        { title: "Processing PDF...", type: "info" }
+                        { title: "Processing PDF.", type: "success" }
                     );
                     return;
                 }
@@ -120,7 +126,11 @@ registry.category("services").add("custom_report_patch", {
     async start(env, { action, notification, bus_service }) {
 
         bus_service.subscribe("pdf_download", (payload) => {
+            console.log("pdf_download received payload:", payload);
+            console.log("Current UNIQUE_TAB_ID:", UNIQUE_TAB_ID);
+
             if (!payload?.url) return;
+            if (payload.tab_id && payload.tab_id !== UNIQUE_TAB_ID) return;
 
             const orderRef = payload.order_ref || "Document";
 
@@ -141,6 +151,12 @@ registry.category("services").add("custom_report_patch", {
         });
 
         bus_service.subscribe("pdf_error", (payload) => {
+            console.log("pdf_error received payload:", payload);
+            console.log("Current UNIQUE_TAB_ID:", UNIQUE_TAB_ID);
+
+            if (payload.tab_id && payload.tab_id !== UNIQUE_TAB_ID) return;
+
+
             notification.add(payload.message || "An error occurred during PDF generation.", {
                 title: payload.title || "PDF Generation Failed",
                 type: "warning",
@@ -192,6 +208,7 @@ registry.category("services").add("custom_report_patch", {
                     await rpc("/report/background_generate", {
                         report_name: reportName,
                         docids: activeIds,
+                        tab_id: UNIQUE_TAB_ID,
                     });
 
                     notification.add("PDF generation started in background.", {

@@ -26,7 +26,7 @@ from odoo.http import request
 class BackgroundAccountingReportController(http.Controller):
 
     @http.route("/report/background_generate_accounting", type="jsonrpc", auth="user")
-    def background_generate_accounting(self, options=None, request_id=False):
+    def background_generate_accounting(self, options=None, request_id=False, tab_id=False):
         """
         Called from the JS fetch interceptor when the user clicks
         'Print PDF' on an enterprise accounting report.
@@ -39,7 +39,6 @@ class BackgroundAccountingReportController(http.Controller):
         """
         if not options or not options.get("report_id"):
             return {"status": "error", "message": "Missing report_id in options"}
-        print("options", options)
 
         if "account.report" not in request.env:
             return {"status": "error", "message": "account_reports module is not installed."}
@@ -47,5 +46,6 @@ class BackgroundAccountingReportController(http.Controller):
         request.env["account.report"].generate_in_background(
             options,
             request_id=request_id,
+            tab_id=tab_id,
         )
         return {"status": "started"}

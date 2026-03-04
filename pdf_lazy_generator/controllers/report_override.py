@@ -25,7 +25,7 @@ from odoo.http import request
 class BackgroundReportController(http.Controller):
 
     @http.route('/report/background_generate', type='jsonrpc', auth='user')
-    def background_generate(self, report_name, docids):
+    def background_generate(self, report_name, docids, request_id=False, tab_id=False):
         """
             Start report PDF generation in the background.
             This controller route is called from the frontend to
@@ -35,5 +35,7 @@ class BackgroundReportController(http.Controller):
         request.env['ir.actions.report'].generate_in_background(
             report_name,
             docids,
+            request_id=request_id,
+            tab_id=tab_id,
         )
         return {"status": "started"}

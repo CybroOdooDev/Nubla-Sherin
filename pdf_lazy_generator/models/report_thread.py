@@ -28,7 +28,7 @@ from odoo.modules.registry import Registry
 class IrActionsReport(models.Model):
     _inherit = "ir.actions.report"
 
-    def generate_in_background(self, report_name, docids):
+    def generate_in_background(self, report_name, docids, request_id=False, tab_id=False):
         """
                Start PDF generation in a background thread.
                This method creates a new daemon thread that calls
@@ -37,12 +37,12 @@ class IrActionsReport(models.Model):
         """
         thread = threading.Thread(
             target=self._generate_pdf_thread,
-            args=(report_name, docids),
+            args=(report_name, docids, None, request_id, tab_id),
         )
         thread.daemon = True
         thread.start()
 
-    def _generate_pdf_thread(self, report_ref, res_ids, data=None):
+    def _generate_pdf_thread(self, report_ref, res_ids, data=None, request_id=False, tab_id=False):
         """
         Generate the PDF in a background thread using a new database cursor,
         create it as an attachment, and send a notification for download.
@@ -110,6 +110,7 @@ class IrActionsReport(models.Model):
                             "url": download_url,
                             "name": attachment.name,
                             "order_ref": record.name,
+                            "tab_id": tab_id,
                         }
                     )
 
@@ -126,6 +127,7 @@ class IrActionsReport(models.Model):
                     "pdf_error",
                     {
                         "message": error_msg,
-                        "title": "PDF Generation Failed"
+                        "title": "PDF Generation Failed",
+                        "tab_id": tab_id,
                     }
                 )

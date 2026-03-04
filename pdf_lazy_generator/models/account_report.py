@@ -33,7 +33,7 @@ _logger = logging.getLogger(__name__)
 class AccountReport(models.Model):
     _inherit = "account.report"
 
-    def generate_in_background(self, options, request_id=False):
+    def generate_in_background(self, options, request_id=False, tab_id=False):
         """
         Start enterprise accounting report PDF generation in a background thread.
         `options` is the full options dict passed from the JS frontend —
@@ -41,12 +41,12 @@ class AccountReport(models.Model):
         """
         thread = threading.Thread(
             target=self._generate_pdf_thread,
-            args=(options, request_id),
+            args=(options, request_id, tab_id),
         )
         thread.daemon = True
         thread.start()
 
-    def _generate_pdf_thread(self, options, request_id=False):
+    def _generate_pdf_thread(self, options, request_id=False, tab_id=False):
         """
         Generate the accounting report PDF in a background thread.
         Uses a fresh DB cursor, creates an ir.attachment, and
@@ -97,6 +97,7 @@ class AccountReport(models.Model):
                         "name": filename,
                         "order_ref": report_name,
                         "request_id": request_id,
+                        "tab_id": tab_id,
                     },
                 )
                 new_cr.commit()
@@ -116,6 +117,7 @@ class AccountReport(models.Model):
                     "pdf_error",
                     {
                         "message": error_msg,
-                        "title": "PDF Generation Failed"
+                        "title": "PDF Generation Failed",
+                        "tab_id": tab_id,
                     }
                 )
