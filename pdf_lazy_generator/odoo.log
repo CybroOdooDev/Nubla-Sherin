@@ -1,0 +1,456 @@
+nohup: ignoring input
+/home/cybrosys/odoo17/odoo/modules/module.py:11: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+2026-03-05 06:46:00,628 175670 INFO ? odoo: Odoo version 17.0 
+2026-03-05 06:46:00,628 175670 INFO ? odoo: Using configuration file at /home/cybrosys/odoo17/odoo.conf 
+2026-03-05 06:46:00,628 175670 INFO ? odoo: addons paths: ['/home/cybrosys/odoo17/odoo/addons', '/home/cybrosys/.local/share/Odoo/addons/17.0', '/home/cybrosys/odoo17/addons', '/home/cybrosys/odoo17/custom', '/home/cybrosys/odoo17/17.0'] 
+2026-03-05 06:46:00,629 175670 INFO ? odoo: database: odoo17@localhost:5432 
+2026-03-05 06:46:00,729 175670 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltopdf binary at /usr/local/bin/wkhtmltopdf 
+2026-03-05 06:46:00,868 175670 INFO ? odoo.service.server: HTTP service (werkzeug) running on cybrosys:8017 
+2026-03-05 06:46:00,886 175670 INFO feb-13-demo odoo.modules.loading: loading 1 modules... 
+2026-03-05 06:46:00,892 175670 INFO feb-13-demo odoo.modules.loading: 1 modules loaded in 0.01s, 0 queries (+0 extra) 
+2026-03-05 06:46:00,921 175670 INFO feb-13-demo odoo.modules.loading: loading 86 modules... 
+2026-03-05 06:46:01,352 175670 WARNING feb-13-demo odoo.api.create: The model odoo.addons.selected_product_return.models.stock_return_picking is not overriding the create method in batch 
+2026-03-05 06:46:01,443 175670 INFO feb-13-demo odoo.modules.loading: 86 modules loaded in 0.52s, 0 queries (+0 extra) 
+2026-03-05 06:46:01,561 175670 INFO feb-13-demo odoo.modules.loading: Modules loaded. 
+2026-03-05 06:46:01,565 175670 INFO feb-13-demo odoo.modules.registry: Registry loaded in 0.697s 
+2026-03-05 06:46:02,003 175670 INFO feb-13-demo odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-03-05 06:46:02,041 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:02] "GET /websocket?version=17.0-1 HTTP/1.1" 101 - 8 0.010 0.037
+2026-03-05 06:46:02,364 175670 INFO ? odoo.addons.bus.models.bus: Bus.loop listen imbus on db postgres 
+2026-03-05 06:46:05,384 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:05] "GET /websocket?version=17.0-1 HTTP/1.1" 101 - 2 0.001 0.003
+2026-03-05 06:46:27,458 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "POST /web/action/load HTTP/1.1" 200 - 10 0.007 0.327
+2026-03-05 06:46:27,557 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "POST /web/dataset/call_kw/ir.module.module/get_views HTTP/1.1" 200 - 49 0.032 0.048
+2026-03-05 06:46:27,597 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 1 0.001 0.031
+2026-03-05 06:46:27,634 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 47 0.027 0.042
+2026-03-05 06:46:27,661 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 4 0.004 0.083
+2026-03-05 06:46:27,885 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /crm/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.007
+2026-03-05 06:46:27,886 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /pos_restaurant/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.009
+2026-03-05 06:46:27,889 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /website/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.011
+2026-03-05 06:46:27,892 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /account/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.014
+2026-03-05 06:46:27,893 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /stock/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.015
+2026-03-05 06:46:27,894 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /sale_management/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.015
+2026-03-05 06:46:27,926 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /point_of_sale/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.001
+2026-03-05 06:46:27,936 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /project/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.001
+2026-03-05 06:46:27,941 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /mass_mailing/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.002
+2026-03-05 06:46:27,943 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /hr/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.001
+2026-03-05 06:46:27,948 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /mrp/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.002
+2026-03-05 06:46:27,951 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /website_sale/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.005
+2026-03-05 06:46:27,964 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /hr_recruitment/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.002
+2026-03-05 06:46:27,972 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /hr_expense/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.002
+2026-03-05 06:46:27,977 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /hr_holidays/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.001
+2026-03-05 06:46:27,980 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /data_recycle/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.005
+2026-03-05 06:46:27,981 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:27] "GET /purchase/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.003
+2026-03-05 06:46:28,002 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /maintenance/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.002
+2026-03-05 06:46:28,015 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /website_slides/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.002
+2026-03-05 06:46:28,025 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /website_event/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.004
+2026-03-05 06:46:28,027 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /mail/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.004
+2026-03-05 06:46:28,029 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /contacts/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.002
+2026-03-05 06:46:28,041 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /calendar/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.002
+2026-03-05 06:46:28,054 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /fleet/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.001
+2026-03-05 06:46:28,061 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /im_livechat/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.001
+2026-03-05 06:46:28,065 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /survey/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.001
+2026-03-05 06:46:28,070 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /repair/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.002
+2026-03-05 06:46:28,074 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /hr_attendance/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.001
+2026-03-05 06:46:28,081 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /mass_mailing_sms/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.001
+2026-03-05 06:46:28,089 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /project_todo/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.003
+2026-03-05 06:46:28,090 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /hr_skills/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.002
+2026-03-05 06:46:28,101 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /lunch/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.002
+2026-03-05 06:46:28,103 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /website_hr_recruitment/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.002
+2026-03-05 06:46:28,119 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /hr_contract/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.002
+2026-03-05 06:46:28,182 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 45 0.022 0.018
+2026-03-05 06:46:28,191 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 4 0.010 0.038
+2026-03-05 06:46:28,346 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:28] "GET /base/static/description/icon.png HTTP/1.1" 304 - 0 0.000 0.002
+2026-03-05 06:46:30,397 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:30] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 45 0.040 0.022
+2026-03-05 06:46:30,412 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:30] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 3 0.005 0.004
+2026-03-05 06:46:35,494 175670 INFO feb-13-demo odoo.addons.base.models.ir_module: ALLOW access to module.button_immediate_upgrade on ['PDF Lazy Generator'] to user 1 #2 via 127.0.0.1 
+2026-03-05 06:46:35,495 175670 INFO feb-13-demo odoo.addons.base.models.ir_module: ALLOW access to module.button_upgrade on ['PDF Lazy Generator'] to user 1 #2 via 127.0.0.1 
+2026-03-05 06:46:35,495 175670 INFO feb-13-demo odoo.addons.base.models.ir_module: ALLOW access to module.update_list on ['PDF Lazy Generator'] to user 1 #2 via 127.0.0.1 
+2026-03-05 06:46:36,894 175670 INFO feb-13-demo odoo.addons.base.models.ir_module: ALLOW access to module.button_install on [] to user 1 #2 via 127.0.0.1 
+2026-03-05 06:46:36,945 175670 INFO feb-13-demo odoo.modules.loading: loading 1 modules... 
+2026-03-05 06:46:36,952 175670 INFO feb-13-demo odoo.modules.loading: 1 modules loaded in 0.01s, 0 queries (+0 extra) 
+2026-03-05 06:46:36,970 175670 INFO feb-13-demo odoo.modules.loading: updating modules list 
+2026-03-05 06:46:36,972 175670 INFO feb-13-demo odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via 127.0.0.1 
+2026-03-05 06:46:38,181 175670 INFO feb-13-demo odoo.modules.loading: loading 86 modules... 
+2026-03-05 06:46:38,214 175670 INFO feb-13-demo odoo.modules.loading: Loading module pdf_lazy_generator (53/86) 
+2026-03-05 06:46:38,398 175670 INFO feb-13-demo odoo.modules.registry: module pdf_lazy_generator: creating or updating database tables 
+2026-03-05 06:46:38,590 175670 INFO feb-13-demo odoo.modules.loading: loading pdf_lazy_generator/views/menus.xml 
+2026-03-05 06:46:38,610 175670 INFO feb-13-demo odoo.models.unlink: User #1 deleted ir.actions.act_window.view records with IDs: [106] 
+2026-03-05 06:46:38,622 175670 INFO feb-13-demo odoo.modules.loading: loading pdf_lazy_generator/views/res_config_settings_views.xml 
+2026-03-05 06:46:38,683 175670 INFO feb-13-demo odoo.modules.loading: Module pdf_lazy_generator loaded in 0.47s, 170 queries (+170 other) 
+2026-03-05 06:46:38,694 175670 INFO feb-13-demo odoo.modules.loading: 86 modules loaded in 0.51s, 170 queries (+170 extra) 
+2026-03-05 06:46:39,074 175670 INFO feb-13-demo odoo.modules.registry: verifying fields for every extended model 
+2026-03-05 06:46:39,797 175670 INFO feb-13-demo odoo.modules.loading: Modules loaded. 
+2026-03-05 06:46:39,802 175670 INFO feb-13-demo odoo.modules.registry: Registry loaded in 2.866s 
+2026-03-05 06:46:39,802 175670 INFO feb-13-demo odoo.addons.base.models.ir_module: getting next ir.actions.todo() 
+2026-03-05 06:46:39,806 175670 INFO feb-13-demo odoo.modules.registry: Registry changed, signaling through the database 
+2026-03-05 06:46:39,807 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:39] "POST /web/dataset/call_button HTTP/1.1" 200 - 6710 2.577 1.741
+2026-03-05 06:46:39,823 175670 INFO feb-13-demo odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-03-05 06:46:40,046 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:40] "GET /web HTTP/1.1" 200 - 83 0.036 0.188
+2026-03-05 06:46:40,162 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:40] "GET /web/manifest.webmanifest HTTP/1.1" 200 - 9 0.031 0.024
+2026-03-05 06:46:40,311 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:40] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 - 68 0.043 0.196
+2026-03-05 06:46:41,380 175670 INFO feb-13-demo odoo.addons.base.models.assetsbundle: Generating a new asset bundle attachment /web/assets/770848b/web.assets_web.min.js (id:946) 
+2026-03-05 06:46:41,382 175670 INFO feb-13-demo odoo.addons.base.models.assetsbundle: Deleting attachments [942] (matching /web/assets/_______/web.assets_web.min.js) because it was replaced with /web/assets/770848b/web.assets_web.min.js 
+2026-03-05 06:46:41,408 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:41] "GET /web/assets/770848b/web.assets_web.min.js HTTP/1.1" 200 - 16 0.021 1.302
+2026-03-05 06:46:41,715 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:41] "GET /bus/websocket_worker_bundle?v=17.0-1 HTTP/1.1" 304 - 4 0.002 0.004
+2026-03-05 06:46:41,781 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:41] "POST /mail/init_messaging HTTP/1.1" 200 - 54 0.030 0.027
+2026-03-05 06:46:41,787 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:41] "POST /web/dataset/call_kw/res.users/systray_get_activities HTTP/1.1" 200 - 21 0.012 0.013
+2026-03-05 06:46:41,815 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:41] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 304 - 9 0.005 0.011
+2026-03-05 06:46:41,843 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:41] "POST /mail/load_message_failures HTTP/1.1" 200 - 14 0.008 0.013
+2026-03-05 06:46:41,953 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:41] "GET /websocket?version=17.0-1 HTTP/1.1" 101 - 1 0.001 0.004
+2026-03-05 06:46:43,772 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:43] "GET /web/service-worker.js HTTP/1.1" 200 - 1 0.000 0.002
+2026-03-05 06:46:44,096 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:44] "POST /web/action/load HTTP/1.1" 200 - 10 0.004 0.008
+2026-03-05 06:46:44,250 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:44] "POST /web/dataset/call_kw/sale.order/get_views HTTP/1.1" 200 - 115 0.047 0.086
+2026-03-05 06:46:44,273 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:44] "POST /web/dataset/call_kw/res.users/has_group HTTP/1.1" 200 - 2 0.002 0.002
+2026-03-05 06:46:44,298 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:44] "POST /web/dataset/call_kw/sale.order/web_search_read HTTP/1.1" 200 - 23 0.012 0.018
+2026-03-05 06:46:44,356 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:44] "POST /onboarding/sale_quotation HTTP/1.1" 200 - 27 0.012 0.026
+2026-03-05 06:46:44,438 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:44] "GET /web/image/onboarding.onboarding.step/3/step_image HTTP/1.1" 304 - 5 0.004 0.020
+2026-03-05 06:46:44,454 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:44] "GET /web/image/onboarding.onboarding.step/2/step_image HTTP/1.1" 304 - 4 0.008 0.033
+2026-03-05 06:46:44,458 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:44] "GET /web/image/onboarding.onboarding.step/13/step_image HTTP/1.1" 304 - 4 0.006 0.037
+2026-03-05 06:46:44,459 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:44] "GET /web/image/onboarding.onboarding.step/12/step_image HTTP/1.1" 304 - 4 0.011 0.034
+2026-03-05 06:46:44,481 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:44] "GET /web/image/res.users/2/avatar_128 HTTP/1.1" 304 - 9 0.016 0.048
+2026-03-05 06:46:49,275 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:49] "POST /web/dataset/call_kw HTTP/1.1" 200 - 3 0.001 0.003
+2026-03-05 06:46:49,282 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:49] "POST /report/background_generate HTTP/1.1" 200 - 1 0.000 0.002
+2026-03-05 06:46:49,540 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:49] "GET /web/assets/6f100a2/web.report_assets_pdf.min.css HTTP/1.1" 200 - 5 0.003 0.005
+2026-03-05 06:46:49,541 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:49] "GET /web/assets/26d541a/web.report_assets_common.min.css HTTP/1.1" 200 - 5 0.003 0.004
+2026-03-05 06:46:49,578 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:49] "GET /web/static/fonts/lato/Lato-Reg-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 06:46:49,586 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:49] "GET /web/static/fonts/lato/Lato-Lig-webfont.woff HTTP/1.1" 200 - 0 0.000 0.003
+2026-03-05 06:46:49,587 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:49] "GET /web/static/fonts/lato/Lato-Bla-webfont.woff HTTP/1.1" 200 - 0 0.000 0.002
+2026-03-05 06:46:49,588 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:49] "GET /web/static/fonts/lato/Lato-Hai-webfont.woff HTTP/1.1" 200 - 0 0.000 0.004
+2026-03-05 06:46:49,588 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:49] "GET /web/static/fonts/lato/Lato-Bol-webfont.woff HTTP/1.1" 200 - 0 0.000 0.003
+2026-03-05 06:46:49,590 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:49] "GET /web/static/src/libs/fontawesome/fonts/fontawesome-webfont.woff?v=4.7.0 HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 06:46:51,724 175670 WARNING ? PyPDF2._writer: No fields to update on this page 
+2026-03-05 06:46:51,724 175670 WARNING ? PyPDF2._writer: No fields to update on this page 
+2026-03-05 06:46:51,724 175670 WARNING ? PyPDF2._writer: No fields to update on this page 
+2026-03-05 06:46:51,724 175670 WARNING ? PyPDF2._writer: No fields to update on this page 
+2026-03-05 06:46:51,762 175670 INFO ? odoo.addons.base.models.ir_actions_report: The PDF report has been generated for model: sale.order, records [7]. 
+2026-03-05 06:46:52,110 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:52] "GET /web/content/947?download=true HTTP/1.1" 200 - 13 0.006 0.007
+2026-03-05 06:46:58,066 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:58] "POST /web/action/load HTTP/1.1" 200 - 9 0.005 0.010
+2026-03-05 06:46:58,182 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:58] "POST /web/dataset/call_kw/account.journal/get_views HTTP/1.1" 200 - 47 0.027 0.062
+2026-03-05 06:46:58,265 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:58] "POST /web/dataset/call_kw/account.journal/web_search_read HTTP/1.1" 200 - 53 0.032 0.039
+2026-03-05 06:46:58,284 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:58] "POST /onboarding/account_dashboard HTTP/1.1" 200 - 9 0.003 0.007
+2026-03-05 06:46:58,329 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:58] "GET /web/bundle/web.chartjs_lib?lang=en_US&debug=1 HTTP/1.1" 200 - 2 0.001 0.003
+2026-03-05 06:46:58,453 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:58] "GET /web/image/onboarding.onboarding.step/5/step_image HTTP/1.1" 304 - 4 0.005 0.019
+2026-03-05 06:46:58,454 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:58] "GET /web/image/onboarding.onboarding.step/7/step_image HTTP/1.1" 304 - 4 0.008 0.016
+2026-03-05 06:46:58,456 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:58] "GET /web/image/onboarding.onboarding.step/8/step_image HTTP/1.1" 304 - 4 0.005 0.020
+2026-03-05 06:46:58,461 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:58] "GET /web/image/onboarding.onboarding.step/6/step_image HTTP/1.1" 304 - 4 0.008 0.023
+2026-03-05 06:46:59,956 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:46:59] "POST /web/action/load HTTP/1.1" 200 - 6 0.003 0.006
+2026-03-05 06:47:00,012 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:47:00] "POST /web/dataset/call_kw/account.report/get_options HTTP/1.1" 200 - 38 0.017 0.022
+2026-03-05 06:47:00,051 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:47:00] "POST /web/dataset/call_kw/account.report/get_report_information HTTP/1.1" 200 - 30 0.016 0.016
+2026-03-05 06:47:01,199 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:47:01] "POST /report/background_generate_accounting HTTP/1.1" 200 - 1 0.000 0.003
+2026-03-05 06:47:01,448 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:47:01] "GET /web/assets/19401cc/account_reports.assets_pdf_export.min.css HTTP/1.1" 200 - 4 0.001 0.003
+2026-03-05 06:47:02,491 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:47:02] "GET /web/assets/6f100a2/web.report_assets_pdf.min.css HTTP/1.1" 200 - 4 0.002 0.003
+2026-03-05 06:47:02,493 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:47:02] "GET /web/assets/26d541a/web.report_assets_common.min.css HTTP/1.1" 200 - 4 0.002 0.006
+2026-03-05 06:47:02,517 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:47:02] "GET /web/static/fonts/lato/Lato-Reg-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 06:47:02,522 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:47:02] "GET /web/static/fonts/lato/Lato-Hai-webfont.woff HTTP/1.1" 200 - 0 0.000 0.003
+2026-03-05 06:47:02,523 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:47:02] "GET /web/static/fonts/lato/Lato-Bla-webfont.woff HTTP/1.1" 200 - 0 0.000 0.002
+2026-03-05 06:47:02,523 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:47:02] "GET /web/static/fonts/lato/Lato-Lig-webfont.woff HTTP/1.1" 200 - 0 0.000 0.004
+2026-03-05 06:47:02,524 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:47:02] "GET /web/static/fonts/lato/Lato-Bol-webfont.woff HTTP/1.1" 200 - 0 0.000 0.004
+2026-03-05 06:47:03,587 175670 INFO ? odoo.addons.pdf_lazy_generator.models.account_report: Background accounting PDF generated: Cash Flow Statement - 2026-02-28.pdf 
+2026-03-05 06:47:03,897 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:47:03] "GET /web/content/948?download=true HTTP/1.1" 200 - 6 0.001 0.003
+2026-03-05 06:48:00,931 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:00] "POST /web/dataset/call_kw/ir.module.module/search_read HTTP/1.1" 200 - 2 0.002 0.006
+2026-03-05 06:48:01,709 175670 INFO feb-13-demo odoo.addons.base.models.ir_cron: Starting job `Base: Auto-vacuum internal data`. 
+2026-03-05 06:48:01,730 175670 INFO feb-13-demo odoo.addons.base.models.ir_attachment: filestore gc 7 checked, 1 removed 
+2026-03-05 06:48:01,806 175670 INFO feb-13-demo odoo.addons.base.models.res_users: GC'd 0 user log entries 
+2026-03-05 06:48:01,828 175670 INFO feb-13-demo odoo.addons.auth_totp.models.auth_totp: GC'd 0 totp devices entries 
+2026-03-05 06:48:01,839 175670 INFO feb-13-demo odoo.models.unlink: User #1 deleted bus.bus records with IDs: [485, 486, 487, 488, 489, 490, 491, 492, 493, 494, 495, 496, 497, 498, 499, 500, 501, 502, 503, 504] 
+2026-03-05 06:48:01,920 175670 INFO feb-13-demo odoo.addons.sms.models.sms_sms: GC'd 0 sms marked for deletion 
+2026-03-05 06:48:02,056 175670 INFO feb-13-demo odoo.addons.base.models.ir_cron: Job done: `Base: Auto-vacuum internal data` (0.348s). 
+2026-03-05 06:48:03,924 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:03] "POST /web/dataset/call_kw/ir.module.module/search_read HTTP/1.1" 200 - 2 0.001 0.003
+2026-03-05 06:48:03,932 175670 INFO feb-13-demo odoo.addons.base.models.ir_module: ALLOW access to module.button_immediate_upgrade on ['PDF Lazy Generator'] to user 1 #2 via 127.0.0.1 
+2026-03-05 06:48:03,933 175670 INFO feb-13-demo odoo.addons.base.models.ir_module: ALLOW access to module.button_upgrade on ['PDF Lazy Generator'] to user 1 #2 via 127.0.0.1 
+2026-03-05 06:48:03,933 175670 INFO feb-13-demo odoo.addons.base.models.ir_module: ALLOW access to module.update_list on ['PDF Lazy Generator'] to user 1 #2 via 127.0.0.1 
+2026-03-05 06:48:05,013 175670 INFO feb-13-demo odoo.addons.base.models.ir_module: ALLOW access to module.button_install on [] to user 1 #2 via 127.0.0.1 
+2026-03-05 06:48:05,039 175670 INFO feb-13-demo odoo.modules.loading: loading 1 modules... 
+2026-03-05 06:48:05,044 175670 INFO feb-13-demo odoo.modules.loading: 1 modules loaded in 0.00s, 0 queries (+0 extra) 
+2026-03-05 06:48:05,064 175670 INFO feb-13-demo odoo.modules.loading: updating modules list 
+2026-03-05 06:48:05,065 175670 INFO feb-13-demo odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via 127.0.0.1 
+2026-03-05 06:48:06,177 175670 INFO feb-13-demo odoo.modules.loading: loading 86 modules... 
+2026-03-05 06:48:06,206 175670 INFO feb-13-demo odoo.modules.loading: Loading module pdf_lazy_generator (53/86) 
+2026-03-05 06:48:06,381 175670 INFO feb-13-demo odoo.modules.registry: module pdf_lazy_generator: creating or updating database tables 
+2026-03-05 06:48:06,477 175670 INFO feb-13-demo odoo.modules.loading: loading pdf_lazy_generator/views/menus.xml 
+2026-03-05 06:48:06,493 175670 INFO feb-13-demo odoo.models.unlink: User #1 deleted ir.actions.act_window.view records with IDs: [107] 
+2026-03-05 06:48:06,504 175670 INFO feb-13-demo odoo.modules.loading: loading pdf_lazy_generator/views/res_config_settings_views.xml 
+2026-03-05 06:48:06,546 175670 INFO feb-13-demo odoo.modules.loading: Module pdf_lazy_generator loaded in 0.34s, 170 queries (+170 other) 
+2026-03-05 06:48:06,557 175670 INFO feb-13-demo odoo.modules.loading: 86 modules loaded in 0.38s, 170 queries (+170 extra) 
+2026-03-05 06:48:06,970 175670 INFO feb-13-demo odoo.modules.registry: verifying fields for every extended model 
+2026-03-05 06:48:07,654 175670 INFO feb-13-demo odoo.modules.loading: Modules loaded. 
+2026-03-05 06:48:07,666 175670 INFO feb-13-demo odoo.modules.registry: Registry loaded in 2.635s 
+2026-03-05 06:48:07,666 175670 INFO feb-13-demo odoo.addons.base.models.ir_module: getting next ir.actions.todo() 
+2026-03-05 06:48:07,670 175670 INFO feb-13-demo odoo.modules.registry: Registry changed, signaling through the database 
+2026-03-05 06:48:07,671 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:07] "POST /web/dataset/call_kw/ir.module.module/button_immediate_upgrade HTTP/1.1" 200 - 6711 2.201 1.541
+2026-03-05 06:48:08,429 175670 INFO feb-13-demo odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-03-05 06:48:08,616 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:08] "GET /web HTTP/1.1" 200 - 83 0.033 0.155
+2026-03-05 06:48:08,810 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:08] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 - 68 0.038 0.128
+2026-03-05 06:48:09,068 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:09] "GET /web/manifest.webmanifest HTTP/1.1" 200 - 9 0.007 0.024
+2026-03-05 06:48:09,069 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:09] "POST /web/action/load HTTP/1.1" 200 - 7 0.006 0.015
+2026-03-05 06:48:09,078 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:09] "GET /bus/websocket_worker_bundle?v=17.0-1 HTTP/1.1" 304 - 4 0.005 0.023
+2026-03-05 06:48:09,122 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:09] "POST /web/dataset/call_kw/res.users/systray_get_activities HTTP/1.1" 200 - 20 0.012 0.018
+2026-03-05 06:48:09,140 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:09] "POST /mail/init_messaging HTTP/1.1" 200 - 54 0.038 0.043
+2026-03-05 06:48:09,152 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:09] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 304 - 9 0.007 0.016
+2026-03-05 06:48:09,192 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:09] "POST /web/dataset/call_kw/account.report/get_options HTTP/1.1" 200 - 44 0.022 0.025
+2026-03-05 06:48:09,262 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:09] "POST /mail/load_message_failures HTTP/1.1" 200 - 14 0.013 0.015
+2026-03-05 06:48:09,289 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:09] "GET /websocket?version=17.0-1 HTTP/1.1" 101 - 1 0.001 0.005
+2026-03-05 06:48:09,314 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:09] "POST /web/dataset/call_kw/account.report/get_report_information HTTP/1.1" 200 - 36 0.035 0.029
+2026-03-05 06:48:10,879 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:10] "POST /report/background_generate_accounting HTTP/1.1" 200 - 1 0.000 0.003
+2026-03-05 06:48:11,108 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:11] "GET /web/service-worker.js HTTP/1.1" 200 - 1 0.000 0.002
+2026-03-05 06:48:11,128 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:11] "GET /web/assets/19401cc/account_reports.assets_pdf_export.min.css HTTP/1.1" 200 - 5 0.002 0.004
+2026-03-05 06:48:12,171 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:12] "GET /web/assets/6f100a2/web.report_assets_pdf.min.css HTTP/1.1" 200 - 4 0.002 0.004
+2026-03-05 06:48:12,172 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:12] "GET /web/assets/26d541a/web.report_assets_common.min.css HTTP/1.1" 200 - 4 0.002 0.004
+2026-03-05 06:48:12,196 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:12] "GET /web/static/fonts/lato/Lato-Reg-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 06:48:12,199 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:12] "GET /web/static/fonts/lato/Lato-Hai-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 06:48:12,199 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:12] "GET /web/static/fonts/lato/Lato-Lig-webfont.woff HTTP/1.1" 200 - 0 0.000 0.002
+2026-03-05 06:48:12,202 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:12] "GET /web/static/fonts/lato/Lato-Bla-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 06:48:12,202 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:12] "GET /web/static/fonts/lato/Lato-Bol-webfont.woff HTTP/1.1" 200 - 0 0.000 0.002
+2026-03-05 06:48:13,271 175670 INFO ? odoo.addons.pdf_lazy_generator.models.account_report: Background accounting PDF generated: Cash Flow Statement - 2026-02-28.pdf 
+2026-03-05 06:48:13,586 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:13] "GET /web/content/949?download=true HTTP/1.1" 200 - 8 0.003 0.004
+2026-03-05 06:48:18,653 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:18] "POST /web/action/load HTTP/1.1" 200 - 10 0.004 0.008
+2026-03-05 06:48:18,706 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:18] "POST /web/dataset/call_kw/ir.attachment/get_views HTTP/1.1" 200 - 22 0.013 0.020
+2026-03-05 06:48:18,729 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:18] "POST /web/dataset/call_kw/res.users/has_group HTTP/1.1" 200 - 2 0.001 0.004
+2026-03-05 06:48:18,758 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:18] "POST /web/dataset/call_kw/ir.attachment/web_search_read HTTP/1.1" 200 - 19 0.022 0.014
+2026-03-05 06:48:42,138 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:42] "POST /mail/init_messaging HTTP/1.1" 200 - 34 0.018 0.025
+2026-03-05 06:48:42,141 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:42] "POST /web/dataset/call_kw/res.users/systray_get_activities HTTP/1.1" 200 - 9 0.006 0.010
+2026-03-05 06:48:42,175 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:42] "POST /mail/load_message_failures HTTP/1.1" 200 - 12 0.006 0.011
+2026-03-05 06:48:44,002 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:44] "GET /web/service-worker.js HTTP/1.1" 200 - 1 0.000 0.002
+2026-03-05 06:48:46,677 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:46] "POST /mail/init_messaging HTTP/1.1" 200 - 34 0.018 0.020
+2026-03-05 06:48:46,684 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:46] "POST /web/dataset/call_kw/res.users/systray_get_activities HTTP/1.1" 200 - 9 0.007 0.010
+2026-03-05 06:48:46,720 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:46] "POST /mail/load_message_failures HTTP/1.1" 200 - 12 0.006 0.011
+2026-03-05 06:48:48,471 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:48] "GET /web/service-worker.js HTTP/1.1" 200 - 1 0.000 0.002
+2026-03-05 06:48:49,477 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:49] "POST /web/action/load HTTP/1.1" 200 - 8 0.002 0.006
+2026-03-05 06:48:49,531 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:49] "POST /web/dataset/call_kw/stock.picking.type/get_views HTTP/1.1" 200 - 37 0.013 0.024
+2026-03-05 06:48:49,558 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:49] "POST /web/dataset/call_kw/stock.picking.type/web_search_read HTTP/1.1" 200 - 13 0.006 0.009
+2026-03-05 06:48:53,837 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:53] "POST /web/action/load HTTP/1.1" 200 - 9 0.003 0.006
+2026-03-05 06:48:53,924 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:53] "POST /web/dataset/call_kw/stock.picking/get_views HTTP/1.1" 200 - 85 0.026 0.053
+2026-03-05 06:48:53,940 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:53] "POST /web/dataset/call_kw/res.users/has_group HTTP/1.1" 200 - 1 0.000 0.004
+2026-03-05 06:48:53,995 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:53] "POST /web/dataset/call_kw/stock.picking/web_search_read HTTP/1.1" 200 - 33 0.027 0.032
+2026-03-05 06:48:55,282 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:55] "POST /web/dataset/call_kw/stock.picking/web_read HTTP/1.1" 200 - 32 0.014 0.022
+2026-03-05 06:48:55,331 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:55] "POST /web/dataset/call_kw/stock.picking.type/check_access_rights HTTP/1.1" 200 - 1 0.001 0.002
+2026-03-05 06:48:55,430 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:55] "POST /mail/thread/data HTTP/1.1" 200 - 27 0.022 0.028
+2026-03-05 06:48:55,460 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:55] "POST /web/dataset/call_kw/ir.attachment/register_as_main_attachment HTTP/1.1" 200 - 4 0.004 0.009
+2026-03-05 06:48:55,474 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:55] "POST /mail/thread/messages HTTP/1.1" 200 - 24 0.032 0.028
+2026-03-05 06:48:56,719 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:56] "POST /web/dataset/call_kw HTTP/1.1" 200 - 12 0.005 0.017
+2026-03-05 06:48:56,727 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:56] "POST /report/background_generate HTTP/1.1" 200 - 1 0.000 0.002
+2026-03-05 06:48:56,939 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:56] "GET /web/assets/26d541a/web.report_assets_common.min.css HTTP/1.1" 200 - 4 0.002 0.003
+2026-03-05 06:48:56,939 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:56] "GET /web/assets/6f100a2/web.report_assets_pdf.min.css HTTP/1.1" 200 - 4 0.002 0.004
+2026-03-05 06:48:56,965 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:56] "GET /web/static/fonts/lato/Lato-Reg-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 06:48:56,972 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:56] "GET /web/static/fonts/lato/Lato-Hai-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 06:48:56,974 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:56] "GET /web/static/fonts/lato/Lato-Lig-webfont.woff HTTP/1.1" 200 - 0 0.000 0.003
+2026-03-05 06:48:56,975 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:56] "GET /web/static/fonts/lato/Lato-Bla-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 06:48:56,975 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:56] "GET /web/static/fonts/lato/Lato-Bol-webfont.woff HTTP/1.1" 200 - 0 0.000 0.003
+2026-03-05 06:48:56,977 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:56] "GET /web/static/src/libs/fontawesome/fonts/fontawesome-webfont.woff?v=4.7.0 HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 06:48:59,093 175670 INFO ? odoo.addons.base.models.ir_actions_report: The PDF report has been generated for model: stock.picking, records [2]. 
+2026-03-05 06:48:59,425 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:48:59] "GET /web/content/950?download=true HTTP/1.1" 200 - 6 0.002 0.005
+2026-03-05 06:49:05,944 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:05] "POST /web/dataset/call_kw HTTP/1.1" 200 - 2 0.001 0.003
+2026-03-05 06:49:05,953 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:05] "POST /report/background_generate HTTP/1.1" 200 - 1 0.000 0.002
+2026-03-05 06:49:06,060 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:06] "GET /web/assets/6f100a2/web.report_assets_pdf.min.css HTTP/1.1" 200 - 4 0.002 0.004
+2026-03-05 06:49:06,061 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:06] "GET /web/assets/26d541a/web.report_assets_common.min.css HTTP/1.1" 200 - 4 0.002 0.004
+2026-03-05 06:49:06,087 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:06] "GET /web/static/fonts/lato/Lato-Reg-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 06:49:06,094 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:06] "GET /web/static/fonts/lato/Lato-Hai-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 06:49:06,096 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:06] "GET /web/static/fonts/lato/Lato-Lig-webfont.woff HTTP/1.1" 200 - 0 0.000 0.003
+2026-03-05 06:49:06,097 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:06] "GET /web/static/fonts/lato/Lato-Bol-webfont.woff HTTP/1.1" 200 - 0 0.000 0.002
+2026-03-05 06:49:06,099 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:06] "GET /web/static/fonts/lato/Lato-Bla-webfont.woff HTTP/1.1" 200 - 0 0.000 0.003
+2026-03-05 06:49:06,100 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:06] "GET /web/static/src/libs/fontawesome/fonts/fontawesome-webfont.woff?v=4.7.0 HTTP/1.1" 200 - 0 0.000 0.002
+2026-03-05 06:49:08,213 175670 INFO ? odoo.addons.base.models.ir_actions_report: The PDF report has been generated for model: stock.picking, records [2]. 
+2026-03-05 06:49:08,391 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:08] "POST /web/dataset/call_kw/stock.picking/web_search_read HTTP/1.1" 200 - 29 0.015 0.027
+2026-03-05 06:49:08,543 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:08] "GET /web/content/951?download=true HTTP/1.1" 200 - 6 0.002 0.004
+2026-03-05 06:49:17,610 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:17] "POST /web/dataset/call_kw HTTP/1.1" 200 - 2 0.001 0.003
+2026-03-05 06:49:17,619 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:17] "POST /report/background_generate HTTP/1.1" 200 - 1 0.001 0.003
+2026-03-05 06:49:17,775 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:17] "GET /web/assets/6f100a2/web.report_assets_pdf.min.css HTTP/1.1" 200 - 4 0.002 0.004
+2026-03-05 06:49:17,776 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:17] "GET /web/assets/26d541a/web.report_assets_common.min.css HTTP/1.1" 200 - 4 0.002 0.003
+2026-03-05 06:49:17,821 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:17] "GET /web/static/fonts/lato/Lato-Reg-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 06:49:17,829 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:17] "GET /web/static/fonts/lato/Lato-Lig-webfont.woff HTTP/1.1" 200 - 0 0.000 0.002
+2026-03-05 06:49:17,830 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:17] "GET /web/static/fonts/lato/Lato-Bol-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 06:49:17,832 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:17] "GET /web/static/fonts/lato/Lato-Hai-webfont.woff HTTP/1.1" 200 - 0 0.000 0.003
+2026-03-05 06:49:17,833 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:17] "GET /web/static/fonts/lato/Lato-Bla-webfont.woff HTTP/1.1" 200 - 0 0.000 0.002
+2026-03-05 06:49:19,988 175670 INFO ? odoo.addons.base.models.ir_actions_report: The PDF report has been generated for model: stock.picking, records [3, 1]. 
+2026-03-05 06:49:20,322 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:20] "GET /web/content/952?download=true HTTP/1.1" 200 - 6 0.003 0.005
+2026-03-05 06:49:28,178 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:28] "POST /web/dataset/call_kw/stock.picking/web_read HTTP/1.1" 200 - 24 0.011 0.020
+2026-03-05 06:49:28,245 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:28] "POST /mail/thread/data HTTP/1.1" 200 - 20 0.013 0.019
+2026-03-05 06:49:28,261 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:28] "POST /web/dataset/call_kw/ir.attachment/register_as_main_attachment HTTP/1.1" 200 - 4 0.001 0.005
+2026-03-05 06:49:28,266 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:28] "POST /mail/thread/messages HTTP/1.1" 200 - 22 0.014 0.017
+2026-03-05 06:49:29,464 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:29] "POST /web/dataset/call_kw HTTP/1.1" 200 - 19 0.006 0.009
+2026-03-05 06:49:29,487 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:29] "POST /web/dataset/call_kw/product.label.layout/get_views HTTP/1.1" 200 - 12 0.004 0.009
+2026-03-05 06:49:29,516 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:29] "POST /web/dataset/call_kw/product.label.layout/onchange HTTP/1.1" 200 - 9 0.008 0.012
+2026-03-05 06:49:29,558 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:29] "GET /web/bundle/web_editor.backend_assets_wysiwyg?lang=en_US&debug=1 HTTP/1.1" 200 - 7 0.003 0.018
+2026-03-05 06:49:29,632 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:29] "POST /web/dataset/call_kw/ir.ui.view/render_public_asset HTTP/1.1" 200 - 8 0.004 0.012
+2026-03-05 06:49:31,085 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:31] "POST /web/dataset/call_kw/product.label.layout/web_save HTTP/1.1" 200 - 10 0.005 0.016
+2026-03-05 06:49:31,098 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label: === ProductLabelLayout.process() CALLED === 
+2026-03-05 06:49:31,098 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.id = 33 
+2026-03-05 06:49:31,099 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.tab_id = False 
+2026-03-05 06:49:31,099 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.env.context = {'default_product_ids': [17], 'default_move_ids': [25], 'default_move_quantity': 'move', 'lang': 'en_US', 'tz': 'Asia/Calcutta', 'uid': 2, 'allowed_company_ids': [1]} 
+2026-03-05 06:49:31,099 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.print_format = 2x7xprice 
+2026-03-05 06:49:31,103 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.product_tmpl_ids = [] 
+2026-03-05 06:49:31,106 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.product_ids = [17] 
+2026-03-05 06:49:31,114 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   super().process() returned: {'context': {'default_product_ids': [17], 'default_move_ids': [25], 'default_move_quantity': 'move', 'lang': 'en_US', 'tz': 'Asia/Calcutta', 'uid': 2, 'allowed_company_ids': [1]}, 'data': {'active_model': 'product.product', 'quantity_by_product': {17: 50}, 'layout_wizard': 33, 'price_included': True, 'custom_barcodes': defaultdict(<class 'list'>, {})}, 'type': 'ir.actions.report', 'report_name': 'product.report_producttemplatelabel2x7', 'report_type': 'qweb-pdf', 'report_file': 'product.report_producttemplatelabel2x7', 'name': 'Product Label 2x7 (PDF)', 'close_on_report_download': True} 
+2026-03-05 06:49:31,114 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   action type=ir.actions.report  report_type=qweb-pdf 
+2026-03-05 06:49:31,114 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   report_name = product.report_producttemplatelabel2x7 
+2026-03-05 06:49:31,114 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   docids from product_ids: [17] 
+2026-03-05 06:49:31,114 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   final docids = [17] 
+2026-03-05 06:49:31,114 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   tab_id = '' 
+2026-03-05 06:49:31,114 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   Calling generate_in_background(report=product.report_producttemplatelabel2x7, docids=[17], tab_id=) 
+2026-03-05 06:49:31,115 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   generate_in_background() called successfully 
+2026-03-05 06:49:31,116 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:31] "POST /web/dataset/call_button HTTP/1.1" 200 - 18 0.008 0.012
+2026-03-05 06:49:37,832 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:37] "POST /web/dataset/call_kw HTTP/1.1" 200 - 7 0.003 0.006
+2026-03-05 06:49:37,849 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:37] "POST /web/dataset/call_kw/product.label.layout/onchange HTTP/1.1" 200 - 3 0.002 0.005
+2026-03-05 06:49:44,223 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:44] "POST /web/dataset/call_kw/stock.picking/web_read HTTP/1.1" 200 - 24 0.010 0.020
+2026-03-05 06:49:44,260 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:44] "POST /mail/thread/messages HTTP/1.1" 200 - 4 0.005 0.006
+2026-03-05 06:49:44,262 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:44] "POST /mail/thread/data HTTP/1.1" 200 - 20 0.012 0.016
+2026-03-05 06:49:44,402 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:44] "POST /web/dataset/call_kw/stock.picking/web_read HTTP/1.1" 200 - 24 0.010 0.019
+2026-03-05 06:49:44,449 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:44] "POST /mail/thread/data HTTP/1.1" 200 - 20 0.015 0.021
+2026-03-05 06:49:44,478 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:44] "POST /mail/thread/messages HTTP/1.1" 200 - 22 0.025 0.025
+2026-03-05 06:49:44,496 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:44] "POST /web/dataset/call_kw/ir.attachment/register_as_main_attachment HTTP/1.1" 200 - 4 0.003 0.005
+2026-03-05 06:49:46,136 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:46] "POST /web/dataset/call_kw HTTP/1.1" 200 - 7 0.003 0.006
+2026-03-05 06:49:46,152 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:46] "POST /web/dataset/call_kw/product.label.layout/onchange HTTP/1.1" 200 - 3 0.002 0.005
+2026-03-05 06:49:47,688 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:47] "POST /web/dataset/call_kw/product.label.layout/web_save HTTP/1.1" 200 - 8 0.004 0.007
+2026-03-05 06:49:47,699 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label: === ProductLabelLayout.process() CALLED === 
+2026-03-05 06:49:47,699 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.id = 34 
+2026-03-05 06:49:47,700 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.tab_id = False 
+2026-03-05 06:49:47,700 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.env.context = {'default_product_ids': [8], 'default_move_ids': [24], 'default_move_quantity': 'move', 'lang': 'en_US', 'tz': 'Asia/Calcutta', 'uid': 2, 'allowed_company_ids': [1]} 
+2026-03-05 06:49:47,700 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.print_format = 2x7xprice 
+2026-03-05 06:49:47,703 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.product_tmpl_ids = [] 
+2026-03-05 06:49:47,706 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.product_ids = [8] 
+2026-03-05 06:49:47,712 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   super().process() returned: {'context': {'default_product_ids': [8], 'default_move_ids': [24], 'default_move_quantity': 'move', 'lang': 'en_US', 'tz': 'Asia/Calcutta', 'uid': 2, 'allowed_company_ids': [1]}, 'data': {'active_model': 'product.product', 'quantity_by_product': {8: 40}, 'layout_wizard': 34, 'price_included': True, 'custom_barcodes': defaultdict(<class 'list'>, {})}, 'type': 'ir.actions.report', 'report_name': 'product.report_producttemplatelabel2x7', 'report_type': 'qweb-pdf', 'report_file': 'product.report_producttemplatelabel2x7', 'name': 'Product Label 2x7 (PDF)', 'close_on_report_download': True} 
+2026-03-05 06:49:47,712 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   action type=ir.actions.report  report_type=qweb-pdf 
+2026-03-05 06:49:47,712 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   report_name = product.report_producttemplatelabel2x7 
+2026-03-05 06:49:47,712 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   docids from product_ids: [8] 
+2026-03-05 06:49:47,712 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   final docids = [8] 
+2026-03-05 06:49:47,712 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   tab_id = '' 
+2026-03-05 06:49:47,713 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   Calling generate_in_background(report=product.report_producttemplatelabel2x7, docids=[8], tab_id=) 
+2026-03-05 06:49:47,713 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   generate_in_background() called successfully 
+2026-03-05 06:49:47,714 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:47] "POST /web/dataset/call_button HTTP/1.1" 200 - 14 0.006 0.012
+2026-03-05 06:49:51,638 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:51] "GET /web/manifest.webmanifest HTTP/1.1" 200 - 7 0.012 0.008
+2026-03-05 06:49:51,647 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:51] "GET /web HTTP/1.1" 200 - 13 0.011 0.019
+2026-03-05 06:49:51,667 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:51] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 - 8 0.006 0.019
+2026-03-05 06:49:54,624 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:54] "POST /web/dataset/call_kw HTTP/1.1" 200 - 7 0.003 0.005
+2026-03-05 06:49:54,644 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:54] "POST /web/dataset/call_kw/product.label.layout/onchange HTTP/1.1" 200 - 3 0.002 0.007
+2026-03-05 06:49:56,269 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:56] "POST /web/dataset/call_kw/product.label.layout/web_save HTTP/1.1" 200 - 8 0.004 0.007
+2026-03-05 06:49:56,280 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label: === ProductLabelLayout.process() CALLED === 
+2026-03-05 06:49:56,280 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.id = 35 
+2026-03-05 06:49:56,282 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.tab_id = False 
+2026-03-05 06:49:56,282 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.env.context = {'default_product_ids': [8], 'default_move_ids': [24], 'default_move_quantity': 'move', 'lang': 'en_US', 'tz': 'Asia/Calcutta', 'uid': 2, 'allowed_company_ids': [1]} 
+2026-03-05 06:49:56,282 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.print_format = 2x7xprice 
+2026-03-05 06:49:56,286 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.product_tmpl_ids = [] 
+2026-03-05 06:49:56,289 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.product_ids = [8] 
+2026-03-05 06:49:56,295 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   super().process() returned: {'context': {'default_product_ids': [8], 'default_move_ids': [24], 'default_move_quantity': 'move', 'lang': 'en_US', 'tz': 'Asia/Calcutta', 'uid': 2, 'allowed_company_ids': [1]}, 'data': {'active_model': 'product.product', 'quantity_by_product': {8: 40}, 'layout_wizard': 35, 'price_included': True, 'custom_barcodes': defaultdict(<class 'list'>, {})}, 'type': 'ir.actions.report', 'report_name': 'product.report_producttemplatelabel2x7', 'report_type': 'qweb-pdf', 'report_file': 'product.report_producttemplatelabel2x7', 'name': 'Product Label 2x7 (PDF)', 'close_on_report_download': True} 
+2026-03-05 06:49:56,295 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   action type=ir.actions.report  report_type=qweb-pdf 
+2026-03-05 06:49:56,295 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   report_name = product.report_producttemplatelabel2x7 
+2026-03-05 06:49:56,295 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   docids from product_ids: [8] 
+2026-03-05 06:49:56,295 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   final docids = [8] 
+2026-03-05 06:49:56,295 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   tab_id = '' 
+2026-03-05 06:49:56,295 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   Calling generate_in_background(report=product.report_producttemplatelabel2x7, docids=[8], tab_id=) 
+2026-03-05 06:49:56,295 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   generate_in_background() called successfully 
+2026-03-05 06:49:56,296 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 06:49:56] "POST /web/dataset/call_button HTTP/1.1" 200 - 14 0.005 0.013
+2026-03-05 06:52:02,304 175670 INFO feb-13-demo odoo.addons.base.models.ir_cron: Starting job `Partner Autocomplete: Sync with remote DB`. 
+2026-03-05 06:52:02,307 175670 INFO feb-13-demo odoo.addons.base.models.ir_cron: Job done: `Partner Autocomplete: Sync with remote DB` (0.003s). 
+2026-03-05 06:52:02,322 175670 INFO feb-13-demo odoo.addons.base.models.ir_cron: Starting job `SMS: SMS Queue Manager`. 
+2026-03-05 06:52:02,325 175670 INFO feb-13-demo odoo.addons.base.models.ir_cron: Job done: `SMS: SMS Queue Manager` (0.003s). 
+2026-03-05 06:52:07,856 175670 INFO feb-13-demo odoo.addons.base.models.ir_cron: Starting job `Snailmail: process letters queue`. 
+2026-03-05 06:52:07,861 175670 INFO feb-13-demo odoo.addons.base.models.ir_cron: Job done: `Snailmail: process letters queue` (0.005s). 
+2026-03-05 07:05:46,347 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:46] "POST /web/dataset/call_kw HTTP/1.1" 200 - 8 0.003 0.014
+2026-03-05 07:05:46,355 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:46] "POST /report/background_generate HTTP/1.1" 200 - 1 0.000 0.003
+2026-03-05 07:05:46,461 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:46] "GET /web/assets/6f100a2/web.report_assets_pdf.min.css HTTP/1.1" 200 - 4 0.002 0.016
+2026-03-05 07:05:46,464 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:46] "GET /web/assets/26d541a/web.report_assets_common.min.css HTTP/1.1" 200 - 4 0.005 0.015
+2026-03-05 07:05:46,493 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:46] "GET /web/static/fonts/lato/Lato-Reg-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 07:05:46,500 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:46] "GET /web/static/fonts/lato/Lato-Lig-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 07:05:46,503 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:46] "GET /web/static/fonts/lato/Lato-Bol-webfont.woff HTTP/1.1" 200 - 0 0.000 0.002
+2026-03-05 07:05:46,504 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:46] "GET /web/static/fonts/lato/Lato-Hai-webfont.woff HTTP/1.1" 200 - 0 0.000 0.004
+2026-03-05 07:05:46,505 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:46] "GET /web/static/fonts/lato/Lato-Bla-webfont.woff HTTP/1.1" 200 - 0 0.000 0.002
+2026-03-05 07:05:46,506 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:46] "GET /web/static/src/libs/fontawesome/fonts/fontawesome-webfont.woff?v=4.7.0 HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 07:05:48,622 175670 INFO ? odoo.addons.base.models.ir_actions_report: The PDF report has been generated for model: stock.picking, records [6]. 
+2026-03-05 07:05:56,553 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:56] "GET /web HTTP/1.1" 200 - 13 0.005 0.014
+2026-03-05 07:05:56,715 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:56] "GET /web/manifest.webmanifest HTTP/1.1" 200 - 7 0.004 0.006
+2026-03-05 07:05:56,727 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:56] "POST /web/action/load HTTP/1.1" 200 - 9 0.005 0.010
+2026-03-05 07:05:56,768 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:56] "POST /web/dataset/call_kw/res.users/systray_get_activities HTTP/1.1" 200 - 9 0.006 0.010
+2026-03-05 07:05:56,771 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:56] "POST /mail/init_messaging HTTP/1.1" 200 - 34 0.022 0.022
+2026-03-05 07:05:56,794 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:56] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 304 - 9 0.005 0.011
+2026-03-05 07:05:56,828 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:56] "POST /mail/load_message_failures HTTP/1.1" 200 - 12 0.010 0.020
+2026-03-05 07:05:56,844 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:56] "POST /web/dataset/call_kw/stock.picking/get_views HTTP/1.1" 200 - 3 0.002 0.036
+2026-03-05 07:05:56,956 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:56] "POST /web/dataset/call_kw/stock.picking/web_read HTTP/1.1" 200 - 24 0.012 0.023
+2026-03-05 07:05:57,015 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:57] "POST /web/dataset/call_kw/stock.picking.type/check_access_rights HTTP/1.1" 200 - 1 0.001 0.002
+2026-03-05 07:05:57,095 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:57] "POST /mail/thread/data HTTP/1.1" 200 - 20 0.013 0.018
+2026-03-05 07:05:57,116 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:57] "POST /web/dataset/call_kw/ir.attachment/register_as_main_attachment HTTP/1.1" 200 - 4 0.003 0.007
+2026-03-05 07:05:57,120 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:57] "POST /mail/thread/messages HTTP/1.1" 200 - 22 0.018 0.019
+2026-03-05 07:05:58,707 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:58] "GET /web/service-worker.js HTTP/1.1" 200 - 1 0.000 0.002
+2026-03-05 07:05:59,960 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:59] "POST /web/dataset/call_kw HTTP/1.1" 200 - 8 0.003 0.014
+2026-03-05 07:05:59,968 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:05:59] "POST /report/background_generate HTTP/1.1" 200 - 1 0.000 0.002
+2026-03-05 07:06:00,054 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:00] "GET /web/assets/6f100a2/web.report_assets_pdf.min.css HTTP/1.1" 200 - 4 0.002 0.003
+2026-03-05 07:06:00,054 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:00] "GET /web/assets/26d541a/web.report_assets_common.min.css HTTP/1.1" 200 - 4 0.002 0.004
+2026-03-05 07:06:00,079 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:00] "GET /web/static/fonts/lato/Lato-Reg-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 07:06:00,087 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:00] "GET /web/static/fonts/lato/Lato-Bol-webfont.woff HTTP/1.1" 200 - 0 0.000 0.002
+2026-03-05 07:06:00,088 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:00] "GET /web/static/fonts/lato/Lato-Bla-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 07:06:00,088 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:00] "GET /web/static/fonts/lato/Lato-Lig-webfont.woff HTTP/1.1" 200 - 0 0.000 0.004
+2026-03-05 07:06:00,089 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:00] "GET /web/static/fonts/lato/Lato-Hai-webfont.woff HTTP/1.1" 200 - 0 0.000 0.004
+2026-03-05 07:06:00,091 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:00] "GET /web/static/src/libs/fontawesome/fonts/fontawesome-webfont.woff?v=4.7.0 HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 07:06:02,207 175670 INFO ? odoo.addons.base.models.ir_actions_report: The PDF report has been generated for model: stock.picking, records [6]. 
+2026-03-05 07:06:02,539 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:02] "GET /web/content/955?download=true HTTP/1.1" 200 - 6 0.002 0.004
+2026-03-05 07:06:12,204 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:12] "POST /web/dataset/call_kw/res.users/has_group HTTP/1.1" 200 - 1 0.000 0.003
+2026-03-05 07:06:12,238 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:12] "POST /web/dataset/call_kw/stock.picking/web_search_read HTTP/1.1" 200 - 29 0.013 0.025
+2026-03-05 07:06:13,184 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:13] "POST /web/dataset/call_kw/stock.picking/web_read HTTP/1.1" 200 - 28 0.012 0.023
+2026-03-05 07:06:13,262 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:13] "POST /mail/thread/data HTTP/1.1" 200 - 20 0.017 0.019
+2026-03-05 07:06:13,275 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:13] "POST /web/dataset/call_kw/ir.attachment/register_as_main_attachment HTTP/1.1" 200 - 4 0.002 0.004
+2026-03-05 07:06:13,276 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:13] "POST /mail/thread/messages HTTP/1.1" 200 - 22 0.019 0.017
+2026-03-05 07:06:17,610 175670 INFO feb-13-demo odoo.addons.phone_validation.tools.phone_validation: The `phonenumbers` Python module is not installed, contact numbers will not be verified. Please install the `phonenumbers` Python module. 
+2026-03-05 07:06:17,626 175670 INFO feb-13-demo odoo.addons.iap.tools.iap_tools: iap jsonrpc https://sms.api.odoo.com/api/sms/3/send 
+2026-03-05 07:06:19,127 175670 INFO feb-13-demo odoo.addons.iap.tools.iap_tools: iap jsonrpc https://sms.api.odoo.com/api/sms/3/send answered in 1.498585 seconds 
+2026-03-05 07:06:19,128 175670 INFO feb-13-demo odoo.addons.sms.models.sms_sms: Send batch 1 SMS: [3]: gave [{'uuid': '5b526b39088b4c42aa159659f95b2a04', 'state': 'unregistered', 'credit': 0}] 
+2026-03-05 07:06:19,174 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:19] "POST /web/dataset/call_kw HTTP/1.1" 200 - 168 0.109 1.608
+2026-03-05 07:06:19,195 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:19] "POST /web/dataset/call_button HTTP/1.1" 200 - 3 0.001 0.006
+2026-03-05 07:06:19,251 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:19] "POST /mail/thread/messages HTTP/1.1" 200 - 23 0.021 0.014
+2026-03-05 07:06:19,252 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:19] "POST /web/dataset/call_kw/stock.picking/web_read HTTP/1.1" 200 - 23 0.015 0.020
+2026-03-05 07:06:19,292 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:06:19] "POST /mail/thread/data HTTP/1.1" 200 - 25 0.013 0.018
+2026-03-05 07:07:55,135 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:07:55] "POST /web/dataset/call_kw HTTP/1.1" 200 - 2 0.001 0.002
+2026-03-05 07:07:55,144 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:07:55] "POST /report/background_generate HTTP/1.1" 200 - 1 0.000 0.003
+2026-03-05 07:07:55,220 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:07:55] "GET /web/assets/6f100a2/web.report_assets_pdf.min.css HTTP/1.1" 200 - 4 0.002 0.004
+2026-03-05 07:07:55,221 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:07:55] "GET /web/assets/26d541a/web.report_assets_common.min.css HTTP/1.1" 200 - 4 0.002 0.004
+2026-03-05 07:07:55,249 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:07:55] "GET /web/static/fonts/lato/Lato-Reg-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 07:07:55,257 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:07:55] "GET /web/static/fonts/lato/Lato-Lig-webfont.woff HTTP/1.1" 200 - 0 0.000 0.002
+2026-03-05 07:07:55,257 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:07:55] "GET /web/static/fonts/lato/Lato-Hai-webfont.woff HTTP/1.1" 200 - 0 0.000 0.002
+2026-03-05 07:07:55,259 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:07:55] "GET /web/static/fonts/lato/Lato-Bol-webfont.woff HTTP/1.1" 200 - 0 0.000 0.003
+2026-03-05 07:07:55,260 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:07:55] "GET /web/static/fonts/lato/Lato-Bla-webfont.woff HTTP/1.1" 200 - 0 0.000 0.001
+2026-03-05 07:07:55,262 175670 INFO ? werkzeug: 127.0.0.1 - - [05/Mar/2026 07:07:55] "GET /web/static/src/libs/fontawesome/fonts/fontawesome-webfont.woff?v=4.7.0 HTTP/1.1" 200 - 0 0.000 0.002
+2026-03-05 07:07:57,378 175670 INFO ? odoo.addons.base.models.ir_actions_report: The PDF report has been generated for model: stock.picking, records [4]. 
+2026-03-05 07:07:57,708 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:07:57] "GET /web/content/956?download=true HTTP/1.1" 200 - 6 0.002 0.004
+2026-03-05 07:08:01,959 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:08:01] "POST /web/dataset/call_kw/stock.picking/web_search_read HTTP/1.1" 200 - 29 0.015 0.027
+2026-03-05 07:08:03,378 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:08:03] "POST /web/dataset/call_kw/stock.picking/web_read HTTP/1.1" 200 - 24 0.009 0.019
+2026-03-05 07:08:03,438 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:08:03] "POST /mail/thread/data HTTP/1.1" 200 - 15 0.012 0.015
+2026-03-05 07:08:03,454 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:08:03] "POST /mail/thread/messages HTTP/1.1" 200 - 22 0.012 0.013
+2026-03-05 07:08:05,010 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:08:05] "POST /web/dataset/call_kw HTTP/1.1" 200 - 7 0.004 0.006
+2026-03-05 07:08:05,026 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:08:05] "POST /web/dataset/call_kw/product.label.layout/get_views HTTP/1.1" 200 - 1 0.001 0.003
+2026-03-05 07:08:05,040 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:08:05] "POST /web/dataset/call_kw/product.label.layout/onchange HTTP/1.1" 200 - 3 0.002 0.005
+2026-03-05 07:08:05,058 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:08:05] "GET /web/bundle/web_editor.backend_assets_wysiwyg?lang=en_US&debug=1 HTTP/1.1" 200 - 1 0.000 0.002
+2026-03-05 07:08:05,128 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:08:05] "POST /web/dataset/call_kw/ir.ui.view/render_public_asset HTTP/1.1" 200 - 5 0.002 0.004
+2026-03-05 07:08:06,683 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:08:06] "POST /web/dataset/call_kw/product.label.layout/web_save HTTP/1.1" 200 - 8 0.004 0.015
+2026-03-05 07:08:06,696 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label: === ProductLabelLayout.process() CALLED === 
+2026-03-05 07:08:06,697 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.id = 36 
+2026-03-05 07:08:06,697 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.tab_id = False 
+2026-03-05 07:08:06,698 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.env.context = {'default_product_ids': [8], 'default_move_ids': [23], 'default_move_quantity': 'move', 'lang': 'en_US', 'tz': 'Asia/Calcutta', 'uid': 2, 'allowed_company_ids': [1]} 
+2026-03-05 07:08:06,698 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.print_format = 2x7xprice 
+2026-03-05 07:08:06,701 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.product_tmpl_ids = [] 
+2026-03-05 07:08:06,704 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.product_ids = [8] 
+2026-03-05 07:08:06,711 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   super().process() returned: {'context': {'default_product_ids': [8], 'default_move_ids': [23], 'default_move_quantity': 'move', 'lang': 'en_US', 'tz': 'Asia/Calcutta', 'uid': 2, 'allowed_company_ids': [1]}, 'data': {'active_model': 'product.product', 'quantity_by_product': {8: 16}, 'layout_wizard': 36, 'price_included': True, 'custom_barcodes': defaultdict(<class 'list'>, {})}, 'type': 'ir.actions.report', 'report_name': 'product.report_producttemplatelabel2x7', 'report_type': 'qweb-pdf', 'report_file': 'product.report_producttemplatelabel2x7', 'name': 'Product Label 2x7 (PDF)', 'close_on_report_download': True} 
+2026-03-05 07:08:06,711 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   action type=ir.actions.report  report_type=qweb-pdf 
+2026-03-05 07:08:06,711 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   report_name = product.report_producttemplatelabel2x7 
+2026-03-05 07:08:06,711 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   docids from product_ids: [8] 
+2026-03-05 07:08:06,711 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   final docids = [8] 
+2026-03-05 07:08:06,711 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   tab_id = '' 
+2026-03-05 07:08:06,711 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   Calling generate_in_background(report=product.report_producttemplatelabel2x7, docids=[8], tab_id=) 
+2026-03-05 07:08:06,711 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   generate_in_background() called successfully 
+2026-03-05 07:08:06,713 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:08:06] "POST /web/dataset/call_button HTTP/1.1" 200 - 14 0.006 0.013
+2026-03-05 07:08:11,252 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:08:11] "POST /web/dataset/call_kw HTTP/1.1" 200 - 7 0.003 0.005
+2026-03-05 07:08:11,268 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:08:11] "POST /web/dataset/call_kw/product.label.layout/onchange HTTP/1.1" 200 - 3 0.002 0.006
+2026-03-05 07:08:13,160 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:08:13] "POST /web/dataset/call_kw/product.label.layout/web_save HTTP/1.1" 200 - 8 0.004 0.015
+2026-03-05 07:08:13,171 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label: === ProductLabelLayout.process() CALLED === 
+2026-03-05 07:08:13,171 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.id = 37 
+2026-03-05 07:08:13,172 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.tab_id = False 
+2026-03-05 07:08:13,172 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.env.context = {'default_product_ids': [8], 'default_move_ids': [23], 'default_move_quantity': 'move', 'lang': 'en_US', 'tz': 'Asia/Calcutta', 'uid': 2, 'allowed_company_ids': [1]} 
+2026-03-05 07:08:13,172 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.print_format = 2x7xprice 
+2026-03-05 07:08:13,175 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.product_tmpl_ids = [] 
+2026-03-05 07:08:13,178 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   self.product_ids = [8] 
+2026-03-05 07:08:13,185 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   super().process() returned: {'context': {'default_product_ids': [8], 'default_move_ids': [23], 'default_move_quantity': 'move', 'lang': 'en_US', 'tz': 'Asia/Calcutta', 'uid': 2, 'allowed_company_ids': [1]}, 'data': {'active_model': 'product.product', 'quantity_by_product': {8: 16}, 'layout_wizard': 37, 'price_included': True, 'custom_barcodes': defaultdict(<class 'list'>, {})}, 'type': 'ir.actions.report', 'report_name': 'product.report_producttemplatelabel2x7', 'report_type': 'qweb-pdf', 'report_file': 'product.report_producttemplatelabel2x7', 'name': 'Product Label 2x7 (PDF)', 'close_on_report_download': True} 
+2026-03-05 07:08:13,185 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   action type=ir.actions.report  report_type=qweb-pdf 
+2026-03-05 07:08:13,185 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   report_name = product.report_producttemplatelabel2x7 
+2026-03-05 07:08:13,186 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   docids from product_ids: [8] 
+2026-03-05 07:08:13,186 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   final docids = [8] 
+2026-03-05 07:08:13,186 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   tab_id = '' 
+2026-03-05 07:08:13,186 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   Calling generate_in_background(report=product.report_producttemplatelabel2x7, docids=[8], tab_id=) 
+2026-03-05 07:08:13,186 175670 INFO feb-13-demo odoo.addons.pdf_lazy_generator.models.product_label:   generate_in_background() called successfully 
+2026-03-05 07:08:13,187 175670 INFO feb-13-demo werkzeug: 127.0.0.1 - - [05/Mar/2026 07:08:13] "POST /web/dataset/call_button HTTP/1.1" 200 - 14 0.006 0.012
