@@ -21,6 +21,7 @@
 #############################################################################
 import base64
 import threading
+import traceback
 import logging
 
 from odoo import api, models
@@ -33,21 +34,27 @@ _logger = logging.getLogger(__name__)
 class AccountReport(models.Model):
     _inherit = "account.report"
 
-    def generate_in_background(self, options, request_id=False,tab_id=False):
+    def generate_in_background(self, options, request_id=False, tab_id=False, context=None):
         """
         Start enterprise accounting report PDF generation in a background thread.
         `options` is the full options dict passed from the JS frontend —
         it contains report_id, date_from, date_to, comparison, filters, etc.
         """
+        if tab_id:
+            self.env['bus.bus']._sendone(
+                self.env.user.partner_id,
+                "pdf_started",
+                {"tab_id": tab_id}
+            )
+
         thread = threading.Thread(
             target=self._generate_pdf_thread,
-            args=(options, request_id,tab_id),
-
+            args=(options, request_id, tab_id, context),
         )
         thread.daemon = True
         thread.start()
 
-    def _generate_pdf_thread(self, options, request_id=False ,tab_id=False):
+    def _generate_pdf_thread(self, options, request_id=False, tab_id=False, context=None):
         """
         Generate the accounting report PDF in a background thread.
         Uses a fresh DB cursor, creates an ir.attachment, and
@@ -58,7 +65,7 @@ class AccountReport(models.Model):
         report_id = options.get("report_id")
 
         with Registry(db_name).cursor() as new_cr:
-            env = api.Environment(new_cr, uid, {})
+            env = api.Environment(new_cr, uid, context or {})
             try:
                 report = env["account.report"].browse(report_id)
 
@@ -107,9 +114,7 @@ class AccountReport(models.Model):
 
             except Exception as e:
                 new_cr.rollback()
-                _logger.exception(
-                    "Background accounting PDF generation failed for report_id=%s", report_id
-                )
+                _logger.error("Background accounting PDF generation failed:\n%s", traceback.format_exc())
                 error_msg = str(e)
                 if hasattr(e, 'name'):
                     error_msg = e.name

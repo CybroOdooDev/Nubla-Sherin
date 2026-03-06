@@ -12,7 +12,7 @@ const UNIQUE_TAB_ID = window.customReportTabId;
 
 
 async function getReportInfo(actionId, rpcService) {
-    if (!isNaN(parseInt(actionId))) {
+    if (!isNaN(parseInt(actionId)) && String(actionId).indexOf('.') === -1) {
         const data = await rpcService("/web/dataset/call_kw", {
             model: "ir.actions.report",
             method: "search_read",
@@ -31,63 +31,97 @@ async function getReportInfo(actionId, rpcService) {
         });
         if (data.length) return data[0];
 
-        const action = await rpcService("/web/action/load", {
-            action_id: actionId,
-        });
-        if (action?.report_type === "qweb-pdf") {
-            return { report_name: action.report_name, report_type: action.report_type };
+        const action = await rpcService("/web/action/load", { action_id: actionId });
+        if (action?.type === "ir.actions.report" || action?.report_type === "qweb-pdf") {
+            return { report_name: action.report_name, report_type: action.report_type || "qweb-pdf" };
         }
     }
-
     return null;
 }
 
+const MODULE_MGMT_METHODS = [
+    "button_immediate_uninstall",
+    "button_immediate_install",
+    "button_immediate_upgrade",
+    "button_uninstall_wizard",
+    "button_install",
+    "button_upgrade",
+];
 
 patch(ViewButton.prototype, {
     async onClick(ev) {
+        if (status(this) === "destroyed") return;
         const clickParams = this.props.clickParams;
         const resId = this.props.record?.resId || null;
+        const resModel = this.props.record?.resModel || null;
         const actionId = clickParams?.name || null;
-        const isPrintButton = this.props.string?.toLowerCase().includes("print") || actionId?.toLowerCase().includes("print");
-        const isXmlId = typeof actionId === "string" && actionId.includes(".");
-        const isNumeric = !isNaN(parseInt(actionId)) && !isNaN(actionId);
 
-        if (actionId && resId && (clickParams?.type === "action" || (clickParams?.type === "object" && isPrintButton))) {
-            if (clickParams?.type === "object") {
-                this.env.services.notification.add(
-                    "Processing print request...",
-                    { type: "info", sticky: false }
-                );
-                return super.onClick(ev);
-            }
+        if (clickParams?.type === "object" && resModel === "ir.module.module" && MODULE_MGMT_METHODS.includes(actionId)) {
+            return super.onClick(ev);
+        }
 
-            if (isXmlId || isNumeric) {
-                try {
-                    const report = await getReportInfo(actionId, this.env.services.rpc);
-                    if (report?.report_type === "qweb-pdf") {
-                        ev.preventDefault();
-                        ev.stopPropagation();
+        if (clickParams?.type === "object" && resId && resModel && actionId) {
+            try {
+                const result = await this.env.services.rpc("/web/dataset/call_kw", {
+                    model: resModel,
+                    method: actionId,
+                    args: [[resId]],
+                    kwargs: {
+                        context: Object.assign({}, this.env.services.user.context, { tab_id: UNIQUE_TAB_ID })
+                    },
+                });
 
-                        await this.env.services.rpc("/report/background_generate", {
-                            report_name: report.report_name,
-                            docids: [resId],
-                            tab_id: UNIQUE_TAB_ID,
-                        });
+                if (result?.type === "ir.actions.report" && result?.report_type === "qweb-pdf") {
+                    ev.preventDefault();
+                    ev.stopPropagation();
 
-                        this.env.services.notification.add(
-                            "PDF generating in background.",
-                            { title: "Success", type: "success" }
-                        );
-                        return;
-                    }
-                } catch (e) {
-                    console.warn("ViewButton action patch error:", e);
+                    await this.env.services.rpc("/report/background_generate", {
+                        report_name: result.report_name,
+                        docids: result.docids || result.res_ids || [resId],
+                        tab_id: UNIQUE_TAB_ID,
+                        data: result.data || {}, // PRESERVE WIZARD DATA
+                    });
+                    return;
                 }
+
+                if (result && typeof result === "object" && result.type) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    const actionService = this.env.services.action;
+                    return actionService.doAction(result, {
+                        additionalContext: { tab_id: UNIQUE_TAB_ID }
+                    });
+                }
+
+                if (result !== undefined) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                }
+                return;
+            } catch (e) {
+                console.warn("[bg_pdf] ViewButton object error:", e);
             }
         }
 
-        if (status(this) === "destroyed") {
-            return;
+        // --- Handle type="action" ---
+        if (actionId && resId && clickParams?.type === "action") {
+            try {
+                const report = await getReportInfo(actionId, this.env.services.rpc);
+                if (report?.report_type === "qweb-pdf") {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+
+                    await this.env.services.rpc("/report/background_generate", {
+                        report_name: report.report_name,
+                        docids: [resId],
+                        tab_id: UNIQUE_TAB_ID,
+                        data: {},
+                    });
+                    return;
+                }
+            } catch (e) {
+                console.warn("[bg_pdf] ViewButton action error:", e);
+            }
         }
 
         return super.onClick(ev);
@@ -96,12 +130,23 @@ patch(ViewButton.prototype, {
 
 
 registry.category("services").add("custom_report_patch", {
-    dependencies: ["action", "notification", "bus_service"],
-    async start(env, { action, notification, bus_service }) {
+    dependencies: ["action", "notification", "bus_service", "user", "rpc"],
+    async start(env, { action, notification, bus_service, user, rpc }) {
+
+        // Inject tab_id into user context globally.
+        Object.assign(user.context, { tab_id: UNIQUE_TAB_ID });
+
+        bus_service.subscribe("pdf_started", (p) => {
+            if (p.tab_id === UNIQUE_TAB_ID) {
+                notification.add("PDF is being generated in the background. It will download automatically when ready.", {
+                    title: "PDF Generation Started",
+                    type: "success"
+                });
+            }
+        });
 
         bus_service.subscribe("pdf_download", (payload) => {
-            if (!payload?.url) return;
-            if (payload.tab_id !== UNIQUE_TAB_ID) return;
+            if (!payload?.url || payload.tab_id !== UNIQUE_TAB_ID) return;
 
             const orderRef = payload.order_ref || "Document";
 
@@ -115,102 +160,71 @@ registry.category("services").add("custom_report_patch", {
                 setTimeout(() => document.body.removeChild(a), 1000);
             }, 300);
 
-            notification.add(`${orderRef} downloaded successfully.`, {
-                title: "Download Completed",
-                type: "success",
-            });
+            notification.add(`${orderRef} downloaded successfully.`, { title: "Done", type: "success" });
+        });
+
+        bus_service.subscribe("pdf_error", (p) => {
+            if (p.tab_id === UNIQUE_TAB_ID) notification.add(p.message || "Error generating PDF.", { title: "Failed", type: "danger", sticky: true });
         });
 
         const originalDoAction = action.doAction.bind(action);
+        action._originalDoAction = originalDoAction;
 
         action.doAction = async function (act, options = {}) {
+            if (!options.additionalContext) options.additionalContext = {};
+            if (!options.additionalContext.tab_id) options.additionalContext.tab_id = UNIQUE_TAB_ID;
+
             try {
-                if (!act) {
-                    return originalDoAction(act, options);
-                }
-
-                // Inject tab_id into the context so wizards can access it
-                const tabContext = { tab_id: UNIQUE_TAB_ID };
-                if (typeof act === "object") {
-                    act.context = Object.assign({}, act.context || {}, tabContext);
-                }
-                options.additionalContext = Object.assign({}, options.additionalContext || {}, tabContext);
-
                 let reportName = null;
                 let activeIds = [];
+                let reportData = {};
 
-                if (typeof act === "object" && act.type === "ir.actions.report") {
-                    if (act.report_type === "qweb-pdf") {
-                        reportName = act.report_name;
+                if (typeof act === "object" && act !== null && act.type === "ir.actions.report" && act.report_type === "qweb-pdf") {
+                    reportName = act.report_name;
+                    reportData = act.data || {};
+                    activeIds = act.docids || act.res_ids || [];
+                    if (!Array.isArray(activeIds)) activeIds = activeIds ? [activeIds] : [];
 
-                        const ctxActiveIds = act.context?.active_ids;
-                        const optActiveIds = options?.additionalContext?.active_ids;
-                        let actionDocIds = act.docids || act.res_ids || [];
-                        if (actionDocIds && !Array.isArray(actionDocIds)) {
-                            actionDocIds = [actionDocIds];
-                        }
-
-                        activeIds = Array.isArray(ctxActiveIds) ? ctxActiveIds : [];
-                        if (!activeIds.length && Array.isArray(optActiveIds)) {
-                            activeIds = optActiveIds;
-                        }
-                        if (!activeIds.length && actionDocIds && actionDocIds.length) {
-                            activeIds = actionDocIds;
-                        }
-                        if (!activeIds.length && act.context?.active_id) {
-                            activeIds = [act.context.active_id];
-                        }
-                        if (!activeIds.length && act.res_id) {
-                            activeIds = [act.res_id];
-                        }
+                    if (!activeIds.length) {
+                        activeIds = options.additionalContext?.active_ids || options.active_ids || (act.context?.active_ids) || (act.res_id ? [act.res_id] : []);
                     }
                 }
-
-                if (!reportName) {
-                    const isNumeric = typeof act === "number" ||
-                        (typeof act === "string" && !isNaN(parseInt(act)) && !act.includes("."));
-                    const isXmlId = typeof act === "string" && act.includes(".");
-
-                    if (isNumeric || isXmlId) {
-                        const report = await getReportInfo(act, action.env ? action.env.services.rpc : env.services.rpc);
+                else if (typeof act === "number" || typeof act === "string") {
+                    const resIds = options.additionalContext?.active_ids || options.active_ids || [];
+                    if (resIds.length) {
+                        const report = await getReportInfo(act, rpc);
                         if (report?.report_type === "qweb-pdf") {
                             reportName = report.report_name;
+                            activeIds = resIds;
                         }
-                    }
-                }
-
-                if (reportName && !activeIds.length) {
-                    const controller = env.services.action.currentController;
-                    if (options?.additionalContext?.active_ids?.length) {
-                        activeIds = options.additionalContext.active_ids;
-                    } else if (controller?.model?.root?.selection?.length) {
-                        activeIds = controller.model.root.selection.map(r => r.resId);
-                    } else if (controller?.model?.root?.resId) {
-                        activeIds = [controller.model.root.resId];
-                    } else if (controller?.props?.resId) {
-                        activeIds = [controller.props.resId];
+                    } else {
+                        try {
+                            const controller = action.currentController;
+                            const root = controller?.model?.root;
+                            const discoveryIds = root?.selection?.length ? root.selection.map(r => r.resId) : (root?.resId ? [root.resId] : []);
+                            if (discoveryIds.length) {
+                                const report = await getReportInfo(act, rpc);
+                                if (report?.report_type === "qweb-pdf") {
+                                    reportName = report.report_name;
+                                    activeIds = discoveryIds;
+                                }
+                            }
+                        } catch (e) { }
                     }
                 }
 
                 if (reportName && activeIds.length) {
-                    // Fire and forget RPC
-                    env.services.rpc("/report/background_generate", {
+                    rpc("/report/background_generate", {
                         report_name: reportName,
-                        docids: activeIds,
+                        docids: Array.isArray(activeIds) ? activeIds : [activeIds],
                         tab_id: UNIQUE_TAB_ID,
-                    }).catch(e => console.warn("Background RPC error:", e));
-
-                    notification.add("PDF generation started in background.", {
-                        title: "Success",
-                        type: "success",
-                    });
+                        data: reportData,
+                    }).catch(e => console.warn("[bg_pdf] RPC error:", e));
                     return true;
                 }
-
             } catch (e) {
-                console.warn("doAction patch error:", e);
+                console.warn("[bg_pdf] doAction error:", e);
             }
-
             return originalDoAction(act, options);
         };
     },

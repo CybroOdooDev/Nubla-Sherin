@@ -44,5 +44,6 @@ class BackgroundAccountingReportController(http.Controller):
             options,
             request_id=request_id,
             tab_id=tab_id,
+            context=dict(request.env.context),
         )
         return {"status": "started"}

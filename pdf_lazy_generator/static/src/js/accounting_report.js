@@ -38,10 +38,6 @@ function patchAccountReportController() {
                                 options: options,
                                 tab_id: UNIQUE_TAB_ID,
                             });
-                            this.env.services.notification.add(
-                                "PDF is being generated in the background. It will download automatically when ready.",
-                                { title: "PDF Generation Started", type: "success" }
-                            );
                             return;
                         } catch (e) {
                             console.error("[bg_pdf] RPC failed:", e);
