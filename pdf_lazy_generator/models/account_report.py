@@ -31,6 +31,9 @@ _logger = logging.getLogger(__name__)
 
 
 class AccountReport(models.Model):
+    """
+        Extends account.report to support background PDF generation.
+    """
     _inherit = "account.report"
 
     def generate_in_background(self, options, request_id=False, tab_id=False):

@@ -24,6 +24,10 @@ from odoo.http import request
 
 
 class BackgroundAccountingReportController(http.Controller):
+    """
+         used to generate accounting reports in the background
+        when the user clicks the Print PDF button.
+    """
 
     @http.route("/report/background_generate_accounting", type="jsonrpc", auth="user")
     def background_generate_accounting(self, options=None, request_id=False, tab_id=False):

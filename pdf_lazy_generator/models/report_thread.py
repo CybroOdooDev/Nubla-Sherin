@@ -26,6 +26,9 @@ from odoo.modules.registry import Registry
 
 
 class IrActionsReport(models.Model):
+    """
+        Extends ir.actions.report to support background PDF generation.
+    """
     _inherit = "ir.actions.report"
 
     def generate_in_background(self, report_name, docids, request_id=False, tab_id=False):
@@ -63,56 +66,61 @@ class IrActionsReport(models.Model):
                 )
 
                 records = env[report.model].browse(res_ids)
-
-                for record in records:
-                    record_name = record.name
-
-                    if not record_name or record_name == "/":
-                        record_name = "Draft"
-
+                
+                # Determine a filename for the consolidated report
+                if len(records) > 1:
+                    filename = f"{report.name or 'Report'}.pdf"
+                elif records:
+                    record = records[0]
+                    record_name = record.name or "Draft"
                     clean_name = record_name.replace("/", "_")
-
                     if record._name == "sale.order":
                         filename = f"Order - {clean_name}.pdf"
-
                     elif record._name == "account.move":
                         filename = f"{clean_name}.pdf"
-
                     else:
                         filename = f"{clean_name}.pdf"
+                else:
+                    filename = "Report.pdf"
 
-                    attach_in_chatter = env['ir.config_parameter'].sudo().get_param(
-                        'custom_report.attach_pdf_in_chatter'
-                    )
+                # Create a primary attachment for the download notification
+                # We'll use the result of the first record as the 'main' reference if needed,
+                # but usually for batch it's better to just use a general name.
+                main_record = records[0] if records else None
+                
+                attachment = env['ir.attachment'].create({
+                    'name': filename,
+                    'type': 'binary',
+                    'datas': base64.b64encode(pdf_content),
+                    'res_model': report.model,
+                    'res_id': main_record.id if main_record else 0,
+                    'mimetype': 'application/pdf',
+                    "is_background_pdf": True
+                })
 
-                    attachment = env['ir.attachment'].create({
-                        'name': filename,
-                        'type': 'binary',
-                        'datas': base64.b64encode(pdf_content),
-                        'res_model': record._name,
-                        'res_id': record.id,
-                        'mimetype': 'application/pdf',
-                        "is_background_pdf": True
-                    })
-
-                    if attach_in_chatter == 'True':
+                # If "Attach PDF in Chatter" is enabled, attach to each record
+                attach_in_chatter = env['ir.config_parameter'].sudo().get_param(
+                    'custom_report.attach_pdf_in_chatter'
+                )
+                if attach_in_chatter == 'True':
+                    for record in records:
                         record.message_post(
                             body="PDF generated successfully.",
                             attachment_ids=[attachment.id],
                         )
 
-                    download_url = f"/web/content/{attachment.id}?download=true"
-
-                    env['bus.bus']._sendone(
-                        env.user.partner_id,
-                        "pdf_download",
-                        {
-                            "url": download_url,
-                            "name": attachment.name,
-                            "order_ref": record.name,
-                            "tab_id": tab_id,
-                        }
-                    )
+                # Send EXACTLY ONE download notification
+                download_url = f"/web/content/{attachment.id}?download=true"
+                env['bus.bus']._sendone(
+                    env.user.partner_id,
+                    "pdf_download",
+                    {
+                        "url": download_url,
+                        "name": filename,
+                        "order_ref": filename.replace(".pdf", ""),
+                        "tab_id": tab_id,
+                    }
+                )
 
                 new_cr.commit()
 

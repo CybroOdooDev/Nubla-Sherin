@@ -22,6 +22,9 @@
 from odoo import models, fields
 
 class ResConfigSettings(models.TransientModel):
+    """
+        Add configuration option to attach background generated PDFs in chatter.
+    """
     _inherit = 'res.config.settings'
 
     attach_pdf_in_chatter = fields.Boolean(
