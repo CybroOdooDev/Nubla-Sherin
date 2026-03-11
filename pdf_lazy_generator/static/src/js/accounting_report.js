@@ -26,6 +26,7 @@ function patchAccountReportController() {
                             {};
 
                         console.log("[bg_pdf] Intercepted PDF export. options.report_id:", options.report_id);
+                        console.log("OPTIONS",options)
 
                         if (!options.report_id) {
                             console.error("[bg_pdf] options.report_id is missing! options keys:", Object.keys(options));
@@ -62,7 +63,6 @@ patchAccountReportController();
 if (odoo.loader && odoo.loader.bus) {
     odoo.loader.bus.addEventListener("module-started", (e) => {
         if (e.detail.moduleName === "@account_reports/components/account_report/controller") {
-            console.log("CONSOLEEEEEEE")
             patchAccountReportController();
         }
     });

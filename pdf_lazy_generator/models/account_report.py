@@ -22,6 +22,7 @@
 import base64
 import threading
 import logging
+import time
 
 from odoo import api, models
 from odoo.modules.registry import Registry
@@ -32,6 +33,9 @@ _logger = logging.getLogger(__name__)
 
 class AccountReport(models.Model):
     _inherit = "account.report"
+    """
+        Extends account.report to support background PDF generation.
+     """
 
     def generate_in_background(self, options, request_id=False,tab_id=False):
         """
@@ -39,6 +43,7 @@ class AccountReport(models.Model):
         `options` is the full options dict passed from the JS frontend —
         it contains report_id, date_from, date_to, comparison, filters, etc.
         """
+        _logger.info("[PDF Background Accounting] Request received for report_id: %s", options.get("report_id"))
         thread = threading.Thread(
             target=self._generate_pdf_thread,
             args=(options, request_id,tab_id),
@@ -59,7 +64,9 @@ class AccountReport(models.Model):
 
         with Registry(db_name).cursor() as new_cr:
             env = api.Environment(new_cr, uid, {})
+            start_time = time.time()
             try:
+                _logger.info("[PDF Background Accounting] Starting generation for report_id: %s", report_id)
                 report = env["account.report"].browse(report_id)
 
                 if not report.exists():
@@ -71,10 +78,13 @@ class AccountReport(models.Model):
 
                 pdf_content = report.export_to_pdf(options)['file_content']
 
-                report_name = report.name or "Report"
+                report_name = report.name or "Accounting Report"
                 date_to = (options.get("date", {}) or {}).get("date_to", "")
-                clean_name = report_name.replace("/", "_")
-                filename = f"{clean_name}{(' - ' + date_to) if date_to else ''}.pdf"
+                clean_name = report_name.replace("/", "_").replace("\\", "_")
+                if date_to:
+                    filename = f"{clean_name} - {date_to}.pdf"
+                else:
+                    filename = f"{clean_name}.pdf"
 
                 attachment = env["ir.attachment"].create(
                     {
@@ -102,14 +112,13 @@ class AccountReport(models.Model):
                     },
                 )
                 new_cr.commit()
-                _logger.info("Background accounting PDF generated: %s", filename)
+                duration = time.time() - start_time
+                _logger.info("[PDF Background Accounting] Successfully generated PDF for report %s in %.2fs", report.name, duration)
 
 
             except Exception as e:
                 new_cr.rollback()
-                _logger.exception(
-                    "Background accounting PDF generation failed for report_id=%s", report_id
-                )
+                _logger.exception("[PDF Background Accounting] Generation failed for report_id: %s", report_id)
                 error_msg = str(e)
                 if hasattr(e, 'name'):
                     error_msg = e.name

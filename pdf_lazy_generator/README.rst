@@ -26,7 +26,7 @@ Company
 
 Credits
 -------
-* Developers:Nubla Sherin K,
+* Developers: (V18), Nubla Sherin K,
 * Contact: odoo@cybrosys.com
 
 Contacts

@@ -24,6 +24,9 @@ from odoo.exceptions import UserError
 
 
 class IrAttachment(models.Model):
+    """
+        Extends ir.attachment to manage background generated PDF files.
+    """
     _inherit = 'ir.attachment'
 
     is_background_pdf = fields.Boolean(

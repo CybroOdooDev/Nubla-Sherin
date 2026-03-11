@@ -22,6 +22,10 @@
 from odoo import http
 from odoo.http import request
 class BackgroundAccountingReportController(http.Controller):
+    """
+         used to generate accounting reports in the background
+         when the user clicks the Print PDF button.
+    """
 
     @http.route("/report/background_generate_accounting", type="json", auth="user")
     def background_generate_accounting(self, options=None, request_id=False, tab_id=False):
@@ -37,7 +41,6 @@ class BackgroundAccountingReportController(http.Controller):
         """
         if not options or not options.get("report_id"):
             return {"status": "error", "message": "Missing report_id in options"}
-        print("options", options)
         if "account.report" not in request.env:
             return {"status": "error", "message": "account_reports module is not installed."}
 

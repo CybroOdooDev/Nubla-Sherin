@@ -23,6 +23,9 @@ from odoo import http
 from odoo.http import request
 
 class BackgroundReportController(http.Controller):
+    """
+        Controller to trigger report PDF generation in the background.
+    """
 
     @http.route('/report/background_generate', type='json', auth='user')
     def background_generate(self, report_name, docids, request_id=False, tab_id=False):
@@ -32,7 +35,6 @@ class BackgroundReportController(http.Controller):
             trigger background report generation without blocking
             the user interface.
         """
-        print("Background Report")
         request.env['ir.actions.report'].generate_in_background(
             report_name,
             docids,

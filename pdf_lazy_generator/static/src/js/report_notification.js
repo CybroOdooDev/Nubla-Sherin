@@ -71,7 +71,7 @@ patch(ViewButton.prototype, {
                     });
 
                     this.env.services.notification.add(
-                        "PDF generating in background...",
+                        "PDF generating in background.",
                         { title: "Success", type: "success" }
                     );
                     return;
@@ -108,7 +108,7 @@ patch(ViewButton.prototype, {
                     });
 
                     this.env.services.notification.add(
-                        "PDF generating in background...",
+                        "PDF generating in background.",
                         { title: "Success", type: "success" }
                     );
                     return;
@@ -129,7 +129,7 @@ registry.category("services").add("custom_report_patch", {
 
         bus_service.subscribe("pdf_download", (payload) => {
             if (!payload?.url) return;
-            if (payload.tab_id && payload.tab_id !== UNIQUE_TAB_ID) return;
+            if (payload.tab_id !== UNIQUE_TAB_ID) return;
 
             const orderRef = payload.order_ref || "Document";
 
@@ -160,8 +160,8 @@ registry.category("services").add("custom_report_patch", {
                     if (act.report_type === "qweb-pdf") {
                         reportName = act.report_name;
                         activeIds = act.context?.active_ids ||
-                                    options?.additionalContext?.active_ids ||
-                                    (act.context?.active_id ? [act.context.active_id] : []);
+                            options?.additionalContext?.active_ids ||
+                            (act.context?.active_id ? [act.context.active_id] : []);
                     }
                 }
 
@@ -194,13 +194,13 @@ registry.category("services").add("custom_report_patch", {
                     await rpc("/report/background_generate", {
                         report_name: reportName,
                         docids: activeIds,
+                        tab_id: UNIQUE_TAB_ID,
                     });
 
                     notification.add("PDF generation started in background.", {
                         title: "Success",
                         type: "success",
                     });
-
                     return;
                 }
 

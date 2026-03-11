@@ -21,7 +21,6 @@
     </record>
 
 
-
     <record id="action_pdf_attachments" model="ir.actions.act_window">
         <field name="name">All PDFs</field>
         <field name="res_model">ir.attachment</field>
