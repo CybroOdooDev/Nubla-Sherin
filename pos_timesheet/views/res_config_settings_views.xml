@@ -10,7 +10,9 @@
             <xpath expr="//setting[@id='multiple_employee_session']"
                    position="after">
                 <setting id="time_log"
-                         title="When starting a session, it automatically creates a task in the selected project and adds the timesheet of the employees based on their work hours automatically"
+                         title="When starting a session, it automatically creates a task in the
+                         selected project and adds the timesheet of
+                          the employees based on their work hours automatically"
                          string="Time Log"
                          help="Automatically record employees' work hours in the timesheet"
                          invisible="not pos_module_pos_hr">

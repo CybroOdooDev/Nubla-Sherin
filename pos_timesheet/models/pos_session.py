@@ -3,8 +3,8 @@
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2025-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author: Ashwin T (odoo@cybrosysy.com)
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
 #    You can modify it under the terms of the GNU LESSER
 #    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
@@ -36,8 +36,19 @@ class PosSession(models.Model):
     task_id = fields.Many2one("project.task", string="Task",
                               help="Session Timesheet Task",
                               required=True, ondelete='cascade', default=False)
+    project_sequence_number = fields.Integer(
+        string="Project Session Sequence",
+        copy=False,
+        readonly=True,
+    )
+    time_log_sequence_number = fields.Integer(
+        string="Time Log Sequence",
+        copy=False,
+        readonly=True,
+    )
 
     def _validate_time_log_project(self):
+        """Validate that the configured project supports timesheets."""
         for session in self.filtered(lambda s: s.config_id.module_pos_hr and s.config_id.time_log):
             project = session.config_id.project_id
             if not project:
@@ -47,29 +58,69 @@ class PosSession(models.Model):
                     "The selected project must have Timesheets enabled and an analytic account."
                 ))
 
+    def _assign_time_log_sequences(self):
+        """Assign sequence numbers for project sessions and time logs."""
+        sessions = self.filtered(
+            lambda s: s.config_id.module_pos_hr and s.config_id.time_log and s.config_id.project_id
+        ).sorted('id')
+        if not sessions:
+            return
+
+        project_next_numbers = {}
+        config_next_numbers = {}
+
+        for session in sessions:
+            project = session.config_id.project_id
+            if not session.project_sequence_number:
+                if project.id not in project_next_numbers:
+                    last_project_session = self.search([
+                        ('config_id.project_id', '=', project.id),
+                        ('project_sequence_number', '>', 0),
+                        ('id', '!=', session.id),
+                    ], order='project_sequence_number desc, id desc', limit=1)
+                    project_next_numbers[project.id] = (
+                        last_project_session.project_sequence_number + 1 if last_project_session else 1
+                    )
+                session.project_sequence_number = project_next_numbers[project.id]
+                project_next_numbers[project.id] += 1
+
+            if not session.time_log_sequence_number:
+                if session.config_id.id not in config_next_numbers:
+                    last_config_session = self.search([
+                        ('config_id', '=', session.config_id.id),
+                        ('time_log_sequence_number', '>', 0),
+                        ('id', '!=', session.id),
+                    ], order='time_log_sequence_number desc, id desc', limit=1)
+                    config_next_numbers[session.config_id.id] = (
+                        last_config_session.time_log_sequence_number + 1 if last_config_session else 1
+                    )
+                session.time_log_sequence_number = config_next_numbers[session.config_id.id]
+                config_next_numbers[session.config_id.id] += 1
+
     def _get_project_sequence(self):
+        """Return the sequence number for the project session."""
         self.ensure_one()
-        return self.search_count([
-            ('config_id.project_id', '=', self.config_id.project_id.id),
-            ('id', '<=', self.id),
-        ])
+        self._assign_time_log_sequences()
+        return self.project_sequence_number
 
     def _get_time_log_sequence(self):
+        """Return the sequence number for the POS time log."""
         self.ensure_one()
-        return self.search_count([
-            ('config_id', '=', self.config_id.id),
-            ('id', '<=', self.id),
-        ])
+        self._assign_time_log_sequences()
+        return self.time_log_sequence_number
 
     def _get_project_session_name(self):
+        """Generate the name for the project session."""
         self.ensure_one()
         return f"{self.config_id.project_id.display_name}/{self._get_project_sequence():05d}"
 
     def _get_time_log_task_name(self):
+        """Generate the task name for the POS time log."""
         self.ensure_one()
         return f"{self.config_id.display_name}/{self._get_time_log_sequence():05d}"
 
     def _ensure_time_log_task(self):
+        """Create or assign a task for the POS session to record timesheets."""
         sessions_needing_task = self.filtered(
             lambda s: s.config_id.module_pos_hr and s.config_id.time_log
         )
@@ -107,44 +158,36 @@ class PosSession(models.Model):
         """Create the session and create the task if required"""
         sessions = super().create(vals_list)
         sessions._validate_time_log_project()
+        sessions._assign_time_log_sequences()
         sessions._ensure_time_log_task()
         return sessions
 
     def set_opening_control(self, cashbox_value: int, notes: str):
+        """Override to validate project and create the time log task when opening a POS session."""
         result = super().set_opening_control(cashbox_value, notes)
         for session in self.filtered(lambda s: s.config_id.module_pos_hr and s.config_id.time_log):
             session._validate_time_log_project()
+            session._assign_time_log_sequences()
             session._ensure_time_log_task()
             session.name = session._get_project_session_name()
             if session.task_id:
                 session.task_id.name = session._get_time_log_task_name()
         return result
 
-    def _pos_ui_models_to_load(self):
-        """loads models to the UI"""
-        result = super()._pos_ui_models_to_load()
-        result.append('account.analytic.line')
+    @api.model
+    def _load_pos_data_models(self, config):
+        """Load the timesheet lines in the POS payload."""
+        result = super()._load_pos_data_models(config)
+        if config.module_pos_hr and config.time_log and 'account.analytic.line' not in result:
+            result.append('account.analytic.line')
         return result
 
-    def _loader_params_account_analytic_line(self):
-        """Returns loader params for account"""
-        return {
-            'search_params': {
-                'domain': [('task_id', '=', self.task_id.id),
-                           ('date', '=', fields.Date.context_today(self))],
-                'fields': ['employee_id', 'unit_amount'],
-            },
-        }
-
-    def _get_pos_ui_account_analytic_line(self, params):
-        """Returns the account analytics line for the pos"""
-        return self.env['account.analytic.line'].search_read(**params['search_params'])
-
-
-    def _loader_params_pos_session(self):
-        """Loading parameters to the session"""
-        result = super()._loader_params_pos_session()
-        result['search_params']['fields'].append('task_id')
+    @api.model
+    def _load_pos_data_fields(self, config):
+        """Include the session task so frontend logic can relate timesheets."""
+        result = super()._load_pos_data_fields(config)
+        if 'task_id' not in result:
+            result.append('task_id')
         return result
 
     def set_timesheet(self, data):
@@ -230,6 +273,7 @@ class PosSession(models.Model):
 
 
 class ProjectTask(models.Model):
+    """Extend Project Task to link it with a POS session for time logging."""
     _inherit = 'project.task'
 
     pos_session_id = fields.Many2one(

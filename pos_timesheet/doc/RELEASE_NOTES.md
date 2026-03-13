@@ -1,6 +1,6 @@
 ## Module <pos_timesheet>
 
-#### 15.07.2025
-#### Version 18.0.1.0.0
+#### 13.03.2026
+#### Version 19.0.1.0.0
 #### ADD
 - Initial commit for POS Timesheet
