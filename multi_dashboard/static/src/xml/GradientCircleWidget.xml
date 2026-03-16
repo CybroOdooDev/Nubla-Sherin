@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!--  GradientCircleWidget template  -->
+    <t t-name="multi_dashboard.GradientCircleWidget" owl="1">
+        <div class="gradient_circle_widget">
+            <div class="gradient_circles_container">
+                <t t-foreach="gradients" t-as="grad" t-key="grad.id">
+                    <div
+                        class="gradient_circle"
+                        t-att-class="isSelected(grad.gradient) ? 'selected' : ''"
+                        t-att-style="'background: ' + grad.gradient"
+                        t-on-click="() => this.selectGradient(grad.gradient)"
+                    >
+                        <div class="checkmark" t-if="isSelected(grad.gradient)">
+                            <i class="fa fa-check"/>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!--  Import chart form view  -->
+    <record id="view_import_chart_form" model="ir.ui.view">
+        <field name="name">import.chart.form</field>
+        <field name="model">import.chart</field>
+        <field name="arch" type="xml">
+            <form string="Import Dashboard Chart">
+                <group>
+                    <field name="dashboard_id" options="{'no_create': True}"/>
+                    <field name="json_file"
+                           filename="file_name"
+                           widget="binary"
+                           options="{'accepted_file_extensions': '.json'}"/>
+                    <field name="file_name" invisible="1"/>
+                </group>
+                <footer>
+                    <button name="action_import_chart" string="Import"
+                            type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <!--  Import chart action  -->
+    <record id="action_import_chart_wizard" model="ir.actions.act_window">
+        <field name="name">Import Chart</field>
+        <field name="res_model">import.chart</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

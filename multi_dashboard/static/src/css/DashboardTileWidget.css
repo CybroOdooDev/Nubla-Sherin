@@ -1,0 +1,108 @@
+/* Larger tiles */
+.dashboard-tile {
+    padding: 32px;
+    height: 160px;
+    border-radius: 16px;
+    color: #fff;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    overflow: hidden;
+}
+
+.dashboard-tile::after {
+    content:"";
+    position:absolute;
+    top:-35px;
+    right:-35px;
+    width:90px;
+    height:90px;
+    background:rgba(255,255,255,0.12);
+    border-radius:50%;
+}
+
+.tile-title {
+    font-size: 18px;
+    font-weight: 500;
+    opacity: .9;
+}
+
+.tile-value {
+    font-size: 38px;
+    font-weight: 700;
+    margin-top: 6px;
+}
+
+.tile-tools-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-5px);
+    transition: all 0.25s ease;
+    z-index: 5;
+}
+
+.download-options {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: all 0.25s ease;
+    z-index: 5;
+}
+
+/* Buttons */
+.download-options button,
+.tile-tools-overlay button {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.download-options button:hover,
+.tile-tools-overlay button:hover {
+    background: rgba(0, 0, 0, 0.65);
+    transform: scale(1.1);
+}
+
+.btn-del-tile:hover {
+    background: #dc3545; /* danger red */
+}
+
+.btn-edit-tile:hover {
+    background: #0d6efd; /* bootstrap primary */
+}
+
+/* Show tools ONLY when sidebar is active */
+.o_sidebar_active .dashboard-tile:hover .tile-tools-overlay {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dashboard-tile:hover .download-options {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.o_sidebar_active .dashboard-tile:hover .download-options {
+    display: none;
+}

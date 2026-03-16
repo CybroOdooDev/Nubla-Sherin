@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--    Email template    -->
+        <record id="email_template_dashboard_report" model="mail.template">
+            <field name="name">Dashboard: Send Report</field>
+            <field name="model_id" ref="multi_dashboard.model_multi_dashboards"/>
+            <field name="subject">Dashboard Report: {{ object.name }} </field>
+            <field name="email_from">{{ (object.company_id.email_formatted or user.email_formatted) }}</field>
+            <field name="reply_to">{{ (user.email_formatted or object.company_id.email_formatted) }}</field>
+            <field name="use_default_to" eval="False"/> <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+                    <p style="margin: 0px; padding: 0px; font-size: 14px; color: #333333;">
+                        Hello,
+                        <br/><br/>
+                        Please find the attached PDF and CSV file of the dashboard:
+                        <strong style="color: #875A7B;"><t t-out="object.name"/></strong>.
+                        <br/><br/>
+                        This report was generated on <t t-out="datetime.date.today().strftime('%B %d, %Y')"/>.
+                        <br/><br/>
+                        Best regards,
+                        <br/>
+                        <t t-if="user.name">
+                            <strong><t t-out="user.name"/></strong><br/>
+                        </t>
+                        <t t-out="object.company_id.name"/>
+                    </p>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

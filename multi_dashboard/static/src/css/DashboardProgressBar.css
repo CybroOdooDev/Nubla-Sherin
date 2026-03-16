@@ -1,0 +1,24 @@
+
+.o_dashboard_progress_card .hover-actions {
+    opacity: 0;
+    display: flex;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.o_dashboard_progress_card .hover-actions .hide-btn {
+    display: none;
+}
+
+.o_dashboard_progress_card:hover .hover-actions {
+    opacity: 1;
+}
+
+.o_sidebar_active .o_dashboard_progress_card:hover .hide-btn {
+    display: block;
+    align-items: center
+}
+
+.hide-btn i {
+    display: flex;
+    align-items: center;
+}

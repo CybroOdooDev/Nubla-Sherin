@@ -1,0 +1,401 @@
+.dashboard-tiles-wrapper {
+    max-width: 1000px;
+}
+/* =========================================================================
+   DASHBOARD THEME VARIABLES
+   ========================================================================= */
+
+.o_multi_dashboard_container {
+    /* Default (Light) Theme Variables */
+    --bs-body-bg: #f8f9fb;
+    --bs-body-color: #374151;
+    --widget-bg: #ffffff;
+    --widget-border: #e5e7eb;
+    --widget-header-bg: #f8f9fb;
+    --widget-header-color: #000000;
+    --widget-text-color: #374151;
+    --sidebar-bg: #f8f9fb;
+    --navbar-bg: #ffffff;
+    --navbar-border: #e5e7eb;
+    --hover-bg: #f3f4f6;
+}
+
+.o-dashboard-theme-dark {
+    --bs-body-bg: #121212;
+    --bs-body-color: #e0e0e0;
+    --widget-bg: #1e1e1e;
+    --widget-border: #333333;
+    --widget-header-bg: #2a2a2a;
+    --widget-header-color: #000000;
+    --widget-text-color: #e0e0e0;
+    --sidebar-bg: #1e1e1e;
+    --navbar-bg: #1e1e1e;
+    --navbar-border: #333333;
+    --hover-bg: #2a2a2a;
+}
+
+.o-dashboard-theme-blue {
+    --bs-body-bg: #f0f4f8;
+    --bs-body-color: #2b3a4a;
+    --widget-bg: #ffffff;
+    --widget-border: #d0e1f9;
+    --widget-header-bg: #e6f0fa;
+    --widget-header-color: #0056b3;
+    --widget-text-color: #334e68;
+    --sidebar-bg: #e6f0fa;
+    --navbar-bg: #ffffff;
+    --navbar-border: #d0e1f9;
+    --hover-bg: #dceafe;
+}
+
+.o-dashboard-theme-green {
+    --bs-body-bg: #f2fbf5;
+    --bs-body-color: #2b4a35;
+    --widget-bg: #ffffff;
+    --widget-border: #c3e6cb;
+    --widget-header-bg: #e2f0e5;
+    --widget-header-color: #155724;
+    --widget-text-color: #355e3b;
+    --sidebar-bg: #e2f0e5;
+    --navbar-bg: #ffffff;
+    --navbar-border: #c3e6cb;
+    --hover-bg: #d4edda;
+}
+
+.o-dashboard-theme-purple {
+    --bs-body-bg: #f3f0fb;
+    --bs-body-color: #3b2b4a;
+    --widget-bg: #ffffff;
+    --widget-border: #d8c3e6;
+    --widget-header-bg: #e9e2f0;
+    --widget-header-color: #4a154b;
+    --widget-text-color: #4d355e;
+    --sidebar-bg: #e9e2f0;
+    --navbar-bg: #ffffff;
+    --navbar-border: #d8c3e6;
+    --hover-bg: #e2d4ed;
+}
+
+/* =========================================================================
+   DASHBOARD GRID & LAYOUT
+   ========================================================================= */
+
+/* Apply Theme Variables to Layout Components */
+.o_multi_dashboard_container .bg-100,
+.o_multi_dashboard_container .bg-light {
+    background-color: var(--bs-body-bg) !important;
+    color: var(--bs-body-color);
+}
+
+.o_multi_dashboard_container .bg-white {
+    background-color: var(--navbar-bg) !important;
+    color: var(--bs-body-color);
+}
+
+.o_multi_dashboard_container .border-bottom,
+.o_multi_dashboard_container .border-top,
+.o_multi_dashboard_container .border-end {
+    border-color: var(--navbar-border) !important;
+}
+
+.o_dashboard_sidebar {
+    background-color: var(--sidebar-bg) !important;
+}
+
+.o_multi_dashboard_container .h4 {
+    color: var(--bs-body-color);
+}
+
+.o_multi_dashboard_container .empty-dashboard-card h3,
+.o_multi_dashboard_container .empty-dashboard-card p {
+    color: var(--bs-body-color);
+}
+
+.o_multi_dashboard_container .icon-loader-wrapper .loader-text {
+    color: var(--bs-body-color);
+}
+
+.o_multi_dashboard_container .btn-outline-secondary {
+    color: var(--bs-body-color);
+    border-color: var(--navbar-border);
+}
+
+.o_multi_dashboard_container .btn-outline-secondary:hover {
+    background-color: var(--hover-bg);
+}
+
+/* CHART WIDGET STYLES */
+.o_dashboard_chart_container {
+    background: var(--widget-accent, var(--widget-bg));
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    border-radius: 5px;
+    box-sizing: border-box;
+    color: var(--widget-text-color);
+    border: 1px solid var(--widget-border);
+}
+
+.o_dashboard_chart_container:hover .export-group {
+    display: flex;
+}
+
+.chart-header {
+    text-align: left;
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    background-color: color-mix(in srgb, var(--widget-accent, var(--widget-header-bg)), white 20%);
+    padding: 5px;
+    border-radius: 5px;
+    color: var(--widget-header-color);
+}
+
+.chart-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    float: right;
+}
+
+.chart-tool {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.35);
+    transition: 0.2s ease, transform 0.2s ease;
+    border: 0.5px solid;
+}
+
+.export-group {
+    display: none;
+    flex-direction: row;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 6px;
+    transition: all 0.4s ease;
+    max-width: 32px; /* Initial width (only shows one button) */
+}
+
+.export-group:hover {
+    max-width: 250px; /* Adjust based on number of buttons */
+}
+
+.export-options {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+.export-group:hover .export-options {
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
+    gap: 3px;
+}
+
+.main-trigger{
+    background: rgba(0, 0, 0, 0.35) !important;
+}
+
+.export-group:hover .main-trigger {
+    display: none;
+}
+
+.exp-print-tool {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.25);
+    transition: 0.2s ease, transform 0.2s ease;
+}
+
+.exp-print-tool i {
+    font-size: 14px;
+    color: #fff;
+}
+
+.exp-print-tool:hover {
+    transform: scale(1.05);
+}
+
+.chart-tool i {
+    font-size: 14px;
+    color: #fff;
+}
+
+/* Hover effect */
+.chart-tool:hover {
+    background: #e27d7d4a;
+    transform: scale(1.05);
+}
+
+.chart-tool:active {
+    transform: scale(0.95);
+}
+
+.o-chart-edit {
+    display: none !important;
+}
+
+.o_sidebar_active .o-chart-edit {
+    display: flex !important;
+}
+
+.o_dashboard_preview_container {
+    height: 450px;
+}
+
+.o_sidebar_active .exp-print-tool {
+    display: none !important;
+}
+
+.empty-dashboard-card {
+    opacity: 0.95;
+}
+
+.empty-dashboard-image {
+    width: 50%;
+    height: auto;
+    opacity: 0.85;
+}
+
+.empty-dashboard-card h3 {
+    font-size: 1.5rem;
+}
+
+.empty-dashboard-card p {
+    font-size: 0.95rem;
+}
+
+.import-chart {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.import-chart i {
+    font-size: 14px;
+    color: #fff;
+}
+
+.import-chart:hover {
+    background: rgba(0, 0, 0, 0.35);
+}
+
+/* Special class applied only during PDF generation */
+.is-exporting-pdf .grid-stack {
+    height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+}
+
+.is-exporting-pdf .grid-stack-item {
+    position: relative !important; /* Helps html2canvas locate elements */
+    page-break-inside: avoid;
+}
+
+/* Ensure amCharts SVGs have a defined height */
+.is-exporting-pdf .grid-stack-item-content {
+    background-color: white !important;
+    min-height: 200px;
+}
+
+/* Target the actual container that overflows */
+.grid-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.grid-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--bs-body-color);
+    border-radius: 10px;
+}
+
+/* Optional: Add a hover effect so you know it's working */
+.grid-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+
+
+
+.nlp-search-container {
+    position: relative;
+    transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+}
+
+/* Expand on hover OR if the input is focused */
+.nlp-search-container:hover,
+.nlp-search-container:focus-within {
+    width: 350px;
+}
+
+.nlp-search-container .input-group {
+    flex-wrap: nowrap;
+}
+
+.nlp-input {
+    border-right: none;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    border: 1px solid #dee2e6;
+}
+
+/* Show text when expanded */
+.nlp-search-container:hover .nlp-input,
+.nlp-search-container:focus-within .nlp-input {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.nlp-btn {
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-radius 0.3s ease;
+}
+
+/* Optional: Subtle glow when active */
+.nlp-search-container:focus-within {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+
+
+
+/* Selected refresh option */
+.active-refresh {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+/* Hover effect */
+.multi-dashboard .dropdown-menu .dropdown-item:hover {
+    background-color: #f1f5f9;
+}
+
+/* Smooth UI */
+.multi-dashboard .dropdown-menu {
+    border-radius: 8px;
+    padding: 6px;
+}

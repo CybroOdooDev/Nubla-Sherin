@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <!--DASHBOARD VIEW WITH NAVIGATION-BAR, INTERACTJS TEMPLATE-->
+    <t t-name="owl.DashboardSidebar" owl="1">
+        <div class="p-2 border-top dashboard-tiles-wrapper dash-sidebar d-flex flex-column h-100">
+            <div class="flex-shrink-0">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h3 class="fw-bold text-dark mb-0">Widgets</h3>
+                </div>
+                <p class="text-muted small">Drag tiles to the dashboard</p>
+            </div>
+            <div class="flex-grow-1 mb-3 overflow-auto sidebar-scrollbar">
+                <div t-attf-class="row {{ props.sidebarWidth &lt; 270 ? 'row-cols-1' : 'row-cols-2' }} g-1 pb-3">
+                    <t t-foreach="items" t-as="item" t-key="item.id">
+                        <div class="col">
+                            <div class="dashboard-tile dashboard-item-tile d-flex flex-column grid-stack-item cursor-pointer"
+                                 t-att-data-type="item.type"
+                                 t-att-data-gs-w="item.w"
+                                 t-att-data-gs-h="item.h">
+                                <div class="dashboard-tile-icon mb-2">
+                                    <img t-attf-src="/multi_dashboard/static/src/icons/{{item.img}}"
+                                         widget="50" height="50"
+                                         class="drag-icon" alt="Icon"/>
+                                </div>
+                                <div class="first-content text-center">
+                                    <span><t t-esc="item.name"/></span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

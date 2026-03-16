@@ -1,0 +1,147 @@
+/** --- Modern Professional Table Styling --- **/
+
+.o_custom_list_view {
+    background: var(--widget-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--widget-border);
+}
+
+/* Header */
+.o_custom_list_view .list-name h1 {
+    color: var(--widget-header-color);
+}
+
+.o_custom_list_view .table thead th {
+    background: var(--widget-header-bg) !important;
+    color: var(--widget-header-color);
+    font-weight: 600;
+    border-bottom: 1px solid var(--widget-border);
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.6px;
+}
+
+/* Hover effect for rows */
+.o_custom_list_view .table tbody tr:hover {
+    background-color: var(--hover-bg);
+    cursor: pointer;
+    transition: background 0.15s ease-in-out;
+}
+
+/* Row height + spacing */
+.o_custom_list_view .table tbody td {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    vertical-align: middle;
+}
+
+/* Text styling */
+.o_custom_list_view .table tbody td {
+    color: var(--widget-text-color) !important;
+    font-size: 0.85rem;
+    border-color: var(--widget-border) !important;
+}
+
+/* Truncate tooltip */
+.o_custom_list_view .table tbody td span {
+    max-width: 180px;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+}
+
+/* Top bar */
+.o_custom_list_view .border-bottom {
+    border-color: var(--widget-border) !important;
+}
+
+/* Badge (record count) */
+.o_custom_list_view .badge {
+    font-size: 0.75rem;
+    color: var(--widget-text-color);
+    background: var(--widget-header-bg) !important;
+    border: 1px solid var(--widget-border);
+}
+
+
+
+
+.list-tools {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-5px);
+    transition: all 0.25s ease;
+    z-index: 5;
+}
+
+/* Buttons */
+.list-tools button {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.list-tools button:hover {
+    background: rgba(0, 0, 0, 0.65);
+    transform: scale(1.1);
+}
+
+.btn-del-list:hover {
+    background: #dc3545; /* danger red */
+}
+
+.btn-edit-list:hover {
+    background: #0d6efd; /* bootstrap primary */
+}
+
+/* Show tools ONLY when sidebar is active */
+.o_sidebar_active .o_custom_list_view:hover .list-tools {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dashboard-badge-list {
+    color: var(--widget-text-color) !important;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.o_sidebar_active .o_custom_list_view:hover .download-options {
+    display: none;
+}
+
+.o_custom_list_view:hover .download-options {
+    opacity: 1;
+}
+

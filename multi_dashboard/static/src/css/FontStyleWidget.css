@@ -1,0 +1,80 @@
+
+/* --- Style 1: Modern Minimal (Clean Sans-Serif) --- */
+/* --- Generic Element Sizes (Defaults) --- */
+.tile-value {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+.tile-label {
+    font-size: 1rem;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+/* --- Style: Modern --- */
+.tile-style-modern .tile-value {
+    font-family: 'Roboto',
+    sans-serif;
+    font-weight: 700;
+}
+.tile-style-modern .tile-label {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1rem;
+}
+
+/* --- Style: Elegant --- */
+.tile-style-elegant .tile-value {
+    font-family: 'Georgia', serif;
+    font-style: italic;
+}
+.tile-style-elegant .tile-label {
+    font-family: sans-serif;
+    font-weight: bold;
+}
+
+/* --- Style: Digital/Tech --- */
+.tile-style-tech .tile-value {
+    font-family: 'Courier New', monospace;
+    font-weight: 900;
+    letter-spacing: -2px;
+}
+.tile-style-tech .tile-label {
+    text-transform: lowercase;
+}
+
+/* --- Style 4: Bold Impact (Heavy weights) --- */
+.tile-style-impact .tile-value {
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.tile-style-impact .tile-label {
+    font-family: 'Arial', sans-serif;
+    font-weight: normal;
+    letter-spacing: 0px;
+}
+
+/* --- Widget Selector Styles --- */
+.font-preview-box {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #f8f9fa;
+    color: #333; /* Dark text for preview legibility */
+    text-align: center;
+}
+
+.font-preview-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.font-preview-box.selected {
+    border: 2px solid #714B67;
+    background: #eef0f3;
+}

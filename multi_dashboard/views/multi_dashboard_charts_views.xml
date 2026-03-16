@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- Search  -->
+    <record id="multi_dashboard_charts_view_search" model="ir.ui.view">
+        <field name="name">multi.dashboard.charts.view.search</field>
+        <field name="model">multi.dashboard.charts</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <group>
+                    <filter string="Dashboard" name="group_by_dashboard_id" context="{'group_by': 'dashboard_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="multi_dashboard_charts_view_list" model="ir.ui.view">
+        <field name="name">multi.dashboard.charts.view.list</field>
+        <field name="model">multi.dashboard.charts</field>
+        <field name="arch" type="xml">
+            <list string="Dashboard Widgets">
+                <field name="name"/>
+                <field name="chart_type"/>
+                <field name="model_id"/>
+                <field name="dashboard_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="multi_dashboard_charts_view_form" model="ir.ui.view">
+        <field name="name">multi.dashboard.charts.view.form</field>
+        <field name="model">multi.dashboard.charts</field>
+        <field name="arch" type="xml">
+            <form string="Dashboard Widget">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Widget Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Monthly Sales"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="dashboard_id" options="{'no_create': True}"/>
+                            <field name="chart_type"/>
+                            <field name="model_id"
+                                   placeholder="Select a model..."
+                                   invisible="chart_type in ['todo', 'clock']"
+                                   required="chart_type not in ['todo', 'clock']"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="model_name" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="widget_preview" widget="dashboard_chart_live_preview" nolabel="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Data" invisible="chart_type in ['clock', 'todo']">
+                            <group string="Columns" invisible="chart_type != 'list'">
+                                    <field name="list_field_ids" nolabel="1">
+                                        <list editable="bottom">
+                                            <field name="sequence" widget="handle"/>
+                                            <field name="field_id"/>
+                                        </list>
+                                    </field>
+                            </group>
+                            <group>
+                                <group string="Progress Configuration" invisible="chart_type != 'progress'">
+                                    <field name="measure_aggregation" widget="radio" options="{'horizontal': true}"/>
+                                    <field name="measure_field_id"
+                                           required="chart_type == 'progress' and measure_aggregation != 'count'"
+                                           invisible="measure_aggregation == 'count'"/>
+                                    <field name="todo_color" widget="color_picker"/>
+
+                                    <separator string="Target Settings"/>
+                                    <field name="progress_target_static"/>
+                                </group>
+
+                                <group string="Tile Data" invisible="chart_type != 'tile'">
+                                    <field name="measure_aggregation" widget="radio" options="{'horizontal': true}"/>
+                                    <field name="measure_field_id"
+                                           required="chart_type == 'tile' and measure_aggregation != 'count'"
+                                           invisible="measure_aggregation == 'count'"/>
+                                </group>
+
+                                <group string="List Data" invisible="chart_type != 'list'">
+                                    <field name="available_sort_fields_ids" widget="many2many_tags" invisible="1"/>
+                                    <field name="list_group_field_id"/>
+                                    <field name="list_sort_field_id"/>
+                                    <field name="list_sort_direction" required="chart_type == 'list'"/>
+                                    <field name="list_limit"/>
+                                    <field name="limit_per_page"/>
+                                    <field name="list_row_clickable"/>
+                                </group>
+
+                                <group string="Chart Settings" invisible="chart_type not in ['bar', 'line', 'pie', 'donut', 'funnel', 'pyramid', 'radar', 'scatter', 'stacked', 'radialBar']">
+                                    <field name="chart_group_field_id" options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="chart_group_field_id_type" invisible="1"/>
+                                    <field name="chart_date_group_by" widget="radio"
+                                           invisible="chart_group_field_id_type not in ['date', 'datetime']"/>
+
+                                    <field name="measure_aggregation" widget="radio" options="{'horizontal': true}"/>
+                                    <field name="measure_field_id"
+                                           options="{'no_create': True, 'no_open': True}"
+                                           invisible="chart_type not in ['pie', 'funnel', 'pyramid'] or measure_aggregation == 'count'"
+                                           required="chart_type in ['pie', 'funnel', 'pyramid'] and measure_aggregation != 'count'"/>
+
+                                    <field name="chart_measure_field_ids"
+                                           widget="many2many_tags"
+                                           options="{'no_create': True, 'no_open': True}"
+                                           invisible="measure_aggregation == 'count' or chart_type in ['pie', 'funnel', 'pyramid']"
+                                           required="measure_aggregation != 'count' and chart_type in ['bar', 'line', 'donut']"/>
+
+                                    <field name="chart_sub_group_field_id"
+                                           options="{'no_create': True, 'no_open': True}"
+                                           invisible="chart_type in ['pie', 'pyramid', 'funnel']"/>
+
+                                    <field name="chart_orientation"
+                                           widget="radio"
+                                           options="{'horizontal': true}"
+                                           invisible="chart_type not in ['funnel', 'pyramid']"/>
+                                </group>
+
+                                <group string="Filtering">
+                                    <field name="filter" widget="domain" options="{'model': 'model_name'}"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="To-Do Content" invisible="chart_type != 'todo'">
+                            <group>
+                                <field name="todo_color" widget="color_picker"/>
+                            </group>
+                            <field name="todo_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="is_done" widget="boolean_toggle"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Clock Settings" invisible="chart_type != 'clock'">
+                            <group>
+                                <field name="tz"/>
+                                <field name="clock_format"/>
+                                <field name="todo_color" widget="color_picker" string="Clock Color"/>
+                            </group>
+                        </page>
+
+                        <page string="Design" invisible="chart_type in ['list', 'clock', 'todo', 'progress']">
+                            <group>
+                                <group string="Typography" invisible="chart_type != 'tile'">
+                                    <field name="layout_style" widget="layout_selector"/>
+                                    <field name="tile_font_style" widget="font_style_selector"/>
+                                    <field name="font_color" widget="color"/>
+                                </group>
+                                <group string="Appearance">
+                                    <field name="am_chart_theme" widget="am_chart_theme_widget"
+                                           invisible="chart_type in ['tile', 'todo', 'clock']"/>
+                                    <field name="widget_color" widget="gradient_circle"
+                                           invisible="chart_type != 'tile'"/>
+                                    <field name="todo_color" widget="color_picker"
+                                           invisible="chart_type not in ['bar', 'line', 'pie', 'donut', 'funnel', 'pyramid', 'radar', 'scatter', 'stacked', 'radialBar']"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Position">
+                            <group>
+                                <group string="Coordinates">
+                                    <field name="gs_x" string="X Position"/>
+                                    <field name="gs_y" string="Y Position"/>
+                                </group>
+                                <group string="Size">
+                                    <field name="gs_w" string="Width"/>
+                                    <field name="gs_h" string="Height"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!--Action and Menuitem-->
+    <record id="multi_dashboard_charts_action" model="ir.actions.act_window">
+        <field name="name">Multi Dashboard Charts</field>
+        <field name="res_model">multi.dashboard.charts</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_by_dashboard_id': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first record
+            </p>
+        </field>
+    </record>
+
+    <!--Menu item-->
+    <menuitem id="menu_dashboard_charts"
+              name="Charts"
+              parent="config_multi_dashboards"
+              action="multi_dashboard_charts_action"/>
+</odoo>

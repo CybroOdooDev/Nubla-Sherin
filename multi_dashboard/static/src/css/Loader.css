@@ -1,0 +1,80 @@
+.icon-loader-wrapper {
+    height: 90vh;
+    background: #fff;
+}
+
+.loader-text {
+    font-size: 15px;
+    letter-spacing: 0.4px;
+    color: #8a6d1d;
+    font-weight: 500;
+    animation: glow 1.6s ease-in-out infinite;
+}
+
+/* Icon container */
+.icon-loader {
+    position: relative;
+    width: 90px;
+    height: 90px;
+}
+
+/* Common style */
+.icon-loader .shape {
+    position: absolute;
+    background: #f4b400;
+    border-radius: 10px;
+    animation: glow 1.6s ease-in-out infinite;
+    opacity: 0.4;
+}
+
+/* Top-left (small) */
+.icon-loader .s1 {
+    width: 38px;
+    height: 24px;
+    top: 0;
+    left: 0;
+    animation-delay: 0s;
+}
+
+/* Bottom-left (tall) */
+.icon-loader .s2 {
+    width: 38px;
+    height: 56px;
+    bottom: 0;
+    left: 0;
+    animation-delay: 0.2s;
+}
+
+/* Bottom-right (small) */
+.icon-loader .s3 {
+    width: 38px;
+    height: 24px;
+    bottom: 0;
+    right: 0;
+    animation-delay: 0.4s;
+}
+
+/* Top-right (tall) */
+.icon-loader .s4 {
+    width: 38px;
+    height: 56px;
+    top: 0;
+    right: 0;
+    animation-delay: 0.6s;
+}
+
+/* Smooth brand animation */
+@keyframes glow {
+    0% {
+        opacity: 0.3;
+        transform: scale(0.95);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0.3;
+        transform: scale(0.95);
+    }
+}

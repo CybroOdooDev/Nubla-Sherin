@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!--  FontStyleWidget template  -->
+    <t t-name="multi_dashboard.FontStyleWidget" owl="1">
+        <div class="d-flex flex-wrap gap-2">
+            <t t-foreach="styles" t-as="style" t-key="style.id">
+                <div class="d-flex flex-column align-items-center"
+                     t-on-click="() => this.selectStyle(style.id)">
+
+                    <div class="font-preview-box"
+                         t-att-class="isSelected(style.id) ? 'selected' : ''">
+                        <div t-att-class="style.id">
+                            <h3 class="tile-value m-0">12.5k</h3>
+                            <span class="tile-label">Label</span>
+                        </div>
+                    </div>
+
+                    <span class="text-muted mt-1" style="font-size: 0.8rem;">
+                        <t t-esc="style.name"/>
+                    </span>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,56 @@
+# -*- coding: utf-8 -*-
+{
+    'name': "Multi Dashboard",
+    'version': '19.0.1.0.0',
+    'category': 'Productivity',
+    'summary': """Odoo Dynamic Dashboard, Dynamic Dashboard, Odoo AI, Odoo18, 
+    Odoo18 Dashboards, Dashboard with AI, AI Dashboard, Odoo Dashboard,Graph View,""",
+    'description': """Create Configurable Odoo Dynamic Dashboard to get the 
+    information that are relevant to your business, department, or a specific 
+    process or need""",
+    'live_test_url': 'https://www.youtube.com/watch?v=bSUashq4_D8',
+    'author': 'Cybrosys Techno Solutions',
+    'company': 'Cybrosys Techno Solutions',
+    'maintainer': 'Cybrosys Techno Solutions',
+    'website': "https://www.cybrosys.com",
+    'depends': ['web', 'mail'],
+    'data': [
+        'data/mail_template_data.xml',
+        'data/multi_dashboard_data.xml',
+        'security/multi_dashboard_security.xml',
+        'security/ir.model.access.csv',
+        'views/multi_dashboards_views.xml',
+        'views/multi_dashboard_charts_views.xml',
+        'wizard/import_chart_views.xml',
+        'views/res_config_settings_views.xml',
+    ],
+    'assets': {
+        'web.assets_backend': [
+            'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/dom-to-image-more/3.5.0/dom-to-image-more.min.js',
+
+            'multi_dashboard/static/src/lib/amCharts/index.js',
+            'multi_dashboard/static/src/lib/amCharts/xy.js',
+            'multi_dashboard/static/src/lib/amCharts/percent.js',
+            'multi_dashboard/static/src/lib/amCharts/Animated.js',
+            'multi_dashboard/static/src/lib/amCharts/Micro.js',
+            'multi_dashboard/static/src/lib/amCharts/Dataviz.js',
+            'multi_dashboard/static/src/lib/amCharts/Material.js',
+            'multi_dashboard/static/src/lib/amCharts/radar.js',
+            'multi_dashboard/static/src/lib/amCharts/vfs_fonts.js',
+
+            'multi_dashboard/static/src/js/**/*.js',
+            'multi_dashboard/static/src/xml/**/*.xml',
+            'multi_dashboard/static/src/css/**/*.css',
+            'multi_dashboard/static/src/css/**/*.scss',
+            'multi_dashboard/static/src/lib/gridstack/**/*',
+            'multi_dashboard/static/src/lib/tools/**/*',
+            'multi_dashboard/static/src/lib/amCharts/exporting.js',
+        ],
+    },
+    'uninstall_hook': 'uninstall_hook',
+    'license': "AGPL-3",
+    'installable': True,
+    'auto_install': False,
+    'application': True,
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--  Multi dashboard category  -->
+    <record id="module_category_multi_dashboard" model="ir.module.category">
+        <field name="name">Multi Dashboard</field>
+        <field name="description">Allows you to manage your Multi Dashboard.</field>
+        <field name="sequence">1</field>
+    </record>
+    <!--  Multi dashboard privilege  -->
+    <record id="res_groups_privilege_multi_dashboard" model="res.groups.privilege">
+        <field name="name">Multi Dashboard</field>
+        <field name="category_id" ref="multi_dashboard.module_category_multi_dashboard"/>
+        <field name="description">Access to Multi Dashboard features including viewing data, reporting.</field>
+    </record>
+    <!--  Group multi dashboard user  -->
+    <record id="group_multi_dashboard_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="privilege_id" ref="res_groups_privilege_multi_dashboard"/>
+        <field name="comment">Basic access to Multi Dashboard features such as viewing dashboards
+            and accessing reports. Does not include configuration or management rights.
+        </field>
+    </record>
+    <!--  Group multi dashboard manager  -->
+    <record id="group_multi_dashboard_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="sequence">20</field>
+        <field name="privilege_id" ref="res_groups_privilege_multi_dashboard"/>
+        <field name="implied_ids" eval="[Command.link(ref('multi_dashboard.group_multi_dashboard_user'))]"/>
+        <field name="user_ids" eval="[Command.link(ref('base.user_root')), Command.link(ref('base.user_admin'))]"/>
+        <field name="comment">Full access to all dashboard features including configuration rights.</field>
+    </record>
+</odoo>

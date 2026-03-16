@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <!--DASHBOARD VIEW WITH NAVIGATION-BAR, INTERACTJS TEMPLATE-->
+    <t t-name="owl.MultiDashboard" owl="1">
+        <div t-att-class="{'o_sidebar_active': state.sidebarVisible, ['o-dashboard-theme-' + state.theme]: true}"
+             class="o_multi_dashboard_container d-flex h-100 w-100 position-absolute" style="overflow: hidden;">
+            <div class="o_dashboard_sidebar bg-light border-end transition-width position-relative"
+                 t-ref="sidebar"
+                 t-att-style="state.sidebarVisible ? `width: ${state.sidebarWidth}px; min-width: ${state.sidebarWidth}px;` : 'width: 0px; overflow: hidden;'">
+                 <DashboardSidebar
+                         dashboardId="dashboardId"
+                         sidebarWidth="state.sidebarWidth"/>
+
+                 <!-- Resize Handle -->
+                 <div class="sidebar-resize-handle position-absolute top-0 end-0 h-100"
+                      t-if="state.sidebarVisible"
+                      t-ref="resizeHandle"
+                      t-on-mousedown="onResizeStart"
+                      style="width: 4px; cursor: col-resize; background: transparent; z-index: 1000;">
+                 </div>
+            </div>
+
+            <div class="o_dashboard_main flex-grow-1 d-flex flex-column bg-100 position-relative">
+                <div class="p-2 border-bottom border-top bg-white d-flex align-items-center">
+                    <button class="btn btn-outline-secondary border-0 shadow-none"
+                            t-on-click="toggleSidebar"
+                            title="Toggle Sidebar">
+                        <i t-att-class="state.sidebarVisible ? 'fa fa-chevron-left' : 'fa fa-chevron-right'"/>
+                    </button>
+                    <span class="ms-3 h4 mb-0"><t t-esc="state.dashboardName"/></span>
+
+                    <div class="ms-auto d-flex align-items-center gap-1">
+                        <!-- NLP Input Field -->
+                        <div class="nlp-search-container me-2">
+                            <div class="input-group">
+                                <input type="text"
+                                       class="form-control nlp-input"
+                                       placeholder="Generate chart...e.g.'Pie chart of sales by month'"
+                                       t-model="state.nlpQuery"
+                                       t-on-keydown="onNlpInputKeydown"/>
+                                <button class="btn btn-outline-secondary nlp-btn" type="button" t-on-click="generateChartFromText" t-att-disabled="state.isGeneratingChart" title="Generate Chart">
+                                    <i t-att-class="state.isGeneratingChart ? 'fa fa-spinner fa-spin' : 'fa fa-magic'"/>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle"
+                                    type="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                    title="Dashboard Theme">
+                                <i class="fa fa-paint-brush"/>
+                            </button>
+                            <ul class="multi-dashboard dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.theme === 'light' ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       t-on-click.prevent="() => this.setTheme('light')">
+                                        <i t-att-class="state.theme === 'light' ? 'fa fa-check me-2' : 'fa fa-sun-o me-2'"/>
+                                        Light
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.theme === 'dark' ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       t-on-click.prevent="() => this.setTheme('dark')">
+                                        <i t-att-class="state.theme === 'dark' ? 'fa fa-check me-2' : 'fa fa-sun-o me-2'"/>
+                                        Dark
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.theme === 'blue' ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       t-on-click.prevent="() => this.setTheme('blue')">
+                                        <i t-att-class="state.theme === 'blue' ? 'fa fa-check me-2' : 'fa fa-sun-o me-2'"/>
+                                        Blue
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.theme === 'green' ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       t-on-click.prevent="() => this.setTheme('green')">
+                                        <i t-att-class="state.theme === 'green' ? 'fa fa-check me-2' : 'fa fa-sun-o me-2'"/>
+                                        Green
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.theme === 'purple' ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       t-on-click.prevent="() => this.setTheme('purple')">
+                                        <i t-att-class="state.theme === 'purple' ? 'fa fa-check me-2' : 'fa fa-sun-o me-2'"/>
+                                        Purple
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dropdown me-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Auto Refresh">
+                                <i class="fa fa-refresh"/>
+                                <t t-if="state.refreshInterval > 0">
+                                    <span class="ms-1"><t t-esc="state.refreshInterval"/>m</span>
+                                </t>
+                            </button>
+                            <ul class="multi-dashboard dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item"
+                                       t-att-class="state.refreshInterval === 0 ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       href="#"
+                                       t-on-click.prevent="() => this.setRefreshInterval(0)">
+                                        <i t-att-class="state.refreshInterval === 0 ? 'fa fa-check me-2' : 'fa fa-stop-circle-o me-2'"/>
+                                        Off
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       t-att-class="state.refreshInterval === 1 ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       href="#"
+                                       t-on-click.prevent="() => this.setRefreshInterval(1)">
+                                        <i t-att-class="state.refreshInterval === 1 ? 'fa fa-check me-2' : 'fa fa-clock-o me-2'"/>
+                                        1 Minute
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       t-att-class="state.refreshInterval === 5 ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       href="#"
+                                       t-on-click.prevent="() => this.setRefreshInterval(5)">
+                                        <i t-att-class="state.refreshInterval === 5 ? 'fa fa-check me-2' : 'fa fa-clock-o me-2'"/>
+                                        5 Minutes
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       t-att-class="state.refreshInterval === 10 ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       href="#"
+                                       t-on-click.prevent="() => this.setRefreshInterval(10)">
+                                        <i t-att-class="state.refreshInterval === 10 ? 'fa fa-check me-2' : 'fa fa-clock-o me-2'"/>
+                                        10 Minutes
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       t-att-class="state.refreshInterval === 15 ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       href="#"
+                                       t-on-click.prevent="() => this.setRefreshInterval(15)">
+                                        <i t-att-class="state.refreshInterval === 15 ? 'fa fa-check me-2' : 'fa fa-clock-o me-2'"/>
+                                        15 Minutes
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       t-att-class="state.refreshInterval === 30 ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       href="#"
+                                       t-on-click.prevent="() => this.setRefreshInterval(15)">
+                                        <i t-att-class="state.refreshInterval === 30 ? 'fa fa-check me-2' : 'fa fa-clock-o me-2'"/>
+                                        30 Minutes
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="import-chart"
+                             t-on-click="sendDashboard"
+                             title="Send">
+                            <i class="fa fa-paper-plane"/>
+                        </div>
+                        <div class="import-chart"
+                             t-on-click="() => this.printDashboard(false)"
+                             title="Print">
+                            <i class="fa fa-print"/>
+                        </div>
+                        <div class="import-chart"
+                             t-on-click="exportDashboard"
+                             title="Export">
+                            <i class="fa fa-upload"/>
+                        </div>
+                        <div class="import-chart"
+                                t-on-click="importDashboard"
+                                title="Import">
+                            <i class="fa fa-download"/>
+                        </div>
+                        <div class="import-chart"
+                             t-if="state.sidebarVisible"
+                             t-on-click="toggleCompactView"
+                             title="Compact View">
+                            <i class="fa fa-window-restore"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid Area -->
+                <div class="p-4 mb-5 overflow-auto grid-scrollbar h-100 bg-light">
+                    <div t-attf-class="icon-loader-wrapper d-flex flex-column align-items-center justify-content-center {{ state.loading ? '' : 'd-none' }}">
+                        <div class="icon-loader">
+                            <span class="shape s1"/>
+                            <span class="shape s2"/>
+                            <span class="shape s3"/>
+                            <span class="shape s4"/>
+                        </div>
+                        <div class="loader-text mt-3">
+                            Fetching data…
+                        </div>
+                    </div>
+
+                    <!-- Gridstack Container -->
+                    <div t-attf-class="grid-stack min-vh-100 {{state.loading ? 'd-none' : ''}}"
+                         t-ref="grid" id="dashboard-grid">
+                        <!-- Existing widgets would be loaded here -->
+                        <div t-if="state.isEmpty"
+                             class="d-flex align-items-center justify-content-center">
+
+                            <div class="empty-dashboard-card text-center p-4">
+                                <!-- Stock Image -->
+                                <img src="/multi_dashboard/static/src/icons/blank.png"
+                                     alt="Empty Dashboard"
+                                     class="mb-3 empty-dashboard-image"/>
+                                <!-- Title -->
+                                <h3 class="fw-bold mb-2">Your dashboard is empty</h3>
+                                <!-- Description -->
+                                <p class="text-muted mb-3">
+                                    Open the <strong>Sidebar</strong> and drag widgets onto the grid to get started.
+                                </p>
+                                <!-- Action Button -->
+                                <button t-if="!state.sidebarVisible"
+                                        class="btn btn-primary px-4"
+                                        t-on-click="toggleSidebar">
+                                    <i class="fa fa-bars me-1"/> Open Sidebar
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
