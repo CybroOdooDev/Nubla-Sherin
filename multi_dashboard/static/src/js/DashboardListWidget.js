@@ -89,9 +89,9 @@ export class DashboardListWidget extends Component {
     toggleGroup(groupName) {
         // Toggle the boolean value for the specific group
         if (this.state.expandedGroups[groupName]) {
-             this.state.expandedGroups[groupName] = false;
+            this.state.expandedGroups[groupName] = false;
         } else {
-             this.state.expandedGroups[groupName] = true;
+            this.state.expandedGroups[groupName] = true;
         }
     }
 

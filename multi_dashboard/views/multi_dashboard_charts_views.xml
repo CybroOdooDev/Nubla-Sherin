@@ -125,6 +125,7 @@
                                 </group>
 
                                 <group string="Filtering">
+                                    <field name="filter_date_field_id" options="{'no_create': True, 'no_open': True}"/>
                                     <field name="filter" widget="domain" options="{'model': 'model_name'}"/>
                                 </group>
                             </group>

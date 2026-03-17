@@ -1,4 +1,24 @@
 # -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 import base64
 import json
 from google import genai
@@ -255,6 +275,21 @@ class MultiDashboards(models.Model):
 
         client = genai.Client(api_key=api_key)
 
+        # Dynamic model selection to avoid 404 errors
+        model_name = 'gemini-1.5-flash' # Default
+        try:
+            available_models = [m.name for m in client.models.list()]
+            # Look for flash models first, then pro
+            flash_models = [m for m in available_models if 'flash' in m.lower()]
+            pro_models = [m for m in available_models if 'pro' in m.lower()]
+            
+            if flash_models:
+                model_name = flash_models[0].replace('models/', '')
+            elif pro_models:
+                model_name = pro_models[0].replace('models/', '')
+        except Exception:
+            pass
+
         prompt = f"""
         Analyze the following user query for an Odoo MVP dashboard and generate appropriate charts:
         Query: "{query}"
@@ -275,7 +310,7 @@ class MultiDashboards(models.Model):
 
         try:
             response = client.models.generate_content(
-                model='gemini-2.5-flash',
+                model=model_name,
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
@@ -283,7 +318,10 @@ class MultiDashboards(models.Model):
             )
             ai_data = json.loads(response.text)
         except Exception as e:
-            return {'success': False, 'error': f'AI Generation Failed: {str(e)}'}
+            error_msg = str(e)
+            if "429" in error_msg:
+                error_msg = "API Quota Exceeded. Please wait a minute and try again."
+            return {'success': False, 'error': f'AI Generation Failed ({model_name}): {error_msg}'}
 
         if isinstance(ai_data, dict):
             ai_data_list = [ai_data]
@@ -417,3 +455,98 @@ class MultiDashboards(models.Model):
             return {'success': True, 'message': f'Generated {created_charts} charts.', 'errors': errors if errors else False}
         else:
             return {'success': False, 'error': f'Failed to generate any charts. Errors: {", ".join(errors)}'}
+    @api.model
+    def action_get_dashboard_summary(self, dashboard_id, date_filter=None):
+        """
+        Aggregate all chart data on the dashboard and get an AI-generated summary from Gemini.
+        """
+        dashboard = self.browse(dashboard_id)
+        if not dashboard.exists():
+            return {'success': False, 'error': 'Dashboard not found'}
+
+        api_key = self.env['ir.config_parameter'].sudo().get_param('multi_dashboard.gemini_api_key')
+        if not api_key:
+            return {'success': False, 'error': 'Gemini API Key is not configured. Please add it in General Settings.'}
+
+        charts = dashboard.chart_ids
+        dashboard_data = []
+
+        for chart in charts:
+            try:
+                # Use existing method to get chart data
+                widget_data = chart.get_widget_value(date_filter=date_filter)
+                
+                # Simplify data for AI context to save tokens and improve focus
+                simplified_data = {
+                    'chart_name': chart.name,
+                    'chart_type': chart.chart_type,
+                    'model': chart.model_id.name,
+                    'data_points': []
+                }
+                
+                if chart.chart_type in ['tile', 'progress']:
+                    simplified_data['value'] = widget_data.get('value', 0)
+                elif chart.chart_type == 'list':
+                    # Grab a few top records for context
+                    simplified_data['data_points'] = widget_data.get('data', [])[:5]
+                elif isinstance(widget_data.get('data'), list):
+                    # For amCharts (pie, bar, line, etc.)
+                    simplified_data['data_points'] = widget_data.get('data')
+                
+                dashboard_data.append(simplified_data)
+            except Exception as e:
+                continue
+
+        if not dashboard_data:
+            return {'success': False, 'error': 'No chart data available for analysis.'}
+
+        client = genai.Client(api_key=api_key)
+
+        # Dynamic model selection for summarization
+        model_name = 'gemini-1.5-flash'
+        try:
+            available_models = [m.name for m in client.models.list()]
+            flash_models = [m for m in available_models if 'flash' in m.lower()]
+            pro_models = [m for m in available_models if 'pro' in m.lower()]
+            
+            if flash_models:
+                model_name = flash_models[0].replace('models/', '')
+            elif pro_models:
+                model_name = pro_models[0].replace('models/', '')
+        except Exception:
+            pass
+
+        prompt = f"""
+        Act as a Senior Business Analyst. Analyze the data from the "{dashboard.name}" dashboard and provide a CONCISE, high-impact summary. Avoid fluff and long explanations.
+        
+        Dashboard Data (JSON):
+        {json.dumps(dashboard_data, indent=2, default=str)}
+        
+        Structure your response exactly as follows:
+        ## Quick Impact
+        One punchy sentence on the overall health (e.g., "Revenue is soaring due to high-value orders, but customer acquisition is slowing.").
+        
+        ## Key Metrics
+        3-5 bullet points highlighting the most critical trends or anomalies. Keep each point to one sentence.
+        
+        ## Strategic Moves
+        2-3 high-priority, actionable recommendations based on the data.
+        
+        Formatting rules:
+        - Use ## for section headers.
+        - Be extremely concise. Maximum 2 sentences per section where applicable.
+        - No introductory or concluding remarks.
+        """
+
+        try:
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+            )
+            summary = response.text
+            return {'success': True, 'summary': summary}
+        except Exception as e:
+            error_msg = str(e)
+            if "429" in error_msg:
+                error_msg = "API Quota Exceeded. Please wait a minute and try again."
+            return {'success': False, 'error': f'AI Summarization Failed ({model_name}): {error_msg}'}

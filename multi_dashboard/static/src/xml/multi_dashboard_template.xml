@@ -95,6 +95,74 @@
                             </ul>
                         </div>
                         <div class="dropdown me-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="false" aria-expanded="false" title="Date Filter" t-ref="dateFilterDropdownButton">
+                                <i class="fa fa-calendar me-1"/>
+                                <span class="d-none d-md-inline"><t t-esc="state.dateFilter.label"/></span>
+                            </button>
+                            <ul class="multi-dashboard multi-dashboard-date-dropdown dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.dateFilter.label === 'All Time' ? 'active-refresh' : ''"
+                                       t-on-click.prevent="() => this.setDateFilter('all')">
+                                        All Time
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"/></li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.dateFilter.label === 'Today' ? 'active-refresh' : ''"
+                                       t-on-click.prevent="() => this.setDateFilter('today')">
+                                        Today
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.dateFilter.label === 'This Week' ? 'active-refresh' : ''"
+                                       t-on-click.prevent="() => this.setDateFilter('this_week')">
+                                        This Week
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.dateFilter.label === 'This Month' ? 'active-refresh' : ''"
+                                       t-on-click.prevent="() => this.setDateFilter('this_month')">
+                                        This Month
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.dateFilter.label === 'This Year' ? 'active-refresh' : ''"
+                                       t-on-click.prevent="() => this.setDateFilter('this_year')">
+                                        This Year
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"/></li>
+                                <li class="px-3 py-2 multi-dashboard-date-range-item" t-on-click.stop="">
+                                    <div class="multi-dashboard-date-range-title">Custom Range</div>
+                                    <div class="multi-dashboard-date-range-row">
+                                        <span class="multi-dashboard-date-range-label">From</span>
+                                        <DateTimeInput
+                                            type="'date'"
+                                            class="'o-navigable multi-dashboard-date-input'"
+                                            value="getCustomDateValue(state.customStartDate)"
+                                            onChange="(date) => this.onCustomDateChange('start', date)"
+                                        />
+                                        <span class="multi-dashboard-date-range-label">to</span>
+                                        <DateTimeInput
+                                            type="'date'"
+                                            class="'o-navigable multi-dashboard-date-input'"
+                                            value="getCustomDateValue(state.customEndDate)"
+                                            onChange="(date) => this.onCustomDateChange('end', date)"
+                                        />
+                                    </div>
+                                    <button class="btn btn-sm btn-primary w-100 mt-1"
+                                            t-on-click.prevent="applyCustomDateFilter">
+                                        Apply Range
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dropdown me-2">
                             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Auto Refresh">
                                 <i class="fa fa-refresh"/>
                                 <t t-if="state.refreshInterval > 0">
@@ -159,6 +227,12 @@
                             </ul>
                         </div>
                         <div class="import-chart"
+                             t-on-click="summarizeDashboard"
+                             t-att-class="state.isSummarizing ? 'pe-none opacity-50' : ''"
+                             title="AI Insights">
+                            <i t-att-class="state.isSummarizing ? 'fa fa-spinner fa-spin' : 'fa fa-lightbulb-o'"/>
+                        </div>
+                        <div class="import-chart"
                              t-on-click="sendDashboard"
                              title="Send">
                             <i class="fa fa-paper-plane"/>
@@ -187,8 +261,20 @@
                     </div>
                 </div>
 
+                <!-- AI Summary Area -->
+                <div t-if="state.aiSummary" class="ai-summary-container">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fa fa-magic text-primary me-2"/>
+                        <h5 class="mb-0 text-primary">AI Dashboard Insights</h5>
+                        <button class="btn-close ms-auto shadow-none" t-on-click="() => state.aiSummary = false"/>
+                    </div>
+                    <div class="ai-summary-content">
+                        <t t-out="state.aiSummary"/>
+                    </div>
+                </div>
+
                 <!-- Grid Area -->
-                <div class="p-4 mb-5 overflow-auto grid-scrollbar h-100 bg-light">
+                <div class="p-4 mb-5 overflow-auto grid-scrollbar flex-grow-1 bg-light" style="min-height: 0;">
                     <div t-attf-class="icon-loader-wrapper d-flex flex-column align-items-center justify-content-center {{ state.loading ? '' : 'd-none' }}">
                         <div class="icon-loader">
                             <span class="shape s1"/>

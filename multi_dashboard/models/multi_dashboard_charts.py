@@ -1,9 +1,35 @@
 # -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
+
 import json
+import logging
 import pytz
 from itertools import groupby
 from operator import itemgetter
 from odoo import api, fields, models
+from odoo.tools import date_utils
+from odoo.tools.safe_eval import safe_eval
+
+_logger = logging.getLogger(__name__)
 
 
 # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
@@ -79,6 +105,10 @@ class MultiDashboardCharts(models.Model):
                                        help='Field to be used as measure in the chart')
     filter = fields.Char('Filter',
                          help='Filter the records for the chart data source')
+    filter_date_field_id = fields.Many2one('ir.model.fields',
+                                          'Filter Date Field',
+                                          domain="[('model_id', '=', model_id), ('ttype', 'in', ('date', 'datetime'))]",
+                                          help='Select the date field to be used for global dashboard filtering')
 
     # List View specific fields
     list_field_ids = fields.One2many('multi.dashboard.list',
@@ -232,11 +262,13 @@ class MultiDashboardCharts(models.Model):
             self.gs_w = 6
             self.gs_h = 6
 
-    def get_widget_value(self):
+    def get_widget_value(self, date_filter=None):
         """Compute data for the widget based on configuration"""
         self.ensure_one()
 
         try:
+            date_domain = self._get_date_domain(date_filter)
+
             if self.chart_type == 'clock':
                 return {
                     'id': self.id,
@@ -247,7 +279,9 @@ class MultiDashboardCharts(models.Model):
                     'clock_format': self.clock_format,
                 }
             elif self.chart_type == 'tile':
-                domain = eval(self.filter) if self.filter else []
+                domain = safe_eval(self.filter) if self.filter else []
+                if date_domain:
+                    domain += date_domain
                 model = self.env[self.model_name]
 
                 field_name = self.measure_field_id.name if self.measure_field_id else None
@@ -297,7 +331,9 @@ class MultiDashboardCharts(models.Model):
                 }
                 return vals
             elif self.chart_type == 'progress':
-                domain = eval(self.filter) if self.filter else []
+                domain = safe_eval(self.filter) if self.filter else []
+                if date_domain:
+                    domain += date_domain
                 model = self.env[self.model_name]
 
                 # Calculate Current Value (reuse your tile logic)
@@ -328,20 +364,91 @@ class MultiDashboardCharts(models.Model):
                     'todo_color': self.todo_color,
                 }
             elif self.chart_type == 'list':
-                return self._get_list_view_data()
+                return self._get_list_view_data(date_domain)
             else:
-                return self._get_amcharts_data()
+                return self._get_amcharts_data(date_domain)
 
         except Exception as e:
             return {'value': 0, 'error': str(e)}
 
-    def _get_amcharts_data(self):
+    def _get_date_domain(self, date_filter=None):
+        """Build the dashboard date domain for this widget."""
+        self.ensure_one()
+
+        date_domain = []
+        if not date_filter or not isinstance(date_filter, dict):
+            return date_domain
+
+        start_date = date_filter.get('start_date')
+        end_date = date_filter.get('end_date')
+        if not start_date and not end_date:
+            return date_domain
+
+        date_field = self.filter_date_field_id
+        if not date_field and self.model_id:
+            fallback_names = ['date', 'date_order', 'invoice_date', 'create_date']
+            for name in fallback_names:
+                found = self.env['ir.model.fields'].search([
+                    ('model_id', '=', self.model_id.id),
+                    ('name', '=', name),
+                    ('ttype', 'in', ('date', 'datetime'))
+                ], limit=1)
+                if found:
+                    date_field = found
+                    break
+
+        if not date_field:
+            _logger.warning(
+                "Widget %s (%s) received date filter but has no Filter Date Field and no suitable fallback found.",
+                self.id, self.name
+            )
+            return date_domain
+
+        field_name = date_field.name
+        if start_date:
+            date_domain.append((field_name, '>=', start_date))
+        if end_date:
+            if date_field.ttype == 'datetime':
+                date_domain.append((field_name, '<=', f"{end_date} 23:59:59"))
+            else:
+                date_domain.append((field_name, '<=', end_date))
+
+        _logger.info(
+            "Widget %s (%s) applying date filter on %s: %s -> %s",
+            self.id, self.name, field_name, date_filter.get('label'), date_domain
+        )
+        return date_domain
+
+    def action_open_filtered_records(self, date_filter=None, extra_domain=None):
+        """Open the widget records using the same domain as the dashboard tile."""
+        self.ensure_one()
+
+        base_domain = safe_eval(self.filter) if self.filter else []
+        domain = list(base_domain)
+        domain += self._get_date_domain(date_filter)
+
+        if extra_domain:
+            domain += extra_domain
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f"Records for {self.name or 'Widget'}",
+            'res_model': self.model_name,
+            'views': [[False, 'list'], [False, 'form']],
+            'domain': domain,
+            'target': 'current',
+        }
+
+
+    def _get_amcharts_data(self, date_domain=None):
         """
         Main entry point for fetching chart data.
         Routes to appropriate method based on chart type.
         """
         model = self.env[self.model_name]
-        domain = eval(self.filter) if self.filter else []
+        domain = safe_eval(self.filter) if self.filter else []
+        if date_domain:
+            domain += date_domain
 
         if not self.chart_group_field_id:
             return {'error': "Please configure a 'Group By' field."}
@@ -407,6 +514,19 @@ class MultiDashboardCharts(models.Model):
             'measure_fields': measure_fields,
             'selection_labels': selection_labels
         }
+
+    def _get_raw_value(self, raw_label, field):
+        """Extract the raw ID or value for filtering."""
+        if not raw_label:
+            return False
+
+        if field.ttype == 'many2one':
+            if hasattr(raw_label, 'id'):
+                return raw_label.id
+            elif isinstance(raw_label, (list, tuple)) and len(raw_label) > 0:
+                return raw_label[0]
+            return raw_label
+        return raw_label
 
     def _format_label(self, raw_label, field, selection_labels):
         """
@@ -490,6 +610,7 @@ class MultiDashboardCharts(models.Model):
             raw_label = group.get(group_field)
             label = self._format_label(raw_label, self.chart_group_field_id,
                                        selection_labels)
+            raw_val = self._get_raw_value(raw_label, self.chart_group_field_id)
 
             if self.measure_aggregation == 'count':
                 value = group.get('__count', 0)
@@ -506,6 +627,7 @@ class MultiDashboardCharts(models.Model):
 
             chart_data.append({
                 'category': label,
+                'raw_value': raw_val,
                 'value': value
             })
 
@@ -531,6 +653,7 @@ class MultiDashboardCharts(models.Model):
             'name': self.name,
             'has_sub_group': False,
             'orientation': self.chart_orientation,
+            'groupField': self.chart_group_field_id.name,
             'groupFieldLabel': self.chart_group_field_id.field_description,
             'measureFieldLabel': self.measure_field_id.field_description if self.measure_field_id else 'Count',
         }
@@ -641,6 +764,7 @@ class MultiDashboardCharts(models.Model):
 
                 chart_data.append({
                     'category': label,
+                    'raw_value': self._get_raw_value(raw_label, self.chart_group_field_id),
                     'value': value
                 })
 
@@ -661,6 +785,7 @@ class MultiDashboardCharts(models.Model):
             'series': series_config,
             'name': self.name,
             'has_sub_group': False,
+            'groupField': self.chart_group_field_id.name,
             'groupFieldLabel': self.chart_group_field_id.field_description,
             'measureFieldLabel': self.measure_field_id.field_description if self.measure_field_id else 'Count',
         }
@@ -726,9 +851,10 @@ class MultiDashboardCharts(models.Model):
             raw_label = group.get(group_field_param)
             label = self._format_label(raw_label, self.chart_group_field_id,
                                        selection_labels)
+            raw_val = self._get_raw_value(raw_label, self.chart_group_field_id)
 
             # Initialize ONE data point for this group row
-            data_point = {'category': label}
+            data_point = {'category': label, 'raw_value': raw_val}
 
             # Process Sub-Group Label
             sub_label = None
@@ -793,6 +919,7 @@ class MultiDashboardCharts(models.Model):
             'series': series_config,
             'name': self.name,
             'has_sub_group': bool(sub_group_field),
+            'groupField': self.chart_group_field_id.name,
             'groupFieldLabel': self.chart_group_field_id.field_description,
         }
 
@@ -849,14 +976,16 @@ class MultiDashboardCharts(models.Model):
 
         return series_config
 
-    def _get_list_view_data(self):
+    def _get_list_view_data(self, date_domain=None):
         """Get data for list view widget with Group By support"""
         self.ensure_one()
         if not self.model_name or not self.list_field_ids:
             return {'records': [], 'fields': []}
 
         try:
-            domain = eval(self.filter) if self.filter else []
+            domain = safe_eval(self.filter) if self.filter else []
+            if date_domain:
+                domain += date_domain
             model = self.env[self.model_name]
 
             # SORTING LOGIC

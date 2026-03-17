@@ -1,6 +1,7 @@
 .dashboard-tiles-wrapper {
     max-width: 1000px;
 }
+
 /* =========================================================================
    DASHBOARD THEME VARIABLES
    ========================================================================= */
@@ -180,11 +181,13 @@
     overflow: hidden;
     border-radius: 6px;
     transition: all 0.4s ease;
-    max-width: 32px; /* Initial width (only shows one button) */
+    max-width: 32px;
+    /* Initial width (only shows one button) */
 }
 
 .export-group:hover {
-    max-width: 250px; /* Adjust based on number of buttons */
+    max-width: 250px;
+    /* Adjust based on number of buttons */
 }
 
 .export-options {
@@ -201,7 +204,7 @@
     gap: 3px;
 }
 
-.main-trigger{
+.main-trigger {
     background: rgba(0, 0, 0, 0.35) !important;
 }
 
@@ -307,7 +310,8 @@
 }
 
 .is-exporting-pdf .grid-stack-item {
-    position: relative !important; /* Helps html2canvas locate elements */
+    position: relative !important;
+    /* Helps html2canvas locate elements */
     page-break-inside: avoid;
 }
 
@@ -390,7 +394,7 @@
 }
 
 /* Hover effect */
-.multi-dashboard .dropdown-menu .dropdown-item:hover {
+.multi-dashboard.dropdown-menu .dropdown-item:hover {
     background-color: #f1f5f9;
 }
 
@@ -398,4 +402,122 @@
 .multi-dashboard .dropdown-menu {
     border-radius: 8px;
     padding: 6px;
+}
+
+/* AI Summary Styling */
+.ai-summary-container {
+    background-color: #ffffff;
+    border-left: 5px solid #71639e;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin: 20px;
+    padding: 30px !important;
+    border-radius: 12px;
+    animation: slideInDown 0.4s ease-out;
+    border: 1px solid #e2e8f0;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.ai-summary-content {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #1e293b;
+}
+
+.ai-summary-content strong {
+    color: #71639e;
+    font-weight: 700;
+}
+
+.ai-summary-content ul {
+    margin-top: 10px;
+}
+
+.ai-summary-content li {
+    margin-bottom: 10px;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Custom Date Filter styles */
+.multi-dashboard.dropdown-menu {
+    min-width: 350px !important;
+}
+
+.multi-dashboard-date-dropdown {
+    min-width: 460px !important;
+    max-width: min(460px, calc(100vw - 2rem));
+}
+
+.dropdown-header {
+    font-weight: bold;
+    color: var(--widget-header-color);
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.active-refresh {
+    background-color: var(--hover-bg) !important;
+    font-weight: bold;
+}
+
+.multi-dashboard-date-range-item {
+    cursor: default;
+}
+
+.multi-dashboard-date-range-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--widget-header-color);
+    margin-bottom: 0.75rem;
+}
+
+.multi-dashboard-date-range-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+}
+
+.multi-dashboard-date-range-label {
+    color: var(--bs-body-color);
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+
+.multi-dashboard-date-range-row .multi-dashboard-date-input {
+    flex: 0 0 116px;
+    width: 116px !important;
+    min-width: 116px;
+    margin: 0;
+    padding: 0.25rem 0.5rem;
+    text-align: center;
+}
+
+@media (max-width: 575.98px) {
+    .multi-dashboard-date-dropdown {
+        min-width: 320px !important;
+    }
+
+    .multi-dashboard-date-range-row {
+        flex-wrap: wrap;
+    }
+
+    .multi-dashboard-date-range-row .multi-dashboard-date-input {
+        flex: 1 1 100%;
+        width: 100% !important;
+        min-width: 0;
+    }
 }

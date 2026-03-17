@@ -1,5 +1,7 @@
 /** @odoo-module **/
 import { registry } from "@web/core/registry";
+import { DateTimeInput } from "@web/core/datetime/datetime_input";
+import { deserializeDate, formatDate, serializeDate } from "@web/core/l10n/dates";
 import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 import { DashboardTileWidget } from "./DashboardTileWidget";
@@ -9,7 +11,7 @@ import { DashboardTodoWidget } from "./DashboardTodoWidget";
 import { DashboardChart } from "./DashboardChart";
 import { DashboardClock } from "./DashboardClock";
 import { DashboardProgressBar } from "./DashboardProgressBar";
-import { Component, useState, useRef, onWillStart, onMounted, onWillUnmount, onWillUpdateProps, mount } from "@odoo/owl";
+import { Component, useState, useRef, onWillStart, onMounted, onWillUnmount, onWillUpdateProps, mount, markup } from "@odoo/owl";
 
 
 /* MultiDashboard Client Action
@@ -46,12 +48,25 @@ export class MultiDashboard extends Component {
             refreshInterval: 0,
             nlpQuery: '',
             isGeneratingChart: false,
+            aiSummary: false,
+            isSummarizing: false,
+            dateFilter: {
+                label: 'All Time',
+                start_date: null,
+                end_date: null
+            },
+            customStartDate: null,
+            customEndDate: null,
         });
 
         this.sidebar = useRef("sidebar");
         this.resizeHandle = useRef("resizeHandle");
         this.gridRef = useRef("grid");
+        this.dateFilterDropdownButton = useRef("dateFilterDropdownButton");
         this.grid = null;
+        this.boundOnResize = this.onResize.bind(this);
+        this.boundOnResizeEnd = this.onResizeEnd.bind(this);
+        this.boundHandleDocumentPointerDown = this.handleDocumentPointerDown.bind(this);
 
         this.isResizing = false;
         this.startX = 0;
@@ -76,8 +91,9 @@ export class MultiDashboard extends Component {
                 this.state.sidebarWidth = parseInt(savedWidth);
             }
 
-            document.addEventListener('mousemove', this.onResize.bind(this));
-            document.addEventListener('mouseup', this.onResizeEnd.bind(this));
+            document.addEventListener('mousemove', this.boundOnResize);
+            document.addEventListener('mouseup', this.boundOnResizeEnd);
+            document.addEventListener('pointerdown', this.boundHandleDocumentPointerDown, true);
 
             await this.initGrid();
             await this.loadWidgets();
@@ -90,8 +106,9 @@ export class MultiDashboard extends Component {
         });
 
         onWillUnmount(() => {
-            document.removeEventListener('mousemove', this.onResize.bind(this));
-            document.removeEventListener('mouseup', this.onResizeEnd.bind(this));
+            document.removeEventListener('mousemove', this.boundOnResize);
+            document.removeEventListener('mouseup', this.boundOnResizeEnd);
+            document.removeEventListener('pointerdown', this.boundHandleDocumentPointerDown, true);
 
             if (this.refreshTimer) {
                 clearInterval(this.refreshTimer);
@@ -348,7 +365,7 @@ export class MultiDashboard extends Component {
             // Fetch latest widget metadata + fresh data in parallel
             const [widgets, data] = await Promise.all([
                 this.orm.call('multi.dashboard.charts', 'get_dashboard_widgets', [this.dashboardId]),
-                this.orm.call('multi.dashboard.charts', 'get_widget_value', [parseInt(id)]),
+                this.orm.call('multi.dashboard.charts', 'get_widget_value', [[parseInt(id)]], { date_filter: this.state.dateFilter }),
             ]);
 
             const widget = widgets.find(w => String(w.id) === id);
@@ -422,13 +439,13 @@ export class MultiDashboard extends Component {
 
         // Callbacks that target only this one widget
         const onRefresh = async () => await this.refreshWidget(id);
-        const onDelete  = () => this.removeWidget(id);
+        const onDelete = () => this.removeWidget(id);
 
         let comp;
 
         if (widget.chart_type === 'tile') {
             comp = await mount(DashboardTileWidget, targetEl, {
-                props: { widget, data, onRefresh, onDelete },
+                props: { widget, data, dateFilter: this.state.dateFilter, onRefresh, onDelete },
                 env: this.env,
             });
         } else if (widget.chart_type === 'clock') {
@@ -477,6 +494,11 @@ export class MultiDashboard extends Component {
                     theme: widget.am_chart_theme || 'default',
                     onRefresh,
                     onDelete,
+                    isManager: this.state.isManager,
+                    sidebarVisible: this.state.sidebarVisible,
+                    modelName: widget.model_name,
+                    groupField: data.groupField,
+                    filter: this.state.dateFilter,
                 },
                 env: this.env,
             });
@@ -577,7 +599,7 @@ export class MultiDashboard extends Component {
      */
     async _addWidgetToGrid(w) {
         try {
-            const data = await this.orm.call('multi.dashboard.charts', 'get_widget_value', [w.id]);
+            const data = await this.orm.call('multi.dashboard.charts', 'get_widget_value', [[w.id]], { date_filter: this.state.dateFilter });
 
             const gridItem = document.createElement('div');
             gridItem.className = 'grid-stack-item';
@@ -750,6 +772,52 @@ export class MultiDashboard extends Component {
         }
     }
 
+    async summarizeDashboard() {
+        if (this.state.isSummarizing) return;
+
+        this.state.isSummarizing = true;
+        this.state.aiSummary = false;
+
+        try {
+            const result = await this.orm.call(
+                "multi.dashboards",
+                "action_get_dashboard_summary",
+                [this.dashboardId],
+                { date_filter: this.state.dateFilter }
+            );
+
+            if (result && result.success) {
+                // Formatting the summary to be Odoo-friendly if it's markdown
+                // We'll use a simple approach here, but in a real app we might use a markdown lib
+                let summary = result.summary;
+
+                // Convert Markdown to clean HTML with basic headers support
+                summary = summary
+                    .replace(/### (.*?)(\n|$)/g, '<h5 class="mt-3 mb-1">$1</h5>') // H3 -> H5
+                    .replace(/## (.*?)(\n|$)/g, '<h4 class="mt-4 mb-2 text-primary">$1</h4>') // H2 -> H4
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')     // Bold
+                    .replace(/\* (.*?)(\n|$)/g, '<li>$1</li>')            // Bullets
+                    .replace(/\n\n/g, '<br/><br/>')
+                    .replace(/\n/g, '<br/>');
+
+                // Wrap bullets in <ul> if present
+                if (summary.includes('<li>')) {
+                    summary = summary.replace(/(<li>.*?<\/li>)+/sg, (match) => `<ul class="ps-3 mb-0 mt-2">${match}</ul>`);
+                }
+
+                this.state.aiSummary = markup(summary);
+                this.notification.add("Insights generated!", { type: "success" });
+            } else {
+                this.notification.add(result.error || "Failed to generate insights.", { type: "danger" });
+            }
+        } catch (error) {
+            console.error("Error summarizing dashboard:", error);
+            this.notification.add("An error occurred while generating insights.", { type: "danger" });
+        } finally {
+            this.state.isSummarizing = false;
+        }
+    }
+
     /**
      * Change the overall dashboard theme.
      * Overrides CSS variables globally on the container based on the selected theme.
@@ -803,8 +871,162 @@ export class MultiDashboard extends Component {
             await this.refreshWidget(recordId);
         }
     }
+
+    /**
+     * Set the current date filter for the dashboard and reload all widgets.
+     * @param {string} type 
+     */
+    async setDateFilter(type) {
+        const today = new Date();
+        let start_date = null;
+        let end_date = null;
+        let label = 'All Time';
+
+        const formatDate = (date) => {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        };
+
+        switch (type) {
+            case 'today':
+                start_date = formatDate(today);
+                end_date = formatDate(today);
+                label = 'Today';
+                break;
+            case 'this_week':
+                const first = today.getDate() - today.getDay();
+                const last = first + 6;
+                start_date = formatDate(new Date(new Date().setDate(first)));
+                end_date = formatDate(new Date(new Date().setDate(last)));
+                label = 'This Week';
+                break;
+            case 'this_month':
+                start_date = formatDate(new Date(today.getFullYear(), today.getMonth(), 1));
+                end_date = formatDate(new Date(today.getFullYear(), today.getMonth() + 1, 0));
+                label = 'This Month';
+                break;
+            case 'this_year':
+                start_date = formatDate(new Date(today.getFullYear(), 0, 1));
+                end_date = formatDate(new Date(today.getFullYear(), 11, 31));
+                label = 'This Year';
+                break;
+            case 'all':
+            default:
+                start_date = null;
+                end_date = null;
+                label = 'All Time';
+                break;
+        }
+
+        this.state.dateFilter = { label, start_date, end_date };
+        this.closeDateFilterDropdown();
+        await this.loadWidgets();
+    }
+
+    /**
+     * Apply a custom date range selected by the user.
+     */
+    async applyCustomDateFilter() {
+        const start = this.state.customStartDate;
+        const end = this.state.customEndDate;
+
+        if (!start && !end) {
+            this.notification.add("Please select at least one date for the custom range", { type: "warning" });
+            return;
+        }
+
+        this.state.dateFilter = {
+            label: this.getCustomDateFilterLabel(start, end),
+            start_date: start,
+            end_date: end
+        };
+        this.closeDateFilterDropdown();
+        await this.loadWidgets();
+    }
+
+    getCustomDateValue(value) {
+        return value ? deserializeDate(value) : null;
+    }
+
+    onCustomDateChange(type, value) {
+        const serializedValue = value ? serializeDate(value) : null;
+        if (type === 'start') {
+            this.state.customStartDate = serializedValue;
+        } else {
+            this.state.customEndDate = serializedValue;
+        }
+    }
+
+    getCustomDateFilterLabel(start, end) {
+        if (start && end) {
+            return `${formatDate(deserializeDate(start))} to ${formatDate(deserializeDate(end))}`;
+        }
+        if (start) {
+            return `From ${formatDate(deserializeDate(start))}`;
+        }
+        if (end) {
+            return `Until ${formatDate(deserializeDate(end))}`;
+        }
+        return 'Custom Range';
+    }
+
+    closeDateFilterDropdown() {
+        const { button, dropdown, menu } = this.getDateFilterDropdownElements();
+        if (!button || !menu) {
+            return;
+        }
+
+        const BootstrapDropdown = globalThis.bootstrap?.Dropdown;
+        if (BootstrapDropdown) {
+            BootstrapDropdown.getOrCreateInstance(button).hide();
+        } else {
+            menu.classList.remove('show');
+            menu.removeAttribute('data-bs-popper');
+            button.classList.remove('show');
+            button.setAttribute('aria-expanded', 'false');
+            button.blur();
+            dropdown?.classList.remove('show');
+        }
+    }
+
+    getDateFilterDropdownElements() {
+        const button = this.dateFilterDropdownButton?.el || null;
+        const dropdown = button?.closest('.dropdown') || null;
+        const menu = dropdown?.querySelector('.multi-dashboard-date-dropdown') || null;
+        return { button, dropdown, menu };
+    }
+
+    isDateFilterDropdownOpen() {
+        const { button, menu } = this.getDateFilterDropdownElements();
+        return Boolean(button && menu && button.getAttribute('aria-expanded') === 'true' && menu.classList.contains('show'));
+    }
+
+    handleDocumentPointerDown(ev) {
+        if (!this.isDateFilterDropdownOpen()) {
+            return;
+        }
+
+        const target = ev.target;
+        const { button, menu } = this.getDateFilterDropdownElements();
+        if (!(target instanceof Element)) {
+            return;
+        }
+
+        if (
+            button?.contains(target) ||
+            menu?.contains(target) ||
+            target.closest('.o_datetime_picker') ||
+            target.closest('.o_popover')
+        ) {
+            return;
+        }
+
+        this.closeDateFilterDropdown();
+    }
 }
 
-MultiDashboard.components = { DashboardSidebar };
+MultiDashboard.components = { DashboardSidebar, DateTimeInput };
 MultiDashboard.template = "owl.MultiDashboard"
 registry.category("actions").add("MultiDashboardClientAction", MultiDashboard)

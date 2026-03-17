@@ -96,32 +96,19 @@ export class DashboardTileWidget extends Component {
             return; // let the specific button handler handle it
         }
 
-        console.log('PROPSSSSSSSSS', this.props)
-        const modelName = this.props.widget?.model_name;
-        if (!modelName) return;
+        const widgetId = this.props.widget?.id;
+        if (!widgetId) return;
 
-        let domain = [];
-        if (this.props.filter) {
-            try {
-                // If the filter can be evaluated/parsed easily, we would do it here.
-                // In a robust implementation, the evaluated domain should come from kwargs.
-                // We'll leave it empty to just show all records for now or try to pass it if it's an array.
-                 if (typeof this.props.filter === 'object') {
-                    domain = this.props.filter;
-                 }
-            } catch (e) {
-                console.warn("Could not parse filter domain", e);
-            }
+        const action = await this.orm.call(
+            "multi.dashboard.charts",
+            "action_open_filtered_records",
+            [[widgetId]],
+            { date_filter: this.props.dateFilter || null }
+        );
+
+        if (action) {
+            this.actionService.doAction(action);
         }
-
-        this.actionService.doAction({
-            type: 'ir.actions.act_window',
-            name: `Records for ${this.props.data.name || 'Tile'}`,
-            res_model: modelName,
-            views: [[false, 'list'], [false, 'form']],
-            domain: domain,
-            target: 'current',
-        });
     }
 }
 

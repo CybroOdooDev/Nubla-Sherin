@@ -9,7 +9,8 @@
             <field name="email_from">{{ (object.company_id.email_formatted or user.email_formatted) }}</field>
             <field name="reply_to">{{ (user.email_formatted or object.company_id.email_formatted) }}</field>
             <field name="use_default_to" eval="False"/> <field name="body_html" type="html">
-                <div style="margin: 0px; padding: 0px; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+                <div style="margin: 0px; padding: 0px; font-family: 'Segoe UI',
+                    Roboto, 'Helvetica Neue', Arial, sans-serif;">
                     <p style="margin: 0px; padding: 0px; font-size: 14px; color: #333333;">
                         Hello,
                         <br/><br/>

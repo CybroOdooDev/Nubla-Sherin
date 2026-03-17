@@ -21,7 +21,7 @@ export class DashboardClock extends Component {
             minuteMarks: [],
             hourMarks: [],
             numbers: [],
-            date:"",
+            date: "",
         });
 
         this.generateDial();

@@ -20,7 +20,7 @@ export class DashboardChart extends Component {
         theme: { type: String, optional: true },
         onRefresh: { type: Function, optional: true },
         onDelete: { type: Function, optional: true },
-        filter: { type: String, optional: true },
+        filter: { type: Object, optional: true },
         modelName: { type: String, optional: true },
         groupField: { type: String, optional: true },
         subGroupField: { type: String, optional: true },
@@ -100,7 +100,7 @@ export class DashboardChart extends Component {
         } else if (type === 'pie') {
             this._createPieChart(data, type);
         } else if (type === 'donut') {
-            this._createDonutChart(data, type)
+            this._createDonutChart(data, type);
         } else if (type === 'funnel' || type === 'pyramid') {
             this._createPyramidFunnelChart(data, type);
         } else if (type === 'radar') {
@@ -153,32 +153,9 @@ export class DashboardChart extends Component {
         });
     }
 
-    // Method to handle click on the chart container for settings
-    onChartClick(ev) {
-        if (this.props.isPreview) return;
-        console.log("CLICKEDDDDDDDDDDDDDD")
-
-        // If in edit mode (sidebar visible) and user is manager, clicking the chart opens settings
-        if (this.props.isManager && this.props.sidebarVisible) {
-            // Check if the chart type is one of the requested types
-            const supportedTypes = ['bar', 'pie', 'donut', 'stacked'];
-            if (supportedTypes.includes(this.props.chartType)) {
-                this.onEdit();
-            }
-        }
-    }
-
     // Method to handle drill-down for specific chart elements
     async _onChartElementClick(ev) {
         if (this.props.isPreview) return;
-
-        console.log("Chart element interaction detected:", ev.target);
-
-        // If in edit mode, element click also opens settings
-        if (this.props.isManager && this.props.sidebarVisible) {
-            this.onEdit();
-            return;
-        }
 
         const dataItem = ev.target.dataItem;
         if (!dataItem) return;
@@ -190,11 +167,15 @@ export class DashboardChart extends Component {
             ? dataContext.raw_value
             : (dataItem.get("category") || dataItem.get("categoryX") || dataItem.get("categoryY"));
 
-        if (categoryValue === undefined || categoryValue === null) return;
+        if (categoryValue === undefined || categoryValue === null) {
+            return;
+        }
 
         // Determine the field name for filtering
         const groupField = this.props.groupField;
-        if (!groupField) return;
+        if (!groupField) {
+            return;
+        }
 
         // Build the extra domain for drill-down
         // Handle both ID-based filtering and string-based fallbacks for "Undefined"
@@ -202,18 +183,22 @@ export class DashboardChart extends Component {
             ? [[groupField, '=', false]]
             : [[groupField, '=', categoryValue]];
 
-        const action = await this.orm.call(
-            "multi.dashboard.charts",
-            "action_open_filtered_records",
-            [[this.props.id]],
-            {
-                date_filter: this.props.filter || null,
-                extra_domain: extraDomain
-            }
-        );
+        try {
+            const action = await this.orm.call(
+                "multi.dashboard.charts",
+                "action_open_filtered_records",
+                [[this.props.id]],
+                {
+                    date_filter: this.props.filter || null,
+                    extra_domain: extraDomain
+                }
+            );
 
-        if (action) {
-            this.actionService.doAction(action);
+            if (action) {
+                this.actionService.doAction(action);
+            }
+        } catch (error) {
+            console.error("Failed to perform drill-down orm call:", error);
         }
     }
 
@@ -401,6 +386,7 @@ export class DashboardChart extends Component {
                 yAxis: yAxis,
                 valueYField: s.valueField,
                 categoryXField: "category",
+                interactive: true,
                 tooltip: am5.Tooltip.new(root, {
                     labelText: "{name}: {valueY}"
                 })
@@ -415,7 +401,7 @@ export class DashboardChart extends Component {
                     cursorOverStyle: "pointer"
                 });
 
-                bulletCircle.events.on("pointerdown", (ev) => {
+                bulletCircle.events.on("click", (ev) => {
                     ev.originalEvent.stopPropagation();
                     this._onChartElementClick(ev);
                 });
@@ -430,7 +416,7 @@ export class DashboardChart extends Component {
                 interactive: true,
                 cursorOverStyle: "pointer"
             });
-            series.strokes.template.events.on("pointerdown", (ev) => {
+            series.strokes.template.events.on("click", (ev) => {
                 ev.originalEvent.stopPropagation();
                 this._onChartElementClick(ev);
             });
@@ -530,7 +516,7 @@ export class DashboardChart extends Component {
                     cursorOverStyle: "pointer"
                 });
 
-                series.columns.template.events.on("pointerdown", (ev) => {
+                series.columns.template.events.on("click", (ev) => {
                     ev.originalEvent.stopPropagation();
                     this._onChartElementClick(ev);
                 });
@@ -564,7 +550,7 @@ export class DashboardChart extends Component {
                     cursorOverStyle: "pointer"
                 });
 
-                series.strokes.template.events.on("pointerdown", (ev) => {
+                series.strokes.template.events.on("click", (ev) => {
                     ev.originalEvent.stopPropagation();
                     this._onChartElementClick(ev);
                 });
@@ -577,7 +563,7 @@ export class DashboardChart extends Component {
                         cursorOverStyle: "pointer"
                     });
 
-                    bulletCircle.events.on("pointerdown", (ev) => {
+                    bulletCircle.events.on("click", (ev) => {
                         ev.originalEvent.stopPropagation();
                         this._onChartElementClick(ev);
                     });
@@ -614,7 +600,8 @@ export class DashboardChart extends Component {
         // Create the Chart Container
         let chart = root.container.children.push(am5percent.PieChart.new(root, {
             layout: root.verticalLayout,
-            innerRadius: am5.percent(type === 'donut' ? 20 : 0)
+            innerRadius: am5.percent(type === 'donut' ? 20 : 0),
+            interactive: true
         }));
 
         // Logic for Nested Rings
@@ -630,6 +617,7 @@ export class DashboardChart extends Component {
                 categoryField: "category",
                 alignLabels: true,
                 name: s.name,
+                interactive: true,
             };
 
             if (isNested) {
@@ -644,7 +632,6 @@ export class DashboardChart extends Component {
 
             // Create the Series
             let series = chart.series.push(am5percent.PieSeries.new(root, seriesSettings));
-            series.data.setAll(data);
 
             if (isNested) {
                 // Only show labels on the outermost ring
@@ -657,12 +644,16 @@ export class DashboardChart extends Component {
             series.slices.template.setAll({
                 tooltipText: "{name} ({category}): {value}",
                 interactive: true,
-                cursorOverStyle: "pointer"
+                cursorOverStyle: "pointer",
+                toggleKey: "none"
             });
-            series.slices.template.events.on("pointerdown", (ev) => {
+
+            series.slices.template.events.on("click", (ev) => {
                 ev.originalEvent.stopPropagation();
                 this._onChartElementClick(ev);
             });
+
+            series.data.setAll(data);
         });
 
         // Legend
@@ -695,7 +686,8 @@ export class DashboardChart extends Component {
 
         let chart = root.container.children.push(am5percent.PieChart.new(root, {
             layout: root.verticalLayout,
-            innerRadius: type === 'donut' ? am5.percent(50) : 0
+            innerRadius: am5.percent(0), // Pie chart always has 0 inner radius here
+            interactive: true
         }));
 
         let series = chart.series.push(am5percent.PieSeries.new(root, {
@@ -705,8 +697,12 @@ export class DashboardChart extends Component {
             interactive: true
         }));
 
-        series.slices.template.set("cursorOverStyle", "pointer");
-        series.slices.template.events.on("pointerdown", (ev) => {
+        series.slices.template.setAll({
+            interactive: true,
+            cursorOverStyle: "pointer",
+            toggleKey: "none"
+        });
+        series.slices.template.events.on("click", (ev) => {
             ev.originalEvent.stopPropagation();
             this._onChartElementClick(ev);
         });
@@ -750,7 +746,8 @@ export class DashboardChart extends Component {
                     orientation: chartOrientation,
                     valueField: "value",
                     categoryField: "category",
-                    valueIs: "height"
+                    valueIs: "height",
+                    interactive: true
                 })
             );
         } else {
@@ -760,7 +757,8 @@ export class DashboardChart extends Component {
                     orientation: chartOrientation,
                     valueField: "value",
                     categoryField: "category",
-                    valueIs: "height"
+                    valueIs: "height",
+                    interactive: true
                 })
             );
         }
@@ -776,7 +774,7 @@ export class DashboardChart extends Component {
             cursorOverStyle: "pointer"
         });
 
-        series.slices.template.events.on("pointerdown", (ev) => {
+        series.slices.template.events.on("click", (ev) => {
             ev.originalEvent.stopPropagation();
             this._onChartElementClick(ev);
         });
@@ -855,6 +853,7 @@ export class DashboardChart extends Component {
                 yAxis: yAxis,
                 valueYField: s.valueField,
                 categoryXField: "category",
+                interactive: true,
                 tooltip: am5.Tooltip.new(root, {
                     labelText: "{name}: {valueY}"
                 })
@@ -868,7 +867,7 @@ export class DashboardChart extends Component {
                 cursorOverStyle: "pointer"
             });
 
-            series.columns.template.events.on("pointerdown", (ev) => {
+            series.columns.template.events.on("click", (ev) => {
                 ev.originalEvent.stopPropagation();
                 this._onChartElementClick(ev);
             });
@@ -945,6 +944,7 @@ export class DashboardChart extends Component {
                 yAxis: yAxis,
                 valueYField: s.valueField,
                 categoryXField: "category",
+                interactive: true,
                 tooltip: am5.Tooltip.new(root, {
                     labelText: "{name}: {valueY}"
                 })
@@ -964,7 +964,7 @@ export class DashboardChart extends Component {
                     cursorOverStyle: "pointer"
                 });
 
-                bulletCircle.events.on("pointerdown", (ev) => {
+                bulletCircle.events.on("click", (ev) => {
                     ev.originalEvent.stopPropagation();
                     this._onChartElementClick(ev);
                 });
@@ -986,7 +986,7 @@ export class DashboardChart extends Component {
                         cursorOverStyle: "pointer"
                     });
 
-                    bulletCircle.events.on("pointerdown", (ev) => {
+                    bulletCircle.events.on("click", (ev) => {
                         ev.originalEvent.stopPropagation();
                         this._onChartElementClick(ev);
                     });
@@ -1017,8 +1017,7 @@ export class DashboardChart extends Component {
 
 DashboardChart.template = xml`
     <div class="o_dashboard_chart_container"
-         t-attf-style="--widget-accent: {{ this.accentColor }};"
-         t-on-pointerdown="onChartClick">
+         t-attf-style="--widget-accent: {{ this.accentColor }};">
 
         <div class="chart-header d-flex justify-content-between align-items-center">
             <t t-esc="props.name || 'Untitled Chart'"/>

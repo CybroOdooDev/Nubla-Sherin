@@ -1,10 +1,30 @@
 # -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 {
     'name': "Multi Dashboard",
     'version': '19.0.1.0.0',
     'category': 'Productivity',
-    'summary': """Odoo Dynamic Dashboard, Dynamic Dashboard, Odoo AI, Odoo18, 
-    Odoo18 Dashboards, Dashboard with AI, AI Dashboard, Odoo Dashboard,Graph View,""",
+    'summary': """Odoo Dynamic Dashboard, Dynamic Dashboard, Odoo AI, Odoo19, 
+    Odoo19 Dashboards, Dashboard with AI, AI Dashboard, Odoo Dashboard,Graph View,""",
     'description': """Create Configurable Odoo Dynamic Dashboard to get the 
     information that are relevant to your business, department, or a specific 
     process or need""",
@@ -47,6 +67,9 @@
             'multi_dashboard/static/src/lib/tools/**/*',
             'multi_dashboard/static/src/lib/amCharts/exporting.js',
         ],
+    },
+    'external_dependencies': {
+        'python': ['google-genai'],
     },
     'uninstall_hook': 'uninstall_hook',
     'license': "AGPL-3",
