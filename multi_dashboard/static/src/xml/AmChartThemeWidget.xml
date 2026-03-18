@@ -5,14 +5,16 @@
         <div class="d-flex flex-wrap gap-2">
             <t t-foreach="options" t-as="theme" t-key="theme.value">
                 <div t-on-click="() => this.onSelectTheme(theme.value)"
-                     t-att-class="'d-flex flex-column align-items-center p-2 border rounded cursor-pointer ' + (props.record.data[props.name] === theme.value ? 'border-primary bg-light' : 'border-secondary')"
+                     t-att-class="'d-flex flex-column align-items-center p-2 border
+                      rounded cursor-pointer ' + (props.record.data[props.name] === theme.value ? 'border-primary bg-light' : 'border-secondary')"
                      style="width: 140px; transition: all 0.2s;">
 
                     <span class="fw-bold mb-1 small" t-esc="theme.label"/>
 
                     <div class="d-flex">
                         <t t-foreach="theme.colors" t-as="color" t-key="color_index">
-                            <div t-att-style="'background-color:' + color + '; width: 20px; height: 20px; border-radius: 50%; margin-right: -5px; border: 1px solid white;'"/>
+                            <div t-att-style="'background-color:' + color + ';
+                             width: 20px; height: 20px; border-radius: 50%; margin-right: -5px; border: 1px solid white;'"/>
                         </t>
                     </div>
                 </div>

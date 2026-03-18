@@ -1,11 +1,18 @@
 /** @odoo-module */
-import { Component, onMounted, onWillUnmount, useRef, useEffect, xml } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, useRef, useEffect, xml, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 const COLORS = [
     "#ffffff", "#ff9c9c", "#f7c698", "#fde388", "#bbd7f8", "#d9a8cc",
     "#f8d6c8", "#89e1db", "#97a6f9", "#ff9ecc", "#b7edbe", "#e6dbfc"
 ];
+
+const THEME_PALETTES = {
+    'kelly': ["#F2F3F4", "#222222", "#F3C300", "#875692", "#F38400", "#A1CAF1", "#BE0032", "#C2B280", "#848482", "#008856", "#E68FAC", "#0067A5", "#F99379", "#604E97", "#F6A600", "#B3446C", "#DCD300", "#882D17", "#8DB600", "#654522", "#E25822", "#2B3D26"],
+    'moonrise': ["#3a1302", "#601205", "#8a2b0d", "#c75e24", "#c79f59", "#a4dded", "#4b7d87", "#1d3549", "#204054", "#364e62"],
+    'frozen': ["#bec4f8", "#a5abee", "#6a6dde", "#4d42cf", "#713e8d", "#a160a0", "#eb6eb0", "#f597bb", "#fbbec1", "#f9dada"],
+    'spiritedaway': ["#65738e", "#523b58", "#a43820", "#f07f59", "#f2b46f", "#f2e291", "#708d81", "#02111b", "#386375", "#558e90"]
+};
 
 // Dashboard Chart component responsible for rendering different types of charts using amCharts 5.
 export class DashboardChart extends Component {
@@ -29,9 +36,14 @@ export class DashboardChart extends Component {
 
     setup() {
         this.orm = useService("orm");
+        this.notification = useService("notification");
         this.actionService = useService("action");
         this.chartRef = useRef("chartdiv");
         this.root = null;
+        this.state = useState({
+            aiInsight: null,
+            isGettingInsight: false,
+        });
 
         onMounted(() => {
             this.renderChart();
@@ -90,8 +102,17 @@ export class DashboardChart extends Component {
 
         if (SelectedThemeClass) {
             activeThemes.push(SelectedThemeClass.new(this.root));
+        } else if (THEME_PALETTES[themeKey]) {
+            // Fallback for missing theme files
+            const localPalette = THEME_PALETTES[themeKey];
+            const myTheme = am5.Theme.new(this.root);
+            myTheme.rule("ColorSet").setAll({
+                colors: localPalette.map(c => am5.color(c)),
+                reuse: true
+            });
+            activeThemes.push(myTheme);
         } else if (themeKey !== 'default') {
-            console.warn(`Theme ${themeKey} script not loaded in manifest.`);
+            console.warn(`Theme ${themeKey} script not loaded and no local fallback found.`);
         }
         this.root.setThemes(activeThemes);
 
@@ -134,6 +155,31 @@ export class DashboardChart extends Component {
     }
 
     // Method to handle editing of the chart record.
+    async getChartInsight() {
+        if (this.state.isGettingInsight) return;
+        this.state.isGettingInsight = true;
+
+        try {
+            const result = await this.orm.call(
+                "multi.dashboard.charts",
+                "action_get_chart_insight",
+                [[this.props.id]],
+                { date_filter: this.props.filter || null }
+            );
+
+            if (result && result.success) {
+                this.state.aiInsight = result.summary;
+            } else {
+                this.notification.add(result.error || "Failed to generate insight.", { type: "danger" });
+            }
+        } catch (error) {
+            console.error("Error generating insight:", error);
+            this.notification.add("An error occurred while generating insight.", { type: "danger" });
+        } finally {
+            this.state.isGettingInsight = false;
+        }
+    }
+
     onEdit() {
         const chartId = this.props.id;
         if (!chartId) return;
@@ -165,7 +211,7 @@ export class DashboardChart extends Component {
         const dataContext = dataItem.dataContext;
         const categoryValue = (dataContext && dataContext.raw_value !== undefined)
             ? dataContext.raw_value
-            : (dataItem.get("category") || dataItem.get("categoryX") || dataItem.get("categoryY"));
+            : (dataItem.get("category") || dataItem.get("categoryX") || dataItem.get("categoryY") || (dataContext && dataContext.category));
 
         if (categoryValue === undefined || categoryValue === null) {
             return;
@@ -355,7 +401,7 @@ export class DashboardChart extends Component {
         let chart = root.container.children.push(am5radar.RadarChart.new(root, {
             panX: false,
             panY: false,
-            layout: root.verticalLayout
+            // layout: root.verticalLayout // REMOVED: Breaks circular rendering
         }));
 
         // X-Axis (Circular/Category)
@@ -379,6 +425,7 @@ export class DashboardChart extends Component {
         }));
 
         // Create Series (Loop for multiple measures or sub-groups)
+        const self = this;
         seriesConfig.forEach((s) => {
             let series = chart.series.push(am5radar.RadarLineSeries.new(root, {
                 name: s.name,
@@ -403,7 +450,7 @@ export class DashboardChart extends Component {
 
                 bulletCircle.events.on("click", (ev) => {
                     ev.originalEvent.stopPropagation();
-                    this._onChartElementClick(ev);
+                    self._onChartElementClick(ev);
                 });
 
                 return am5.Bullet.new(root, {
@@ -491,6 +538,7 @@ export class DashboardChart extends Component {
         }));
 
         const seriesConfig = this.props.series || [{ valueField: 'value', name: 'Count' }];
+        const self = this;
 
         seriesConfig.forEach((s) => {
             let series;
@@ -516,9 +564,9 @@ export class DashboardChart extends Component {
                     cursorOverStyle: "pointer"
                 });
 
-                series.columns.template.events.on("click", (ev) => {
+                series.columns.template.events.on("click", function (ev) {
                     ev.originalEvent.stopPropagation();
-                    this._onChartElementClick(ev);
+                    self._onChartElementClick(ev);
                 });
 
                 // Only apply rainbow colors if single series without stacking/sub-groups
@@ -550,12 +598,12 @@ export class DashboardChart extends Component {
                     cursorOverStyle: "pointer"
                 });
 
-                series.strokes.template.events.on("click", (ev) => {
+                series.strokes.template.events.on("click", function (ev) {
                     ev.originalEvent.stopPropagation();
-                    this._onChartElementClick(ev);
+                    self._onChartElementClick(ev);
                 });
 
-                series.bullets.push(() => {
+                series.bullets.push(function () {
                     let bulletCircle = am5.Circle.new(root, {
                         radius: 5,
                         fill: series.get("fill"),
@@ -565,7 +613,7 @@ export class DashboardChart extends Component {
 
                     bulletCircle.events.on("click", (ev) => {
                         ev.originalEvent.stopPropagation();
-                        this._onChartElementClick(ev);
+                        self._onChartElementClick(ev);
                     });
 
                     return am5.Bullet.new(root, {
@@ -648,9 +696,10 @@ export class DashboardChart extends Component {
                 toggleKey: "none"
             });
 
-            series.slices.template.events.on("click", (ev) => {
+            const self = this;
+            series.slices.template.events.on("click", function (ev) {
                 ev.originalEvent.stopPropagation();
-                this._onChartElementClick(ev);
+                self._onChartElementClick(ev);
             });
 
             series.data.setAll(data);
@@ -702,9 +751,11 @@ export class DashboardChart extends Component {
             cursorOverStyle: "pointer",
             toggleKey: "none"
         });
-        series.slices.template.events.on("click", (ev) => {
+
+        const self = this;
+        series.slices.template.events.on("click", function (ev) {
             ev.originalEvent.stopPropagation();
-            this._onChartElementClick(ev);
+            self._onChartElementClick(ev);
         });
 
         series.data.setAll(data);
@@ -763,7 +814,7 @@ export class DashboardChart extends Component {
             );
         }
 
-        series.data.setAll(data);
+        // series.data.setAll(data); // MOVED to end
 
         // Configure appearance
         series.slices.template.setAll({
@@ -771,12 +822,15 @@ export class DashboardChart extends Component {
             stroke: am5.color(0xffffff),
             cornerRadius: 5,
             interactive: true,
-            cursorOverStyle: "pointer"
+            cursorOverStyle: "pointer",
+            toggleKey: "none",
+            tooltipText: "{category}: {value}"
         });
 
-        series.slices.template.events.on("click", (ev) => {
+        const self = this;
+        series.slices.template.events.on("click", function (ev) {
             ev.originalEvent.stopPropagation();
-            this._onChartElementClick(ev);
+            self._onChartElementClick(ev);
         });
 
         series.labels.template.setAll({
@@ -797,6 +851,8 @@ export class DashboardChart extends Component {
             })
         );
 
+        // Populate data at the VERY END to ensure all events are ready
+        series.data.setAll(data);
         legend.data.setAll(series.dataItems);
 
         // Animate on load
@@ -813,7 +869,7 @@ export class DashboardChart extends Component {
             panX: false,
             panY: false,
             innerRadius: am5.percent(20),
-            layout: root.verticalLayout
+            // layout: root.verticalLayout // REMOVED: Breaks circular rendering
         }));
 
         // 2. X-Axis (Circular/Category) - Categories go around the circle
@@ -846,6 +902,7 @@ export class DashboardChart extends Component {
         }));
 
         // 4. Create Series
+        const self = this;
         seriesConfig.forEach((s) => {
             let series = chart.series.push(am5radar.RadarColumnSeries.new(root, {
                 name: s.name,
@@ -867,9 +924,9 @@ export class DashboardChart extends Component {
                 cursorOverStyle: "pointer"
             });
 
-            series.columns.template.events.on("click", (ev) => {
+            series.columns.template.events.on("click", function (ev) {
                 ev.originalEvent.stopPropagation();
-                this._onChartElementClick(ev);
+                self._onChartElementClick(ev);
             });
 
             // Colorize each slice differently (Rainbow effect)
@@ -954,7 +1011,7 @@ export class DashboardChart extends Component {
             series.strokes.template.set("strokeOpacity", 0);
 
             // Add Bullets (The dots)
-            series.bullets.push(() => {
+            series.bullets.push(function () {
                 let bulletCircle = am5.Circle.new(root, {
                     radius: 6, // Slightly larger than line chart bullets
                     fill: series.get("fill"),
@@ -966,7 +1023,7 @@ export class DashboardChart extends Component {
 
                 bulletCircle.events.on("click", (ev) => {
                     ev.originalEvent.stopPropagation();
-                    this._onChartElementClick(ev);
+                    self._onChartElementClick(ev);
                 });
 
                 return am5.Bullet.new(root, {
@@ -976,7 +1033,7 @@ export class DashboardChart extends Component {
 
             // Randomize colors if it's a simple count chart
             if (seriesConfig.length === 1) {
-                series.bullets.push(function () {
+                series.bullets.push(() => {
                     let bulletCircle = am5.Circle.new(root, {
                         radius: 6,
                         fill: chart.get("colors").getIndex(
@@ -1035,6 +1092,9 @@ DashboardChart.template = xml`
                         <div class="exp-print-tool" t-on-click="() => this.onPrintImg('json')" title="JSON"><i class="fa fa-files-o"/></div>
                     </div>
                 </div>
+                <div class="chart-tool o-chart-insight" t-on-click.stop="getChartInsight" title="AI Insight">
+                    <i t-att-class="state.isGettingInsight ? 'fa fa-spinner fa-spin' : 'fa fa-lightbulb-o'"/>
+                </div>
                 <div class="chart-tool o-chart-edit" t-on-click.stop="onEdit">
                     <i class="fa fa-pencil"/>
                 </div>
@@ -1044,9 +1104,22 @@ DashboardChart.template = xml`
             </div>
         </div>
 
-        <div class="chart-canvas"
-             t-ref="chartdiv"
-             style="width: 100%; flex-grow: 1; min-height: 300px;">
+        <div class="d-flex flex-grow-1 overflow-hidden position-relative">
+            <div class="chart-canvas flex-grow-1"
+                 t-ref="chartdiv"
+                 style="min-width: 0;">
+            </div>
+
+            <div t-if="state.aiInsight" class="chart-ai-insight-side-panel shadow-sm animate__animated animate__slideInRight flex-shrink-0">
+                <div class="d-flex align-items-center mb-2 p-3 pb-0">
+                    <i class="fa fa-magic text-primary me-2"/>
+                    <span class="fw-bold text-primary small">AI Chart Insight</span>
+                    <button class="btn-close ms-auto shadow-none small" style="transform: scale(0.8);" t-on-click="() => state.aiInsight = null"/>
+                </div>
+                <div class="insight-text p-3 pt-2 small">
+                    <t t-esc="state.aiInsight"/>
+                </div>
+            </div>
         </div>
     </div>
 `;

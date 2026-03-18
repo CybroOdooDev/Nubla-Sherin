@@ -23,6 +23,8 @@
 import json
 import logging
 import pytz
+from google import genai
+from google.genai import types
 from itertools import groupby
 from operator import itemgetter
 from odoo import api, fields, models
@@ -438,6 +440,69 @@ class MultiDashboardCharts(models.Model):
             'domain': domain,
             'target': 'current',
         }
+
+    def action_get_chart_insight(self, date_filter=None):
+        """Aggregate data for THIS specific chart and get an AI-generated summary."""
+        self.ensure_one()
+
+        api_key = self.env['ir.config_parameter'].sudo().get_param('multi_dashboard.gemini_api_key')
+        if not api_key:
+            return {'success': False, 'error': 'Gemini API Key is not configured. Please add it in General Settings.'}
+
+        try:
+            widget_data = self.get_widget_value(date_filter=date_filter)
+
+            # Simplify data for AI context
+            simplified_data = {
+                'chart_name': self.name,
+                'chart_type': self.chart_type,
+                'model': self.model_id.name,
+                'data_points': []
+            }
+
+            if self.chart_type in ['tile', 'progress']:
+                simplified_data['value'] = widget_data.get('value', widget_data.get('current_value', 0))
+            elif self.chart_type == 'list':
+                simplified_data['data_points'] = widget_data.get('records', [])[:5]
+            elif isinstance(widget_data.get('data'), list):
+                simplified_data['data_points'] = widget_data.get('data')
+
+            client = genai.Client(api_key=api_key)
+
+            # Dynamic model selection
+            model_name = 'gemini-1.5-flash'
+            try:
+                available_models = [m.name for m in client.models.list()]
+                flash_models = [m for m in available_models if 'flash' in m.lower()]
+                if flash_models:
+                    model_name = flash_models[0].replace('models/', '')
+            except Exception:
+                pass
+
+            prompt = f"""
+            Analyze the following data for the individual chart "{self.name}" from an Odoo dashboard.
+            Model: {self.model_id.name}
+            Chart Type: {self.chart_type}
+            
+            Data (JSON):
+            {json.dumps(simplified_data, indent=2, default=str)}
+            
+            Provide a CONCISE insight (max 3 sentences) explaining:
+            1. What this data currently tells us.
+            2. Any notable trend or outlier.
+            3. A quick recommended action.
+            
+            Be direct and analytical. No fluff.
+            """
+
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+            )
+            return {'success': True, 'summary': response.text}
+
+        except Exception as e:
+            return {'success': False, 'error': f'Insight Generation Failed: {str(e)}'}
 
 
     def _get_amcharts_data(self, date_domain=None):

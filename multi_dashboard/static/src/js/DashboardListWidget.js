@@ -7,10 +7,40 @@ export class DashboardListWidget extends Component {
     setup() {
         this.state = useState({
             currentPage: 1,
-            expandedGroups: {}
+            expandedGroups: {},
+            aiInsight: null,
+            isGettingInsight: false,
         });
         this.orm = useService("orm");
         this.actionService = useService("action");
+        this.notification = useService("notification");
+    }
+
+    // Method to get AI insight for the list widget
+    async getChartInsight() {
+        if (this.state.isGettingInsight) return;
+        this.state.isGettingInsight = true;
+
+        try {
+            const result = await this.orm.call(
+                "multi.dashboard.charts",
+                "action_get_chart_insight",
+                [[this.props.data.id]],
+                { date_filter: this.props.dateFilter || null }
+            );
+
+            if (result && result.success) {
+
+                this.state.aiInsight = result.summary;
+            } else {
+                this.notification.add(result.error || "Failed to generate insight.", { type: "danger" });
+            }
+        } catch (error) {
+            console.error("Error generating insight:", error);
+            this.notification.add("An error occurred while generating insight.", { type: "danger" });
+        } finally {
+            this.state.isGettingInsight = false;
+        }
     }
 
     // --- Edit Actions ---
@@ -169,6 +199,9 @@ DashboardListWidget.template = xml`
             </div>
 
             <div class="list-tools">
+                <button class="btn-insight-list" t-on-click.stop="getChartInsight" title="AI Insight">
+                    <i t-att-class="state.isGettingInsight ? 'fa fa-spinner fa-spin' : 'fa fa-lightbulb-o'"/>
+                </button>
                 <button class="btn-edit-list" t-on-click="onEdit">
                     <i class="fa fa-pencil"/>
                 </button>
@@ -184,7 +217,8 @@ DashboardListWidget.template = xml`
             </div>
         </div>
 
-        <div class="flex-grow-1 table-responsive custom-scrollbar" style="overflow-y: auto;">
+        <div class="o_list_body flex-grow-1">
+        <div class="o_list_main table-responsive custom-scrollbar" style="overflow-y: auto;">
             <table class="table mb-0 w-100 align-middle">
                 <thead>
                     <tr>
@@ -263,6 +297,21 @@ DashboardListWidget.template = xml`
                     </t>
                 </tbody>
             </table>
+        </div>
+
+        <div t-if="state.aiInsight"
+             class="chart-ai-insight-side-panel o_list_insight_panel shadow-sm animate__animated animate__fadeIn">
+            <div class="d-flex align-items-center mb-1">
+                <i class="fa fa-magic text-primary me-2 small"/>
+                <span class="fw-bold text-primary extra-small">AI Insight</span>
+                <button class="btn-close ms-auto shadow-none small"
+                        style="transform: scale(0.6);"
+                        t-on-click.stop="() => state.aiInsight = null"/>
+            </div>
+            <div class="insight-text extra-small">
+                <t t-esc="state.aiInsight"/>
+            </div>
+        </div>
         </div>
 
         <div t-if="!props.data.is_grouped and totalPages > 1" class="px-3 py-2 border-top d-flex justify-content-between align-items-center flex-shrink-0" style="font-size: 0.85rem;">

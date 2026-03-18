@@ -20,6 +20,11 @@
                  </div>
             </div>
 
+            <!-- Mobile-only backdrop when sidebar is open (off-canvas behavior) -->
+            <div t-if="state.sidebarVisible"
+                 class="o_dashboard_sidebar_backdrop"
+                 t-on-click="toggleSidebar"/>
+
             <div class="o_dashboard_main flex-grow-1 d-flex flex-column bg-100 position-relative">
                 <div class="p-2 border-bottom border-top bg-white d-flex align-items-center">
                     <button class="btn btn-outline-secondary border-0 shadow-none"
@@ -286,6 +291,7 @@
                             Fetching data…
                         </div>
                     </div>
+
 
                     <!-- Gridstack Container -->
                     <div t-attf-class="grid-stack min-vh-100 {{state.loading ? 'd-none' : ''}}"

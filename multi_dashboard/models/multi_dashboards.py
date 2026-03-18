@@ -517,25 +517,26 @@ class MultiDashboards(models.Model):
             pass
 
         prompt = f"""
-        Act as a Senior Business Analyst. Analyze the data from the "{dashboard.name}" dashboard and provide a CONCISE, high-impact summary. Avoid fluff and long explanations.
+        Act as a Senior Business Analyst. Provide a comprehensive, high-impact summary of the "{dashboard.name}" dashboard based on ALL charts below. 
+        Focus on identifying trends, anomalies, and actionable insights.
         
         Dashboard Data (JSON):
         {json.dumps(dashboard_data, indent=2, default=str)}
         
         Structure your response exactly as follows:
-        ## Quick Impact
-        One punchy sentence on the overall health (e.g., "Revenue is soaring due to high-value orders, but customer acquisition is slowing.").
+        ## Executive Pulse
+        2-3 clear sentences on the most critical findings and overall health of the metrics in this dashboard.
         
-        ## Key Metrics
-        3-5 bullet points highlighting the most critical trends or anomalies. Keep each point to one sentence.
+        ## Chart Highlights
+        3-4 detailed bullet points (2-3 sentences each) summarizing the key takeaways, comparisons, and trends from the charts provided.
         
-        ## Strategic Moves
-        2-3 high-priority, actionable recommendations based on the data.
+        ## Strategic Recommendations
+        2-3 clear, actionable strategic moves the user should take based on this data.
         
         Formatting rules:
-        - Use ## for section headers.
-        - Be extremely concise. Maximum 2 sentences per section where applicable.
-        - No introductory or concluding remarks.
+        - Use ## for headers.
+        - ABSOLUTELY NO introductory or concluding text. 
+        - Total response should be around 250-300 words for depth.
         """
 
         try:

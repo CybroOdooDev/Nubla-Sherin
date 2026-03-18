@@ -9,9 +9,38 @@ export class DashboardTileWidget extends Component {
     setup() {
         this.orm = useService("orm");
         this.actionService = useService("action");
+        this.notification = useService("notification");
         this.state = useState({
             data: this.props.data || {},
+            aiInsight: null,
+            isGettingInsight: false,
         });
+    }
+
+    // Method to get AI insight for the tile
+    async getChartInsight() {
+        if (this.state.isGettingInsight) return;
+        this.state.isGettingInsight = true;
+
+        try {
+            const result = await this.orm.call(
+                "multi.dashboard.charts",
+                "action_get_chart_insight",
+                [[this.props.data.id]],
+                { date_filter: this.props.dateFilter || null }
+            );
+
+            if (result && result.success) {
+                this.state.aiInsight = result.summary;
+            } else {
+                this.notification.add(result.error || "Failed to generate insight.", { type: "danger" });
+            }
+        } catch (error) {
+            console.error("Error generating insight:", error);
+            this.notification.add("An error occurred while generating insight.", { type: "danger" });
+        } finally {
+            this.state.isGettingInsight = false;
+        }
     }
 
     // This method will trigger the download of the chart's data in JSON format.
@@ -118,6 +147,9 @@ DashboardTileWidget.template = xml`
          t-on-click="onTileClick">
 
         <div class="tile-tools-overlay">
+            <button class="btn-insight-tile" t-on-click.stop="getChartInsight" title="AI Insight">
+                <i t-att-class="state.isGettingInsight ? 'fa fa-spinner fa-spin' : 'fa fa-lightbulb-o'"/>
+            </button>
             <button class="btn-edit-tile" t-on-click="onEdit">
                 <i class="fa fa-pencil"/>
             </button>
@@ -130,6 +162,18 @@ DashboardTileWidget.template = xml`
                 <i class="fa fa-download"/>
             </button>
         </div>
+
+        <div t-if="state.aiInsight" class="tile-ai-insight-overlay shadow-sm animate__animated animate__fadeIn">
+            <div class="d-flex align-items-center mb-1">
+                <i class="fa fa-magic text-white me-2 small"/>
+                <span class="fw-bold text-white extra-small">AI Insight</span>
+                <button class="btn-close btn-close-white ms-auto shadow-none small" style="transform: scale(0.6);" t-on-click.stop="() => state.aiInsight = null"/>
+            </div>
+            <div class="insight-text-tile extra-small text-white opacity-90">
+                <t t-esc="state.aiInsight"/>
+            </div>
+        </div>
+
         <div class="tile-value">
             <t t-esc="state.data.value"/>
         </div>

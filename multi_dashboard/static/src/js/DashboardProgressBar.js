@@ -19,9 +19,38 @@ export class DashboardProgressBar extends Component {
     setup() {
         this.orm = useService("orm");
         this.actionService = useService("action");
+        this.notification = useService("notification");
         this.state = useState({
             data: this.props.data || {},
+            aiInsight: null,
+            isGettingInsight: false,
         });
+    }
+
+    // Method to get AI insight for the progress bar
+    async getChartInsight() {
+        if (this.state.isGettingInsight) return;
+        this.state.isGettingInsight = true;
+
+        try {
+            const result = await this.orm.call(
+                "multi.dashboard.charts",
+                "action_get_chart_insight",
+                [[this.props.data.id]],
+                { date_filter: this.props.dateFilter || null }
+            );
+
+            if (result && result.success) {
+                this.state.aiInsight = result.summary;
+            } else {
+                this.notification.add(result.error || "Failed to generate insight.", { type: "danger" });
+            }
+        } catch (error) {
+            console.error("Error generating insight:", error);
+            this.notification.add("An error occurred while generating insight.", { type: "danger" });
+        } finally {
+            this.state.isGettingInsight = false;
+        }
     }
 
     // Helper to get the hex code based on the prop integer
@@ -108,8 +137,12 @@ DashboardProgressBar.template = xml`
 
         <div class="d-flex justify-content-between align-items-start mb-2">
             <h5 class="m-0 text-truncate fw-bold" t-esc="props.widget?.name || 'Progress Bar'"/>
-            <t t-log='props'/>
             <div t-if="!props.isPreview" class="hover-actions btn-group btn-group-sm">
+                <button class="btn btn-light border-0 opacity-75-hover"
+                        title="AI Insight"
+                        t-on-click.stop="getChartInsight">
+                    <i t-att-class="state.isGettingInsight ? 'fa fa-spinner fa-spin' : 'fa fa-lightbulb-o'"/>
+                </button>
                 <button class="btn btn-light border-0 opacity-75-hover"
                         title="Refresh"
                         t-on-click.prevent="props.onRefresh">
@@ -130,6 +163,17 @@ DashboardProgressBar.template = xml`
                         t-on-click="onDelete">
                     <i class="fa fa-trash"/>
                 </button>
+            </div>
+        </div>
+
+        <div t-if="state.aiInsight" class="chart-ai-insight-overlay shadow-sm animate__animated animate__fadeIn">
+            <div class="d-flex align-items-center mb-1">
+                <i class="fa fa-magic text-primary me-2 small"/>
+                <span class="fw-bold text-primary extra-small">AI Insight</span>
+                <button class="btn-close ms-auto shadow-none small" style="transform: scale(0.6);" t-on-click.stop="() => state.aiInsight = null"/>
+            </div>
+            <div class="insight-text extra-small">
+                <t t-esc="state.aiInsight"/>
             </div>
         </div>
 

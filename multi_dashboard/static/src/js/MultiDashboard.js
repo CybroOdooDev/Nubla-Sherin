@@ -64,6 +64,8 @@ export class MultiDashboard extends Component {
         this.gridRef = useRef("grid");
         this.dateFilterDropdownButton = useRef("dateFilterDropdownButton");
         this.grid = null;
+        this._responsiveObserver = null;
+        this._isResponsiveRelayout = false;
         this.boundOnResize = this.onResize.bind(this);
         this.boundOnResizeEnd = this.onResizeEnd.bind(this);
         this.boundHandleDocumentPointerDown = this.handleDocumentPointerDown.bind(this);
@@ -83,6 +85,16 @@ export class MultiDashboard extends Component {
                 this.state.theme = dashboards[0].theme;
                 this.state.refreshInterval = parseInt(dashboards[0].refresh_interval) || 0;
             }
+
+            // Load saved date filter
+            const savedFilter = localStorage.getItem(`dashboard_filter_${this.state.dashboardId}`);
+            if (savedFilter) {
+                try {
+                    this.state.dateFilter = JSON.parse(savedFilter);
+                } catch (e) {
+                    console.error("Error parsing saved date filter", e);
+                }
+            }
         });
 
         onMounted(async () => {
@@ -96,6 +108,7 @@ export class MultiDashboard extends Component {
             document.addEventListener('pointerdown', this.boundHandleDocumentPointerDown, true);
 
             await this.initGrid();
+            this._setupResponsiveGridColumns();
             await this.loadWidgets();
 
             // Start the timer if an interval is set in the database
@@ -115,6 +128,15 @@ export class MultiDashboard extends Component {
                 this.refreshTimer = null; // Clean up the reference
             }
 
+            if (this._responsiveObserver) {
+                try {
+                    this._responsiveObserver.disconnect();
+                } catch (e) {
+                    // Ignore observer cleanup errors
+                }
+                this._responsiveObserver = null;
+            }
+
             if (this.grid) this.grid.destroy(false);
         });
 
@@ -130,6 +152,23 @@ export class MultiDashboard extends Component {
                 const dashboards = await this.orm.searchRead('multi.dashboards', [['id', '=', this.state.dashboardId]], ['theme']);
                 if (dashboards.length) {
                     this.state.theme = dashboards[0].theme;
+                }
+
+                // Load saved date filter for the new dashboard
+                const savedFilter = localStorage.getItem(`dashboard_filter_${this.state.dashboardId}`);
+                if (savedFilter) {
+                    try {
+                        this.state.dateFilter = JSON.parse(savedFilter);
+                    } catch (e) {
+                        console.error("Error parsing saved date filter", e);
+                    }
+                } else {
+                    // Reset to default if no saved filter
+                    this.state.dateFilter = {
+                        label: 'All Time',
+                        start_date: null,
+                        end_date: null
+                    };
                 }
 
                 await this.loadWidgets();
@@ -267,6 +306,16 @@ export class MultiDashboard extends Component {
             float: true,
             cellHeight: 100,
             column: 12,
+            // Responsive columns: desktop 12, tablet 6, mobile 1.
+            // Uses GridStack's built-in dynamic columns & per-column layouts.
+            columnOpts: {
+                columnMax: 12,
+                layout: "moveScale",
+                breakpoints: [
+                    { w: 992, c: 6 },
+                    { w: 576, c: 1 },
+                ],
+            },
             margin: 5,
             acceptWidgets: true,
             animate: true,
@@ -291,16 +340,42 @@ export class MultiDashboard extends Component {
         });
 
         this.grid.on('change', (event, items) => {
+            if (this._isResponsiveRelayout) return;
             this.saveLayout(items);
         });
 
         this.grid.on('resizestop', (event, el) => {
+            if (this._isResponsiveRelayout) return;
             this.grid.compact();
             const node = el.gridstackNode;
             if (node) {
                 this.saveLayout([node]);
             }
         });
+    }
+
+    _setupResponsiveGridColumns() {
+        if (!this.gridRef?.el || !this.grid || typeof ResizeObserver === "undefined") return;
+        if (this._responsiveObserver) return;
+
+        const apply = () => {
+            if (!this.grid) return;
+            if (typeof this.grid.checkDynamicColumn !== "function") return;
+
+            this._isResponsiveRelayout = true;
+            try {
+                this.grid.checkDynamicColumn();
+            } finally {
+                // change events can fire on the next tick; keep the guard briefly.
+                setTimeout(() => {
+                    this._isResponsiveRelayout = false;
+                }, 0);
+            }
+        };
+
+        this._responsiveObserver = new ResizeObserver(apply);
+        this._responsiveObserver.observe(this.gridRef.el);
+        apply();
     }
 
     /**
@@ -510,6 +585,9 @@ export class MultiDashboard extends Component {
 
     // Save the layout changes for the given items to the backend. Called on move/resize events.
     async saveLayout(items) {
+        // Only persist layout when a manager is actively editing (sidebar open).
+        // Responsive relayout (dynamic columns) must never be written back to DB.
+        if (!this.state.isManager || !this.state.sidebarVisible) return;
         if (!items) return;
 
         const updates = items.map(item => {
@@ -536,6 +614,17 @@ export class MultiDashboard extends Component {
 
         if (this.grid) {
             this.grid.setStatic(!this.state.sidebarVisible);
+            // Sidebar toggling changes available width; re-evaluate responsive columns.
+            if (typeof this.grid.checkDynamicColumn === "function") {
+                this._isResponsiveRelayout = true;
+                try {
+                    this.grid.checkDynamicColumn();
+                } finally {
+                    setTimeout(() => {
+                        this._isResponsiveRelayout = false;
+                    }, 0);
+                }
+            }
         }
     }
 
@@ -921,6 +1010,7 @@ export class MultiDashboard extends Component {
         }
 
         this.state.dateFilter = { label, start_date, end_date };
+        localStorage.setItem(`dashboard_filter_${this.state.dashboardId}`, JSON.stringify(this.state.dateFilter));
         this.closeDateFilterDropdown();
         await this.loadWidgets();
     }
@@ -942,6 +1032,7 @@ export class MultiDashboard extends Component {
             start_date: start,
             end_date: end
         };
+        localStorage.setItem(`dashboard_filter_${this.state.dashboardId}`, JSON.stringify(this.state.dateFilter));
         this.closeDateFilterDropdown();
         await this.loadWidgets();
     }

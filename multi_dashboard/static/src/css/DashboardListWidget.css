@@ -5,6 +5,7 @@
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid var(--widget-border);
+    position: relative; /* anchor absolutely-positioned tool buttons */
 }
 
 /* Header */
@@ -84,8 +85,9 @@
 
 .list-tools {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 6px;
+    /* Leave space for the JSON download button so click targets don't overlap */
+    right: 50px;
     display: flex;
     gap: 6px;
     opacity: 0;
@@ -93,6 +95,13 @@
     transform: translateY(-5px);
     transition: all 0.25s ease;
     z-index: 5;
+}
+
+/* Show AI insight on hover (view mode) */
+.o_custom_list_view:hover .list-tools {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
 /* Buttons */
@@ -124,11 +133,24 @@
     background: #0d6efd; /* bootstrap primary */
 }
 
-/* Show tools ONLY when sidebar is active */
-.o_sidebar_active .o_custom_list_view:hover .list-tools {
+/* In view mode, only show AI insight (hide edit/delete) */
+.o_custom_list_view .list-tools .btn-edit-list,
+.o_custom_list_view .list-tools .btn-del-list {
+    display: none;
+}
+
+/* Show edit/delete when sidebar is active (edit mode) */
+.o_sidebar_active .o_custom_list_view .list-tools .btn-edit-list,
+.o_sidebar_active .o_custom_list_view .list-tools .btn-del-list {
+    display: flex;
+}
+
+/* Show tools when sidebar is active */
+.o_sidebar_active .o_custom_list_view .list-tools {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+    right: 10px; /* download button is hidden in edit mode */
 }
 
 .dashboard-badge-list {
@@ -137,11 +159,55 @@
     display: inline-block;
 }
 
-.o_sidebar_active .o_custom_list_view:hover .download-options {
+.o_sidebar_active .o_custom_list_view .download-options {
     display: none;
+}
+
+.o_custom_list_view .btn-download-json {
+    display: flex; /* override other widget CSS that hides this class by default */
+}
+
+.o_custom_list_view .download-options {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
 }
 
 .o_custom_list_view:hover .download-options {
     opacity: 1;
+    pointer-events: auto;
 }
 
+/* List widget body layout: table + AI insight side panel */
+.o_custom_list_view .o_list_body {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem 1rem 1rem;
+    min-height: 0; /* allows inner scroll */
+}
+
+.o_custom_list_view .o_list_main {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0; /* allows inner scroll */
+}
+
+/* Reuse the global side-panel styling but tighten spacing for list widget */
+.o_custom_list_view .o_list_insight_panel {
+    width: 280px;
+    max-width: 40%;
+    margin: 0;
+    padding: 10px;
+    overflow: hidden;
+}
+
+/* On smaller screens, stack the insight below the table */
+@media (max-width: 991.98px) {
+    .o_custom_list_view .o_list_body {
+        flex-direction: column;
+    }
+    .o_custom_list_view .o_list_insight_panel {
+        width: 100%;
+        max-width: 100%;
+    }
+}

@@ -137,6 +137,7 @@
     box-sizing: border-box;
     color: var(--widget-text-color);
     border: 1px solid var(--widget-border);
+    position: relative;
 }
 
 .o_dashboard_chart_container:hover .export-group {
@@ -248,11 +249,16 @@
     transform: scale(0.95);
 }
 
-.o-chart-edit {
+.o-chart-edit,
+.o-chart-insight {
     display: none !important;
 }
 
 .o_sidebar_active .o-chart-edit {
+    display: flex !important;
+}
+
+.o_dashboard_chart_container:hover .o-chart-insight {
     display: flex !important;
 }
 
@@ -384,8 +390,6 @@
 }
 
 
-
-
 /* Selected refresh option */
 .active-refresh {
     background-color: #e7f1ff;
@@ -409,18 +413,19 @@
     background-color: #ffffff;
     border-left: 5px solid #71639e;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    margin: 20px;
-    padding: 30px !important;
+    margin: 10px 10px 20px 10px;
+    padding: 40px !important;
     border-radius: 12px;
     animation: slideInDown 0.4s ease-out;
     border: 1px solid #e2e8f0;
-    max-height: 600px;
+    max-height: 6500px;
+    min-height: 350px;
     overflow-y: auto;
 }
 
 .ai-summary-content {
-    font-size: 15px;
-    line-height: 1.8;
+    font-size: 14px;
+    line-height: 2.0;
     color: #1e293b;
 }
 
@@ -519,5 +524,144 @@
         flex: 1 1 100%;
         width: 100% !important;
         min-width: 0;
+    }
+}
+
+/* Chart Specific AI Insight Side-Panel (Non-overlapping) */
+.chart-ai-insight-side-panel {
+    width: 300px;
+    max-width: 45%;
+    height: fit-content;
+    align-self: flex-start;
+    margin: 10px;
+    background: var(--widget-bg);
+    border: 1px solid var(--widget-border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    overflow-y: auto;
+}
+
+.o-dashboard-theme-dark .chart-ai-insight-side-panel {
+    background: #2a2a2a;
+    color: #e0e0e0;
+}
+
+
+.insight-text {
+    line-height: 1.5;
+    color: var(--bs-body-color);
+}
+
+/* Tile Specific AI Insight Overlay */
+.tile-ai-insight-overlay {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    height: fit-content;
+    max-height: calc(100% - 10px);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(4px);
+    border-radius: 8px;
+    padding: 10px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* List Specific AI Insight Overlay */
+.chart-ai-insight-overlay {
+    background: var(--widget-bg);
+    border: 1px solid var(--widget-border);
+    border-radius: 8px;
+    padding: 0;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.extra-small {
+    font-size: 0.7rem;
+}
+
+.opacity-90 {
+    opacity: 0.9;
+}
+
+/* =========================================================================
+   RESPONSIVE TWEAKS (MOBILE/TABLET)
+   ========================================================================= */
+
+@media (max-width: 991.98px) {
+    /* Reduce large desktop padding and avoid horizontal scrolling on small screens */
+    .o_multi_dashboard_container .grid-scrollbar {
+        padding: 1rem !important;
+        overflow-x: hidden;
+    }
+}
+
+@media (max-width: 767.98px) {
+    /* Top action bar: allow wrapping instead of overflowing */
+    .o_multi_dashboard_container .o_dashboard_main > .p-2.border-bottom.border-top {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .o_multi_dashboard_container .o_dashboard_main > .p-2.border-bottom.border-top .ms-auto {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    /* Make NLP input usable on touch devices (no hover) */
+    .o_multi_dashboard_container .nlp-search-container,
+    .o_multi_dashboard_container .nlp-search-container:hover,
+    .o_multi_dashboard_container .nlp-search-container:focus-within {
+        width: 100% !important;
+    }
+
+    .o_multi_dashboard_container .nlp-input {
+        opacity: 1;
+        transform: none;
+    }
+
+    .o_multi_dashboard_container .h4 {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    /* Off-canvas sidebar on mobile: keep main content full width */
+    .o_multi_dashboard_container .o_dashboard_sidebar {
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        height: 100%;
+        z-index: 1100;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    }
+
+    .o_multi_dashboard_container.o_sidebar_active .o_dashboard_sidebar {
+        width: min(85vw, 320px) !important;
+        min-width: min(85vw, 320px) !important;
+    }
+
+    .o_multi_dashboard_container .sidebar-resize-handle {
+        display: none !important;
+    }
+
+    .o_multi_dashboard_container .o_dashboard_main {
+        width: 100%;
+    }
+
+    .o_multi_dashboard_container .o_dashboard_sidebar_backdrop {
+        position: absolute;
+        inset: 0;
+        z-index: 1050;
+        background: rgba(15, 23, 42, 0.25);
+        backdrop-filter: blur(1px);
     }
 }
