@@ -133,66 +133,59 @@ export class DashboardProgressBar extends Component {
 
 DashboardProgressBar.template = xml`
     <div class="o_dashboard_progress_card shadow-sm h-100 d-flex flex-column p-3 position-relative"
-         t-attf-style="background-color: {{ this.accentColor }}; border-left: 5px solid rgba(0,0,0,0.1);">
+         t-attf-style="--widget-accent: {{ this.accentColor }}; background-color: var(--widget-accent); border-left: 5px solid rgba(0,0,0,0.1);">
 
-        <div class="d-flex justify-content-between align-items-start mb-2">
-            <h5 class="m-0 text-truncate fw-bold" t-esc="props.widget?.name || 'Progress Bar'"/>
-            <div t-if="!props.isPreview" class="hover-actions btn-group btn-group-sm">
-                <button class="btn btn-light border-0 opacity-75-hover"
-                        title="AI Insight"
-                        t-on-click.stop="getChartInsight">
-                    <i t-att-class="state.isGettingInsight ? 'fa fa-spinner fa-spin' : 'fa fa-lightbulb-o'"/>
-                </button>
-                <button class="btn btn-light border-0 opacity-75-hover"
-                        title="Refresh"
-                        t-on-click.prevent="props.onRefresh">
-                    <i class="fa fa-refresh"/>
-                </button>
-                <button class="btn btn-light border-0 opacity-75-hover"
-                        title="JSON"
-                        t-on-click="downloadJson">
+        <div class="chart-header d-flex justify-content-between align-items-center">
+            <div class="o_progress_title flex-grow-1" t-esc="props.widget?.name || 'Progress Bar'"/>
+            <div t-if="!props.isPreview" class="progress-tools">
+                <div class="chart-tool o-progress-download" title="JSON" t-on-click.stop="downloadJson">
                     <i class="fa fa-download"/>
-                </button>
-                <button class="btn btn-light border-0 opacity-75-hover hide-btn"
-                        title="Edit"
-                        t-on-click="onEdit">
+                </div>
+                <div class="chart-tool o-progress-insight" title="AI Insight" t-on-click.stop="getChartInsight">
+                    <i t-att-class="state.isGettingInsight ? 'fa fa-spinner fa-spin' : 'fa fa-lightbulb-o'"/>
+                </div>
+
+                <div class="chart-tool o-progress-edit" title="Edit" t-on-click.stop="onEdit">
                     <i class="fa fa-pencil"/>
-                </button>
-                <button class="btn btn-light border-0 text-danger opacity-75-hover hide-btn"
-                        title="Delete"
-                        t-on-click="onDelete">
+                </div>
+                <div class="chart-tool o-progress-delete" title="Delete" t-on-click.stop="onDelete">
                     <i class="fa fa-trash"/>
-                </button>
+                </div>
             </div>
         </div>
 
-        <div t-if="state.aiInsight" class="chart-ai-insight-overlay shadow-sm animate__animated animate__fadeIn">
-            <div class="d-flex align-items-center mb-1">
-                <i class="fa fa-magic text-primary me-2 small"/>
-                <span class="fw-bold text-primary extra-small">AI Insight</span>
-                <button class="btn-close ms-auto shadow-none small" style="transform: scale(0.6);" t-on-click.stop="() => state.aiInsight = null"/>
-            </div>
-            <div class="insight-text extra-small">
-                <t t-esc="state.aiInsight"/>
-            </div>
-        </div>
+        <div class="o_progress_body flex-grow-1 d-flex gap-2 overflow-hidden">
+            <div class="o_progress_main flex-grow-1 d-flex flex-column justify-content-center" style="min-width: 0;">
+                <div class="d-flex justify-content-between align-items-end mb-1">
+                    <span class="h3 m-0 fw-bold" t-esc="props.data.current_value"/>
+                    <span class="text-dark opacity-75 small">Target: <t t-esc="props.data.target_value"/></span>
+                </div>
 
-        <div class="flex-grow-1 d-flex flex-column justify-content-center">
-            <div class="d-flex justify-content-between align-items-end mb-1">
-                <span class="h3 m-0 fw-bold" t-esc="props.data.current_value"/>
-                <span class="text-dark opacity-75 small">Target: <t t-esc="props.data.target_value"/></span>
-            </div>
+                <div class="progress" style="height: 12px; background-color: rgba(0,0,0,0.05); border-radius: 10px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                         role="progressbar"
+                         t-att-style="barStyle">
+                    </div>
+                </div>
 
-            <div class="progress" style="height: 12px; background-color: rgba(0,0,0,0.05); border-radius: 10px;">
-                <div class="progress-bar progress-bar-striped progress-bar-animated"
-                     role="progressbar"
-                     t-att-style="barStyle">
+                <div class="text-end mt-1">
+                    <span t-attf-class="small fw-bold {{isCritical ? 'text-danger' : 'text-dark'}}"
+                          t-esc="props.data.percentage + '%'"/>
                 </div>
             </div>
 
-            <div class="text-end mt-1">
-                <span t-attf-class="small fw-bold {{isCritical ? 'text-danger' : 'text-dark'}}"
-                      t-esc="props.data.percentage + '%'"/>
+            <div t-if="state.aiInsight"
+                 class="progress-ai-insight-side-panel shadow-sm animate__animated animate__slideInRight flex-shrink-0">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fa fa-magic text-primary me-2 small"/>
+                    <span class="fw-bold text-primary extra-small">AI Insight</span>
+                    <button class="btn-close ms-auto shadow-none small"
+                            style="transform: scale(0.6);"
+                            t-on-click.stop="() => state.aiInsight = null"/>
+                </div>
+                <div class="progress-insight-text extra-small">
+                    <t t-esc="state.aiInsight"/>
+                </div>
             </div>
         </div>
     </div>

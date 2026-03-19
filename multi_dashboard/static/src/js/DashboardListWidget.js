@@ -2,6 +2,23 @@
 import { Component, xml, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
+const COLORS = [
+    "#ffffff", "#ff9c9c", "#f7c698", "#fde388", "#bbd7f8", "#d9a8cc",
+    "#f8d6c8", "#89e1db", "#97a6f9", "#ff9ecc", "#b7edbe", "#e6dbfc"
+];
+
+function getOnAccentColor(hexColor) {
+    const hex = (hexColor || "").trim().replace("#", "");
+    if (hex.length !== 6) {
+        return "#111827";
+    }
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    const l = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    return l > 0.65 ? "#111827" : "#ffffff";
+}
+
 // This component is designed to be used inside the MultiDashboard widget.
 export class DashboardListWidget extends Component {
     setup() {
@@ -180,20 +197,31 @@ export class DashboardListWidget extends Component {
             console.error("Export failed:", error);
         }
     }
+
+    // Keep list widgets readable in dark dashboards by using a light accent surface.
+    get accentColor() {
+        const index = this.props.color || 0;
+        return COLORS[index] || COLORS[0];
+    }
+
+    get onAccentColor() {
+        return getOnAccentColor(this.accentColor);
+    }
 }
 
 DashboardListWidget.template = xml`
-    <div class="o_custom_list_view h-100 d-flex flex-column border rounded shadow-sm overflow-hidden">
+    <div class="o_custom_list_view h-100 d-flex flex-column border rounded shadow-sm overflow-hidden"
+         t-attf-style="--widget-accent: {{ this.accentColor }}; --widget-on-accent: {{ this.onAccentColor }};">
 
         <div class="px-4 py-3 d-flex align-items-center justify-content-between"
-             style="border-bottom: 1px solid var(--widget-border);">
+             style="border-bottom: 1px solid var(--list-border-color);">
 
             <div class="d-flex align-items-center gap-2 overflow-hidden list-name">
                 <h1 class="m-0 fw-semibold text-truncate" style="font-size: 1.3rem;">
                     <t t-esc="props.data.name"/>
                 </h1>
                 <span class="dashboard-badge dashboard-badge-list rounded-pill px-3 py-2"
-                      style="border: 1px solid var(--widget-border);">
+                      style="border: 1px solid var(--list-border-color);">
                     Total: <t t-esc="props.data.total_count or 0"/>
                 </span>
             </div>

@@ -1,5 +1,6 @@
 /** @odoo-module **/
 import { registry } from "@web/core/registry";
+import { cookie } from "@web/core/browser/cookie";
 import { DateTimeInput } from "@web/core/datetime/datetime_input";
 import { deserializeDate, formatDate, serializeDate } from "@web/core/l10n/dates";
 import { user } from "@web/core/user";
@@ -33,6 +34,7 @@ export class MultiDashboard extends Component {
 
         const params = this.props.action.params || {};
         this.dashboardId = params.dashboard_id || null;
+        const odooColorScheme = cookie.get("color_scheme") || "light";
 
         this.state = useState({
             dashboardId: this.dashboardId,
@@ -45,6 +47,8 @@ export class MultiDashboard extends Component {
             isManager: false,
             isCompact: false,
             theme: params.theme || 'light',
+            odooColorScheme,
+            isOdooDark: odooColorScheme === "dark",
             refreshInterval: 0,
             nlpQuery: '',
             isGeneratingChart: false,
@@ -57,6 +61,7 @@ export class MultiDashboard extends Component {
             },
             customStartDate: null,
             customEndDate: null,
+            isEditMode: false,
         });
 
         this.sidebar = useRef("sidebar");
@@ -125,7 +130,12 @@ export class MultiDashboard extends Component {
 
             if (this.refreshTimer) {
                 clearInterval(this.refreshTimer);
-                this.refreshTimer = null; // Clean up the reference
+                this.refreshTimer = null;
+            }
+
+            if (this.loadWidgetsTimer) {
+                clearTimeout(this.loadWidgetsTimer);
+                this.loadWidgetsTimer = null;
             }
 
             if (this._responsiveObserver) {
@@ -137,7 +147,14 @@ export class MultiDashboard extends Component {
                 this._responsiveObserver = null;
             }
 
-            if (this.grid) this.grid.destroy(false);
+            if (this._applyResponsive) {
+                window.removeEventListener('resize', this._applyResponsive);
+            }
+
+            if (this.grid) {
+                this.grid.destroy(false);
+                this.grid = null;
+            }
         });
 
         onWillUpdateProps(async (nextProps) => {
@@ -319,7 +336,7 @@ export class MultiDashboard extends Component {
             margin: 5,
             acceptWidgets: true,
             animate: true,
-            staticGrid: !this.state.sidebarVisible,
+            staticGrid: !this.state.isEditMode,
             minRow: 12,
         }, this.gridRef.el);
 
@@ -358,13 +375,20 @@ export class MultiDashboard extends Component {
         if (!this.gridRef?.el || !this.grid || typeof ResizeObserver === "undefined") return;
         if (this._responsiveObserver) return;
 
-        const apply = () => {
+        this._applyResponsive = () => {
             if (!this.grid) return;
-            if (typeof this.grid.checkDynamicColumn !== "function") return;
 
             this._isResponsiveRelayout = true;
             try {
-                this.grid.checkDynamicColumn();
+                if (typeof this.grid.checkDynamicColumn === "function") {
+                    this.grid.checkDynamicColumn();
+                }
+
+                // Extra safety: GridStack sometimes gets stuck in 1 column when scaling up
+                const width = this.gridRef.el.offsetWidth;
+                if (width > 992 && this.grid.getColumn() !== 12) {
+                    this.grid.column(12, 'moveScale');
+                }
             } finally {
                 // change events can fire on the next tick; keep the guard briefly.
                 setTimeout(() => {
@@ -373,9 +397,12 @@ export class MultiDashboard extends Component {
             }
         };
 
-        this._responsiveObserver = new ResizeObserver(apply);
+        this._responsiveObserver = new ResizeObserver(this._applyResponsive);
         this._responsiveObserver.observe(this.gridRef.el);
-        apply();
+
+        window.addEventListener('resize', this._applyResponsive);
+
+        this._applyResponsive();
     }
 
     /**
@@ -490,8 +517,10 @@ export class MultiDashboard extends Component {
             console.error("Error loading widgets", e);
         } finally {
             if (this.grid) {
-                setTimeout(() => {
-                    this.grid.setStatic(!this.state.sidebarVisible);
+                this.loadWidgetsTimer = setTimeout(() => {
+                    if (this.grid && typeof this.grid.setStatic === 'function') {
+                        this.grid.setStatic(!this.state.isEditMode);
+                    }
                 }, 100);
             }
         }
@@ -534,6 +563,7 @@ export class MultiDashboard extends Component {
                     name: widget.name,
                     model: widget.model_name,
                     data,
+                    color: widget.todo_color || 0,
                     onRefresh,
                     onDelete,
                 },
@@ -573,6 +603,8 @@ export class MultiDashboard extends Component {
                     sidebarVisible: this.state.sidebarVisible,
                     modelName: widget.model_name,
                     groupField: data.groupField,
+                    groupFieldType: data.groupFieldType,
+                    dateGranularity: data.date_granularity,
                     filter: this.state.dateFilter,
                 },
                 env: this.env,
@@ -611,9 +643,10 @@ export class MultiDashboard extends Component {
             return;
         }
         this.state.sidebarVisible = !this.state.sidebarVisible;
+        this.state.isEditMode = this.state.sidebarVisible;
 
-        if (this.grid) {
-            this.grid.setStatic(!this.state.sidebarVisible);
+        if (this.grid && typeof this.grid.setStatic === 'function') {
+            this.grid.setStatic(!this.state.isEditMode);
             // Sidebar toggling changes available width; re-evaluate responsive columns.
             if (typeof this.grid.checkDynamicColumn === "function") {
                 this._isResponsiveRelayout = true;
@@ -628,6 +661,21 @@ export class MultiDashboard extends Component {
         }
     }
 
+    /**
+     * Explicitly toggle move/edit mode for layout adjustments.
+     */
+    toggleEditMode() {
+        if (!this.state.isManager) {
+            this.notification.add("Access Denied: Only managers can edit layouts.", { type: "danger" });
+            return;
+        }
+        this.state.isEditMode = !this.state.isEditMode;
+        if (this.grid && typeof this.grid.setStatic === 'function') {
+            this.grid.setStatic(!this.state.isEditMode);
+        }
+        this.notification.add(this.state.isEditMode ? "Layout Movement Enabled" : "Layout Movement Disabled", { type: "info" });
+    }
+
     /* Handle the drop of a new widget from the sidebar: open a form view
     to create the widget, then add it to the grid on save */
     async handleNewWidgetDrop(item) {
@@ -635,11 +683,42 @@ export class MultiDashboard extends Component {
         const y = item.y !== undefined ? item.y : 0;
 
         const type = item.el.dataset.type;
-        const defaultW = item.w;
-        const defaultH = item.h;
+        const w = item.w;
+        const h = item.h;
 
         this.grid.removeWidget(item.el, true);
+        await this._openWidgetConfigForm(type, w, h, x, y);
+    }
 
+    /**
+     * Handle clicking on a widget in the sidebar (for mobile or convenience).
+     * @param {Object} item
+     */
+    async onItemClick(item) {
+        if (!this.state.isManager) {
+            this.notification.add("Access Denied: Only managers can edit layouts.", { type: "danger" });
+            return;
+        }
+        // Hide sidebar on mobile/tablet so the configuration form is visible
+        if (window.innerWidth < 992) {
+            this.state.sidebarVisible = false;
+            if (this.grid && typeof this.grid.setStatic === 'function') {
+                this.grid.setStatic(!this.state.isEditMode);
+            }
+        }
+        // Default to (0,0); GridStack or the user can adjust later.
+        await this._openWidgetConfigForm(item.type, item.w, item.h, 0, 0);
+    }
+
+    /**
+     * Common logic to open the widget configuration form.
+     * @param {string} type
+     * @param {number} w
+     * @param {number} h
+     * @param {number} x
+     * @param {number} y
+     */
+    async _openWidgetConfigForm(type, w, h, x, y) {
         const existingIds = new Set(Object.keys(this.mountedComponents));
 
         await this.action.doAction({
@@ -653,8 +732,8 @@ export class MultiDashboard extends Component {
                 default_chart_type: type,
                 default_gs_x: x,
                 default_gs_y: y,
-                default_gs_w: defaultW,
-                default_gs_h: defaultH,
+                default_gs_w: w,
+                default_gs_h: h,
             }
         }, {
             onClose: async () => {
@@ -810,7 +889,7 @@ export class MultiDashboard extends Component {
     widgets up to fill gaps, while spacious mode preserves their positions with more whitespace.*/
     toggleCompactView() {
         this.state.isCompact = !this.state.isCompact;
-        if (this.grid) {
+        if (this.grid && typeof this.grid.compact === 'function') {
             this.grid.compact('compact');
 
             const items = this.grid.getGridItems().map(el => el.gridstackNode);

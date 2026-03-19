@@ -174,11 +174,22 @@ DashboardTileWidget.template = xml`
             </div>
         </div>
 
-        <div class="tile-value">
-            <t t-esc="state.data.value"/>
+        <div t-if="state.data.tile_icon" class="tile-icon-wrapper">
+             <i t-attf-class="fa {{state.data.tile_icon}}"/>
         </div>
-        <div class="tile-label">
-            <t t-esc="state.data.name"/>
+
+        <div class="tile-content-wrapper">
+            <div t-if="state.data.kpi_data" class="tile-kpi" t-attf-class="{{state.data.kpi_data.direction}} shadow-sm animate__animated animate__fadeIn">
+                <i t-attf-class="fa fa-caret-{{state.data.kpi_data.direction == 'up' ? 'up' : 'down'}}"/>
+                <t t-esc="state.data.kpi_data.percentage"/>%
+                <span class="ms-1 extra-small opacity-75 d-none d-lg-inline"><t t-esc="state.data.kpi_data.comparison_label"/></span>
+            </div>
+            <div class="tile-value">
+                <t t-esc="state.data.value"/>
+            </div>
+            <div class="tile-label">
+                <t t-esc="state.data.name"/>
+            </div>
         </div>
     </div>
 `;

@@ -15,15 +15,19 @@
                         <div class="col">
                             <div class="dashboard-tile dashboard-item-tile d-flex flex-column grid-stack-item cursor-pointer"
                                  t-att-data-type="item.type"
-                                 t-att-data-gs-w="item.w"
-                                 t-att-data-gs-h="item.h">
-                                <div class="dashboard-tile-icon mb-2">
-                                    <img t-attf-src="/multi_dashboard/static/src/icons/{{item.img}}"
-                                         widget="50" height="50"
-                                         class="drag-icon" alt="Icon"/>
-                                </div>
-                                <div class="first-content text-center">
-                                    <span><t t-esc="item.name"/></span>
+                                 t-att-gs-w="item.w"
+                                 t-att-gs-h="item.h"
+                                 t-on-click="() => props.onItemClick(item)">
+                                <!-- GridStack's default draggable handle is '.grid-stack-item-content'. -->
+                                <div class="grid-stack-item-content w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                                    <div class="dashboard-tile-icon mb-2">
+                                        <img t-attf-src="/multi_dashboard/static/src/icons/{{item.img}}"
+                                             widget="50" height="50"
+                                             class="drag-icon" alt="Icon"/>
+                                    </div>
+                                    <div class="first-content text-center">
+                                        <span><t t-esc="item.name"/></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

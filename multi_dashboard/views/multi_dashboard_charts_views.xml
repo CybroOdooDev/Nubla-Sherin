@@ -27,7 +27,7 @@
             </list>
         </field>
     </record>
-
+s
     <!-- Form View -->
     <record id="multi_dashboard_charts_view_form" model="ir.ui.view">
         <field name="name">multi.dashboard.charts.view.form</field>
@@ -84,6 +84,12 @@
                                     <field name="measure_field_id"
                                            required="chart_type == 'tile' and measure_aggregation != 'count'"
                                            invisible="measure_aggregation == 'count'"/>
+                                    <field name="tile_unit_format"/>
+                                    <field name="is_kpi"/>
+                                    <field name="kpi_comparison" invisible="not is_kpi"/>
+                                    <field name="progress_target_static" string="Target Value"
+                                           invisible="not is_kpi or kpi_comparison != 'target'"
+                                           required="is_kpi and kpi_comparison == 'target'"/>
                                 </group>
 
                                 <group string="List Data" invisible="chart_type != 'list'">
@@ -94,9 +100,11 @@
                                     <field name="list_limit"/>
                                     <field name="limit_per_page"/>
                                     <field name="list_row_clickable"/>
+                                    <field name="todo_color" widget="color_picker" string="List Color"/>
                                 </group>
 
-                                <group string="Chart Settings" invisible="chart_type not in ['bar', 'line', 'pie', 'donut', 'funnel', 'pyramid', 'radar', 'scatter', 'stacked', 'radialBar']">
+                                <group string="Chart Settings" invisible="chart_type not in ['bar', 'line', 'pie',
+                                 'donut', 'funnel', 'pyramid', 'radar', 'scatter', 'stacked', 'radialBar']">
                                     <field name="chart_group_field_id" options="{'no_create': True, 'no_open': True}"/>
                                     <field name="chart_group_field_id_type" invisible="1"/>
                                     <field name="chart_date_group_by" widget="radio"
@@ -152,20 +160,22 @@
                             </group>
                         </page>
 
-                        <page string="Design" invisible="chart_type in ['list', 'clock', 'todo', 'progress']">
+                        <page string="Design" invisible="chart_type in ['clock', 'todo', 'progress']">
                             <group>
-                                <group string="Typography" invisible="chart_type != 'tile'">
+                                <group string="Typography" invisible="chart_type != 'tile','list'">
                                     <field name="layout_style" widget="layout_selector"/>
                                     <field name="tile_font_style" widget="font_style_selector"/>
                                     <field name="font_color" widget="color"/>
+                                    <field name="tile_icon" placeholder="e.g. fa-shopping-cart"/>
                                 </group>
                                 <group string="Appearance">
                                     <field name="am_chart_theme" widget="am_chart_theme_widget"
-                                           invisible="chart_type in ['tile', 'todo', 'clock']"/>
+                                           invisible="chart_type in ['tile', 'todo', 'clock' ,'list' ]"/>
                                     <field name="widget_color" widget="gradient_circle"
                                            invisible="chart_type != 'tile'"/>
                                     <field name="todo_color" widget="color_picker"
-                                           invisible="chart_type not in ['bar', 'line', 'pie', 'donut', 'funnel', 'pyramid', 'radar', 'scatter', 'stacked', 'radialBar']"/>
+                                           invisible="chart_type not in ['bar', 'line', 'pie', 'donut', 'funnel',
+                                           'pyramid', 'radar', 'scatter', 'stacked', 'radialBar','list']"/>
                                 </group>
                             </group>
                         </page>

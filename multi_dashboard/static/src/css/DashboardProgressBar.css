@@ -1,24 +1,56 @@
 
-.o_dashboard_progress_card .hover-actions {
-    opacity: 0;
+/* Progress header action icons should match chart widget icons */
+.o_dashboard_progress_card .progress-tools {
     display: flex;
-    transition: opacity 0.2s ease-in-out;
+    align-items: center;
+    gap: 6px;
 }
 
-.o_dashboard_progress_card .hover-actions .hide-btn {
+/* View mode: show only Download + AI Insight on hover (like chart widgets) */
+.o_dashboard_progress_card .progress-tools .chart-tool {
     display: none;
 }
 
-.o_dashboard_progress_card:hover .hover-actions {
-    opacity: 1;
-}
-
-.o_sidebar_active .o_dashboard_progress_card:hover .hide-btn {
-    display: block;
-    align-items: center
-}
-
-.hide-btn i {
+.o_dashboard_progress_card:hover .progress-tools .o-progress-download,
+.o_dashboard_progress_card:hover .progress-tools .o-progress-insight {
     display: flex;
-    align-items: center;
+}
+
+/* Edit mode (sidebar open): show all tools (download/insight/refresh/edit/delete) */
+.o_sidebar_active .o_dashboard_progress_card .progress-tools .chart-tool {
+    display: flex;
+}
+
+/* Compact right-side AI insight panel for Progress Bar widget */
+.o_dashboard_progress_card .progress-ai-insight-side-panel {
+    width: 280px;
+    max-width: 45%;
+    height: fit-content;
+    max-height: 100%;
+    align-self: flex-start;
+    padding: 10px;
+    border-radius: 8px;
+    background: #fff;
+    color: #111827;
+    border: 1px solid rgba(17, 24, 39, 0.12);
+    overflow: auto;
+}
+
+.o_dashboard_progress_card .progress-insight-text {
+    line-height: 1.35;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.o_dashboard_progress_card .o_progress_title {
+    /* Let `.chart-header` drive typography; keep truncation like chart widgets. */
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Keep destructive action obvious in edit mode */
+.o_sidebar_active .o_dashboard_progress_card .progress-tools .o-progress-delete {
+    background: rgba(220, 53, 69, 0.35);
 }

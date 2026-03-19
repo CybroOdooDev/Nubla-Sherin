@@ -4,6 +4,7 @@
     justify-content: center;
     font-weight: bold;
     font-size: medium;
+    cursor: pointer !important;
 }
 
 .dashboard-item-tile::before,

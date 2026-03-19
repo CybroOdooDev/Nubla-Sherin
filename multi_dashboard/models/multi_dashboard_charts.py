@@ -27,6 +27,8 @@ from google import genai
 from google.genai import types
 from itertools import groupby
 from operator import itemgetter
+from datetime import date, datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from odoo import api, fields, models
 from odoo.tools import date_utils
 from odoo.tools.safe_eval import safe_eval
@@ -205,6 +207,23 @@ class MultiDashboardCharts(models.Model):
     font_color = fields.Char('Font Color',
                              default="#000000",
                              help='Font color for the tile widget')
+    tile_icon = fields.Char('Tile Icon', help='FontAwesome class for the tile icon (e.g. fa-users)')
+    tile_unit_format = fields.Selection([
+        ('auto', 'Auto'),
+        ('none', 'None'),
+        ('k', 'Thousands (K)'),
+        ('l', 'Lakhs (L)'),
+        ('m', 'Millions (M)'),
+        ('c', 'Crores (C)'),
+    ], string='Unit Format', default='auto', help='Display values using selected unit.')
+
+    # KPI Configuration
+    is_kpi = fields.Boolean('Show KPI', help='Display a KPI indicator on the tile')
+    kpi_comparison = fields.Selection([
+        ('previous_period', 'Previous Period'),
+        ('previous_year', 'Same Period Last Year'),
+        ('target', 'Target Value'),
+    ], string='Comparison', default='previous_period', help='Compare current data with another period or a target goal')
 
     clock_format = fields.Selection([('12', '12 Hr'), ('24', '24 Hr')],
                                     'Format',
@@ -309,14 +328,79 @@ class MultiDashboardCharts(models.Model):
                     'layout_3': 'tile-layout-corner'
                 }
 
+                # Apply unit formatting
+                display_value = round(value, 2)
+                unit_format = self.tile_unit_format or 'auto'
+
+                if unit_format == 'auto':
+                    if value >= 10000000: # Crores
+                        display_value = f"{round(value / 10000000, 1)}C"
+                    elif value >= 1000000: # Millions
+                        display_value = f"{round(value / 1000000, 1)}M"
+                    elif value >= 100000: # Lakhs
+                        display_value = f"{round(value / 100000, 1)}L"
+                    elif value >= 1000: # Thousands
+                        display_value = f"{round(value / 1000, 1)}K"
+                elif unit_format == 'k':
+                    display_value = f"{round(value / 1000, 1)}K"
+                elif unit_format == 'l':
+                    display_value = f"{round(value / 100000, 1)}L"
+                elif unit_format == 'm':
+                    display_value = f"{round(value / 1000000, 1)}M"
+                elif unit_format == 'c':
+                    display_value = f"{round(value / 10000000, 1)}C"
+
+                kpi_data = False
+                if self.is_kpi:
+                    if self.kpi_comparison == 'target':
+                        target_val = self.progress_target_static or 1.0
+                        percentage = (value / target_val * 100) if target_val > 0 else 0
+                        kpi_data = {
+                            'percentage': round(percentage, 1),
+                            'direction': 'up' if percentage >= 100 else 'down',
+                            'comparison_label': 'of Target'
+                        }
+                    elif date_filter:
+                        prev_domain = self._get_previous_period_domain(date_filter)
+                        if prev_domain:
+                            full_prev_domain = safe_eval(self.filter) if self.filter else []
+                            full_prev_domain += prev_domain
+                            prev_records = model.search(full_prev_domain)
+                            
+                            if self.measure_aggregation == 'count':
+                                prev_value = len(prev_records)
+                            elif self.measure_aggregation in ['sum', 'avg']:
+                                prev_values = prev_records.mapped(field_name)
+                                if self.measure_aggregation == 'sum':
+                                    prev_value = sum(prev_values) if prev_values else 0
+                                else:
+                                    prev_value = sum(prev_values) / len(prev_values) if prev_values else 0
+                            else:
+                                prev_value = 0
+
+                            if prev_value > 0:
+                                percentage = ((value - prev_value) / prev_value) * 100
+                            elif value > 0:
+                                percentage = 100
+                            else:
+                                percentage = 0
+                            
+                            kpi_data = {
+                                'percentage': round(abs(percentage), 1),
+                                'direction': 'up' if percentage >= 0 else 'down',
+                                'comparison_label': 'vs Prev. Period' if self.kpi_comparison == 'previous_period' else 'vs Last Year'
+                            }
+
                 return {
                     'id': self.id,
                     'name': self.name,
-                    'value': round(value, 2),
+                    'value': display_value,
                     'widget_color': self.widget_color or 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     'layout_style': layout_map.get(self.layout_style, 'tile-layout-center'),
                     'tile_font_style': self.tile_font_style or 'tile-style-modern',
                     'font_color': self.font_color or '#ffffff',
+                    'tile_icon': self.tile_icon,
+                    'kpi_data': kpi_data,
                 }
 
             elif self.chart_type == 'todo':
@@ -420,6 +504,60 @@ class MultiDashboardCharts(models.Model):
             self.id, self.name, field_name, date_filter.get('label'), date_domain
         )
         return date_domain
+
+    def _get_previous_period_domain(self, date_filter=None):
+        """Calculate the domain for the previous period for KPI comparison."""
+        self.ensure_one()
+        if not date_filter or not isinstance(date_filter, dict):
+            return []
+
+        start_date_str = date_filter.get('start_date')
+        end_date_str = date_filter.get('end_date')
+        if not start_date_str or not end_date_str:
+            return []
+
+        try:
+            start_date = fields.Date.from_string(start_date_str)
+            end_date = fields.Date.from_string(end_date_str)
+            
+            if self.kpi_comparison == 'previous_period':
+                duration = (end_date - start_date).days + 1
+                prev_start = start_date - relativedelta(days=duration)
+                prev_end = start_date - relativedelta(days=1)
+            elif self.kpi_comparison == 'previous_year':
+                prev_start = start_date - relativedelta(years=1)
+                prev_end = end_date - relativedelta(years=1)
+            else:
+                return []
+
+            date_field = self.filter_date_field_id
+            if not date_field and self.model_id:
+                fallback_names = ['date', 'date_order', 'invoice_date', 'create_date']
+                for name in fallback_names:
+                    found = self.env['ir.model.fields'].search([
+                        ('model_id', '=', self.model_id.id),
+                        ('name', '=', name),
+                        ('ttype', 'in', ('date', 'datetime'))
+                    ], limit=1)
+                    if found:
+                        date_field = found
+                        break
+
+            if not date_field:
+                return []
+
+            field_name = date_field.name
+            prev_domain = []
+            prev_domain.append((field_name, '>=', fields.Date.to_string(prev_start)))
+            if date_field.ttype == 'datetime':
+                prev_domain.append((field_name, '<=', f"{fields.Date.to_string(prev_end)} 23:59:59"))
+            else:
+                prev_domain.append((field_name, '<=', fields.Date.to_string(prev_end)))
+            
+            return prev_domain
+        except Exception as e:
+            _logger.error("Error calculating previous period domain: %s", e)
+            return []
 
     def action_open_filtered_records(self, date_filter=None, extra_domain=None):
         """Open the widget records using the same domain as the dashboard tile."""
@@ -985,6 +1123,8 @@ class MultiDashboardCharts(models.Model):
             'name': self.name,
             'has_sub_group': bool(sub_group_field),
             'groupField': self.chart_group_field_id.name,
+            'groupFieldType': self.chart_group_field_id.ttype,
+            'date_granularity': self.chart_date_group_by if self.chart_group_field_id.ttype in ['date', 'datetime'] else False,
             'groupFieldLabel': self.chart_group_field_id.field_description,
         }
 
@@ -1217,6 +1357,8 @@ class MultiDashboardCharts(models.Model):
             'clock_format': config.get('clock_format', '24'),
             'progress_target_static': config.get('progress_target_static'),
             'chart_date_group_by': config.get('chart_date_group_by'),
+            'tile_icon': config.get('tile_icon'),
+            'tile_unit_format': config.get('tile_unit_format', 'auto'),
         }
 
         # Remove None values
@@ -1291,6 +1433,8 @@ class MultiDashboardCharts(models.Model):
                 'gs_y': chart.gs_y,
                 'gs_w': chart.gs_w,
                 'gs_h': chart.gs_h,
+                'is_kpi': chart.is_kpi,
+                'kpi_comparison': chart.kpi_comparison,
             }
             chart_data_list.append(config)
         return {

@@ -1,11 +1,26 @@
 /** @odoo-module */
 import { Component, onMounted, onWillUnmount, useRef, useEffect, xml, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { deserializeDate, serializeDate } from "@web/core/l10n/dates";
 
 const COLORS = [
     "#ffffff", "#ff9c9c", "#f7c698", "#fde388", "#bbd7f8", "#d9a8cc",
     "#f8d6c8", "#89e1db", "#97a6f9", "#ff9ecc", "#b7edbe", "#e6dbfc"
 ];
+
+function getOnAccentColor(hexColor) {
+    // hexColor is expected to be "#rrggbb" from COLORS.
+    const hex = (hexColor || "").trim().replace("#", "");
+    if (hex.length !== 6) {
+        return "#111827";
+    }
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    // Relative luminance approximation good enough for picking white/black.
+    const l = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    return l > 0.65 ? "#111827" : "#ffffff";
+}
 
 const THEME_PALETTES = {
     'kelly': ["#F2F3F4", "#222222", "#F3C300", "#875692", "#F38400", "#A1CAF1", "#BE0032", "#C2B280", "#848482", "#008856", "#E68FAC", "#0067A5", "#F99379", "#604E97", "#F6A600", "#B3446C", "#DCD300", "#882D17", "#8DB600", "#654522", "#E25822", "#2B3D26"],
@@ -30,6 +45,8 @@ export class DashboardChart extends Component {
         filter: { type: Object, optional: true },
         modelName: { type: String, optional: true },
         groupField: { type: String, optional: true },
+        groupFieldType: { type: String, optional: true },
+        dateGranularity: { type: [String, Boolean], optional: true },
         subGroupField: { type: String, optional: true },
         isPreview: { type: Boolean, optional: true }
     };
@@ -139,6 +156,10 @@ export class DashboardChart extends Component {
         return COLORS[index] || COLORS[0];
     }
 
+    get onAccentColor() {
+        return getOnAccentColor(this.accentColor);
+    }
+
     // Method to handle deletion of the chart record.
     onDelete() {
         const chartId = this.props.id;
@@ -224,10 +245,40 @@ export class DashboardChart extends Component {
         }
 
         // Build the extra domain for drill-down
-        // Handle both ID-based filtering and string-based fallbacks for "Undefined"
-        const extraDomain = (categoryValue === "Undefined" || categoryValue === false)
-            ? [[groupField, '=', false]]
-            : [[groupField, '=', categoryValue]];
+        let extraDomain;
+        const isDate = this.props.groupFieldType === 'date' || this.props.groupFieldType === 'datetime';
+        const granularity = this.props.dateGranularity;
+
+        if (isDate && granularity && categoryValue && categoryValue !== "Undefined") {
+            const startDate = deserializeDate(categoryValue);
+            let endDate;
+
+            if (granularity === 'day') {
+                endDate = startDate.plus({ days: 1 });
+            } else if (granularity === 'week') {
+                endDate = startDate.plus({ weeks: 1 });
+            } else if (granularity === 'month') {
+                endDate = startDate.plus({ months: 1 });
+            } else if (granularity === 'quarter') {
+                endDate = startDate.plus({ months: 3 });
+            } else if (granularity === 'year') {
+                endDate = startDate.plus({ years: 1 });
+            }
+
+            if (endDate) {
+                extraDomain = [
+                    [groupField, '>=', serializeDate(startDate)],
+                    [groupField, '<', serializeDate(endDate)]
+                ];
+            } else {
+                extraDomain = [[groupField, '=', categoryValue]];
+            }
+        } else {
+            // Handle both ID-based filtering and string-based fallbacks for "Undefined"
+            extraDomain = (categoryValue === "Undefined" || categoryValue === false)
+                ? [[groupField, '=', false]]
+                : [[groupField, '=', categoryValue]];
+        }
 
         try {
             const action = await this.orm.call(
@@ -1074,7 +1125,7 @@ export class DashboardChart extends Component {
 
 DashboardChart.template = xml`
     <div class="o_dashboard_chart_container"
-         t-attf-style="--widget-accent: {{ this.accentColor }};">
+         t-attf-style="--widget-accent: {{ this.accentColor }}; --widget-on-accent: {{ this.onAccentColor }};">
 
         <div class="chart-header d-flex justify-content-between align-items-center">
             <t t-esc="props.name || 'Untitled Chart'"/>

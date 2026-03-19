@@ -152,6 +152,7 @@
     background-color: color-mix(in srgb, var(--widget-accent, var(--widget-header-bg)), white 20%);
     padding: 5px;
     border-radius: 5px;
+    /* Heading text follows the selected dashboard theme (green/blue/purple/etc). */
     color: var(--widget-header-color);
 }
 
@@ -595,6 +596,7 @@
    ========================================================================= */
 
 @media (max-width: 991.98px) {
+
     /* Reduce large desktop padding and avoid horizontal scrolling on small screens */
     .o_multi_dashboard_container .grid-scrollbar {
         padding: 1rem !important;
@@ -603,13 +605,14 @@
 }
 
 @media (max-width: 767.98px) {
+
     /* Top action bar: allow wrapping instead of overflowing */
-    .o_multi_dashboard_container .o_dashboard_main > .p-2.border-bottom.border-top {
+    .o_multi_dashboard_container .o_dashboard_main>.p-2.border-bottom.border-top {
         flex-wrap: wrap;
         gap: 0.5rem;
     }
 
-    .o_multi_dashboard_container .o_dashboard_main > .p-2.border-bottom.border-top .ms-auto {
+    .o_multi_dashboard_container .o_dashboard_main>.p-2.border-bottom.border-top .ms-auto {
         width: 100%;
         justify-content: flex-start;
         flex-wrap: wrap;
@@ -633,6 +636,7 @@
 }
 
 @media (max-width: 575.98px) {
+
     /* Off-canvas sidebar on mobile: keep main content full width */
     .o_multi_dashboard_container .o_dashboard_sidebar {
         position: absolute !important;
@@ -640,13 +644,13 @@
         left: 0;
         bottom: 0;
         height: 100%;
-        z-index: 1100;
+        z-index: 1040;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
     }
 
     .o_multi_dashboard_container.o_sidebar_active .o_dashboard_sidebar {
-        width: min(85vw, 320px) !important;
-        min-width: min(85vw, 320px) !important;
+        width: min(75vw, 300px) !important;
+        min-width: min(75vw, 300px) !important;
     }
 
     .o_multi_dashboard_container .sidebar-resize-handle {
@@ -655,13 +659,17 @@
 
     .o_multi_dashboard_container .o_dashboard_main {
         width: 100%;
+        /* Ensure main content is below backdrop */
+        z-index: 1000;
     }
 
     .o_multi_dashboard_container .o_dashboard_sidebar_backdrop {
         position: absolute;
         inset: 0;
-        z-index: 1050;
-        background: rgba(15, 23, 42, 0.25);
-        backdrop-filter: blur(1px);
+        z-index: 1030;
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(2px);
+        pointer-events: auto;
+        cursor: pointer;
     }
 }

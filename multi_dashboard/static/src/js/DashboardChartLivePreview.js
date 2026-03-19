@@ -69,6 +69,8 @@ export class DashboardChartLivePreview extends Component {
 
                 this.props.record.data.progress_target_static,
                 this.props.record.data.chart_date_group_by,
+                this.props.record.data.tile_icon,
+                this.props.record.data.tile_unit_format,
             ]
         );
     }
@@ -144,6 +146,8 @@ export class DashboardChartLivePreview extends Component {
                 layout_style: recordData.layout_style,
                 tile_font_style: recordData.tile_font_style,
                 font_color: recordData.font_color,
+                tile_icon: recordData.tile_icon,
+                tile_unit_format: recordData.tile_unit_format,
 
                 // To-Do
                 todo_ids: todoCommands,
