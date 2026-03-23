@@ -171,6 +171,7 @@ s
                                 <group string="Appearance">
                                     <field name="am_chart_theme" widget="am_chart_theme_widget"
                                            invisible="chart_type in ['tile', 'todo', 'clock' ,'list' ]"/>
+                                    <field name="use_background_gradient"/>
                                     <field name="widget_color" widget="gradient_circle"
                                            invisible="chart_type != 'tile'"/>
                                     <field name="todo_color" widget="color_picker"

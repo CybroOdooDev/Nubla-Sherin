@@ -7,6 +7,20 @@ const COLORS = [
     "#ffffff", "#ff9c9c", "#f7c698", "#fde388", "#bbd7f8", "#d9a8cc",
     "#f8d6c8", "#89e1db", "#97a6f9", "#ff9ecc", "#b7edbe", "#e6dbfc"
 ];
+const GRADIENTS = [
+    "linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%)",
+    "linear-gradient(135deg, #ff9c9c 0%, #ee5253 100%)",
+    "linear-gradient(135deg, #f7c698 0%, #ff9f43 100%)",
+    "linear-gradient(135deg, #fde388 0%, #feca57 100%)",
+    "linear-gradient(135deg, #bbd7f8 0%, #54a0ff 100%)",
+    "linear-gradient(135deg, #d9a8cc 0%, #9b59b6 100%)",
+    "linear-gradient(135deg, #f8d6c8 0%, #ff9f43 100%)",
+    "linear-gradient(135deg, #89e1db 0%, #00d2d3 100%)",
+    "linear-gradient(135deg, #97a6f9 0%, #5d6df0 100%)",
+    "linear-gradient(135deg, #ff9ecc 0%, #e91e63 100%)",
+    "linear-gradient(135deg, #b7edbe 0%, #10ac84 100%)",
+    "linear-gradient(135deg, #e6dbfc 0%, #5f27cd 100%)"
+];
 
 function getOnAccentColor(hexColor) {
     // hexColor is expected to be "#rrggbb" from COLORS.
@@ -48,7 +62,8 @@ export class DashboardChart extends Component {
         groupFieldType: { type: String, optional: true },
         dateGranularity: { type: [String, Boolean], optional: true },
         subGroupField: { type: String, optional: true },
-        isPreview: { type: Boolean, optional: true }
+        isPreview: { type: Boolean, optional: true },
+        useBackgroundGradient: { type: Boolean, optional: true }
     };
 
     setup() {
@@ -153,11 +168,19 @@ export class DashboardChart extends Component {
     // Simple method to get accent color based on the provided index, defaults to first color if index is out of range or not provided.
     get accentColor() {
         const index = this.props.color || 0;
-        return COLORS[index] || COLORS[0];
+        return index === 0 ? null : (COLORS[index] || COLORS[0]);
     }
 
     get onAccentColor() {
         return getOnAccentColor(this.accentColor);
+    }
+
+    get backgroundStyle() {
+        const index = this.props.color || 0;
+        if (this.props.useBackgroundGradient) {
+            return (GRADIENTS[index] || GRADIENTS[0]);
+        }
+        return (COLORS[index] || COLORS[0]);
     }
 
     // Method to handle deletion of the chart record.
@@ -422,7 +445,6 @@ export class DashboardChart extends Component {
     async generateXLSXReport() {
         try {
             // 1. Get the data from the chart
-            // In amCharts 5, data is usually held in the series or the main chart data object
             const chartData = this.props.data;
 
             if (!chartData || chartData.length === 0) {
@@ -430,7 +452,19 @@ export class DashboardChart extends Component {
                 return;
             }
 
-            const worksheet = window.XLSX.utils.json_to_sheet(chartData);
+            // Create a worksheet starting with the heading
+            const heading = [[this.props.name || "Chart Data"]];
+            const worksheet = window.XLSX.utils.aoa_to_sheet(heading);
+
+            // Add the JSON data starting at row 2 (A2)
+            window.XLSX.utils.sheet_add_json(worksheet, chartData, { origin: "A2" });
+
+            // Optional: Merge the heading cells across the width of the data if columns exist
+            const columns = Object.keys(chartData[0]);
+            if (columns.length > 1) {
+                if (!worksheet['!merges']) worksheet['!merges'] = [];
+                worksheet['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: columns.length - 1 } });
+            }
 
             const workbook = window.XLSX.utils.book_new();
             window.XLSX.utils.book_append_sheet(workbook, worksheet, "Chart Data");
@@ -1125,7 +1159,7 @@ export class DashboardChart extends Component {
 
 DashboardChart.template = xml`
     <div class="o_dashboard_chart_container"
-         t-attf-style="--widget-accent: {{ this.accentColor }}; --widget-on-accent: {{ this.onAccentColor }};">
+         t-attf-style="background: {{ this.backgroundStyle }}; {{ this.accentColor ? '--widget-accent: ' + this.accentColor + '; --widget-on-accent: ' + this.onAccentColor + ';' : '' }}">
 
         <div class="chart-header d-flex justify-content-between align-items-center">
             <t t-esc="props.name || 'Untitled Chart'"/>
@@ -1163,8 +1197,8 @@ DashboardChart.template = xml`
 
             <div t-if="state.aiInsight" class="chart-ai-insight-side-panel shadow-sm animate__animated animate__slideInRight flex-shrink-0">
                 <div class="d-flex align-items-center mb-2 p-3 pb-0">
-                    <i class="fa fa-magic text-primary me-2"/>
-                    <span class="fw-bold text-primary small">AI Chart Insight</span>
+                    <i class="fa fa-magic me-2"/>
+                    <span class="fw-bold small">AI Chart Insight</span>
                     <button class="btn-close ms-auto shadow-none small" style="transform: scale(0.8);" t-on-click="() => state.aiInsight = null"/>
                 </div>
                 <div class="insight-text p-3 pt-2 small">

@@ -71,6 +71,7 @@ export class DashboardChartLivePreview extends Component {
                 this.props.record.data.chart_date_group_by,
                 this.props.record.data.tile_icon,
                 this.props.record.data.tile_unit_format,
+                this.props.record.data.use_background_gradient,
             ]
         );
     }
@@ -174,6 +175,7 @@ export class DashboardChartLivePreview extends Component {
                 am_chart_theme: recordData.am_chart_theme,
                 tz: recordData.tz,
                 clock_format: recordData.clock_format,
+                use_background_gradient: recordData.use_background_gradient,
             };
             if (!config.chart_type) {
                 this.state.chartData = [];

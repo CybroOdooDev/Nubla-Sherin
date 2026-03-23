@@ -6,6 +6,20 @@ const COLORS = [
     "#ffffff", "#ff9c9c", "#f7c698", "#fde388", "#bbd7f8", "#d9a8cc",
     "#f8d6c8", "#89e1db", "#97a6f9", "#ff9ecc", "#b7edbe", "#e6dbfc"
 ];
+const GRADIENTS = [
+    "linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%)",
+    "linear-gradient(135deg, #ff9c9c 0%, #ee5253 100%)",
+    "linear-gradient(135deg, #f7c698 0%, #ff9f43 100%)",
+    "linear-gradient(135deg, #fde388 0%, #feca57 100%)",
+    "linear-gradient(135deg, #bbd7f8 0%, #54a0ff 100%)",
+    "linear-gradient(135deg, #d9a8cc 0%, #9b59b6 100%)",
+    "linear-gradient(135deg, #f8d6c8 0%, #ff9f43 100%)",
+    "linear-gradient(135deg, #89e1db 0%, #00d2d3 100%)",
+    "linear-gradient(135deg, #97a6f9 0%, #5d6df0 100%)",
+    "linear-gradient(135deg, #ff9ecc 0%, #e91e63 100%)",
+    "linear-gradient(135deg, #b7edbe 0%, #10ac84 100%)",
+    "linear-gradient(135deg, #e6dbfc 0%, #5f27cd 100%)"
+];
 
 /* DashboardClock component: An analog clock with digital time and date
     display, plus edit/delete options. */
@@ -73,6 +87,14 @@ export class DashboardClock extends Component {
     get accentColor() {
         const index = this.props.data.todo_color || 0;
         return COLORS[index] || COLORS[0];
+    }
+
+    get backgroundStyle() {
+        const index = this.props.data.todo_color || 0;
+        if (this.props.data.use_background_gradient) {
+            return (GRADIENTS[index] || GRADIENTS[0]);
+        }
+        return 'var(--widget-bg)';
     }
 
     // Update clock angles and digital time/date every second
@@ -202,7 +224,7 @@ export class DashboardClock extends Component {
 
 DashboardClock.template = xml`
     <div class="clock-widget d-flex flex-column align-items-center justify-content-center h-100 shadow-sm rounded p-2"
-         t-attf-style="--widget-accent: {{ this.accentColor }};">
+         t-attf-style="background: {{ this.backgroundStyle }}; --widget-accent: {{ this.accentColor }};">
 
          <div class="clock-tools-overlay">
             <button class="btn-edit-clock" t-on-click="onEdit">

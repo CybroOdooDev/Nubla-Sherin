@@ -6,6 +6,20 @@ const COLORS = [
     "#ffffff", "#ff9c9c", "#f7c698", "#fde388", "#bbd7f8", "#d9a8cc",
     "#f8d6c8", "#89e1db", "#97a6f9", "#ff9ecc", "#b7edbe", "#e6dbfc"
 ];
+const GRADIENTS = [
+    "linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%)",
+    "linear-gradient(135deg, #ff9c9c 0%, #ee5253 100%)",
+    "linear-gradient(135deg, #f7c698 0%, #ff9f43 100%)",
+    "linear-gradient(135deg, #fde388 0%, #feca57 100%)",
+    "linear-gradient(135deg, #bbd7f8 0%, #54a0ff 100%)",
+    "linear-gradient(135deg, #d9a8cc 0%, #9b59b6 100%)",
+    "linear-gradient(135deg, #f8d6c8 0%, #ff9f43 100%)",
+    "linear-gradient(135deg, #89e1db 0%, #00d2d3 100%)",
+    "linear-gradient(135deg, #97a6f9 0%, #5d6df0 100%)",
+    "linear-gradient(135deg, #ff9ecc 0%, #e91e63 100%)",
+    "linear-gradient(135deg, #b7edbe 0%, #10ac84 100%)",
+    "linear-gradient(135deg, #e6dbfc 0%, #5f27cd 100%)"
+];
 
 const colorClass = [
     "class0", "class1", "class2", "class3", "class4", "class5",
@@ -38,6 +52,14 @@ export class DashboardTodoWidget extends Component {
     get colorClass() {
         const index = this.props.data.todo_color || 0;
         return colorClass[index] || colorClass[0];
+    }
+
+    get backgroundStyle() {
+        const index = this.props.data.todo_color || 0;
+        if (this.props.data.use_background_gradient) {
+            return (GRADIENTS[index] || GRADIENTS[0]);
+        }
+        return '';
     }
 
     // Toggle the visibility of the input field for adding new tasks
@@ -231,7 +253,8 @@ export class DashboardTodoWidget extends Component {
 }
 
 DashboardTodoWidget.template = xml`
-    <div t-attf-class="todo-widget-card h-100 overflow-hidden {{ colorClass }}">
+    <div t-attf-class="todo-widget-card h-100 overflow-hidden {{ colorClass }}"
+         t-attf-style="{{ this.backgroundStyle ? 'background: ' + this.backgroundStyle + ';' : '' }}">
         <div class="todo-header">
             <div class="d-flex align-items-center">
                 <span class="todo-title me-2"><t t-esc="props.data.name"/></span>

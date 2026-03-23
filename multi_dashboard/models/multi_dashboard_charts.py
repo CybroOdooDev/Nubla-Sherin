@@ -249,6 +249,8 @@ class MultiDashboardCharts(models.Model):
 
     widget_preview = fields.Char('Preview',
                                  help='Preview of the widget configuration.')
+    use_background_gradient = fields.Boolean('Use Background Gradient', default=False,
+                                             help='Apply a linear gradient background to the widget.')
 
     @api.depends('model_id', 'list_field_ids')
     def _compute_available_sort_fields(self):
@@ -298,6 +300,7 @@ class MultiDashboardCharts(models.Model):
                     'todo_color': self.todo_color,
                     'tz': self.tz,
                     'clock_format': self.clock_format,
+                    'use_background_gradient': self.use_background_gradient,
                 }
             elif self.chart_type == 'tile':
                 domain = safe_eval(self.filter) if self.filter else []
@@ -401,6 +404,7 @@ class MultiDashboardCharts(models.Model):
                     'font_color': self.font_color or '#ffffff',
                     'tile_icon': self.tile_icon,
                     'kpi_data': kpi_data,
+                    'use_background_gradient': self.use_background_gradient,
                 }
 
             elif self.chart_type == 'todo':
@@ -409,6 +413,7 @@ class MultiDashboardCharts(models.Model):
                     'name': self.name,
                     'todo_color': self.todo_color,
                     'chart_type': self.chart_type,
+                    'use_background_gradient': self.use_background_gradient,
                     'todos': [{
                         'id': t.id,
                         'name': t.name,
@@ -448,6 +453,7 @@ class MultiDashboardCharts(models.Model):
                     'percentage': min(round(percentage, 2), 100),
                     'chart_type': 'progress',
                     'todo_color': self.todo_color,
+                    'use_background_gradient': self.use_background_gradient,
                 }
             elif self.chart_type == 'list':
                 return self._get_list_view_data(date_domain)
@@ -558,6 +564,14 @@ class MultiDashboardCharts(models.Model):
         except Exception as e:
             _logger.error("Error calculating previous period domain: %s", e)
             return []
+
+    @api.model
+    def action_clear_dashboard(self, dashboard_id):
+        """Delete all widgets for a specific dashboard."""
+        widgets = self.search([('dashboard_id', '=', dashboard_id)])
+        if widgets:
+            widgets.unlink()
+        return True
 
     def action_open_filtered_records(self, date_filter=None, extra_domain=None):
         """Open the widget records using the same domain as the dashboard tile."""
@@ -1304,6 +1318,8 @@ class MultiDashboardCharts(models.Model):
                 'total_count': len(records),
                 'limit_per_page': self.limit_per_page,
                 'is_grouped': is_grouped,
+                'todo_color': self.todo_color,
+                'use_background_gradient': self.use_background_gradient,
             }
 
         except Exception as e:
@@ -1340,6 +1356,7 @@ class MultiDashboardCharts(models.Model):
             'font_color': config.get('font_color'),
             'todo_ids': config.get('todo_ids', []),
             'todo_color': config.get('todo_color', 4),
+            'use_background_gradient': config.get('use_background_gradient', False),
             'list_field_ids': config.get('list_field_ids', []),
             'list_group_field_id': config.get('list_group_field_id'),
             'list_sort_field_id': config.get('list_sort_field_id'),
@@ -1435,6 +1452,7 @@ class MultiDashboardCharts(models.Model):
                 'gs_h': chart.gs_h,
                 'is_kpi': chart.is_kpi,
                 'kpi_comparison': chart.kpi_comparison,
+                'use_background_gradient': chart.use_background_gradient,
             }
             chart_data_list.append(config)
         return {

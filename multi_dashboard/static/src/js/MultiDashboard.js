@@ -7,12 +7,14 @@ import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 import { DashboardTileWidget } from "./DashboardTileWidget";
 import { DashboardSidebar } from "./DashboardSidebar";
+import { DashboardChat } from "./DashboardChat";
 import { DashboardListWidget } from "./DashboardListWidget";
 import { DashboardTodoWidget } from "./DashboardTodoWidget";
 import { DashboardChart } from "./DashboardChart";
 import { DashboardClock } from "./DashboardClock";
 import { DashboardProgressBar } from "./DashboardProgressBar";
 import { Component, useState, useRef, onWillStart, onMounted, onWillUnmount, onWillUpdateProps, mount, markup } from "@odoo/owl";
+import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 
 
 /* MultiDashboard Client Action
@@ -586,6 +588,18 @@ export class MultiDashboard extends Component {
                 props: { widget, data, onRefresh, onDelete },
                 env: this.env,
             });
+        } else if (widget.chart_type === 'chat') {
+            comp = await mount(DashboardChat, targetEl, {
+                props: {
+                    id: widget.id,
+                    name: widget.name,
+                    data: data,
+                    onRefresh,
+                    onDelete,
+                    isManager: this.state.isManager,
+                },
+                env: this.env,
+            });
         } else {
             comp = await mount(DashboardChart, targetEl, {
                 props: {
@@ -606,6 +620,7 @@ export class MultiDashboard extends Component {
                     groupFieldType: data.groupFieldType,
                     dateGranularity: data.date_granularity,
                     filter: this.state.dateFilter,
+                    useBackgroundGradient: widget.use_background_gradient,
                 },
                 env: this.env,
             });
@@ -699,6 +714,13 @@ export class MultiDashboard extends Component {
             this.notification.add("Access Denied: Only managers can edit layouts.", { type: "danger" });
             return;
         }
+
+        // On desktop (>= 992px), we force drag-and-drop.
+        // Clicking is only for mobile/tablet where dragging is difficult.
+        if (window.innerWidth >= 992) {
+            return;
+        }
+
         // Hide sidebar on mobile/tablet so the configuration form is visible
         if (window.innerWidth < 992) {
             this.state.sidebarVisible = false;
@@ -1142,6 +1164,38 @@ export class MultiDashboard extends Component {
         return 'Custom Range';
     }
 
+    /**
+     * Clear all widgets from the dashboard after confirmation.
+     */
+    async clearDashboard() {
+        if (!this.state.isManager) {
+            this.notification.add("Access Denied: Only managers can edit layouts.", { type: "danger" });
+            return;
+        }
+
+        const confirmed = await new Promise((resolve) => {
+            this.env.services.dialog.add(ConfirmationDialog, {
+                body: "Are you sure you want to clear all widgets from this dashboard? This action cannot be undone.",
+                confirm: () => resolve(true),
+                cancel: () => resolve(false),
+            });
+        });
+
+        if (!confirmed) return;
+
+        try {
+            this.state.loading = true; // Use state.loading instead of this.isLoading for UI feedback
+            await this.orm.call("multi.dashboard.charts", "action_clear_dashboard", [this.state.dashboardId]);
+            await this.loadWidgets();
+            this.state.loading = false;
+            this.notification.add("Dashboard cleared successfully.", { type: "success" });
+        } catch (error) {
+            console.error("Failed to clear dashboard:", error);
+            this.state.loading = false;
+            this.notification.add("An error occurred while clearing the dashboard.", { type: "danger" });
+        }
+    }
+
     closeDateFilterDropdown() {
         const { button, dropdown, menu } = this.getDateFilterDropdownElements();
         if (!button || !menu) {
@@ -1197,6 +1251,16 @@ export class MultiDashboard extends Component {
     }
 }
 
-MultiDashboard.components = { DashboardSidebar, DateTimeInput };
+MultiDashboard.components = {
+    DashboardSidebar,
+    DashboardChat,
+    DashboardChart,
+    DashboardTileWidget,
+    DashboardListWidget,
+    DashboardTodoWidget,
+    DashboardClock,
+    DashboardProgressBar,
+    DateTimeInput
+};
 MultiDashboard.template = "owl.MultiDashboard"
 registry.category("actions").add("MultiDashboardClientAction", MultiDashboard)

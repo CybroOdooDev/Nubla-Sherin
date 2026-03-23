@@ -551,3 +551,103 @@ class MultiDashboards(models.Model):
             if "429" in error_msg:
                 error_msg = "API Quota Exceeded. Please wait a minute and try again."
             return {'success': False, 'error': f'AI Summarization Failed ({model_name}): {error_msg}'}
+    @api.model
+    def action_chat_with_dashboard(self, dashboard_id, query, chat_history=None, date_filter=None):
+        """
+        Context-aware AI Chat for the dashboard.
+        Answers questions based on the provided dashboard data.
+        """
+        dashboard = self.browse(dashboard_id)
+        if not dashboard.exists():
+            return {'success': False, 'error': 'Dashboard not found'}
+
+        api_key = self.env['ir.config_parameter'].sudo().get_param('multi_dashboard.gemini_api_key')
+        if not api_key:
+            return {'success': False, 'error': 'Gemini API Key is not configured.'}
+
+        # 1. Gather Context (Dashboard Data)
+        charts = dashboard.chart_ids
+        dashboard_context = []
+        for chart in charts:
+            try:
+                widget_data = chart.get_widget_value(date_filter=date_filter)
+                simplified = {
+                    'name': chart.name,
+                    'type': chart.chart_type,
+                    'model': chart.model_id.name,
+                }
+                if chart.chart_type in ['tile', 'progress']:
+                    simplified['value'] = widget_data.get('value', 0)
+                elif chart.chart_type == 'list':
+                    simplified['data'] = widget_data.get('records', [])[:10]
+                else:
+                    simplified['data'] = widget_data.get('data', [])
+                dashboard_context.append(simplified)
+            except Exception:
+                continue
+
+        # 2. Prepare AI Client
+        client = genai.Client(api_key=api_key)
+
+        # Dynamic model selection to avoid 404 errors
+        model_name = 'gemini-1.5-flash'
+        try:
+            available_models = [m.name for m in client.models.list()]
+            flash_models = [m for m in available_models if 'flash' in m.lower()]
+            pro_models = [m for m in available_models if 'pro' in m.lower()]
+            
+            if flash_models:
+                model_name = flash_models[0].replace('models/', '')
+            elif pro_models:
+                model_name = pro_models[0].replace('models/', '')
+        except Exception:
+            pass
+        
+        # 3. Construct System Prompt
+        system_instruction = f"""
+        You are the "Multi Dashboard AI Assistant", a professional business analyst bot for Odoo.
+        You have access to the data of the current dashboard named "{dashboard.name}".
+        
+        Dashboard Context (JSON):
+        {json.dumps(dashboard_context, indent=2, default=str)}
+        
+        Your Goal:
+        - Answer user questions accurately based on the PROVIDED DATA.
+        - If the user asks for "top 5" or "top X", find the relevant chart or list in the context and extract the information.
+        - If the user asks "Why sales dropped?", analyze the trends in the provided data.
+        - Be concise, professional, and helpful.
+        - Format your response using clean Markdown.
+        - If the data is not available in the context, politely inform the user.
+        """
+
+        # 4. Prepare History
+        contents = []
+        if chat_history:
+            for msg in chat_history:
+                role = "user" if msg['role'] == 'user' else "model"
+                contents.append({
+                    "role": role,
+                    "parts": [{"text": msg['content']}]
+                })
+        
+        # Add the current user query
+        contents.append({
+            "role": "user",
+            "parts": [{"text": query}]
+        })
+
+        # 5. Generate Response
+        try:
+            response = client.models.generate_content(
+                model=model_name,
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_instruction
+                )
+            )
+            return {
+                'success': True,
+                'response': response.text
+            }
+        except Exception as e:
+            return {'success': False, 'error': f'AI Chat Failed: {str(e)}'}

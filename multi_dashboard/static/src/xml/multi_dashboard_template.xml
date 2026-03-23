@@ -273,6 +273,12 @@
                              title="Compact View">
                             <i class="fa fa-window-restore"/>
                         </div>
+                        <div class="import-chart bg-danger text-white border-0"
+                             t-if="state.sidebarVisible"
+                             t-on-click="clearDashboard"
+                             title="Clear Dashboard">
+                            <i class="fa fa-trash-o"/>
+                        </div>
                     </div>
                 </div>
 
@@ -332,6 +338,7 @@
 
                     </div>
                 </div>
+                <DashboardChat dashboardId="dashboardId" dateFilter="state.dateFilter"/>
             </div>
         </div>
     </t>

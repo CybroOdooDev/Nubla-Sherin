@@ -6,6 +6,20 @@ const COLORS = [
     "#ffffff", "#ff9c9c", "#f7c698", "#fde388", "#bbd7f8", "#d9a8cc",
     "#f8d6c8", "#89e1db", "#97a6f9", "#ff9ecc", "#b7edbe", "#e6dbfc"
 ];
+const GRADIENTS = [
+    "linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%)",
+    "linear-gradient(135deg, #ff9c9c 0%, #ee5253 100%)",
+    "linear-gradient(135deg, #f7c698 0%, #ff9f43 100%)",
+    "linear-gradient(135deg, #fde388 0%, #feca57 100%)",
+    "linear-gradient(135deg, #bbd7f8 0%, #54a0ff 100%)",
+    "linear-gradient(135deg, #d9a8cc 0%, #9b59b6 100%)",
+    "linear-gradient(135deg, #f8d6c8 0%, #ff9f43 100%)",
+    "linear-gradient(135deg, #89e1db 0%, #00d2d3 100%)",
+    "linear-gradient(135deg, #97a6f9 0%, #5d6df0 100%)",
+    "linear-gradient(135deg, #ff9ecc 0%, #e91e63 100%)",
+    "linear-gradient(135deg, #b7edbe 0%, #10ac84 100%)",
+    "linear-gradient(135deg, #e6dbfc 0%, #5f27cd 100%)"
+];
 
 function getOnAccentColor(hexColor) {
     const hex = (hexColor || "").trim().replace("#", "");
@@ -201,17 +215,25 @@ export class DashboardListWidget extends Component {
     // Keep list widgets readable in dark dashboards by using a light accent surface.
     get accentColor() {
         const index = this.props.color || 0;
-        return COLORS[index] || COLORS[0];
+        return index === 0 ? null : (COLORS[index] || COLORS[0]);
     }
 
     get onAccentColor() {
         return getOnAccentColor(this.accentColor);
     }
+
+    get backgroundStyle() {
+        const index = this.props.color || 0;
+        if (this.props.data.use_background_gradient) {
+            return (GRADIENTS[index] || GRADIENTS[0]);
+        }
+        return (COLORS[index] || COLORS[0]);
+    }
 }
 
 DashboardListWidget.template = xml`
     <div class="o_custom_list_view h-100 d-flex flex-column border rounded shadow-sm overflow-hidden"
-         t-attf-style="--widget-accent: {{ this.accentColor }}; --widget-on-accent: {{ this.onAccentColor }};">
+         t-attf-style="background: {{ this.backgroundStyle }}; {{ this.accentColor ? '--widget-accent: ' + this.accentColor + '; --widget-on-accent: ' + this.onAccentColor + ';' : '' }}">
 
         <div class="px-4 py-3 d-flex align-items-center justify-content-between"
              style="border-bottom: 1px solid var(--list-border-color);">
@@ -303,7 +325,7 @@ DashboardListWidget.template = xml`
                                 t-on-click="() => this.onRowClick(record)">
 
                                 <t t-foreach="props.data.fields" t-as="field" t-key="field.name">
-                                    <td class="text-truncate px-3 text-dark" style="max-width: 200px;" t-att-title="record[field.name]">
+                                    <td class="text-truncate px-3" style="max-width: 200px;" t-att-title="record[field.name]">
                                         <span class="d-block text-truncate">
                                             <t t-esc="record[field.name]"/>
                                         </span>
@@ -330,8 +352,8 @@ DashboardListWidget.template = xml`
         <div t-if="state.aiInsight"
              class="chart-ai-insight-side-panel o_list_insight_panel shadow-sm animate__animated animate__fadeIn">
             <div class="d-flex align-items-center mb-1">
-                <i class="fa fa-magic text-primary me-2 small"/>
-                <span class="fw-bold text-primary extra-small">AI Insight</span>
+                <i class="fa fa-magic me-2 small"/>
+                <span class="fw-bold extra-small">AI Insight</span>
                 <button class="btn-close ms-auto shadow-none small"
                         style="transform: scale(0.6);"
                         t-on-click.stop="() => state.aiInsight = null"/>

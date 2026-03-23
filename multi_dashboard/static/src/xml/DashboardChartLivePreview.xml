@@ -48,6 +48,7 @@
                             name="state.config.name"
                             color="state.config.todo_color"
                             orientation="state.chartResult.orientation"
+                            useBackgroundGradient="state.config.use_background_gradient"
                             isPreview="true"
                     />
                 </t>
