@@ -30,7 +30,7 @@
                 <div class="o_chat_messages flex-grow-1 p-3 overflow-auto d-flex flex-column gap-3" t-ref="chatScroll">
                     <t t-foreach="state.messages" t-as="msg" t-key="msg_index">
                         <div t-attf-class="o_chat_message d-flex flex-column {{ msg.role === 'user' ? 'align-items-end' : 'align-items-start' }}">
-                            <div t-attf-class="o_message_content p-2 rounded {{ msg.role === 'user' ? 'bg-primary text-white shadow-sm' : 'bg-light border shadow-sm' }}">
+                            <div class="o_message_content p-2 rounded shadow-sm">
                                 <t t-out="msg.content"/>
                             </div>
                             <small class="text-muted mt-1" style="font-size: 0.7rem;">
@@ -39,7 +39,7 @@
                         </div>
                     </t>
                     <div t-if="state.isLoading" class="o_chat_message align-items-start d-flex flex-column">
-                        <div class="o_message_content p-3 bg-light border rounded">
+                        <div class="o_message_content p-3 rounded shadow-sm">
                             <div class="typing-dots d-flex gap-1">
                                 <span class="dot"/>
                                 <span class="dot"/>

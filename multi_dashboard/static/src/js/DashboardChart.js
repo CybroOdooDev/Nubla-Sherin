@@ -495,11 +495,20 @@ export class DashboardChart extends Component {
             textType: "adjusted"
         });
 
+        let axisTooltip = am5.Tooltip.new(root, {
+            labelText: "{category}"
+        });
+        axisTooltip.label.setAll({ fill: am5.color(0xffffff) });
+        axisTooltip.get("background").setAll({
+            fill: am5.color(0x000000),
+            fillOpacity: 0.8
+        });
+
         let xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
             maxDeviation: 0,
             categoryField: "category",
             renderer: xRenderer,
-            tooltip: am5.Tooltip.new(root, {})
+            tooltip: axisTooltip
         }));
         xAxis.data.setAll(data);
 
@@ -611,10 +620,19 @@ export class DashboardChart extends Component {
             paddingRight: 15
         });
 
+        let axisTooltip = am5.Tooltip.new(root, {
+            labelText: "{category}"
+        });
+        axisTooltip.label.setAll({ fill: am5.color(0xffffff) });
+        axisTooltip.get("background").setAll({
+            fill: am5.color(0x000000),
+            fillOpacity: 0.8
+        });
+
         let xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
             categoryField: "category",
             renderer: xRenderer,
-            tooltip: am5.Tooltip.new(root, {})
+            tooltip: axisTooltip
         }));
         xAxis.data.setAll(data);
 
@@ -969,11 +987,20 @@ export class DashboardChart extends Component {
             radius: 10
         });
 
+        let axisTooltip = am5.Tooltip.new(root, {
+            labelText: "{category}"
+        });
+        axisTooltip.label.setAll({ fill: am5.color(0xffffff) });
+        axisTooltip.get("background").setAll({
+            fill: am5.color(0x000000),
+            fillOpacity: 0.8
+        });
+
         let xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
             maxDeviation: 0,
             categoryField: "category",
             renderer: xRenderer,
-            tooltip: am5.Tooltip.new(root, {})
+            tooltip: axisTooltip
         }));
         xAxis.data.setAll(data);
 
@@ -1066,10 +1093,19 @@ export class DashboardChart extends Component {
             paddingRight: 15
         });
 
+        let axisTooltip = am5.Tooltip.new(root, {
+            labelText: "{category}"
+        });
+        axisTooltip.label.setAll({ fill: am5.color(0xffffff) });
+        axisTooltip.get("background").setAll({
+            fill: am5.color(0x000000),
+            fillOpacity: 0.8
+        });
+
         let xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
             categoryField: "category",
             renderer: xRenderer,
-            tooltip: am5.Tooltip.new(root, {})
+            tooltip: axisTooltip
         }));
         xAxis.data.setAll(data);
 

@@ -10,6 +10,8 @@
                  <DashboardSidebar
                          dashboardId="dashboardId"
                          sidebarWidth="state.sidebarWidth"
+                         currentLayout="state.dashboardLayout"
+                         onChangeLayout="(layoutId) => this.onChangeLayout(layoutId)"
                          onItemClick="(item) => this.onItemClick(item)"/>
 
                  <!-- Resize Handle -->

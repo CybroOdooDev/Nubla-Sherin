@@ -68,6 +68,7 @@
                         <group string="Additional Options">
                             <field name="theme"/>
                             <field name="refresh_interval"/>
+                            <field name="dashboard_layout" widget="layout_selector"/>
                         </group>
                     </group>
                 </sheet>

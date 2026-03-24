@@ -19,7 +19,7 @@ export class DashboardChat extends Component {
             messages: [
                 {
                     role: "assistant",
-                    content: "Hello! I'm your Dashboard AI Assistant. Ask me anything about your data, like 'What are the top 5 products?' or 'Why did sales drop?'",
+                    content: "Hello! I'm your Dashboard AI Assistant. Ask me anything about your data.....",
                     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                 }
             ]

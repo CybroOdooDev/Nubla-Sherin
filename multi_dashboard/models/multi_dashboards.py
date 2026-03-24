@@ -97,6 +97,12 @@ class MultiDashboards(models.Model):
         ('30', '30 Minutes'),
     ], string='Refresh Interval', default='0',
         help="Automatically refresh dashboard widgets")
+    dashboard_layout = fields.Selection([
+        ('layout_1', 'Centered'),
+        ('layout_2', 'Side-by-Side'),
+        ('layout_3', 'Grid')
+    ], string='Layout', default='layout_1',
+        help="Predefined layout for the dashboard widgets")
 
     @api.constrains('name')
     def _check_name(self):

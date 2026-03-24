@@ -49,6 +49,7 @@ export class MultiDashboard extends Component {
             isManager: false,
             isCompact: false,
             theme: params.theme || 'light',
+            dashboardLayout: 'layout_1',
             odooColorScheme,
             isOdooDark: odooColorScheme === "dark",
             refreshInterval: 0,
@@ -86,11 +87,12 @@ export class MultiDashboard extends Component {
             const dashboards = await this.orm.searchRead(
                 'multi.dashboards',
                 [['id', '=', this.state.dashboardId]],
-                ['theme', 'refresh_interval']
+                ['theme', 'refresh_interval', 'dashboard_layout']
             );
             if (dashboards.length) {
                 this.state.theme = dashboards[0].theme;
                 this.state.refreshInterval = parseInt(dashboards[0].refresh_interval) || 0;
+                this.state.dashboardLayout = dashboards[0].dashboard_layout || 'layout_1';
             }
 
             // Load saved date filter
@@ -168,9 +170,10 @@ export class MultiDashboard extends Component {
                 this.state.dashboardName = nextProps.action.name || "Dashboard";
                 this.state.loading = true;
 
-                const dashboards = await this.orm.searchRead('multi.dashboards', [['id', '=', this.state.dashboardId]], ['theme']);
+                const dashboards = await this.orm.searchRead('multi.dashboards', [['id', '=', this.state.dashboardId]], ['theme', 'dashboard_layout']);
                 if (dashboards.length) {
                     this.state.theme = dashboards[0].theme;
+                    this.state.dashboardLayout = dashboards[0].dashboard_layout || 'layout_1';
                 }
 
                 // Load saved date filter for the new dashboard
@@ -689,6 +692,125 @@ export class MultiDashboard extends Component {
             this.grid.setStatic(!this.state.isEditMode);
         }
         this.notification.add(this.state.isEditMode ? "Layout Movement Enabled" : "Layout Movement Disabled", { type: "info" });
+    }
+
+    /**
+     * Change the dashboard layout and rearrange widgets.
+     * @param {string} layoutId
+     */
+    async onChangeLayout(layoutId) {
+        if (!this.state.isManager) {
+            this.notification.add("Access Denied: Only managers can edit layouts.", { type: "danger" });
+            return;
+        }
+        this.state.dashboardLayout = layoutId;
+        this.isLoading = true;
+
+        try {
+            await this.orm.write('multi.dashboards', [this.state.dashboardId], {
+                dashboard_layout: layoutId
+            });
+            await this.applyLayoutRearrangement(layoutId);
+            this.notification.add(`Layout changed to ${layoutId === 'layout_1' ? 'Centered' : layoutId === 'layout_2' ? 'Side-by-Side' : 'Grid'}`, { type: "success" });
+        } catch (e) {
+            console.error("Error changing layout", e);
+            this.notification.add("Failed to change layout", { type: "danger" });
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    /**
+     * Rearrange existing widgets based on the selected layout algorithm.
+     * @param {string} layoutId
+     */
+    async applyLayoutRearrangement(layoutId) {
+        if (!this.grid) return;
+
+        this._isResponsiveRelayout = true;
+        this.grid.batchUpdate();
+
+        try {
+            const widgets = await this.orm.call(
+                'multi.dashboard.charts',
+                'get_dashboard_widgets',
+                [this.dashboardId],
+            );
+
+            if (!widgets || widgets.length === 0) return;
+
+            // Sort widgets by their current Y position, then X position to maintain a logical order
+            widgets.sort((a, b) => {
+                if (a.gs_y !== b.gs_y) return a.gs_y - b.gs_y;
+                return a.gs_x - b.gs_x;
+            });
+
+            let currentX = 0;
+            let currentY = 0;
+            let rowMaxHeight = 0;
+            const updates = [];
+
+            for (const widget of widgets) {
+                let newW, newH, newX, newY;
+
+                if (layoutId === 'layout_1') {
+                    // Centered: Fixed width 8, centered in 12-column grid (x=2)
+                    newW = 8;
+                    newH = widget.gs_h;
+                    newX = 2;
+                    newY = currentY;
+                    currentY += newH;
+                } else if (layoutId === 'layout_2') {
+                    // Side-by-Side: 2 columns of width 6
+                    newW = 6;
+                    newH = widget.gs_h;
+                    if (currentX + newW > 12) {
+                        currentX = 0;
+                        currentY += rowMaxHeight;
+                        rowMaxHeight = 0;
+                    }
+                    newX = currentX;
+                    newY = currentY;
+                    currentX += newW;
+                    rowMaxHeight = Math.max(rowMaxHeight, newH);
+                } else {
+                    // Grid: 3 columns of width 4
+                    newW = 4;
+                    newH = widget.gs_h;
+                    if (currentX + newW > 12) {
+                        currentX = 0;
+                        currentY += rowMaxHeight;
+                        rowMaxHeight = 0;
+                    }
+                    newX = currentX;
+                    newY = currentY;
+                    currentX += newW;
+                    rowMaxHeight = Math.max(rowMaxHeight, newH);
+                }
+
+                // Find the element in the grid
+                const gridEl = this.gridRef.el.querySelector(`[data-record-id="${widget.id}"]`);
+                if (gridEl) {
+                    this.grid.update(gridEl, { x: newX, y: newY, w: newW, h: newH });
+                }
+
+                // Save the new position to DB
+                updates.push(this.orm.write('multi.dashboard.charts', [widget.id], {
+                    gs_x: newX,
+                    gs_y: newY,
+                    gs_w: newW,
+                    gs_h: newH
+                }));
+            }
+
+            await Promise.all(updates);
+        } finally {
+            this.grid.commit();
+            // grid events can fire on next tick, keep guard briefly
+            setTimeout(() => {
+                this._isResponsiveRelayout = false;
+            }, 100);
+        }
     }
 
     /* Handle the drop of a new widget from the sidebar: open a form view
