@@ -37,10 +37,12 @@
     'data': [
         'data/mail_template_data.xml',
         'data/multi_dashboard_data.xml',
+        'data/multi_dashboard_alert_data.xml',
         'security/multi_dashboard_security.xml',
         'security/ir.model.access.csv',
         'views/multi_dashboards_views.xml',
         'views/multi_dashboard_charts_views.xml',
+        'views/multi_dashboard_alert_views.xml',
         'wizard/import_chart_views.xml',
         'views/res_config_settings_views.xml',
     ],

@@ -4,3 +4,4 @@ access_multi_dashboard_charts_user,access.multi.dashboard.charts.user,model_mult
 access_multi_dashboard_list_user,access.multi.dashboard.list.user,model_multi_dashboard_list,base.group_user,1,1,1,1
 access_multi_dashboard_todo_user,access.multi.dashboard.todo,model_multi_dashboard_todo,base.group_user,1,1,1,1
 access_import_chart_user,access.import.chart,model_import_chart,base.group_user,1,1,1,1
+access_multi_dashboard_alert_user,access.multi.dashboard.alert.user,model_multi_dashboard_alert,base.group_user,1,1,1,1

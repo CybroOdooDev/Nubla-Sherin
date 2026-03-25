@@ -4,15 +4,17 @@
     <t t-name="owl.MultiDashboard" owl="1">
         <div t-att-class="{'o_sidebar_active': state.sidebarVisible, ['o-dashboard-theme-' + state.theme]: true}"
              class="o_multi_dashboard_container d-flex h-100 w-100 position-absolute" style="overflow: hidden;">
-            <div class="o_dashboard_sidebar bg-light border-end transition-width position-relative"
+            <div class="o_dashboard_sidebar border-end transition-width position-relative"
                  t-ref="sidebar"
                  t-att-style="state.sidebarVisible ? `width: ${state.sidebarWidth}px; min-width: ${state.sidebarWidth}px;` : 'width: 0px; overflow: hidden;'">
                  <DashboardSidebar
-                         dashboardId="dashboardId"
+                         dashboardId="state.dashboardId"
                          sidebarWidth="state.sidebarWidth"
                          currentLayout="state.dashboardLayout"
+                         favoriteDashboards="state.favoriteDashboards"
                          onChangeLayout="(layoutId) => this.onChangeLayout(layoutId)"
-                         onItemClick="(item) => this.onItemClick(item)"/>
+                         onItemClick="(item) => this.onItemClick(item)"
+                         onFavoriteClick="(dashboard) => this.onFavoriteDashboardClick(dashboard)"/>
 
                  <!-- Resize Handle -->
                  <div class="sidebar-resize-handle position-absolute top-0 end-0 h-100"
@@ -36,17 +38,21 @@
                         <i t-att-class="state.sidebarVisible ? 'fa fa-chevron-left' : 'fa fa-chevron-right'"/>
                     </button>
                     <span class="ms-3 h4 mb-0"><t t-esc="state.dashboardName"/></span>
+                    <i class="fa fa-star ms-2 cursor-pointer favorite-star"
+                       t-att-class="state.isFavorite ? 'text-warning' : 'text-muted'"
+                       t-on-click="toggleFavorite"
+                       t-att-title="state.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'"/>
 
                     <div class="ms-auto d-flex align-items-center gap-1">
                         <!-- NLP Input Field -->
                         <div class="nlp-search-container me-2">
                             <div class="input-group">
                                 <input type="text"
-                                       class="form-control nlp-input"
-                                       placeholder="Generate chart...e.g.'Pie chart of sales by month'"
+                                       class="form-control nlp-input shadow-none"
+                                       placeholder="Generate dashboard..."
                                        t-model="state.nlpQuery"
                                        t-on-keydown="onNlpInputKeydown"/>
-                                <button class="btn btn-outline-secondary nlp-btn" type="button" t-on-click="generateChartFromText" t-att-disabled="state.isGeneratingChart" title="Generate Chart">
+                                <button class="btn btn-primary nlp-btn" type="button" t-on-click="generateChartFromText" t-att-disabled="state.isGeneratingChart" title="Generate Chart">
                                     <i t-att-class="state.isGeneratingChart ? 'fa fa-spinner fa-spin' : 'fa fa-magic'"/>
                                 </button>
                             </div>
@@ -249,6 +255,16 @@
 <!--                        <i t-att-class="state.isEditMode ? 'fa fa-check-square-o' : 'fa fa-arrows'"/>-->
 <!--                        <span class="d-none d-md-inline ms-1"><t t-esc="state.isEditMode ? 'Done' : 'Move'"/></span>-->
 <!--                    </button>-->
+                        <div class="import-chart position-relative"
+                             t-on-click="toggleNotificationDropdown"
+                             title="Dashboard Alerts">
+                            <i class="fa fa-bell"/>
+                            <span t-if="state.notificationCount > 0"
+                                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                  style="font-size: 0.6rem; padding: 0.25em 0.4em;">
+                                <t t-esc="state.notificationCount"/>
+                            </span>
+                        </div>
                         <div class="import-chart"
                              t-on-click="sendDashboard"
                              title="Send">
@@ -296,6 +312,50 @@
                     </div>
                 </div>
 
+                <!-- Notification Dropdown -->
+                <div t-if="state.showNotificationDropdown" class="dashboard-notification-dropdown shadow-lg rounded border bg-white position-absolute">
+                    <div class="d-flex align-items-center p-2 border-bottom bg-light rounded-top">
+                        <h6 class="mb-0 fw-bold small">Dashboard Alerts</h6>
+                        <button class="btn-close ms-auto shadow-none" t-on-click="toggleNotificationDropdown" style="font-size: 0.7rem;"/>
+                    </div>
+                    <div class="notification-list overflow-auto" style="max-height: 300px; min-width: 250px;">
+                        <t t-if="state.notifications.length > 0">
+                            <t t-foreach="state.notifications" t-as="notif" t-key="notif.id">
+                                <div class="notification-item p-2 border-bottom hover-bg-light transition-base" t-on-click="() => this.onNotificationClick(notif)">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="fw-bold text-primary small"><t t-esc="notif.name"/></span>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-warning text-dark" style="font-size: 0.45rem;">Triggered</span>
+                                            <i class="fa fa-times text-muted cursor-pointer hover-text-danger p-1" 
+                                               t-on-click.stop="() => this.dismissNotification(notif)"
+                                               title="Dismiss"/>
+                                        </div>
+                                    </div>
+                                    <div class="small mb-1">
+                                        <span class="text-muted"><t t-esc="notif.widget"/></span>
+                                        <span class="mx-1 ms-2 fw-bold text-danger">
+                                            <t t-if="notif.condition == 'greater'">></t>
+                                            <t t-elif="notif.condition == 'less'">&lt;</t>
+                                            <t t-else="">=</t>
+                                            <t t-esc="notif.threshold"/>
+                                        </span>
+                                        <span class="ms-2 text-muted" style="font-size: 0.6rem;">(Value: <t t-esc="notif.value"/>)</span>
+                                    </div>
+                                    <div class="text-end text-muted" style="font-size: 0.6rem;">
+                                        <t t-esc="notif.date"/>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                        <t t-else="">
+                            <div class="p-4 text-center text-muted small">
+                                <i class="fa fa-check-circle-o d-block mb-2 text-success" style="font-size: 1.5rem;"/>
+                                No active alerts
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
                 <!-- Grid Area -->
                 <div class="p-4 mb-5 overflow-auto grid-scrollbar flex-grow-1 bg-light" style="min-height: 0;">
                     <div t-attf-class="icon-loader-wrapper d-flex flex-column align-items-center justify-content-center {{ state.loading ? '' : 'd-none' }}">
@@ -340,7 +400,7 @@
 
                     </div>
                 </div>
-                <DashboardChat dashboardId="dashboardId" dateFilter="state.dateFilter"/>
+                <DashboardChat dashboardId="state.dashboardId" dateFilter="state.dateFilter"/>
             </div>
         </div>
     </t>

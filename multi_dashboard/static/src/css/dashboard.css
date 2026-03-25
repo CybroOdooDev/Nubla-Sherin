@@ -855,3 +855,69 @@
 .o_chat_footer input::placeholder {
     color: #cbd5e0;
 }
+
+/* Favorite Star */
+.favorite-star {
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s, color 0.2s;
+}
+
+.favorite-star:hover {
+    transform: scale(1.2);
+}
+
+.bg-light-hover {
+    transition: background-color 0.2s;
+}
+
+.bg-light-hover:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.favorite-dashboard-item {
+    transition: background-color 0.2s;
+    color: var(--bs-body-color);
+}
+
+.favorite-dashboard-item span {
+    color: inherit;
+}
+
+.layout-btn {
+    color: var(--bs-body-color);
+    transition: all 0.2s;
+}
+
+.layout-btn.bg-primary {
+    color: #ffffff !important;
+}
+
+/* Sidebar Boxed Sections */
+.sidebar-card {
+    background: var(--widget-bg);
+    border: 1px solid var(--widget-border);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.o_dashboard_sidebar {
+    background-color: var(--sidebar-bg);
+}
+
+.extra-small {
+    font-size: 0.75rem !important;
+}
+
+.opacity-75 {
+    opacity: 0.75;
+}
+
+.bg-light-hover {
+    transition: background-color 0.2s;
+}
+
+.bg-light-hover:hover {
+    background-color: var(--hover-bg) !important;
+}

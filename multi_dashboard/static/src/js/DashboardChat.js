@@ -90,6 +90,6 @@ export class DashboardChat extends Component {
 
 DashboardChat.template = "multi_dashboard.DashboardChat";
 DashboardChat.props = {
-    dashboardId: { type: Number },
+    dashboardId: { type: [Number, Boolean], optional: true },
     dateFilter: { type: Object, optional: true }
 };

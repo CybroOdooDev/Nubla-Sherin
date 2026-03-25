@@ -1,0 +1,33 @@
+.bg-light-hover:hover {
+    background-color: var(--hover-bg) !important;
+}
+
+.dashboard-notification-dropdown {
+    right: 15px;
+    top: 60px;
+    z-index: 1050;
+    width: 320px;
+    max-width: 90vw;
+}
+
+.notification-item {
+    cursor: pointer;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
+
+.transition-base {
+    transition: all 0.2s ease-in-out;
+}
+
+.hover-bg-light:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.widget-highlight-alert {
+    box-shadow: 0 0 15px 5px rgba(255, 193, 7, 0.7) !important;
+    transform: scale(1.02);
+    transition: all 0.3s ease-in-out;
+}

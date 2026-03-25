@@ -104,6 +104,50 @@ class MultiDashboards(models.Model):
     ], string='Layout', default='layout_1',
         help="Predefined layout for the dashboard widgets")
 
+    favorite_user_ids = fields.Many2many(
+        'res.users',
+        'multi_dashboard_favorite_user_id_rel',
+        'dashboard_id',
+        'user_id',
+        string='Favorite Users',
+        help='Users who have favorited this dashboard'
+    )
+    is_favorite = fields.Boolean(
+        'Is Favorite',
+        compute='_compute_is_favorite',
+        search='_search_is_favorite',
+        help='Whether the current user has favorited this dashboard'
+    )
+
+    def _compute_is_favorite(self):
+        for record in self:
+            record.is_favorite = self.env.user in record.favorite_user_ids
+
+    def _search_is_favorite(self, operator, value):
+        if operator not in ('=', '!=') or not isinstance(value, bool):
+            raise UserError(_('Operation not supported'))
+        if (operator == '=' and value) or (operator == '!=' and not value):
+            return [('favorite_user_ids', 'in', self.env.user.id)]
+        return [('favorite_user_ids', 'not in', self.env.user.id)]
+
+    def action_toggle_favorite(self):
+        self.ensure_one()
+        if self.env.user in self.favorite_user_ids:
+            self.favorite_user_ids = [fields.Command.unlink(self.env.user.id)]
+        else:
+            self.favorite_user_ids = [fields.Command.link(self.env.user.id)]
+        return True
+
+    @api.model
+    def get_favorite_dashboards(self):
+        """Returns a list of favorited dashboards for the current user"""
+        favorites = self.search([('favorite_user_ids', 'in', self.env.user.id)])
+        return [{
+            'id': fav.id,
+            'name': fav.name,
+        } for fav in favorites]
+
+
     @api.constrains('name')
     def _check_name(self):
         """Ensure that the dashboard name is not empty or just whitespace"""

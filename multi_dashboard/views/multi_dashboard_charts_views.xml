@@ -181,6 +181,17 @@ s
                             </group>
                         </page>
 
+                        <page string="Alerts" invisible="chart_type in ['clock', 'todo']">
+                            <field name="alert_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="condition"/>
+                                    <field name="value"/>
+                                    <field name="user_ids" widget="many2many_tags"/>
+                                    <field name="is_active" widget="boolean_toggle"/>
+                                </list>
+                            </field>
+                        </page>
                         <page string="Position">
                             <group>
                                 <group string="Coordinates">
@@ -195,6 +206,7 @@ s
                         </page>
                     </notebook>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>

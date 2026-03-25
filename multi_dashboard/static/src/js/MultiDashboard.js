@@ -35,7 +35,7 @@ export class MultiDashboard extends Component {
         this.mountedComponents = {};
 
         const params = this.props.action.params || {};
-        this.dashboardId = params.dashboard_id || null;
+        this.dashboardId = parseInt(params.dashboard_id) || null;
         const odooColorScheme = cookie.get("color_scheme") || "light";
 
         this.state = useState({
@@ -65,6 +65,13 @@ export class MultiDashboard extends Component {
             customStartDate: null,
             customEndDate: null,
             isEditMode: false,
+            isFavorite: false,
+            favoriteDashboards: [],
+            nlpQuery: "",
+            isGeneratingChart: false,
+            notificationCount: 0,
+            showNotificationDropdown: false,
+            notifications: [],
         });
 
         this.sidebar = useRef("sidebar");
@@ -87,13 +94,18 @@ export class MultiDashboard extends Component {
             const dashboards = await this.orm.searchRead(
                 'multi.dashboards',
                 [['id', '=', this.state.dashboardId]],
-                ['theme', 'refresh_interval', 'dashboard_layout']
+                ['name', 'theme', 'refresh_interval', 'dashboard_layout', 'is_favorite']
             );
             if (dashboards.length) {
+                this.state.dashboardName = dashboards[0].name;
                 this.state.theme = dashboards[0].theme;
                 this.state.refreshInterval = parseInt(dashboards[0].refresh_interval) || 0;
                 this.state.dashboardLayout = dashboards[0].dashboard_layout || 'layout_1';
+                this.state.isFavorite = dashboards[0].is_favorite;
             }
+
+            // Load favorite dashboards
+            this.state.favoriteDashboards = await this.orm.call('multi.dashboards', 'get_favorite_dashboards', []);
 
             // Load saved date filter
             const savedFilter = localStorage.getItem(`dashboard_filter_${this.state.dashboardId}`);
@@ -104,6 +116,8 @@ export class MultiDashboard extends Component {
                     console.error("Error parsing saved date filter", e);
                 }
             }
+
+            await this.loadNotificationCount();
         });
 
         onMounted(async () => {
@@ -163,17 +177,19 @@ export class MultiDashboard extends Component {
 
         onWillUpdateProps(async (nextProps) => {
             const nextParams = nextProps.action.params || {};
-            const nextDashboardId = nextParams.dashboard_id || null;
+            const nextDashboardId = parseInt(nextParams.dashboard_id) || null;
             if (nextDashboardId && nextDashboardId !== this.state.dashboardId) {
                 this.dashboardId = nextDashboardId;
                 this.state.dashboardId = nextDashboardId;
                 this.state.dashboardName = nextProps.action.name || "Dashboard";
                 this.state.loading = true;
 
-                const dashboards = await this.orm.searchRead('multi.dashboards', [['id', '=', this.state.dashboardId]], ['theme', 'dashboard_layout']);
+                const dashboards = await this.orm.searchRead('multi.dashboards', [['id', '=', this.state.dashboardId]], ['name', 'theme', 'dashboard_layout', 'is_favorite']);
                 if (dashboards.length) {
+                    this.state.dashboardName = dashboards[0].name;
                     this.state.theme = dashboards[0].theme;
                     this.state.dashboardLayout = dashboards[0].dashboard_layout || 'layout_1';
+                    this.state.isFavorite = dashboards[0].is_favorite;
                 }
 
                 // Load saved date filter for the new dashboard
@@ -237,6 +253,38 @@ export class MultiDashboard extends Component {
         document.body.style.userSelect = '';
     }
 
+    /**
+     * Toggle the favorite status of the current dashboard
+     */
+    async toggleFavorite() {
+        try {
+            await this.orm.call('multi.dashboards', 'action_toggle_favorite', [this.state.dashboardId]);
+            this.state.isFavorite = !this.state.isFavorite;
+
+            // Refresh the favorites list
+            this.state.favoriteDashboards = await this.orm.call('multi.dashboards', 'get_favorite_dashboards', []);
+
+            this.notification.add(this.state.isFavorite ? "Dashboard added to favorites" : "Dashboard removed from favorites", { type: "success" });
+        } catch (error) {
+            console.error("Toggle favorite failed:", error);
+        }
+    }
+
+    /**
+     * Switch to a favorited dashboard
+     */
+    onFavoriteDashboardClick(dashboard) {
+        this.action.doAction({
+            type: 'ir.actions.client',
+            tag: 'MultiDashboardClientAction',
+            params: {
+                dashboard_id: dashboard.id,
+                dashboard_name: dashboard.name,
+            },
+            name: dashboard.name,
+        });
+    }
+
     // Export the current dashboard configuration to JSON and trigger a download in the browser
     async exportDashboard() {
         try {
@@ -261,6 +309,68 @@ export class MultiDashboard extends Component {
 
         } catch (error) {
             console.error("Export failed:", error);
+        }
+    }
+
+    /**
+     * Fetch the number of triggered alerts for this dashboard
+     */
+    async loadNotificationCount() {
+        try {
+            const result = await this.orm.call(
+                "multi.dashboard.alert",
+                "get_dashboard_notifications",
+                [],
+                { dashboard_id: this.dashboardId }
+            );
+            this.state.notificationCount = result.count || 0;
+            this.state.notifications = result.notifications || [];
+        } catch (error) {
+            console.error("Failed to load notifications:", error);
+        }
+    }
+
+    /**
+     * Toggle the dashboard-specific notification dropdown
+     */
+    toggleNotificationDropdown() {
+        this.state.showNotificationDropdown = !this.state.showNotificationDropdown;
+        if (this.state.showNotificationDropdown) {
+            this.loadNotificationCount();
+        }
+    }
+
+    /**
+     * Handle clicking on a notification: Close dropdown and attempt to highlight the widget
+     */
+    onNotificationClick(notif) {
+        this.state.showNotificationDropdown = false;
+        if (notif.widget_id) {
+            const gridEl = this.gridRef.el.querySelector(`[data-record-id="${notif.widget_id}"]`);
+            if (gridEl) {
+                gridEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                gridEl.classList.add('widget-highlight-alert');
+                setTimeout(() => {
+                    gridEl.classList.remove('widget-highlight-alert');
+                }, 3000);
+            }
+        }
+    }
+
+    /**
+     * Dismiss a specific notification
+     */
+    async dismissNotification(notif) {
+        try {
+            await this.orm.call(
+                "multi.dashboard.alert",
+                "action_dismiss_alert",
+                [[notif.id]]
+            );
+            // Refresh the count and list
+            await this.loadNotificationCount();
+        } catch (error) {
+            console.error("Failed to dismiss alert:", error);
         }
     }
 
@@ -1066,6 +1176,11 @@ export class MultiDashboard extends Component {
                 }
                 this.state.nlpQuery = '';
                 await this.loadWidgets();
+
+                // Apply the current dashboard layout after generation
+                if (this.state.dashboardLayout) {
+                    await this.onChangeLayout(this.state.dashboardLayout);
+                }
             } else {
                 this.notification.add(result.error || "Failed to generate chart.", { type: "danger" });
             }

@@ -47,6 +47,7 @@ def _tz_get(self):
 class MultiDashboardCharts(models.Model):
     """ Model representing individual charts/widgets on the multi-dashboard."""
     _name = 'multi.dashboard.charts'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Multi Dashboard Charts'
     _order = 'id desc'
 
@@ -251,6 +252,7 @@ class MultiDashboardCharts(models.Model):
                                  help='Preview of the widget configuration.')
     use_background_gradient = fields.Boolean('Use Background Gradient', default=False,
                                              help='Apply a linear gradient background to the widget.')
+    alert_ids = fields.One2many('multi.dashboard.alert', 'chart_id', string='Alerts')
 
     @api.depends('model_id', 'list_field_ids')
     def _compute_available_sort_fields(self):
