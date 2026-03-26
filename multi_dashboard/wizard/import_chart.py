@@ -80,6 +80,11 @@ class ImportChart(models.TransientModel):
                                                     'vertical'),
                     'progress_target_static': config.get('progress_target_static', 0),
                     'chart_date_group_by': config.get('chart_date_group_by'),
+                    'enable_forecast': config.get('enable_forecast', False),
+                    'forecast_periods': config.get('forecast_periods', 3),
+                    'forecast_method': config.get('forecast_method', 'trend'),
+                    'forecast_ai_cache_ttl_hours': config.get('forecast_ai_cache_ttl_hours', 24),
+                    'forecast_history_periods': config.get('forecast_history_periods', 24),
 
                     'gs_x': config.get('gs_x', 0),
                     'gs_y': config.get('gs_y', 0),

@@ -72,7 +72,12 @@ export class MultiDashboard extends Component {
             notificationCount: 0,
             showNotificationDropdown: false,
             notifications: [],
+            targetNotifications: [],
         });
+
+        this.dismissedTargets = new Set();
+
+        this.loadId = 0;
 
         this.sidebar = useRef("sidebar");
         this.resizeHandle = useRef("resizeHandle");
@@ -264,7 +269,8 @@ export class MultiDashboard extends Component {
             // Refresh the favorites list
             this.state.favoriteDashboards = await this.orm.call('multi.dashboards', 'get_favorite_dashboards', []);
 
-            this.notification.add(this.state.isFavorite ? "Dashboard added to favorites" : "Dashboard removed from favorites", { type: "success" });
+            // Success notification removed per user request
+
         } catch (error) {
             console.error("Toggle favorite failed:", error);
         }
@@ -328,7 +334,19 @@ export class MultiDashboard extends Component {
         } catch (error) {
             console.error("Failed to load notifications:", error);
         }
+        this._mergeTargetNotifications();
     }
+
+    /**
+     * Merge current target performance "alerts" into the notification list.
+     */
+    _mergeTargetNotifications() {
+        // Remove old target pseudo-notifications if any exist in the main list
+        const dbNotifs = this.state.notifications.filter(n => !n.isTarget);
+        this.state.notifications = [...this.state.targetNotifications, ...dbNotifs];
+        this.state.notificationCount = this.state.notifications.length;
+    }
+
 
     /**
      * Toggle the dashboard-specific notification dropdown
@@ -362,6 +380,13 @@ export class MultiDashboard extends Component {
      */
     async dismissNotification(notif) {
         try {
+            if (notif.isTarget) {
+                this.dismissedTargets.add(notif.id);
+                this.state.targetNotifications = this.state.targetNotifications.filter(n => n.id !== notif.id);
+                this.state.notifications = this.state.notifications.filter(n => n.id !== notif.id);
+                this.state.notificationCount = this.state.notifications.length;
+                return;
+            }
             await this.orm.call(
                 "multi.dashboard.alert",
                 "action_dismiss_alert",
@@ -553,6 +578,19 @@ export class MultiDashboard extends Component {
             this.grid.removeWidget(gridEl, true); // true = remove DOM node
         }
 
+        // Maintain layout pattern (Centered/Grid) after removal
+        if (this.grid) {
+            if (this.state.dashboardLayout && this.state.dashboardLayout !== 'layout_3') {
+                // If it's layout_1 (Centered) or layout_2 (Side-by-Side), re-apply the pattern
+                this.applyLayoutRearrangement(this.state.dashboardLayout);
+            } else if (!this.state.isCompact) {
+                // Default Grid layout: just compact
+                this.grid.compact();
+                const items = this.grid.getGridItems().map(el => el.gridstackNode);
+                this.saveLayout(items);
+            }
+        }
+
         // Update empty-state flag
         const remaining = this.gridRef.el.querySelectorAll('.grid-stack-item[data-record-id]');
         this.state.isEmpty = remaining.length === 0;
@@ -608,6 +646,8 @@ export class MultiDashboard extends Component {
      * Destroys all mounted components and rebuilds the grid from scratch.
      */
     async loadWidgets() {
+        const loadId = ++this.loadId;
+
         // Destroy every tracked Owl component
         for (const id of Object.keys(this.mountedComponents)) {
             this._destroyWidgetComponent(id);
@@ -626,7 +666,34 @@ export class MultiDashboard extends Component {
 
             if (!this.state.isEmpty) {
                 // Mount all widgets in parallel; _addWidgetToGrid handles DOM + Owl
-                await Promise.all(widgets.map(w => this._addWidgetToGrid(w)));
+                const results = await Promise.all(widgets.map(w => this._addWidgetToGrid(w, loadId)));
+
+                // Collect target notifications from the fetched widget values
+                const targetNotifs = [];
+                for (const res of results) {
+                    if (res && res.kpi_data && res.kpi_data.comparison_label === 'of Target') {
+                        const targetId = `target_${res.id}`;
+                        if (this.dismissedTargets.has(targetId)) continue;
+
+                        targetNotifs.push({
+                            id: targetId,
+                            isTarget: true,
+                            name: res.kpi_data.direction === 'up' ? "Target Achieved" : "Target Pending",
+                            widget: res.name,
+                            widget_id: res.id,
+                            value: res.value,
+                            condition: res.kpi_data.direction === 'up' ? '>=' : '<',
+                            threshold: res.kpi_data.target || 'Target',
+                            date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                            type: res.kpi_data.direction === 'up' ? 'success' : 'danger'
+                        });
+                    }
+                }
+                this.state.targetNotifications = targetNotifs;
+                // Merge with DB alerts
+                const dbNotifs = this.state.notifications.filter(n => !n.isTarget);
+                this.state.notifications = [...targetNotifs, ...dbNotifs];
+                this.state.notificationCount = this.state.notifications.length;
             }
         } catch (e) {
             console.error("Error loading widgets", e);
@@ -654,6 +721,9 @@ export class MultiDashboard extends Component {
      * @param {number|string} recordId
      */
     async renderWidgetContent(widget, data, targetEl, recordId) {
+        if (!targetEl || !document.body.contains(targetEl)) {
+            return;
+        }
         const id = String(recordId);
 
         // Callbacks that target only this one widget
@@ -732,8 +802,13 @@ export class MultiDashboard extends Component {
                     groupField: data.groupField,
                     groupFieldType: data.groupFieldType,
                     dateGranularity: data.date_granularity,
+                    hasSubGroup: data.has_sub_group,
                     filter: this.state.dateFilter,
                     useBackgroundGradient: widget.use_background_gradient,
+                    showTarget: data.show_target,
+                    targetValue: data.target_value,
+                    targetColor: data.target_color,
+                    targetLabel: data.target_label,
                 },
                 env: this.env,
             });
@@ -821,7 +896,8 @@ export class MultiDashboard extends Component {
                 dashboard_layout: layoutId
             });
             await this.applyLayoutRearrangement(layoutId);
-            this.notification.add(`Layout changed to ${layoutId === 'layout_1' ? 'Centered' : layoutId === 'layout_2' ? 'Side-by-Side' : 'Grid'}`, { type: "success" });
+            // Success notification removed per user request
+
         } catch (e) {
             console.error("Error changing layout", e);
             this.notification.add("Failed to change layout", { type: "danger" });
@@ -1018,10 +1094,13 @@ export class MultiDashboard extends Component {
      * Fetch data for a single widget, create its GridStack item, and mount its
      * Owl component — without disturbing any already-rendered widgets.
      * @param {Object} w  Widget record from get_dashboard_widgets
+     * @param {number} loadId Optional cancellation token
      */
-    async _addWidgetToGrid(w) {
+    async _addWidgetToGrid(w, loadId) {
         try {
+            if (loadId && loadId !== this.loadId) return null;
             const data = await this.orm.call('multi.dashboard.charts', 'get_widget_value', [[w.id]], { date_filter: this.state.dateFilter });
+            if (loadId && loadId !== this.loadId) return null;
 
             const gridItem = document.createElement('div');
             gridItem.className = 'grid-stack-item';
@@ -1042,6 +1121,13 @@ export class MultiDashboard extends Component {
             this.isLoading = false;
 
             await this.renderWidgetContent(w, data, gridContent, w.id);
+
+            return {
+                id: w.id,
+                name: w.name,
+                value: data.value || data.current_value,
+                kpi_data: data.kpi_data
+            };
         } catch (e) {
             console.error(`Error adding widget ${w.id} to grid`, e);
             this.isLoading = false;
@@ -1094,11 +1180,13 @@ export class MultiDashboard extends Component {
 
                     if (for_mail) {
                         const pdfBase64 = doc.output('datauristring').split(',')[1];
-                        this.notification.add("PDF generated for email.", { type: "success" });
+                        // Success notification removed per user request
+
                         resolve(pdfBase64);
                     } else {
                         doc.save("Dashboard_Full_Report.pdf");
-                        this.notification.add("Export Complete", { type: "success" });
+                        // Success notification removed per user request
+
                         resolve(null);
                     }
                 };
@@ -1172,7 +1260,8 @@ export class MultiDashboard extends Component {
                 if (result.errors && result.errors.length > 0) {
                     this.notification.add(`${successMsg} with some errors: ${result.errors.join(', ')}`, { type: "warning" });
                 } else {
-                    this.notification.add(successMsg, { type: "success" });
+                    // Success notification removed per user request
+
                 }
                 this.state.nlpQuery = '';
                 await this.loadWidgets();
@@ -1233,7 +1322,8 @@ export class MultiDashboard extends Component {
                 }
 
                 this.state.aiSummary = markup(summary);
-                this.notification.add("Insights generated!", { type: "success" });
+                // Success notification removed per user request
+
             } else {
                 this.notification.add(result.error || "Failed to generate insights.", { type: "danger" });
             }
@@ -1256,7 +1346,8 @@ export class MultiDashboard extends Component {
                 theme: themeName,
             });
             this.state.theme = themeName;
-            this.notification.add("Theme updated", { type: "success" });
+            // Success notification removed per user request
+
         } catch (error) {
             this.notification.add("Could not save theme", { type: "danger" });
         }
@@ -1425,7 +1516,8 @@ export class MultiDashboard extends Component {
             await this.orm.call("multi.dashboard.charts", "action_clear_dashboard", [this.state.dashboardId]);
             await this.loadWidgets();
             this.state.loading = false;
-            this.notification.add("Dashboard cleared successfully.", { type: "success" });
+            // Success notification removed per user request
+
         } catch (error) {
             console.error("Failed to clear dashboard:", error);
             this.state.loading = false;

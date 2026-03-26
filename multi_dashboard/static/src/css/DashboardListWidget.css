@@ -11,7 +11,8 @@
     --list-header-bg: color-mix(in srgb, var(--widget-accent, #fff), black 6%);
     --list-hover-bg: rgba(17, 24, 39, 0.04);
     border: 1px solid var(--list-border-color);
-    position: relative; /* anchor absolutely-positioned tool buttons */
+    position: relative;
+    /* anchor absolutely-positioned tool buttons */
 }
 
 /* Header */
@@ -141,22 +142,26 @@
 }
 
 .btn-del-list:hover {
-    background: #dc3545; /* danger red */
+    background: #dc3545;
+    /* danger red */
 }
 
 .btn-edit-list:hover {
-    background: #0d6efd; /* bootstrap primary */
+    background: #0d6efd;
+    /* bootstrap primary */
 }
 
 /* In view mode, only show AI insight (hide edit/delete) */
 .o_custom_list_view .list-tools .btn-edit-list,
-.o_custom_list_view .list-tools .btn-del-list {
+.o_custom_list_view .list-tools .btn-del-list,
+.o_custom_list_view .list-tools .btn-duplicate-list {
     display: none;
 }
 
 /* Show edit/delete when sidebar is active (edit mode) */
 .o_sidebar_active .o_custom_list_view .list-tools .btn-edit-list,
-.o_sidebar_active .o_custom_list_view .list-tools .btn-del-list {
+.o_sidebar_active .o_custom_list_view .list-tools .btn-del-list,
+.o_sidebar_active .o_custom_list_view .list-tools .btn-duplicate-list {
     display: flex;
 }
 
@@ -165,7 +170,8 @@
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
-    right: 10px; /* download button is hidden in edit mode */
+    right: 10px;
+    /* download button is hidden in edit mode */
 }
 
 .dashboard-badge-list {
@@ -180,7 +186,8 @@
 }
 
 .o_custom_list_view .btn-download-json {
-    display: flex; /* override other widget CSS that hides this class by default */
+    display: flex;
+    /* override other widget CSS that hides this class by default */
 }
 
 .o_custom_list_view .download-options {
@@ -199,13 +206,15 @@
     display: flex;
     gap: 0.75rem;
     padding: 0.5rem 1rem 1rem 1rem;
-    min-height: 0; /* allows inner scroll */
+    min-height: 0;
+    /* allows inner scroll */
 }
 
 .o_custom_list_view .o_list_main {
     flex: 1 1 auto;
     min-width: 0;
-    min-height: 0; /* allows inner scroll */
+    min-height: 0;
+    /* allows inner scroll */
 }
 
 /* Reuse the global side-panel styling but tighten spacing for list widget */
@@ -222,6 +231,7 @@
     .o_custom_list_view .o_list_body {
         flex-direction: column;
     }
+
     .o_custom_list_view .o_list_insight_panel {
         width: 100%;
         max-width: 100%;

@@ -18,11 +18,27 @@
     --chat-header-color: #ffffff;
     --widget-header-bg: #f8f9fb;
     --widget-header-color: #000000;
+    /* Used only for the widget title row (e.g. "Sales by Salesperson"). */
+    --chart-header-color: var(--widget-header-color);
     --widget-text-color: #374151;
     --sidebar-bg: #f8f9fb;
     --navbar-bg: #ffffff;
     --navbar-border: #e5e7eb;
     --hover-bg: #f3f4f6;
+    --theme-primary: #71639e;
+    /* Chart widget tool buttons (download/insight/edit/delete/duplicate) */
+    /* Keep these themed (not "black") so they match green/blue/purple dashboard themes. */
+    --chart-tool-bg: var(--theme-primary);
+    --chart-tool-bg-muted: color-mix(in srgb, var(--theme-primary), black 10%);
+    --chart-tool-border: color-mix(in srgb, var(--theme-primary), white 30%);
+    --chart-tool-fg: #ffffff;
+    --chart-tool-hover-bg: color-mix(in srgb, var(--theme-primary), white 25%);
+    /* Tile widget tool buttons (AI/Download/Edit/Delete/Duplicate) */
+    --tile-tool-bg: var(--theme-primary);
+    --tile-tool-hover-bg: color-mix(in srgb, var(--theme-primary), white 20%);
+    --tile-tool-border: color-mix(in srgb, var(--theme-primary), white 30%);
+    --tile-tool-fg: #ffffff;
+    background: var(--theme-gradient) !important;
 }
 
 .o-dashboard-theme-dark {
@@ -41,6 +57,16 @@
     --navbar-bg: #1e1e1e;
     --navbar-border: #333333;
     --hover-bg: #2a2a2a;
+    --theme-primary: #bb86fc;
+    --chart-tool-bg: var(--theme-primary);
+    --chart-tool-bg-muted: color-mix(in srgb, var(--theme-primary), black 25%);
+    --chart-tool-border: color-mix(in srgb, var(--theme-primary), white 15%);
+    --chart-tool-fg: #ffffff;
+    --chart-tool-hover-bg: color-mix(in srgb, var(--theme-primary), white 15%);
+    --tile-tool-bg: var(--theme-primary);
+    --tile-tool-hover-bg: color-mix(in srgb, var(--theme-primary), white 12%);
+    --tile-tool-border: color-mix(in srgb, var(--theme-primary), white 15%);
+    --tile-tool-fg: #ffffff;
 }
 
 .o-dashboard-theme-blue {
@@ -59,6 +85,7 @@
     --navbar-bg: #f8fbff;
     --navbar-border: #bcd4ef;
     --hover-bg: #c9daf8;
+    --theme-primary: #0b5394;
 }
 
 .o-dashboard-theme-green {
@@ -77,6 +104,7 @@
     --navbar-bg: #f5fcf7;
     --navbar-border: #b7d8be;
     --hover-bg: #c2e0c9;
+    --theme-primary: #274e13;
 }
 
 .o-dashboard-theme-purple {
@@ -95,6 +123,37 @@
     --navbar-bg: #fcfaff;
     --navbar-border: #d1c4e9;
     --hover-bg: #d9ccf5;
+    --theme-primary: #4a148c;
+}
+
+.o-dashboard-theme-dark-gradient {
+    --bs-body-bg: #0f172a;
+    --bs-body-color: #f1f5f9;
+    --theme-gradient: linear-gradient(135deg, #1e1b4b 0%, #7e22ce 40%, #be185d 75%, #ef4444 100%);
+    --widget-bg: rgba(255, 255, 255, 0.1);
+    --widget-border: rgba(255, 255, 255, 0.15);
+    --chat-bubble-bg: linear-gradient(to top, #374151 0%, #111827 100%);
+    --chat-header-bg: linear-gradient(to top, #374151 0%, #111827 100%);
+    --chat-header-color: #f1f5f9;
+    --widget-header-bg: rgba(0, 0, 0, 0.2);
+    --widget-header-color: #f8fafc;
+    /* Keep the dashboard headings light, but make chart titles readable on light widget headers. */
+    --chart-header-color: #C2185B;
+    --widget-text-color: #f1f5f9;
+    --sidebar-bg: rgba(30, 41, 59, 0.6);
+    --navbar-bg: rgba(15, 23, 42, 0.7);
+    --navbar-border: rgba(255, 255, 255, 0.1);
+    --hover-bg: rgba(255, 255, 255, 0.05);
+    --theme-primary: #f472b6;
+    --chart-tool-bg: rgba(0, 0, 0, 0.35);
+    --chart-tool-bg-muted: rgba(0, 0, 0, 0.25);
+    --chart-tool-border: rgba(255, 255, 255, 0.25);
+    --chart-tool-fg: #ffffff;
+    --chart-tool-hover-bg: rgba(255, 255, 255, 0.12);
+    --tile-tool-bg: rgba(0, 0, 0, 0.35);
+    --tile-tool-hover-bg: rgba(255, 255, 255, 0.12);
+    --tile-tool-border: rgba(255, 255, 255, 0.25);
+    --tile-tool-fg: #ffffff;
 }
 
 /* =========================================================================
@@ -103,8 +162,9 @@
 
 /* Apply Theme Variables to Layout Components */
 .o_multi_dashboard_container .bg-100,
-.o_multi_dashboard_container .bg-light {
-    background-color: var(--bs-body-bg) !important;
+.o_multi_dashboard_container .bg-light,
+.o_multi_dashboard_container .o_dashboard_main {
+    background: transparent !important;
     color: var(--bs-body-color);
 }
 
@@ -145,6 +205,18 @@
     background-color: var(--hover-bg);
 }
 
+.o_multi_dashboard_container .btn-primary {
+    background-color: var(--theme-primary) !important;
+    border-color: var(--theme-primary) !important;
+    color: #ffffff !important;
+}
+
+.o_multi_dashboard_container .btn-primary:hover {
+    opacity: 0.9;
+    background-color: var(--theme-primary) !important;
+    border-color: var(--theme-primary) !important;
+}
+
 /* CHART WIDGET STYLES */
 .o_dashboard_chart_container,
 .o_custom_list_view,
@@ -181,7 +253,7 @@
     padding: 5px;
     border-radius: 5px;
     /* Heading text follows the selected dashboard theme (green/blue/purple/etc). */
-    color: var(--widget-header-color);
+    color: var(--chart-header-color, var(--widget-header-color));
 }
 
 .chart-tools {
@@ -199,9 +271,10 @@
     justify-content: center;
     cursor: pointer;
     border-radius: 6px;
-    background: rgba(0, 0, 0, 0.35);
+    background: var(--chart-tool-bg);
     transition: 0.2s ease, transform 0.2s ease;
     border: 0.5px solid;
+    border-color: var(--chart-tool-border);
 }
 
 .export-group {
@@ -235,7 +308,7 @@
 }
 
 .main-trigger {
-    background: rgba(0, 0, 0, 0.35) !important;
+    background: var(--chart-tool-bg) !important;
 }
 
 .export-group:hover .main-trigger {
@@ -250,27 +323,28 @@
     justify-content: center;
     cursor: pointer;
     border-radius: 6px;
-    background: rgba(0, 0, 0, 0.25);
+    background: var(--chart-tool-bg-muted);
     transition: 0.2s ease, transform 0.2s ease;
 }
 
 .exp-print-tool i {
     font-size: 14px;
-    color: #fff;
+    color: var(--chart-tool-fg);
 }
 
 .exp-print-tool:hover {
+    background: var(--chart-tool-hover-bg);
     transform: scale(1.05);
 }
 
 .chart-tool i {
     font-size: 14px;
-    color: #fff;
+    color: var(--chart-tool-fg);
 }
 
 /* Hover effect */
 .chart-tool:hover {
-    background: #e27d7d4a;
+    background: var(--chart-tool-hover-bg);
     transform: scale(1.05);
 }
 
@@ -279,15 +353,26 @@
 }
 
 .o-chart-edit,
-.o-chart-insight {
+.o-chart-insight,
+.o-chart-duplicate,
+.o-progress-edit,
+.o-progress-delete,
+.o-progress-duplicate {
     display: none !important;
 }
 
-.o_sidebar_active .o-chart-edit {
+.o_sidebar_active .o-chart-edit,
+.o_sidebar_active .o-chart-duplicate,
+.o_sidebar_active .o-progress-edit,
+.o_sidebar_active .o-progress-delete,
+.o_sidebar_active .o-progress-duplicate {
     display: flex !important;
 }
 
-.o_dashboard_chart_container:hover .o-chart-insight {
+.o_dashboard_chart_container:hover .o-chart-insight,
+.o_dashboard_chart_container:hover .o-chart-duplicate,
+.o_dashboard_progress_card:hover .o-progress-insight,
+.o_dashboard_progress_card:hover .o-progress-duplicate {
     display: flex !important;
 }
 
@@ -325,7 +410,8 @@
     justify-content: center;
     cursor: pointer;
     border-radius: 6px;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--theme-primary, rgba(0, 0, 0, 0.5));
+    transition: all 0.2s ease;
 }
 
 .import-chart i {
@@ -333,8 +419,9 @@
     color: #fff;
 }
 
-.import_chart:hover {
-    background: rgba(0, 0, 0, 0.35);
+.import-chart:hover {
+    opacity: 0.85;
+    transform: translateY(-1px);
 }
 
 .layout-btn {
@@ -349,8 +436,8 @@
 }
 
 .layout-btn.bg-primary {
-    background-color: #71639e !important;
-    border-color: #71639e !important;
+    background-color: var(--theme-primary) !important;
+    border-color: var(--theme-primary) !important;
 }
 
 /* Special class applied only during PDF generation */
@@ -920,4 +1007,88 @@
 
 .bg-light-hover:hover {
     background-color: var(--hover-bg) !important;
+}
+
+/* Notification Dropdown Theme Support */
+.dashboard-notification-dropdown {
+    background-color: var(--widget-bg) !important;
+    color: var(--bs-body-color);
+    border-color: var(--widget-border) !important;
+    right: 20px;
+    top: 60px;
+    z-index: 1050;
+    min-width: 250px;
+}
+
+.dashboard-notification-dropdown .notification-header {
+    background-color: var(--widget-header-bg) !important;
+    color: var(--bs-body-color);
+    border-bottom: 1px solid var(--widget-border);
+}
+
+.notification-item {
+    border-bottom: 1px solid var(--widget-border) !important;
+    color: var(--bs-body-color);
+    background-color: var(--widget-bg) !important;
+}
+
+.notification-item:hover {
+    background-color: var(--hover-bg) !important;
+}
+
+.notification-item .text-muted {
+    color: var(--bs-body-color) !important;
+    opacity: 0.7;
+}
+
+/* Notification Hover Refinement */
+.notification-item:hover {
+    background-color: var(--hover-bg) !important;
+    box-shadow: inset 0 0 0 1px var(--widget-border);
+}
+
+.notification-item:hover .text-primary,
+.notification-item .text-primary,
+.notification-item:hover .fw-bold,
+.notification-item .fw-bold {
+    color: var(--theme-primary) !important;
+}
+
+.o-dashboard-theme-dark-gradient .notification-item .text-muted,
+.o-dashboard-theme-dark .notification-item .text-muted {
+    color: #cbd5e1 !important;
+    opacity: 0.9;
+}
+
+.o-dashboard-theme-dark-gradient .dashboard-notification-dropdown,
+.o-dashboard-theme-dark .dashboard-notification-dropdown {
+    background: var(--navbar-bg) !important;
+    border-color: var(--navbar-border) !important;
+    backdrop-filter: blur(10px);
+}
+
+.o-dashboard-theme-dark-gradient .notification-header,
+.o-dashboard-theme-dark .notification-header {
+    background: var(--widget-header-bg) !important;
+    color: var(--widget-header-color) !important;
+}
+
+/* Ensure secondary labels maintain clear visibility */
+.notification-item:hover .text-muted {
+    color: var(--bs-body-color) !important;
+    opacity: 0.7;
+}
+
+/* Ensure badges/tags retain their original theme colors */
+.notification-item:hover .badge {
+    opacity: 1 !important;
+}
+
+/* Maintain specific alert colors on hover */
+.notification-item:hover .text-danger {
+    color: #dc3545 !important;
+}
+
+.notification-item:hover .text-success {
+    color: #28a745 !important;
 }

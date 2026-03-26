@@ -23,6 +23,8 @@
 import json
 import logging
 import pytz
+import re
+import hashlib
 from google import genai
 from google.genai import types
 from itertools import groupby
@@ -198,6 +200,54 @@ class MultiDashboardCharts(models.Model):
                                          default='vertical',
                                          help='Orientation of the chart.')
 
+    # Forecasting (XY charts)
+    enable_forecast = fields.Boolean(
+        string='Enable Forecast',
+        default=False,
+        help="If enabled, the widget will append forecast points for date-based XY charts (bar/line/stacked).",
+    )
+    forecast_method = fields.Selection(
+        [
+            ('trend', 'Trend (Fast)'),
+            ('ai_gemini', 'AI (Gemini)'),
+        ],
+        string='Forecast Method',
+        default='trend',
+        required=True,
+        help="Trend uses a simple statistical model. AI uses Gemini to predict future values from the displayed time series.",
+    )
+    forecast_periods = fields.Integer(
+        string='Forecast Periods',
+        default=3,
+        help="How many future periods to predict (based on the selected date granularity).",
+    )
+    forecast_history_periods = fields.Integer(
+        string='History Periods',
+        default=24,
+        help="How many past periods to use for forecasting. If the dashboard filter shows fewer points (e.g. only today), this setting allows building a better forecast from prior history.",
+    )
+    forecast_ai_cache = fields.Text(
+        string='AI Forecast Cache (JSON)',
+        help="Internal cache to avoid calling AI repeatedly.",
+    )
+    forecast_ai_cache_hash = fields.Char(string='AI Forecast Cache Hash')
+    forecast_ai_cache_date = fields.Datetime(string='AI Forecast Cache Date')
+    forecast_ai_cache_ttl_hours = fields.Integer(
+        string='AI Cache TTL (Hours)',
+        default=24,
+        help="How long to reuse the cached AI forecast before generating a new one.",
+    )
+
+    def action_clear_forecast_cache(self):
+        """Clear cached AI forecast (so next load will regenerate)."""
+        for rec in self:
+            rec.write({
+                'forecast_ai_cache': False,
+                'forecast_ai_cache_hash': False,
+                'forecast_ai_cache_date': False,
+            })
+        return True
+
     # Layout configuration
     widget_color = fields.Char('Widget Color',
                                help='Background color or gradient for the tile widget.')
@@ -250,6 +300,18 @@ class MultiDashboardCharts(models.Model):
 
     widget_preview = fields.Char('Preview',
                                  help='Preview of the widget configuration.')
+    is_ai_config = fields.Boolean(string="AI Optimized", default=False,
+                                  help="Flag to identify AI generated charts")
+    
+    # Target & Notification Fields
+    show_target = fields.Boolean('Show Target', help='Show a target line on the chart')
+    target_value = fields.Float('Target Value', help='Value for the target line')
+    target_color = fields.Char('Target Color', default='#FF0000', help='Color of the target line')
+    target_label = fields.Char('Target Label', default='Target', help='Label for the target line')
+    send_target_email = fields.Boolean('Email Notification on Target', help='Send email when target is met')
+    target_email_recipient_ids = fields.Many2many('res.users', 'multi_chart_target_user_rel', 'chart_id', 'user_id', 
+                                                 string='Email Recipients', help='Users to notify when target is met')
+    last_target_email_date = fields.Datetime('Last Target Email Sent')
     use_background_gradient = fields.Boolean('Use Background Gradient', default=False,
                                              help='Apply a linear gradient background to the widget.')
     alert_ids = fields.One2many('multi.dashboard.alert', 'chart_id', string='Alerts')
@@ -363,7 +425,8 @@ class MultiDashboardCharts(models.Model):
                         kpi_data = {
                             'percentage': round(percentage, 1),
                             'direction': 'up' if percentage >= 100 else 'down',
-                            'comparison_label': 'of Target'
+                            'comparison_label': 'of Target',
+                            'target': target_val
                         }
                     elif date_filter:
                         prev_domain = self._get_previous_period_domain(date_filter)
@@ -460,10 +523,41 @@ class MultiDashboardCharts(models.Model):
             elif self.chart_type == 'list':
                 return self._get_list_view_data(date_domain)
             else:
-                return self._get_amcharts_data(date_domain)
+                res = self._get_amcharts_data(date_domain)
+
+            # Add Target Information for all types that support it
+            if self.chart_type in ['bar', 'line', 'stacked']:
+                res.update({
+                    'show_target': self.show_target,
+                    'target_value': self.target_value,
+                    'target_color': self.target_color,
+                    'target_label': self.target_label,
+                })
+                # Check target achievement for email notification
+                if self.show_target and self.send_target_email:
+                    # Get the numerical value for check. 
+                    # For charts, we usually take the grand total or latest value.
+                    # But the request says "sales targets are met", 
+                    # which often refers to the total 'value' in the result.
+                    val_to_check = res.get('value', 0)
+                    self._check_target_achievement(val_to_check)
+            
+            return res
 
         except Exception as e:
             return {'value': 0, 'error': str(e)}
+
+    def _check_target_achievement(self, current_value):
+        """Check if target is reached and send email if not already sent recently."""
+        if current_value >= self.target_value:
+            # Check if we should send email (e.g. once per 24h per widget)
+            now = fields.Datetime.now()
+            if not self.last_target_email_date or (now - self.last_target_email_date).total_seconds() > 86400:
+                template = self.env.ref('multi_dashboard.email_template_chart_target_achievement', raise_if_not_found=False)
+                if template:
+                    template.with_context(current_value=current_value).send_mail(self.id, force_send=True)
+                    self.write({'last_target_email_date': now})
+                    _logger.info("Target achieved email sent for widget %s", self.name)
 
     def _get_date_domain(self, date_filter=None):
         """Build the dashboard date domain for this widget."""
@@ -875,6 +969,7 @@ class MultiDashboardCharts(models.Model):
             'groupField': self.chart_group_field_id.name,
             'groupFieldLabel': self.chart_group_field_id.field_description,
             'measureFieldLabel': self.measure_field_id.field_description if self.measure_field_id else 'Count',
+            'value': sum(p.get('value', 0) for p in chart_data),
         }
 
     def _get_pie_chart_data(self, model, domain):
@@ -1007,6 +1102,7 @@ class MultiDashboardCharts(models.Model):
             'groupField': self.chart_group_field_id.name,
             'groupFieldLabel': self.chart_group_field_id.field_description,
             'measureFieldLabel': self.measure_field_id.field_description if self.measure_field_id else 'Count',
+            'value': sum(sum(p.get(f.name, 0) for f in self.chart_measure_field_ids) if is_multi_measure_donut else p.get('value', 0) for p in chart_data),
         }
 
     def _get_bar_line_chart_data(self, model, domain):
@@ -1132,17 +1228,427 @@ class MultiDashboardCharts(models.Model):
             sub_group_field
         )
 
-        return {
+        # Total of actual (non-forecast) values. This is used for target checks and summaries.
+        actual_total = 0
+        for point in chart_data:
+            for s in series_config:
+                v = point.get(s.get('valueField'))
+                if isinstance(v, (int, float)):
+                    actual_total += v
+
+        result = {
             'chart_type': self.chart_type,
             'data': chart_data,
             'series': series_config,
             'name': self.name,
             'has_sub_group': bool(sub_group_field),
+            'orientation': self.chart_orientation,
             'groupField': self.chart_group_field_id.name,
             'groupFieldType': self.chart_group_field_id.ttype,
-            'date_granularity': self.chart_date_group_by if self.chart_group_field_id.ttype in ['date', 'datetime'] else False,
+            'date_granularity': self.chart_date_group_by if self.chart_group_field_id.ttype in ('date', 'datetime') else False,
             'groupFieldLabel': self.chart_group_field_id.field_description,
+            'value': round(actual_total, 2),
         }
+
+        # Append forecast series + future points (only for date/datetime group-by on XY charts)
+        if self.enable_forecast and self.chart_type in ('bar', 'line', 'stacked') and self.chart_group_field_id.ttype in ('date', 'datetime'):
+            base_domain = safe_eval(self.filter) if self.filter else []
+            self._add_forecast_to_xy_result(result, model=model, base_domain=base_domain)
+
+        return result
+
+    def _coerce_period_start_date(self, raw_value):
+        """Coerce a grouped label into a date representing the period start."""
+        if not raw_value:
+            return None
+        if isinstance(raw_value, datetime):
+            return raw_value.date()
+        if isinstance(raw_value, date):
+            return raw_value
+        if isinstance(raw_value, str):
+            # raw_value can be 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS'
+            try:
+                return fields.Date.from_string(raw_value)
+            except Exception:
+                try:
+                    return fields.Datetime.from_string(raw_value).date()
+                except Exception:
+                    return None
+        return None
+
+    def _get_period_delta(self):
+        """Return a relativedelta for stepping one period forward based on chart_date_group_by."""
+        gran = self.chart_date_group_by or 'month'
+        if gran == 'day':
+            return relativedelta(days=1)
+        if gran == 'week':
+            return relativedelta(weeks=1)
+        if gran == 'month':
+            return relativedelta(months=1)
+        if gran == 'quarter':
+            return relativedelta(months=3)
+        if gran == 'year':
+            return relativedelta(years=1)
+        return relativedelta(months=1)
+
+    def _linear_regression_forecast(self, ys, horizon):
+        """Simple OLS y ~ t forecast. Returns list of predictions for next `horizon` steps."""
+        ys = [y for y in ys if isinstance(y, (int, float))]
+        n = len(ys)
+        if horizon <= 0:
+            return []
+        if n < 2:
+            return [round(ys[-1], 2)] * horizon if n == 1 else []
+
+        sumx = (n - 1) * n / 2.0
+        sumxx = (n - 1) * n * (2 * n - 1) / 6.0
+        sumy = float(sum(ys))
+        sumxy = float(sum(i * y for i, y in enumerate(ys)))
+        denom = (n * sumxx - sumx * sumx)
+        slope = (n * sumxy - sumx * sumy) / denom if denom else 0.0
+        intercept = (sumy - slope * sumx) / n
+
+        start = n
+        return [round(intercept + slope * (start + i), 2) for i in range(horizon)]
+
+    def _extract_json_object(self, text):
+        """Extract the first top-level JSON object from a model response."""
+        if not text:
+            return None
+        # Strip markdown fences if present
+        cleaned = text.strip()
+        cleaned = re.sub(r"^```(?:json)?", "", cleaned, flags=re.IGNORECASE).strip()
+        cleaned = re.sub(r"```$", "", cleaned).strip()
+        # Fallback: take substring between first '{' and last '}'
+        start = cleaned.find("{")
+        end = cleaned.rfind("}")
+        if start == -1 or end == -1 or end <= start:
+            return None
+        return cleaned[start:end + 1]
+
+    def _compute_ai_cache_hash(self, payload):
+        raw = json.dumps(payload, sort_keys=True, default=str).encode("utf-8")
+        return hashlib.sha1(raw).hexdigest()
+
+    def _get_ai_forecast_predictions(self, history_points, series_keys, horizon):
+        """
+        Call Gemini to forecast the next `horizon` values for each key in `series_keys`.
+
+        history_points: list of {'date': 'YYYY-MM-DD', 'values': {key: number}}
+        returns: dict {key: [float, ...]} length == horizon
+        """
+        api_key = self.env['ir.config_parameter'].sudo().get_param('multi_dashboard.gemini_api_key')
+        if not api_key:
+            raise ValueError("Gemini API Key is not configured.")
+
+        client = genai.Client(api_key=api_key)
+
+        # Keep model selection stable; flash is cheaper/faster.
+        model_name = 'gemini-1.5-flash'
+
+        prompt = f"""
+You are a forecasting engine. Return ONLY valid JSON. No markdown, no explanations.
+
+Input is a monthly (or period-based) time series.
+Task: Predict the NEXT {horizon} future periods for each series key.
+
+Rules:
+- Output JSON must contain: {{ "predictions": {{ "<key>": [..{horizon} numbers..], ... }}, "notes": "<short>" }}
+- Each list must be EXACTLY length {horizon}.
+- Numbers must be plain JSON numbers (no quotes, no commas in numbers).
+- Do not output null; if unsure, output a reasonable continuation.
+
+Series Keys:
+{json.dumps(series_keys)}
+
+History:
+{json.dumps(history_points, indent=2)}
+"""
+
+        response = client.models.generate_content(
+            model=model_name,
+            contents=prompt,
+        )
+        raw = (response.text or "").strip()
+        json_text = self._extract_json_object(raw)
+        if not json_text:
+            raise ValueError("AI response did not contain JSON.")
+        parsed = json.loads(json_text)
+        predictions = (parsed or {}).get("predictions") or {}
+        if not isinstance(predictions, dict):
+            raise ValueError("AI predictions must be an object.")
+        return predictions
+
+    def _get_extended_time_series_history(self, model, base_domain, end_date, periods, series_keys):
+        """
+        Build a fixed-length (periods) history ending at `end_date` (inclusive) using the chart's X-axis date field.
+        Returns: list of dicts: [{'date': 'YYYY-MM-DD', 'values': {key: number}}, ...] sorted ascending.
+        """
+        if not periods or periods <= 0:
+            return []
+        if not end_date or not isinstance(end_date, date):
+            return []
+        if self.chart_group_field_id.ttype not in ('date', 'datetime'):
+            return []
+
+        group_field = self.chart_group_field_id.name
+        group_field_param = group_field
+        if self.chart_date_group_by:
+            group_field_param = f"{group_field}:{self.chart_date_group_by}"
+
+        step = self._get_period_delta()
+        start_date = end_date
+        for _ in range(int(periods) - 1):
+            start_date = start_date - step
+
+        # Domain bounds. Use < next period start so we include full end period.
+        end_exclusive = end_date + step
+        domain = list(base_domain or [])
+
+        if self.chart_group_field_id.ttype == 'datetime':
+            domain += [
+                (group_field, '>=', fields.Datetime.to_string(datetime.combine(start_date, datetime.min.time()))),
+                (group_field, '<', fields.Datetime.to_string(datetime.combine(end_exclusive, datetime.min.time()))),
+            ]
+        else:
+            domain += [
+                (group_field, '>=', fields.Date.to_string(start_date)),
+                (group_field, '<', fields.Date.to_string(end_exclusive)),
+            ]
+
+        aggregates = ['__count']
+        measure_fields = []
+        if self.measure_aggregation != 'count':
+            measure_fields = [f.name for f in self.chart_measure_field_ids]
+            for field_name in measure_fields:
+                aggregates.append(f"{field_name}:sum")
+
+        raw_groups = model._read_group(domain, groupby=[group_field_param], aggregates=aggregates)
+
+        # Map grouped results into a dict keyed by period start date
+        grouped = {}
+        for res in raw_groups:
+            # res[0] is group value for group_field_param
+            dt = self._coerce_period_start_date(res[0])
+            if not dt:
+                continue
+            count = res[1]
+            vals = {}
+            if self.measure_aggregation == 'count':
+                vals['value'] = int(count or 0)
+            else:
+                for i, field_name in enumerate(measure_fields):
+                    summed = res[2 + i] or 0.0
+                    if self.measure_aggregation == 'avg':
+                        vals[field_name] = float(summed) / float(count or 1)
+                    else:
+                        vals[field_name] = float(summed)
+            grouped[dt] = vals
+
+        # Build a contiguous timeline and fill missing periods with 0
+        out = []
+        cur = start_date
+        for _ in range(int(periods)):
+            label = fields.Date.to_string(cur)
+            base_vals = grouped.get(cur, {}) or {}
+            values = {}
+            for k in series_keys:
+                if k in base_vals and isinstance(base_vals[k], (int, float)):
+                    values[k] = round(float(base_vals[k]), 2)
+                else:
+                    values[k] = 0.0
+            out.append({'date': label, 'values': values})
+            cur = cur + step
+
+        return out
+
+    def _add_forecast_to_xy_result(self, result, model=None, base_domain=None):
+        """
+        Mutates `result` in-place:
+        - Adds forecast series configs (rendered as dashed lines)
+        - Adds future data points and forecast values
+        Forecast is only meaningful when X-axis is date-based.
+        """
+        data = list(result.get('data') or [])
+        series = list(result.get('series') or [])
+
+        # Only forecast if we have at least one date-like label to anchor on.
+        dated_points = []
+        other_points = []
+        for p in data:
+            dt = self._coerce_period_start_date(p.get('raw_value') or p.get('category'))
+            if dt:
+                dated_points.append((dt, p))
+            else:
+                other_points.append(p)
+
+        if not dated_points:
+            return
+
+        # Sort chronologically for sensible forecasting and axis order.
+        dated_points.sort(key=lambda x: x[0])
+        dated_only_sorted = [p for _, p in dated_points]
+        data_sorted = other_points + dated_only_sorted
+
+        # Forecast horizon guard
+        horizon = int(self.forecast_periods or 0)
+        if horizon <= 0:
+            result['data'] = data_sorted
+            return
+
+        # Create forecast series definitions
+        forecast_series = []
+        for s in series:
+            value_field = s.get('valueField')
+            if not value_field:
+                continue
+            forecast_field = f"__forecast__{value_field}"
+            forecast_series.append({
+                'valueField': forecast_field,
+                'name': f"{s.get('name') or value_field} (Forecast)",
+                'renderAs': 'line',
+                'isForecast': True,
+                'baseValueField': value_field,
+            })
+
+        if not forecast_series:
+            result['data'] = data_sorted
+            return
+
+        # Ensure existing points contain forecast fields as null for clean gaps
+        for p in data_sorted:
+            p['__is_forecast'] = False
+            for fs in forecast_series:
+                p[fs['valueField']] = None
+
+        # To visually "connect" actual -> forecast for line rendering, seed the last actual point.
+        last_actual_point = dated_only_sorted[-1] if dated_only_sorted else None
+        if last_actual_point:
+            for fs in forecast_series:
+                base_key = fs['baseValueField']
+                last_actual_point[fs['valueField']] = last_actual_point.get(base_key)
+
+        last_date = dated_points[-1][0]
+        step = self._get_period_delta()
+
+        # Build per-series y history (ordered by time)
+        history_by_field = {}
+        for fs in forecast_series:
+            base_key = fs['baseValueField']
+            history_by_field[base_key] = [p.get(base_key) for p in dated_only_sorted]
+
+        preds_by_field = {}
+
+        method = (self.forecast_method or 'trend')
+        if self.env.context.get('dashboard_preview'):
+            method = 'trend'  # never call external AI for live preview
+
+        if method == 'ai_gemini' and result.get('has_sub_group'):
+            # Sub-group series keys are sparse and hard to forecast reliably with a single prompt.
+            method = 'trend'
+
+        # Extend history for forecasting if needed (e.g. chart shows only today)
+        history_periods = int(self.forecast_history_periods or 0)
+        if history_periods > 0 and model is not None and dated_only_sorted:
+            end_dt = self._coerce_period_start_date(dated_only_sorted[-1].get('raw_value') or dated_only_sorted[-1].get('category'))
+            if end_dt and history_periods > len(dated_only_sorted):
+                try:
+                    series_keys = list(history_by_field.keys())
+                    extended = self._get_extended_time_series_history(model, base_domain, end_dt, history_periods, series_keys)
+                    if extended:
+                        # Rebuild history arrays from extended timeline
+                        for k in series_keys:
+                            history_by_field[k] = [p['values'].get(k) for p in extended]
+                except Exception as e:
+                    _logger.info("Failed to build extended history for widget %s (%s): %s", self.id, self.name, e)
+
+        if method == 'ai_gemini':
+            # Prepare compact history payload (limit to most recent 24 points)
+            history_points = []
+            # If we extended history above, use it; otherwise use the visible points.
+            if model is not None and history_periods > 0 and len(next(iter(history_by_field.values()), [])) >= 2 and dated_only_sorted:
+                end_dt = self._coerce_period_start_date(dated_only_sorted[-1].get('raw_value') or dated_only_sorted[-1].get('category'))
+                if end_dt:
+                    try:
+                        series_keys = list(history_by_field.keys())
+                        extended = self._get_extended_time_series_history(model, base_domain, end_dt, min(history_periods, 36), series_keys)
+                        history_points = extended or []
+                    except Exception:
+                        history_points = []
+            if not history_points:
+                for p in dated_only_sorted[-24:]:
+                    history_points.append({
+                        'date': (p.get('raw_value') or p.get('category')),
+                        'values': {k: (p.get(k) if isinstance(p.get(k), (int, float)) else None) for k in history_by_field.keys()},
+                    })
+
+            series_keys = list(history_by_field.keys())
+            payload = {
+                'chart_id': self.id,
+                'granularity': self.chart_date_group_by,
+                'horizon': horizon,
+                'series_keys': series_keys,
+                'history': history_points,
+            }
+            cache_hash = self._compute_ai_cache_hash(payload)
+
+            use_cache = False
+            if self.forecast_ai_cache and self.forecast_ai_cache_hash == cache_hash and self.forecast_ai_cache_date:
+                ttl = int(self.forecast_ai_cache_ttl_hours or 0)
+                if ttl > 0:
+                    age_hours = (fields.Datetime.now() - self.forecast_ai_cache_date).total_seconds() / 3600.0
+                    use_cache = age_hours <= ttl
+
+            try:
+                if use_cache:
+                    cached = json.loads(self.forecast_ai_cache or "{}")
+                    ai_predictions = (cached or {}).get("predictions") or {}
+                else:
+                    ai_predictions = self._get_ai_forecast_predictions(history_points, series_keys, horizon)
+                    # Persist cache
+                    self.sudo().write({
+                        'forecast_ai_cache': json.dumps({'predictions': ai_predictions}),
+                        'forecast_ai_cache_hash': cache_hash,
+                        'forecast_ai_cache_date': fields.Datetime.now(),
+                    })
+
+                for k in series_keys:
+                    seq = ai_predictions.get(k)
+                    if isinstance(seq, list) and len(seq) == horizon:
+                        preds_by_field[k] = [float(x) for x in seq]
+                    else:
+                        preds_by_field[k] = self._linear_regression_forecast(history_by_field[k], horizon)
+            except Exception as e:
+                _logger.warning("AI forecast failed for widget %s (%s); falling back to trend. Error: %s", self.id, self.name, e)
+                for k in history_by_field.keys():
+                    preds_by_field[k] = self._linear_regression_forecast(history_by_field[k], horizon)
+        else:
+            for k, ys in history_by_field.items():
+                preds_by_field[k] = self._linear_regression_forecast(ys, horizon)
+
+        future_points = []
+        current = last_date
+        for i in range(horizon):
+            current = current + step
+            label = fields.Date.to_string(current)
+            fp = {
+                'category': label,
+                'raw_value': label,
+                '__is_forecast': True,
+            }
+            # Hide actual series values in forecast region
+            for s in series:
+                k = s.get('valueField')
+                if k:
+                    fp[k] = None
+            # Populate forecast values
+            for fs in forecast_series:
+                base_key = fs['baseValueField']
+                fp[fs['valueField']] = preds_by_field.get(base_key, [None] * horizon)[i]
+            future_points.append(fp)
+
+        result['data'] = data_sorted + future_points
+        result['series'] = series + forecast_series
 
     def _merge_chart_data(self, chart_data):
         """
@@ -1378,6 +1884,11 @@ class MultiDashboardCharts(models.Model):
             'chart_date_group_by': config.get('chart_date_group_by'),
             'tile_icon': config.get('tile_icon'),
             'tile_unit_format': config.get('tile_unit_format', 'auto'),
+            'enable_forecast': config.get('enable_forecast', False),
+            'forecast_method': config.get('forecast_method', 'trend'),
+            'forecast_periods': config.get('forecast_periods', 3),
+            'forecast_history_periods': config.get('forecast_history_periods', 24),
+            'forecast_ai_cache_ttl_hours': config.get('forecast_ai_cache_ttl_hours', 24),
         }
 
         # Remove None values
@@ -1385,7 +1896,7 @@ class MultiDashboardCharts(models.Model):
 
         try:
             # Create an in-memory record from the config dict
-            mock_record = self.new(clean_config)
+            mock_record = self.with_context(dashboard_preview=True).new(clean_config)
 
             # Reuse your existing routing logic
             return mock_record.get_widget_value()
@@ -1455,6 +1966,11 @@ class MultiDashboardCharts(models.Model):
                 'is_kpi': chart.is_kpi,
                 'kpi_comparison': chart.kpi_comparison,
                 'use_background_gradient': chart.use_background_gradient,
+                'enable_forecast': chart.enable_forecast,
+                'forecast_method': chart.forecast_method,
+                'forecast_periods': chart.forecast_periods,
+                'forecast_history_periods': chart.forecast_history_periods,
+                'forecast_ai_cache_ttl_hours': chart.forecast_ai_cache_ttl_hours,
             }
             chart_data_list.append(config)
         return {

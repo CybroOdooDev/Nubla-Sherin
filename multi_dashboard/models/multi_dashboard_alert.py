@@ -41,7 +41,7 @@ class MultiDashboardAlert(models.Model):
     value = fields.Float('Threshold Value', required=True)
     user_ids = fields.Many2many('res.users', string='Users to Notify', required=True, default=lambda self: self.env.user)
     is_active = fields.Boolean('Is Active', default=True)
-    is_acknowledged = fields.Boolean('Acknowledged', default=True)
+    is_acknowledged = fields.Boolean('Acknowledged', default=False)
     last_triggered_value = fields.Float('Last Triggered Value', readonly=True)
 
     @api.model
@@ -115,14 +115,6 @@ class MultiDashboardAlert(models.Model):
             self.name, self.chart_id.name, current_value, self.condition, self.value)
         
         for user in self.user_ids:
-            # Send bus notification for immediate popup (Plain Text only)
-            self.env['bus.bus']._sendone(user.partner_id, 'simple_notification', {
-                'title': _('Dashboard Alert: %s') % self.name,
-                'message': plain_body,
-                'sticky': True,
-                'type': 'warning',
-            })
-            
             # This ensures it appears in the Messaging menu (bell icon) and inbox (HTML supported)
             self.chart_id.message_notify(
                 body=html_body,
@@ -172,6 +164,14 @@ class MultiDashboardAlert(models.Model):
         }
 
     def action_dismiss_alert(self):
-        """Dismiss the current alert notification"""
+        """Dismiss the current alert notification and complete associated activities"""
         self.write({'is_acknowledged': True})
+        # Find and mark activities as done
+        activities = self.env['mail.activity'].search([
+            ('res_model', '=', self._name),
+            ('res_id', 'in', self.ids),
+            ('summary', '=', _('Dashboard Alert Triggered'))
+        ])
+        if activities:
+            activities.action_feedback(feedback=_('Dismissed from Dashboard'))
         return True

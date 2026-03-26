@@ -109,6 +109,27 @@ export class DashboardListWidget extends Component {
         });
     }
 
+    onDuplicateMove() {
+        const listId = this.props.data.id;
+        if (!listId) return;
+
+        this.actionService.doAction({
+            type: "ir.actions.act_window",
+            res_model: "multi.dashboard.duplicate.move",
+            views: [[false, "form"]],
+            target: "new",
+            context: {
+                default_chart_id: listId,
+            }
+        }, {
+            onClose: async () => {
+                if (this.props.onRefresh) {
+                    await this.props.onRefresh();
+                }
+            }
+        });
+    }
+
     // --- Pagination Getters (unchanged) ---
     get limitPerPage() {
         return this.props.data.limit_per_page || 10;
@@ -257,6 +278,9 @@ DashboardListWidget.template = xml`
                 </button>
                 <button class="btn-del-list" t-on-click="onDelete">
                     <i class="fa fa-trash"/>
+                </button>
+                <button class="btn-duplicate-list" t-on-click="onDuplicateMove" title="Duplicate/Move to Dashboard" style="background: none; border: none; padding: 5px; color: inherit; opacity: 0.7; transition: opacity 0.2s;">
+                    <i class="fa fa-copy"/>
                 </button>
             </div>
 

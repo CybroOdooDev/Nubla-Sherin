@@ -21,7 +21,7 @@
         <field name="arch" type="xml">
             <form string="Dashboard Alert">
                 <header>
-                    <button name="action_dismiss_alert" string="Dismiss" type="object" class="oe_highlight"/>
+                    <button name="action_dismiss_alert" string="Dismiss" type="object" class="oe_highlight" invisible="is_acknowledged"/>
                     <field name="is_acknowledged" widget="boolean_toggle" readonly="1"/>
                 </header>
                 <sheet>

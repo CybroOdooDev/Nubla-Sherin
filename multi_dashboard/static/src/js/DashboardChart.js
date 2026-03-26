@@ -62,8 +62,13 @@ export class DashboardChart extends Component {
         groupFieldType: { type: String, optional: true },
         dateGranularity: { type: [String, Boolean], optional: true },
         subGroupField: { type: String, optional: true },
+        hasSubGroup: { type: Boolean, optional: true },
         isPreview: { type: Boolean, optional: true },
-        useBackgroundGradient: { type: Boolean, optional: true }
+        useBackgroundGradient: { type: Boolean, optional: true },
+        showTarget: { type: Boolean, optional: true },
+        targetValue: { type: Number, optional: true },
+        targetColor: { type: String, optional: true },
+        targetLabel: { type: String, optional: true }
     };
 
     setup() {
@@ -165,7 +170,8 @@ export class DashboardChart extends Component {
         }
     }
 
-    // Simple method to get accent color based on the provided index, defaults to first color if index is out of range or not provided.
+    // Simple method to get accent color based on the provided index,
+    // defaults to first color if index is out of range or not provided.
     get accentColor() {
         const index = this.props.color || 0;
         return index === 0 ? null : (COLORS[index] || COLORS[0]);
@@ -243,6 +249,27 @@ export class DashboardChart extends Component {
         });
     }
 
+    onDuplicateMove() {
+        const chartId = this.props.id;
+        if (!chartId) return;
+
+        this.actionService.doAction({
+            type: "ir.actions.act_window",
+            res_model: "multi.dashboard.duplicate.move",
+            views: [[false, "form"]],
+            target: "new",
+            context: {
+                default_chart_id: chartId,
+            }
+        }, {
+            onClose: async () => {
+                if (this.props.onRefresh) {
+                    await this.props.onRefresh();
+                }
+            }
+        });
+    }
+
     // Method to handle drill-down for specific chart elements
     async _onChartElementClick(ev) {
         if (this.props.isPreview) return;
@@ -253,6 +280,10 @@ export class DashboardChart extends Component {
         // Determine category value from the chart's data point
         // Use raw_value if available (for precise ID filtering), otherwise fall back to formatted category
         const dataContext = dataItem.dataContext;
+        if (dataContext && dataContext.__is_forecast) {
+            // Forecast points are synthetic; they should not open drill-down actions.
+            return;
+        }
         const categoryValue = (dataContext && dataContext.raw_value !== undefined)
             ? dataContext.raw_value
             : (dataItem.get("category") || dataItem.get("categoryX") || dataItem.get("categoryY") || (dataContext && dataContext.category));
@@ -347,7 +378,8 @@ export class DashboardChart extends Component {
         }
     }
 
-    // Method to call the server to get JSON export for either a chart or a dashboard, then trigger download in the browser.
+    // Method to call the server to get JSON export for either
+    //a chart or a dashboard, then trigger download in the browser.
     async downloadJsonExport(exportParams) {
         /**
          * exportParams can be:
@@ -378,7 +410,8 @@ export class DashboardChart extends Component {
         }
     }
 
-    // This method is specifically for exporting the chart configuration as JSON, which can be used for backup or transferring settings between environments.
+    // This method is specifically for exporting the chart configuration as JSON,
+    //which can be used for backup or transferring settings between environments.
     async generateJsonReport() {
         try {
             const chartId = this.props.id;
@@ -644,9 +677,11 @@ export class DashboardChart extends Component {
         const self = this;
 
         seriesConfig.forEach((s) => {
+            const isForecast = !!(s.isForecast || s.is_forecast);
+            const renderAs = s.renderAs || (isForecast ? 'line' : ((type === 'bar' || type === 'stacked') ? 'column' : 'line'));
             let series;
 
-            if (type === 'bar' || type === 'stacked') {
+            if (renderAs === 'column') {
                 series = chart.series.push(am5xy.ColumnSeries.new(root, {
                     name: s.name,
                     xAxis: xAxis,
@@ -690,6 +725,7 @@ export class DashboardChart extends Component {
                     yAxis: yAxis,
                     valueYField: s.valueField,
                     categoryXField: "category",
+                    connect: false,
                     tooltip: am5.Tooltip.new(root, {
                         labelText: "{name}: {valueY}"
                     })
@@ -698,31 +734,42 @@ export class DashboardChart extends Component {
                 series.strokes.template.setAll({
                     strokeWidth: 3,
                     interactive: true,
-                    cursorOverStyle: "pointer"
+                    cursorOverStyle: isForecast ? "default" : "pointer"
                 });
 
-                series.strokes.template.events.on("click", function (ev) {
-                    ev.originalEvent.stopPropagation();
-                    self._onChartElementClick(ev);
-                });
-
-                series.bullets.push(function () {
-                    let bulletCircle = am5.Circle.new(root, {
-                        radius: 5,
-                        fill: series.get("fill"),
-                        interactive: true,
-                        cursorOverStyle: "pointer"
-                    });
-
-                    bulletCircle.events.on("click", (ev) => {
+                if (!isForecast) {
+                    series.strokes.template.events.on("click", function (ev) {
                         ev.originalEvent.stopPropagation();
                         self._onChartElementClick(ev);
                     });
+                }
 
-                    return am5.Bullet.new(root, {
-                        sprite: bulletCircle
+                if (isForecast) {
+                    series.strokes.template.setAll({
+                        strokeDasharray: [6, 4],
+                        strokeOpacity: 0.9,
+                        strokeWidth: 2,
                     });
-                });
+                    // No bullets and no drill-down for forecast.
+                } else {
+                    series.bullets.push(function () {
+                        let bulletCircle = am5.Circle.new(root, {
+                            radius: 5,
+                            fill: series.get("fill"),
+                            interactive: true,
+                            cursorOverStyle: "pointer"
+                        });
+
+                        bulletCircle.events.on("click", (ev) => {
+                            ev.originalEvent.stopPropagation();
+                            self._onChartElementClick(ev);
+                        });
+
+                        return am5.Bullet.new(root, {
+                            sprite: bulletCircle
+                        });
+                    });
+                }
             }
             series.data.setAll(data);
         });
@@ -741,6 +788,34 @@ export class DashboardChart extends Component {
             behavior: "zoomX",
             interactive: true
         }));
+
+        // Add Target Line if configured
+        if (this.props.showTarget && this.props.targetValue !== undefined) {
+            let rangeDataItem = yAxis.makeDataItem({
+                value: this.props.targetValue
+            });
+
+            let range = yAxis.createAxisRange(rangeDataItem);
+
+            range.get("grid").setAll({
+                stroke: am5.color(this.props.targetColor || "#FF0000"),
+                strokeOpacity: 1,
+                strokeWidth: 2,
+                strokeDasharray: [3, 3],
+                visible: true
+            });
+
+            range.get("label").setAll({
+                text: this.props.targetLabel || "Target",
+                inside: true,
+                fill: am5.color(this.props.targetColor || "#FF0000"),
+                fontSize: 10,
+                fontWeight: "bold",
+                location: 1,
+                centerX: am5.p100,
+                centerY: am5.p100
+            });
+        }
     }
 
     // Method to create either a Donut Chart or a Nested Donut Chart based on the provided data and series configuration.
@@ -1221,6 +1296,9 @@ DashboardChart.template = xml`
                 </div>
                 <div class="chart-tool o-chart-edit" t-on-click.stop="onDelete">
                     <i class="fa fa-trash"/>
+                </div>
+                <div class="chart-tool o-chart-duplicate" t-on-click.stop="onDuplicateMove" title="Duplicate/Move to Dashboard">
+                    <i class="fa fa-copy"/>
                 </div>
             </div>
         </div>

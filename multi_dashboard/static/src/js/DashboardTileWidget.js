@@ -117,6 +117,28 @@ export class DashboardTileWidget extends Component {
         });
     }
 
+    // Method to open the duplicate/move wizard
+    onDuplicateMove() {
+        const tileId = this.props.data.id;
+        if (!tileId) return;
+
+        this.actionService.doAction({
+            type: "ir.actions.act_window",
+            res_model: "multi.dashboard.duplicate.move",
+            views: [[false, "form"]],
+            target: "new",
+            context: {
+                default_chart_id: tileId,
+            }
+        }, {
+            onClose: async () => {
+                if (this.props.onRefresh) {
+                    await this.props.onRefresh();
+                }
+            }
+        });
+    }
+
     // Method to handle user click on the tile
     async onTileClick(ev) {
         if (this.props.isPreview) return;
@@ -177,6 +199,9 @@ DashboardTileWidget.template = xml`
             </button>
             <button class="btn-del-tile" t-on-click="onDelete">
                 <i class="fa fa-trash"/>
+            </button>
+            <button class="btn-duplicate-tile" t-on-click="onDuplicateMove" title="Duplicate/Move to Dashboard">
+                <i class="fa fa-copy"/>
             </button>
         </div>
         <div t-if="!props.isPreview" class="download-options">

@@ -1,5 +1,5 @@
 .clock-widget {
-    background: var(--widget-accent, #fffff);
+    background: var(--widget-accent, #ffffff);
 }
 
 .clock-tools-overlay {
@@ -37,11 +37,18 @@
 }
 
 .btn-del-clock:hover {
-    background: #dc3545; /* danger red */
+    background: #dc3545;
+    /* danger red */
 }
 
 .btn-edit-clock:hover {
-    background: #0d6efd; /* bootstrap primary */
+    background: #0d6efd;
+    /* bootstrap primary */
+}
+
+.btn-duplicate-clock:hover {
+    background: #6f42c1;
+    /* purple */
 }
 
 /* Show tools ONLY when sidebar is active */

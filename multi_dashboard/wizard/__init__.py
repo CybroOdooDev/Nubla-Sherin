@@ -20,3 +20,4 @@
 #
 #############################################################################
 from . import import_chart
+from . import multi_dashboard_duplicate_move

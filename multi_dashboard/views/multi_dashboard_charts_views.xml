@@ -27,7 +27,6 @@
             </list>
         </field>
     </record>
-s
     <!-- Form View -->
     <record id="multi_dashboard_charts_view_form" model="ir.ui.view">
         <field name="name">multi.dashboard.charts.view.form</field>
@@ -110,6 +109,26 @@ s
                                     <field name="chart_date_group_by" widget="radio"
                                            invisible="chart_group_field_id_type not in ['date', 'datetime']"/>
 
+                                    <separator string="Forecast"
+                                               invisible="chart_type not in ['bar', 'line', 'stacked'] or chart_group_field_id_type not in ['date', 'datetime']"/>
+                                    <field name="enable_forecast"
+                                           invisible="chart_type not in ['bar', 'line', 'stacked'] or chart_group_field_id_type not in ['date', 'datetime']"/>
+                                    <field name="forecast_method"
+                                           invisible="not enable_forecast or chart_type not in ['bar', 'line', 'stacked'] or chart_group_field_id_type not in ['date', 'datetime']"/>
+                                    <field name="forecast_periods"
+                                           invisible="not enable_forecast or chart_type not in ['bar', 'line', 'stacked'] or chart_group_field_id_type not in ['date', 'datetime']"/>
+                                    <field name="forecast_history_periods"
+                                           invisible="not enable_forecast or chart_type not in ['bar', 'line', 'stacked'] or chart_group_field_id_type not in ['date', 'datetime']"/>
+                                    <field name="forecast_ai_cache_date" readonly="1"
+                                           invisible="forecast_method != 'ai_gemini' or not enable_forecast or chart_type not in ['bar', 'line', 'stacked'] or chart_group_field_id_type not in ['date', 'datetime']"/>
+                                    <field name="forecast_ai_cache_ttl_hours"
+                                           invisible="forecast_method != 'ai_gemini' or not enable_forecast or chart_type not in ['bar', 'line', 'stacked'] or chart_group_field_id_type not in ['date', 'datetime']"/>
+                                    <button name="action_clear_forecast_cache"
+                                            type="object"
+                                            string="Clear AI Forecast Cache"
+                                            class="btn-secondary"
+                                            invisible="forecast_method != 'ai_gemini' or not enable_forecast or chart_type not in ['bar', 'line', 'stacked'] or chart_group_field_id_type not in ['date', 'datetime']"/>
+
                                     <field name="measure_aggregation" widget="radio" options="{'horizontal': true}"/>
                                     <field name="measure_field_id"
                                            options="{'no_create': True, 'no_open': True}"
@@ -181,6 +200,22 @@ s
                             </group>
                         </page>
 
+                        <page string="Targets &amp; Notifications" invisible="chart_type not in ['bar', 'line', 'stacked']">
+                            <group>
+                                <group string="Visual Target">
+                                    <field name="show_target"/>
+                                    <field name="target_value" invisible="not show_target" required="show_target"/>
+                                    <field name="target_label" invisible="not show_target"/>
+                                    <field name="target_color" widget="color" invisible="not show_target"/>
+                                </group>
+                                <group string="Email Notifications">
+                                    <field name="send_target_email"/>
+                                    <field name="target_email_recipient_ids" widget="many2many_tags" 
+                                           invisible="not send_target_email" required="send_target_email"/>
+                                    <field name="last_target_email_date" readonly="1" invisible="not send_target_email"/>
+                                </group>
+                            </group>
+                        </page>
                         <page string="Alerts" invisible="chart_type in ['clock', 'todo']">
                             <field name="alert_ids">
                                 <list editable="bottom">

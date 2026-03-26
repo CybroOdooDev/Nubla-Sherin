@@ -98,6 +98,27 @@ export class DashboardTodoWidget extends Component {
         });
     }
 
+    onDuplicateMove() {
+        const todoId = this.props.data.id;
+        if (!todoId) return;
+
+        this.actionService.doAction({
+            type: "ir.actions.act_window",
+            res_model: "multi.dashboard.duplicate.move",
+            views: [[false, "form"]],
+            target: "new",
+            context: {
+                default_chart_id: todoId,
+            }
+        }, {
+            onClose: async () => {
+                if (this.props.onRefresh) {
+                    await this.props.onRefresh();
+                }
+            }
+        });
+    }
+
     // Add a new to-do item when the user presses Enter in the input field
     async addTodo(ev) {
         if (this.props.isPreview) {
@@ -268,6 +289,9 @@ DashboardTodoWidget.template = xml`
                 </button>
                 <button class="btn-del-todo" t-on-click="deleteTodo">
                     <i class="fa fa-trash"/>
+                </button>
+                <button class="btn-duplicate-todo" t-on-click="onDuplicateMove" title="Duplicate/Move to Dashboard">
+                    <i class="fa fa-copy"/>
                 </button>
                 <button class="btn-download-json" t-on-click="downloadJson">
                     <i class="fa fa-download"/>

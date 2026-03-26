@@ -144,9 +144,9 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    border: none;
-    background: rgba(0, 0, 0, 0.45);
-    color: #fff;
+    border: 1px solid var(--tile-tool-border, rgba(255, 255, 255, 0.25));
+    background: var(--tile-tool-bg, rgba(0, 0, 0, 0.45));
+    color: var(--tile-tool-fg, #fff);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -157,7 +157,7 @@
 
 .download-options button:hover,
 .tile-tools-overlay button:hover {
-    background: rgba(0, 0, 0, 0.65);
+    background: var(--tile-tool-hover-bg, rgba(0, 0, 0, 0.65));
     transform: scale(1.1);
 }
 
@@ -180,7 +180,8 @@
 
 /* View mode: hide edit/delete (keep only AI insight). */
 .dashboard-tile .tile-tools-overlay .btn-edit-tile,
-.dashboard-tile .tile-tools-overlay .btn-del-tile {
+.dashboard-tile .tile-tools-overlay .btn-del-tile,
+.dashboard-tile .tile-tools-overlay .btn-duplicate-tile {
     display: none;
 }
 
@@ -190,7 +191,8 @@
 }
 
 .o_sidebar_active .dashboard-tile .tile-tools-overlay .btn-edit-tile,
-.o_sidebar_active .dashboard-tile .tile-tools-overlay .btn-del-tile {
+.o_sidebar_active .dashboard-tile .tile-tools-overlay .btn-del-tile,
+.o_sidebar_active .dashboard-tile .tile-tools-overlay .btn-duplicate-tile {
     display: flex;
 }
 

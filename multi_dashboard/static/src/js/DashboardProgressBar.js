@@ -137,6 +137,27 @@ export class DashboardProgressBar extends Component {
         });
     }
 
+    onDuplicateMove() {
+        const tileId = this.props.data.id;
+        if (!tileId) return;
+
+        this.actionService.doAction({
+            type: "ir.actions.act_window",
+            res_model: "multi.dashboard.duplicate.move",
+            views: [[false, "form"]],
+            target: "new",
+            context: {
+                default_chart_id: tileId,
+            }
+        }, {
+            onClose: async () => {
+                if (this.props.onRefresh) {
+                    await this.props.onRefresh();
+                }
+            }
+        });
+    }
+
     onDelete() {
         if (this.props.isPreview) {
             return;
@@ -172,6 +193,9 @@ DashboardProgressBar.template = xml`
                 </div>
                 <div class="chart-tool o-progress-delete" title="Delete" t-on-click.stop="onDelete">
                     <i class="fa fa-trash"/>
+                </div>
+                <div class="chart-tool o-progress-duplicate" title="Duplicate/Move to Dashboard" t-on-click.stop="onDuplicateMove">
+                    <i class="fa fa-copy"/>
                 </div>
             </div>
         </div>

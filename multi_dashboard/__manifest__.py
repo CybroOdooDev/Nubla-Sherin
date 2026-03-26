@@ -44,6 +44,7 @@
         'views/multi_dashboard_charts_views.xml',
         'views/multi_dashboard_alert_views.xml',
         'wizard/import_chart_views.xml',
+        'wizard/multi_dashboard_duplicate_move_views.xml',
         'views/res_config_settings_views.xml',
     ],
     'assets': {

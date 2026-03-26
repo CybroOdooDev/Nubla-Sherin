@@ -29,5 +29,30 @@
                 </div>
             </field>
         </record>
+        <record id="email_template_chart_target_achievement" model="mail.template">
+            <field name="name">Chart: Target Achievement Notification</field>
+            <field name="model_id" ref="multi_dashboard.model_multi_dashboard_charts"/>
+            <field name="subject">Target Achieved: {{ object.name }}</field>
+            <field name="email_from">{{ (object.dashboard_id.company_id.email_formatted or user.email_formatted) }}</field>
+            <field name="email_to">{{ ','.join(object.target_email_recipient_ids.mapped('email')) }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+                    <p style="margin: 0px; padding: 0px; font-size: 14px; color: #333333;">
+                        Hello,
+                        <br/><br/>
+                        We are pleased to inform you that the target for 
+                        <strong style="color: #875A7B;"><t t-out="object.name"/></strong> 
+                        on the dashboard <t t-out="object.dashboard_id.name"/> has been achieved.
+                        <br/><br/>
+                        <strong>Target Value:</strong> <t t-out="object.target_value"/><br/>
+                        <strong>Current Value:</strong> <t t-out="ctx.get('current_value')"/><br/>
+                        <br/><br/>
+                        Best regards,
+                        <br/>
+                        <t t-out="object.dashboard_id.company_id.name"/>
+                    </p>
+                </div>
+            </field>
+        </record>
     </data>
 </odoo>

@@ -2,12 +2,13 @@
 .todo-widget-card {
     position: relative;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Soft professional shadow */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    /* Soft professional shadow */
     display: flex;
     flex-direction: column;
     height: 100%;
     transition: transform 0.2s;
-    background: var(--widget-accent, #fffff);
+    background: var(--widget-accent, #ffffff);
 }
 
 .todo-widget-card::after {
@@ -19,7 +20,7 @@
     height: 35px;
     z-index: 2;
     background: linear-gradient(135deg, color-mix(in srgb, var(--widget-accent), black 20%) 50%, #ffffff87 51%, #ffffff 100%);
-    box-shadow: -1px -1px 2px rgba(0,0,0,0.05);
+    box-shadow: -1px -1px 2px rgba(0, 0, 0, 0.05);
     pointer-events: none;
     border-radius: 5px 0;
 }
@@ -56,6 +57,7 @@
 
 .btn-edit-todo,
 .btn-del-todo,
+.btn-duplicate-todo,
 .btn-add-task {
     width: 32px;
     height: 32px;
@@ -70,7 +72,8 @@
 }
 
 .btn-del-todo,
-.btn-edit-todo {
+.btn-edit-todo,
+.btn-duplicate-todo {
     display: none;
 }
 
@@ -84,7 +87,8 @@
 }
 
 .o_sidebar_active .todo-widget-card:hover .btn-del-todo,
-.o_sidebar_active .todo-widget-card:hover .btn-edit-todo {
+.o_sidebar_active .todo-widget-card:hover .btn-edit-todo,
+.o_sidebar_active .todo-widget-card:hover .btn-duplicate-todo {
     display: flex;
 }
 
@@ -120,7 +124,8 @@
 }
 
 .btn-del-task:hover {
-    background-color: #ff0000; /* Accent color */
+    background-color: #ff0000;
+    /* Accent color */
     color: white;
 }
 
@@ -147,7 +152,8 @@
 
 .modern-input:focus {
     background: #fff;
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05); /* Made neutral to avoid clash */
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+    /* Made neutral to avoid clash */
     border-color: var(--widget-accent, #714B67);
 }
 
@@ -169,7 +175,8 @@
     width: 18px;
     height: 18px;
     border: 2px solid #adb5bd;
-    border-radius: 50%; /* Circle checkbox */
+    border-radius: 50%;
+    /* Circle checkbox */
     cursor: pointer;
     appearance: none;
     outline: none;
@@ -191,7 +198,8 @@
     font-size: 0.75rem;
     font-weight: 600;
     line-height: 1;
-    border-radius: 999px; /* pill shape */
+    border-radius: 999px;
+    /* pill shape */
     background-color: color-mix(in srgb, var(--widget-accent), white 70%);
     color: #333;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -214,6 +222,7 @@
 .custom-scroll::-webkit-scrollbar {
     width: 2px;
 }
+
 .custom-scroll::-webkit-scrollbar-thumb {
     background-color: #dee2e6;
     border-radius: 4px;

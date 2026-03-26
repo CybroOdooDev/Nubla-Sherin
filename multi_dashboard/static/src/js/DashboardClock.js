@@ -172,6 +172,27 @@ export class DashboardClock extends Component {
         });
     }
 
+    onDuplicateMove() {
+        const clockId = this.props.data.id;
+        if (!clockId) return;
+
+        this.actionService.doAction({
+            type: "ir.actions.act_window",
+            res_model: "multi.dashboard.duplicate.move",
+            views: [[false, "form"]],
+            target: "new",
+            context: {
+                default_chart_id: clockId,
+            }
+        }, {
+            onClose: async () => {
+                if (this.props.onRefresh) {
+                    await this.props.onRefresh();
+                }
+            }
+        });
+    }
+
     // Unlink the record from the dashboard. After deletion, trigger a refresh.
     onDelete() {
         const clockId = this.props.data.id; // Assuming you pass the record ID in props
@@ -232,6 +253,9 @@ DashboardClock.template = xml`
             </button>
             <button class="btn-del-clock" t-on-click="onDelete">
                 <i class="fa fa-trash"/>
+            </button>
+            <button class="btn-duplicate-clock" t-on-click="onDuplicateMove" title="Duplicate/Move to Dashboard">
+                <i class="fa fa-copy"/>
             </button>
         </div>
         <div t-if="!props.isPreview" class="download-options">

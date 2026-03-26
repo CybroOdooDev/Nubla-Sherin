@@ -72,6 +72,11 @@ export class DashboardChartLivePreview extends Component {
                 this.props.record.data.tile_icon,
                 this.props.record.data.tile_unit_format,
                 this.props.record.data.use_background_gradient,
+                this.props.record.data.enable_forecast,
+                this.props.record.data.forecast_periods,
+                this.props.record.data.forecast_method,
+                this.props.record.data.forecast_ai_cache_ttl_hours,
+                this.props.record.data.forecast_history_periods,
             ]
         );
     }
@@ -173,6 +178,11 @@ export class DashboardChartLivePreview extends Component {
                 chart_sub_group_field_id: recordData.chart_sub_group_field_id ? recordData.chart_sub_group_field_id.id : false,
                 chart_orientation: recordData.chart_orientation,
                 am_chart_theme: recordData.am_chart_theme,
+                enable_forecast: recordData.enable_forecast,
+                forecast_periods: recordData.forecast_periods,
+                forecast_method: recordData.forecast_method,
+                forecast_ai_cache_ttl_hours: recordData.forecast_ai_cache_ttl_hours,
+                forecast_history_periods: recordData.forecast_history_periods,
                 tz: recordData.tz,
                 clock_format: recordData.clock_format,
                 use_background_gradient: recordData.use_background_gradient,

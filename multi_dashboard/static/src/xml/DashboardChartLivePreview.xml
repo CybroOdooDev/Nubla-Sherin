@@ -48,6 +48,10 @@
                             name="state.config.name"
                             color="state.config.todo_color"
                             orientation="state.chartResult.orientation"
+                            hasSubGroup="state.chartResult.has_sub_group"
+                            groupField="state.chartResult.groupField"
+                            groupFieldType="state.chartResult.groupFieldType"
+                            dateGranularity="state.chartResult.date_granularity"
                             useBackgroundGradient="state.config.use_background_gradient"
                             isPreview="true"
                     />

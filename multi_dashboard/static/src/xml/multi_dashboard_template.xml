@@ -106,6 +106,14 @@
                                         Purple
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.theme === 'dark-gradient' ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       t-on-click.prevent="() => this.setTheme('dark-gradient')">
+                                        <i t-att-class="state.theme === 'dark-gradient' ? 'fa fa-check me-2' : 'fa fa-moon-o me-2'"/>
+                                        Dark Gradient
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                         <div class="dropdown me-2">
@@ -313,19 +321,23 @@
                 </div>
 
                 <!-- Notification Dropdown -->
-                <div t-if="state.showNotificationDropdown" class="dashboard-notification-dropdown shadow-lg rounded border bg-white position-absolute">
-                    <div class="d-flex align-items-center p-2 border-bottom bg-light rounded-top">
+                <div t-if="state.showNotificationDropdown" class="dashboard-notification-dropdown shadow-lg rounded border position-absolute">
+                    <div class="d-flex align-items-center p-2 notification-header rounded-top">
                         <h6 class="mb-0 fw-bold small">Dashboard Alerts</h6>
                         <button class="btn-close ms-auto shadow-none" t-on-click="toggleNotificationDropdown" style="font-size: 0.7rem;"/>
                     </div>
-                    <div class="notification-list overflow-auto" style="max-height: 300px; min-width: 250px;">
+                    <div class="notification-list overflow-auto" style="max-height: 300px;">
                         <t t-if="state.notifications.length > 0">
                             <t t-foreach="state.notifications" t-as="notif" t-key="notif.id">
-                                <div class="notification-item p-2 border-bottom hover-bg-light transition-base" t-on-click="() => this.onNotificationClick(notif)">
+                                <div class="notification-item p-2 transition-base" t-on-click="() => this.onNotificationClick(notif)">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                         <span class="fw-bold text-primary small"><t t-esc="notif.name"/></span>
                                         <div class="d-flex align-items-center gap-2">
-                                            <span class="badge bg-warning text-dark" style="font-size: 0.45rem;">Triggered</span>
+                                            <span t-if="notif.isTarget" class="badge" t-attf-class="bg-{{notif.type}} text-white" style="font-size: 0.45rem;">
+                                                <t t-if="notif.type == 'success'">Achieved</t>
+                                                <t t-else="">Pending</t>
+                                            </span>
+                                            <span t-else="" class="badge bg-warning text-dark" style="font-size: 0.45rem;">Triggered</span>
                                             <i class="fa fa-times text-muted cursor-pointer hover-text-danger p-1" 
                                                t-on-click.stop="() => this.dismissNotification(notif)"
                                                title="Dismiss"/>
@@ -333,11 +345,14 @@
                                     </div>
                                     <div class="small mb-1">
                                         <span class="text-muted"><t t-esc="notif.widget"/></span>
-                                        <span class="mx-1 ms-2 fw-bold text-danger">
-                                            <t t-if="notif.condition == 'greater'">></t>
-                                            <t t-elif="notif.condition == 'less'">&lt;</t>
-                                            <t t-else="">=</t>
-                                            <t t-esc="notif.threshold"/>
+                                        <span class="mx-1 ms-2 fw-bold" t-attf-class="text-{{notif.isTarget ? notif.type : 'danger'}}">
+                                            <t t-if="notif.isTarget">Target: <t t-esc="notif.threshold"/></t>
+                                            <t t-else="">
+                                                <t t-if="notif.condition == 'greater'">></t>
+                                                <t t-elif="notif.condition == 'less'">&lt;</t>
+                                                <t t-else="">=</t>
+                                                <t t-esc="notif.threshold"/>
+                                            </t>
                                         </span>
                                         <span class="ms-2 text-muted" style="font-size: 0.6rem;">(Value: <t t-esc="notif.value"/>)</span>
                                     </div>

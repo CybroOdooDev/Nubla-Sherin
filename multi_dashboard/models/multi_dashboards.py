@@ -85,7 +85,8 @@ class MultiDashboards(models.Model):
         ('dark', 'Dark'),
         ('blue', 'Blue'),
         ('green', 'Green'),
-        ('purple', 'Purple')
+        ('purple', 'Purple'),
+        ('dark-gradient', 'Dark Gradient')
     ], string='Theme', default='light',
         help='Visual theme for this specific dashboard')
     refresh_interval = fields.Selection([
