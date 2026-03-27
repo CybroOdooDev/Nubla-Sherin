@@ -97,12 +97,37 @@ patch(NavBar.prototype, {
             this.$dropdown_menu = document.querySelector(".dropdown-menu");
             this.doGreeting(); // Perform greeting
             this.setupSidebarListeners(); // Setup sidebar toggle listeners
+            this._setupFullScreenAppsMenuListeners(); // Restore navbar menus when full-screen apps menu closes
             applyDarkMode();
         });
 
         onPatched(() => {
             applyDarkMode();
         });
+    },
+
+    // -------------------------------------------------------------------------
+    // Full-screen apps menu: ensure navbar menu sections are restored on close
+    // -------------------------------------------------------------------------
+    _hideNavbarMenusForFullScreenAppsMenu() {
+        this._setElementsDisplay('.o_menu_sections', 'none');
+        this._setElementsDisplay('.o_menu_brand', 'none');
+    },
+
+    _showNavbarMenusAfterFullScreenAppsMenu() {
+        this._setElementsDisplay('.o_menu_sections', 'flex');
+        this._setElementsDisplay('.o_menu_brand', 'block');
+    },
+
+    _setupFullScreenAppsMenuListeners() {
+        const toggle = document.querySelector("a.full[data-bs-toggle='dropdown']");
+        if (!toggle) {
+            return;
+        }
+        // Bootstrap emits `shown.bs.dropdown` / `hidden.bs.dropdown` on the toggle.
+        // When hidden, always restore menu sections so a refresh isn't required.
+        toggle.addEventListener("shown.bs.dropdown", () => this._hideNavbarMenusForFullScreenAppsMenu());
+        toggle.addEventListener("hidden.bs.dropdown", () => this._showNavbarMenusAfterFullScreenAppsMenu());
     },
 
     // Setup sidebar toggle listeners
@@ -151,7 +176,6 @@ patch(NavBar.prototype, {
         }
 
         try {
-            // ✅ Fetch full session info
             const sessionInfo = await rpc('/web/session/get_session_info');
             const userName = sessionInfo.name || "User";
             const userId = sessionInfo.uid;
@@ -284,6 +308,11 @@ patch(NavBar.prototype, {
             if (menu) {
                 // Navigate to the app
                 this.menuService.selectMenu(menu);
+
+                // If the click came from the full-screen apps menu, the theme may have
+                // hidden `.o_menu_sections` / `.o_menu_brand`. Restore them immediately
+                // (bootstrap will also emit `hidden.bs.dropdown` when the menu closes).
+                setTimeout(() => this._showNavbarMenusAfterFullScreenAppsMenu(), 0);
 
                 // Add to recent apps
                 let app = {

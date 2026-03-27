@@ -795,31 +795,43 @@ template {
 .main_sidebar .sidebar_wrapper .sidebar_content .button_properties .card-body .button_cutomise .optss .t_align {
     display: flex;
     padding-left: 0;
+    margin: 0;
+    list-style: none;
     background-color: var(--sub-color-i-3) !important;
-    justify-content: space-around;
+    justify-content: space-between;
+    gap: 0;
 }
 
 .main_sidebar .sidebar_wrapper .sidebar_content .button_properties .card .button_cutomise .optss .t_align li,
 .main_sidebar .sidebar_wrapper .sidebar_content .button_properties .card-body .button_cutomise .optss .t_align li {
     border: 1px solid transparent;
     border-right-color: var(--text-color) !important;
+    /* Make each alignment option occupy a full "tile" so the whole tile is clickable. */
+    flex: 1 1 0;
+    display: flex;
+    cursor: pointer;
 }
 
 .main_sidebar .sidebar_wrapper .sidebar_content .button_properties .card .button_cutomise .optss .t_align li a,
 .main_sidebar .sidebar_wrapper .sidebar_content .button_properties .card-body .button_cutomise .optss .t_align li a {
-    display: block;
-    width: 12px;
-    margin-right: 14px;
+    display: flex;
+    flex: 1 1 auto;
+    width: 100%;
+    margin-right: 0;
     padding: 8px 0;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
 .main_sidebar .sidebar_wrapper .sidebar_content .button_properties .card .button_cutomise .optss .t_align li a img,
 .main_sidebar .sidebar_wrapper .sidebar_content .button_properties .card-body .button_cutomise .optss .t_align li a img {
-    width: 100%;
+    width: 12px;
+    height: auto;
 }
 
-.main_sidebar .sidebar_wrapper .sidebar_content .button_properties .card .button_cutomise .optss .t_align :last-child,
-.main_sidebar .sidebar_wrapper .sidebar_content .button_properties .card-body .button_cutomise .optss .t_align :last-child {
+.main_sidebar .sidebar_wrapper .sidebar_content .button_properties .card .button_cutomise .optss .t_align li:last-child,
+.main_sidebar .sidebar_wrapper .sidebar_content .button_properties .card-body .button_cutomise .optss .t_align li:last-child {
     border-right-color: transparent !important;
 }
 
@@ -1575,19 +1587,18 @@ label:hover div.popover.fade.in {
 }
 
 .infinito-btn-group-nav .btn-infinito-close {
-    color: grey;
+    color: white !important;
     font-size: 14px;
-    border: 1px solid grey !important;
-
+    border: 1px solid white !important;
 }
 
 .infinito-btn-group-nav .btn-infinito-close:hover {
-    color: #cdcdcd;
+    color: #cdcdcd !important;
     border: 1px solid #cdcdcd !important;
 }
 
 .infinito-btn-group-nav .btn-infinito-close i.fa {
-    color: grey !important;
+    color: white !important;
 }
 
 .infinito-btn-group-nav .btn-infinito-close .backend_theme_studio_close:hover {
@@ -1675,7 +1686,9 @@ label:hover div.popover.fade.in {
 }
 
 .o_action_manager {
-    overflow: scroll !important;
+    /* Avoid forcing scrollbars (causes horizontal scrollbar when menus/popovers open). */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
 }
 
 #theme_editor_sidebar_preset {
@@ -1901,25 +1914,8 @@ label:hover div.popover.fade.in {
     border-right: #000000 !important;
 }
 
-.o_field_widget.o_field_many2many_tags .badge {
-    -webkit-box-flex: 0;
-    -webkit-flex: 0 0 auto;
-    flex: 0 0 auto;
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: flex;
-    align-items: center;
-    width: fit-content !important;
-}
-
-.o_wrap_field>.o_cell>.o_field_widget>.o_field_tags>.rounded-pill {
-    font-weight: 500 !important;
-    color: var(--button-bg) !important;
-    width: fit-content !important;
-    text-align: center !important;
-    padding: 7px 5px !important;
-    height: 26px;
-}
+/* Keep Many2many tags widget styling close to Odoo default.
+ * Theme-specific sizing/colors here were causing tag labels to truncate (e.g. "V..."). */
 
 .o_searchview_input_container {
     flex-wrap: nowrap !important;

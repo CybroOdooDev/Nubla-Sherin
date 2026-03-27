@@ -95,5 +95,4 @@
     'installable': True,
     'application': False,
     'auto_install': False,
-    'models': ['models/ir_ui_menu.py'],
 }

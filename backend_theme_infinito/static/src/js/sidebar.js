@@ -70,8 +70,18 @@ odoo.define('sidebar_app.SidebarMenu', [], function (require) {
             const header = document.querySelector("header");
 
             if (header) {
-                header.className = ""; // remove all existing classes
+                // Remove the previously added data-id classes but keep default classes like o_navbar
+                menuItems.forEach(item => {
+                    const itemId = item.dataset.id;
+                    if (itemId) {
+                        header.classList.remove(itemId);
+                    }
+                });
                 header.classList.add(id);
+                // Ensure the base class is always present
+                if (!header.classList.contains("o_navbar")) {
+                    header.classList.add("o_navbar");
+                }
             }
 
             menuItems.forEach(item => item.classList.remove("active"));

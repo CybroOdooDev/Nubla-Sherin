@@ -19,6 +19,7 @@ export class EditorClientAction extends Component{
         super.setup();
         this.env= useEnv();
         this.dialog = useService("dialog");
+        this._mountedSidebar = null;
         var navbar= document.querySelector(".o_main_navbar")
         if (navbar) {
             navbar.style.display = "none";
@@ -117,22 +118,44 @@ _closeSidebar() {
          * Handles item click event in the menu.
          * @param {Event} ev - The click event object.
          */
-        onItemClick(ev){
-            var object = ev
-            var elem_name = ev.currentTarget.dataset.name
-            var preset = ev.target.dataset.preset
-            var env= this.env;
-            var dialog = this.dialog;
-            ev.stopPropagation();
-            this.sidebar_pos = document.querySelector('.backend_theme_studio_sidebar .sidebar-here')
-            var sidebars=document.querySelector('.marg_main')
+	        onItemClick(ev){
+	            // Ensure we only ever have one sidebar mounted. Multiple mounts lead to overlapping DOM,
+	            // flaky click targets, and performance issues.
+	            try {
+	                if (this._mountedSidebar?.destroy) {
+	                    this._mountedSidebar.destroy();
+	                }
+	            } catch {
+	                // ignore
+	            }
+	            this._mountedSidebar = null;
+	            const existingSidebar = document.getElementById("theme_editor_sidebar_preset");
+	            if (existingSidebar) existingSidebar.remove();
+
+	            const targetEl = ev.currentTarget;
+	            // Pass a stable reference to the selected DOM node (not the event object).
+	            // Storing the event causes flaky behavior since event.currentTarget is only set during dispatch.
+	            const object = { target: targetEl };
+	            var elem_name = targetEl.dataset.name
+	            var preset = (ev.target && ev.target.dataset && ev.target.dataset.preset) || targetEl.dataset.preset
+	            var env= this.env;
+	            var dialog = this.dialog;
+	            ev.stopPropagation();
+	            this.sidebar_pos = document.querySelector('.backend_theme_studio_sidebar .sidebar-here')
+	            var sidebars=document.querySelector('.marg_main')
             if (sidebars){
                 sidebars.style.marginLeft="340px";
             }else{
                 sidebars.style.marginLeft="0px";
             }
-            mount(ThemeEditorSidebar,document.body,{env,dialog, props:{elem_name,preset,object}})
-        }
+	            // `mount` returns the mounted component (or a promise of it, depending on Owl build).
+	            const mounted = mount(ThemeEditorSidebar, document.body, { env, dialog, props: { elem_name, preset, object } });
+	            if (mounted && typeof mounted.then === "function") {
+	                mounted.then((inst) => (this._mountedSidebar = inst));
+	            } else {
+	                this._mountedSidebar = mounted;
+	            }
+	        }
         /**
          * Handles the event when the theme studio sidebar is closed.
          * @param {Event} ev - The click event object.
