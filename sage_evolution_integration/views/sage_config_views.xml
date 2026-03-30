@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Define Actions First to avoid External ID errors -->
+    <record id="action_pull_customers" model="ir.actions.server">
+        <field name="name">Pull Customers from Sage</field>
+        <field name="model_id" ref="model_sage_sync_log"/>
+        <field name="state">code</field>
+        <field name="code">model.pull_customers()</field>
+    </record>
+
+    <record id="action_pull_products" model="ir.actions.server">
+        <field name="name">Pull Products from Sage</field>
+        <field name="model_id" ref="model_sage_sync_log"/>
+        <field name="state">code</field>
+        <field name="code">model.pull_products()</field>
+    </record>
+
+    <record id="action_pull_sales_orders" model="ir.actions.server">
+        <field name="name">Pull Sales Orders from Sage</field>
+        <field name="model_id" ref="model_sage_sync_log"/>
+        <field name="state">code</field>
+        <field name="code">model.pull_sales_orders()</field>
+    </record>
+
+    <record id="action_pull_sales_invoices" model="ir.actions.server">
+        <field name="name">Pull Sales Invoices from Sage</field>
+        <field name="model_id" ref="model_sage_sync_log"/>
+        <field name="state">code</field>
+        <field name="code">model.pull_sales_invoices()</field>
+    </record>
+
+    <record id="action_pull_purchase_invoices" model="ir.actions.server">
+        <field name="name">Pull Purchase Invoices from Sage</field>
+        <field name="model_id" ref="model_sage_sync_log"/>
+        <field name="state">code</field>
+        <field name="code">model.pull_purchase_invoices()</field>
+    </record>
+
+    <record id="action_push_customers" model="ir.actions.server">
+        <field name="name">Export Customers to Sage</field>
+        <field name="model_id" ref="model_sage_sync_log"/>
+        <field name="state">code</field>
+        <field name="code">model.push_customers()</field>
+    </record>
+
+    <record id="action_push_products" model="ir.actions.server">
+        <field name="name">Export Products to Sage</field>
+        <field name="model_id" ref="model_sage_sync_log"/>
+        <field name="state">code</field>
+        <field name="code">model.push_products()</field>
+    </record>
+
+    <record id="action_push_sales_invoices" model="ir.actions.server">
+        <field name="name">Export Invoices to Sage</field>
+        <field name="model_id" ref="model_sage_sync_log"/>
+        <field name="state">code</field>
+        <field name="code">model.push_sales_invoices()</field>
+    </record>
+
+    <record id="res_config_settings_view_form_sage" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sage</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Sage Evolution" name="sage_evolution_integration" logo="/sage_evolution_integration/static/description/icon.png">
+                    <block title="Sage 200 Evolution (Freedom Service)" name="sage_evolution_config">
+                        <setting string="Freedom Service Credentials" help="Configure Sage 200 Evolution Freedom Service REST API">
+                            <div class="content-group mt16">
+                                <label for="sage_evolution_api_url"/>
+                                <field name="sage_evolution_api_url" placeholder="http://server_ip:port/FreedomService"/>
+                            </div>
+                            <div class="content-group mt8">
+                                <label for="sage_evolution_db"/>
+                                <field name="sage_evolution_db" placeholder="Evolution Company Database Name"/>
+                            </div>
+                            <div class="content-group mt8">
+                                <label for="sage_evolution_username"/>
+                                <field name="sage_evolution_username"/>
+                            </div>
+                            <div class="content-group mt8">
+                                <label for="sage_evolution_password"/>
+                                <field name="sage_evolution_password" password="True"/>
+                            </div>
+                            <div class="mt16">
+                                <button name="action_test_freedom_connection" type="object" string="Test Connection" class="btn-primary"/>
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Sage Cloud (OAuth)" name="sage_cloud_config">
+                        <setting string="OAuth Credentials" help="Configure Sage Business Cloud / OAuth 2.0 Integration">
+                            <div class="content-group mt16">
+                                <label for="sage_client_id"/>
+                                <field name="sage_client_id" placeholder="Enter Sage Client ID"/>
+                            </div>
+                            <div class="content-group mt8">
+                                <label for="sage_client_secret"/>
+                                <field name="sage_client_secret" password="True" placeholder="Enter Sage Client Secret"/>
+                            </div>
+                            <div class="mt16">
+                                <button name="action_connect_to_sage" type="object" string="Connect to Sage" class="btn-primary"/>
+                            </div>
+                            <div class="mt8 text-muted">
+                                <strong>Redirect URI:</strong> <field name="sage_auth_token" invisible="1"/><span class="ml8 t-text-muted">https://&lt;your-domain&gt;/sage_evolution_integration/callback</span>
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Manual Sync" name="sage_sync_actions">
+                        <setting string="Import from Sage" help="Trigger manual data import">
+                            <div class="content-group mt16">
+                                <div class="mt8">
+                                    <button name="%(sage_evolution_integration.action_pull_customers)d" type="action" string="Sync Customers" class="btn-secondary"/>
+                                    <button name="%(sage_evolution_integration.action_pull_products)d" type="action" string="Sync Products" class="ml8 btn-secondary"/>
+                                    <button name="%(sage_evolution_integration.action_pull_sales_orders)d" type="action" string="Sync Sales Orders" class="ml8 btn-secondary"/>
+                                </div>
+                                <div class="mt8">
+                                    <button name="%(sage_evolution_integration.action_pull_sales_invoices)d" type="action" string="Sync Sales Invoices" class="btn-secondary"/>
+                                    <button name="%(sage_evolution_integration.action_pull_purchase_invoices)d" type="action" string="Sync Purchase Invoices" class="ml8 btn-secondary"/>
+                                </div>
+                            </div>
+                        </setting>
+                        <setting string="Export to Sage" help="Trigger manual data export">
+                            <div class="content-group mt16">
+                                <div class="mt8">
+                                    <button name="%(sage_evolution_integration.action_push_customers)d" type="action" string="Export Customers" class="btn-secondary"/>
+                                    <button name="%(sage_evolution_integration.action_push_products)d" type="action" string="Export Products" class="ml8 btn-secondary"/>
+                                    <button name="%(sage_evolution_integration.action_push_sales_invoices)d" type="action" string="Export Invoices" class="ml8 btn-secondary"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

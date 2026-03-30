@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="sage_auth_success" name="Sage Auth Success">
+        <t t-call="web.layout">
+            <t t-set="html_data" t-value="{'style': 'height: 100%;'}"/>
+            <div class="container mt-5">
+                <div class="card shadow">
+                    <div class="card-body text-center">
+                        <i class="fa fa-check-circle text-success mb-3" style="font-size: 4rem;"/>
+                        <h2 class="card-title">Authentication Successful!</h2>
+                        <p class="card-text"><t t-esc="message"/></p>
+                        <p class="text-muted">You can now close this window and return to Odoo Settings.</p>
+                        <button class="btn btn-primary mt-3" onclick="window.close()">Close Window</button>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

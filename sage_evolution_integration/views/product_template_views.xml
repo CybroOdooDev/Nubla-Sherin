@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_template_form_inherit_sage" model="ir.ui.view">
+        <field name="name">product.template.form.inherit.sage</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Sage Integration" name="sage_integration">
+                    <group>
+                        <group name="sage_details" string="Sage Details">
+                            <field name="sage_id" readonly="1"/>
+                            <field name="sage_code" readonly="1"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
