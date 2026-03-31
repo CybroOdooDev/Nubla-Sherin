@@ -380,6 +380,86 @@
     padding-left: 4px !important;
 }
 
+// -----------------------------------------------------------------------------
+// Form statusbar buttons: darker soft accent (match theme better)
+// -----------------------------------------------------------------------------
+// In some databases the action buttons (Create Invoice/Send by Email/Preview/Cancel)
+// and the statusbar steps look too light. Use a darker "soft accent" derived from
+// the main accent color.
+.o_form_view .o_form_statusbar {
+    .o_statusbar_buttons {
+        // Keep "secondary" buttons handled by the rule below (darker blue).
+        .btn:not(.btn-primary):not(.btn-danger):not(.btn-success):not(.btn-link):not(.btn-secondary) {
+            background-color: #a8bde8 !important; /* fallback */
+            background-color: color-mix(in srgb, var(--button-bg) 35%, white) !important;
+            border: 1px solid #a6bde8 !important; /* fallback */
+            border-color: color-mix(in srgb, var(--button-bg) 45%, white) !important;
+            color: var(--button-bg-darker) !important;
+        }
+        .btn:not(.btn-primary):not(.btn-danger):not(.btn-success):not(.btn-link):not(.btn-secondary):hover {
+            background-color: #a8bde8 !important; /* fallback */
+            background-color: color-mix(in srgb, var(--button-bg) 45%, white) !important;
+        }
+    }
+
+    .o_statusbar_status {
+        .o_arrow_button.btn-secondary:not(.o_arrow_button_current) {
+            background-color: #b8c9ee !important; /* fallback */
+            background-color: color-mix(in srgb, var(--button-bg) 35%, white) !important;
+            color: var(--button-bg-darker) !important;
+        }
+        .o_arrow_button.btn-secondary:not(.o_arrow_button_current)::after {
+            border-left-color: #b8c9ee !important; /* fallback */
+            border-left-color: color-mix(in srgb, var(--button-bg) 35%, white) !important;
+        }
+    }
+}
+
+// Make form header action buttons (btn-secondary in the statusbar button area) darker blue.
+// This targets the exact buttons shown in the screenshot: Create Invoice / Send by Email / Preview / Cancel.
+.o_form_view .o_form_statusbar .o_statusbar_buttons {
+    .btn.btn-secondary:not(.btn-link) {
+        background-color: var(--button-bg-dark) !important;
+        border-color: var(--button-bg-dark) !important;
+        color: #fff !important;
+    }
+    .btn.btn-secondary:not(.btn-link):hover {
+        background-color: var(--button-bg-darker) !important;
+        border-color: var(--button-bg-darker) !important;
+    }
+    .btn.btn-secondary:not(.btn-link):disabled,
+    .btn.btn-secondary:not(.btn-link).disabled {
+        opacity: 0.75;
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Form view "New" button: restore outline border (theme `.btn { border: none; }`)
+// -----------------------------------------------------------------------------
+// Odoo renders the control-panel create button as `btn-outline-primary`, but the
+// theme's global `.btn` rule removes borders, so the "New" button looks like plain
+// text. Bring back the 1px outline to match the desired UI.
+.o_form_view {
+    .o_control_panel,
+    .o_cp_controller {
+        .o_form_button_create.btn-outline-primary,
+        .o_form_buttons_view .o_form_button_create.btn-outline-primary {
+            border: 1px solid var(--button-bg) !important;
+            background-color: transparent !important;
+            color: var(--button-bg) !important;
+        }
+        .o_form_button_create.btn-outline-primary:hover,
+        .o_form_buttons_view .o_form_button_create.btn-outline-primary:hover {
+            background-color: var(--button-bg) !important;
+            color: #fff !important;
+        }
+        .o_form_button_create.btn-outline-primary:focus,
+        .o_form_button_create.btn-outline-primary:active {
+            box-shadow: none !important;
+        }
+    }
+}
+
 .o_field_widget.o_field_many2many_tags .o_tag.o_badge .o_delete i,
 .o_field_widget.o_field_many2many_tags_avatar .o_tag.o_badge .o_delete i {
     font-size: 12px;

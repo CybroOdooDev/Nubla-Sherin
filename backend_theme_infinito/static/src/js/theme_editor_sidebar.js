@@ -426,16 +426,42 @@ _onPresetChange(ev) {
 		    // Stable selected element from the preview (the element with `t-on-click="onItemClick"`).
 		    const selectedTarget = this.props.object?.currentTarget || this.props.object?.target;
 		    let target = selectedTarget;
-		    if (!target) return;
+		    if (!target || target.isConnected === false) {
+		        // The view may have been switched (DOM re-rendered). Ask the user to reselect,
+		        // but also try to recover by selecting a reasonable default in the current preview.
+		        const fallback =
+		            document.querySelector(".preview_area .item[data-name][data-class]") ||
+		            document.querySelector(".preview_area .item[data-name]") ||
+		            document.querySelector(".preview_area .item");
+		        if (fallback) {
+		            fallback.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+		        }
+		        return;
+		    }
+
+		    // Search preview: users often click wrapper nodes. Apply alignment to the real inner element.
+		    // Examples:
+		    // - `.o_cp_top_left` contains the `.o_searchview_input`
+		    // - `.o_cp_searchview` contains the `.o_searchview` container
+		    // - `.o_searchview_input_container` contains facets, which are laid out with flex in Odoo
+		    if (target.querySelector) {
+		        if (target.classList?.contains("o_cp_top_left")) {
+		            const innerInput = target.querySelector("input.o_searchview_input, .o_searchview_input");
+		            if (innerInput) target = innerInput;
+		        } else if (target.classList?.contains("o_cp_searchview")) {
+		            const innerSearchview = target.querySelector(".o_searchview");
+		            if (innerSearchview) target = innerSearchview;
+		        }
+		    }
 	    // If the original click was inside a cell, style the cell (and not a nested span, etc.).
 	    if (target.closest) {
 	        const cell = target.closest("td,th");
 	        if (cell) target = cell;
 	    }
 
-	    // For table elements, apply alignment to the actual cells to keep table layout intact.
-	    const tag = (target.tagName || "").toUpperCase();
-	    let nodes = [target];
+		    // For table elements, apply alignment to the actual cells to keep table layout intact.
+		    const tag = (target.tagName || "").toUpperCase();
+		    let nodes = [target];
 	    if (tag === "TR" || tag === "TBODY" || tag === "THEAD" || tag === "TFOOT" || tag === "TABLE") {
 	        const cells = target.querySelectorAll?.("th,td");
 	        if (cells && cells.length) nodes = Array.from(cells);
@@ -446,9 +472,70 @@ _onPresetChange(ev) {
 		        // - Works for normal text via `text-align`
 		        // - If the node is already a flex container, also set `justify-content` for reliability
 		        const flexMap = { left: "flex-start", center: "center", right: "flex-end" };
+		        const selfAlign = (n) => {
+		            if (!n || !n.style) return;
+		            try {
+		                const parent = n.parentElement;
+		                if (!parent) return;
+		                const isInputLike =
+		                    n.matches?.("input,select,textarea") ||
+		                    n.classList?.contains("o_input") ||
+		                    n.classList?.contains("form-control") ||
+		                    n.classList?.contains("o_datepicker_input");
+		                if (!isInputLike) return;
+
+		                // Only try to reposition if it doesn't already span full width.
+		                const rect = n.getBoundingClientRect();
+		                const prect = parent.getBoundingClientRect();
+		                if ((prect.width - rect.width) < 4) return;
+
+		                // Margins are the safest way to align a fixed-width control in its container.
+		                n.style.setProperty("display", "block", "important");
+		                if (align === "left") {
+		                    n.style.setProperty("margin-left", "0", "important");
+		                    n.style.setProperty("margin-right", "auto", "important");
+		                } else if (align === "center") {
+		                    n.style.setProperty("margin-left", "auto", "important");
+		                    n.style.setProperty("margin-right", "auto", "important");
+		                } else if (align === "right") {
+		                    n.style.setProperty("margin-left", "auto", "important");
+		                    n.style.setProperty("margin-right", "0", "important");
+		                }
+		            } catch {
+		                // ignore
+		            }
+		        };
+
+		        // Search facets: align the facet row as a whole (flex container in Odoo).
+		        const searchInputContainer = target?.closest?.(".o_searchview_input_container");
+		        if (searchInputContainer && flexMap[align]) {
+		            searchInputContainer.style.setProperty("display", "flex", "important");
+		            searchInputContainer.style.setProperty("justify-content", flexMap[align], "important");
+		            // Make alignment visible in the preview.
+		            searchInputContainer.style.setProperty("min-height", "36px", "important");
+		        }
+
+		        // Tabs: align the tab row itself (this is what users expect visually).
+		        const navTabs = target?.closest?.("ul.nav-tabs, .nav-tabs");
+		        if (navTabs && flexMap[align]) {
+		            navTabs.style.setProperty("display", "flex", "important");
+		            navTabs.style.setProperty("justify-content", flexMap[align], "important");
+		        }
+
 		        nodes.forEach((n) => {
 		            if (!n?.style) return;
+		            const isProgress =
+		                n.classList?.contains("progress") ||
+		                n.classList?.contains("o_kanban_counter_progress");
+		            if (isProgress && flexMap[align]) {
+		                // Keep Bootstrap progress behavior intact (must remain flex).
+		                n.style.setProperty("display", "flex", "important");
+		                n.style.setProperty("justify-content", flexMap[align], "important");
+		                n.style.setProperty("align-items", "stretch", "important");
+		                return;
+		            }
 		            n.style.setProperty("text-align", align, "important");
+		            selfAlign(n);
 		            try {
 		                const disp = window.getComputedStyle(n).display;
 		                if (disp && disp.includes("flex") && flexMap[align]) {
@@ -477,10 +564,38 @@ _onPresetChange(ev) {
 		            const disp = selectedTarget && window.getComputedStyle(selectedTarget).display;
 		            const flexVal = flexAlignMap[align];
 		            if (disp && disp.includes("flex") && flexVal) {
-		                selectedTarget.style.setProperty("align-items", flexVal, "important");
-		                if (!selectedTarget.style.minHeight) {
-		                    selectedTarget.style.setProperty("min-height", "48px", "important");
+		                const isProgress =
+		                    selectedTarget?.classList?.contains("progress") ||
+		                    selectedTarget?.classList?.contains("o_kanban_counter_progress");
+		                if (isProgress) {
+		                    // Allow vertical alignment for progress bars without collapsing children:
+		                    // make the bars shorter, then align them within the container.
+		                    selectedTarget.style.setProperty("display", "flex", "important");
+		                    selectedTarget.style.setProperty("align-items", flexVal, "important");
+		                    // Ensure the container is taller than the bars so alignment is visible.
+		                    selectedTarget.style.setProperty("height", "18px", "important");
+		                    selectedTarget
+		                        .querySelectorAll?.(".progress-bar")
+		                        ?.forEach((pb) => pb.style.setProperty("height", "10px", "important"));
+		                } else {
+		                    selectedTarget.style.setProperty("align-items", flexVal, "important");
+		                    if (!selectedTarget.style.minHeight) {
+		                        selectedTarget.style.setProperty("min-height", "48px", "important");
+		                    }
 		                }
+		            }
+		        } catch {
+		            // ignore
+		        }
+
+		        // Search facets: align the facet row vertically (flex container in Odoo).
+		        try {
+		            const searchInputContainer = target?.closest?.(".o_searchview_input_container");
+		            const flexVal = flexAlignMap[align];
+		            if (searchInputContainer && flexVal) {
+		                searchInputContainer.style.setProperty("display", "flex", "important");
+		                searchInputContainer.style.setProperty("align-items", flexVal, "important");
+		                searchInputContainer.style.setProperty("min-height", "36px", "important");
 		            }
 		        } catch {
 		            // ignore
@@ -509,7 +624,19 @@ _onPresetChange(ev) {
 		                };
 
 		                if (disp && disp.includes("flex")) {
-		                    n.style.setProperty("align-items", flexVal, "important");
+		                    const isProgress =
+		                        n?.classList?.contains("progress") ||
+		                        n?.classList?.contains("o_kanban_counter_progress");
+		                    if (isProgress) {
+		                        n.style.setProperty("display", "flex", "important");
+		                        n.style.setProperty("align-items", flexVal, "important");
+		                        n.style.setProperty("height", "18px", "important");
+		                        n.querySelectorAll?.(".progress-bar")?.forEach((pb) => {
+		                            pb.style.setProperty("height", "10px", "important");
+		                        });
+		                    } else {
+		                        n.style.setProperty("align-items", flexVal, "important");
+		                    }
 		                    return;
 		                }
 
@@ -772,14 +899,21 @@ _onPresetChange(ev) {
      * @param {Event} ev - The event object representing the click event.
      */
     toggleSidebar(ev) {
-        // Get the parent element of the sidebar preset
-        var parent = document.querySelector("#theme_editor_sidebar_preset")
-        // If the parent element exists
+        if (ev && ev.preventDefault) ev.preventDefault();
+        // Prefer letting the parent client action close the sidebar so it can
+        // also restore any hidden panels and offsets.
+        if (this.props && typeof this.props.onClose === "function") {
+            this.props.onClose();
+            return;
+        }
+        // Fallback for older callers that don't pass `onClose`.
+        var parent = document.querySelector("#theme_editor_sidebar_preset");
         if (parent) {
-            // Reset the margin of the main content area
             var main_div = document.querySelector('.marg_main');
-            main_div.style.marginLeft = "0px";
-            // Remove the sidebar preset
+            if (main_div) {
+                main_div.style.marginLeft = "0px";
+                main_div.style.width = "100%";
+            }
             parent.remove();
         }
     }

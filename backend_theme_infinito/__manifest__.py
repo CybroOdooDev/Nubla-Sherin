@@ -87,6 +87,7 @@
         },
     },
     'post_init_hook': 'icons_post_init_hook',
+    'uninstall_hook': 'icons_uninstall_hook',
     'images': [
         'static/description/banner.jpg',
         'static/description/theme_screenshot.jpg',
