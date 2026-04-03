@@ -1,4 +1,24 @@
 # -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 from odoo import api, fields, models
         
 class RoomBooking(models.Model):
@@ -43,6 +63,43 @@ class RoomBooking(models.Model):
                             'product_type': 'pos'
                         })
         return booking_list
+
+    def get_bill_summary_lines(self):
+        """Returns a list of summary lines for the bill report:
+        [
+          {'ref': '', 'order_no': 'S00048', 'date': '...', 'total': 123.45},
+          {'ref': '', 'order_no': 'New/0011', 'date': '...', 'total': 456.78},
+        ]
+        Matches the 1st image layout.
+        """
+        self.ensure_one()
+        lines = []
+        
+        # 1. Folio Line
+        # We use amount_total - amount_total_pos to get the folio-only total (room, food, etc. from hotel module)
+        folio_total = sum(self.room_line_ids.mapped('price_total')) + \
+                      sum(self.food_order_line_ids.mapped('price_total')) + \
+                      sum(self.service_line_ids.mapped('price_total')) + \
+                      sum(self.vehicle_line_ids.mapped('price_total')) + \
+                      sum(self.event_line_ids.mapped('price_total'))
+                      
+        lines.append({
+            'reference': self.name,
+            'order_no': self.name,
+            'date': self.date_order,
+            'total': folio_total,
+        })
+        
+        # 2. POS Order Lines
+        for pos_link in self.pos_order_line_ids:
+            lines.append({
+                'reference': pos_link.pos_order_id.name,
+                'order_no': pos_link.pos_order_id.pos_reference,
+                'date': pos_link.pos_order_id.date_order,
+                'total': pos_link.pos_order_id.amount_total,
+            })
+            
+        return lines
 
     pos_invoice_count = fields.Integer(compute='_compute_pos_invoice_count', string='POS Invoice Count')
 
