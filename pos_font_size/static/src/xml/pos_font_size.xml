@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-inherit="point_of_sale.PaymentScreenDue" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[contains(@class, 'total')]" position="attributes">
+            <attribute name="t-att-style">!ui.isSmall? 'font-size: var(--pos-payment-total-font-size);' : ''</attribute>
+        </xpath>
+    </t>
+
+    <t t-inherit="point_of_sale.PartnerList" t-inherit-mode="extension" owl="1">
+        <xpath expr="//Dialog" position="attributes">
+            <attribute name="contentClass">'h-100 pos-partner-list-screen'</attribute>
+        </xpath>
+    </t>
+</templates>
