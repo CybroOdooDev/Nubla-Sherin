@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fitness_class_booking_tree" model="ir.ui.view">
+        <field name="name">fitness.class.booking.tree</field>
+        <field name="model">fitness.class.booking</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <list string="Class Bookings">
+                <field name="schedule_id"/>
+                <field name="member_id"/>
+                <field name="booking_date"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_fitness_class_booking" model="ir.actions.act_window">
+        <field name="name">Class Bookings</field>
+        <field name="res_model">fitness.class.booking</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_fitness_class_booking"
+              name="Class Bookings"
+              parent="menu_fitness_classes_root"
+              action="action_fitness_class_booking"
+              sequence="30"/>
+</odoo>

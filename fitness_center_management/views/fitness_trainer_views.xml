@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fitness_trainer_tree" model="ir.ui.view">
+        <field name="name">fitness.trainer.tree</field>
+        <field name="model">fitness.trainer</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <list string="Trainers">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="experience_years"/>
+                <field name="hourly_rate"/>
+                <field name="rating" widget="priority"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fitness_trainer_form" model="ir.ui.view">
+        <field name="name">fitness.trainer.form</field>
+        <field name="model">fitness.trainer</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <form string="Trainer">
+                <sheet>
+                    <field name="photo" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="Trainer Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="experience" string="Experience &amp; Rate">
+                            <field name="employee_id"/>
+                            <field name="experience_years"/>
+                            <field name="hourly_rate"/>
+                        </group>
+                        <group name="skills" string="Skills &amp; Rating">
+                            <field name="rating" widget="priority"/>
+                            <field name="specialization_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Biography" name="bio">
+                            <field name="bio" placeholder="Enter trainer's bio..."/>
+                        </page>
+                        <page string="Certifications" name="certification">
+                            <field name="certification" placeholder="Enter certifications..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fitness_trainer" model="ir.actions.act_window">
+        <field name="name">Trainers</field>
+        <field name="res_model">fitness.trainer</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_fitness_trainer_tree"/>
+    </record>
+
+    <record id="action_fitness_trainer_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_fitness_trainer_tree"/>
+        <field name="act_window_id" ref="action_fitness_trainer"/>
+    </record>
+
+    <record id="action_fitness_trainer_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_fitness_trainer_form"/>
+        <field name="act_window_id" ref="action_fitness_trainer"/>
+    </record>
+
+    <menuitem id="menu_fitness_trainer"
+              name="Trainers"
+              parent="menu_fitness_trainers_root"
+              action="action_fitness_trainer"
+              sequence="10"/>
+</odoo>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fitness_subscription_tree" model="ir.ui.view">
+        <field name="name">fitness.subscription.tree</field>
+        <field name="model">fitness.subscription</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <list string="Subscriptions">
+                <field name="name"/>
+                <field name="member_id"/>
+                <field name="plan_id"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'active'"
+                       decoration-warning="state == 'frozen'"
+                       decoration-danger="state == 'expired'"/>
+                <field name="payment_status" widget="badge"
+                       decoration-success="payment_status == 'paid'"
+                       decoration-warning="payment_status == 'partial'"
+                       decoration-danger="payment_status == 'unpaid'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fitness_subscription_form_new" model="ir.ui.view">
+        <field name="name">fitness.subscription.form.new</field>
+        <field name="model">fitness.subscription</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Subscription Details">
+                            <field name="member_id"/>
+                            <field name="plan_id"/>
+                        </group>
+                        <group string="Financials">
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="payment_status"/>
+                            <field name="total_amount"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fitness_subscription" model="ir.actions.act_window">
+        <field name="name">Subscriptions</field>
+        <field name="res_model">fitness.subscription</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_fitness_subscription_tree"/>
+    </record>
+
+    <record id="action_fitness_subscription_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_fitness_subscription_tree"/>
+        <field name="act_window_id" ref="action_fitness_subscription"/>
+    </record>
+
+    <record id="action_fitness_subscription_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_fitness_subscription_form_new"/>
+        <field name="act_window_id" ref="action_fitness_subscription"/>
+    </record>
+
+    <menuitem id="menu_fitness_subscription"
+              name="Subscriptions"
+              parent="menu_fitness_subscriptions_root"
+              action="action_fitness_subscription"
+              sequence="10"/>
+</odoo>
