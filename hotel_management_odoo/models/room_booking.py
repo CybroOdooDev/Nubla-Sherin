@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-###############################################################################
+#############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2024-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author: ADARSH K (odoo@cybrosys.com)
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
 #    You can modify it under the terms of the GNU LESSER
 #    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
@@ -18,7 +18,7 @@
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
-###############################################################################
+#############################################################################
 from datetime import datetime, timedelta
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
@@ -169,69 +169,74 @@ class RoomBooking(models.Model):
     amount_untaxed = fields.Monetary(string="Total Untaxed Amount",
                                      help="This indicates the total untaxed "
                                           "amount", store=True,
-                                     compute='_compute_amount_untaxed',
+                                     compute='_compute_amounts',
                                      tracking=5)
     amount_tax = fields.Monetary(string="Taxes", help="Total Tax Amount",
-                                 store=True, compute='_compute_amount_untaxed')
+                                 store=True, compute='_compute_amounts')
     amount_total = fields.Monetary(string="Total", store=True,
                                    help="The total Amount including Tax",
-                                   compute='_compute_amount_untaxed',
+                                   compute='_compute_amounts',
                                    tracking=4)
     amount_untaxed_room = fields.Monetary(string="Room Untaxed",
                                           help="Untaxed Amount for Room",
-                                          compute='_compute_amount_untaxed',
+                                          compute='_compute_amount_breakdown',
                                           tracking=5)
     amount_untaxed_food = fields.Monetary(string="Food Untaxed",
                                           help="Untaxed Amount for Food",
-                                          compute='_compute_amount_untaxed',
+                                          compute='_compute_amount_breakdown',
                                           tracking=5)
     amount_untaxed_event = fields.Monetary(string="Event Untaxed",
                                            help="Untaxed Amount for Event",
-                                           compute='_compute_amount_untaxed',
+                                           compute='_compute_amount_breakdown',
                                            tracking=5)
     amount_untaxed_service = fields.Monetary(
         string="Service Untaxed", help="Untaxed Amount for Service",
-        compute='_compute_amount_untaxed', tracking=5)
+        compute='_compute_amount_breakdown', tracking=5)
     amount_untaxed_fleet = fields.Monetary(string="Amount Untaxed",
                                            help="Untaxed amount for Fleet",
-                                           compute='_compute_amount_untaxed',
+                                           compute='_compute_amount_breakdown',
                                            tracking=5)
     amount_taxed_room = fields.Monetary(string="Rom Tax", help="Tax for Room",
-                                        compute='_compute_amount_untaxed',
+                                        compute='_compute_amount_breakdown',
                                         tracking=5)
     amount_taxed_food = fields.Monetary(string="Food Tax", help="Tax for Food",
-                                        compute='_compute_amount_untaxed',
+                                        compute='_compute_amount_breakdown',
                                         tracking=5)
     amount_taxed_event = fields.Monetary(string="Event Tax",
                                          help="Tax for Event",
-                                         compute='_compute_amount_untaxed',
+                                         compute='_compute_amount_breakdown',
                                          tracking=5)
     amount_taxed_service = fields.Monetary(string="Service Tax",
-                                           compute='_compute_amount_untaxed',
+                                           compute='_compute_amount_breakdown',
                                            help="Tax for Service", tracking=5)
     amount_taxed_fleet = fields.Monetary(string="Fleet Tax",
-                                         compute='_compute_amount_untaxed',
+                                         compute='_compute_amount_breakdown',
                                          help="Tax for Fleet", tracking=5)
     amount_total_room = fields.Monetary(string="Total Amount for Room",
-                                        compute='_compute_amount_untaxed',
+                                        compute='_compute_amount_breakdown',
                                         help="This is the Total Amount for "
                                              "Room", tracking=5)
     amount_total_food = fields.Monetary(string="Total Amount for Food",
-                                        compute='_compute_amount_untaxed',
+                                        compute='_compute_amount_breakdown',
                                         help="This is the Total Amount for "
                                              "Food", tracking=5)
     amount_total_event = fields.Monetary(string="Total Amount for Event",
-                                         compute='_compute_amount_untaxed',
+                                         compute='_compute_amount_breakdown',
                                          help="This is the Total Amount for "
                                               "Event", tracking=5)
     amount_total_service = fields.Monetary(string="Total Amount for Service",
-                                           compute='_compute_amount_untaxed',
+                                           compute='_compute_amount_breakdown',
                                            help="This is the Total Amount for "
                                                 "Service", tracking=5)
     amount_total_fleet = fields.Monetary(string="Total Amount for Fleet",
-                                         compute='_compute_amount_untaxed',
+                                         compute='_compute_amount_breakdown',
                                          help="This is the Total Amount for "
                                               "Fleet", tracking=5)
+    has_pos_orders = fields.Boolean(compute='_compute_has_pos_orders', string='Has POS Orders', help='Indicates if there are POS orders linked to this booking')
+
+    def _compute_has_pos_orders(self):
+        for rec in self:
+            rec.has_pos_orders = False
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -278,9 +283,53 @@ class RoomBooking(models.Model):
                  'event_line_ids.price_subtotal', 'event_line_ids.price_tax',
                  'event_line_ids.price_total',
                  )
-    def _compute_amount_untaxed(self, flag=False):
-        """Compute the total amounts of the Sale Order"""
-        total_booking_list = []
+    def _compute_amounts(self):
+        """Compute the stored total amounts"""
+        for record in self:
+            vals, _ = record._calculate_amounts()
+            record.update({
+                'amount_untaxed': vals['amount_untaxed'],
+                'amount_tax': vals['amount_tax'],
+                'amount_total': vals['amount_total'],
+            })
+
+    @api.depends('room_line_ids.price_subtotal', 'room_line_ids.price_tax',
+                 'room_line_ids.price_total',
+                 'food_order_line_ids.price_subtotal',
+                 'food_order_line_ids.price_tax',
+                 'food_order_line_ids.price_total',
+                 'service_line_ids.price_subtotal',
+                 'service_line_ids.price_tax', 'service_line_ids.price_total',
+                 'vehicle_line_ids.price_subtotal',
+                 'vehicle_line_ids.price_tax', 'vehicle_line_ids.price_total',
+                 'event_line_ids.price_subtotal', 'event_line_ids.price_tax',
+                 'event_line_ids.price_total',
+                 )
+    def _compute_amount_breakdown(self):
+        """Compute the non-stored breakdown amounts"""
+        for record in self:
+            vals, _ = record._calculate_amounts()
+            record.update({
+                'amount_untaxed_food': vals['amount_untaxed_food'],
+                'amount_untaxed_room': vals['amount_untaxed_room'],
+                'amount_untaxed_fleet': vals['amount_untaxed_fleet'],
+                'amount_untaxed_event': vals['amount_untaxed_event'],
+                'amount_untaxed_service': vals['amount_untaxed_service'],
+                'amount_taxed_food': vals['amount_taxed_food'],
+                'amount_taxed_room': vals['amount_taxed_room'],
+                'amount_taxed_fleet': vals['amount_taxed_fleet'],
+                'amount_taxed_event': vals['amount_taxed_event'],
+                'amount_taxed_service': vals['amount_taxed_service'],
+                'amount_total_food': vals['amount_total_food'],
+                'amount_total_room': vals['amount_total_room'],
+                'amount_total_fleet': vals['amount_total_fleet'],
+                'amount_total_event': vals['amount_total_event'],
+                'amount_total_service': vals['amount_total_service'],
+            })
+
+    def _calculate_amounts(self, flag=False):
+        """Helper to calculate all amounts and return breakdown values + booking list"""
+        res_list = []
         for record in self:
             amount_untaxed_room = 0.0
             amount_untaxed_food = 0.0
@@ -332,8 +381,8 @@ class RoomBooking(models.Model):
                                         booking_list.append(
                                             {'name': room.room_id.name,
                                              "quantity": booking_dict[
-                                                             'quantity'] - rec[
-                                                             'quantity'],
+                                                               'quantity'] - rec[
+                                                               'quantity'],
                                              "price_unit": room.price_unit,
                                              "product_type": 'room'})
                                     else:
@@ -366,32 +415,41 @@ class RoomBooking(models.Model):
                 amount_taxed_event += sum(event_lines.mapped('price_tax'))
                 amount_total_event += sum(event_lines.mapped('price_total'))
 
-            record.amount_untaxed = amount_untaxed_food + amount_untaxed_room + \
-                                 amount_untaxed_fleet + \
-                                 amount_untaxed_event + amount_untaxed_service
-            record.amount_untaxed_food = amount_untaxed_food
-            record.amount_untaxed_room = amount_untaxed_room
-            record.amount_untaxed_fleet = amount_untaxed_fleet
-            record.amount_untaxed_event = amount_untaxed_event
-            record.amount_untaxed_service = amount_untaxed_service
-            record.amount_tax = (amount_taxed_food + amount_taxed_room
-                              + amount_taxed_fleet
-                              + amount_taxed_event + amount_taxed_service)
-            record.amount_taxed_food = amount_taxed_food
-            record.amount_taxed_room = amount_taxed_room
-            record.amount_taxed_fleet = amount_taxed_fleet
-            record.amount_taxed_event = amount_taxed_event
-            record.amount_taxed_service = amount_taxed_service
-            record.amount_total = (amount_total_food + amount_total_room
-                                + amount_total_fleet + amount_total_event
-                                + amount_total_service)
-            record.amount_total_food = amount_total_food
-            record.amount_total_room = amount_total_room
-            record.amount_total_fleet = amount_total_fleet
-            record.amount_total_event = amount_total_event
-            record.amount_total_service = amount_total_service
-            total_booking_list.extend(booking_list)
-        return total_booking_list
+            amount_untaxed = amount_untaxed_food + amount_untaxed_room + \
+                                  amount_untaxed_fleet + \
+                                  amount_untaxed_event + amount_untaxed_service
+            amount_tax = (amount_taxed_food + amount_taxed_room
+                               + amount_taxed_fleet
+                               + amount_taxed_event + amount_taxed_service)
+            amount_total = (amount_total_food + amount_total_room
+                                 + amount_total_fleet + amount_total_event
+                                 + amount_total_service)
+            
+            vals = {
+                'amount_untaxed': amount_untaxed,
+                'amount_tax': amount_tax,
+                'amount_total': amount_total,
+                'amount_untaxed_room': amount_untaxed_room,
+                'amount_untaxed_food': amount_untaxed_food,
+                'amount_untaxed_fleet': amount_untaxed_fleet,
+                'amount_untaxed_event': amount_untaxed_event,
+                'amount_untaxed_service': amount_untaxed_service,
+                'amount_taxed_room': amount_taxed_room,
+                'amount_taxed_food': amount_taxed_food,
+                'amount_taxed_fleet': amount_taxed_fleet,
+                'amount_taxed_event': amount_taxed_event,
+                'amount_taxed_service': amount_taxed_service,
+                'amount_total_room': amount_total_room,
+                'amount_total_food': amount_total_food,
+                'amount_total_fleet': amount_total_fleet,
+                'amount_total_event': amount_total_event,
+                'amount_total_service': amount_total_service,
+            }
+            res_list.append((vals, booking_list))
+        
+        if len(self) == 1:
+            return res_list[0]
+        return res_list
 
     @api.onchange('need_food')
     def _onchange_need_food(self):
@@ -427,7 +485,8 @@ class RoomBooking(models.Model):
                   'service_line_ids', 'vehicle_line_ids', 'event_line_ids')
     def _onchange_room_line_ids(self):
         """Invokes the Compute amounts function"""
-        self._compute_amount_untaxed()
+        self._compute_amounts()
+        self._compute_amount_breakdown()
         self.invoice_button_visible = False
 
     @api.constrains("room_line_ids")
@@ -594,7 +653,7 @@ class RoomBooking(models.Model):
         self.ensure_one()
         if not self.room_line_ids:
             raise ValidationError(_("Please Enter Room Details"))
-        booking_list = self._compute_amount_untaxed(True)
+        _, booking_list = self._calculate_amounts(True)
         if booking_list:
             account_move = self.env["account.move"].create([{
                 'move_type': 'out_invoice',
@@ -663,11 +722,7 @@ class RoomBooking(models.Model):
 
     def get_details(self):
         """ Returns different counts for displaying in dashboard"""
-        today = datetime.today()
-        tz_name = self.env.user.tz
-        today_utc = pytz.timezone('UTC').localize(today,
-                                                  is_dst=False)
-        context_today = today_utc.astimezone(pytz.timezone(tz_name))
+        today_date = fields.Date.context_today(self)
         total_room = self.env['hotel.room'].search_count([])
         check_in = self.env['room.booking'].search_count(
             [('state', '=', 'check_in')])
@@ -680,7 +735,7 @@ class RoomBooking(models.Model):
         staff = 0
         for rec in check_outs:
             for room in rec.room_line_ids:
-                if room.checkout_date.date() == context_today.date():
+                if room.checkout_date and fields.Date.to_date(fields.Datetime.context_timestamp(self, room.checkout_date)) == today_date:
                     check_out += 1
             """staff"""
             staff = self.env['res.users'].search_count(
@@ -708,7 +763,7 @@ class RoomBooking(models.Model):
         for pending in pending_event:
             if pending.date_end >= fields.Datetime.now():
                 pending_events += 1
-            if pending.date_end.date() == fields.Date.today():
+            if fields.Date.to_date(fields.Datetime.context_timestamp(self, pending.date_end)) == today_date:
                 today_events += 1
         food_items = self.env['lunch.product'].search_count([])
         food_order = len(self.env['food.booking.line'].search([]).filtered(
@@ -749,4 +804,16 @@ class RoomBooking(models.Model):
             'pending_payment': round(pending_payment, 2),
             'currency_symbol': self.env.user.company_id.currency_id.symbol,
             'currency_position': self.env.user.company_id.currency_id.position
+        }
+
+    def action_compute_bill(self):
+        """Open the Compute Bill wizard"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Compute Bill',
+            'res_model': 'compute.bill',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_booking_id': self.id}
         }

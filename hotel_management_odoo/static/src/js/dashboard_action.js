@@ -126,7 +126,7 @@ export class CustomDashBoard extends Component {
             res_model: 'event.event',
             view_mode: 'kanban,list,form',
             views: [[false, 'kanban'], [false, 'list'], [false, 'form']],
-            domain: [['date_end', '=', formattedDate]],
+            domain: [['date_end', '>=', formattedDate + ' 00:00:00'], ['date_end', '<=', formattedDate + ' 23:59:59']],
             target: 'current'
         }, options)
     }
@@ -177,7 +177,7 @@ export class CustomDashBoard extends Component {
             res_model: 'room.booking',
             view_mode: 'list,form',
             views: [[false, 'list'], [false, 'form']],
-            domain: [['room_line_ids.checkout_date', '=', formattedDate]],
+            domain: [['room_line_ids.checkout_date', '>=', formattedDate + ' 00:00:00'], ['room_line_ids.checkout_date', '<=', formattedDate + ' 23:59:59']],
             target: 'current'
         }, options)
     }

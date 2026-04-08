@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-###############################################################################
+#############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2024-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author: ADARSH K (odoo@cybrosys.com)
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
 #    You can modify it under the terms of the GNU LESSER
 #    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
@@ -18,7 +18,7 @@
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
-###############################################################################
+#############################################################################
 from odoo import api, fields, models, tools, _
 from odoo.exceptions import ValidationError
 
@@ -135,7 +135,7 @@ class RoomBookingLine(models.Model):
                 'tax_ids': self.tax_ids,
                 'quantity': self.uom_qty,
                 'partner_id': self.booking_id.partner_id,
-                'currency_id': self.currency_id,
+                'currency_id': self.currency_id or self.env.company.currency_id,
             },
         )
 

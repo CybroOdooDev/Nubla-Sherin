@@ -10,6 +10,9 @@
                     <button name="action_reserve" string="Reserve"
                             invisible="state != 'draft'" type="object"
                             class="btn-primary"/>
+                    <button name="action_compute_bill" string="COMPUTE BILL"
+                            invisible="state not in ['check_in', 'check_out', 'done'] or has_pos_orders == False"
+                            type="object" class="btn-primary"/>
                     <button name="action_checkin" string="Check-In"
                             class="btn-primary"
                             invisible="is_checkin == True or (state in ['check_in','check_out','done','cancel'])"
@@ -54,6 +57,7 @@
                         <!-- Invisible Fields -->
                         <field name="is_checkin" invisible="1"/>
                         <field name="company_id" invisible="1"/>
+                        <field name="has_pos_orders" invisible="1"/>
                         <field name="checkin_date" invisible="1"/>
                         <field name="checkout_date" invisible="1"/>
                         <field name="duration" readonly="1" invisible="1"/>

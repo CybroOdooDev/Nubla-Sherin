@@ -21,7 +21,8 @@ Company
 
 Credits
 -------
-* Developer:(V18) Adarsh K,
+* Developer:(V19) Nubla Sherin k,
+            (V18) Adarsh K,
             (V17) Vishnu K P
   Contact: odoo@cybrosys.com
 

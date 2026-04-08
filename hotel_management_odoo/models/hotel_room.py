@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-###############################################################################
+#############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2024-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author: ADARSH K (odoo@cybrosys.com)
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
 #    You can modify it under the terms of the GNU LESSER
 #    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
@@ -18,7 +18,7 @@
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
-###############################################################################
+#############################################################################
 from odoo import api, fields, models, tools, _
 from odoo.exceptions import ValidationError
 
@@ -94,7 +94,7 @@ class HotelRoom(models.Model):
     @api.onchange("room_type")
     def _onchange_room_type(self):
         """Based on selected room type, number of person will be updated.
-        ----------------------------------------
+
         @param self: object pointer"""
         if self.room_type == "single":
             self.num_person = 1

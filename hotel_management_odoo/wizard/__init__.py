@@ -19,5 +19,6 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 ###############################################################################
-from .import room_booking_detail
-from .import sale_order_detail
+from . import room_booking_detail
+from . import sale_order_detail
+from . import compute_bill
