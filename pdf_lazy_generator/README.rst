@@ -2,9 +2,9 @@
     :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
     :alt: License: LGPL-3
 
-Duplicate Contact Details Alert
+PDF Lazy Generator
 ===============================
-* Duplicate Contact Details Alert module for Odoo 19.
+* Background PDF generation in Odoo 19.
 
 Configuration
 =============
@@ -22,6 +22,7 @@ General Public License, Version 3 (LGPL v3).
 Credits
 =======
 Developer: (V19) Nubla Sherin K ,
+
 Contact: odoo@cybrosys.com
 
 Contacts

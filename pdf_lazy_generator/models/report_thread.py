@@ -23,6 +23,7 @@ import threading
 import base64
 from odoo import models, api
 from odoo.modules.registry import Registry
+from odoo.addons.mail.tools.discuss import Store
 
 
 class IrActionsReport(models.Model):
@@ -66,7 +67,7 @@ class IrActionsReport(models.Model):
                 )
 
                 records = env[report.model].browse(res_ids)
-                
+
                 # Determine a filename for the consolidated report
                 if len(records) > 1:
                     filename = f"{report.name or 'Report'}.pdf"
@@ -87,7 +88,7 @@ class IrActionsReport(models.Model):
                 # We'll use the result of the first record as the 'main' reference if needed,
                 # but usually for batch it's better to just use a general name.
                 main_record = records[0] if records else None
-                
+
                 attachment = env['ir.attachment'].create({
                     'name': filename,
                     'type': 'binary',
@@ -100,36 +101,79 @@ class IrActionsReport(models.Model):
 
                 # If "Attach PDF in Chatter" is enabled, attach to each record
                 attach_in_chatter = env['ir.config_parameter'].sudo().get_param(
-                    'custom_report.attach_pdf_in_chatter'
+                    'custom_report.is_attach_pdf_in_chatter'
                 )
-                if attach_in_chatter == 'True':
-                    for record in records:
-                        record.message_post(
-                            body="PDF generated successfully.",
-                            attachment_ids=[attachment.id],
-                        )
 
-                # Send EXACTLY ONE download notification
-                download_url = f"/web/content/{attachment.id}?download=true"
+                try:
+                    # Get the current user's partner_id for targeted notification
+                    user_partner_id = env.user.partner_id.id
+
+                    for record in records:
+                        message = False
+                        if attach_in_chatter == 'True':
+                            message = record.message_post(
+                                body="PDF generated successfully.",
+                                attachment_ids=[attachment.id],
+                                subtype_xmlid='mail.mt_comment',
+                                partner_ids=[user_partner_id],
+                            )
+
+                        # Commit here ensures message and attachment are in DB
+                        new_cr.commit()
+
+                        # Send bus notification to refresh chatter
+                        # 1. Notify current user's partner channel
+                        try:
+                            store_user = Store(bus_channel=env.user.partner_id)
+                            if message:
+                                store_user.add(message)
+                            store_user.add(record, [], as_thread=True, request_list=["attachments", "messages"])
+                            store_user.bus_send()
+                        except:
+                            pass
+
+                        # 2. Notify thread channel (standard for chatter updates)
+                        try:
+                            store_thread = Store(bus_channel=record)
+                            if message:
+                                store_thread.add(message)
+                            store_thread.add(record, [], as_thread=True, request_list=["attachments", "messages"])
+                            store_thread.bus_send()
+                        except:
+                            pass
+                except Exception as store_error:
+                    # Log the error but don't fail the PDF generation
+                    env.cr.execute("""
+                        INSERT INTO ir_logging(name, type, level, dbname, path, line, msg)
+                        VALUES('pdf_lazy_generator', 'server', 'error', %s, %s, '0', %s)
+                    """, (env.cr.dbname, __file__, str(store_error)))
+                
+                # Final commit before bus notification
+                new_cr.commit()
+
+                # Send download notification with metadata
                 env['bus.bus']._sendone(
                     env.user.partner_id,
                     "pdf_download",
                     {
-                        "url": download_url,
-                        "name": filename,
-                        "order_ref": filename.replace(".pdf", ""),
+                        "url": f"/web/content/{attachment.id}?download=true",
+                        "name": attachment.name,
+                        "order_ref": attachment.name.replace(".pdf", ""),
+                        "res_ids": res_ids,
+                        "model": report.model,
                         "tab_id": tab_id,
+                        "message_id": message.id if message else False,
+                        "attachment_id": attachment.id,
+                        "is_attach_pdf_in_chatter": attach_in_chatter == 'True',
                     }
                 )
-
-                new_cr.commit()
 
             except Exception as e:
                 new_cr.rollback()
                 error_msg = str(e)
                 if hasattr(e, 'name'):
                     error_msg = e.name
-                
+
                 env['bus.bus']._sendone(
                     env.user.partner_id,
                     "pdf_error",

@@ -27,7 +27,8 @@ class ResConfigSettings(models.TransientModel):
     """
     _inherit = 'res.config.settings'
 
-    attach_pdf_in_chatter = fields.Boolean(
+    is_attach_pdf_in_chatter = fields.Boolean(
         string="Attach Background PDF in Chatter",
-        config_parameter="custom_report.attach_pdf_in_chatter",
+        config_parameter="custom_report.is_attach_pdf_in_chatter",
+        help="Enable this to attach generated PDF reports in the chatter."
     )

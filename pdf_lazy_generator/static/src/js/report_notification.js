@@ -4,7 +4,6 @@ import { registry } from "@web/core/registry";
 import { rpc } from "@web/core/network/rpc";
 import { patch } from "@web/core/utils/patch";
 import { ViewButton } from "@web/views/view_button/view_button";
-import { browser } from "@web/core/browser/browser";
 
 if (!window.customReportTabId) {
     window.customReportTabId = Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
@@ -122,8 +121,8 @@ patch(ViewButton.prototype, {
 
 
 registry.category("services").add("custom_report_patch", {
-    dependencies: ["action", "notification", "bus_service"],
-    async start(env, { action, notification, bus_service }) {
+    dependencies: ["action", "notification", "bus_service", "mail.store"],
+    async start(env, { action, notification, bus_service, "mail.store": mailStore }) {
 
         bus_service.subscribe("pdf_download", (payload) => {
             console.log("pdf_download received payload:", payload);
@@ -148,6 +147,16 @@ registry.category("services").add("custom_report_patch", {
                 title: "Download Completed",
                 type: "success",
             });
+
+            // TAB-LEVEL ATOMIC RELOAD v14 (Conditional)
+            // If this is the tab that initiated the request AND chatter attachment is enabled, we reload.
+            if (payload.tab_id && payload.tab_id === UNIQUE_TAB_ID && payload.is_attach_pdf_in_chatter) {
+                console.log("pdf_download: Initiating conditional tab-level atomic reload");
+                setTimeout(() => {
+                    console.log("pdf_download: Hardware reload triggered (Condition Met)");
+                    window.location.reload();
+                }, 30);
+            }
         });
 
         bus_service.subscribe("pdf_error", (payload) => {

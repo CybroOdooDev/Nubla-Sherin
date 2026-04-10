@@ -22,13 +22,13 @@
 {
     'name': 'PDF Lazy Generator',
     'version': '19.0.1.0.0',
-    'summary': 'PDF Generation Using Thread',
-    'description': "PDF Generation Using Thread",
+    'summary': 'Generate PDF reports in the background using threads.',
+    'description': "This module enables asynchronous PDF generation to improve report loading performance and user experience.",
     'author': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'depends': ['base','account'],
+    'depends': ['account'],
     'data': [
         'views/menus.xml',
         'views/res_config_settings_views.xml'
@@ -36,7 +36,7 @@
     'assets': {
         'web.assets_backend': [
             'pdf_lazy_generator/static/src/js/report_notification.js',
-            'pdf_lazy_generator/static/src/js/accounting_report.js'
+            'pdf_lazy_generator/static/src/components/account_report/accounting_report.js',
         ],
     },
     'images': [

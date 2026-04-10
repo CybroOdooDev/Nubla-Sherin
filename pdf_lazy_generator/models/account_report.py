@@ -92,6 +92,7 @@ class AccountReport(models.Model):
 
                 download_url = f"/web/content/{attachment.id}?download=true"
 
+                new_cr.commit()
                 env["bus.bus"]._sendone(
                     env.user.partner_id,
                     "pdf_download",
@@ -103,7 +104,6 @@ class AccountReport(models.Model):
                         "tab_id": tab_id,
                     },
                 )
-                new_cr.commit()
                 _logger.info("Background accounting PDF generated: %s", filename)
 
             except Exception as e:
