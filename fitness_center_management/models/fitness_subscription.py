@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
+from dateutil.relativedelta import relativedelta
 
 class FitnessSubscription(models.Model):
     _name = 'fitness.subscription'
@@ -23,15 +24,28 @@ class FitnessSubscription(models.Model):
         ('unpaid', 'Unpaid'),
         ('partial', 'Partially Paid'),
         ('paid', 'Paid')
-    ], string='Payment Status', default='unpaid', tracking=True)
+    ], string='Payment Status', compute='_compute_payment_status', store=True, tracking=True)
     total_amount = fields.Float(string='Total Amount', related='plan_id.price', readonly=True, store=True)
     invoice_ids = fields.Many2many('account.move', string='Invoices', readonly=True)
+
+    @api.depends('invoice_ids.payment_state')
+    def _compute_payment_status(self):
+        for record in self:
+            if not record.invoice_ids:
+                record.payment_status = 'unpaid'
+            else:
+                if all(inv.payment_state in ('paid', 'in_payment') for inv in record.invoice_ids):
+                    record.payment_status = 'paid'
+                elif any(inv.payment_state in ('paid', 'in_payment') for inv in record.invoice_ids):
+                    record.payment_status = 'partial'
+                else:
+                    record.payment_status = 'unpaid'
 
     @api.depends('start_date', 'plan_id.duration_months')
     def _compute_end_date(self):
         for record in self:
             if record.start_date and record.plan_id:
-                record.end_date = record.start_date + fields.Date.relativedelta(months=record.plan_id.duration_months)
+                record.end_date = record.start_date + relativedelta(months=record.plan_id.duration_months)
             else:
                 record.end_date = False
 

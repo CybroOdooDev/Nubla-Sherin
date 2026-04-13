@@ -21,3 +21,6 @@ access_fitness_equipment_maintenance_user,fitness.equipment.maintenance.user,mod
 access_fitness_equipment_maintenance_manager,fitness.equipment.maintenance.manager,model_fitness_equipment_maintenance,group_fitness_manager,1,1,1,1
 access_fitness_payment_user,fitness.payment.user,model_fitness_payment,group_fitness_user,1,1,1,0
 access_fitness_payment_manager,fitness.payment.manager,model_fitness_payment,group_fitness_manager,1,1,1,1
+access_fitness_membership_plan_public,fitness.membership.plan.public,model_fitness_membership_plan,,1,0,0,0
+access_fitness_trainer_public,fitness.trainer.public,model_fitness_trainer,,1,0,0,0
+access_fitness_class_public,fitness.class.public,model_fitness_class,,1,0,0,0

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="fitness_center_management.DarkModeSystray">
+        <div class="o_nav_entry dropdown" role="button" t-on-click="toggleDarkMode" style="cursor: pointer; padding: 0 10px; display: flex; align-items: center; height: 100%;">
+            <i t-attf-class="fa #{state.darkMode ? 'fa-sun-o text-warning' : 'fa-moon-o'} fa-lg"/>
+        </div>
+    </t>
+</templates>

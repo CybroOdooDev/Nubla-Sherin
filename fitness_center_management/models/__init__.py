@@ -10,3 +10,5 @@ from . import fitness_class_booking
 from . import fitness_equipment
 from . import fitness_equipment_maintenance
 from . import fitness_payment
+from . import account_move
+from . import account_payment

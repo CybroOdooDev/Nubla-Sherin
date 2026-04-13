@@ -18,7 +18,7 @@
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'depends': ['base', 'mail', 'contacts', 'hr', 'hr_skills'],
+    'depends': ['base', 'mail', 'contacts', 'hr', 'hr_skills', 'website','portal', 'account'],
     'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
@@ -35,7 +35,24 @@
         'views/fitness_equipment_views.xml',
         'views/fitness_equipment_maintenance_views.xml',
         'views/fitness_payment_views.xml',
+        'views/website_templates.xml',
     ],
+    'assets': {
+        'web.assets_frontend': [
+            'fitness_center_management/static/src/css/fitness_website.css',
+        ],
+        'web.assets_backend': [
+            'fitness_center_management/static/src/css/fitness_dashboard.css',
+            'fitness_center_management/static/src/css/fitness_dark_global.css',
+            'fitness_center_management/static/src/js/dark_mode_manager.js',
+            'fitness_center_management/static/src/js/dark_mode_scope_service.js',
+            'fitness_center_management/static/src/js/dark_mode_init.js',
+            'fitness_center_management/static/src/js/dark_mode_systray.js',
+            'fitness_center_management/static/src/js/fitness_dashboard.js',
+            'fitness_center_management/static/src/xml/fitness_dashboard.xml',
+            'fitness_center_management/static/src/xml/dark_mode_systray.xml',
+        ],
+    },
     'installable': True,
     'application': True,
     'license': 'AGPL-3',
