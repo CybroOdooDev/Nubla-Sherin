@@ -36,6 +36,13 @@
         'views/fitness_equipment_maintenance_views.xml',
         'views/fitness_payment_views.xml',
         'views/website_templates.xml',
+        'views/advanced_features_views.xml',
+        'views/fitness_workout_views.xml',
+        'views/fitness_eat_views.xml',
+        'views/fitness_mind_views.xml',
+        'views/fitness_social_views.xml',
+        'views/fitness_ecosystem_menus.xml',
+        'views/portal_templates.xml',
     ],
     'assets': {
         'web.assets_frontend': [

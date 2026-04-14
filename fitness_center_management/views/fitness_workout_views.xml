@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- EXERCISE LIBRARY -->
+    <record id="view_fitness_exercise_library_tree" model="ir.ui.view">
+        <field name="name">fitness.exercise.library.list</field>
+        <field name="model">fitness.exercise.library</field>
+        <field name="arch" type="xml">
+            <list string="Exercise Library">
+                <field name="name"/>
+                <field name="body_part"/>
+                <field name="difficulty"/>
+                <field name="equipment_required"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fitness_exercise_library_form" model="ir.ui.view">
+        <field name="name">fitness.exercise.library.form</field>
+        <field name="model">fitness.exercise.library</field>
+        <field name="arch" type="xml">
+            <form string="Exercise">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Exercise Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="body_part"/>
+                            <field name="equipment_required"/>
+                        </group>
+                        <group>
+                            <field name="difficulty"/>
+                            <field name="calories_per_minute"/>
+                            <field name="video_demo" widget="url"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Instructions" name="instructions">
+                            <field name="description"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fitness_exercise_library" model="ir.actions.act_window">
+        <field name="name">Exercise Library</field>
+        <field name="res_model">fitness.exercise.library</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add your first exercise to the library!
+            </p>
+        </field>
+    </record>
+
+    <!-- WORKOUT LOG -->
+    <record id="view_fitness_workout_log_tree" model="ir.ui.view">
+        <field name="name">fitness.workout.log.list</field>
+        <field name="model">fitness.workout.log</field>
+        <field name="arch" type="xml">
+            <list string="Workout Logs">
+                <field name="name"/>
+                <field name="member_id"/>
+                <field name="date"/>
+                <field name="duration"/>
+                <field name="calories_burned"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fitness_workout_log_form" model="ir.ui.view">
+        <field name="name">fitness.workout.log.form</field>
+        <field name="model">fitness.workout.log</field>
+        <field name="arch" type="xml">
+            <form string="Workout Log">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="member_id"/>
+                            <field name="plan_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="duration"/>
+                            <field name="calories_burned"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Exercises" name="exercises">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="exercise_id"/>
+                                    <field name="sets"/>
+                                    <field name="reps"/>
+                                    <field name="weight"/>
+                                    <field name="duration_minutes"/>
+                                    <field name="calories_burned"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="How did it go?"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fitness_workout_log" model="ir.actions.act_window">
+        <field name="name">Workout Logs</field>
+        <field name="res_model">fitness.workout.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Log a new workout!
+            </p>
+        </field>
+    </record>
+
+</odoo>

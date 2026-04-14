@@ -16,5 +16,19 @@
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+        <record id="seq_fitness_workout_log" model="ir.sequence">
+            <field name="name">Fitness Workout Log</field>
+            <field name="code">fitness.workout.log</field>
+            <field name="prefix">WKL</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_fitness_meal_log" model="ir.sequence">
+            <field name="name">Fitness Meal Log</field>
+            <field name="code">fitness.meal.log</field>
+            <field name="prefix">MEAL</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- MEDITATION SESSIONS -->
+    <record id="view_fitness_meditation_session_tree" model="ir.ui.view">
+        <field name="name">fitness.meditation.session.list</field>
+        <field name="model">fitness.meditation.session</field>
+        <field name="arch" type="xml">
+            <list string="Meditation Sessions">
+                <field name="name"/>
+                <field name="focus"/>
+                <field name="duration"/>
+                <field name="is_premium"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fitness_meditation_session_form" model="ir.ui.view">
+        <field name="name">fitness.meditation.session.form</field>
+        <field name="model">fitness.meditation.session</field>
+        <field name="arch" type="xml">
+            <form string="Meditation Session">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="E.g. Deep Sleep Journey"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="focus"/>
+                            <field name="duration"/>
+                        </group>
+                        <group>
+                            <field name="audio_url" widget="url"/>
+                            <field name="is_premium"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fitness_meditation_session" model="ir.actions.act_window">
+        <field name="name">Meditation Library</field>
+        <field name="res_model">fitness.meditation.session</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- SLEEP LOG -->
+    <record id="view_fitness_sleep_log_tree" model="ir.ui.view">
+        <field name="name">fitness.sleep.log.list</field>
+        <field name="model">fitness.sleep.log</field>
+        <field name="arch" type="xml">
+            <list string="Sleep Logs">
+                <field name="name"/>
+                <field name="member_id"/>
+                <field name="date"/>
+                <field name="duration"/>
+                <field name="sleep_score"/>
+                <field name="source"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fitness_sleep_log_form" model="ir.ui.view">
+        <field name="name">fitness.sleep.log.form</field>
+        <field name="model">fitness.sleep.log</field>
+        <field name="arch" type="xml">
+            <form string="Sleep Log">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="member_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="source"/>
+                        </group>
+                    </group>
+                    <group string="Sleep Metrics">
+                        <group>
+                            <field name="duration"/>
+                            <field name="deep_sleep"/>
+                            <field name="rem_sleep"/>
+                        </group>
+                        <group>
+                            <field name="sleep_score"/>
+                            <field name="stress_score"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes/Dreams" name="notes">
+                            <field name="notes" placeholder="How did you feel waking up?"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fitness_sleep_log" model="ir.actions.act_window">
+        <field name="name">Sleep Logs</field>
+        <field name="res_model">fitness.sleep.log</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ECOSYSTEM MENU HIERARCHY (V5) -->
+    <menuitem id="menu_fitness_ecosystem_root" name="Ecosystem" parent="fitness_center_management.menu_fitness_root" sequence="95"/>
+
+    <!-- VERTICAL 1: WORKOUT -->
+    <menuitem id="menu_ecosystem_workout" name="Workout Engine" parent="menu_fitness_ecosystem_root" sequence="10"/>
+    <menuitem id="menu_action_exercise_library" name="Exercise Library" parent="menu_ecosystem_workout" action="action_fitness_exercise_library" sequence="10"/>
+    <menuitem id="menu_action_workout_log" name="Workout Logs" parent="menu_ecosystem_workout" action="action_fitness_workout_log" sequence="20"/>
+
+    <!-- VERTICAL 2: EAT -->
+    <menuitem id="menu_ecosystem_eat" name="Eat &amp; Nutrition" parent="menu_fitness_ecosystem_root" sequence="20"/>
+    <menuitem id="menu_action_food_item" name="Food Database" parent="menu_ecosystem_eat" action="action_fitness_food_item" sequence="10"/>
+    <menuitem id="menu_action_meal_log" name="Meal Logs" parent="menu_ecosystem_eat" action="action_fitness_meal_log" sequence="20"/>
+
+    <!-- VERTICAL 3: MIND -->
+    <menuitem id="menu_ecosystem_mind" name="Mind &amp; Wellness" parent="menu_fitness_ecosystem_root" sequence="30"/>
+    <menuitem id="menu_action_meditation" name="Meditation Library" parent="menu_ecosystem_mind" action="action_fitness_meditation_session" sequence="10"/>
+    <menuitem id="menu_action_sleep_log" name="Sleep Logs" parent="menu_ecosystem_mind" action="action_fitness_sleep_log" sequence="20"/>
+
+    <!-- VERTICAL 4: SOCIAL -->
+    <menuitem id="menu_ecosystem_social" name="Community" parent="menu_fitness_ecosystem_root" sequence="40"/>
+    <menuitem id="menu_action_social_post" name="Community Feed" parent="menu_ecosystem_social" action="action_fitness_social_post" sequence="10"/>
+    <menuitem id="menu_action_challenge" name="Challenges" parent="menu_ecosystem_social" action="action_fitness_challenge" sequence="20"/>
+
+</odoo>

@@ -11,6 +11,8 @@
                 <field name="check_out"/>
                 <field name="duration" sum="Total Duration"/>
                 <field name="method"/>
+                <field name="check_in_user_id" optional="hide"/>
+                <field name="check_out_user_id" optional="hide"/>
             </list>
         </field>
     </record>
@@ -21,11 +23,17 @@
         <field name="priority">1</field>
         <field name="arch" type="xml">
             <form string="Attendance">
+                <header>
+                    <button name="action_check_out_now" type="object" string="Check Out Now" class="btn-primary"
+                            invisible="check_out"/>
+                </header>
                 <sheet>
                     <group>
                         <group name="member_info" string="Member Information">
                             <field name="member_id"/>
                             <field name="method"/>
+                            <field name="check_in_user_id" readonly="1"/>
+                            <field name="check_out_user_id" readonly="1"/>
                         </group>
                         <group name="timing" string="Timing &amp; Duration">
                             <field name="check_in"/>

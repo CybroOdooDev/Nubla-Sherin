@@ -6,8 +6,19 @@ from datetime import date
 
 class FitnessHome(Home):
     def _login_redirect(self, uid, redirect=None):
-        if not redirect:
-            return '/fitness/dashboard'
+        user = request.env['res.users'].sudo().browse(uid)
+        
+        # Override default /web or the old /fitness/dashboard redirect with our portal routes
+        if not redirect or redirect == '/web' or redirect == '/fitness/dashboard':
+            if user.has_group('fitness_center_management.group_fitness_manager'):
+                return '/my/manager'
+            elif request.env['fitness.trainer'].sudo().search_count([('employee_id.user_id.partner_id', '=', user.partner_id.id)]):
+                return '/my/trainer'
+            elif request.env['fitness.member'].sudo().search_count([('partner_id', '=', user.partner_id.id)]):
+                # Auto attendance check-in for members when logging into the Fitness website area.
+                request.env['fitness.attendance'].sudo().portal_check_in_for_user(uid)
+                return '/my/fitness'
+                
         return super(FitnessHome, self)._login_redirect(uid, redirect=redirect)
 
 class FitnessWebsite(http.Controller):
@@ -34,6 +45,45 @@ class FitnessWebsite(http.Controller):
         return request.render("fitness_center_management.fitness_classes_schedule", {
             'schedules': schedules,
         })
+
+    @http.route(['/fitness/classes/book'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
+    def fitness_class_book(self, **post):
+        schedule_id = post.get('schedule_id')
+        if not schedule_id:
+            return request.redirect('/fitness/classes')
+
+        schedule = request.env['fitness.class.schedule'].sudo().browse(int(schedule_id))
+        if not schedule.exists():
+            return request.redirect('/fitness/classes')
+
+        # Find member linked to current user
+        partner = request.env.user.partner_id
+        member = request.env['fitness.member'].sudo().search(
+            [('partner_id', '=', partner.id)], limit=1,
+        )
+        if not member:
+            return request.redirect('/fitness/classes?error=no_member')
+
+        # Check if already booked
+        Booking = request.env['fitness.class.booking'].sudo()
+        existing = Booking.search([
+            ('schedule_id', '=', schedule.id),
+            ('member_id', '=', member.id),
+            ('state', '!=', 'cancelled'),
+        ], limit=1)
+        if existing:
+            return request.redirect('/fitness/classes?error=already_booked')
+
+        # Check availability
+        if schedule.available_spots <= 0:
+            return request.redirect('/fitness/classes?error=full')
+
+        # Create booking
+        Booking.create({
+            'schedule_id': schedule.id,
+            'member_id': member.id,
+        })
+        return request.redirect('/fitness/classes?success=1')
 
     @http.route(['/fitness/trainers'], type='http', auth="public", website=True)
     def fitness_trainers(self, **post):
@@ -126,40 +176,16 @@ class FitnessWebsite(http.Controller):
         # Redirect directly to portal payment page
         return request.redirect(invoice.get_portal_url())
 
-    @http.route(['/fitness/dashboard'], type='http', auth="user", website=True)
-    def fitness_dashboard(self, **post):
-        partner = request.env.user.partner_id
-        member = request.env['fitness.member'].sudo().search([('partner_id', '=', partner.id)], limit=1)
+    @http.route(['/fitness/router'], type='http', auth="user", website=True)
+    def fitness_portal_router(self, **post):
+        user = request.env.user
         
-        # Get active or most recent subscription
-        subscription = False
-        days_left = 0
-        status = 'no_plan'
-        
-        if member:
-            subscription = request.env['fitness.subscription'].sudo().search(
-                [('member_id', '=', member.id)],
-                order='start_date desc',
-                limit=1
-            )
+        if user.has_group('fitness_center_management.group_fitness_manager'):
+            return request.redirect('/my/manager')
             
-            if subscription:
-                status = subscription.state
-                if subscription.end_date:
-                    days_left = (subscription.end_date - date.today()).days
-                    if days_left < 0:
-                        status = 'expired'
-                        if subscription.state == 'active':
-                            subscription.sudo().write({'state': 'expired'})
+        is_trainer = request.env['fitness.trainer'].sudo().search_count([('employee_id.user_id.partner_id', '=', user.partner_id.id)])
+        if is_trainer:
+            return request.redirect('/my/trainer')
+            
+        return request.redirect('/my/fitness')
 
-        plans = request.env['fitness.membership.plan'].sudo().search([('active', '=', True)])
-        
-        values = {
-            'member': member,
-            'subscription': subscription,
-            'days_left': days_left,
-            'status': status,
-            'plans': plans,
-        }
-        
-        return request.render("fitness_center_management.fitness_dashboard", values)

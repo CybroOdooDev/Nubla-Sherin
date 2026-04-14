@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Training Session -->
+    <record id="view_fitness_training_session_form" model="ir.ui.view">
+        <field name="name">fitness.training.session.form</field>
+        <field name="model">fitness.training.session</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_schedule" string="Schedule" type="object" state="draft" class="oe_highlight"/>
+                    <button name="action_start" string="Start" type="object" state="scheduled" class="oe_highlight"/>
+                    <button name="action_complete" string="Complete" type="object" state="active" class="oe_highlight"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Session Title..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="session_type"/>
+                            <field name="trainer_id"/>
+                            <field name="video_url" widget="url"/>
+                        </group>
+                        <group>
+                            <field name="start_time"/>
+                            <field name="duration"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Members" name="members">
+                            <field name="member_ids" widget="many2many_tags" placeholder="Add Members..."/>
+                        </page>
+                        <page string="Description" name="description">
+                            <field name="description"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fitness_training_session" model="ir.actions.act_window">
+        <field name="name">Training Sessions</field>
+        <field name="res_model">fitness.training.session</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Trainer Schedule -->
+    <record id="view_fitness_trainer_schedule_form" model="ir.ui.view">
+        <field name="name">fitness.trainer.schedule.form</field>
+        <field name="model">fitness.trainer.schedule</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="trainer_id"/>
+                            <field name="date"/>
+                            <field name="state"/>
+                        </group>
+                        <group>
+                            <field name="start_time" widget="float_time"/>
+                            <field name="end_time" widget="float_time"/>
+                            <field name="session_id"/>
+                            <field name="member_id"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fitness_trainer_schedule" model="ir.actions.act_window">
+        <field name="name">Trainer Schedules</field>
+        <field name="res_model">fitness.trainer.schedule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Workout Plan -->
+    <record id="view_fitness_workout_plan_form" model="ir.ui.view">
+        <field name="name">fitness.workout.plan.form</field>
+        <field name="model">fitness.workout.plan</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Plan Name..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="member_id"/>
+                            <field name="trainer_id"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Exercises" name="exercises">
+                            <field name="exercise_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="sets"/>
+                                    <field name="reps"/>
+                                    <field name="duration_minutes"/>
+                                    <field name="description"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fitness_workout_plan" model="ir.actions.act_window">
+        <field name="name">Workout Plans</field>
+        <field name="res_model">fitness.workout.plan</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Diet Plan -->
+    <record id="view_fitness_diet_plan_form" model="ir.ui.view">
+        <field name="name">fitness.diet.plan.form</field>
+        <field name="model">fitness.diet.plan</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Diet Plan Name..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="member_id"/>
+                            <field name="trainer_id"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="total_calories"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Meals" name="meals">
+                            <field name="meal_ids">
+                                <list editable="bottom">
+                                    <field name="meal_type"/>
+                                    <field name="name"/>
+                                    <field name="calories" sum="Total Calories"/>
+                                    <field name="protein" sum="Total Protein"/>
+                                    <field name="carbs" sum="Total Carbs"/>
+                                    <field name="fats" sum="Total Fats"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fitness_diet_plan" model="ir.actions.act_window">
+        <field name="name">Diet Plans</field>
+        <field name="res_model">fitness.diet.plan</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Member Progress -->
+    <record id="view_fitness_member_progress_form" model="ir.ui.view">
+        <field name="name">fitness.member.progress.form</field>
+        <field name="model">fitness.member.progress</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_avatar" style="display:flex; justify-content:space-between; width: 300px;">
+                        <field name="before_photo" widget="image" class="oe_avatar"/>
+                        <field name="after_photo" widget="image" class="oe_avatar"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="member_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="weight"/>
+                            <field name="height"/>
+                            <field name="bmi"/>
+                        </group>
+                        <group>
+                            <field name="body_fat_percent"/>
+                            <field name="muscle_mass"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" nolabel="1" placeholder="Progress notes..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fitness_member_progress" model="ir.actions.act_window">
+        <field name="name">Member Progress</field>
+        <field name="res_model">fitness.member.progress</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Menus -->
+    <menuitem id="menu_fitness_advanced_features" name="Member Services" parent="fitness_center_management.menu_fitness_root" sequence="90"/>
+    <menuitem id="menu_fitness_training_session" name="Training Sessions" parent="menu_fitness_advanced_features" action="action_fitness_training_session" sequence="10"/>
+    <menuitem id="menu_fitness_trainer_schedule" name="Trainer Schedules" parent="menu_fitness_advanced_features" action="action_fitness_trainer_schedule" sequence="20"/>
+    <menuitem id="menu_fitness_workout_plan" name="Workout Plans" parent="menu_fitness_advanced_features" action="action_fitness_workout_plan" sequence="30"/>
+    <menuitem id="menu_fitness_diet_plan" name="Diet Plans" parent="menu_fitness_advanced_features" action="action_fitness_diet_plan" sequence="40"/>
+    <menuitem id="menu_fitness_member_progress" name="Member Progress" parent="menu_fitness_advanced_features" action="action_fitness_member_progress" sequence="50"/>
+
+</odoo>

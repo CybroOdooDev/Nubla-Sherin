@@ -6,7 +6,7 @@
             <li class="nav-item dropdown o_no_autohide_item">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Fitness</a>
                 <div class="dropdown-menu" role="menu">
-                    <a href="/fitness/dashboard" class="dropdown-item" role="menuitem">Dashboard</a>
+                    <a href="/fitness/router" class="dropdown-item" role="menuitem">Dashboard</a>
                     <a href="/fitness/membership" class="dropdown-item" role="menuitem">Plans</a>
                     <a href="/fitness/classes" class="dropdown-item" role="menuitem">Classes</a>
                     <a href="/fitness/trainers" class="dropdown-item" role="menuitem">Trainers</a>
@@ -136,6 +136,29 @@
             <div id="wrap" class="py-5">
                 <div class="container">
                     <h2 class="fitness-section-title">Class Schedule</h2>
+
+                    <!-- Booking feedback alerts -->
+                    <t t-if="request.params.get('success')">
+                        <div class="alert alert-success text-center shadow-sm" role="alert">
+                            <i class="fa fa-check-circle mr-2"/> <strong>Booked!</strong> Your class has been booked successfully.
+                        </div>
+                    </t>
+                    <t t-if="request.params.get('error') == 'no_member'">
+                        <div class="alert alert-warning text-center shadow-sm" role="alert">
+                            <i class="fa fa-exclamation-triangle mr-2"/> You need an active member profile to book a class.
+                            <a href="/fitness/membership" class="alert-link">Join a plan first</a>.
+                        </div>
+                    </t>
+                    <t t-if="request.params.get('error') == 'already_booked'">
+                        <div class="alert alert-info text-center shadow-sm" role="alert">
+                            <i class="fa fa-info-circle mr-2"/> You have already booked this class.
+                        </div>
+                    </t>
+                    <t t-if="request.params.get('error') == 'full'">
+                        <div class="alert alert-danger text-center shadow-sm" role="alert">
+                            <i class="fa fa-times-circle mr-2"/> Sorry, this class is full. No spots available.
+                        </div>
+                    </t>
                     <div class="table-responsive">
                         <table class="table table-hover shadow-sm rounded">
                             <thead class="bg-dark text-white">
@@ -176,7 +199,12 @@
                                             </t>
                                         </td>
                                         <td>
-                                            <button class="btn btn-sm btn-fitness" t-att-disabled="schedule.available_spots &lt;= 0">Book Now</button>
+                                            <form action="/fitness/classes/book" method="post" class="d-inline">
+                                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                                <input type="hidden" name="schedule_id" t-att-value="schedule.id"/>
+                                                <button type="submit" class="btn btn-sm btn-fitness"
+                                                        t-att-disabled="schedule.available_spots &lt;= 0">Book Now</button>
+                                            </form>
                                         </td>
                                     </tr>
                                 </t>
@@ -286,214 +314,12 @@
                     <p class="lead text-muted">Thank you for joining. Our team will contact you shortly regarding the payment and facility access.</p>
                     <div class="mt-4">
                         <a href="/fitness" class="btn btn-outline-dark me-2">Back to Home</a>
-                        <a href="/fitness/dashboard" class="btn btn-fitness">Go to Dashboard</a>
+                        <a href="/my/fitness" class="btn btn-fitness">Go to Dashboard</a>
                     </div>
                 </div>
             </div>
         </t>
     </template>
 
-    <!-- Fitness Dashboard (Standalone) -->
-    <template id="fitness_dashboard" name="Fitness Dashboard">
-        <t t-call="website.layout">
-            <div id="wrap" class="bg-light pb-5">
-                <!-- Dashboard Header -->
-                <div class="bg-dark text-white py-4 mb-4">
-                    <div class="container d-flex justify-content-between align-items-center">
-                        <h2 class="mb-0">Welcome, <t t-esc="request.env.user.name"/></h2>
-                        <div>
-                            <span class="mr-2">Your Dashboard</span>
-                            <i class="fa fa-tachometer fa-2x align-middle"/>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="container">
-                    <!-- EXPIRED WARNING -->
-                    <t t-if="status == 'expired'">
-                        <div class="alert alert-danger text-center shadow-sm" role="alert">
-                            <h4 class="alert-heading font-weight-bold"><i class="fa fa-lock mr-2"/> Subscription Expired</h4>
-                            <p class="mb-0">Your subscription has expired. Premium features such as class bookings and trainer sessions have been locked.</p>
-                            <a t-attf-href="/fitness/join/#{subscription.plan_id.id if subscription else ''}" class="btn btn-danger mt-3 font-weight-bold">Renew Subscription</a>
-                        </div>
-                    </t>
-
-                    <!-- EXPIRING SOON WARNING -->
-                    <t t-if="status == 'active' and days_left &lt;= 7 and days_left &gt;= 0">
-                        <div class="alert alert-warning text-center shadow-sm" role="alert">
-                            <h4 class="alert-heading font-weight-bold"><i class="fa fa-exclamation-triangle mr-2"/> Action Required</h4>
-                            <p class="mb-0">Your subscription expires in <strong><t t-esc="days_left"/> days</strong>! Renew now to continue enjoying our classes and facilities without interruption.</p>
-                        </div>
-                    </t>
-
-                    <!-- NO SUBSCRIPTION: SHOW PLANS -->
-                    <t t-if="status == 'no_plan' or status == 'cancelled'">
-                        <div class="mt-4">
-                            <h3 class="text-center font-weight-bold mb-4">You don't have an active plan. Select one to get started!</h3>
-                            <div class="row justify-content-center">
-                                <t t-foreach="plans" t-as="plan">
-                                    <div class="col-md-4 mb-4">
-                                        <div class="card fitness-card text-center h-100 shadow-sm border-0">
-                                            <div class="card-header bg-dark text-white py-4">
-                                                <h4 class="mb-0" t-esc="plan.name"/>
-                                            </div>
-                                            <div class="card-body d-flex flex-column">
-                                                <div class="fitness-price-tag mb-3">
-                                                    $<span t-esc="plan.price"/>
-                                                    <small class="text-muted">/ <t t-esc="plan.plan_type"/></small>
-                                                </div>
-                                                <ul class="list-unstyled mb-4 text-left px-3">
-                                                    <t t-if="plan.features">
-                                                        <t t-foreach="plan.features.split('\n')" t-as="feature">
-                                                            <li class="mb-2 border-bottom pb-2"><i class="fa fa-check text-success mr-2"/> <t t-esc="feature"/></li>
-                                                        </t>
-                                                    </t>
-                                                    <t t-else="">
-                                                        <li class="mb-2"><i class="fa fa-check text-success mr-2"/> Core Gym Access</li>
-                                                    </t>
-                                                </ul>
-                                                <div class="mt-auto">
-                                                    <a t-attf-href="/fitness/join/#{plan.id}" class="btn btn-fitness w-100 p-2 font-weight-bold">Subscribe Now</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </t>
-                            </div>
-                        </div>
-                    </t>
-
-                    <!-- ACTIVE / EXPIRED / DRAFT SUBSCRIPTION WIDGET -->
-                    <t t-if="status in ['active', 'expired', 'draft'] and subscription">
-                        <div class="row mt-4">
-                            <!-- Subscription Status Widget -->
-                            <div class="col-md-6 mb-4">
-                                <div class="card shadow-sm border-0 h-100">
-                                    <div class="card-header bg-white border-bottom-0 pb-0 pt-4 px-4">
-                                        <h4 class="font-weight-bold"><i class="fa fa-id-card-o text-primary mr-2"/> Current Subscription</h4>
-                                    </div>
-                                    <div class="card-body px-4">
-                                        <div class="d-flex align-items-center mb-4">
-                                            <h2 class="mb-0 text-dark font-weight-bold mr-3" t-esc="subscription.plan_id.name"/>
-                                            <span t-attf-class="badge #{'bg-success' if status == 'active' else 'bg-warning' if status == 'draft' else 'bg-danger'} px-3 py-2 text-uppercase" t-esc="'PENDING' if status == 'draft' else status"/>
-                                        </div>
-                                        <div class="row text-center mb-4 p-3 bg-light rounded">
-                                            <div class="col-6 border-right">
-                                                <p class="text-muted mb-1 small text-uppercase font-weight-bold">Start Date</p>
-                                                <h5 class="font-weight-bold mb-0 text-dark"><span t-esc="subscription.start_date or 'Pending'"/></h5>
-                                            </div>
-                                            <div class="col-6">
-                                                <p class="text-muted mb-1 small text-uppercase font-weight-bold">End Date</p>
-                                                <h5 class="font-weight-bold mb-0 text-dark"><span t-esc="subscription.end_date or 'Pending'"/></h5>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="text-muted font-weight-bold text-uppercase">Days Remaining</span>
-                                            <h2 t-attf-class="mb-0 font-weight-bold #{'text-success' if days_left &gt; 7 else 'text-warning' if days_left &gt; 0 else 'text-danger'}">
-                                                <t t-if="status == 'draft'">N/A</t>
-                                                <t t-elif="days_left &gt; 0" t-esc="days_left"/>
-                                                <t t-else="">0</t>
-                                            </h2>
-                                        </div>
-                                        <div class="progress" style="height: 10px;">
-                                            <div t-attf-class="progress-bar #{'bg-success' if days_left &gt; 7 else 'bg-warning' if days_left &gt; 0 else 'bg-danger'}" role="progressbar" t-attf-style="width: #{0 if status == 'draft' else min(100, max(0, (days_left / 30.0) * 100))}%;"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Quick Actions Widget -->
-                            <div class="col-md-6 mb-4">
-                                <div class="card shadow-sm border-0 h-100">
-                                    <div class="card-header bg-white border-bottom-0 pb-0 pt-4 px-4">
-                                        <h4 class="font-weight-bold"><i class="fa fa-bolt text-warning mr-2"/> Quick Actions</h4>
-                                    </div>
-                                    <div class="card-body px-4">
-                                        <div class="row h-100">
-                                            <div class="col-6 p-2">
-                                                <a href="/fitness/classes" t-attf-class="btn btn-outline-primary w-100 h-100 d-flex flex-column justify-content-center align-items-center rounded py-4 #{'disabled' if status in ['expired', 'draft'] else ''}">
-                                                    <i class="fa fa-calendar fa-2x mb-2"/>
-                                                    <span class="font-weight-bold">Book Class</span>
-                                                </a>
-                                            </div>
-                                            <div class="col-6 p-2">
-                                                <a href="/fitness/trainers" t-attf-class="btn btn-outline-info w-100 h-100 d-flex flex-column justify-content-center align-items-center rounded py-4 #{'disabled' if status in ['expired', 'draft'] else ''}">
-                                                    <i class="fa fa-user-circle fa-2x mb-2"/>
-                                                    <span class="font-weight-bold">Trainers</span>
-                                                </a>
-                                            </div>
-                                            <div class="col-6 p-2">
-                                                <a href="#" t-attf-class="btn btn-outline-success w-100 h-100 d-flex flex-column justify-content-center align-items-center rounded py-4 #{'disabled' if status in ['expired', 'draft'] else ''}">
-                                                    <i class="fa fa-heartbeat fa-2x mb-2"/>
-                                                    <span class="font-weight-bold">Diet &amp; Workout</span>
-                                                </a>
-                                            </div>
-                                            <div class="col-6 p-2">
-                                                <a href="#fitness_invoices" class="btn btn-outline-secondary w-100 h-100 d-flex flex-column justify-content-center align-items-center rounded py-4">
-                                                    <i class="fa fa-file-text-o fa-2x mb-2"/>
-                                                    <span class="font-weight-bold">Invoices</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Fitness Invoices List -->
-                        <t t-if="subscription">
-                            <div class="card shadow-sm border-0 mt-4 mb-5" id="fitness_invoices">
-                                <div class="card-header bg-white pb-0 pt-4 px-4 border-bottom-0">
-                                    <h4 class="font-weight-bold"><i class="fa fa-file-text-o text-secondary mr-2"/> Fitness Invoices</h4>
-                                </div>
-                                <div class="card-body px-4">
-                                    <t t-if="subscription.invoice_ids">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover mb-0">
-                                            <thead class="bg-light">
-                                                <tr>
-                                                    <th class="border-top-0 border-0">Invoice</th>
-                                                    <th class="border-top-0 border-0">Date</th>
-                                                    <th class="border-top-0 border-0 text-right">Amount</th>
-                                                    <th class="border-top-0 border-0 text-center">Status</th>
-                                                    <th class="border-top-0 border-0 text-center">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <t t-foreach="subscription.invoice_ids" t-as="inv">
-                                                    <tr>
-                                                        <td class="align-middle font-weight-bold" t-esc="inv.name"/>
-                                                        <td class="align-middle" t-esc="inv.invoice_date"/>
-                                                        <td class="align-middle text-right font-weight-bold">
-                                                            $ <span t-esc="inv.amount_total"/>
-                                                        </td>
-                                                        <td class="align-middle text-center">
-                                                            <span t-attf-class="badge #{'bg-success' if inv.payment_state in ['paid', 'in_payment'] else 'bg-warning'} px-2 py-1 text-uppercase" t-esc="'PAID' if inv.payment_state in ['paid', 'in_payment'] else 'UNPAID'"/>
-                                                        </td>
-                                                        <td class="align-middle text-center">
-                                                            <a t-att-href="inv.get_portal_url()" class="btn btn-sm btn-outline-primary shadow-sm font-weight-bold py-1 px-3">
-                                                                <t t-if="inv.payment_state not in ['paid', 'in_payment']">Pay Now</t>
-                                                                <t t-else="">View Details</t>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                </t>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    </t>
-                                    <t t-else="">
-                                        <div class="text-center py-4 text-muted">
-                                            <i class="fa fa-file-text-o fa-3x mb-3 opacity-50"/>
-                                            <p class="mb-0 font-weight-bold">No invoices generated yet.</p>
-                                        </div>
-                                    </t>
-                                </div>
-                            </div>
-                        </t>
-                    </t>
-                </div>
-            </div>
-        </t>
-    </template>
 </odoo>
