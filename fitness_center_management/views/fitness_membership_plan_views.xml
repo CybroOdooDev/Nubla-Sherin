@@ -35,6 +35,9 @@
                         </group>
                         <group name="pricing" string="Pricing &amp; Status">
                             <field name="price"/>
+                            <field name="special_offer_price"/>
+                            <field name="offer_start_date"/>
+                            <field name="offer_end_date"/>
                             <field name="max_freeze_days"/>
                             <field name="active"/>
                         </group>

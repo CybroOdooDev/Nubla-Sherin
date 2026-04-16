@@ -80,8 +80,15 @@ class FitnessAttendance(models.Model):
     @api.model
     def portal_check_in_for_user(self, user_id):
         """Auto check-in on login. Safe no-op if already checked in or no member."""
+        import logging
+        _logger = logging.getLogger(__name__)
         member = self._get_member_for_user(user_id)
+        _logger.info("portal_check_in_for_user: user_id=%s, member=%s", user_id, member.name if member else 'None')
         if not member:
+            return False
+
+        if member.membership_status != 'active':
+            _logger.info("Check-in skipped: Member status is %s", member.membership_status)
             return False
 
         open_attendance = self.sudo().search([
@@ -89,14 +96,17 @@ class FitnessAttendance(models.Model):
             ('check_out', '=', False),
         ], order='check_in desc', limit=1)
         if open_attendance:
+            _logger.info("Check-in skipped: Open attendance exists: %s", open_attendance.id)
             return open_attendance
 
-        return self.sudo().create({
+        res = self.sudo().create({
             'member_id': member.id,
             'check_in': fields.Datetime.now(),
             'method': 'portal',
             'check_in_user_id': int(user_id),
         })
+        _logger.info("Check-in created: %s", res.id)
+        return res
 
     @api.model
     def portal_check_out_for_user(self, user_id):

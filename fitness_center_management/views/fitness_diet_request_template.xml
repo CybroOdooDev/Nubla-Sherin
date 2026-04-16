@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══════════ Website Menu Item ══════════ -->
+    <record id="menu_diet_request" model="website.menu">
+        <field name="name">Diet Request</field>
+        <field name="url">/diet-request</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence">60</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <!-- ══════════ Diet Request Page ══════════ -->
+    <template id="diet_request_page" name="Diet Request Form">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure">
+                <!-- Banner -->
+                <section class="s_text_image pt0 pb0" style="position:relative;">
+                    <div style="position:relative; width:100%; height:220px; overflow:hidden; background: linear-gradient(135deg, #2d6a4f 0%, #52b788 100%);">
+                        <img src="/fitness_center_management/static/src/img/diet_request_banner.png"
+                             alt="Diet Request Banner"
+                             style="width:100%; height:100%; object-fit:cover; opacity:0.5;"/>
+                        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align:center;">
+                            <h1 style="color:#fff; font-size:2.8rem; font-weight:700; text-shadow:2px 2px 8px rgba(0,0,0,0.4);">Diet Request Form</h1>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Form Section -->
+                <div class="container py-5">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-9">
+                            <div class="card shadow-sm border-0" style="border-radius:12px;">
+                                <div class="card-body p-4 p-md-5">
+                                    <h3 class="text-center mb-4" style="font-weight:600;">Diet Request</h3>
+                                    <form action="/diet-request/submit" method="POST">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                                        <!-- Customer Details -->
+                                        <h5 class="mb-3" style="font-weight:600; border-bottom:2px solid #dee2e6; padding-bottom:8px;">Customer Details</h5>
+
+                                        <div class="mb-3">
+                                            <div class="input-group">
+                                                <span class="input-group-text" style="background:#6c757d; color:#fff; font-weight:500; min-width:110px;">Title</span>
+                                                <input type="text" name="title" class="form-control" placeholder="Inquiry for xyz diet plan" required="required"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="input-group">
+                                                <span class="input-group-text" style="background:#6c757d; color:#fff; font-weight:500; min-width:110px;">Name</span>
+                                                <input type="text" name="name" class="form-control" placeholder="Alex Martin" required="required"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="input-group">
+                                                    <span class="input-group-text" style="background:#6c757d; color:#fff; font-weight:500; min-width:110px;">Birthdate</span>
+                                                    <input type="date" name="birthdate" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="d-flex align-items-center h-100">
+                                                    <span class="badge me-3" style="background:#6c757d; color:#fff; font-size:0.9rem; padding:8px 12px;">Gender</span>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="gender" id="gender_male" value="male"/>
+                                                        <label class="form-check-label" for="gender_male">Male</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="gender" id="gender_female" value="female"/>
+                                                        <label class="form-check-label" for="gender_female">Female</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="gender" id="gender_other" value="other"/>
+                                                        <label class="form-check-label" for="gender_other">Other</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="input-group">
+                                                    <span class="input-group-text" style="background:#6c757d; color:#fff; font-weight:500; min-width:110px;">Phone</span>
+                                                    <input type="tel" name="phone" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="input-group">
+                                                    <span class="input-group-text" style="background:#6c757d; color:#fff; font-weight:500; min-width:110px;">Email</span>
+                                                    <input type="email" name="email" class="form-control" required="required"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Diet Information -->
+                                        <h5 class="mt-4 mb-3" style="font-weight:600; border-bottom:2px solid #dee2e6; padding-bottom:8px;">Diet Information</h5>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="input-group">
+                                                    <span class="input-group-text" style="background:#6c757d; color:#fff; font-weight:500; min-width:130px;">Diet Category</span>
+                                                    <select name="diet_category_id" class="form-select">
+                                                        <option value="">Select Diet Category</option>
+                                                        <t t-foreach="categories" t-as="cat">
+                                                            <option t-att-value="cat.id"><t t-esc="cat.name"/></option>
+                                                        </t>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="input-group">
+                                                    <span class="input-group-text" style="background:#6c757d; color:#fff; font-weight:500; min-width:130px;">Diet Type</span>
+                                                    <select name="diet_type_id" class="form-select">
+                                                        <option value="">Select Diet Type</option>
+                                                        <t t-foreach="diet_types" t-as="dt">
+                                                            <option t-att-value="dt.id"><t t-esc="dt.name"/></option>
+                                                        </t>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="input-group align-items-start">
+                                                <span class="input-group-text" style="background:#6c757d; color:#fff; font-weight:500; min-width:130px;">Description</span>
+                                                <textarea name="description" class="form-control" rows="4" placeholder="Write Your Goals &amp; Problems in Detail"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-danger px-4 py-2" style="font-weight:600;">Submit</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ══════════ Thank You page ══════════ -->
+    <template id="diet_request_thanks" name="Diet Request Thank You">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure">
+                <div class="container py-5 text-center">
+                    <div class="card shadow-sm border-0 p-5" style="border-radius:12px;">
+                        <div class="mb-3">
+                            <i class="fa fa-check-circle text-success" style="font-size:4rem;"></i>
+                        </div>
+                        <h2 class="text-success mb-3">Thank You!</h2>
+                        <p class="lead">Your diet request has been submitted successfully.<br/>Our team will contact you shortly.</p>
+                        <a href="/" class="btn btn-primary mt-3 px-4">Back to Home</a>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

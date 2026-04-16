@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+from . import fitness_branch
 from . import fitness_member
 from . import fitness_membership_plan
 from . import fitness_subscription
@@ -26,5 +26,10 @@ from . import fitness_sleep_log
 from . import fitness_social_post
 from . import fitness_social_kudos
 from . import fitness_challenge
-from . import fitness_exercise_library
-from . import fitness_workout_log
+from . import res_config_settings
+from . import fitness_diet_category
+from . import fitness_diet_type
+from . import fitness_nutrient
+from . import fitness_diet_template
+from . import fitness_report
+from . import fitness_crm

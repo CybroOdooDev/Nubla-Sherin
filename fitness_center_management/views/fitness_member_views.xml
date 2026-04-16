@@ -60,6 +60,14 @@
                                 icon="fa-money">
                             <field name="payment_count" widget="statinfo" string="Payments"/>
                         </button>
+                        <button name="action_view_fitness_reports" type="object" class="oe_stat_button"
+                                icon="fa-heartbeat">
+                            <field name="fitness_report_count" widget="statinfo" string="Diet Reports"/>
+                        </button>
+                        <button name="action_view_diet_plans" type="object" class="oe_stat_button"
+                                icon="fa-cutlery">
+                            <field name="diet_plan_count" widget="statinfo" string="Diet Plans"/>
+                        </button>
                     </div>
 
                     <!-- ─── Avatar + Title ─── -->
@@ -82,12 +90,14 @@
                             <field name="age"/>
                             <field name="blood_group"/>
                             <field name="nationality"/>
+                            <field name="branch_id"/>
                             <field name="id_number"/>
                         </group>
                         <group string="Contact Info">
                             <field name="phone" widget="phone"/>
                             <field name="email" widget="email"/>
                             <field name="join_date"/>
+                            <field name="is_diet_member"/>
                             <field name="fitness_goal"/>
                             <field name="preferred_time"/>
                             <field name="trainer_id"/>

@@ -16,6 +16,7 @@ class FitnessMember(models.Model):
         'res.partner', string='Related Partner',
         ondelete='cascade', help='Link to a partner',
     )
+    branch_id = fields.Many2one('fitness.branch', string='Home Branch', tracking=True)
     member_id = fields.Char(
         string='Member ID', required=True, copy=False,
         readonly=True, default='New',
@@ -100,6 +101,13 @@ class FitnessMember(models.Model):
     doctor_name = fields.Char(string='Doctor Name')
     doctor_phone = fields.Char(string='Doctor Phone')
 
+    # ── Diet & Nutrition ───────────────────────────────────────────────
+    is_diet_member = fields.Boolean(string='Diet Member', default=False)
+    diet_plan_ids = fields.One2many('fitness.diet.plan', 'member_id', string='Diet Plans')
+    diet_plan_count = fields.Integer(string='Diet Plans', compute='_compute_diet_plan_count')
+    fitness_report_ids = fields.One2many('fitness.report', 'member_id', string='Fitness Reports')
+    fitness_report_count = fields.Integer(string='Fitness Reports', compute='_compute_fitness_report_count')
+
     # ── Attendance ──────────────────────────────────────────────────────
     attendance_ids = fields.One2many(
         'fitness.attendance', 'member_id', string='Attendance Logs',
@@ -113,6 +121,12 @@ class FitnessMember(models.Model):
     )
     is_checked_in = fields.Boolean(
         string='Checked In', compute='_compute_attendance_stats',
+    )
+    last_check_in = fields.Datetime(
+        string='Last Check In', compute='_compute_attendance_stats',
+    )
+    last_check_out = fields.Datetime(
+        string='Last Check Out', compute='_compute_attendance_stats',
     )
 
     # ── Subscriptions ───────────────────────────────────────────────────
@@ -146,12 +160,12 @@ class FitnessMember(models.Model):
                 member.is_checked_in = False
             return
 
-        counts = Attendance.read_group(
+        counts = Attendance._read_group(
             [('member_id', 'in', self.ids)],
             ['member_id'],
-            ['member_id'],
+            ['__count'],
         )
-        count_map = {c['member_id'][0]: c['member_id_count'] for c in counts if c.get('member_id')}
+        count_map = {member.id: count for member, count in counts}
 
         open_att = Attendance.search(
             [('member_id', 'in', self.ids), ('check_out', '=', False)],
@@ -167,6 +181,15 @@ class FitnessMember(models.Model):
             member.attendance_count = count_map.get(member.id, 0)
             member.open_attendance_id = open_map.get(member.id)
             member.is_checked_in = bool(open_map.get(member.id))
+
+            # Get last attendance (open or closed)
+            last_att = Attendance.search(
+                [('member_id', '=', member.id)],
+                order='check_in desc',
+                limit=1
+            )
+            member.last_check_in = last_att.check_in if last_att else False
+            member.last_check_out = last_att.check_out if last_att else False
 
     @api.depends('dob')
     def _compute_age(self):
@@ -202,6 +225,14 @@ class FitnessMember(models.Model):
             member.payment_count = Payment.search_count([
                 ('subscription_id.member_id', '=', member.id),
             ])
+
+    def _compute_diet_plan_count(self):
+        for member in self:
+            member.diet_plan_count = len(member.diet_plan_ids)
+
+    def _compute_fitness_report_count(self):
+        for member in self:
+            member.fitness_report_count = len(member.fitness_report_ids)
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -286,9 +317,36 @@ class FitnessMember(models.Model):
             'domain': [('subscription_id.member_id', '=', self.id)],
         }
 
+    def action_view_diet_plans(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Diet Plans',
+            'res_model': 'fitness.diet.plan',
+            'view_mode': 'list,form',
+            'domain': [('member_id', '=', self.id)],
+            'context': {'default_member_id': self.id},
+        }
+
+    def action_view_fitness_reports(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Fitness Reports',
+            'res_model': 'fitness.report',
+            'view_mode': 'list,form',
+            'domain': [('member_id', '=', self.id)],
+            'context': {'default_member_id': self.id},
+        }
+
     @api.model
     def get_dashboard_data(self):
         """Return all dashboard KPIs and data for the OWL dashboard."""
+        # Auto attendance check-in on dashboard load if enabled
+        is_auto = self.env['ir.config_parameter'].sudo().get_param('fitness.is_auto_attendance')
+        if str(is_auto).lower() in ['true', '1']:
+            self.env['fitness.attendance'].sudo().portal_check_in_for_user(self.env.user.id)
+
         # KPIs
         total_members = self.sudo().search_count([])
         active_subs = self.env['fitness.subscription'].sudo().search_count([('state', '=', 'active')])
@@ -303,7 +361,7 @@ class FitnessMember(models.Model):
         total_revenue = sum(payments.mapped('amount'))
 
         # Recent Members (last 5)
-        recent = self.search([], order='create_date desc', limit=5)
+        recent = self.sudo().search([], order='create_date desc', limit=5)
         recent_members = [{
             'id': m.id,
             'name': m.name,
@@ -326,10 +384,10 @@ class FitnessMember(models.Model):
         } for state, count in state_counts.items()]
 
         # Plan Distribution
-        plans = self.env['fitness.membership.plan'].search([])
+        plans = self.env['fitness.membership.plan'].sudo().search([])
         plan_distribution = []
         for plan in plans:
-            cnt = self.env['fitness.subscription'].search_count([('plan_id', '=', plan.id)])
+            cnt = self.env['fitness.subscription'].sudo().search_count([('plan_id', '=', plan.id)])
             plan_distribution.append({
                 'name': plan.name,
                 'count': cnt,

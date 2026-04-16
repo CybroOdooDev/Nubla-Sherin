@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.fitness</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="90"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Fitness" string="Fitness" name="fitness_center_management" groups="fitness_center_management.group_fitness_manager">
+                    <block title="Fitness Management" name="fitness_management_setting_container">
+                        <div class="row mt16 o_settings_container" name="fitness_nutrition_feedback">
+                            <setting id="fitness_nutrition" string="Nutrition" help="Manage nutrition subscribers, services and plans">
+                                <field name="is_nutrition"/>
+                            </setting>
+                            <setting id="fitness_feedback" string="Feedback" help="Manage customer feedback regarding fitness services and plan">
+                                <field name="is_feedback"/>
+                            </setting>
+                            <setting id="fitness_auto_attendance" string="Automatic Attendance" help="Automatically check-in/out members on portal login/logout">
+                                <field name="is_auto_attendance"/>
+                            </setting>
+                        </div>
+
+                        <div class="row mt16 o_settings_container" name="fitness_mail_templates">
+                            <setting id="welcome_mail" string="Welcome Mail Template" help="Subscriber welcome mail template">
+                                <field name="welcome_mail_template_id" class="w-75"/>
+                            </setting>
+                            <setting id="invoice_mail" string="Invoice Mail Template" help="Mail template for plan invoice">
+                                <field name="invoice_mail_template_id" class="w-75"/>
+                            </setting>
+                        </div>
+
+                        <div class="row mt16 o_settings_container" name="fitness_alert_days">
+                            <setting id="renewal_days" string="Membership Renewal Days">
+                                <field name="membership_renewal_days"/>
+                            </setting>
+                            <setting id="expiry_days" string="Expiry Alert Days">
+                                <field name="expiry_alert_days"/>
+                            </setting>
+                        </div>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_fitness_config_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'module': 'fitness_center_management', 'bin_size': False}</field>
+    </record>
+
+    <menuitem id="menu_fitness_settings"
+              name="Settings"
+              parent="menu_fitness_configuration_root"
+              action="action_fitness_config_settings"
+              sequence="0"/>
+</odoo>

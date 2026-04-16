@@ -1,5 +1,6 @@
-# -*- coding: utf-8 -*-
 from odoo import http, fields, _
+import logging
+_logger = logging.getLogger(__name__)
 from odoo.http import request
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
 from datetime import date
@@ -47,6 +48,12 @@ class FitnessPortal(CustomerPortal):
             ('state', 'in', ['booked', 'attended'])
         ], order='create_date desc', limit=5)
         
+        # Auto attendance check-in if enabled
+        is_auto = request.env['ir.config_parameter'].sudo().get_param('fitness.is_auto_attendance')
+        _logger.info("Portal Dashboard: user_id=%s, is_auto=%s", request.env.user.id, is_auto)
+        if str(is_auto).lower() in ['true', '1']:
+            request.env['fitness.attendance'].sudo().portal_check_in_for_user(request.env.user.id)
+
         values.update({
             'member': member,
             'subscription': subscription,
@@ -194,6 +201,11 @@ class FitnessPortal(CustomerPortal):
             ('pt_plan_ids', '!=', False) # Simple client association logic for now
         ], limit=5)
         
+        # Auto attendance check-in if enabled and user is also a member
+        is_auto = request.env['ir.config_parameter'].sudo().get_param('fitness.is_auto_attendance')
+        if str(is_auto).lower() in ['true', '1']:
+            request.env['fitness.attendance'].sudo().portal_check_in_for_user(request.env.user.id)
+        
         values.update({
             'trainer': trainer,
             'classes': classes,
@@ -259,6 +271,11 @@ class FitnessPortal(CustomerPortal):
         active_subscriptions = request.env['fitness.subscription'].sudo().search_count([('state', '=', 'active')])
         active_classes = request.env['fitness.class.schedule'].sudo().search_count([('state', '=', 'scheduled')])
         
+        # Auto attendance check-in if enabled and user is also a member
+        is_auto = request.env['ir.config_parameter'].sudo().get_param('fitness.is_auto_attendance')
+        if str(is_auto).lower() in ['true', '1']:
+            request.env['fitness.attendance'].sudo().portal_check_in_for_user(request.env.user.id)
+
         values.update({
             'member_count': member_count,
             'trainer_count': trainer_count,

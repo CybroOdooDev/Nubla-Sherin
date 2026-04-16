@@ -18,8 +18,15 @@ class FitnessWorkoutExercise(models.Model):
     _description = 'Fitness Workout Exercise'
 
     plan_id = fields.Many2one('fitness.workout.plan', string='Workout Plan', ondelete='cascade')
+    exercise_id = fields.Many2one('fitness.exercise.library', string='Exercise')
     name = fields.Char(string='Exercise Name', required=True)
     description = fields.Text(string='Description/Instructions')
     sets = fields.Integer(string='Sets', default=3)
     reps = fields.Integer(string='Reps', default=10)
     duration_minutes = fields.Integer(string='Duration (mins)')
+
+    @api.onchange('exercise_id')
+    def _onchange_exercise_id(self):
+        if self.exercise_id:
+            self.name = self.exercise_id.name
+            self.description = self.exercise_id.description

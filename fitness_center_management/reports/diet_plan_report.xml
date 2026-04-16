@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_diet_plan" model="ir.actions.report">
+        <field name="name">Diet Plan</field>
+        <field name="model">fitness.diet.plan</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">fitness_center_management.report_diet_plan_template</field>
+        <field name="report_file">fitness_center_management.report_diet_plan_template</field>
+        <field name="print_report_name">'Diet Plan - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_fitness_diet_plan"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_diet_plan_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="row mt32 mb32">
+                            <div class="col-12 text-center">
+                                <h2>Nutrition Schedule</h2>
+                                <h4 t-field="o.name"/>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Member: </strong><span t-field="o.member_id.name"/><br/>
+                                <strong>Nutritionist: </strong><span t-field="o.trainer_id.name"/><br/>
+                            </div>
+                            <div class="col-6 text-right">
+                                <strong>Start Date: </strong><span t-field="o.start_date"/><br/>
+                                <strong>End Date: </strong><span t-field="o.end_date"/><br/>
+                                <strong>Target Calories: </strong><span t-field="o.total_calories"/> kcal/day<br/>
+                            </div>
+                        </div>
+
+                        <table class="table table-sm o_main_table mt32">
+                            <thead>
+                                <tr>
+                                    <th class="text-left">Meal Type</th>
+                                    <th class="text-left">Details</th>
+                                    <th class="text-right">Calories</th>
+                                    <th class="text-right">P/C/F (g)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.meal_ids" t-as="line">
+                                    <tr>
+                                        <td class="text-capitalize"><span t-field="line.meal_type"/></td>
+                                        <td>
+                                            <strong t-field="line.name"/><br/>
+                                            <small class="text-muted">
+                                                Fiber: <span t-field="line.fiber"/>g | 
+                                                Sugar: <span t-field="line.sugar"/>g | 
+                                                Vit: <span t-field="line.vitamins"/> | 
+                                                Min: <span t-field="line.minerals"/>
+                                            </small>
+                                        </td>
+                                        <td class="text-right"><span t-field="line.calories"/></td>
+                                        <td class="text-right">
+                                            <span t-field="line.protein"/> / 
+                                            <span t-field="line.carbs"/> / 
+                                            <span t-field="line.fats"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

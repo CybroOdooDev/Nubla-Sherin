@@ -15,6 +15,7 @@ class FitnessClass(models.Model):
         ('other', 'Other')
     ], string='Class Type', required=True)
     max_capacity = fields.Integer(string='Max Capacity', default=20)
+    branch_id = fields.Many2one('fitness.branch', string='Branch', tracking=True)
     default_duration = fields.Float(string='Default Duration (Hours)', default=1.0)
     difficulty = fields.Selection([
         ('beginner', 'Beginner'),

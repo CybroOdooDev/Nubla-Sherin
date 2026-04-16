@@ -1,5 +1,6 @@
-# -*- coding: utf-8 -*-
 from odoo import http, fields
+import logging
+_logger = logging.getLogger(__name__)
 from odoo.http import request
 from odoo.addons.web.controllers.home import Home
 from datetime import date
@@ -9,14 +10,22 @@ class FitnessHome(Home):
         user = request.env['res.users'].sudo().browse(uid)
         
         # Override default /web or the old /fitness/dashboard redirect with our portal routes
+        # Auto attendance check-in for ANYONE linked to a fitness member record
+        member_count = request.env['fitness.member'].sudo().search_count([('partner_id', '=', user.partner_id.id)])
+        _logger.info("Login Redirect: uid=%s, member_count=%s", uid, member_count)
+        if member_count:
+            is_auto = request.env['ir.config_parameter'].sudo().get_param('fitness.is_auto_attendance')
+            _logger.info("Auto Attendance Setting: %s", is_auto)
+            if str(is_auto).lower() in ['true', '1']:
+                request.env['fitness.attendance'].sudo().portal_check_in_for_user(uid)
+
+        # Override default /web or the old /fitness/dashboard redirect with our portal routes
         if not redirect or redirect == '/web' or redirect == '/fitness/dashboard':
             if user.has_group('fitness_center_management.group_fitness_manager'):
                 return '/my/manager'
             elif request.env['fitness.trainer'].sudo().search_count([('employee_id.user_id.partner_id', '=', user.partner_id.id)]):
                 return '/my/trainer'
-            elif request.env['fitness.member'].sudo().search_count([('partner_id', '=', user.partner_id.id)]):
-                # Auto attendance check-in for members when logging into the Fitness website area.
-                request.env['fitness.attendance'].sudo().portal_check_in_for_user(uid)
+            elif member_count:
                 return '/my/fitness'
                 
         return super(FitnessHome, self)._login_redirect(uid, redirect=redirect)

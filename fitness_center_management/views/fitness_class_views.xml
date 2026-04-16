@@ -33,6 +33,7 @@
                         <group name="class_details" string="Class Details">
                             <field name="class_type"/>
                             <field name="max_capacity"/>
+                            <field name="branch_id"/>
                         </group>
                         <group name="timing_diff" string="Timing &amp; Difficulty">
                             <field name="default_duration"/>

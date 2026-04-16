@@ -12,13 +12,17 @@ class FitnessSession(Session):
     def logout(self, redirect='/odoo'):
         uid = request.session.uid
         if uid:
-            request.env['fitness.attendance'].sudo().portal_check_out_for_user(uid)
+            is_auto = request.env['ir.config_parameter'].sudo().get_param('fitness.is_auto_attendance')
+            if str(is_auto).lower() in ['true', '1']:
+                request.env['fitness.attendance'].sudo().portal_check_out_for_user(uid)
         return super().logout(redirect=redirect)
 
     @http.route('/web/session/destroy', type='jsonrpc', auth='user', readonly=True)
     def destroy(self):
         uid = request.session.uid
         if uid:
-            request.env['fitness.attendance'].sudo().portal_check_out_for_user(uid)
+            is_auto = request.env['ir.config_parameter'].sudo().get_param('fitness.is_auto_attendance')
+            if str(is_auto).lower() in ['true', '1']:
+                request.env['fitness.attendance'].sudo().portal_check_out_for_user(uid)
         return super().destroy()
 

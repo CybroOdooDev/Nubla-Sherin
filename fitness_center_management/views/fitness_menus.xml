@@ -3,7 +3,8 @@
     <menuitem id="menu_fitness_root"
               name="Fitness Center"
               web_icon="fitness_center_management,static/description/icon.png"
-              sequence="10"/>
+              sequence="10"
+              groups="group_fitness_user"/>
 
     <!-- Dashboard Client Action -->
     <record id="action_fitness_dashboard" model="ir.actions.client">
@@ -17,35 +18,46 @@
               action="action_fitness_dashboard"
               sequence="1"/>
 
+    <!-- Root Groups -->
+    <menuitem id="menu_fitness_operations" name="Operations" parent="menu_fitness_root" sequence="10"/>
+    <menuitem id="menu_fitness_training" name="Training" parent="menu_fitness_root" sequence="20"/>
+    <menuitem id="menu_fitness_membership" name="Membership" parent="menu_fitness_root" sequence="30"/>
+    <menuitem id="menu_fitness_health_wellness" name="Health &amp; Wellness" parent="menu_fitness_root" sequence="40"/>
+    <menuitem id="menu_fitness_facility" name="Facility" parent="menu_fitness_root" sequence="50"/>
+
+    <!-- Operations Submenus -->
     <menuitem id="menu_fitness_members_root"
               name="Members"
-              parent="menu_fitness_root"
+              parent="menu_fitness_operations"
               sequence="10"/>
-
-    <menuitem id="menu_fitness_subscriptions_root"
-              name="Subscriptions"
-              parent="menu_fitness_root"
-              sequence="20"/>
-
-    <menuitem id="menu_fitness_classes_root"
-              name="Classes"
-              parent="menu_fitness_root"
-              sequence="30"/>
-
-    <menuitem id="menu_fitness_trainers_root"
-              name="Trainers"
-              parent="menu_fitness_root"
-              sequence="40"/>
 
     <menuitem id="menu_fitness_attendance_root"
               name="Attendance"
-              parent="menu_fitness_root"
-              sequence="50"/>
+              parent="menu_fitness_operations"
+              sequence="20"/>
 
+    <!-- Membership Submenus -->
+    <menuitem id="menu_fitness_subscriptions_root"
+              name="Subscriptions"
+              parent="menu_fitness_membership"
+              sequence="10"/>
+
+    <!-- Training Submenus -->
+    <menuitem id="menu_fitness_classes_root"
+              name="Classes"
+              parent="menu_fitness_training"
+              sequence="10"/>
+
+    <menuitem id="menu_fitness_trainers_root"
+              name="Trainers"
+              parent="menu_fitness_training"
+              sequence="20"/>
+
+    <!-- Facility Submenus -->
     <menuitem id="menu_fitness_equipment_root"
               name="Equipment"
-              parent="menu_fitness_root"
-              sequence="60"/>
+              parent="menu_fitness_facility"
+              sequence="10"/>
 
     <menuitem id="menu_fitness_configuration_root"
               name="Configuration"

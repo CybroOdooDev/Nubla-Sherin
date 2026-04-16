@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══════════ DIET CATEGORY ══════════ -->
+    <record id="view_fitness_diet_category_list" model="ir.ui.view">
+        <field name="name">fitness.diet.category.list</field>
+        <field name="model">fitness.diet.category</field>
+        <field name="arch" type="xml">
+            <list string="Diet Categories" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="description"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_fitness_diet_category" model="ir.actions.act_window">
+        <field name="name">Diet Categories</field>
+        <field name="res_model">fitness.diet.category</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- ══════════ DIET TYPE ══════════ -->
+    <record id="view_fitness_diet_type_list" model="ir.ui.view">
+        <field name="name">fitness.diet.type.list</field>
+        <field name="model">fitness.diet.type</field>
+        <field name="arch" type="xml">
+            <list string="Diet Types" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="description"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_fitness_diet_type" model="ir.actions.act_window">
+        <field name="name">Diet Types</field>
+        <field name="res_model">fitness.diet.type</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- ══════════ NUTRIENT ══════════ -->
+    <record id="view_fitness_nutrient_list" model="ir.ui.view">
+        <field name="name">fitness.nutrient.list</field>
+        <field name="model">fitness.nutrient</field>
+        <field name="arch" type="xml">
+            <list string="Nutrients" editable="bottom">
+                <field name="name"/>
+                <field name="nutrient_type"/>
+                <field name="unit"/>
+                <field name="daily_value"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_fitness_nutrient" model="ir.actions.act_window">
+        <field name="name">Nutrients</field>
+        <field name="res_model">fitness.nutrient</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- ══════════ FOOD ITEM (ENHANCED) ══════════ -->
+    <record id="view_fitness_food_item_form" model="ir.ui.view">
+        <field name="name">fitness.food.item.form.enhanced</field>
+        <field name="model">fitness.food.item</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Food Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="General">
+                            <field name="food_group"/>
+                            <field name="barcode"/>
+                            <field name="serving_size"/>
+                            <field name="is_verified"/>
+                        </group>
+                        <group string="Nutrition per Serving">
+                            <field name="calorie_unit"/>
+                            <field name="calories"/>
+                            <field name="protein"/>
+                            <field name="carbs"/>
+                            <field name="fats"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Nutrients" name="nutrients">
+                            <field name="nutrient_ids">
+                                <list editable="bottom">
+                                    <field name="nutrient_id"/>
+                                    <field name="amount"/>
+                                    <field name="unit"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fitness_food_item_list" model="ir.ui.view">
+        <field name="name">fitness.food.item.list.enhanced</field>
+        <field name="model">fitness.food.item</field>
+        <field name="arch" type="xml">
+            <list string="Foods">
+                <field name="name"/>
+                <field name="food_group"/>
+                <field name="calories"/>
+                <field name="calorie_unit"/>
+                <field name="protein"/>
+                <field name="carbs"/>
+                <field name="fats"/>
+                <field name="is_verified"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_fitness_food_item" model="ir.actions.act_window">
+        <field name="name">Foods</field>
+        <field name="res_model">fitness.food.item</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ══════════ DIET TEMPLATE ══════════ -->
+    <record id="view_fitness_diet_template_form" model="ir.ui.view">
+        <field name="name">fitness.diet.template.form</field>
+        <field name="model">fitness.diet.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Template Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="diet_category_id"/>
+                            <field name="diet_type_id"/>
+                        </group>
+                        <group>
+                            <field name="target_calories"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Meal Plan" name="meals">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="meal_type"/>
+                                    <field name="name"/>
+                                    <field name="calories" sum="Total Calories"/>
+                                    <field name="protein" sum="Total Protein"/>
+                                    <field name="carbs" sum="Total Carbs"/>
+                                    <field name="fats" sum="Total Fats"/>
+                                    <field name="fiber" sum="Total Fiber" optional="hide"/>
+                                    <field name="sugar" sum="Total Sugar" optional="hide"/>
+                                    <field name="vitamins" optional="hide"/>
+                                    <field name="minerals" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Description" name="description">
+                            <field name="description" nolabel="1" placeholder="Template description..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fitness_diet_template_list" model="ir.ui.view">
+        <field name="name">fitness.diet.template.list</field>
+        <field name="model">fitness.diet.template</field>
+        <field name="arch" type="xml">
+            <list string="Diet Templates">
+                <field name="name"/>
+                <field name="diet_category_id"/>
+                <field name="diet_type_id"/>
+                <field name="target_calories"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_fitness_diet_template" model="ir.actions.act_window">
+        <field name="name">Diet Templates</field>
+        <field name="res_model">fitness.diet.template</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ══════════ FITNESS REPORT ══════════ -->
+    <record id="view_fitness_report_form" model="ir.ui.view">
+        <field name="name">fitness.report.form</field>
+        <field name="model">fitness.report</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Member Info">
+                            <field name="member_id"/>
+                            <field name="date"/>
+                            <field name="age"/>
+                            <field name="gender"/>
+                        </group>
+                        <group string="Measurements">
+                            <field name="height"/>
+                            <field name="weight"/>
+                            <field name="waist"/>
+                            <field name="hip"/>
+                            <field name="neck"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="BMI Index">
+                            <field name="bmi"/>
+                            <field name="bmi_category" widget="badge"
+                                   decoration-success="bmi_category == 'normal'"
+                                   decoration-warning="bmi_category in ('underweight', 'overweight')"
+                                   decoration-danger="bmi_category == 'obese'"/>
+                        </group>
+                        <group string="Metabolic Rates">
+                            <field name="bmr"/>
+                            <field name="bfp"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" nolabel="1" placeholder="Additional notes..."/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fitness_report_list" model="ir.ui.view">
+        <field name="name">fitness.report.list</field>
+        <field name="model">fitness.report</field>
+        <field name="arch" type="xml">
+            <list string="Fitness Reports">
+                <field name="name"/>
+                <field name="member_id"/>
+                <field name="date"/>
+                <field name="bmi"/>
+                <field name="bmi_category" widget="badge"
+                       decoration-success="bmi_category == 'normal'"
+                       decoration-warning="bmi_category in ('underweight', 'overweight')"
+                       decoration-danger="bmi_category == 'obese'"/>
+                <field name="bmr"/>
+                <field name="bfp"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_fitness_report" model="ir.actions.act_window">
+        <field name="name">Fitness Reports</field>
+        <field name="res_model">fitness.report</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ══════════ MENUS ══════════ -->
+    <!-- Under Health & Wellness -->
+    <menuitem id="menu_fitness_nutrition_root" name="Nutrition" parent="fitness_center_management.menu_fitness_health_wellness" sequence="5"/>
+    <menuitem id="menu_fitness_foods" name="Foods" parent="menu_fitness_nutrition_root" action="action_fitness_food_item" sequence="10"/>
+    <menuitem id="menu_fitness_nutrients" name="Nutrients" parent="menu_fitness_nutrition_root" action="action_fitness_nutrient" sequence="20"/>
+    <menuitem id="menu_fitness_diet_templates" name="Diet Templates" parent="fitness_center_management.menu_fitness_health_wellness" action="action_fitness_diet_template" sequence="15"/>
+    <menuitem id="menu_fitness_fitness_reports" name="Fitness Reports" parent="fitness_center_management.menu_fitness_health_wellness" action="action_fitness_report" sequence="40"/>
+
+    <!-- Under Configuration -->
+    <menuitem id="menu_fitness_diet_config" name="Diet &amp; Nutrition" parent="fitness_center_management.menu_fitness_configuration_root" sequence="20"/>
+    <menuitem id="menu_fitness_config_diet_categories" name="Diet Categories" parent="menu_fitness_diet_config" action="action_fitness_diet_category" sequence="10"/>
+    <menuitem id="menu_fitness_config_diet_types" name="Diet Types" parent="menu_fitness_diet_config" action="action_fitness_diet_type" sequence="20"/>
+
+</odoo>

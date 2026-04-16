@@ -113,6 +113,7 @@
                         <page string="Exercises" name="exercises">
                             <field name="exercise_ids">
                                 <list editable="bottom">
+                                    <field name="exercise_id"/>
                                     <field name="name"/>
                                     <field name="sets"/>
                                     <field name="reps"/>
@@ -140,7 +141,27 @@
         <field name="model">fitness.diet.plan</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_done" type="object" string="Done" class="btn-primary"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_cancel" type="object" string="Cancel" class="btn-secondary"
+                            invisible="state in ('done', 'cancelled')"/>
+                    <button name="action_draft" type="object" string="Set to Draft" class="btn-secondary"
+                            invisible="state not in ('cancelled',)"/>
+                    <button name="action_create_invoice" type="object" string="Create Invoice"
+                            class="btn-secondary" icon="fa-money"
+                            invisible="state == 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
+                </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_create_invoice" type="object" class="oe_stat_button"
+                                icon="fa-pencil-square-o" invisible="not invoice_id">
+                            <field name="invoice_id" widget="statinfo" string="Invoice"/>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <h1>
                             <field name="name" placeholder="Diet Plan Name..."/>
@@ -150,11 +171,17 @@
                         <group>
                             <field name="member_id"/>
                             <field name="trainer_id"/>
+                            <field name="diet_category_id"/>
+                            <field name="diet_type_id"/>
                         </group>
                         <group>
+                            <field name="template_id"/>
+                            <button name="action_load_from_template" type="object" string="Load from Template"
+                                    class="btn-link" icon="fa-download" invisible="not template_id"/>
                             <field name="start_date"/>
                             <field name="end_date"/>
                             <field name="total_calories"/>
+                            <field name="charges"/>
                         </group>
                     </group>
                     <notebook>
@@ -167,6 +194,10 @@
                                     <field name="protein" sum="Total Protein"/>
                                     <field name="carbs" sum="Total Carbs"/>
                                     <field name="fats" sum="Total Fats"/>
+                                    <field name="fiber" sum="Total Fiber" optional="hide"/>
+                                    <field name="sugar" sum="Total Sugar" optional="hide"/>
+                                    <field name="vitamins" optional="hide"/>
+                                    <field name="minerals" optional="hide"/>
                                 </list>
                             </field>
                         </page>
@@ -224,11 +255,10 @@
     </record>
 
     <!-- Menus -->
-    <menuitem id="menu_fitness_advanced_features" name="Member Services" parent="fitness_center_management.menu_fitness_root" sequence="90"/>
-    <menuitem id="menu_fitness_training_session" name="Training Sessions" parent="menu_fitness_advanced_features" action="action_fitness_training_session" sequence="10"/>
-    <menuitem id="menu_fitness_trainer_schedule" name="Trainer Schedules" parent="menu_fitness_advanced_features" action="action_fitness_trainer_schedule" sequence="20"/>
-    <menuitem id="menu_fitness_workout_plan" name="Workout Plans" parent="menu_fitness_advanced_features" action="action_fitness_workout_plan" sequence="30"/>
-    <menuitem id="menu_fitness_diet_plan" name="Diet Plans" parent="menu_fitness_advanced_features" action="action_fitness_diet_plan" sequence="40"/>
-    <menuitem id="menu_fitness_member_progress" name="Member Progress" parent="menu_fitness_advanced_features" action="action_fitness_member_progress" sequence="50"/>
+    <menuitem id="menu_fitness_training_session" name="Training Sessions" parent="fitness_center_management.menu_fitness_training" action="action_fitness_training_session" sequence="30"/>
+    <menuitem id="menu_fitness_trainer_schedule" name="Trainer Schedules" parent="fitness_center_management.menu_fitness_training" action="action_fitness_trainer_schedule" sequence="40"/>
+    <menuitem id="menu_fitness_workout_plan" name="Workout Plans" parent="fitness_center_management.menu_fitness_health_wellness" action="action_fitness_workout_plan" sequence="10"/>
+    <menuitem id="menu_fitness_diet_plan" name="Diet Plans" parent="fitness_center_management.menu_fitness_health_wellness" action="action_fitness_diet_plan" sequence="20"/>
+    <menuitem id="menu_fitness_member_progress" name="Member Progress" parent="fitness_center_management.menu_fitness_health_wellness" action="action_fitness_member_progress" sequence="30"/>
 
 </odoo>

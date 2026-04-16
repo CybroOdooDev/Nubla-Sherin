@@ -10,6 +10,7 @@
                     <a href="/fitness/membership" class="dropdown-item" role="menuitem">Plans</a>
                     <a href="/fitness/classes" class="dropdown-item" role="menuitem">Classes</a>
                     <a href="/fitness/trainers" class="dropdown-item" role="menuitem">Trainers</a>
+                    <a href="/diet-request" class="dropdown-item" role="menuitem">Diet Request</a>
                 </div>
             </li>
         </xpath>
