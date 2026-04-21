@@ -39,6 +39,9 @@
     ],
     'assets': {
         'point_of_sale._assets_pos': [
+            'hotel_pos_extension/static/src/app/screens/payment_screen/HotelPaymentScreen.js',
+            'hotel_pos_extension/static/src/overrides/models/HotelPosOrder.js',
+            'hotel_pos_extension/static/src/app/screens/product_screen/HotelRoomSelectionButton.js',
             'hotel_pos_extension/static/src/js/**/*',
             'hotel_pos_extension/static/src/xml/**/*',
         ],
@@ -46,4 +49,6 @@
     'license': 'LGPL-3',
     'installable': True,
     'auto_install': False,
+    'post_init_hook': 'post_init_hook',
+    'uninstall_hook': 'uninstall_hook',
 }

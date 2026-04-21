@@ -22,9 +22,29 @@
 from odoo import api, fields, models
 
 class PosOrder(models.Model):
+    """Extend POS order to link with hotel bookings."""
     _inherit = 'pos.order'
 
     booking_id = fields.Many2one('room.booking', string='Hotel Booking', help='Hotel booking associated with this POS order.')
+    hotel_pos_status = fields.Selection([
+        ('draft', 'New'),
+        ('cancel', 'Cancelled'),
+        ('paid', 'Paid'),
+        ('done', 'Posted'),
+        ('invoiced', 'Posted'),
+    ], string='Status', compute='_compute_hotel_pos_status')
+
+    @api.depends('state', 'account_move.payment_state')
+    def _compute_hotel_pos_status(self):
+        for order in self:
+            if order.state == 'invoiced' and order.account_move:
+                if order.account_move.payment_state == 'paid':
+                    order.hotel_pos_status = 'paid'
+                else:
+                    order.hotel_pos_status = 'invoiced'
+            else:
+                order.hotel_pos_status = order.state
+
 
     def _ensure_hotel_pos_line(self):
         """Ensure the booking shows the POS order under the 'POS Orders' tab.
@@ -52,18 +72,19 @@ class PosOrder(models.Model):
     @api.model
     def _order_fields(self, ui_order):
         """Add booking_id to the order fields"""
-        res = super(PosOrder, self)._order_fields(ui_order)
+        res = super()._order_fields(ui_order)
         res['booking_id'] = ui_order.get('booking_id', False)
         return res
 
     @api.model_create_multi
     def create(self, vals_list):
         """Create Hotel POS Line if the order is charged to a room"""
-        orders = super(PosOrder, self).create(vals_list)
+        orders = super().create(vals_list)
         orders._ensure_hotel_pos_line()
         return orders
 
     def write(self, vals):
+        """Update POS order and ensure booking linkage."""
         res = super().write(vals)
         # Create/update the link record when the order is later validated and payments are added.
         self._ensure_hotel_pos_line()
@@ -88,7 +109,7 @@ class PosOrder(models.Model):
         """Override to forcefully keep the invoice 'Not Paid' for hotel charges.
         We use a context flag that is caught by our AccountMoveLine.reconcile override.
         """
-        is_hotel_charge = self.booking_id or any(p.payment_method_id.is_hotel_charge or p.payment_method_id.type == 'pay_later' for p in self.payment_ids)
+        is_hotel_charge = any(p.payment_method_id.is_hotel_charge for p in self.payment_ids)
         if is_hotel_charge:
             # We call super with a context flag that prevents reconciliation at the line level.
             # This is the most absolute way to ensure the invoice remains 'Not Paid'.
@@ -119,13 +140,14 @@ class PosOrder(models.Model):
 
     def _reconcile_invoice_payments(self, invoice, payment_moves):
         """Secondary layer to skip reconciliation for hotel room charges in Odoo 19."""
-        is_hotel_charge = self.booking_id or any(p.payment_method_id.is_hotel_charge or p.payment_method_id.type == 'pay_later' for p in self.payment_ids)
+        is_hotel_charge = any(p.payment_method_id.is_hotel_charge for p in self.payment_ids)
         if self.env.context.get('skip_pos_invoice_reconciliation') or is_hotel_charge:
             return
 
         return super()._reconcile_invoice_payments(invoice, payment_moves)
 
 class AccountMove(models.Model):
+    """Customize payment status for hotel POS invoices."""
     _inherit = 'account.move'
 
     @api.depends('payment_state', 'state', 'is_move_sent', 'pos_order_ids')
@@ -139,6 +161,5 @@ class AccountMove(models.Model):
             if move.state == 'posted' and move.payment_state == 'not_paid':
                 # Check if this invoice is from a hotel POS order (has booking_id or specific payment methods)
                 # Standard Odoo 19 field name is pos_order_ids (One2many)
-                if move.pos_order_ids.filtered(lambda o: o.booking_id or any(p.payment_method_id.is_hotel_charge or p.payment_method_id.type == 'pay_later' for p in o.payment_ids)):
+                if move.pos_order_ids.filtered(lambda o: any(p.payment_method_id.is_hotel_charge for p in o.payment_ids)):
                     move.status_in_payment = 'not_paid'
-

@@ -22,6 +22,7 @@
 from odoo import api, fields, models
 
 class PosPaymentMethod(models.Model):
+    """Extend POS payment method for hotel charge support."""
     _inherit = 'pos.payment.method'
 
     is_hotel_charge = fields.Boolean(string='Is Hotel Charge',
@@ -34,3 +35,9 @@ class PosPaymentMethod(models.Model):
         if 'is_hotel_charge' not in fields_list:
             fields_list.append('is_hotel_charge')
         return fields_list
+
+    def _is_write_forbidden(self, fields):
+        """Bypass validation blocks during module installation/upgrades."""
+        if self.env.context.get('install_mode'):
+            return False
+        return super()._is_write_forbidden(fields)

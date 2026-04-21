@@ -22,6 +22,7 @@
 from odoo import api, fields, models
 
 class HotelPosLine(models.Model):
+    """Store and link POS orders with hotel bookings for tracking and billing purposes."""
     _name = "hotel.pos.line"
     _description = "Hotel POS Line"
 
@@ -35,8 +36,3 @@ class HotelPosLine(models.Model):
     session_id = fields.Many2one(related="pos_order_id.session_id", string="Session")
     user_id = fields.Many2one(related="pos_order_id.user_id", string="Cashier")
     partner_id = fields.Many2one(related="pos_order_id.partner_id", string="Customer")
-
-    @api.depends('amount_total')
-    def _compute_price_subtotal(self):
-        # Dummy for standard hotel module logic if needed
-        pass

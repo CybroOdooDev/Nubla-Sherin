@@ -22,10 +22,17 @@
 from odoo import api, fields, models
         
 class RoomBooking(models.Model):
+    """Extend room booking to include POS order tracking."""
     _inherit = 'room.booking'
 
     pos_order_line_ids = fields.One2many('hotel.pos.line', 'booking_id', string='POS Orders')
-    amount_total_pos = fields.Monetary(string="Total POS Amount", compute='_compute_amount_untaxed')
+    amount_total_pos = fields.Monetary(string="Total POS Amount", compute='_compute_amount_breakdown', store=False)
+
+    @api.depends('pos_order_line_ids')
+    def _compute_has_pos_orders(self):
+        """Compute if booking has linked POS orders."""
+        for rec in self:
+            rec.has_pos_orders = bool(rec.pos_order_line_ids)
 
     @api.depends(
         'room_line_ids.price_subtotal', 'room_line_ids.price_tax', 'room_line_ids.price_total',
@@ -38,18 +45,41 @@ class RoomBooking(models.Model):
         'pos_order_line_ids.pos_order_id.currency_id',
         'pos_order_line_ids.pos_order_id.state',
     )
-    def _compute_amount_untaxed(self, flag=False):
+    def _calculate_amounts(self, flag=False):
         """Extended calculation to include POS charges and add to invoice list"""
-        booking_list = super(RoomBooking, self)._compute_amount_untaxed(flag=flag)
+        if hasattr(super(), '_calculate_amounts'):
+            res = super()._calculate_amounts(flag=flag)
+        else:
+            # Fallback if parent doesn't have _calculate_amounts
+            res_list = []
+            for rec in self:
+                vals = {
+                    'amount_untaxed': rec.amount_untaxed,
+                    'amount_tax': rec.amount_tax,
+                    'amount_total': rec.amount_total,
+                }
+                booking_list = []
+                if flag:
+                    # Parent returns a list of items for the record
+                    booking_list = rec._compute_amount_untaxed(flag=True)
+                res_list.append((vals, booking_list))
+            res = res_list[0] if len(self) == 1 else res_list
         
-        for rec in self:
+        # Handle both single record and multiple records result from super
+        is_single = len(self) == 1
+        res_list = [res] if is_single else res
+        
+        final_res = []
+        for rec, (vals, booking_list) in zip(self, res_list):
             amount_total_pos = sum(rec.pos_order_line_ids.mapped('amount_total'))
-            rec.amount_total_pos = amount_total_pos
-            rec.amount_total += amount_total_pos
+            
+            # Update values in the dict returned by super
+            vals['amount_total_pos'] = amount_total_pos
+            vals['amount_total'] += amount_total_pos
             # Since POS orders are already taxed, we add to total.
             # We also add to amount_untaxed for consistent subtotal display projects, 
             # though this is technically an approximation if the POS order has taxes.
-            rec.amount_untaxed += amount_total_pos 
+            vals['amount_untaxed'] += amount_total_pos 
             
             if flag:
                 # Add POS orders to the booking_list for invoicing
@@ -62,7 +92,16 @@ class RoomBooking(models.Model):
                             'price_unit': pos_line.price_unit,
                             'product_type': 'pos'
                         })
-        return booking_list
+            final_res.append((vals, booking_list))
+            
+        return final_res[0] if is_single else final_res
+
+    def _compute_amount_breakdown(self):
+        """Compute POS amount total from calculated values."""
+        # super()._compute_amount_breakdown()
+        for record in self:
+            vals, _ = record._calculate_amounts()
+            record.amount_total_pos = vals.get('amount_total_pos', 0.0)
 
     def get_bill_summary_lines(self):
         """Returns a list of summary lines for the bill report:
@@ -104,11 +143,13 @@ class RoomBooking(models.Model):
     pos_invoice_count = fields.Integer(compute='_compute_pos_invoice_count', string='POS Invoice Count')
 
     def _compute_pos_invoice_count(self):
+        """Compute number of valid POS invoices linked to the record."""
         for rec in self:
             invoices = rec.pos_order_line_ids.mapped('pos_order_id.account_move')
             rec.pos_invoice_count = len(invoices.filtered(lambda x: x.state != 'cancel'))
 
     def action_view_pos_invoices(self):
+        """Open POS invoices related to the record."""
         self.ensure_one()
         invoices = self.pos_order_line_ids.mapped('pos_order_id.account_move').filtered(lambda x: x.state != 'cancel')
         action = self.env["ir.actions.actions"]._for_xml_id("account.action_move_out_invoice_type")

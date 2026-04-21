@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="hotel_management_odoo.room_booking_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <!-- Add any header buttons if needed, but user asked for smart button and status column -->
+                <!-- Add any header buttons if needed -->
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_view_pos_invoices" type="object" class="oe_stat_button" icon="fa-file-text-o" invisible="pos_invoice_count == 0">
@@ -14,7 +14,8 @@
                 </button>
             </xpath>
             <xpath expr="//notebook" position="inside">
-                <page string="POS Orders" name="pos_orders">
+                <field name="has_pos_orders" invisible="1"/>
+                <page string="POS Orders" name="pos_orders" invisible="not has_pos_orders">
                     <field name="pos_order_line_ids" readonly="1">
                         <list>
                             <field name="pos_order_id" string="Order Ref"/>

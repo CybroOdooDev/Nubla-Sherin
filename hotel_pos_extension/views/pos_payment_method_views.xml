@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+        <!-- Extend payment method form to add hotel charge option -->
     <record id="pos_payment_method_view_form_inherit_hotel" model="ir.ui.view">
         <field name="name">pos.payment.method.view.form.inherit.hotel</field>
         <field name="model">pos.payment.method</field>

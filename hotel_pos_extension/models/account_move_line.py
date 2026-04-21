@@ -22,6 +22,7 @@
 from odoo import fields, models
 
 class AccountMoveLine(models.Model):
+    """Extend account move line to support POS product type and control reconciliation behavior."""
     _inherit = "account.move.line"
 
     product_type = fields.Selection(selection_add=[('pos', 'POS')],
