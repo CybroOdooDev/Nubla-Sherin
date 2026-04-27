@@ -1,0 +1,93 @@
+<odoo>
+    <!-- Action -->
+    <record id="action_fine" model="ir.actions.act_window">
+        <field name="name">Library Fines</field>
+        <field name="res_model">library.fine</field>
+        <field name="view_mode">list,form</field>
+        <field name="help">Track library fines and penalties</field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_fine_list" model="ir.ui.view">
+        <field name="name">fine.list</field>
+        <field name="model">library.fine</field>
+        <field name="arch" type="xml">
+            <list string="Library Fines">
+                <field name="member_id"/>
+                <field name="book_register_id"/>
+                <field name="rule_id"/>
+                <field name="fine_date"/>
+                <field name="original_amount"/>
+                <field name="adjusted_amount"/>
+                <field name="waived_amount"/>
+                <field name="state"/>
+                <field name="note"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_fine_form" model="ir.ui.view">
+        <field name="name">fine.form</field>
+        <field name="model">library.fine</field>
+        <field name="arch" type="xml">
+            <form string="Library Fine">
+                <header>
+                    <!-- Create Invoice button -->
+                    <button name="action_create_invoice"
+                            type="object"
+                            string="Create Invoice"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"/>
+
+                    <!-- Statusbar -->
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,paid"/>
+                </header>
+
+                <sheet>
+                    <!-- Smart Button Section -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_invoice"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-money"
+                                invisible="not invoice_id">
+                            <field name="invoice_id" invisible="1"/>
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Invoice</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Title -->
+                    <h2>
+                        <field name="member_id"/>
+                    </h2>
+
+                    <!-- Fine Information -->
+                    <group>
+                        <group string="Fine Information">
+                            <field name="book_register_id"
+                                   domain="[('register_member_id', '=', member_id)]"/>
+                            <field name="rule_id"/>
+                            <field name="fine_date"/>
+                        </group>
+                        <group string="Amount Details">
+                            <field name="original_amount"/>
+                            <field name="waived_amount"/>
+                            <field name="adjusted_amount"/>
+                        </group>
+                    </group>
+
+
+                    <!-- Notebook Section -->
+                    <notebook>
+                        <page string="Notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--This record defines the form view for managing book authors model.-->
+    <record id="book_authors_view_form" model="ir.ui.view">
+        <field name="name">book.author.view.form</field>
+        <field name="model">book.author</field>
+        <field name="arch" type="xml">
+            <form string="Authors">
+                <sheet>
+                    <div class="oe_button_box" style="" name="button_box">
+                        <button class="oe_stat_button" type="object"
+                                icon="fa-book" name="action_view_written_books">
+                            <div class="o_form_field o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="author_book_qty"
+                                           widget="statinfo" nolabel="1"
+                                           readonly="1"
+                                           force_save="1"/>
+                                </span>
+                                <span class="o_stat_text">
+                                    Books
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                    <field name="image_medium"
+                           class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label class="oe_edit_only" for="author_name"
+                               string="Author Name"/>
+                        <h1>
+                            <field name="author_name"
+                                   placeholder="Author Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Author details">
+                            <field name="language"/>
+                            <field name="gender"/>
+                        </group>
+                        <group string="Extra details">
+                            <field name="nationality_id"/>
+                            <field name="born"/>
+                            <field name="died"/>
+                        </group>
+                    </group>
+                    <group string="Awards">
+                        <field name="author_awards_ids" nolabel="1" colspan="2">
+                            <kanban class="o_kanban_mobile">
+                                <field name="id"/>
+                                <field name="award_id"/>
+                                <field name="image_medium"/>
+                                <field name="country_id"/>
+                                <field name="awarded_by"/>
+                                <field name="ribbon" />
+                                <field name="next"/>
+                                <field name="lower"/>
+                                <templates>
+                                    <t t-name="card">
+                                        <div class="oe_kanban_global_click">
+                                            <div class="o_kanban_image">
+                                                <field name="image_medium" />
+                                            </div>
+                                            <div class="oe_kanban_details">
+                                                <div class="row">
+                                                    <div class="col-8">
+                                                        <strong class="o_kanban_record_title">
+                                                            <b>
+                                                                <field name="award_id"/>
+                                                            </b>
+                                                        </strong>
+                                                    </div>
+                                                </div>
+                                                <div name="tags"
+                                                     style="height: 18px;overflow: hidden;color: #868585;">
+                                                    <field name="country_id"/>
+                                                </div>
+                                                <div name="tags">
+                                                    <span style="color: #b3acac;font-size: 10px;">
+                                                        Next :
+                                                    </span>
+                                                    <field name="next"/>
+                                                    <span style="color: #b3acac;font-size: 10px;">
+                                                        Lower :
+                                                    </span>
+                                                    <field name="lower"/>
+                                                </div>
+                                                <div name="tags"
+                                                     style="height: 20px;width:auto;">
+                                                    <field name="ribbon" />
+                                                </div>
+                                                <div name="tags"/>
+                                                <ul>
+                                                    <li>
+                                                        <field name="awarded_by"/>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </templates>
+                            </kanban>
+                            <form string="Awards">
+                                <sheet>
+                                    <group>
+                                        <group>
+                                            <field name="award_id"/>
+                                        </group>
+                                        <group>
+                                            <field name="awarded_on"/>
+                                        </group>
+                                    </group>
+
+                                    <div class="oe_title">
+                                        <label class="oe_edit_only"
+                                               for="award_name"
+                                               string="Award Name"/>
+                                        <h1>
+                                            <field name="award_name"
+                                                   placeholder="Award Name"/>
+                                        </h1>
+                                    </div>
+                                    <group string="Details">
+                                        <group>
+                                            <field name="country_id"/>
+                                            <field name="awarded_by"/>
+                                            <field name="ribbon" widget="image"
+                                                   class="oe_avatar"/>
+                                        </group>
+                                        <group>
+                                            <field name="next"/>
+                                            <field name="lower"/>
+                                        </group>
+                                    </group>
+                                </sheet>
+                            </form>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!--This record defines the list view for displaying a list of book authors-->
+    <record id="book_authors_view_list" model="ir.ui.view">
+        <field name="name">book.author.view.list</field>
+        <field name="model">book.author</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="author_name"/>
+                <field name="language"/>
+                <field name="gender"/>
+                <field name="nationality_id"/>
+                <field name="born"/>
+                <field name="died"/>
+            </list>
+        </field>
+    </record>
+    <!--This record defines the kanban view for visualizing book authors-->
+    <record id="book_authors_view_kanban" model="ir.ui.view">
+        <field name="name">book.author.view.kanban</field>
+        <field name="model">book.author</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="id"/>
+                <field name="image_medium" />
+                <field name="author_name"/>
+                <field name="language"/>
+                <field name="gender"/>
+                <field name="nationality_id"/>
+                <field name="born"/>
+                <field name="died"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <field name="image_medium" widget="image" style="width: 70px; height: 70px; object-fit: cover; border-radius: 5px;"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <b>
+                                        <field name="author_name"/>
+                                    </b>
+                                </strong>
+                                <div name="tags">
+                                    <field name="nationality_id"/>
+                                </div>
+                                <div name="tags">
+                                    <span style="color: #b3acac;font-size: 10px;">
+                                        Born :
+                                    </span>
+                                    <field name="born"/>
+                                    <span style="color: #b3acac;font-size: 10px;">
+                                        Died :
+                                    </span>
+                                    <field name="died"/>
+                                </div>
+                                <div name="tags"/>
+                                <ul>
+                                    <li>
+                                        <field name="language"/>
+                                    </li>
+                                </ul>
+                                <div name="tags"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <!--This record defines an action window for managing book authors-->
+    <record id="book_authors_action" model="ir.actions.act_window">
+        <field name="name">Authors</field>
+        <field name="res_model">book.author</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to define a new authors.
+            </p>
+        </field>
+        <field name="binding_view_types">kanban,form</field>
+    </record>
+</odoo>

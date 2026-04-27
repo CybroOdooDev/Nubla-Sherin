@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Define the form view for the product template with additional fields for book details -->
+    <record id="product_template_form_view" model="ir.ui.view">
+        <field name="name">
+            product.template.view.form.inherit.library.management.system
+        </field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='options']" position="inside">
+                <field name="is_a_book"/>
+                <label for="is_a_book"/>
+            </xpath>
+            <xpath expr="//page[last()]" position="after">
+                <page string="Book Details"
+                      invisible="is_a_book==False">
+                    <group>
+                        <group string="Basic Information">
+                            <field name="book_title"/>
+                            <field name="author_name" widget="many2many_tags"/>
+                            <field name="pages" style="width:80px;"/>
+                        </group>
+                        <group string="">
+                            <field name="isbn_number"/>
+                            <field name="isbn_13_number"/>
+                            <field name="publisher_id"/>
+                            <field name="copyright"/>
+                            <field name="edition"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Extra Information">
+                            <field name="categories"/>
+                            <field name="rating"/>
+                            <field name="book_language"/>
+                        </group>
+                        <group string="External Links">
+                            <field name="web_reader_link"/>
+                            <field name="preview_link"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Issued History"
+                      invisible="is_a_book==False">
+                    <group>
+                        <field name="issued_history_ids" nolabel="1" mode="list"
+                               colspan="2">
+                            <list
+                                    default_order="register_sequence desc">
+                                <field name="register_sequence"/>
+                                <field name="member_book_history_id"/>
+                                <field name="created_user_id"/>
+                                <field name="issued_date"/>
+                                <field name="expiry_date"/>
+                            </list>
+                            <form>
+                                <group>
+                                    <group>
+                                        <field name="register_sequence"/>
+                                        <field name="book_name_id"/>
+                                        <field name="edition"/>
+                                        <field name="book_isbn"/>
+                                    </group>
+                                    <group>
+                                        <field name="issued_date"/>
+                                        <field name="expiry_date"/>
+                                    </group>
+                                </group>
+                                <footer>
+                                    <button name="action_view_register"
+                                            string="View Details" type="object"
+                                            class="btn-primary"/>
+                                </footer>
+                            </form>
+                        </field>
+                    </group>
+                </page>
+                <page string="Awards">
+                    <group string="Awards">
+                        <field name="book_awards_ids" nolabel="1" colspan="2">
+                            <kanban>
+                                <field name="id"/>
+                                <field name="book_award_id"/>
+                                <field name="image_medium"/>
+                                <field name="country_id"/>
+                                <field name="awarded_by"/>
+                                <field name="ribbon"/>
+                                <field name="next"/>
+                                <field name="lower"/>
+                                <templates>
+                                    <t t-name="card">
+                                        <div >
+                                            <div class="">
+                                                <field name="image_medium"/>
+                                            </div>
+                                            <div class="oe_kanban_details">
+                                                <div class="row">
+                                                    <div class="col-8">
+                                                        <strong class="o_kanban_record_title">
+                                                            <b>
+                                                                <field name="book_award_id"/>
+                                                            </b>
+                                                        </strong>
+                                                    </div>
+                                                </div>
+                                                <div name="tags"
+                                                     style="height: 18px;overflow: hidden;color: #868585;">
+                                                    <field name="country_id"/>
+                                                </div>
+                                                <div name="tags">
+                                                    <span style="color: #b3acac;font-size: 10px;">
+                                                        Next :
+                                                    </span>
+                                                    <field name="next"/>
+                                                    <span style="color: #b3acac;font-size: 10px;">
+                                                        Lower :
+                                                    </span>
+                                                    <field name="lower"/>
+                                                </div>
+                                                <div name="tags"
+                                                     style="height: 20px;width:auto;">
+
+                                                    <field name="ribbon"/>
+
+                                                </div>
+                                                <div name="tags"/>
+                                                <ul>
+                                                    <li>
+                                                        <field name="awarded_by"/>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </templates>
+                            </kanban>
+                            <form string="Awards">
+                                <sheet>
+                                    <group>
+                                        <group>
+                                            <field name="book_award_id"/>
+                                        </group>
+                                        <group>
+                                            <field name="awarded_on"/>
+                                        </group>
+                                    </group>
+                                    <field name="image_medium" widget="image"
+                                           class="oe_avatar"/>
+                                    <div class="oe_title">
+                                        <label class="oe_edit_only"
+                                               for="book_award_name"
+                                               string="Award Name"/>
+                                        <h1>
+                                            <field name="book_award_name"
+                                                   placeholder="Award Name"/>
+                                        </h1>
+                                    </div>
+                                    <group string="Details">
+                                        <group>
+                                            <field name="country_id"/>
+                                            <field name="awarded_by"/>
+                                            <field name="ribbon" widget="image"
+                                                   class="oe_avatar"/>
+                                        </group>
+                                        <group>
+                                            <field name="next"/>
+                                            <field name="lower"/>
+                                        </group>
+                                    </group>
+                                </sheet>
+                            </form>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+    <!-- Define the kanban view for the product template with additional fields for book details -->
+    <record id="product_template_kanban_view" model="ir.ui.view">
+        <field name="name">
+            product.template.view.kanban.inherit.library.management.system
+        </field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="is_a_book"/>
+                <field name="edition"/>
+                <field name="pages"/>
+                <field name="author_name"/>
+                <field name="isbn_number"/>f
+                <field name="isbn_13_number"/>
+            </xpath>
+            <xpath expr="//aside"
+                   position="replace">
+                <t t-if="record.is_a_book.raw_value== true">
+                    <aside>
+                        <field name="image_128" widget="image" alt="Product"
+                               options="{'img_class': 'w-100 object-fit-contain'}"/>
+                    </aside>
+                </t>
+                <t t-else="">
+                    <aside>
+                        <field name="image_128" widget="image" alt="Product"
+                               options="{'img_class': 'w-100 object-fit-contain'}"/>
+                    </aside>
+                </t>
+            </xpath>
+            <xpath expr="//strong" position="after">
+                <t t-if="record.is_a_book.raw_value== true">
+                    <div style="display: block;font-size: 10px;color: grey; height: 13px;overflow: hidden;">
+                        <field name="author_name" widget="many2many_tags"/>
+                    </div>
+                    <strong style="font-size:10px; display: block;font-weight: bold;color: grey;margin-top:2px">
+                        <span>ISBN :</span>
+                        <field name="isbn_number"/>
+                        <span>,</span>
+                        <field name="isbn_13_number"/>
+                    </strong>
+                </t>
+            </xpath>
+            <xpath expr="//main[hasclass('pe-2')]/span" position="replace">
+                <t t-if=" record.is_a_book.raw_value== true">
+                    <li t-if=" record.is_a_book.raw_value== true">
+                    </li>
+                </t>
+                <t t-else="">
+                    <li>Price:
+                        <field name="list_price" widget="monetary"
+                               options="{'currency_field': 'currency_id', 'field_digits': True}"/>
+                    </li>
+                </t>
+            </xpath>
+        </field>
+    </record>
+    <!-- Define the action for the product template with a focus on Books -->
+    <record id="product_template_action" model="ir.actions.act_window">
+        <field name="name">Books</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form,pivot</field>
+        <field name="domain">[('is_a_book', '=', True)]</field>
+        <field name="context">{'default_is_a_book': True}</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to define a new Books.
+            </p>
+        </field>
+        <field name="binding_view_types">kanban</field>
+    </record>
+</odoo>

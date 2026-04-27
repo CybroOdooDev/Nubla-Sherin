@@ -1,0 +1,128 @@
+.card-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 20px;
+}
+
+.card {
+    /*width: 430px;
+    height: 185px;
+    padding: 15px;*/
+    border-radius: 23px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 0px;
+}
+
+.card .card-content h2 {
+    color: floralwhite;
+    font-size: 26px;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.card .card-content p {
+    color: floralwhite;
+    font-size: 24px;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+.card-image {
+    height: 70px;
+    width: 65px;
+    /*margin-top: -120px;
+    margin-left: 325px;*/
+}
+
+.card .card-footer {
+    /*margin-left: -16px;
+    margin-bottom: -16px;
+    width: 430px;*/
+    border-radius: 23px;
+    text-align: center;
+}
+
+.card .card-footer a .fa {
+    margin-left: 2px;
+    font-size: 18px;
+}
+
+.card .card-footer p {
+    color: floralwhite;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.card.color {
+    background-image: linear-gradient( 109.6deg,  rgba(10,5,5,1) 11.2%, rgba(36,163,190,1) 91.1% );
+}
+
+.main-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.left-panel {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 50%
+}
+
+.card h1 {
+    font-size: 26px;
+    margin-top: 10px;
+    margin-left: 10px;
+    color: floralwhite;
+}
+
+.card h3 {
+    font-size: 18px;
+    margin-top: 10px;
+    margin-left: 10px;
+    color: floralwhite;
+}
+
+.card.tile {
+    background-image: radial-gradient(
+                            circle 1292px at -13.6% 51.7%,
+                            rgba(0,56,68,1) 0%,
+                            rgba(163,217,185,1) 51.5%,
+                            rgba(255,252,247,1) 88.6% );
+}
+
+.right-panel {
+    flex: 1;
+    margin-left: 20px;
+    max-width: 50%
+}
+
+.text-primary {
+    color: #2196F3;
+}
+
+.fw-bold {
+    font-weight: bold;
+}
+
+.chart {
+    margin-bottom: 10px;
+    margin-top: 20px;
+    background-color: white;
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-image: linear-gradient(-225deg, #FFFEFF 0%, #D7FFFE 100%);
+}
+
+.box-sm {
+    background-color: white;
+    width: 100%;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-image: linear-gradient(-225deg, #FFFEFF 0%, #D7FFFE 100%);
+}

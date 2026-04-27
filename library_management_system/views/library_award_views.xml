@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!--    This record defines the form view for managing awards in the library management system.-->
+    <record id="library_awards_view_form" model="ir.ui.view">
+        <field name="name">library.award.view.form</field>
+        <field name="model">library.award</field>
+        <field name="arch" type="xml">
+            <form string="Awards">
+                <sheet>
+                    <field name="image_medium" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label class="oe_edit_only" for="award_name" string="Award Name"/>
+                        <h1>
+                            <field name="award_name" placeholder="Award Name"/>
+                        </h1>
+                    </div>
+                    <group string="Details">
+                        <group>
+                            <field name="country_id"/>
+                            <field name="awarded_by"/>
+                            <field name="ribbon" widget="image" class="oe_avatar"/>
+                        </group>
+                        <group>
+                            <field name="next"/>
+                            <field name="lower"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+<!--This record defines the kanban view for visualizing awards in the library management system.-->
+    <record id="library_awards_view_kanban" model="ir.ui.view">
+        <field name="name">library.award.view.kanban</field>
+        <field name="model">library.award</field>
+        <field name="arch" type="xml">
+            <kanban default_order="award_name desc">
+                <field name="id"/>
+                <field name="award_name"/>
+                <field name="image_medium"/>
+                <field name="country_id"/>
+                <field name="awarded_by"/>
+                <field name="ribbon"/>
+                <field name="next"/>
+                <field name="lower"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <field  name="image_medium"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <strong class="o_kanban_record_title">
+                                            <b>
+                                                <field name="award_name"/>
+                                            </b>
+                                        </strong>
+                                    </div>
+                                </div>
+                                <div name="tags" style="height: 18px;overflow: hidden;color: #868585;">
+                                    <field name="country_id"/>
+                                </div>
+                                <div name="tags">
+                                    <span style="color: #b3acac;font-size: 10px;">Next :</span>
+                                    <field name="next"/>
+                                    <span style="color: #b3acac;font-size: 10px;">Lower :</span>
+                                    <field name="lower"/>
+                                </div>
+                                <div name="tags" style="height: 20px;width:auto;">
+                                    <field  name ="image_medium"/>
+                                </div>
+                                <div name="tags"/>
+                                <ul>
+                                    <li>
+                                        <field name="awarded_by"/>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+<!--    This record defines an action window for managing awards in the library management system.-->
+    <record id="library_awards_action" model="ir.actions.act_window">
+        <field name="name">Awards</field>
+        <field name="res_model">library.award</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to define a new awards.
+            </p>
+        </field>
+        <field name="binding_view_types">kanban</field>
+    </record>
+</odoo>
