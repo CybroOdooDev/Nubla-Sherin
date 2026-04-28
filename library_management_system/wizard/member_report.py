@@ -141,10 +141,13 @@ class MemberReport(models.TransientModel):
         col_num = 2
         for memb in members:
             membership = membership_obj.browse(memb['membership_type_id'])
+            # Odoo 19: res.partner no longer has a stored `mobile` column.
+            # Keep the report compatible across versions by falling back to `phone`.
+            mobile = memb.get('mobile') or memb.get('phone') or ''
             sheet.write(row_num + 1, col_num, memb['member_sequence'], txt)
             sheet.write(row_num + 1, col_num + 1, memb['name'], txt)
             sheet.write(row_num + 1, col_num + 2, memb['street'], txt)
-            sheet.write(row_num + 1, col_num + 3, memb['mobile'], txt)
+            sheet.write(row_num + 1, col_num + 3, mobile, txt)
             sheet.write(row_num + 1, col_num + 4, memb['email'], txt)
             sheet.write(row_num + 1, col_num + 5, membership.membership_name,
                         txt)

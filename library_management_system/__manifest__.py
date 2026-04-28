@@ -20,7 +20,7 @@
 #
 ###############################################################################
 {
-    'name': 'Library Management System',
+    'name': 'Library Management  System',
     'version': '19.0.1.0.1',
     'category': 'Industries',
     'summary': """Advanced Library Management Module to Manage Books, Books Borrowing, Members, etc.""",

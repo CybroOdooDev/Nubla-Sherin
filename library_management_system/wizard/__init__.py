@@ -22,7 +22,6 @@
 from . import book_report
 from . import create_book
 from . import import_book
-from . import ir_actions_xlsx_download
 from . import issued_book_report
 from . import issued_book_report
 from . import library_member_report
