@@ -2,9 +2,9 @@
     :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
     :alt: License: LGPL-3
 
-Duplicate Contact Details Alert
-===============================
-* Duplicate Contact Details Alert module for Odoo 19.
+POS Font Size
+=============
+* This module helps to change the font size in the Odoo 19 POS interface.
 
 Configuration
 =============

@@ -24,7 +24,9 @@
 /* ── Product Card: Price ── */
 .product .price-tag,
 .product-list .price-tag,
-.product .product-price {
+.product .product-price,
+.orderline .product-price,
+.orderline .price {
     font-size: var(--pos-product-price-font-size) !important;
 }
 
@@ -59,7 +61,7 @@
 
 .order-summary .fs-3,
 .order-summary .total {
-    font-size: calc(var(--pos-order-line-font-size) * 1.5) !important;
+    font-size: var(--pos-order-summary-total-font-size, calc(var(--pos-order-line-font-size) * 1.5)) !important;
 }
 
 /* ── Control / Action Buttons ── */

@@ -82,5 +82,11 @@ patch(Chrome.prototype, {
             }
             rootStyle.setProperty(`--pos-${key}-font-size`, finalSize);
         }
+
+        if (preset === 'custom' && config.pos_payment_total_font_size && config.pos_payment_total_font_size > 0) {
+            rootStyle.setProperty('--pos-order-summary-total-font-size', `${config.pos_payment_total_font_size}px`);
+        } else {
+            rootStyle.removeProperty('--pos-order-summary-total-font-size');
+        }
     },
 });
