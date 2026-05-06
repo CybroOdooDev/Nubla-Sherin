@@ -19,7 +19,6 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-
 from odoo import fields, models
 
 
@@ -28,7 +27,6 @@ class ResConfigSettings(models.TransientModel):
 
     pos_font_preset = fields.Selection(related='pos_config_id.pos_font_preset', readonly=False)
     pos_global_scale = fields.Integer(related='pos_config_id.pos_global_scale', readonly=False)
-    
     pos_product_card_font_size = fields.Integer(related='pos_config_id.pos_product_card_font_size', readonly=False)
     pos_product_price_font_size = fields.Integer(related='pos_config_id.pos_product_price_font_size', readonly=False)
     pos_categories_font_size = fields.Integer(related='pos_config_id.pos_categories_font_size', readonly=False)

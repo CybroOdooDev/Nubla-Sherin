@@ -1,9 +1,9 @@
-.. image:: https://img.shields.io/badge/license-LGPL--3-blue.svg
-    :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
+.. image:: https://img.shields.io/badge/license-LGPL--3-green.svg
+    :target: https://www.gnu.org/licenses/lgpl-3.0-standalone.html
     :alt: License: LGPL-3
 
-POS Font Size
-=============
+POS UI Font Manager
+===================
 * This module helps to change the font size in the Odoo 19 POS interface.
 
 Configuration

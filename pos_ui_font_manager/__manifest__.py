@@ -20,7 +20,7 @@
 #
 #############################################################################
 {
-    'name': 'POS Font Size',
+    'name': 'POS UI Font Manager',
     'version': '19.0.1.0.0',
     'category': 'Point of Sale',
     'summary': 'Configure Font Sizes for POS UI Elements',
@@ -36,12 +36,14 @@
     ],
     'assets': {
         'point_of_sale._assets_pos': [
-            'pos_font_size/static/src/js/**/*',
-            'pos_font_size/static/src/css/**/*',
-            'pos_font_size/static/src/xml/**/*',
+            'pos_ui_font_manager/static/src/js/**/*',
+            'pos_ui_font_manager/static/src/css/**/*',
+            'pos_ui_font_manager/static/src/xml/**/*',
         ],
     },
     'license': 'LGPL-3',
+    'images': ['static/description/banner.jpg'],
     'installable': True,
     'auto_install': False,
+    'application': True,
 }

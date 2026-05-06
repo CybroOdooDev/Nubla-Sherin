@@ -33,6 +33,12 @@
 /* ── Category Selector ── */
 .category-button {
     font-size: var(--pos-categories-font-size) !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    height: auto !important;
+    min-height: 48px !important;
+    line-height: 1.2 !important;
+    padding: 8px !important;
 }
 
 /* ── Numpad ── */
@@ -105,14 +111,7 @@
 .pos-receipt span:not(.fa):not(.oi),
 .pos-receipt div:not(.pos-receipt-contact):not(.pos-receipt-logo):not(.pos-change-title):not(.pos-change-value),
 .pos-receipt li,
-.pos-receipt pre,
-.receipt-screen,
-.receipt-screen .button,
-.receipt-screen .validation-buttons .button,
-.receipt-screen .fs-3,
-.receipt-screen .fs-4,
-.receipt-screen .notice,
-.receipt-screen input {
+.pos-receipt pre {
     font-size: var(--pos-receipt-preview-font-size) !important;
 }
 
@@ -146,7 +145,27 @@
 .ticket-screen .order-row,
 .ticket-screen .header-row,
 .ticket-screen .col,
-.ticket-screen .button {
+.ticket-screen .button,
+.ticket-screen .btn,
+.ticket-screen input,
+.ticket-screen select,
+.ticket-screen span:not(.fa):not(.oi),
+.ticket-screen .order-row div,
+.ticket-screen .header-row div,
+.ticket-screen .orderline,
+.ticket-screen .orderline .product-name,
+.ticket-screen .orderline .price-tag,
+.ticket-screen .orderline .info-list,
+.ticket-screen .orderline .info,
+.ticket-screen .orderline .price,
+.ticket-screen .order-summary,
+.ticket-screen .order-summary .subentry,
+.ticket-screen .order-summary .tax-info,
+.ticket-screen .order-summary .fs-6,
+.ticket-screen .order-summary .subtotal,
+.ticket-screen .order-summary .tax,
+.ticket-screen .order-summary .fs-3,
+.ticket-screen .order-summary .total {
     font-size: var(--pos-ticket-screen-font-size) !important;
 }
 
