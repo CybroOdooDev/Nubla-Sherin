@@ -25,6 +25,8 @@ from odoo import models, api
 from odoo.modules.registry import Registry
 from odoo.addons.mail.tools.discuss import Store
 
+from ..utils import wkhtmltopdf_request
+
 
 class IrActionsReport(models.Model):
     """
@@ -39,14 +41,30 @@ class IrActionsReport(models.Model):
                `_generate_pdf_thread` to render the report PDF
                without blocking the main user request.
         """
+        try:
+            from odoo.http import request
+            session_id = request.session.sid if request else False
+        except Exception:
+            session_id = False
+
         thread = threading.Thread(
             target=self._generate_pdf_thread,
-            args=(report_name, docids, None, request_id, tab_id),
+            args=(report_name, docids, None, request_id, tab_id, session_id),
         )
         thread.daemon = True
         thread.start()
 
-    def _generate_pdf_thread(self, report_ref, res_ids, data=None, request_id=False, tab_id=False):
+    def _build_wkhtmltopdf_args(self, *args, **kwargs):
+        command_args = super()._build_wkhtmltopdf_args(*args, **kwargs)
+        bg_session_id = self.env.context.get('background_session_id')
+        if bg_session_id:
+            try:
+                command_args.extend(['--cookie', 'session_id', bg_session_id])
+            except Exception:
+                pass
+        return command_args
+
+    def _generate_pdf_thread(self, report_ref, res_ids, data=None, request_id=False, tab_id=False, session_id=False):
         """
         Generate the PDF in a background thread using a new database cursor,
         create it as an attachment, and send a notification for download.
@@ -56,15 +74,20 @@ class IrActionsReport(models.Model):
 
         with Registry(db_name).cursor() as new_cr:
             env = api.Environment(new_cr, uid, {})
+            if session_id:
+                env = env(context=dict(env.context, background_session_id=session_id))
 
             try:
                 report = env['ir.actions.report']._get_report_from_name(report_ref)
 
-                pdf_content, _ = report._render_qweb_pdf(
-                    report_ref,
-                    res_ids=res_ids,
-                    data=data,
-                )
+                # Ensure wkhtmltopdf gets a session cookie jar so it can load
+                # `/web/assets` even when `dbfilter` is not configured.
+                with wkhtmltopdf_request(env):
+                    pdf_content, _ = report._render_qweb_pdf(
+                        report_ref,
+                        res_ids=res_ids,
+                        data=data,
+                    )
 
                 records = env[report.model].browse(res_ids)
 
@@ -143,10 +166,15 @@ class IrActionsReport(models.Model):
                             pass
                 except Exception as store_error:
                     # Log the error but don't fail the PDF generation
-                    env.cr.execute("""
-                        INSERT INTO ir_logging(name, type, level, dbname, path, line, msg)
-                        VALUES('pdf_lazy_generator', 'server', 'error', %s, %s, '0', %s)
-                    """, (env.cr.dbname, __file__, str(store_error)))
+                    env['ir.logging'].sudo().create({
+                        'name': 'pdf_lazy_generator',
+                        'type': 'server',
+                        'level': 'error',
+                        'dbname': env.cr.dbname,
+                        'path': __file__,
+                        'line': '0',
+                        'msg': str(store_error),
+                    })
                 
                 # Final commit before bus notification
                 new_cr.commit()

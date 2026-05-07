@@ -22,8 +22,10 @@
 {
     'name': 'PDF Lazy Generator',
     'version': '19.0.1.0.0',
-    'summary': 'Generate PDF reports in the background using threads.',
-    'description': "This module enables asynchronous PDF generation to improve report loading performance and user experience.",
+    'category': 'Tools',
+    'summary': """Generate PDF reports in the background using threads.""",
+    'description': """This module enables asynchronous PDF generation to improve 
+    report loading performance and user experience.""",
     'author': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
@@ -42,7 +44,7 @@
     'images': [
             'static/description/banner.jpg',
         ],
-    'license': 'AGPL-3',
+    'license': 'LGPL-3',
     'auto_install': False,
     'installable': True,
     'application': True,

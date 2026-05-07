@@ -3,8 +3,8 @@
     :alt: License: LGPL-3
 
 PDF Lazy Generator
-===============================
-* Background PDF generation in Odoo 19.
+==================
+This module enables asynchronous PDF generation to improve report loading performance and user experience
 
 Configuration
 =============

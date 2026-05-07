@@ -154,7 +154,10 @@ registry.category("services").add("custom_report_patch", {
                 console.log("pdf_download: Initiating conditional tab-level atomic reload");
                 setTimeout(() => {
                     console.log("pdf_download: Hardware reload triggered (Condition Met)");
-                    window.location.reload();
+                    action.doAction({
+                        type: 'ir.actions.client',
+                        tag: 'soft_reload',
+                    });
                 }, 30);
             }
         });
