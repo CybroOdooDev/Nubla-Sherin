@@ -25,8 +25,8 @@ Sandbox test NHS Numbers: 9000000009, 9000000017, 9000000025, 9000000033
     },
     'data': [
         'security/ir.model.access.csv',
-        'data/ir_config_parameter.xml',
         'views/res_config_settings_views.xml',
+        'views/nhs_simple_doctor_views.xml',
         'views/nhs_simple_patient_views.xml',
         'views/nhs_simple_log_views.xml',
         'views/menu_views.xml',

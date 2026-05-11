@@ -11,6 +11,7 @@
                 <field name="nhs_number"/>
                 <field name="age"/>
                 <field name="gender"/>
+                <field name="primary_doctor_id"/>
                 <field name="phone"/>
                 <field name="city"/>
                 <field name="nhs_synced" widget="boolean_toggle"
@@ -60,10 +61,13 @@
                             <field name="nhs_synced" readonly="1"/>
                             <field name="nhs_last_sync" readonly="1"/>
                         </group>
-                        <group string="Demographics">
+                        <group string="Demographics &amp; GP">
                             <field name="date_of_birth"/>
                             <field name="age"/>
                             <field name="gender"/>
+                            <field name="primary_doctor_id"/>
+                            <field name="gp_code" invisible="not primary_doctor_id"/>
+                            <field name="gp_phone" invisible="not primary_doctor_id"/>
                         </group>
                     </group>
                     <group>

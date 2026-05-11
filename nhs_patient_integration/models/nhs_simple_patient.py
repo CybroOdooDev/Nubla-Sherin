@@ -61,6 +61,10 @@ class NhsSimplePatient(models.Model):
     nhs_raw_response = fields.Text(string='Last NHS FHIR Response',
                                     readonly=True)
 
+    primary_doctor_id = fields.Many2one('nhs.simple.doctor', string='Primary GP/Doctor', tracking=True)
+    gp_code = fields.Char(related='primary_doctor_id.gp_code', string='GP Code', readonly=True)
+    gp_phone = fields.Char(related='primary_doctor_id.phone', string='GP Phone', readonly=True)
+
     active = fields.Boolean(default=True)
 
     # ---------- computed ----------
@@ -217,6 +221,39 @@ class NhsSimplePatient(models.Model):
                 vals['city'] = home['city']
             if home.get('postalCode'):
                 vals['zip'] = home['postalCode']
+
+        # general practitioner
+        gps = fhir.get('generalPractitioner', [])
+        if gps:
+            gp = gps[0]
+            gp_name = gp.get('display')
+            gp_code = None
+            if gp.get('identifier') and gp['identifier'].get('value'):
+                gp_code = gp['identifier']['value']
+            
+            if gp_name or gp_code:
+                domain = []
+                if gp_code:
+                    domain.append(('gp_code', '=', gp_code))
+                elif gp_name:
+                    domain.append(('name', '=', gp_name))
+                
+                if domain:
+                    existing_gp = self.env['nhs.simple.doctor'].search(domain, limit=1)
+                    if existing_gp:
+                        vals['primary_doctor_id'] = existing_gp.id
+                    else:
+                        fallback_name = gp_name
+                        if not fallback_name and gp_code:
+                            fallback_name = f"GP Practice ({gp_code})"
+                        else:
+                            fallback_name = fallback_name or 'Unknown GP'
+                            
+                        new_gp = self.env['nhs.simple.doctor'].create({
+                            'name': fallback_name,
+                            'gp_code': gp_code,
+                        })
+                        vals['primary_doctor_id'] = new_gp.id
 
         # telecom
         telecoms = fhir.get('telecom', []) or []

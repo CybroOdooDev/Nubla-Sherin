@@ -11,6 +11,12 @@
               action="action_nhs_simple_patient"
               sequence="10"/>
 
+    <menuitem id="menu_nhs_simple_doctor"
+              name="Doctors / GPs"
+              parent="menu_nhs_simple_root"
+              action="action_nhs_simple_doctor"
+              sequence="20"/>
+
     <menuitem id="menu_nhs_simple_config"
               name="Configuration"
               parent="menu_nhs_simple_root"
