@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.epic</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="20"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Epic Integration" string="Epic Integration" name="epic_integration" groups="base.group_system">
+
+                    <block title="Epic API Configuration" name="epic_api_config">
+                        <setting string="Test Connection" help="Verify your Epic credentials and see which scopes are granted.">
+                            <button string="Test Connection" type="object" name="action_test_epic_connection" class="btn-primary"/>
+                        </setting>
+                        <setting string="Epic Environment" help="Select which environment you are connecting to.">
+                            <field name="epic_environment"/>
+                        </setting>
+                        <setting string="Epic Client ID" help="Production Client ID from Epic App Orchard.">
+                            <field name="epic_client_id"/>
+                        </setting>
+                        <setting string="Epic Non-Production Client ID" help="Sandbox/testing Client ID from Epic App Orchard.">
+                            <field name="epic_non_production_client_id"/>
+                        </setting>
+                        <setting string="Epic Token Endpoint" help="OAuth 2.0 token URL from Epic.">
+                            <field name="epic_token_endpoint" widget="url"/>
+                        </setting>
+                        <setting string="Epic FHIR Base URL" help="Base URL for Epic's FHIR API.">
+                            <field name="epic_fhir_base_url" widget="url"/>
+                        </setting>
+                        <setting string="Epic Private Key" help="RS384 PEM private key used to sign the JWT.">
+                            <field name="epic_private_key" class="w-100"/>
+                        </setting>
+                        <setting string="Epic JWKS (Public Key)" help="Paste your JWKS JSON here. Odoo hosts it at /epic/jwks.json">
+                            <field name="epic_jwks" class="w-100"/>
+                        </setting>
+                    </block>
+
+                    <block title="Practitioner Sync Defaults" name="epic_practitioner_sync_defaults">
+                        <setting string="Search Identifier" help="FHIR `identifier` parameter.">
+                            <field name="epic_practitioner_search_identifier"/>
+                        </setting>
+                        <setting string="Search Family (Last Name)" help="FHIR `family` parameter.">
+                            <field name="epic_practitioner_search_family"/>
+                        </setting>
+                        <setting string="Search Given (First Name)" help="FHIR `given` parameter.">
+                            <field name="epic_practitioner_search_given"/>
+                        </setting>
+                        <setting string="Search Name (Full Name)" help="FHIR `name` parameter.">
+                            <field name="epic_practitioner_search_name"/>
+                        </setting>
+                    </block>
+
+                    <block title="Appointment Sync Defaults" name="epic_appointment_sync_defaults">
+                        <setting string="Date From" help="Fetch appointments on or after this date. FHIR `date=ge{date}`.">
+                            <field name="epic_appointment_search_date"/>
+                        </setting>
+                        <setting string="Status Filter" help="Optional. E.g. booked, arrived, fulfilled, cancelled.">
+                            <field name="epic_appointment_search_status" placeholder="e.g. booked"/>
+                        </setting>
+                        <setting string="Patient ID" help="Optional. Epic FHIR Patient ID to filter appointments.">
+                            <field name="epic_appointment_search_patient"/>
+                        </setting>
+                    </block>
+
+                    <block title="Patient Sync Defaults" name="epic_patient_sync_defaults">
+                        <setting string="Search Family (Last Name)" help="FHIR `family` parameter. Fill this — leave Search Name empty.">
+                            <field name="epic_patient_search_family" placeholder="e.g. Smith"/>
+                        </setting>
+                        <setting string="Search Name (Full Name)" help="FHIR `name` parameter. Use only if Search Family is empty.">
+                            <field name="epic_patient_search_name"/>
+                        </setting>
+                        <setting string="Search Given (First Name)" help="FHIR `given` parameter.">
+                            <field name="epic_patient_search_given"/>
+                        </setting>
+                        <setting string="Search Identifier (MRN)" help="FHIR `identifier` parameter.">
+                            <field name="epic_patient_search_identifier"/>
+                        </setting>
+                        <setting string="Search Birthdate" help="FHIR `birthdate` parameter.">
+                            <field name="epic_patient_search_birthdate"/>
+                        </setting>
+                    </block>
+
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="epic_config_settings_action" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'module': 'epic_integration', 'bin_size': False}</field>
+    </record>
+</odoo>

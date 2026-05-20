@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_epic_practitioner,epic.practitioner,model_epic_practitioner,base.group_user,1,1,1,1
+access_epic_appointment,epic.appointment,model_epic_appointment,base.group_user,1,1,1,1
+access_epic_patient,epic.patient,model_epic_patient,base.group_user,1,1,1,1

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="view_epic_practitioner_tree" model="ir.ui.view">
+        <field name="name">epic.practitioner.tree</field>
+        <field name="model">epic.practitioner</field>
+        <field name="arch" type="xml">
+            <list string="Practitioners">
+                <header>
+                    <button name="action_sync_practitioners" type="object" string="Sync Practitioners from Epic" class="btn-primary" display="always"/>
+                </header>
+                <field name="name"/>
+                <field name="epic_id"/>
+                <field name="npi"/>
+                <field name="telecom"/>
+                <field name="gender"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_epic_practitioner_form" model="ir.ui.view">
+        <field name="name">epic.practitioner.form</field>
+        <field name="model">epic.practitioner</field>
+        <field name="arch" type="xml">
+            <form string="Practitioner">
+                <header>
+                    <button name="action_sync_practitioners" type="object" string="Sync Practitioners from Epic" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="epic_id"/>
+                            <field name="npi"/>
+                        </group>
+                        <group>
+                            <field name="telecom"/>
+                            <field name="gender"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_epic_practitioner" model="ir.actions.act_window">
+        <field name="name">Practitioners</field>
+        <field name="res_model">epic.practitioner</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Sync Practitioners from Epic</p>
+            <p>Click "Sync Practitioners from Epic" to fetch data from the Epic FHIR API.</p>
+        </field>
+    </record>
+
+    <!-- Root Menu -->
+    <menuitem id="menu_epic_integration_root" name="Epic Integration" sequence="50"/>
+
+    <!-- Main Menus -->
+    <menuitem id="menu_epic_practitioners" name="Practitioners"
+              parent="menu_epic_integration_root"
+              action="action_epic_practitioner" sequence="10"/>
+    <menuitem id="menu_epic_appointments" name="Appointments"
+              parent="menu_epic_integration_root"
+              action="action_epic_appointment" sequence="20"/>
+    <menuitem id="menu_epic_patients" name="Patients"
+              parent="menu_epic_integration_root"
+              action="action_epic_patient" sequence="30"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_epic_configuration" name="Configuration"
+              parent="menu_epic_integration_root" sequence="100"/>
+    <menuitem id="menu_epic_settings" name="Settings"
+              parent="menu_epic_configuration"
+              action="epic_config_settings_action" sequence="10"/>
+</odoo>

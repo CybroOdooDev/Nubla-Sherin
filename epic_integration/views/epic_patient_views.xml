@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="view_epic_patient_list" model="ir.ui.view">
+        <field name="name">epic.patient.list</field>
+        <field name="model">epic.patient</field>
+        <field name="arch" type="xml">
+            <list string="Patients">
+                <header>
+                    <button name="action_sync_patients" type="object" string="Sync Patients from Epic" class="btn-primary" display="always"/>
+                </header>
+                <field name="name"/>
+                <field name="mrn"/>
+                <field name="birth_date"/>
+                <field name="gender"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="address"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_epic_patient_form" model="ir.ui.view">
+        <field name="name">epic.patient.form</field>
+        <field name="model">epic.patient</field>
+        <field name="arch" type="xml">
+            <form string="Patient">
+                <header>
+                    <button name="action_sync_patients" type="object" string="Sync Patients from Epic" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Patient Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Demographics">
+                            <field name="birth_date"/>
+                            <field name="gender"/>
+                            <field name="mrn"/>
+                            <field name="epic_id"/>
+                        </group>
+                        <group string="Contact">
+                            <field name="phone" widget="phone"/>
+                            <field name="email" widget="email"/>
+                            <field name="address"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_epic_patient" model="ir.actions.act_window">
+        <field name="name">Patients</field>
+        <field name="res_model">epic.patient</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Sync Patients from Epic</p>
+            <p>Click "Sync Patients from Epic" to fetch patient data from the Epic FHIR API.</p>
+        </field>
+    </record>
+</odoo>
