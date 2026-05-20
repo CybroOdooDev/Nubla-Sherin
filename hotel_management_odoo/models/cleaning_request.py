@@ -119,7 +119,8 @@ class CleaningRequest(models.Model):
             'date': fields.Date.today(),
             'state': 'draft',
             'type': self.cleaning_type,
-            'vehicle_maintenance_id': self.vehicle_id.id
+            'vehicle_maintenance_id': self.vehicle_id.id,
+            'is_hotel': True,
         })
         return {
             'type': 'ir.actions.client',

@@ -26,10 +26,11 @@ from odoo.exceptions import ValidationError
 class MaintenanceRequest(models.Model):
     """Model that handles the maintenance requests"""
 
-    _name = 'maintenance.request'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['maintenance.request', 'mail.thread', 'mail.activity.mixin']
     _rec_name = 'sequence'
     _description = "Maintenance Request"
+
+    is_hotel = fields.Boolean(string="Is Hotel Maintenance", default=False)
 
     sequence = fields.Char(readonly=True, string="Sequence", copy=False,
                            default='New', help='Sequence number for'

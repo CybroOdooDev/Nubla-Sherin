@@ -24,8 +24,10 @@ from odoo import fields, models
 
 class MaintenanceTeam(models.Model):
     """Model that handles the maintenance team """
-    _name = "maintenance.team"
+    _inherit = "maintenance.team"
     _description = "Maintenance Team"
+
+    is_hotel = fields.Boolean(string="Is Hotel Maintenance", default=False)
 
     name = fields.Char(string='Maintenance Team',
                        help='Name of the maintenance team')
