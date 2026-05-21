@@ -28,7 +28,8 @@
         <field name="arch" type="xml">
             <form string="Patient">
                 <header>
-                    <button name="action_sync_patients" type="object" string="Sync Patients from Epic" class="btn-primary"/>
+                    <button name="action_push_to_epic" type="object" string="Push to Epic" class="btn-primary" invisible="epic_id != False"/>
+                    <button name="action_sync_patients" type="object" string="Sync Patients from Epic" class="btn-secondary"/>
                 </header>
                 <sheet>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
@@ -42,6 +43,7 @@
                             <field name="birth_date"/>
                             <field name="gender"/>
                             <field name="mrn"/>
+                            <field name="ssn" password="True"/>
                             <field name="epic_id"/>
                         </group>
                         <group string="Contact">

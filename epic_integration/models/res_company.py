@@ -27,6 +27,17 @@ class ResCompany(models.Model):
     epic_appointment_search_status = fields.Char(string='Appointment Search Status')
     epic_appointment_search_patient = fields.Char(string='Appointment Search Patient ID')
 
+    # --- Allergy Search ---
+    epic_allergy_search_patient = fields.Char(string='Allergy Search Patient Epic ID')
+
+    # --- Condition Search ---
+    epic_condition_search_patient = fields.Char(string='Condition Search Patient Epic ID')
+    epic_condition_search_category = fields.Selection([
+        ('problem-list-item', 'Problem List'),
+        ('encounter-diagnosis', 'Encounter Diagnosis'),
+        ('health-concern', 'Health Concern'),
+    ], string='Condition Category Filter')
+
     # --- Patient Search ---
     epic_patient_search_name = fields.Char(string='Patient Search Name')
     epic_patient_search_family = fields.Char(string='Patient Search Family')

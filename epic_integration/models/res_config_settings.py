@@ -37,6 +37,13 @@ class ResConfigSettings(models.TransientModel):
     epic_appointment_search_status = fields.Char(related='company_id.epic_appointment_search_status', readonly=False)
     epic_appointment_search_patient = fields.Char(related='company_id.epic_appointment_search_patient', readonly=False)
 
+    # Allergy
+    epic_allergy_search_patient = fields.Char(related='company_id.epic_allergy_search_patient', readonly=False)
+
+    # Condition
+    epic_condition_search_patient = fields.Char(related='company_id.epic_condition_search_patient', readonly=False)
+    epic_condition_search_category = fields.Selection(related='company_id.epic_condition_search_category', readonly=False)
+
     # Patient
     epic_patient_search_name = fields.Char(related='company_id.epic_patient_search_name', readonly=False)
     epic_patient_search_family = fields.Char(related='company_id.epic_patient_search_family', readonly=False)

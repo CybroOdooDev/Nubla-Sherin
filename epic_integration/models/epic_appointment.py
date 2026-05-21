@@ -1,7 +1,17 @@
 import logging
+from dateutil import parser as dateutil_parser
 from odoo import models, fields, exceptions
 
 _logger = logging.getLogger(__name__)
+
+
+def _parse_epic_dt(value):
+    if not value:
+        return False
+    dt = dateutil_parser.parse(value)
+    if dt.tzinfo is not None:
+        dt = dt.astimezone(tz=None).replace(tzinfo=None)
+    return dt.strftime('%Y-%m-%d %H:%M:%S')
 
 
 class EpicAppointment(models.Model):
@@ -92,8 +102,8 @@ class EpicAppointment(models.Model):
 
             vals = {
                 'status': resource.get('status', ''),
-                'start': resource.get('start') or False,
-                'end': resource.get('end') or False,
+                'start': _parse_epic_dt(resource.get('start')),
+                'end': _parse_epic_dt(resource.get('end')),
                 'description': resource.get('description', ''),
                 'appointment_type': appointment_type,
                 'service_type': service_type,

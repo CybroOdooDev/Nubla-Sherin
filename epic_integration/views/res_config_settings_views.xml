@@ -63,6 +63,21 @@
                         </setting>
                     </block>
 
+                    <block title="Allergy Sync Defaults" name="epic_allergy_sync_defaults">
+                        <setting string="Patient Epic ID" help="Epic FHIR Patient ID to fetch allergies for.">
+                            <field name="epic_allergy_search_patient" placeholder="e.g. ejwmLhJPukP2qXnej7TB91A3"/>
+                        </setting>
+                    </block>
+
+                    <block title="Condition Sync Defaults" name="epic_condition_sync_defaults">
+                        <setting string="Patient Epic ID" help="Epic FHIR Patient ID to fetch conditions for.">
+                            <field name="epic_condition_search_patient" placeholder="e.g. ejwmLhJPukP2qXnej7TB91A3"/>
+                        </setting>
+                        <setting string="Category Filter" help="Optional. Filter by condition category.">
+                            <field name="epic_condition_search_category"/>
+                        </setting>
+                    </block>
+
                     <block title="Patient Sync Defaults" name="epic_patient_sync_defaults">
                         <setting string="Search Family (Last Name)" help="FHIR `family` parameter. Fill this — leave Search Name empty.">
                             <field name="epic_patient_search_family" placeholder="e.g. Smith"/>

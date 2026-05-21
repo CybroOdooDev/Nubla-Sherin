@@ -88,17 +88,39 @@ class EpicFhirMixin(models.AbstractModel):
 
         return token_data.get('access_token'), granted_scope
 
+    def _epic_has_scope(self, required_scope, granted_scope):
+        """Return True if granted_scope contains required_scope (exact or qualified variant)."""
+        granted = granted_scope or ''
+        return any(
+            token == required_scope or token.startswith(required_scope + '?')
+            for token in granted.split()
+        )
+
     def _epic_check_scope(self, required_scope, granted_scope):
-        if not granted_scope or required_scope not in granted_scope:
-            resource = required_scope.replace('system/', '').replace('.read', '')
+        if not self._epic_has_scope(required_scope, granted_scope):
+            resource = required_scope.replace('system/', '').split('.')[0]
+            is_write = required_scope.endswith('.write')
+            if is_write:
+                api_hint = (
+                    f"  2. Search for '{resource}.Create'\n"
+                    f"  3. Add '{resource}.Create (Demographics) (R4)' or any available\n"
+                    f"     qualified (R4) Create variant for your use case.\n"
+                    f"     (The Open Epic sandbox only provides qualified R4 versions.)\n"
+                )
+            else:
+                api_hint = (
+                    f"  2. Search for '{resource}.Read' and '{resource}.Search'\n"
+                    f"  3. Add ALL available (R4) versions — including qualified ones like\n"
+                    f"     '{resource}.Read (Demographics) (R4)', etc.\n"
+                    f"     (The Open Epic sandbox only provides qualified R4 versions.)\n"
+                )
             raise exceptions.UserError(
                 f"Epic did not grant '{required_scope}' scope.\n\n"
                 f"Scopes currently granted: {granted_scope or '(none)'}\n\n"
                 f"To fix in Epic App Orchard:\n"
                 f"  1. Open your app → Incoming APIs\n"
-                f"  2. Search for '{resource}.Read' and '{resource}.Search'\n"
-                f"  3. Add the plain (R4) versions — no qualifiers like '(Demographics)' or '(Patient Chart)'\n"
-                f"  4. Save the app and retry."
+                + api_hint +
+                f"  4. Save the app, wait ~1 minute, then retry."
             )
 
     def _epic_fhir_url(self, company, resource):
@@ -125,5 +147,25 @@ class EpicFhirMixin(models.AbstractModel):
                 )
             raise exceptions.UserError(
                 f"Epic FHIR API request failed ({response.status_code}) for {url}{qs}.\n{details}".strip()
+            )
+        return response.json()
+
+    def _epic_fhir_post(self, access_token, url, json_data):
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation'
+        }
+        response = requests.post(url, headers=headers, json=json_data, timeout=30)
+        if response.status_code >= 400:
+            www_auth = response.headers.get('WWW-Authenticate', '')
+            _logger.error("Epic FHIR POST failed %s %s | WWW-Auth: %s | Body: %s",
+                          response.status_code, url, www_auth, response.text)
+            details = response.text or ''
+            if www_auth:
+                details += f"\nWWW-Authenticate: {www_auth}"
+            raise exceptions.UserError(
+                f"Epic FHIR API creation failed ({response.status_code}) for {url}.\n{details}".strip()
             )
         return response.json()

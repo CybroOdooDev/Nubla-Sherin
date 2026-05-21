@@ -11,7 +11,7 @@ class EpicPatient(models.Model):
     _description = 'Epic Patient'
     _inherit = ['epic.fhir.mixin']
 
-    epic_id = fields.Char(string='Epic FHIR ID', required=True, index=True)
+    epic_id = fields.Char(string='Epic FHIR ID', index=True)
     name = fields.Char(string='Name', required=True)
     birth_date = fields.Date(string='Date of Birth')
     gender = fields.Selection([
@@ -21,10 +21,92 @@ class EpicPatient(models.Model):
         ('unknown', 'Unknown'),
     ], string='Gender')
     mrn = fields.Char(string='MRN')
+    ssn = fields.Char(string='SSN')
     phone = fields.Char(string='Phone')
     email = fields.Char(string='Email')
     address = fields.Char(string='Address')
     active = fields.Boolean(default=True)
+
+    def action_push_to_epic(self):
+        company = self.env.company
+        access_token, granted_scope = self._epic_get_access_token(company)
+        if not access_token:
+            raise exceptions.UserError("Failed to obtain access token from Epic.")
+
+        if not self._epic_has_scope('system/Patient.write', granted_scope):
+            _logger.warning(
+                "system/Patient.write not in granted scopes (%s) — attempting push anyway. "
+                "If it fails, add 'Patient.Create (Demographics) (R4)' to your Epic App Orchard app.",
+                granted_scope,
+            )
+        url = self._epic_fhir_url(company, 'Patient')
+
+        for patient in self:
+            if patient.epic_id:
+                raise exceptions.UserError(f"Patient {patient.name} already has an Epic FHIR ID ({patient.epic_id}).")
+
+            names = (patient.name or '').split(' ', 1)
+            given = [names[0]] if names else []
+            family = names[1] if len(names) > 1 else (names[0] if names else 'Unknown')
+
+            if not patient.ssn:
+                raise exceptions.UserError(
+                    f"Patient '{patient.name}' is missing an SSN.\n"
+                    "Epic requires an SSN identifier to create a patient. "
+                    "Please fill in the SSN field before pushing."
+                )
+
+            fhir_payload = {
+                "resourceType": "Patient",
+                "active": patient.active,
+                "name": [{"use": "official", "family": family, "given": given}],
+                "identifier": [{
+                    "use": "usual",
+                    "type": {
+                        "coding": [{
+                            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                            "code": "SS"
+                        }]
+                    },
+                    "system": "urn:oid:2.16.840.1.113883.4.1",
+                    "value": patient.ssn,
+                }],
+            }
+
+            if patient.gender and patient.gender != 'unknown':
+                fhir_payload['gender'] = patient.gender
+
+            if patient.birth_date:
+                fhir_payload['birthDate'] = str(patient.birth_date)
+
+            telecom = []
+            if patient.phone:
+                telecom.append({"system": "phone", "value": patient.phone, "use": "home"})
+            if patient.email:
+                telecom.append({"system": "email", "value": patient.email, "use": "home"})
+            if telecom:
+                fhir_payload['telecom'] = telecom
+
+            if patient.address:
+                fhir_payload['address'] = [{"use": "home", "text": patient.address}]
+
+            response_data = self._epic_fhir_post(access_token, url, fhir_payload)
+            epic_id = response_data.get('id')
+            if not epic_id:
+                raise exceptions.UserError("Epic successfully created the patient but did not return a FHIR ID.")
+            
+            patient.epic_id = epic_id
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Success',
+                'message': 'Patient(s) successfully pushed to Epic.',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
 
     def action_sync_patients(self):
         company = self.env.company
@@ -35,7 +117,11 @@ class EpicPatient(models.Model):
         if company.epic_patient_search_given:
             search_params['given'] = company.epic_patient_search_given.strip()
         if company.epic_patient_search_identifier:
-            search_params['identifier'] = company.epic_patient_search_identifier.strip()
+            ident = company.epic_patient_search_identifier.strip()
+            if len(ident) > 15:
+                search_params['_id'] = ident
+            else:
+                search_params['identifier'] = ident
         if company.epic_patient_search_birthdate:
             search_params['birthdate'] = str(company.epic_patient_search_birthdate)
         # Use name only if no other param set (avoid duplicate with family)
@@ -53,7 +139,7 @@ class EpicPatient(models.Model):
             raise exceptions.UserError("Failed to obtain access token from Epic.")
 
         # Try standard Patient search first
-        if 'system/Patient.read' in (granted_scope or ''):
+        if self._epic_has_scope('system/Patient.read', granted_scope):
             url = self._epic_fhir_url(company, 'Patient')
             bundle = self._epic_fhir_get(access_token, url, params=search_params)
             entries = bundle.get('entry', [])
@@ -143,12 +229,16 @@ class EpicPatient(models.Model):
                     family = n.get('family', '')
                     full_name = f"{given} {family}".strip() or 'Unknown'
 
-            mrn = ''
+            mrn = ssn = ''
             for ident in resource.get('identifier', []):
                 type_codings = ident.get('type', {}).get('coding', [])
-                if any(c.get('code') == 'MR' for c in type_codings):
+                codes = [c.get('code') for c in type_codings]
+                if 'MR' in codes and not mrn:
                     mrn = ident.get('value', '')
-                    break
+                elif 'SS' in codes and not ssn:
+                    ssn = ident.get('value', '')
+                elif ident.get('system') == 'urn:oid:2.16.840.1.113883.4.1' and not ssn:
+                    ssn = ident.get('value', '')
 
             phone = email = ''
             for t in resource.get('telecom', []):
@@ -169,6 +259,7 @@ class EpicPatient(models.Model):
                 'birth_date': resource.get('birthDate') or False,
                 'gender': resource.get('gender', 'unknown'),
                 'mrn': mrn,
+                'ssn': ssn,
                 'phone': phone,
                 'email': email,
                 'address': address,
@@ -181,7 +272,7 @@ class EpicPatient(models.Model):
                 updated += 1
             else:
                 vals['epic_id'] = epic_id
-                self.create(vals)
+                self.with_context(sync_from_epic=True).create(vals)
                 created += 1
 
         return {

@@ -4,3 +4,5 @@ from . import epic_fhir_mixin
 from . import epic_practitioner
 from . import epic_appointment
 from . import epic_patient
+from . import epic_allergy
+from . import epic_condition
