@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- App category -->
+    <record id="module_category_nhs_epic" model="ir.module.category">
+        <field name="name">NHS Trust | Epic Integration</field>
+        <field name="description">Role-based access for NHS Trust operations with Epic EHR integration.</field>
+        <field name="sequence">200</field>
+    </record>
+
+    <!-- Privilege (the role-selector shown on the user form in Odoo 19) -->
+    <record id="privilege_nhs_access_level" model="res.groups.privilege">
+        <field name="name">NHS Trust Access Level</field>
+        <field name="category_id" ref="module_category_nhs_epic"/>
+        <field name="sequence">10</field>
+        <field name="placeholder">No Access</field>
+    </record>
+
+    <!-- Receptionist: appointments and patient demographics -->
+    <record id="group_nhs_receptionist" model="res.groups">
+        <field name="name">Receptionist</field>
+        <field name="privilege_id" ref="privilege_nhs_access_level"/>
+        <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+        <field name="comment">Can manage appointments and view patient demographics. No access to clinical records.</field>
+    </record>
+
+    <!-- Clinician: full clinical access -->
+    <record id="group_nhs_clinician" model="res.groups">
+        <field name="name">Clinician</field>
+        <field name="privilege_id" ref="privilege_nhs_access_level"/>
+        <field name="implied_ids" eval="[Command.link(ref('group_nhs_receptionist'))]"/>
+        <field name="comment">Full access to patient records, clinical notes, allergies and conditions.</field>
+    </record>
+
+    <!-- Trust Administrator: full system access -->
+    <record id="group_nhs_trust_admin" model="res.groups">
+        <field name="name">Trust Administrator</field>
+        <field name="privilege_id" ref="privilege_nhs_access_level"/>
+        <field name="implied_ids" eval="[Command.link(ref('group_nhs_clinician'))]"/>
+        <field name="comment">Full administrative access including Epic API configuration and ward management.</field>
+    </record>
+</odoo>

@@ -4,6 +4,20 @@ from odoo import models, fields
 class ResCompany(models.Model):
     _inherit = 'res.company'
 
+    # --- NHS Trust Identity ---
+    nhs_ods_code = fields.Char(string='ODS Organisation Code', help='NHS Organisation Data Service code (e.g. RJ1, RQM).')
+    nhs_cqc_number = fields.Char(string='CQC Registration Number', help='Care Quality Commission registration number.')
+    nhs_trust_type = fields.Selection([
+        ('acute', 'Acute Trust'),
+        ('mental_health', 'Mental Health Trust'),
+        ('community', 'Community Trust'),
+        ('ambulance', 'Ambulance Trust'),
+        ('foundation', 'NHS Foundation Trust'),
+        ('specialist', 'Specialist Trust'),
+        ('integrated', 'Integrated Care Board'),
+    ], string='Trust Type')
+    nhs_trust_region = fields.Char(string='NHS England Region', help='e.g. London, South East, North West.')
+
     # --- Epic API Connection ---
     epic_client_id = fields.Char(string='Epic Client ID')
     epic_non_production_client_id = fields.Char(string='Epic Non-Production Client ID')
@@ -29,6 +43,10 @@ class ResCompany(models.Model):
 
     # --- Allergy Search ---
     epic_allergy_search_patient = fields.Char(string='Allergy Search Patient Epic ID')
+
+    # --- Clinical Notes Search ---
+    epic_clinical_note_search_patient = fields.Char(string='Clinical Note Search Patient Epic ID')
+    epic_clinical_note_search_type = fields.Char(string='Clinical Note Type Filter')
 
     # --- Condition Search ---
     epic_condition_search_patient = fields.Char(string='Condition Search Patient Epic ID')

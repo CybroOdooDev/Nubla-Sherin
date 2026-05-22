@@ -7,92 +7,146 @@
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
-                <app data-string="Epic Integration" string="Epic Integration" name="epic_integration" groups="base.group_system">
+                <app data-string="NHS Trust | Epic Integration"
+                     string="NHS Trust | Epic Integration"
+                     name="epic_integration"
+                     groups="base.group_system">
 
-                    <block title="Epic API Configuration" name="epic_api_config">
-                        <setting string="Test Connection" help="Verify your Epic credentials and see which scopes are granted.">
-                            <button string="Test Connection" type="object" name="action_test_epic_connection" class="btn-primary"/>
+                    <!-- NHS Trust Details -->
+                    <block title="NHS Trust Details" name="nhs_trust_details">
+                        <setting string="Trust Type">
+                            <field name="nhs_trust_type"/>
                         </setting>
-                        <setting string="Epic Environment" help="Select which environment you are connecting to.">
+                        <setting string="ODS Organisation Code"
+                                 help="NHS Organisation Data Service code — e.g. RJ1, RQM, RA4.">
+                            <field name="nhs_ods_code" placeholder="e.g. RJ1"/>
+                        </setting>
+                        <setting string="CQC Registration Number"
+                                 help="Care Quality Commission registration number.">
+                            <field name="nhs_cqc_number" placeholder="e.g. 1-123456789"/>
+                        </setting>
+                        <setting string="NHS England Region">
+                            <field name="nhs_trust_region" placeholder="e.g. London"/>
+                        </setting>
+                    </block>
+
+                    <!-- Epic API Connection -->
+                    <block title="Epic API Configuration" name="epic_api_config">
+                        <setting string="Test Connection"
+                                 help="Verify your Epic credentials and inspect granted scopes.">
+                            <button string="Test Connection" type="object"
+                                    name="action_test_epic_connection" class="btn-primary"/>
+                        </setting>
+                        <setting string="Epic Environment">
                             <field name="epic_environment"/>
                         </setting>
-                        <setting string="Epic Client ID" help="Production Client ID from Epic App Orchard.">
+                        <setting string="Production Client ID"
+                                 help="Client ID from Epic App Orchard (production).">
                             <field name="epic_client_id"/>
                         </setting>
-                        <setting string="Epic Non-Production Client ID" help="Sandbox/testing Client ID from Epic App Orchard.">
+                        <setting string="Non-Production Client ID"
+                                 help="Client ID for sandbox / testing (Open Epic).">
                             <field name="epic_non_production_client_id"/>
                         </setting>
-                        <setting string="Epic Token Endpoint" help="OAuth 2.0 token URL from Epic.">
+                        <setting string="Token Endpoint"
+                                 help="OAuth 2.0 token URL — e.g. https://fhir.epic.com/interconnect-fhir-oauth/oauth2/token">
                             <field name="epic_token_endpoint" widget="url"/>
                         </setting>
-                        <setting string="Epic FHIR Base URL" help="Base URL for Epic's FHIR API.">
+                        <setting string="FHIR Base URL"
+                                 help="Epic FHIR R4 base — e.g. https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4">
                             <field name="epic_fhir_base_url" widget="url"/>
                         </setting>
-                        <setting string="Epic Private Key" help="RS384 PEM private key used to sign the JWT.">
+                        <setting string="Private Key (RS384 PEM)"
+                                 help="RS384 PEM private key for JWT signing. Starts with -----BEGIN.">
                             <field name="epic_private_key" class="w-100"/>
                         </setting>
-                        <setting string="Epic JWKS (Public Key)" help="Paste your JWKS JSON here. Odoo hosts it at /epic/jwks.json">
+                        <setting string="JWKS (Public Key JSON)"
+                                 help="Paste your JWKS JSON here. Odoo serves it at /epic/jwks.json for Epic to verify JWT signatures.">
                             <field name="epic_jwks" class="w-100"/>
                         </setting>
                     </block>
 
-                    <block title="Practitioner Sync Defaults" name="epic_practitioner_sync_defaults">
-                        <setting string="Search Identifier" help="FHIR `identifier` parameter.">
+                    <!-- Staff Sync -->
+                    <block title="Staff Sync Defaults" name="epic_practitioner_sync_defaults">
+                        <setting string="Search Identifier">
                             <field name="epic_practitioner_search_identifier"/>
                         </setting>
-                        <setting string="Search Family (Last Name)" help="FHIR `family` parameter.">
+                        <setting string="Search Family (Last Name)">
                             <field name="epic_practitioner_search_family"/>
                         </setting>
-                        <setting string="Search Given (First Name)" help="FHIR `given` parameter.">
+                        <setting string="Search Given (First Name)">
                             <field name="epic_practitioner_search_given"/>
                         </setting>
-                        <setting string="Search Name (Full Name)" help="FHIR `name` parameter.">
+                        <setting string="Search Name (Full Name)">
                             <field name="epic_practitioner_search_name"/>
                         </setting>
                     </block>
 
+                    <!-- Appointment Sync -->
                     <block title="Appointment Sync Defaults" name="epic_appointment_sync_defaults">
-                        <setting string="Date From" help="Fetch appointments on or after this date. FHIR `date=ge{date}`.">
+                        <setting string="Date From">
                             <field name="epic_appointment_search_date"/>
                         </setting>
-                        <setting string="Status Filter" help="Optional. E.g. booked, arrived, fulfilled, cancelled.">
+                        <setting string="Status Filter" help="e.g. booked, arrived, fulfilled, cancelled.">
                             <field name="epic_appointment_search_status" placeholder="e.g. booked"/>
                         </setting>
-                        <setting string="Patient ID" help="Optional. Epic FHIR Patient ID to filter appointments.">
+                        <setting string="Patient Epic ID">
                             <field name="epic_appointment_search_patient"/>
                         </setting>
                     </block>
 
-                    <block title="Allergy Sync Defaults" name="epic_allergy_sync_defaults">
-                        <setting string="Patient Epic ID" help="Epic FHIR Patient ID to fetch allergies for.">
-                            <field name="epic_allergy_search_patient" placeholder="e.g. ejwmLhJPukP2qXnej7TB91A3"/>
-                        </setting>
-                    </block>
-
-                    <block title="Condition Sync Defaults" name="epic_condition_sync_defaults">
-                        <setting string="Patient Epic ID" help="Epic FHIR Patient ID to fetch conditions for.">
-                            <field name="epic_condition_search_patient" placeholder="e.g. ejwmLhJPukP2qXnej7TB91A3"/>
-                        </setting>
-                        <setting string="Category Filter" help="Optional. Filter by condition category.">
-                            <field name="epic_condition_search_category"/>
-                        </setting>
-                    </block>
-
+                    <!-- Patient Sync -->
                     <block title="Patient Sync Defaults" name="epic_patient_sync_defaults">
-                        <setting string="Search Family (Last Name)" help="FHIR `family` parameter. Fill this — leave Search Name empty.">
+                        <setting string="Search Family (Last Name)">
                             <field name="epic_patient_search_family" placeholder="e.g. Smith"/>
                         </setting>
-                        <setting string="Search Name (Full Name)" help="FHIR `name` parameter. Use only if Search Family is empty.">
+                        <setting string="Search Name (Full Name)"
+                                 help="Use only when Search Family is empty.">
                             <field name="epic_patient_search_name"/>
                         </setting>
-                        <setting string="Search Given (First Name)" help="FHIR `given` parameter.">
+                        <setting string="Search Given (First Name)">
                             <field name="epic_patient_search_given"/>
                         </setting>
-                        <setting string="Search Identifier (MRN)" help="FHIR `identifier` parameter.">
+                        <setting string="Search Identifier (MRN)">
                             <field name="epic_patient_search_identifier"/>
                         </setting>
-                        <setting string="Search Birthdate" help="FHIR `birthdate` parameter.">
+                        <setting string="Search Birthdate">
                             <field name="epic_patient_search_birthdate"/>
+                        </setting>
+                    </block>
+
+                    <!-- Clinical Notes Sync -->
+                    <block title="Clinical Notes Sync Defaults" name="epic_clinical_note_sync_defaults">
+                        <setting string="Patient Epic ID"
+                                 help="Leave empty to sync for all patients.">
+                            <field name="epic_clinical_note_search_patient"
+                                   placeholder="e.g. erXuFYUfucBZaryVksYEcMg3"/>
+                        </setting>
+                        <setting string="Note Type Filter"
+                                 help="Optional LOINC code — leave empty for all note types.">
+                            <field name="epic_clinical_note_search_type"
+                                   placeholder="e.g. 11488-4"/>
+                        </setting>
+                    </block>
+
+                    <!-- Allergy Sync -->
+                    <block title="Allergy Sync Defaults" name="epic_allergy_sync_defaults">
+                        <setting string="Patient Epic ID"
+                                 help="Leave empty to sync for all patients.">
+                            <field name="epic_allergy_search_patient"
+                                   placeholder="e.g. erXuFYUfucBZaryVksYEcMg3"/>
+                        </setting>
+                    </block>
+
+                    <!-- Condition Sync -->
+                    <block title="Condition Sync Defaults" name="epic_condition_sync_defaults">
+                        <setting string="Patient Epic ID"
+                                 help="Leave empty to sync for all patients.">
+                            <field name="epic_condition_search_patient"
+                                   placeholder="e.g. erXuFYUfucBZaryVksYEcMg3"/>
+                        </setting>
+                        <setting string="Category Filter">
+                            <field name="epic_condition_search_category"/>
                         </setting>
                     </block>
 

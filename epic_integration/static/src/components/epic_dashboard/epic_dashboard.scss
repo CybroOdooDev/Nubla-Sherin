@@ -1,0 +1,160 @@
+// NHS Trust | Epic Dashboard styles
+// NHS colour palette: Blue #003087 / #005EB8, Aqua #41B6E6, Green #007F3B, Red #D5281B, Yellow #FFB81C
+
+.o_epic_dashboard {
+    padding: 24px 28px;
+    background: #f4f6f8;
+    min-height: 100%;
+    font-family: "Frutiger", "Arial Narrow", Arial, sans-serif;
+}
+
+// ── Header ──────────────────────────────────────────────────────────────────
+.o_epic_dashboard_header {
+    h3 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #003087;
+    }
+}
+
+// ── KPI Cards ────────────────────────────────────────────────────────────────
+.o_epic_kpi_row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+
+    @media (max-width: 1200px) { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 768px)  { grid-template-columns: repeat(2, 1fr); }
+}
+
+.o_epic_kpi_card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    border-left: 4px solid transparent;
+    overflow: hidden;
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    }
+}
+
+// Per-card accent colours
+.o_epic_kpi_patients    { border-left-color: #005EB8; .o_epic_kpi_icon { background: #e6f0fb; color: #005EB8; } }
+.o_epic_kpi_appointments{ border-left-color: #41B6E6; .o_epic_kpi_icon { background: #e9f7fc; color: #41B6E6; } }
+.o_epic_kpi_allergies   { border-left-color: #D5281B; .o_epic_kpi_icon { background: #fce9e7; color: #D5281B; } }
+.o_epic_kpi_conditions  { border-left-color: #007F3B; .o_epic_kpi_icon { background: #e5f3ec; color: #007F3B; } }
+.o_epic_kpi_notes       { border-left-color: #FFB81C; .o_epic_kpi_icon { background: #fff8e6; color: #cc9216; } }
+.o_epic_kpi_staff       { border-left-color: #003087; .o_epic_kpi_icon { background: #e6e8f0; color: #003087; } }
+
+.o_epic_kpi_icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.o_epic_kpi_body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.o_epic_kpi_value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1a1a2e;
+    line-height: 1;
+}
+
+.o_epic_kpi_label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #6c757d;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.o_epic_kpi_sub {
+    font-size: 0.72rem;
+    color: #9ca3af;
+    margin-top: 3px;
+
+    .badge { font-size: 0.65rem; }
+}
+
+// ── Chart Grid ───────────────────────────────────────────────────────────────
+.o_epic_charts_row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+
+    @media (max-width: 1024px) { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 640px)  { grid-template-columns: 1fr; }
+}
+
+.o_epic_chart_card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+.o_epic_chart_title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #003087;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 14px;
+}
+
+.o_epic_chart_container {
+    height: 200px;
+    position: relative;
+}
+
+// ── Criticality Summary Card ──────────────────────────────────────────────────
+.o_epic_summary_card {
+    display: flex;
+    flex-direction: column;
+}
+
+.o_epic_criticality_summary {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+    padding: 8px 0;
+}
+
+.o_epic_crit_row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+
+    span { flex: 1; color: #495057; }
+    strong { font-size: 1.5rem; font-weight: 800; }
+
+    .fa-circle { font-size: 10px; }
+}
+
+.o_epic_crit_high  { strong { color: #D5281B; } .fa-circle { color: #D5281B; } }
+.o_epic_crit_low   { strong { color: #FFB81C; } .fa-circle { color: #FFB81C; } }
+.o_epic_crit_total { strong { color: #003087; } .fa-circle { color: #003087; } }

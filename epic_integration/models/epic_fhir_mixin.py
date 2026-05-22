@@ -18,7 +18,7 @@ class EpicFhirMixin(models.AbstractModel):
     _name = 'epic.fhir.mixin'
     _description = 'Epic FHIR Shared Authentication Mixin'
 
-    def _epic_get_access_token(self, company):
+    def _epic_get_access_token(self, company, scope=None):
         if not jwt:
             raise exceptions.UserError("PyJWT library required. Run: pip install PyJWT")
 
@@ -63,14 +63,18 @@ class EpicFhirMixin(models.AbstractModel):
         if isinstance(encoded_jwt, bytes):
             encoded_jwt = encoded_jwt.decode('utf-8')
 
+        token_data = {
+            'grant_type': 'client_credentials',
+            'client_assertion_type': 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
+            'client_assertion': encoded_jwt,
+        }
+        if scope:
+            token_data['scope'] = scope
+
         response = requests.post(
             token_endpoint,
             headers={'Content-Type': 'application/x-www-form-urlencoded'},
-            data={
-                'grant_type': 'client_credentials',
-                'client_assertion_type': 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-                'client_assertion': encoded_jwt,
-            },
+            data=token_data,
             timeout=15,
         )
         if not response.ok:

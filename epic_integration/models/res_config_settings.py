@@ -17,7 +17,13 @@ except ImportError:
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
-    # Connection
+    # --- NHS Trust ---
+    nhs_ods_code = fields.Char(related='company_id.nhs_ods_code', readonly=False)
+    nhs_cqc_number = fields.Char(related='company_id.nhs_cqc_number', readonly=False)
+    nhs_trust_type = fields.Selection(related='company_id.nhs_trust_type', readonly=False)
+    nhs_trust_region = fields.Char(related='company_id.nhs_trust_region', readonly=False)
+
+    # --- Connection ---
     epic_client_id = fields.Char(related='company_id.epic_client_id', readonly=False)
     epic_non_production_client_id = fields.Char(related='company_id.epic_non_production_client_id', readonly=False)
     epic_environment = fields.Selection(related='company_id.epic_environment', readonly=False)
@@ -26,25 +32,29 @@ class ResConfigSettings(models.TransientModel):
     epic_token_endpoint = fields.Char(related='company_id.epic_token_endpoint', readonly=False)
     epic_fhir_base_url = fields.Char(related='company_id.epic_fhir_base_url', readonly=False)
 
-    # Practitioner
+    # --- Practitioner ---
     epic_practitioner_search_identifier = fields.Char(related='company_id.epic_practitioner_search_identifier', readonly=False)
     epic_practitioner_search_family = fields.Char(related='company_id.epic_practitioner_search_family', readonly=False)
     epic_practitioner_search_given = fields.Char(related='company_id.epic_practitioner_search_given', readonly=False)
     epic_practitioner_search_name = fields.Char(related='company_id.epic_practitioner_search_name', readonly=False)
 
-    # Appointment
+    # --- Appointment ---
     epic_appointment_search_date = fields.Date(related='company_id.epic_appointment_search_date', readonly=False)
     epic_appointment_search_status = fields.Char(related='company_id.epic_appointment_search_status', readonly=False)
     epic_appointment_search_patient = fields.Char(related='company_id.epic_appointment_search_patient', readonly=False)
 
-    # Allergy
+    # --- Clinical Notes ---
+    epic_clinical_note_search_patient = fields.Char(related='company_id.epic_clinical_note_search_patient', readonly=False)
+    epic_clinical_note_search_type = fields.Char(related='company_id.epic_clinical_note_search_type', readonly=False)
+
+    # --- Allergy ---
     epic_allergy_search_patient = fields.Char(related='company_id.epic_allergy_search_patient', readonly=False)
 
-    # Condition
+    # --- Condition ---
     epic_condition_search_patient = fields.Char(related='company_id.epic_condition_search_patient', readonly=False)
     epic_condition_search_category = fields.Selection(related='company_id.epic_condition_search_category', readonly=False)
 
-    # Patient
+    # --- Patient ---
     epic_patient_search_name = fields.Char(related='company_id.epic_patient_search_name', readonly=False)
     epic_patient_search_family = fields.Char(related='company_id.epic_patient_search_family', readonly=False)
     epic_patient_search_given = fields.Char(related='company_id.epic_patient_search_given', readonly=False)
@@ -63,7 +73,9 @@ class ResConfigSettings(models.TransientModel):
         fhir_base = (company.epic_fhir_base_url or '').rstrip('/')
 
         if not all([client_id, private_key, token_endpoint, fhir_base]):
-            raise exceptions.UserError("Please fill in all Epic API Configuration fields before testing.")
+            raise exceptions.UserError(
+                "Please fill in all Epic API Configuration fields before testing."
+            )
 
         lines = []
 
@@ -107,20 +119,27 @@ class ResConfigSettings(models.TransientModel):
             token_data = resp.json()
             access_token = token_data.get('access_token')
             granted_scope = token_data.get('scope', '(none granted)')
-            lines.append(f"✔ Token obtained.")
-            lines.append(f"   Scopes granted by Epic: {granted_scope}")
+            lines.append("✔ Access token obtained.")
+            lines.append(f"   Scopes granted: {granted_scope}")
             if not access_token:
-                raise exceptions.UserError("Token response had no access_token.")
+                raise exceptions.UserError("Token response contained no access_token.")
         except exceptions.UserError:
             raise
         except Exception as e:
             raise exceptions.UserError(f"Token request error: {e}")
 
         try:
-            meta_url = (fhir_base + '/metadata') if '/api/FHIR/' in fhir_base else (fhir_base + '/api/FHIR/R4/metadata')
+            meta_url = (
+                fhir_base + '/metadata'
+                if '/api/FHIR/' in fhir_base
+                else fhir_base + '/api/FHIR/R4/metadata'
+            )
             meta_resp = requests.get(meta_url, headers={'Accept': 'application/json'}, timeout=15)
-            lines.append(f"✔ FHIR Base URL reachable (metadata OK)." if meta_resp.ok
-                         else f"✘ FHIR metadata returned {meta_resp.status_code} — check FHIR Base URL.")
+            lines.append(
+                "✔ FHIR Base URL reachable (metadata OK)."
+                if meta_resp.ok
+                else f"✘ FHIR metadata returned {meta_resp.status_code} — check FHIR Base URL."
+            )
         except Exception as e:
             lines.append(f"✘ Could not reach FHIR Base URL: {e}")
 
@@ -136,28 +155,35 @@ class ResConfigSettings(models.TransientModel):
 
         if search_params:
             try:
-                prac_url = (fhir_base + '/Practitioner') if '/api/FHIR/' in fhir_base else (fhir_base + '/api/FHIR/R4/Practitioner')
+                prac_url = (
+                    fhir_base + '/Practitioner'
+                    if '/api/FHIR/' in fhir_base
+                    else fhir_base + '/api/FHIR/R4/Practitioner'
+                )
                 prac_resp = requests.get(
                     prac_url,
                     headers={'Authorization': f'Bearer {access_token}', 'Accept': 'application/json'},
-                    params=search_params, timeout=15,
+                    params=search_params,
+                    timeout=15,
                 )
                 if prac_resp.ok:
                     count = len(prac_resp.json().get('entry', []))
-                    lines.append(f"✔ Practitioner search succeeded! Found {count} result(s).")
+                    lines.append(f"✔ Practitioner search succeeded — {count} result(s) found.")
                     if count == 0:
                         lines.append("   (No practitioners matched — try a different search filter.)")
                 else:
                     www_auth = prac_resp.headers.get('WWW-Authenticate', '')
                     lines.append(f"✘ Practitioner search failed ({prac_resp.status_code}).")
                     if 'insufficient_scope' in www_auth:
-                        lines.append("   Cause: insufficient_scope — add Practitioner.Read/Search (R4) to Epic app.")
+                        lines.append(
+                            "   Cause: insufficient_scope — add Practitioner.Read/Search (R4) to Epic app."
+                        )
                     else:
                         lines.append(f"   Detail: {prac_resp.text[:300]}")
             except Exception as e:
                 lines.append(f"✘ Practitioner search error: {e}")
         else:
-            lines.append("ℹ No practitioner search parameter configured — skipped.")
+            lines.append("ℹ No practitioner search parameter configured — staff search skipped.")
 
         message = '\n'.join(lines)
         _logger.info("Epic connection test:\n%s", message)

@@ -87,8 +87,4 @@
         </field>
     </record>
 
-    <!-- Menu Item -->
-    <menuitem id="menu_epic_conditions" name="Conditions"
-              parent="menu_epic_integration_root"
-              action="action_epic_condition" sequence="40"/>
 </odoo>

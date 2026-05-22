@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Restore Appointments menu to epic.appointment (reverts appointment_type_epic_views) -->
+    <record id="menu_epic_appointments" model="ir.ui.menu">
+        <field name="action" ref="action_epic_appointment"/>
+        <field name="name">Appointments</field>
+    </record>
+
+    <!-- Deactivate the Synced Appointments sub-menu added during the appointment module integration -->
+    <menuitem id="menu_epic_synced_appointments"
+              name="Synced Appointments (Epic)"
+              parent="menu_epic_clinical"
+              action="action_epic_appointment"
+              sequence="35"
+              active="False"
+              groups="epic_integration.group_nhs_clinician"/>
+</odoo>

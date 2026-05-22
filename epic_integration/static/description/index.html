@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #333; margin: 0; padding: 0; }
+        .hero { background: linear-gradient(135deg, #003087 0%, #005EB8 100%); color: #fff; padding: 48px 40px; }
+        .hero h1 { margin: 0 0 12px; font-size: 2.2em; font-weight: 700; }
+        .hero p { margin: 0; font-size: 1.1em; opacity: 0.92; max-width: 700px; }
+        .nhs-bar { background: #005EB8; height: 6px; }
+        .badge { display: inline-block; background: #41B6E6; color: #fff; border-radius: 4px; padding: 3px 10px; font-size: 0.8em; margin: 4px 4px 4px 0; font-weight: 600; }
+        .badge.green { background: #009639; }
+        .badge.purple { background: #330072; }
+        section { padding: 36px 40px; border-bottom: 1px solid #e8e8e8; }
+        section:last-child { border-bottom: none; }
+        h2 { color: #003087; font-size: 1.4em; margin-bottom: 16px; }
+        h3 { color: #005EB8; font-size: 1.05em; margin: 20px 0 8px; }
+        .features { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; margin-top: 16px; }
+        .feature-card { border: 1px solid #d0e4f0; border-radius: 8px; padding: 20px; background: #f8fbfe; }
+        .feature-card .icon { font-size: 2em; margin-bottom: 10px; }
+        .feature-card h3 { margin: 0 0 8px; color: #003087; font-size: 1em; }
+        .feature-card p { margin: 0; font-size: 0.9em; color: #555; line-height: 1.5; }
+        .steps { counter-reset: step; }
+        .step { display: flex; gap: 16px; margin-bottom: 16px; align-items: flex-start; }
+        .step-num { background: #005EB8; color: #fff; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; font-size: 0.9em; }
+        .step-body h4 { margin: 0 0 4px; font-size: 0.95em; }
+        .step-body p { margin: 0; font-size: 0.85em; color: #666; }
+        .scope-table { width: 100%; border-collapse: collapse; font-size: 0.9em; margin-top: 12px; }
+        .scope-table th { background: #003087; color: #fff; padding: 8px 12px; text-align: left; }
+        .scope-table td { padding: 7px 12px; border-bottom: 1px solid #eee; }
+        .scope-table tr:nth-child(even) td { background: #f5f8fb; }
+        code { background: #f0f4f8; border-radius: 3px; padding: 1px 5px; font-family: monospace; font-size: 0.88em; }
+        ul { padding-left: 20px; line-height: 1.8; }
+        .roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 12px; }
+        .role-card { border-radius: 8px; padding: 16px; }
+        .role-card.admin { background: #fef3e2; border-left: 4px solid #f0a500; }
+        .role-card.clinician { background: #e8f5e9; border-left: 4px solid #009639; }
+        .role-card.receptionist { background: #e3f2fd; border-left: 4px solid #41B6E6; }
+        .role-card h3 { margin: 0 0 8px; font-size: 0.95em; }
+        .role-card ul { margin: 0; padding-left: 16px; font-size: 0.85em; color: #555; }
+    </style>
+</head>
+<body>
+
+<div class="nhs-bar"></div>
+<div class="hero">
+    <h1>NHS Trust | Epic Integration</h1>
+    <p>A complete Odoo module for NHS Trusts — sync patients, clinical notes, appointments, allergies and conditions directly from your Epic EHR system using the FHIR R4 API.</p>
+    <br/>
+    <span class="badge">FHIR R4</span>
+    <span class="badge">Epic EHR</span>
+    <span class="badge green">NHS-Ready</span>
+    <span class="badge purple">Odoo 19</span>
+</div>
+
+<section>
+    <h2>Overview</h2>
+    <p>
+        This module bridges your NHS Trust's operational workflows in Odoo with your Epic Electronic Health Record system.
+        Using Epic's SMART on FHIR Backend Services (OAuth2 + JWT), it securely authenticates as a backend system
+        and synchronises clinical data in real time — no patient login required.
+    </p>
+    <p style="margin-top:12px;">
+        Built with NHS-specific data requirements in mind: NHS numbers, ODS organisation codes, CQC registration,
+        ward management, GMC/NMC staff identifiers, and NHS ethnic group classifications are all supported out of the box.
+    </p>
+</section>
+
+<section>
+    <h2>Key Features</h2>
+    <div class="features">
+        <div class="feature-card">
+            <div class="icon">🏥</div>
+            <h3>Ward Management</h3>
+            <p>Manage NHS wards and departments — General, ICU, HDU, Maternity, A&amp;E, Oncology and more. Track bed capacity and current patient census per ward.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">🧑‍⚕️</div>
+            <h3>Patient Records</h3>
+            <p>Full NHS patient profiles with NHS Number, ward assignment, GP details, blood type, next of kin, and NHS ethnic group codes (16+1 classification).</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">📅</div>
+            <h3>Appointment Sync</h3>
+            <p>Pull appointment schedules from Epic with status tracking (booked, arrived, fulfilled, cancelled). Filter by date, patient, or status.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">📋</div>
+            <h3>Clinical Notes</h3>
+            <p>Sync DocumentReference clinical notes from Epic including full HTML and plain-text content. Supports multiple note types via LOINC codes.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">⚠️</div>
+            <h3>Allergies &amp; Intolerances</h3>
+            <p>Bi-directional allergy management — pull from Epic and push new records back. Includes criticality, reaction severity, substance codes (SNOMED/RxNorm).</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">🩺</div>
+            <h3>Conditions / Diagnoses</h3>
+            <p>Sync problem lists and encounter diagnoses from Epic. Push new conditions with ICD-10/SNOMED coding. Tracks clinical and verification status.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">👨‍⚕️</div>
+            <h3>Clinical Staff</h3>
+            <p>Practitioner records with GMC number, NMC Pin, specialty, department and role (Consultant, Registrar, Nurse, GP, Pharmacist, etc.).</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">🔐</div>
+            <h3>Role-Based Security</h3>
+            <p>Three NHS-specific roles: Trust Administrator, Clinician, and Receptionist — with carefully defined access rights for each clinical data type.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">🔗</div>
+            <h3>Secure FHIR Auth</h3>
+            <p>Uses Epic SMART Backend Services with RS384 JWT signing and JWKS public key hosting. Supports both sandbox (Open Epic) and production environments.</p>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>Role-Based Access Control</h2>
+    <div class="roles">
+        <div class="role-card admin">
+            <h3>Trust Administrator</h3>
+            <ul>
+                <li>Epic API configuration</li>
+                <li>Ward creation &amp; management</li>
+                <li>Full CRUD on all data</li>
+                <li>Staff management</li>
+            </ul>
+        </div>
+        <div class="role-card clinician">
+            <h3>Clinician</h3>
+            <ul>
+                <li>Patient records (create/edit)</li>
+                <li>Clinical notes</li>
+                <li>Allergies &amp; conditions</li>
+                <li>Appointments (view/edit)</li>
+            </ul>
+        </div>
+        <div class="role-card receptionist">
+            <h3>Receptionist</h3>
+            <ul>
+                <li>Patient demographics</li>
+                <li>Appointment booking</li>
+                <li>Read-only clinical data</li>
+                <li>Ward directory</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>Epic API Setup</h2>
+    <div class="steps">
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+                <h4>Register in Epic App Orchard</h4>
+                <p>Create a Backend Systems application at <code>open.epic.com</code>. Set Application Audience to <strong>Backend Systems</strong> and Use Case to <strong>General</strong>.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+                <h4>Add Required Incoming APIs</h4>
+                <p>Select all R4 variants of: Patient, Practitioner, PractitionerRole, Appointment, AllergyIntolerance, Condition, DocumentReference (Clinical Notes), and Binary (Clinical Notes).</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+                <h4>Generate RSA Key Pair</h4>
+                <p>Generate an RS384 key pair. Host the JWKS (public key) at <code>/epic/jwks.json</code> — Odoo serves this automatically from Settings.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+                <h4>Configure in Odoo Settings</h4>
+                <p>Go to <strong>Settings → NHS Trust | Epic Integration</strong>. Enter your Client IDs, token endpoint, FHIR base URL, private key, and JWKS. Click <strong>Test Connection</strong> to verify.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+                <h4>Start Syncing</h4>
+                <p>Use the <strong>Sync from Epic</strong> buttons on each list view to pull data. Push patient, allergy, and condition records back to Epic using the <strong>Push to Epic</strong> button on individual records.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>Required Epic API Scopes</h2>
+    <table class="scope-table">
+        <tr><th>Feature</th><th>Required Scope / API</th></tr>
+        <tr><td>Patient Sync</td><td><code>system/Patient.read</code> — Patient.Read (R4), Patient.Search (R4)</td></tr>
+        <tr><td>Patient Push</td><td><code>system/Patient.write</code> — Patient.Create (Demographics) (R4)</td></tr>
+        <tr><td>Practitioners</td><td><code>system/Practitioner.read</code> — Practitioner.Read (R4), Practitioner.Search (R4)</td></tr>
+        <tr><td>Appointments</td><td><code>system/Appointment.read</code> — Appointment.Read (R4), Appointment.Search (R4)</td></tr>
+        <tr><td>Allergies (read)</td><td><code>system/AllergyIntolerance.read</code> — AllergyIntolerance.Read (R4), .Search (R4)</td></tr>
+        <tr><td>Allergies (push)</td><td><code>system/AllergyIntolerance.write</code> — AllergyIntolerance.Create (R4)</td></tr>
+        <tr><td>Conditions (read)</td><td><code>system/Condition.read</code> — Condition.Read (R4), .Search (R4)</td></tr>
+        <tr><td>Conditions (push)</td><td><code>system/Condition.write</code> — Condition.Create (R4)</td></tr>
+        <tr><td>Clinical Notes</td><td>DocumentReference.Read (Clinical Notes) (R4), .Search (Clinical Notes) (R4), Binary.Read (Clinical Notes) (R4)</td></tr>
+    </table>
+</section>
+
+<section>
+    <h2>Technical Requirements</h2>
+    <ul>
+        <li>Odoo 19 (Community or Enterprise)</li>
+        <li>Python package: <code>PyJWT</code> — install via <code>pip install PyJWT</code></li>
+        <li>Epic App Orchard account (open.epic.com for sandbox testing)</li>
+        <li>RS384 RSA key pair (2048-bit minimum)</li>
+    </ul>
+</section>
+
+</body>
+</html>

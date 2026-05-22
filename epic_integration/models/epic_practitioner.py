@@ -7,32 +7,58 @@ try:
     import jwt
 except ImportError:
     jwt = None
-    _logger.warning("PyJWT library not found. Epic Integration will not be able to generate JWT assertions.")
+    _logger.warning("PyJWT library not found. Epic Integration requires PyJWT for JWT assertions.")
 
 
 class EpicPractitioner(models.Model):
     _name = 'epic.practitioner'
-    _description = 'Epic Practitioner'
+    _description = 'NHS Clinical Staff'
     _inherit = ['epic.fhir.mixin']
+    _order = 'name'
 
-    name = fields.Char(string='Name', required=True)
+    # --- Core ---
+    name = fields.Char(string='Full Name', required=True)
     epic_id = fields.Char(string='Epic FHIR ID', required=True, index=True)
-    npi = fields.Char(string='NPI')
+    active = fields.Boolean(default=True)
     gender = fields.Selection([
         ('male', 'Male'),
         ('female', 'Female'),
         ('other', 'Other'),
         ('unknown', 'Unknown'),
     ], string='Gender')
-    telecom = fields.Char(string='Telecom')
-    active = fields.Boolean(string='Active', default=True)
+
+    # --- NHS Professional Identifiers ---
+    npi = fields.Char(string='NPI', help='US National Provider Identifier (from Epic).')
+    gmc_number = fields.Char(string='GMC Number', help='General Medical Council registration number.')
+    nmc_pin = fields.Char(string='NMC Pin', help='Nursing & Midwifery Council registration pin.')
+
+    # --- NHS Role & Department ---
+    role = fields.Selection([
+        ('consultant', 'Consultant'),
+        ('registrar', 'Registrar'),
+        ('junior_doctor', 'Junior Doctor / FY'),
+        ('gp', 'GP'),
+        ('nurse_consultant', 'Nurse Consultant'),
+        ('nurse', 'Nurse'),
+        ('specialist_nurse', 'Specialist Nurse'),
+        ('midwife', 'Midwife'),
+        ('pharmacist', 'Pharmacist'),
+        ('physiotherapist', 'Physiotherapist'),
+        ('occupational_therapist', 'Occupational Therapist'),
+        ('radiographer', 'Radiographer'),
+        ('other', 'Other'),
+    ], string='Role')
+    specialty = fields.Char(string='Specialty')
+    department = fields.Char(string='Department')
+    telecom = fields.Char(string='Contact')
 
     def action_sync_practitioners(self):
         if not jwt:
-            raise exceptions.UserError("The PyJWT python library is required. Please install it using 'pip install PyJWT'.")
+            raise exceptions.UserError(
+                "The PyJWT python library is required. Install it with: pip install PyJWT"
+            )
 
         company = self.env.company
-
         search_params = {}
         if company.epic_practitioner_search_identifier:
             search_params['identifier'] = company.epic_practitioner_search_identifier.strip()
@@ -45,8 +71,8 @@ class EpicPractitioner(models.Model):
 
         if not search_params:
             raise exceptions.UserError(
-                "Epic Practitioner sync uses the Practitioner.Search endpoint, which requires at least one search parameter.\n"
-                "Configure at least one of Identifier / Family / Given / Name under Settings > Epic Integration, then retry."
+                "Practitioner sync requires at least one search parameter.\n"
+                "Configure Identifier / Family / Given / Name under Settings > NHS Trust | Epic Integration."
             )
 
         access_token, _scope = self._epic_get_access_token(company)
@@ -67,38 +93,38 @@ class EpicPractitioner(models.Model):
                 continue
 
             epic_id = resource.get('id')
-
             names = resource.get('name', [])
-            full_name = "Unknown Name"
+            full_name = 'Unknown'
             if names:
-                first_name = names[0]
-                text_name = first_name.get('text')
-                if text_name:
-                    full_name = text_name
-                else:
-                    given = " ".join(first_name.get('given', []))
-                    family = first_name.get('family', '')
-                    full_name = f"{given} {family}".strip()
+                n = names[0]
+                text = n.get('text', '')
+                full_name = text or (
+                    f"{' '.join(n.get('given', []))} {n.get('family', '')}".strip() or 'Unknown'
+                )
 
-            npi = ''
+            npi = gmc_number = nmc_pin = ''
             for ident in resource.get('identifier', []):
-                if ident.get('system', '').endswith('hl7.org/fhir/sid/us-npi'):
+                system = ident.get('system', '')
+                if 'hl7.org/fhir/sid/us-npi' in system and not npi:
                     npi = ident.get('value', '')
-                    break
+                elif 'gmc-number' in system.lower() and not gmc_number:
+                    gmc_number = ident.get('value', '')
+                elif 'nmc' in system.lower() and not nmc_pin:
+                    nmc_pin = ident.get('value', '')
 
             telecoms = resource.get('telecom', [])
             telecom_val = telecoms[0].get('value', '') if telecoms else ''
 
-            gender = resource.get('gender', 'unknown')
-
-            existing = self.search([('epic_id', '=', epic_id)], limit=1)
             vals = {
                 'name': full_name,
                 'npi': npi,
-                'gender': gender,
+                'gmc_number': gmc_number,
+                'nmc_pin': nmc_pin,
+                'gender': resource.get('gender', 'unknown'),
                 'telecom': telecom_val,
                 'active': resource.get('active', True),
             }
+            existing = self.search([('epic_id', '=', epic_id)], limit=1)
             if existing:
                 existing.write(vals)
                 updated_count += 1
@@ -111,8 +137,9 @@ class EpicPractitioner(models.Model):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': 'Sync Complete',
-                'message': f'Synced practitioners from Epic. Created: {created_count}, Updated: {updated_count}',
+                'title': 'Staff Sync Complete',
+                'message': f'Synced clinical staff from Epic. Created: {created_count}, Updated: {updated_count}.',
+                'type': 'success',
                 'sticky': False,
             },
         }
