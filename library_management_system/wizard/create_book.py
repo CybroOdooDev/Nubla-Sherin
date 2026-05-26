@@ -80,7 +80,7 @@ class CreateBook(models.Model):
         product_obj = self.env['product.template'].search([])
         book_isbn_found = False
         for book in product_obj:
-            if book.isbn_number == isbn_10 or book.isbn_13_number == isbn_13:
+            if (isbn_10 and book.isbn_number == isbn_10) or (isbn_13 and book.isbn_13_number == isbn_13):
                 book_isbn_found = True
         return book_isbn_found
 
@@ -100,7 +100,7 @@ class CreateBook(models.Model):
                 'company_id': self.env.user.company_id.id,
                 'isbn_number': self.isbn_10,
                 'isbn_13_number': self.isbn_13,
-                'publisher_id': int(self.publisher_id.id),
+                'publisher_id': self.publisher_id.id,
                 'description': self.description,
                 'categories': self.categories,
                 'rating': self.averageRating,

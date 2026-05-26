@@ -21,7 +21,7 @@
 ###############################################################################
 {
     'name': 'Library Management  System',
-    'version': '19.0.1.0.1',
+    'version': '19.0.1.0.2',
     'category': 'Industries',
     'summary': """Advanced Library Management Module to Manage Books, Books Borrowing, Members, etc.""",
     'description': """Library Management System, Library Management, Odoo19, Books, Borrowing, ISBN, Book Importing, Library""",
