@@ -25,133 +25,110 @@ import base64
 from odoo.modules import get_module_resource
 
 
-def icons_post_init_hook(cr):
-    """post init hook for changing module icons"""
-    # env = api.Environment(cr, SUPERUSER_ID, {})
-    menu_item = cr['ir.ui.menu'].search([('parent_id', '=', False)])
+MENU_ICON_MAP = {
+    # Top-level menus whose icons are overwritten by this theme at install time.
+    "Contacts": "contact.png",
+    "Link Tracker": "link-tracker.png",
+    "Dashboards": "dashboard.png",
+    "Sales": "sales.png",
+    "Invoicing": "invoice.png",
+    "Inventory": "inventory.png",
+    "Purchase": "purchase.png",
+    "Calendar": "calendar.png",
+    "CRM": "crm.png",
+    "Notes": "notes.png",
+    "Website": "website.png",
+    "Point of Sale": "pos.png",
+    "Manufacturing": "manufacturing.png",
+    "Repairs": "repairs.png",
+    "Email Marketing": "marketing.png",
+    "SMS Marketing": "sms-marketing.png",
+    "Project": "project.png",
+    "Surveys": "surveys.png",
+    "Employees": "employees.png",
+    "Recruitment": "recruitment.png",
+    "Attendances": "attendance.png",
+    "Time Off": "time-off.png",
+    "Expenses": "expense.png",
+    "Maintenance": "maintenance.png",
+    "Live Chat": "live-chat.png",
+    "Lunch": "lunch.png",
+    "Fleet": "fleet.png",
+    "Timesheets": "timesheets.png",
+    "Events": "events.png",
+    "eLearning": "elearning.png",
+    "Members": "members.png",
+}
 
-    for menu in menu_item:
-        if menu.name == 'Contacts':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'contact.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Link Tracker':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'link-tracker.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Dashboards':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'dashboard.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Sales':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'sales.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Invoicing':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'invoice.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Inventory':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'inventory.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Purchase':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'purchase.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Calendar':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'calendar.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'CRM':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'crm.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Notes':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'notes.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Website':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'website.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Point of Sale':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'pos.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Manufacturing':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'manufacturing.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Repairs':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'repairs.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Email Marketing':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'marketing.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'SMS Marketing':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'sms-marketing.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Project':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'project.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Surveys':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'surveys.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Employees':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'employees.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Recruitment':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'recruitment.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Attendances':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'attendance.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Time Off':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'time-off.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Expenses':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'expense.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Maintenance':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'maintenance.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Live Chat':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'live-chat.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Lunch':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'lunch.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Fleet':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'fleet.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Timesheets':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'timesheets.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Events':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'events.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'eLearning':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'elearning.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
-        if menu.name == 'Members':
-            img_path = get_module_resource(
-                'backend_theme_infinito', 'static', 'src', 'img', 'icons', 'members.png')
-            menu.write({'web_icon_data': base64.b64encode(open(img_path, "rb").read())})
+
+def _theme_icon_b64(icon_filename):
+    img_path = get_module_resource(
+        "backend_theme_infinito", "static", "src", "img", "icons", icon_filename
+    )
+    with open(img_path, "rb") as f:
+        return base64.b64encode(f.read())
+
+
+def icons_post_init_hook(env):
+    """Post init hook for changing menu icons.
+
+    Note: This writes on existing `ir.ui.menu` records, so it must also be
+    reverted on uninstall to avoid leaving permanent UI changes behind.
+    """
+    menus = env["ir.ui.menu"].sudo().search([("parent_id", "=", False)])
+    for menu in menus:
+        filename = MENU_ICON_MAP.get(menu.name)
+        if not filename:
+            continue
+        menu.write({"web_icon_data": _theme_icon_b64(filename)})
+
+
+def icons_uninstall_hook(env):
+    """Uninstall hook to restore default icons.
+
+    Uninstalling a module does not rollback writes done on existing records.
+    This hook restores menu icons to their defaults if they were set by this theme.
+    """
+    Menu = env["ir.ui.menu"].sudo()
+
+    # Restore the `web_icon` overrides done by `views/icons.xml` first.
+    # In Odoo 18, the app grid uses `web_icon_data` attachments returned by
+    # `ir.ui.menu.load_menus()`. Restoring `web_icon` will also recompute and
+    # store `web_icon_data` via the core `write()` override.
+    def _restore_web_icon(xmlid, theme_value, default_value):
+        rec = env.ref(xmlid, raise_if_not_found=False)
+        if rec and rec.web_icon == theme_value:
+            rec.write({"web_icon": default_value})
+
+    _restore_web_icon(
+        "base.menu_administration",
+        "backend_theme_infinito,static/src/img/icons/settings.png",
+        "base,static/description/settings.png",
+    )
+    _restore_web_icon(
+        "base.menu_management",
+        "backend_theme_infinito,static/src/img/icons/apps.png",
+        "base,static/description/modules.png",
+    )
+    _restore_web_icon(
+        "mail.menu_root_discuss",
+        "backend_theme_infinito,static/src/img/icons/discuss.png",
+        "mail,static/description/icon.png",
+    )
+
+    # Restore menus that were overwritten via `web_icon_data` only if the stored
+    # data matches the theme's icon (avoid clobbering user customizations).
+    menus = Menu.search([("parent_id", "=", False)])
+    for menu in menus:
+        filename = MENU_ICON_MAP.get(menu.name)
+        if not filename:
+            continue
+        try:
+            if menu.web_icon_data and menu.web_icon_data == _theme_icon_b64(filename):
+                # Recompute the default icon data from the menu's `web_icon`.
+                # Clearing `web_icon_data` would result in the fallback cube icon.
+                menu.write({"web_icon": menu.web_icon})
+        except Exception:
+            # Best-effort restore: still try to recompute from `web_icon` so we don't
+            # leave the menu with a missing icon.
+            menu.write({"web_icon": menu.web_icon})

@@ -1,8 +1,5 @@
 /** @odoo-module **/
 import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
-const { onMounted, mount } = owl
-import { EditorClientAction } from "./editor_client_action"
 /**
  * EditorService module for managing editor-related functionality.
  */

@@ -2,12 +2,10 @@
 import { Component, useState } from "@odoo/owl";
 import { EditorMenu } from "./editor_menu"
 import { ThemeEditorSidebar } from "./theme_editor_sidebar"
-//import { jsonrpc } from "@web/core/network/rpc_service";
 import { rpc } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { ThemeStudioWidget } from "./ThemeStudioWidget";
-const { onMounted, mount, useEnv } = owl
+const { onMounted, onPatched, mount, useEnv } = owl
 /**
  * EditorClientAction class handles client actions for theme editing.
  */
@@ -19,6 +17,8 @@ export class EditorClientAction extends Component{
         super.setup();
         this.env= useEnv();
         this.dialog = useService("dialog");
+        this._mountedSidebar = null;
+        this._autoSelectTimer = null;
         var navbar= document.querySelector(".o_main_navbar")
         if (navbar) {
             navbar.style.display = "none";
@@ -76,6 +76,68 @@ export class EditorClientAction extends Component{
                 },],
             }
     ];
+
+
+        onMounted(() => this._syncMainOffsetForPresetSidebar());
+        if (onPatched) {
+            onPatched(() => this._syncMainOffsetForPresetSidebar());
+        }
+    }
+
+    _closePresetSidebar() {
+        try {
+            if (this._mountedSidebar?.destroy) {
+                this._mountedSidebar.destroy();
+            }
+        } catch {
+        }
+        this._mountedSidebar = null;
+        const existingSidebar = document.getElementById("theme_editor_sidebar_preset");
+        if (existingSidebar) existingSidebar.remove();
+        this._syncMainOffsetForPresetSidebar();
+    }
+
+    _autoSelectFirstPreviewItem(retries = 8) {
+        if (this._autoSelectTimer) {
+            clearTimeout(this._autoSelectTimer);
+            this._autoSelectTimer = null;
+        }
+        const pick = () => {
+            // Prefer leaf items that have both name and class (those are editable/stylable targets).
+            const el =
+                document.querySelector(".preview_area .item[data-name][data-class]") ||
+                document.querySelector(".preview_area .item[data-name]") ||
+                document.querySelector(".preview_area .item");
+            if (el) {
+                el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+                return true;
+            }
+            return false;
+        };
+        if (pick()) return;
+        if (retries <= 0) return;
+        this._autoSelectTimer = setTimeout(() => this._autoSelectFirstPreviewItem(retries - 1), 60);
+    }
+
+    _syncMainOffsetForPresetSidebar() {
+        const main = document.querySelector(".marg_main");
+        if (!main) return;
+
+        const presetSidebar = document.getElementById("theme_editor_sidebar_preset");
+        if (!presetSidebar) {
+            // Don't fight other sidebars (hamburger/simple editor).
+            const simpleSidebar = document.querySelector(".sidebar_simple_editor");
+            if (simpleSidebar || this.state.sidebarOpen) {
+                return;
+            }
+            main.style.marginLeft = "0px";
+            main.style.width = "100%";
+            return;
+        }
+
+        const width = Math.ceil(presetSidebar.getBoundingClientRect().width || 330);
+        main.style.marginLeft = `${width}px`;
+        main.style.width = `calc(100% - ${width}px)`;
     }
         /**
          * Handles button click event to switch between view types.
@@ -85,12 +147,23 @@ export class EditorClientAction extends Component{
     ev.preventDefault();
     const mode = ev.currentTarget.id;
 
-    // ✅ Close sidebar when switching UI elements
+
+    const hadPresetSidebar = !!document.getElementById("theme_editor_sidebar_preset");
+    if (hadPresetSidebar) {
+        this._closePresetSidebar();
+    }
+
     if (this.state.sidebarOpen) {
         this._closeSidebar();
     }
 
     this.state.viewType = mode;
+    setTimeout(() => {
+        this._syncMainOffsetForPresetSidebar();
+        if (hadPresetSidebar) {
+            this._autoSelectFirstPreviewItem();
+        }
+    }, 0);
 }
 _closeSidebar() {
     const main_div = document.querySelector('.marg_main');
@@ -111,28 +184,61 @@ _closeSidebar() {
     if (hamburger) {
         hamburger.classList.remove('open');
     }
+
+    this._syncMainOffsetForPresetSidebar();
 }
 
         /**
          * Handles item click event in the menu.
          * @param {Event} ev - The click event object.
          */
-        onItemClick(ev){
-            var object = ev
-            var elem_name = ev.currentTarget.dataset.name
-            var preset = ev.target.dataset.preset
-            var env= this.env;
-            var dialog = this.dialog;
-            ev.stopPropagation();
-            this.sidebar_pos = document.querySelector('.backend_theme_studio_sidebar .sidebar-here')
-            var sidebars=document.querySelector('.marg_main')
-            if (sidebars){
-                sidebars.style.marginLeft="340px";
-            }else{
-                sidebars.style.marginLeft="0px";
-            }
-            mount(ThemeEditorSidebar,document.body,{env,dialog, props:{elem_name,preset,object}})
-        }
+	        onItemClick(ev){
+	            try {
+	                if (this._mountedSidebar?.destroy) {
+	                    this._mountedSidebar.destroy();
+	                }
+	            } catch {
+	                // ignore
+	            }
+	            this._mountedSidebar = null;
+	            const existingSidebar = document.getElementById("theme_editor_sidebar_preset");
+	            if (existingSidebar) existingSidebar.remove();
+
+
+	            if (this.state.sidebarOpen || document.querySelector(".sidebar_simple_editor")) {
+	                this._closeSidebar();
+	            }
+
+	            const targetEl = ev.currentTarget;
+	            const object = { target: targetEl };
+	            var elem_name = targetEl.dataset.name
+	            var preset = (ev.target && ev.target.dataset && ev.target.dataset.preset) || targetEl.dataset.preset
+	            var env= this.env;
+		            var dialog = this.dialog;
+		            ev.stopPropagation();
+		            this.sidebar_pos = document.querySelector('.backend_theme_studio_sidebar .sidebar-here')
+		            const mounted = mount(ThemeEditorSidebar, document.body, {
+		                env,
+		                dialog,
+		                props: {
+		                    elem_name,
+		                    preset,
+		                    object,
+		                    onClose: () => this._closePresetSidebar(),
+		                },
+		            });
+		            if (mounted && typeof mounted.then === "function") {
+		                mounted.then((inst) => {
+		                    this._mountedSidebar = inst;
+		                    // Ensure the newly rendered view is shifted correctly.
+		                    this._syncMainOffsetForPresetSidebar();
+		                });
+		            } else {
+		                this._mountedSidebar = mounted;
+		                // Mount is sync in this build, but defer to be safe.
+		                setTimeout(() => this._syncMainOffsetForPresetSidebar(), 0);
+		            }
+		        }
         /**
          * Handles the event when the theme studio sidebar is closed.
          * @param {Event} ev - The click event object.
@@ -156,25 +262,31 @@ _closeSidebar() {
          * Toggles the sidebar visibility.
          * @param {Event} ev - The click event object.
          */
-        _onThemeStudioToggleSidebar (ev) {
-           ev.currentTarget.classList.toggle('open');
-           var main_div = document.querySelector('.marg_main');
-           this.state.sidebarOpen = !this.state.sidebarOpen;
-           ev.preventDefault();
-           if (main_div) {
-    if (this.state.sidebarOpen) {
-        mount(EditorMenu, document.body);
-        main_div.style.marginLeft = "340px";
-        main_div.style.width = "calc(100% - 340px)";
-    } else {
-
-        main_div.style.marginLeft = "0";
-        document.querySelector(".sidebar_simple_editor").remove();
-        main_div.style.width = "100%";
-    }
+	        _onThemeStudioToggleSidebar (ev) {
+	           ev.currentTarget.classList.toggle('open');
+	           var main_div = document.querySelector('.marg_main');
+	           this.state.sidebarOpen = !this.state.sidebarOpen;
+	           ev.preventDefault();
+	           if (main_div) {
+	    if (this.state.sidebarOpen) {
+	        // Never show the hamburger sidebar and the preset sidebar at the same time.
+	        // If a preset sidebar is open, close it before mounting the hamburger sidebar.
+	        if (document.getElementById("theme_editor_sidebar_preset")) {
+	            this._closePresetSidebar();
+	        }
+	        mount(EditorMenu, document.body);
+	        main_div.style.marginLeft = "340px";
+	        main_div.style.width = "calc(100% - 340px)";
+	    } else {
+	
+	        main_div.style.marginLeft = "0";
+	        const side = document.querySelector(".sidebar_simple_editor");
+	        if (side) side.remove();
+	        main_div.style.width = "100%";
+	    }
 }
 
-        }
+	        }
         /**
          * Sets the assets for the theme editor.
          */
@@ -182,8 +294,6 @@ _closeSidebar() {
             location.search = "?debug=assets";
         }
 }
-// Define the template for the EditorClientAction component
 EditorClientAction.template = "backend_theme_infinito.ThemeStudioMenu";
 
-// Register the EditorClientAction component in the actions registry
 registry.category("actions").add("backend_theme_infinito.editor_client_action",EditorClientAction);

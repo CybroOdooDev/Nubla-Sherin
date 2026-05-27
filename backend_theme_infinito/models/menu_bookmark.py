@@ -30,6 +30,6 @@ class InfinitoMenuBookmark(models.Model):
     _description = 'Menu Bookmark'
 
     name = fields.Char(related='action_id.name')
-    action_id = fields.Many2one('ir.actions.act_window')
+    action_id = fields.Many2one('ir.actions.act_window', ondelete='cascade')
     url = fields.Text('Url')
     user_id = fields.Many2one('res.users')

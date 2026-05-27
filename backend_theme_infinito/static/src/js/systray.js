@@ -1,17 +1,11 @@
 /* @odoo-module */
-// Importing necessary modules and components
 import { Component,useState } from "@odoo/owl";
 import { registry } from "@web/core/registry";
-import { session } from "@web/session";
 import { useService } from "@web/core/utils/hooks";
-import { _t } from "@web/core/l10n/translation";
 import { Counter } from "./editor_menu"
-import { EditorClientAction } from "./editor_client_action"
-const { onMounted, mount,useEnv } = owl
-// Definition of InfinitoSystrayItem component
+const {  mount,useEnv } = owl
 export class InfinitoSystrayItem extends Component{
     static template="backend_theme_infinito.StudioSystray"
-    // Setup method to initialize component
     setup(){
         this.render();
         this.env= useEnv();
@@ -53,12 +47,7 @@ export class InfinitoSystrayAdv extends Component{
      /**
      * Method to handle click event for Advanced Systray
      */
-//    _onClick(){
-//        console.log('clicking')
-//          var env= this.env;
-//          var dialog = this.dialog;
-//          mount(Counter, document.body,{env,dialog});
-//    }
+
 
 _onClick() {
     const env = this.env;
@@ -67,7 +56,6 @@ _onClick() {
     const main = document.querySelector('.o_action_manager');
     const existingSidebar = document.querySelector('.sidebar_simple_editor');
 
-    // Prevent duplicate sidebar
     if (existingSidebar) {
         return;
     }
@@ -80,10 +68,8 @@ _onClick() {
 }
 
 }
-// Exporting InfinitoSystrayAdvItem
 export const InfinitoSystrayAdvItem={
     Component: InfinitoSystrayAdv,
 };
-// Adding components to registry
 registry.category("systray").add("backend_theme_infinito.infinito_systray",systrayItem, {sequence:25})
                             .add("backend_theme_infinito.infinito_systray_adv",InfinitoSystrayAdvItem,{sequence:26})

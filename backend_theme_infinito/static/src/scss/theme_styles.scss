@@ -85,8 +85,18 @@ btn-fill-odoo:hover,
     color: var(--text-color-1) !important;
 }
 
-td>.btn.btn-link {
-    color: var(--button-bg) !important;
+td>.o-mail-Discuss-headerActionsGroup {
+    border: 1px solid var(--border-color) !important;
+    --border-opacity: 1 !important;
+
+    .text-muted {
+        color: var(--button-bg) !important;
+        opacity: 1 !important;
+    }
+
+    &:hover {
+        background-color: var(--tr-button-bg) !important;
+    }
 }
 
 button,
@@ -217,53 +227,6 @@ button,
     border-left-width: 12px;
 }
 
-.o_wrap_field>.o_cell>.o_field_widget>.o_field_tags>.rounded-pill {
-    background-color: var(--tr-button-bg) !important;
-    font-weight: 500 !important;
-    color: var(--button-bg) !important;
-    width: 63px !important;
-    text-align: center !important;
-    padding: 7px 5px !important;
-    height: 26px;
-}
-
-.o_tag.o_tag_color_10 {
-    background-color: #30C381 !important;
-}
-
-.o_tag.o_tag_color_5 {
-    color: #FFFFFF !important;
-}
-
-.o_tag.o_tag_color_1 {
-    background-color: #F06050 !important;
-    color: #FFFFFF !important;
-}
-
-.o_tag.o_tag_color_4 {
-    background-color: #6CC1ED !important;
-    color: #000000 !important;
-}
-
-.o_tag.o_tag_color_6 {
-    background-color: #EB7E7F !important;
-    color: #000000 !important;
-}
-
-.o_tag.o_tag_color_2 {
-    background-color: #F4A460 !important;
-    color: #000000 !important;
-}
-
-.o_field_tags>.rounded-pill {
-    background-color: var(--tr-button-bg);
-    font-weight: 500 !important;
-    color: var(--button-bg);
-    width: 75px !important;
-    text-align: center !important;
-    padding: 7px 5px !important;
-}
-
 a>.text-success {
     color: green !important;
 }
@@ -390,10 +353,10 @@ a>.text-danger {
                 }
             }
 
-            .o_cp_top_right {
-                width: 40%;
+	            .o_cp_top_right {
+	                width: 40%;
 
-                .o_searchview {
+	                .o_searchview {
                     background-color: var(--white-color);
                     border: none !important;
                     border-radius: 3px;
@@ -401,20 +364,21 @@ a>.text-danger {
                     -webkit-box-shadow: 0px 1px 12px 2px rgba(240, 240, 240, 0.93);
                     -moz-box-shadow: 0px 1px 12px 2px rgba(240, 240, 240, 0.93);
                     box-shadow: 0px 1px 12px 2px rgba(240, 240, 240, 0.93);
-                    height: 40px;
+	                    height: 40px;
 
-                    .o_searchview_icon {
-                        position: absolute;
-                        top: 10px;
-                        left: auto;
-                        bottom: auto;
-                        right: 16px;
-                        font-size: 18px;
-                        z-index: 999;
-                    }
+	                    .o_searchview_icon {
+	                        position: absolute;
+	                        top: 50%;
+	                        transform: translateY(-50%);
+	                        left: auto;
+	                        bottom: auto;
+	                        right: 16px;
+	                        font-size: 18px;
+	                        z-index: 999;
+	                    }
 
-                }
-            }
+	                }
+	            }
 
             .o_cp_bottom {
                 padding-top: 10px;
@@ -446,21 +410,35 @@ a>.text-danger {
                             margin: 0px 3px;
                             background: var(--tr-button-bg) !important;
                             color: var(--button-bg) !important;
+                            padding: 4px 6px !important;
+                            min-width: 32px !important;
+
+                            .btn {
+                                padding: 2px 6px !important;
+                            }
                         }
                     }
 
                     .o_cp_switch_buttons {
-                        .btn-light {
-                            border-radius: 3px;
+                        .btn {
+                            border-radius: 3px !important;
                             background: var(--tr-button-bg) !important;
                             color: var(--button-bg) !important;
-                            margin-left: 3px;
+                            margin-left: 3px !important;
+                            padding: 2px 6px !important;
+                            /* Even smaller padding */
+                            height: 28px !important;
+                            display: inline-flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            min-width: 28px !important;
+                            /* Forces it to be more square */
                         }
 
                         .active {
-                            border-radius: 3px;
-                            background: var(--tr-button-bg) !important;
-                            color: var(--button-bg) !important;
+                            border-radius: 3px !important;
+                            background: var(--button-bg) !important;
+                            color: var(--white-color) !important;
                         }
                     }
                 }
@@ -844,20 +822,6 @@ a>.text-danger {
     margin-bottom: 10px !important;
 }
 
-.rounded-pill {
-    border: 0;
-    font-size: 14px;
-    user-select: none;
-    color: black !important;
-    background-color: skyblue !important;
-    font-weight: 500;
-    display: inline-block;
-    max-width: 100%;
-    width: 130px;
-    text-align: center;
-    padding: 7px 5px;
-}
-
 .o_tag.o_tag_color_5 {
     color: #FFFFFF !important;
 }
@@ -876,9 +840,8 @@ a>.text-danger {
     background-color: #fff !important;
 }
 
-.o_field_badge span,
-{
-font-weight: 400 !important;
+.o_field_badge span {
+    font-weight: 400 !important;
 }
 
 .o_kanban_renderer .o_kanban_record>div,
@@ -1169,81 +1132,6 @@ o_list_renderer .o_list_table>thead>tr> :last-child,
     color: rgb(82, 121, 190) !important;
 }
 
-.o_searchview_facet {
-    border: none !important;
-    background: var(--tr-button-bg) !important;
-    padding: 0 !important;
-    border-radius: 6px !important;
-    color: var(--button-bg) !important;
-    margin: 2px 2px 2px 0 !important;
-    display: inline-flex !important;
-    align-items: stretch !important;
-
-    .o_searchview_facet_label {
-        background: var(--tr-button-bg) !important;
-        color: var(--button-bg) !important;
-        border-radius: 6px 0 0 6px !important;
-        padding: 0 3px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-
-        i {
-            color: var(--button-bg) !important;
-        }
-    }
-
-    .o_facet_values {
-        padding: 0 3px !important;
-        display: flex !important;
-        align-items: center !important;
-        color: var(--button-bg) !important;
-        background: transparent !important;
-    }
-
-    .o_facet_remove {
-        color: var(--button-bg) !important;
-        padding: 0 6px 0 2px !important;
-        display: flex !important;
-        align-items: center !important;
-        cursor: pointer !important;
-        background: transparent !important;
-    }
-}
-
-.o_tag.o_avatar,
-.o_tag.o_badge {
-    background-color: var(--tr-button-bg) !important;
-    color: var(--button-bg) !important;
-    border: none !important;
-    border-radius: 6px !important;
-    padding: 2px 6px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-
-    .o_tag_badge_text {
-        color: var(--button-bg) !important;
-    }
-
-    .o_delete {
-        color: var(--button-bg) !important;
-        opacity: 1 !important;
-        margin-left: 4px !important;
-
-        i {
-            color: var(--button-bg) !important;
-        }
-    }
-}
-
-.o_tag.o_avatar {
-    padding-left: 0 !important;
-
-    .o_avatar {
-        border-radius: 6px 0 0 6px !important;
-    }
-}
-
 .o-autocomplete--dropdown-menu {
     .o-autocomplete--dropdown-item {
         .ui-menu-item-wrapper {
@@ -1260,4 +1148,8 @@ o_list_renderer .o_list_table>thead>tr> :last-child,
             }
         }
     }
+}
+
+.btn.btn-link {
+    color: var(--button-bg) !important;
 }

@@ -19,6 +19,6 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from .icon_hooks import icons_post_init_hook
+from .icon_hooks import icons_post_init_hook, icons_uninstall_hook
 from . import controllers
 from . import models

@@ -4,7 +4,7 @@
 
 Backend Theme Infinito
 ======================
-* Backend Theme Infinito module for Odoo 17 community editions
+* Backend Theme Infinito module for Odoo 18 community editions
 
 Installation
 ============
@@ -23,7 +23,8 @@ Company
 Credits
 -------
 * 'Cybrosys Techno Solutions <https://cybrosys.com/>'__
-   Author : Farseen, Musthafa , Gokul , Ajith @Cybrosys
+   Author : Farseen, Musthafa , Gokul , Ajith @Cybrosys ,
+            (V18) Nubla Sherin K,
 
 Contacts
 --------

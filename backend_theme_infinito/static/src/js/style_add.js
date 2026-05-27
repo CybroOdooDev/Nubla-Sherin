@@ -1,16 +1,11 @@
 /** @odoo-module **/
-// Importing necessary modules and components
 import { Component, useState } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
-const { useRef, onWillStart, xml ,onMounted} = owl;
-import { useService, useBus } from "@web/core/utils/hooks";
+import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 import { NewTools } from "./change"
-// Dictionary to store design styles
 const DesignDictionary = {}
-// Component definition for InfinitoDialog
 export class InfinitoDialog extends Component{
-    // Setup method to initialize component state and services
     setup() {
         this.actionService = useService("action");
         this.state = useState({
@@ -39,25 +34,20 @@ export class InfinitoDialog extends Component{
                 }
             }
         }
-        // Triggering render event with updated style configuration
         this.env.bus.trigger('renderEvent', { "config": this.state.style })
         this.current_tools.push(val);
         // Closing the dialog
        this.env.dialogData.close();
     }
 }
-// Template definition for InfinitoDialog
 InfinitoDialog.template = "backend_theme_infinito.StyleAdd";
-// Registering Dialog component as a child component
 InfinitoDialog.components = { Dialog };
-// Prop definitions for InfinitoDialog
 InfinitoDialog.props = {
     confirmLabel: { type: String, optional: true },
     confirmClass: { type: String, optional: true },
     tools: Object,
     close: { type: Function, optional: true },
     };
-// Default props for InfinitoDialog
 InfinitoDialog.defaultProps = {
     confirmLabel: _t("ADD"),
     confirmClass: "btn-primary",

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates>
-    <!--    Views-->
+   <!-- Theme Studio templates for customizing backend UI components.
+     Includes previews and styling options for views and interface elements. -->
     <t t-name="backend_theme_infinito.ThemeStudio_tree">
         <header class="main_header backend_theme_studio_menu theme_editor"/>
         <section class="main_bodY backend_theme_studio_sidebar theme_editor">
@@ -1026,12 +1027,13 @@
                                                 <div style="width: 100px; height: 20px;"/>
                                             </div>
                                         </div>
-                                        Input Search Input
-                                        <div class="o_cp_top_left item"
-                                             t-on-click="onItemClick">
-                                            <input class="o_searchview_input"
-                                                   data-class="o_searchview_input"/>
-                                        </div>
+	                                        Input Search Input
+	                                        <div class="o_cp_top_left item"
+	                                             t-on-click="onItemClick">
+	                                            <input class="o_searchview_input"
+	                                                   value="Search text"
+	                                                   data-class="o_searchview_input"/>
+	                                        </div>
                                     </div>
                                     <p class="b_p">
                                         Preview
@@ -1117,71 +1119,77 @@
                                     </div>
                                     <div class="preview_area items">
                                         Input Optional
-                                        <div class="o_cp_top_left">
-                                            <input class="o_field_char o_field_widget o_quick_editable o_input item"
-                                                   data-class="o_field_widget.o_input"
-                                                   title="Edit: Input Optional"
-                                                   data-name="Input Optional"
-                                                   t-on-click="onItemClick"/>
-                                        </div>
+	                                        <div class="o_cp_top_left">
+	                                            <input class="o_field_char o_field_widget o_quick_editable o_input item"
+	                                                   value="Sample text"
+	                                                   data-class="o_field_widget.o_input"
+	                                                   title="Edit: Input Optional"
+	                                                   data-name="Input Optional"
+	                                                   t-on-click="onItemClick"/>
+	                                        </div>
                                         Input Required
-                                        <div class="o_cp_top_left">
-                                            <input class="o_field_char o_field_widget o_quick_editable o_input o_required_modifier item"
-                                                   data-class="o_required_modifier.o_input"
-                                                   title="Edit: Input Required"
-                                                   data-name="Input Required"
-                                                   t-on-click="onItemClick"/>
-                                        </div>
+	                                        <div class="o_cp_top_left">
+	                                            <input class="o_field_char o_field_widget o_quick_editable o_input o_required_modifier item"
+	                                                   value="Sample text"
+	                                                   data-class="o_required_modifier.o_input"
+	                                                   title="Edit: Input Required"
+	                                                   data-name="Input Required"
+	                                                   t-on-click="onItemClick"/>
+	                                        </div>
                                         Input Selection Optional
-                                        <div class="o_cp_top_left">
-                                            <div class="o_field_widget"
-                                                 aria-atomic="true">
-                                                <input type="text"
-                                                       class="o_input item"
-                                                       data-class="o_field_widget .o_input"
-                                                       title="Edit: Input Selection Optional"
-                                                       data-name="Input Selection Optional"
-                                                       t-on-click="onItemClick"/>
-                                            </div>
-                                        </div>
+	                                        <div class="o_cp_top_left">
+	                                            <div class="o_field_widget"
+	                                                 aria-atomic="true">
+	                                                <input type="text"
+	                                                       class="o_input item"
+	                                                       value="Selection"
+	                                                       data-class="o_field_widget .o_input"
+	                                                       title="Edit: Input Selection Optional"
+	                                                       data-name="Input Selection Optional"
+	                                                       t-on-click="onItemClick"/>
+	                                            </div>
+	                                        </div>
                                         Input Selection Required
-                                        <div class="o_cp_top_left">
-                                            <div class="o_field_widget o_required_modifier"
-                                                 aria-atomic="true">
-                                                <input type="text"
-                                                       class="o_input item"
-                                                       data-class="o_required_modifier .o_input"
-                                                       title="Edit: Input Selection Required"
-                                                       data-name="Input Selection Required"
-                                                       t-on-click="onItemClick"/>
-                                            </div>
-                                        </div>
+	                                        <div class="o_cp_top_left">
+	                                            <div class="o_field_widget o_required_modifier"
+	                                                 aria-atomic="true">
+	                                                <input type="text"
+	                                                       class="o_input item"
+	                                                       value="Selection"
+	                                                       data-class="o_required_modifier .o_input"
+	                                                       title="Edit: Input Selection Required"
+	                                                       data-name="Input Selection Required"
+	                                                       t-on-click="onItemClick"/>
+	                                            </div>
+	                                        </div>
 
                                         Date Picker Optional
-                                        <div class="o_cp_top_left">
-                                            <div class="o_datepicker o_field_date o_field_widget o_quick_editable">
-                                                <input type="text"
-                                                       class="o_datepicker_input o_input datetimepicker-input item"
-                                                       data-class="o_datepicker.o_field_widget .o_input.o_datepicker_input"
-                                                       title="Edit: Date Picker Optional"
-                                                       data-name="Date Picker Optional"
-                                                       t-on-click="onItemClick"/>
-                                                <span class="o_datepicker_button"/>
-                                            </div>
-                                        </div>
+	                                        <div class="o_cp_top_left">
+	                                            <div class="o_datepicker o_field_date o_field_widget o_quick_editable">
+	                                                <input type="text"
+	                                                       class="o_datepicker_input o_input datetimepicker-input item"
+	                                                       value="03/31/2026"
+	                                                       data-class="o_datepicker.o_field_widget .o_input.o_datepicker_input"
+	                                                       title="Edit: Date Picker Optional"
+	                                                       data-name="Date Picker Optional"
+	                                                       t-on-click="onItemClick"/>
+	                                                <span class="o_datepicker_button"/>
+	                                            </div>
+	                                        </div>
 
                                         Date Picker Required
-                                        <div class="o_cp_top_left">
-                                            <div class="o_datepicker o_field_date o_field_widget o_quick_editable o_required_modifier">
-                                                <input type="text"
-                                                       class="o_datepicker_input o_input datetimepicker-input item"
-                                                       data-class="o_datepicker.o_field_date.o_field_widget.o_required_modifier > input"
-                                                       title="Edit: Date Picker Required"
-                                                       data-name="Date Picker Required"
-                                                       t-on-click="onItemClick"/>
-                                                <span class="o_datepicker_button"/>
-                                            </div>
-                                        </div>
+	                                        <div class="o_cp_top_left">
+	                                            <div class="o_datepicker o_field_date o_field_widget o_quick_editable o_required_modifier">
+	                                                <input type="text"
+	                                                       class="o_datepicker_input o_input datetimepicker-input item"
+	                                                       value="03/31/2026"
+	                                                       data-class="o_datepicker.o_field_date.o_field_widget.o_required_modifier > input"
+	                                                       title="Edit: Date Picker Required"
+	                                                       data-name="Date Picker Required"
+	                                                       t-on-click="onItemClick"/>
+	                                                <span class="o_datepicker_button"/>
+	                                            </div>
+	                                        </div>
                                     </div>
                                     <p class="b_p">
                                         Preview
@@ -1264,22 +1272,22 @@
                                     </div>
                                     <div class="preview_area items">
                                         Progress Bar
-                                        <div class="col-6">
-                                            <div class="o_kanban_counter_progress progress item"
-                                                 data-class="o_kanban_counter_progress"
-                                                 title="Edit: Progress Bar"
-                                                 data-name="Progress Bar"
-                                                 t-on-click="onItemClick">
-                                                <div class="progress-bar bg-success o_bar_has_records"
-                                                     style="width: 25%;"/>
-                                                <div class="progress-bar bg-warning o_bar_has_records"
-                                                     style="width: 25%;"/>
-                                                <div class="progress-bar bg-danger o_bar_has_records"
-                                                     style="width: 25%;"/>
-                                                <div class="progress-bar bg-muted o_bar_has_records"
-                                                     style="width: 25%;"/>
-                                            </div>
-                                        </div>
+	                                        <div class="col-6">
+	                                            <div class="o_kanban_counter_progress progress item"
+	                                                 data-class="o_kanban_counter_progress"
+	                                                 title="Edit: Progress Bar"
+	                                                 data-name="Progress Bar"
+	                                                 t-on-click="onItemClick">
+	                                                <div class="progress-bar bg-success o_bar_has_records"
+	                                                     style="width: 15%;"/>
+	                                                <div class="progress-bar bg-warning o_bar_has_records"
+	                                                     style="width: 15%;"/>
+	                                                <div class="progress-bar bg-danger o_bar_has_records"
+	                                                     style="width: 15%;"/>
+	                                                <div class="progress-bar bg-muted o_bar_has_records"
+	                                                     style="width: 15%;"/>
+	                                            </div>
+	                                        </div>
                                     </div>
                                     <p class="b_p">
                                         Preview

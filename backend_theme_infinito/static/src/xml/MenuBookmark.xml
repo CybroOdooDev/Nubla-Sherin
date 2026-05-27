@@ -7,7 +7,7 @@
             <button t-ref="bookmark" t-if="bookmarkOn" type="button"
                     class="btn btn-bookmark fa fa-bookmark"
                     t-on-click="onBookmark"
-                    style="font-size: 20px !important;{ color: infinitoBookmarkColors[infinitoBookmarks.indexOf(actionId)] }"/>
+                    t-att-style="'font-size: 20px !important; color: ' + (infinitoState.infinitoBookmarkColors[infinitoState.infinitoBookmarks.indexOf(env.config.actionId)] || '')"/>
         </xpath>
     </t>
 </templates>

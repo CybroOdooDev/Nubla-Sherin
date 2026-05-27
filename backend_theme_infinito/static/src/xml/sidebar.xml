@@ -230,7 +230,6 @@ Fixed sidebar navigation to properly open apps instead of messaging menu.
                    t-attf-href="#menu_id=#{result.id}&amp;action_id=#{result.actionID}"
                    t-att-data-menu-id="result.id"
                    t-att-data-action-id="result.actionID"
-                   t-on-click="onClick"
                    t-raw="result.name"/>
             </div>
         </t>

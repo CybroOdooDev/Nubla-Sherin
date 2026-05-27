@@ -76,6 +76,9 @@
             '/backend_theme_infinito/static/src/js/style_add.js',
             '/backend_theme_infinito/static/src/js/sidebar.js',
             '/backend_theme_infinito/static/src/js/navbar.js',
+            '/backend_theme_infinito/static/src/js/webclient.js',
+            '/backend_theme_infinito/static/src/js/dropdown_item.js',
+            '/backend_theme_infinito/static/src/js/control_panel.js',
             '/backend_theme_infinito/static/src/js/theme_editor_sidebar.js',
             '/backend_theme_infinito/static/src/js/recentApps.js',
             '/backend_theme_infinito/static/src/js/editor_menu.js',
@@ -87,6 +90,7 @@
         },
     },
     'post_init_hook': 'icons_post_init_hook',
+    'uninstall_hook': 'icons_uninstall_hook',
     'images': [
         'static/description/banner.jpg',
         'static/description/theme_screenshot.jpg',
@@ -95,5 +99,4 @@
     'installable': True,
     'application': False,
     'auto_install': False,
-    'models': ['models/ir_ui_menu.py'],
 }

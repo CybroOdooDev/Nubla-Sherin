@@ -1,6 +1,5 @@
 /** @odoo-module **/
-import { Component } from "@odoo/owl";
-import { session } from "@web/session";
+
 import { ThemeStudioWidget } from "./ThemeStudioWidget";
 import { onWillStart } from "@odoo/owl";
 

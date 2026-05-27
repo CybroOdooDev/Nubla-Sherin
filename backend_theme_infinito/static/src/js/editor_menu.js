@@ -1,12 +1,8 @@
 /** @odoo-module **/
-import { ThemeStudioWidget } from "./ThemeStudioWidget";
-import { Component, useState, mount, xml, onWillStart, useEnv, onMounted } from "@odoo/owl";
+import { Component, useState, xml, onMounted } from "@odoo/owl";
 import { session } from "@web/session";
 import { TimePicker } from "./timepicker";
 import { rpc } from "@web/core/network/rpc";
-import { BlockUI } from "@web/core/ui/block_ui";
-import { Dialog } from "@web/core/dialog/dialog";
-import { useService } from "@web/core/utils/hooks";
 
 export class Counter extends Component {
     static template = xml`
@@ -559,7 +555,6 @@ export class Counter extends Component {
      * Reloads the window to discard changes and close the component.
      */
     _Close_changes() {
-        // Reload the window to discard changes and close the component
         window.location.reload();
     }
     /**
@@ -567,17 +562,15 @@ export class Counter extends Component {
      * @param {Event} ev - The event object representing the change event.
      */
     onLoaderChange(ev) {
-        // Activate BlockUI (assuming BlockUI is a function that should be called here)
-        BlockUI;
         let val = ev.target.value;
-        let loader = val == 'default' ? `<img src="/web/static/img/spin.png" alt="Loading..."/>` : `<a href ="#" class="${val}"></a>`;
+        let loader = val == 'default' ? `<img src="/web/static/img/spin.svg" alt="Loading..."/>` : `<a href ="#" class="${val}"></a>`;
         let content = document.createElement('div');
-        content.className = 'o_blockUI';
+        content.className = 'o_blockUI fixed-top d-flex justify-content-center align-items-center flex-column vh-100';
         content.innerHTML = `
-                <div class="o_spinner">
+                <div class="o_spinner mb-4">
                     ${loader}
                 </div>
-                <div class="o_message">
+                <div class="o_message text-center px-4">
                     Loading...
                 </div>`;
         const webClient = document.querySelector('.o_web_client');
@@ -599,7 +592,6 @@ export class Counter extends Component {
         // Convert the selected time to a float value and assign it to darkStartFloat
         this.darkStartFloat = this.timeToFloat(ev.target.value);
         this.darkStart = ev.target.value;
-        this._applyDarkModePreview(document.querySelector('#navbarDarkToggler').checked, this.mode);
     }
     /**
      * Handles the change event when the second time selection is modified.
@@ -609,16 +601,16 @@ export class Counter extends Component {
         // Convert the selected time to a float value and assign it to darkEndFloat
         this.darkEndFloat = this.timeToFloat(ev.target.value);
         this.darkEnd = ev.target.value;
-        this._applyDarkModePreview(document.querySelector('#navbarDarkToggler').checked, this.mode);
     }
     /**
      * Handles the change event when the dark mode option is modified.
      * @param {Event} ev - The event object representing the change event.
      */
     _OnChangeDark(ev) {
-        // Call the showDarkOptions method with the checked status of the target element
         this.showDarkOptions(ev.target.checked);
-        this._applyDarkModePreview(ev.target.checked, this.mode);
+        console.log("DHDHHHHHHHHHHH")
+        console.log("djjj")
+
     }
     /**
     * Displays or hides dark mode options based on the toggle status.
@@ -662,7 +654,6 @@ export class Counter extends Component {
                 this.darkStart = '19:00';
                 this.darkEnd = '05:00';
             }
-            this._applyDarkModePreview(document.querySelector('#navbarDarkToggler').checked, this.mode);
         }
     }
     /**
@@ -675,58 +666,6 @@ export class Counter extends Component {
         return hours + (minutes / 60);
     }
 
-    /**
-     * Applies dark mode immediately for preview
-     * @param {boolean} isDarkChecked 
-     * @param {string} mode 
-     */
-    _applyDarkModePreview(isDarkChecked, mode) {
-        const webClient = document.querySelector('.o_web_client');
-        const navbars = document.querySelectorAll('.o_navbar, .o_main_navbar, .pos-topheader');
-        let shouldBeDark = false;
-
-        if (isDarkChecked) {
-            if (mode === 'all') {
-                shouldBeDark = true;
-            } else {
-                let now = new Date();
-                let hour = now.getHours();
-                let min = now.getMinutes();
-
-                let startHour = Math.floor(this.darkStartFloat);
-                let startMin = Math.round((this.darkStartFloat - startHour) * 60);
-
-                let endHour = Math.floor(this.darkEndFloat);
-                let endMin = Math.round((this.darkEndFloat - endHour) * 60);
-
-                if (startHour > endHour) {
-                    endHour += 24;
-                    if (hour < startHour) {
-                        hour += 24;
-                    }
-                }
-
-                if (endHour > hour && hour > startHour) {
-                    shouldBeDark = true;
-                } else if (hour === startHour && min >= startMin && hour < endHour) {
-                    shouldBeDark = true;
-                } else if (hour === endHour && min <= endMin && hour >= startHour) {
-                    shouldBeDark = true;
-                }
-            }
-        }
-
-        if (shouldBeDark) {
-            if (webClient) webClient.classList.add('dark-mode');
-            document.body.classList.add('dark-mode');
-            // Add .dark-mode to navbars so it double-inverts and returns to its original dark color
-            navbars.forEach(n => n.classList.add('dark-mode'));
-        } else {
-            if (webClient) webClient.classList.remove('dark-mode');
-            document.body.classList.remove('dark-mode');
-            navbars.forEach(n => n.classList.remove('dark-mode'));
-        }
-    }
 
     /**
      * Handles click on schedule input to show time picker.

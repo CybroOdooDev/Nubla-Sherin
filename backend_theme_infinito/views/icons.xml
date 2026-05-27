@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
+    <!-- Updates default menu icons for Settings, Apps, and Discuss menus.
+         Custom icons are loaded from the Backend Theme Infinito module. -->
     <data>
         <menuitem id="base.menu_administration" name="Settings"
                   web_icon="backend_theme_infinito,static/src/img/icons/settings.png"/>

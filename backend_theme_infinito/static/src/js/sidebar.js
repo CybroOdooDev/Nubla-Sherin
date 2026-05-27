@@ -1,11 +1,7 @@
 odoo.define('sidebar_app.SidebarMenu', [], function (require) {
     "use strict";
-
-    import { session } from "@web/session";
-
     document.addEventListener("click", function (event) {
 
-        // ---- Handle Close Sidebar ----
         if (event.target.closest("#closeSidebar")) {
             const closeBtn = document.getElementById("closeSidebar");
             const openBtn = document.getElementById("openSidebar");
@@ -31,7 +27,6 @@ odoo.define('sidebar_app.SidebarMenu', [], function (require) {
             }
         }
 
-        // ---- Handle Open Sidebar ----
         if (event.target.closest("#openSidebar")) {
             const openBtn = document.getElementById("openSidebar");
             const closeBtn = document.getElementById("closeSidebar");
@@ -62,7 +57,6 @@ odoo.define('sidebar_app.SidebarMenu', [], function (require) {
             }
         }
 
-        // ---- Handle Sidebar Menu Click ----
         if (event.target.closest(".sidebar a")) {
             const clickedLink = event.target.closest(".sidebar a");
             const menuItems = document.querySelectorAll(".sidebar a");
@@ -70,14 +64,23 @@ odoo.define('sidebar_app.SidebarMenu', [], function (require) {
             const header = document.querySelector("header");
 
             if (header) {
-                header.className = ""; // remove all existing classes
+                // Remove the previously added data-id classes but keep default classes like o_navbar
+                menuItems.forEach(item => {
+                    const itemId = item.dataset.id;
+                    if (itemId) {
+                        header.classList.remove(itemId);
+                    }
+                });
                 header.classList.add(id);
+                // Ensure the base class is always present
+                if (!header.classList.contains("o_navbar")) {
+                    header.classList.add("o_navbar");
+                }
             }
 
             menuItems.forEach(item => item.classList.remove("active"));
             clickedLink.classList.add("active");
 
-            // Close sidebar
             const sidebarPanel = document.getElementById("sidebar_panel");
             const closeBtn = document.getElementById("closeSidebar");
             const openBtn = document.getElementById("openSidebar");

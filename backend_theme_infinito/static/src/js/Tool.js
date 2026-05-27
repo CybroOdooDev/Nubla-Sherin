@@ -1,5 +1,4 @@
 /** @odoo-module **/
-import { Component } from "@odoo/owl";
 import { ThemeStudioWidget } from "./ThemeStudioWidget";
 export class Tool extends ThemeStudioWidget {
     constructor() {

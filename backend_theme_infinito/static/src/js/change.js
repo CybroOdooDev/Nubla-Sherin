@@ -1,5 +1,4 @@
 /** @odoo-module **/
-import { useState } from "@odoo/owl";
 /**
  * NewTools module for managing CSS properties and their options.
  */

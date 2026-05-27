@@ -74,7 +74,8 @@
   }
   .o_cp_top_left, .o_cp_searchview {
     width: 100%;
-    height: 50px;
+    min-height: 50px;
+    height: auto;
   }
   .o_cp_top_right {
     width: 100%;

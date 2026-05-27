@@ -197,9 +197,6 @@
                                                 Loaders
                                             </h6>
                                             <div class="sub_style">
-                                                <!--                    <div class="font custom">-->
-                                                <!--                      <div class="d-flex">-->
-                                                <!--                      </div>-->
                                                 <select class="form-select infinito-form-select"
                                                         id="loader"/>
                                             </div>

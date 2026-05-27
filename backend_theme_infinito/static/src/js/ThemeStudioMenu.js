@@ -1,6 +1,5 @@
 /** @odoo-module **/
 import {ThemeStudioWidget} from "./ThemeStudioWidget";
-//import {jsonrpc} from "@web/core/network/rpc_service";
 import { rpc } from "@web/core/network/rpc";
 
 export class ThemeStudioMenu extends ThemeStudioWidget {
