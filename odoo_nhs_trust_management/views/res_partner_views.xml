@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_nhs_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.nhs.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="NHS Governance" name="nhs_governance">
+                    <group string="Trust Board Membership Profile">
+                        <group>
+                            <field name="is_nhs_board_member" widget="boolean_toggle"/>
+                            <field name="nhs_trust_id" invisible="not is_nhs_board_member" required="is_nhs_board_member"/>
+                            <field name="nhs_board_role" invisible="not is_nhs_board_member" required="is_nhs_board_member"/>
+                            <field name="is_voting_member" invisible="not is_nhs_board_member"/>
+                        </group>
+                        <group invisible="not is_nhs_board_member">
+                            <field name="term_start_date"/>
+                            <field name="term_end_date"/>
+                            <field name="is_term_active" readonly="1"/>
+                            <field name="appointment_authority"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
