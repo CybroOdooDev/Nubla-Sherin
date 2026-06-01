@@ -4,8 +4,18 @@ from odoo import models, fields, api
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    is_nhs_board_member = fields.Boolean(string='Is NHS Board Member', default=False, index=True)
-    nhs_trust_id = fields.Many2one('nhs.trust', string='NHS Trust', index=True)
+    is_nhs_board_member = fields.Boolean(
+        string='Is NHS Board Member', 
+        default=False, 
+        index=True,
+        help="Master flag. Setting to True reveals the NHS Board Member notebook page on the partner form. Used in domain filters across all NHS views."
+    )
+    nhs_trust_id = fields.Many2one(
+        'nhs.trust', 
+        string='NHS Trust', 
+        index=True,
+        help="Trust this person sits on the board of. Required if is_nhs_board_member=True (enforced by view)."
+    )
     nhs_board_role = fields.Selection([
         ('chair', 'Chair'),
         ('ceo', 'Chief Executive Officer (CEO)'),
@@ -15,12 +25,36 @@ class ResPartner(models.Model):
         ('exec', 'Executive Director'),
         ('non_exec', 'Non-Executive Director'),
         ('other', 'Other Board Member'),
-    ], string='Board Role', index=True)
-    is_voting_member = fields.Boolean(string='Voting Member', default=True)
-    term_start_date = fields.Date(string='Term Start Date')
-    term_end_date = fields.Date(string='Term End Date')
-    appointment_authority = fields.Char(string='Appointment Authority', help='e.g., NHS England, Scottish Government, etc.')
-    is_term_active = fields.Boolean(string='Term Active', compute='_compute_is_term_active', store=True, index=True)
+    ], 
+        string='Board Role', 
+        index=True,
+        help="Selection: chair / vice_chair / ceo / medical_director / director_of_nursing / finance_director / coo / exec_director / ned / associate_ned / governor / other. NED = Non-Executive Director (independent oversight role)."
+    )
+    is_voting_member = fields.Boolean(
+        string='Voting Member', 
+        default=True,
+        help="True for full voting board members. Default: True. Set False for advisors, observers, associate directors."
+    )
+    term_start_date = fields.Date(
+        string='Term Start Date',
+        help="Start of current appointment term."
+    )
+    term_end_date = fields.Date(
+        string='Term End Date',
+        help="End of current appointment term. Used to compute is_term_active."
+    )
+    appointment_authority = fields.Char(
+        string='Appointment Authority', 
+        help="Body that appointed this member (e.g. 'NHS Improvement', 'Council of Governors', 'Secretary of State')."
+    )
+    is_term_active = fields.Boolean(
+        string='Term Active', 
+        compute='_compute_is_term_active', 
+        store=True, 
+        index=True,
+        help="True if today's date is within [term_start_date, term_end_date]."
+    )
+
 
     @api.depends('term_start_date', 'term_end_date', 'is_nhs_board_member')
     def _compute_is_term_active(self):

@@ -9,50 +9,203 @@ class NhsTrust(models.Model):
     _rec_name = 'name'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char(string='Trust Name', required=True, tracking=True, index=True)
-    short_name = fields.Char(string='Short Name', tracking=True)
-    ods_code = fields.Char(string='ODS Code', required=True, tracking=True, index=True)
+    name = fields.Char(
+        string='Trust Name', 
+        required=True, 
+        tracking=True, 
+        index=True,
+        help="Trust legal name as registered with Companies House / Scottish Govt (e.g. 'Barts Health NHS Trust'). Indexed for search."
+    )
+    short_name = fields.Char(
+        string='Short Name', 
+        tracking=True,
+        help="Display name used on cards, breadcrumbs, and PDF headers (e.g. 'Barts Health'). Falls back to name if blank."
+    )
+    ods_code = fields.Char(
+        string='ODS Code', 
+        required=True, 
+        tracking=True, 
+        index=True,
+        help="Organisation Data Service code from NHS Digital. The single canonical identifier for an NHS organisation across all NHS data flows. Examples: 'RJ1', 'RGT', 'S08000021'. 2–10 chars, uppercase. Unique across the database (SQL constraint). Indexed."
+    )
     health_system = fields.Selection([
         ('nhs_england', 'NHS England'),
         ('nhs_scotland', 'NHS Scotland'),
-    ], string='NHS Health System', required=True, default='nhs_england', tracking=True, index=True)
-    trust_type_id = fields.Many2one('nhs.trust.type', string='Trust Type', required=True, tracking=True, index=True)
-    foundation_trust = fields.Boolean(string='Foundation Trust', default=False, tracking=True)
-    foundation_authorised_date = fields.Date(string='Foundation Authorisation Date', tracking=True)
+    ], 
+        string='NHS Health System', 
+        required=True, 
+        default='nhs_england', 
+        tracking=True, 
+        index=True,
+        help="Selection: 'nhs_england' or 'nhs_scotland'. Default: 'nhs_england'. Drives field visibility on the form: NHS England fields (ICB, ICS) hide for Scotland; Health Board field hides for England. Changing this clears mutually exclusive references."
+    )
+    trust_type_id = fields.Many2one(
+        'nhs.trust.type', 
+        string='Trust Type', 
+        required=True, 
+        tracking=True, 
+        index=True,
+        help="Classification. Dropdown is filtered by health_system."
+    )
+    foundation_trust = fields.Boolean(
+        string='Foundation Trust', 
+        default=False, 
+        tracking=True,
+        help="Tick if authorised as an NHS Foundation Trust by NHS England (formerly Monitor). Foundation Trusts have additional autonomy and a Council of Governors. Only valid for England — hidden when health_system='nhs_scotland'."
+    )
+    foundation_authorised_date = fields.Date(
+        string='Foundation Authorisation Date', 
+        tracking=True,
+        help="The date NHSE authorised foundation status. Required when foundation_trust=True (enforced by @api.constrains)."
+    )
     
     # Governance & Legal details
-    companies_house_number = fields.Char(string='Companies House Number', tracking=True)
-    vat_number = fields.Char(string='VAT Registration Number', tracking=True)
-    establishment_date = fields.Date(string='Establishment Date', tracking=True)
+    companies_house_number = fields.Char(
+        string='Companies House Number', 
+        tracking=True,
+        help="Companies House registration number. Only Foundation Trusts have one — shown only when foundation_trust=True."
+    )
+    vat_number = fields.Char(
+        string='VAT Registration Number', 
+        tracking=True,
+        help="VAT registration number. NHS bodies are generally outside the scope of VAT but some have it for trading activities."
+    )
+    establishment_date = fields.Date(
+        string='Establishment Date', 
+        tracking=True,
+        help="Date the Trust was established as a legal entity."
+    )
 
     # Relationships & Geography
-    region_id = fields.Many2one('nhs.region', string='NHS Region', required=True, index=True, tracking=True)
-    icb_id = fields.Many2one('nhs.icb', string='Integrated Care Board (ICB)', index=True, tracking=True)
-    ics_id = fields.Many2one('nhs.ics', string='Integrated Care System (ICS)', index=True, tracking=True)
-    health_board_id = fields.Many2one('nhs.health.board', string='NHS Health Board', index=True, tracking=True)
-    company_id = fields.Many2one('res.company', string='Odoo Company Reference', default=lambda self: self.env.company, required=True, index=True)
+    region_id = fields.Many2one(
+        'nhs.region', 
+        string='NHS Region', 
+        required=True, 
+        index=True, 
+        tracking=True,
+        help="Region — filtered to those matching the chosen health_system. Required for all trusts."
+    )
+    icb_id = fields.Many2one(
+        'nhs.icb', 
+        string='Integrated Care Board (ICB)', 
+        index=True, 
+        tracking=True,
+        help="Integrated Care Board. Required when health_system='nhs_england'. Domain restricts to ICBs in the selected region. Drives record-level security — NHS Trust Users only see trusts within their allowed ICBs."
+    )
+    ics_id = fields.Many2one(
+        'nhs.ics', 
+        string='Integrated Care System (ICS)', 
+        index=True, 
+        tracking=True,
+        help="Optional ICS sub-grouping. Domain restricts to ICSs of the selected ICB. England only."
+    )
+    health_board_id = fields.Many2one(
+        'nhs.health.board', 
+        string='NHS Health Board', 
+        index=True, 
+        tracking=True,
+        help="Required when health_system='nhs_scotland'. Hidden for England. Drives record-level security for Scottish users via res.users.nhs_allowed_health_board_ids."
+    )
+    company_id = fields.Many2one(
+        'res.company', 
+        string='Odoo Company Reference', 
+        default=lambda self: self.env.company, 
+        required=True, 
+        index=True,
+        help="Optional link to an Odoo res.company. Hybrid model: leave blank for trusts that share the default company, or set to a dedicated company for separated accounting and multi-company users. Important: this is NOT the same as Odoo's multi-company restrictions — those are deferred to the future phase that integrates Accounting."
+    )
 
     # Address & Contact info
-    street = fields.Char(string='Street')
-    street2 = fields.Char(string='Street 2')
-    city = fields.Char(string='City')
-    county = fields.Char(string='County')
-    zip = fields.Char(string='Postcode')
-    country_id = fields.Many2one('res.country', string='Country', default=lambda self: self.env.ref('base.uk', raise_if_not_found=False), required=True)
-    phone = fields.Char(string='Phone')
-    email = fields.Char(string='Email')
-    website = fields.Char(string='Website')
+    street = fields.Char(
+        string='Street',
+        help="Standard address fields for the Trust's main / registered HQ. Not synced to a res.partner because the Trust is not a contact."
+    )
+    street2 = fields.Char(
+        string='Street 2',
+        help="Standard address fields for the Trust's main / registered HQ. Not synced to a res.partner because the Trust is not a contact."
+    )
+    city = fields.Char(
+        string='City',
+        help="Standard address fields for the Trust's main / registered HQ. Not synced to a res.partner because the Trust is not a contact."
+    )
+    county = fields.Char(
+        string='County',
+        help="Standard address fields for the Trust's main / registered HQ. Not synced to a res.partner because the Trust is not a contact."
+    )
+    zip = fields.Char(
+        string='Postcode',
+        help="Standard address fields for the Trust's main / registered HQ. Not synced to a res.partner because the Trust is not a contact."
+    )
+    country_id = fields.Many2one(
+        'res.country', 
+        string='Country', 
+        default=lambda self: self.env.ref('base.uk', raise_if_not_found=False), 
+        required=True,
+        help="Defaults to United Kingdom."
+    )
+    phone = fields.Char(
+        string='Phone',
+        help="Main switchboard / general enquiries contact details. Rendered with the standard phone widget."
+    )
+    email = fields.Char(
+        string='Email',
+        help="Main switchboard / general enquiries contact details. Rendered with the standard email widget."
+    )
+    website = fields.Char(
+        string='Website',
+        help="Main switchboard / general enquiries contact details. Rendered with the standard url widget."
+    )
 
     # Governance Leadership (Many2one -> res.partner)
-    chair_id = fields.Many2one('res.partner', string='Board Chair', tracking=True, index=True)
-    chief_executive_id = fields.Many2one('res.partner', string='Chief Executive', tracking=True, index=True)
-    medical_director_id = fields.Many2one('res.partner', string='Medical Director', tracking=True, index=True)
-    director_of_nursing_id = fields.Many2one('res.partner', string='Director of Nursing', tracking=True, index=True)
-    finance_director_id = fields.Many2one('res.partner', string='Director of Finance', tracking=True, index=True)
+    chair_id = fields.Many2one(
+        'res.partner', 
+        string='Board Chair', 
+        tracking=True, 
+        index=True,
+        help="Chair of the board. Stored as a contact so they can also appear in the board_member_ids list."
+    )
+    chief_executive_id = fields.Many2one(
+        'res.partner', 
+        string='Chief Executive', 
+        tracking=True, 
+        index=True,
+        help="CEO / Accountable Officer. Tracked on chatter — changes are logged automatically."
+    )
+    medical_director_id = fields.Many2one(
+        'res.partner', 
+        string='Medical Director', 
+        tracking=True, 
+        index=True,
+        help="Medical Director — clinical leadership and Caldicott Guardian role often sits here."
+    )
+    director_of_nursing_id = fields.Many2one(
+        'res.partner', 
+        string='Director of Nursing', 
+        tracking=True, 
+        index=True,
+        help="Chief Nurse / Director of Nursing."
+    )
+    finance_director_id = fields.Many2one(
+        'res.partner', 
+        string='Director of Finance', 
+        tracking=True, 
+        index=True,
+        help="Director of Finance."
+    )
 
     # Board Members List & State
-    board_member_ids = fields.One2many('res.partner', 'nhs_trust_id', string='Board Members', domain=[('is_nhs_board_member', '=', True)])
-    board_member_count = fields.Integer(string='Board Member Count', compute='_compute_board_member_count')
+    board_member_ids = fields.One2many(
+        'res.partner', 
+        'nhs_trust_id', 
+        string='Board Members', 
+        domain=[('is_nhs_board_member', '=', True)],
+        help="All board members. Filtered domain ('is_nhs_board_member','=',True). When adding from this o2m, context defaults set is_nhs_board_member=True and is_company=False automatically."
+    )
+    board_member_count = fields.Integer(
+        string='Board Member Count', 
+        compute='_compute_board_member_count',
+        help="Count of board members. Shown on the stat button."
+    )
     
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -61,12 +214,36 @@ class NhsTrust(models.Model):
         ('special_measures', 'Special Measures'),
         ('merging', 'Merging'),
         ('dissolved', 'Dissolved'),
-    ], string='Workflow State', required=True, default='draft', tracking=True, index=True)
+    ], 
+        string='Workflow State', 
+        required=True, 
+        default='draft', 
+        tracking=True, 
+        index=True,
+        help="Selection: draft / under_review / active / special_measures / merging / dissolved. Default: 'draft'. DO NOT write to this field directly — write() is overridden to raise UserError unless approved_state_change context is set. Use State Change Wizard."
+    )
     
-    state_log_ids = fields.One2many('nhs.trust.state.log', 'trust_id', string='State Audit History')
-    description = fields.Html(string='Description / Clinical Notes')
-    color = fields.Integer(string='Color Index', default=0)
-    active = fields.Boolean(string='Active', default=True)
+    state_log_ids = fields.One2many(
+        'nhs.trust.state.log', 
+        'trust_id', 
+        string='State Audit History',
+        help="Immutable audit log of every state transition. Read-only — even managers cannot edit existing entries."
+    )
+    description = fields.Html(
+        string='Description / Clinical Notes',
+        help="Rich-text description / notes. Free-form internal field."
+    )
+    color = fields.Integer(
+        string='Color Index', 
+        default=0,
+        help="Kanban color index (0–11). Used by users to colour-code cards manually."
+    )
+    active = fields.Boolean(
+        string='Active', 
+        default=True,
+        help="Archive flag."
+    )
+
 
     _sql_constraints = [
         ('ods_code_unique', 'unique(ods_code)', 'The ODS code must be unique!'),
@@ -165,6 +342,7 @@ class NhsTrust(models.Model):
     def _compute_board_member_count(self):
         for trust in self:
             trust.board_member_count = len(trust.board_member_ids)
+
 
     @api.model_create_multi
     def create(self, vals_list):

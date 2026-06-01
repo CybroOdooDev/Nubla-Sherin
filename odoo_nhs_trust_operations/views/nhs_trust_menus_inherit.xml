@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Adds Operations and Compliance sub-menus under the root NHS Trusts menu.
+        The root menu (menu_nhs_trust_root) is defined in odoo_nhs_trust_management.
+    -->
+
+    <!-- ── Operations Parent Submenu ───────────────────────────────────── -->
+    <menuitem id="menu_nhs_trust_operations"
+              name="Operations"
+              parent="odoo_nhs_trust_management.menu_nhs_trust_root"
+              sequence="10"/>
+
+    <!-- Trusts (action defined in base, listed here under Operations) -->
+<!--    <menuitem id="menu_nhs_trust_ops_trusts"-->
+<!--              name="Trusts"-->
+<!--              parent="menu_nhs_trust_operations"-->
+<!--              action="odoo_nhs_trust_management.action_nhs_trust"-->
+<!--              sequence="5"/>-->
+
+    <!-- Sites -->
+    <menuitem id="menu_nhs_trust_site"
+              name="Sites"
+              parent="menu_nhs_trust_operations"
+              action="action_nhs_trust_site"
+              sequence="10"/>
+
+    <!-- Departments -->
+    <menuitem id="menu_nhs_trust_department"
+              name="Departments"
+              parent="menu_nhs_trust_operations"
+              action="action_nhs_trust_department"
+              sequence="20"/>
+
+    <!-- Board Members (all board members, not scoped to a single trust) -->
+    <menuitem id="menu_nhs_trust_ops_board_members"
+              name="Board Members"
+              parent="menu_nhs_trust_operations"
+              action="action_nhs_board_members"
+              sequence="30"/>
+
+    <!-- ── Compliance Parent Submenu ────────────────────────────────────── -->
+    <menuitem id="menu_nhs_trust_compliance"
+              name="Compliance"
+              parent="odoo_nhs_trust_management.menu_nhs_trust_root"
+              sequence="20"/>
+
+    <!-- CQC Inspections -->
+    <menuitem id="menu_nhs_trust_cqc"
+              name="CQC Inspections"
+              parent="menu_nhs_trust_compliance"
+              action="action_nhs_trust_cqc_inspection"
+              sequence="10"/>
+
+    <!-- State Change Audit (action defined in base, surfaced here under Compliance) -->
+    <menuitem id="menu_nhs_trust_compliance_state_log"
+              name="State Change Audit"
+              parent="menu_nhs_trust_compliance"
+              action="odoo_nhs_trust_management.action_nhs_trust_state_log"
+              sequence="20"/>
+
+    <!-- ── Configuration extension — Clinical Specialties ──────────────── -->
+    <menuitem id="menu_nhs_trust_specialty"
+              name="Clinical Specialties"
+              parent="odoo_nhs_trust_management.menu_nhs_trust_config"
+              action="action_nhs_trust_specialty"
+              sequence="60"
+              groups="odoo_nhs_trust_management.group_nhs_trust_admin"/>
+</odoo>

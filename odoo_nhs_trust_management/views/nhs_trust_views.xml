@@ -90,6 +90,7 @@
                             <field name="board_member_count" string="Board Members" widget="statinfo"/>
                         </button>
                     </div>
+
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only"/>
                         <h1>
@@ -131,7 +132,7 @@
                                     </span>
                                 </group>
                                 <group string="Corporate Registrations">
-                                    <field name="companies_house_number" placeholder="e.g. 01234567"/>
+                                    <field name="companies_house_number" placeholder="e.g. 01234567" invisible="not foundation_trust"/>
                                     <field name="vat_number" placeholder="e.g. GB123456789"/>
                                 </group>
                             </group>

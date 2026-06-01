@@ -34,16 +34,16 @@ Key Features:
         # Security definitions loaded first
         'security/odoo_nhs_trust_management_security.xml',
         'security/ir.model.access.csv',
-        
+
         # Seed master data
         'data/nhs_region_data.xml',
         'data/nhs_trust_type_data.xml',
         'data/nhs_icb_data.xml',
         'data/nhs_health_board_data.xml',
-        
+
         # Wizards loaded before base views
         'wizards/nhs_trust_state_change_wizard_views.xml',
-        
+
         # Base and extended views
         'views/nhs_region_views.xml',
         'views/nhs_trust_type_views.xml',
@@ -53,12 +53,14 @@ Key Features:
         'views/nhs_trust_state_log_views.xml',
         'views/res_partner_views.xml',
         'views/nhs_trust_views.xml',
-        
+
         # Menu structure loaded last
         'views/nhs_trust_menus.xml',
+
     ],
     'demo': [],
     'installable': True,
     'application': True,
     'auto_install': False,
 }
+
