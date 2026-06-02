@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>NHS Trust Management — Reports &amp; Documents</title>
+</head>
+<body>
+<section style="max-width:900px; margin:0 auto; font-family:Arial,sans-serif; color:#222;">
+    <div style="background:#005EB8; padding:24px; border-radius:6px; color:#fff; margin-bottom:24px;">
+        <img src="icon.png" alt="NHS" style="height:60px; float:left; margin-right:16px;"/>
+        <h1 style="margin:0; font-size:1.8em;">NHS Trust Management</h1>
+        <h2 style="margin:4px 0 0; font-size:1.1em; font-weight:normal;">Reports &amp; Documents</h2>
+    </div>
+
+    <p>Adds the document and output layer on top of the Foundation and Operations modules.</p>
+
+    <h2>Trust Profile PDF</h2>
+    <p>NHS blue-branded QWeb PDF bound to the Trust form via the Print menu.</p>
+    <ul>
+        <li>Header band (NHS blue #005EB8) with name, ODS code, FT badge, status</li>
+        <li>Section 1 — Identification (legal name, type, dates, Companies House)</li>
+        <li>Section 2 — Organisational Hierarchy (Region, ICB/ICS or Health Board)</li>
+        <li>Section 3 — Contact (address, phone, email, website)</li>
+        <li>Section 4 — Governance (Chair, CEO, MD, DoN, Finance Director + Board Members table)</li>
+        <li>Section 5 — Financials (budget, income, expenditure, surplus/deficit, capital, PFI)</li>
+        <li>Section 6 — Workforce &amp; Capacity (FTE, beds, sites, departments)</li>
+        <li>Section 7 — Sites table (code, name, type, city, beds, A&amp;E badge)</li>
+        <li>Section 8 — CQC Inspection History table (England only)</li>
+        <li>Footer with generation timestamp</li>
+    </ul>
+
+    <h2>Trust Directory Excel Export</h2>
+    <p>Wizard accessible via <strong>NHS Trusts → Reports → Export Trust Directory</strong>.</p>
+    <ul>
+        <li>23-column NHS Trust directory with NHS-blue header row</li>
+        <li>Auto-filter enabled; top row + first 2 columns frozen</li>
+        <li>Surplus/Deficit colour-coded green (surplus) / red (deficit)</li>
+        <li>Filters: Health System, Status, Regions</li>
+    </ul>
+
+    <h2>Prerequisites</h2>
+    <p>Requires <strong>odoo_nhs_trust_management</strong> and <strong>odoo_nhs_trust_operations</strong>.
+    Also requires <code>xlsxwriter</code>: <code>pip install xlsxwriter</code></p>
+</section>
+</body>
+</html>
