@@ -1,4 +1,24 @@
 # -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 from odoo import models, fields, api
 
 
@@ -66,8 +86,7 @@ class NhsTrustOperations(models.Model):
         string='Currency',
         default=lambda self: self.env.ref('base.GBP', raise_if_not_found=False),
         required=True,
-        groups='base.group_no_one',
-        help="Defaults to GBP. Required for the Monetary fields. Hidden by default (group_no_one) since UK NHS is always GBP."
+        help="Defaults to GBP. Required for the Monetary fields. Hidden by default since UK NHS is always GBP."
     )
     annual_budget = fields.Monetary(
         string='Annual Budget',

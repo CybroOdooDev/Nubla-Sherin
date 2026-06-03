@@ -1,4 +1,24 @@
 # -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 {
     'name': 'NHS Trust Management - Foundation',
     'version': '19.0.1.0.0',
@@ -24,7 +44,6 @@ Key Features:
     """,
     'author': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'license': 'LGPL-3',
     'depends': [
         'base',
         'mail',
@@ -43,6 +62,7 @@ Key Features:
 
         # Wizards loaded before base views
         'wizards/nhs_trust_state_change_wizard_views.xml',
+        'wizards/nhs_trust_workflow_wizards_views.xml',
 
         # Base and extended views
         'views/nhs_region_views.xml',
@@ -52,15 +72,20 @@ Key Features:
         'views/nhs_health_board_views.xml',
         'views/nhs_trust_state_log_views.xml',
         'views/res_partner_views.xml',
+        'views/res_users_views.xml',
         'views/nhs_trust_views.xml',
 
         # Menu structure loaded last
         'views/nhs_trust_menus.xml',
+        'views/nhs_settings_menu.xml',
 
     ],
     'demo': [],
+    'images': ['static/description/banner.png'],
+    'license': 'LGPL-3',
     'installable': True,
     'application': True,
     'auto_install': False,
+
 }
 

@@ -2,7 +2,7 @@
 <odoo>
     <!-- Root Menu -->
     <menuitem id="menu_nhs_trust_root"
-              name="NHS Trusts"
+              name="Trust Management"
               web_icon="odoo_nhs_trust_management,static/description/icon.png"
               sequence="45"/>
 
@@ -11,7 +11,7 @@
               name="Trusts"
               parent="menu_nhs_trust_root"
               action="action_nhs_trust"
-              sequence="10"/>
+              sequence="5"/>
 
     <!-- Configuration Menu -->
     <menuitem id="menu_nhs_trust_config"
@@ -51,10 +51,10 @@
               action="action_nhs_health_board"
               sequence="50"/>
 
-    <menuitem id="menu_nhs_trust_state_log"
-              name="Workflow Audit Logs"
-              parent="menu_nhs_trust_config"
-              action="action_nhs_trust_state_log"
-              sequence="90"/>
+<!--    <menuitem id="menu_nhs_trust_state_log"-->
+<!--              name="Workflow Audit Logs"-->
+<!--              parent="menu_nhs_trust_config"-->
+<!--              action="action_nhs_trust_state_log"-->
+<!--              sequence="90"/>-->
 </odoo>
 

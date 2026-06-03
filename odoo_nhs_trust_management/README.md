@@ -1,15 +1,48 @@
-# NHS Trust Management — Foundation
+.. image:: https://img.shields.io/badge/license-LGPL--3-green.svg
+    :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
+    :alt: License: LGPL-3
 
-A clean, foundational NHS Trust management module built for Odoo 19.
+NHS Trust Management - Foundation
+=================================
+* This module enables NHS Trust Management - Foundation.
 
-## Modules Summary
+Configuration
+=============
+No configuration
 
-This module establishes the foundational data model, record rules, workflows, leadership tracking, and geographic classifications for the NHS Trust Management suite.
+Company
+-------
+* `Cybrosys Techno Solutions <https://cybrosys.com/>`__
 
-- **Regions**: Classification for England and Scotland NHS regions.
-- **Trust Types**: Segmented by English and Scottish healthcare categories.
-- **Integrated Care Boards (ICBs) & Systems (ICSs)**: Complete statutory seed data for England's region subdivisions.
-- **Scottish Health Boards**: Territorial and National seed data for Scotland.
-- **NHS Trusts**: Base model with state tracking, governance validation, and dynamic form layouts.
-- **Leadership Tracking**: Extension of `res.partner` to track executive board roles and voting privileges.
-- **Workflow State Auditing**: Log records capturing transition histories and justification text.
+License
+-------
+General Public License, Version 3 (LGPL v3).
+(http://www.gnu.org/licenses/lgpl-3.0-standalone.html)
+
+Credits
+=======
+Developer: (V19) Nubla Sherin K ,
+
+Contact: odoo@cybrosys.com
+
+Contacts
+--------
+* Mail Contact : odoo@cybrosys.com
+* Website : https://cybrosys.com
+
+Bug Tracker
+-----------
+Bugs are tracked on GitHub Issues. In case of trouble, please check there if your issue has already been reported.
+
+Maintainer
+==========
+.. image:: https://cybrosys.com/images/logo.png
+   :target: https://cybrosys.com
+
+This module is maintained by Cybrosys Technologies.
+
+For support and more information, please visit `Our Website <https://cybrosys.com/>`__
+
+Further information
+===================
+HTML Description: `<static/description/index.html>`__

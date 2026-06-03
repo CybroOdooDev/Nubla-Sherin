@@ -1,48 +1,48 @@
-# NHS Trust Management — Operations & Compliance
+.. image:: https://img.shields.io/badge/license-LGPL--3-green.svg
+    :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
+    :alt: License: LGPL-3
 
-**Version:** 19.0.1.0.0  
-**Depends on:** `odoo_nhs_trust_management`  
-**License:** LGPL-3
+NHS Trust Management - Operations & Compliance
+==============================================
+* This module enables NHS Trust Management - Operations & Compliance.
 
-## Overview
+Configuration
+=============
+No configuration
 
-This module extends the **NHS Trust Management - Foundation** module with the full
-operational and compliance picture of an NHS Trust. It must be installed on top of
-`odoo_nhs_trust_management`.
+Company
+-------
+* `Cybrosys Techno Solutions <https://cybrosys.com/>`__
 
-## Features Added
+License
+-------
+General Public License, Version 3 (LGPL v3).
+(http://www.gnu.org/licenses/lgpl-3.0-standalone.html)
 
-| Feature | Details |
-|---|---|
-| **Sites** | Physical locations (hospital, clinic, ambulance station, etc.) with GPS co-ordinates, A&E type, bed capacity, theatres, specialties |
-| **Departments** | Sub-units within sites — clinical, corporate, support, or research — with head, specialty, and staff count |
-| **CQC Inspections** | Full inspection history with all 5 KLOE ratings (Safe / Effective / Caring / Responsive / Well-Led) plus Overall |
-| **Financials** | Annual budget, income, expenditure, surplus/deficit, capital allocation, PFI obligations |
-| **Workforce** | Total FTE (manual) and auto-summed bed capacity aggregated from sites |
-| **Clinical Specialties** | Configurable lookup table of NHS specialty codes used on sites and departments |
+Credits
+=======
+Developer: (V19) Nubla Sherin K ,
 
-## Menu Structure Added
+Contact: odoo@cybrosys.com
 
-```
-NHS Trusts
-├── Operations
-│   ├── Trusts          (action from base module)
-│   ├── Sites
-│   ├── Departments
-│   └── Board Members   (action from base module)
-└── Compliance
-    ├── CQC Inspections
-    └── State Change Audit  (action from base module)
-```
+Contacts
+--------
+* Mail Contact : odoo@cybrosys.com
+* Website : https://cybrosys.com
 
-## Security
+Bug Tracker
+-----------
+Bugs are tracked on GitHub Issues. In case of trouble, please check there if your issue has already been reported.
 
-No new groups are introduced — the three base groups (`User / Manager / Admin`) apply.
-Three additional record rules scope Site, Department, and CQC records to the
-user's allowed ICBs / Health Boards.
+Maintainer
+==========
+.. image:: https://cybrosys.com/images/logo.png
+   :target: https://cybrosys.com
 
-## Install Order
+This module is maintained by Cybrosys Technologies.
 
-1. `odoo_nhs_trust_management` (Foundation)
-2. **`odoo_nhs_trust_operations`** (this module)
-3. `odoo_nhs_trust_reports` (Reports & Documents — optional)
+For support and more information, please visit `Our Website <https://cybrosys.com/>`__
+
+Further information
+===================
+HTML Description: `<static/description/index.html>`__

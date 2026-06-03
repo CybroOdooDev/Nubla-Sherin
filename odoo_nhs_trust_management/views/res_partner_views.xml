@@ -5,16 +5,18 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="is_nhs_board_member" widget="boolean_toggle"/>
+            </xpath>
             <xpath expr="//notebook" position="inside">
-                <page string="NHS Governance" name="nhs_governance">
+                <page string="NHS Governance" name="nhs_governance" invisible="not is_nhs_board_member">
                     <group string="Trust Board Membership Profile">
                         <group>
-                            <field name="is_nhs_board_member" widget="boolean_toggle"/>
-                            <field name="nhs_trust_id" invisible="not is_nhs_board_member" required="is_nhs_board_member"/>
-                            <field name="nhs_board_role" invisible="not is_nhs_board_member" required="is_nhs_board_member"/>
-                            <field name="is_voting_member" invisible="not is_nhs_board_member"/>
+                            <field name="nhs_trust_id" required="is_nhs_board_member"/>
+                            <field name="nhs_board_role" required="is_nhs_board_member"/>
+                            <field name="is_voting_member"/>
                         </group>
-                        <group invisible="not is_nhs_board_member">
+                        <group>
                             <field name="term_start_date"/>
                             <field name="term_end_date"/>
                             <field name="is_term_active" readonly="1"/>

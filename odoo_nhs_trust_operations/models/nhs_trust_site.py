@@ -1,5 +1,26 @@
 # -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class NhsTrustSpecialty(models.Model):
@@ -30,6 +51,14 @@ class NhsTrustSpecialty(models.Model):
     _sql_constraints = [
         ('name_unique', 'unique(name)', 'Specialty name must be unique!'),
     ]
+
+    def copy_data(self, default=None):
+        default = dict(default or {})
+        vals_list = super().copy_data(default=default)
+        if 'name' not in default:
+            for specialty, vals in zip(self, vals_list):
+                vals['name'] = ("%s (copy)", specialty.name)
+        return vals_list
 
 
 class NhsTrustSite(models.Model):
@@ -190,3 +219,17 @@ class NhsTrustSite(models.Model):
             'domain': [('site_id', '=', self.id)],
             'context': {'default_site_id': self.id, 'default_trust_id': self.trust_id.id},
         }
+
+    def copy_data(self, default=None):
+        default = dict(default or {})
+        vals_list = super().copy_data(default=default)
+        if 'name' not in default:
+            for site, vals in zip(self, vals_list):
+                vals['name'] = ("%s (copy)", site.name)
+        return vals_list
+
+    def unlink(self):
+        for site in self:
+            if site.department_ids:
+                raise UserError(f"You cannot delete Site '{site.name}' because it has associated departments. Please remove or relocate all departments first.")
+        return super(NhsTrustSite, self).unlink()

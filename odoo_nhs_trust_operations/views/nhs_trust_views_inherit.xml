@@ -25,7 +25,7 @@
         <field name="inherit_id" ref="odoo_nhs_trust_management.view_nhs_trust_form"/>
         <field name="arch" type="xml">
 
-            <!-- ── Stat Buttons ─────────────────────────────────── -->
+            <!-- Stat Buttons -->
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_view_sites" type="object"
                         class="oe_stat_button" icon="fa-map-marker">
@@ -62,48 +62,48 @@
                 </group>
             </xpath>
 
-            <!-- ── Notebook Tabs ─────────────────────────────────── -->
+            <!-- ── Notebook Tabs-->
             <xpath expr="//notebook" position="inside">
 
                 <!-- Sites Tab -->
-                <page string="Sites" name="sites_tab">
-                    <field name="site_ids" context="{'default_trust_id': id}">
-                        <list>
-                            <field name="name"/>
-                            <field name="code"/>
-                            <field name="site_type"/>
-                            <field name="city"/>
-                            <field name="bed_capacity"/>
-                            <field name="has_ae_department" widget="boolean" string="A&amp;E"/>
-                            <field name="department_count" string="Depts"/>
-                        </list>
-                    </field>
-                </page>
+<!--                <page string="Sites" name="sites_tab">-->
+<!--                    <field name="site_ids" context="{'default_trust_id': id}">-->
+<!--                        <list>-->
+<!--                            <field name="name"/>-->
+<!--                            <field name="code"/>-->
+<!--                            <field name="site_type"/>-->
+<!--                            <field name="city"/>-->
+<!--                            <field name="bed_capacity"/>-->
+<!--                            <field name="has_ae_department" widget="boolean" string="A&amp;E"/>-->
+<!--                            <field name="department_count" string="Depts"/>-->
+<!--                        </list>-->
+<!--                    </field>-->
+<!--                </page>-->
 
                 <!-- CQC Inspections Tab (England only) -->
-                <page string="CQC Inspections" name="cqc_tab"
-                      invisible="health_system != 'nhs_england'">
-                    <field name="cqc_inspection_ids" context="{'default_trust_id': id}">
-                        <list decoration-success="overall_rating == 'outstanding'"
-                              decoration-info="overall_rating == 'good'"
-                              decoration-warning="overall_rating == 'requires_improvement'"
-                              decoration-danger="overall_rating == 'inadequate'">
-                            <field name="inspection_date"/>
-                            <field name="inspection_type"/>
-                            <field name="overall_rating" widget="badge"
-                                   decoration-success="overall_rating == 'outstanding'"
-                                   decoration-info="overall_rating == 'good'"
-                                   decoration-warning="overall_rating == 'requires_improvement'"
-                                   decoration-danger="overall_rating == 'inadequate'"/>
-                            <field name="safe_rating"/>
-                            <field name="effective_rating"/>
-                            <field name="caring_rating"/>
-                            <field name="responsive_rating"/>
-                            <field name="well_led_rating"/>
-                            <field name="next_inspection_due"/>
-                        </list>
-                    </field>
-                </page>
+<!--                <page string="CQC Inspections" name="cqc_tab"-->
+<!--                      invisible="health_system != 'nhs_england'">-->
+<!--                    <field name="cqc_inspection_ids" context="{'default_trust_id': id}">-->
+<!--                        <list decoration-success="overall_rating == 'outstanding'"-->
+<!--                              decoration-info="overall_rating == 'good'"-->
+<!--                              decoration-warning="overall_rating == 'requires_improvement'"-->
+<!--                              decoration-danger="overall_rating == 'inadequate'">-->
+<!--                            <field name="inspection_date"/>-->
+<!--                            <field name="inspection_type"/>-->
+<!--                            <field name="overall_rating" widget="badge"-->
+<!--                                   decoration-success="overall_rating == 'outstanding'"-->
+<!--                                   decoration-info="overall_rating == 'good'"-->
+<!--                                   decoration-warning="overall_rating == 'requires_improvement'"-->
+<!--                                   decoration-danger="overall_rating == 'inadequate'"/>-->
+<!--                            <field name="safe_rating"/>-->
+<!--                            <field name="effective_rating"/>-->
+<!--                            <field name="caring_rating"/>-->
+<!--                            <field name="responsive_rating"/>-->
+<!--                            <field name="well_led_rating"/>-->
+<!--                            <field name="next_inspection_due"/>-->
+<!--                        </list>-->
+<!--                    </field>-->
+<!--                </page>-->
 
                 <!-- Financials Tab -->
                 <page string="Financials" name="financials_tab">

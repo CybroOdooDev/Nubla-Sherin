@@ -1,4 +1,24 @@
 # -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 from odoo import models, fields, api
 
 class NhsTrustType(models.Model):
@@ -50,3 +70,20 @@ class NhsTrustType(models.Model):
     _sql_constraints = [
         ('code_unique', 'unique(code)', 'The NHS Trust Type code must be unique!'),
     ]
+
+    def copy_data(self, default=None):
+        default = dict(default or {})
+        vals_list = super().copy_data(default=default)
+        if 'name' not in default:
+            for ttype, vals in zip(self, vals_list):
+                vals['name'] = self.env._("%s (copy)", ttype.name)
+        if 'code' not in default:
+            for ttype, vals in zip(self, vals_list):
+                base_code = ttype.code or ''
+                new_code = base_code
+                count = 1
+                while self.env['nhs.trust.type'].search_count([('code', '=', new_code)]):
+                    new_code = f"{base_code}_{count}"
+                    count += 1
+                vals['code'] = new_code
+        return vals_list

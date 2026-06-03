@@ -81,8 +81,21 @@
         <field name="arch" type="xml">
             <form string="NHS Trust Management">
                 <header>
-                    <button name="action_open_state_change_wizard" string="Change State" type="object" class="oe_highlight btn-primary" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,under_review,active,special_measures,merging,dissolved"/>
+                    <!-- Submit for Review -->
+                    <button name="action_open_state_change_wizard" string="Submit for Review" type="object" class="oe_highlight btn-primary" context="{'default_new_state': 'under_review'}" invisible="state != 'draft'" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    <!-- Approve & Activate -->
+                    <button name="action_open_state_change_wizard" string="Approve &amp; Activate" type="object" class="oe_highlight btn-success" context="{'default_new_state': 'active'}" invisible="state != 'under_review'" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    <!-- Escalate to Special Measures -->
+                    <button name="action_open_state_change_wizard" string="Escalate to Special Measures" type="object" class="btn-warning" context="{'default_new_state': 'special_measures'}" invisible="state != 'active'" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    <!-- Revert to Active -->
+                    <button name="action_open_state_change_wizard" string="Revert to Active" type="object" class="btn-secondary" context="{'default_new_state': 'active'}" invisible="state != 'special_measures'" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    
+                    <!-- Merge Trust Wizard -->
+                    <button name="%(odoo_nhs_trust_management.action_nhs_trust_merge_wizard)d" string="Merge Trust" type="action" class="btn-info" invisible="state not in ('active', 'special_measures')" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    <!-- Dissolve Trust Wizard -->
+                    <button name="%(odoo_nhs_trust_management.action_nhs_trust_dissolve_wizard)d" string="Dissolve Trust" type="action" class="btn-danger" invisible="state not in ('active', 'special_measures', 'merging')" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    
+                    <field name="state" widget="statusbar" statusbar_visible="draft,under_review,active"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -106,12 +119,12 @@
                     <group>
                         <group string="Core Classification" name="class_info">
                             <field name="health_system" widget="radio" options="{'horizontal': true}"/>
-                            <field name="trust_type_id" options="{'no_open': True, 'no_create': True}"/>
-                            <field name="foundation_trust" widget="boolean_toggle"/>
-                            <field name="foundation_authorised_date" invisible="not foundation_trust"/>
+                            <field name="trust_type_id" options="{'no_open': True, 'no_create': True}" domain="[('health_system', 'in', (health_system, 'both'))]"/>
+                            <field name="foundation_trust" widget="boolean_toggle" invisible="health_system != 'nhs_england'"/>
+                            <field name="foundation_authorised_date" invisible="health_system != 'nhs_england' or not foundation_trust"/>
                         </group>
                         <group string="NHS Governance Scope" name="geo_scope">
-                            <field name="region_id" options="{'no_open': True, 'no_create': True}"/>
+                            <field name="region_id" options="{'no_open': True, 'no_create': True}" domain="[('health_system', '=', health_system)]"/>
                             <field name="icb_id" invisible="health_system != 'nhs_england'" required="health_system == 'nhs_england'" domain="[('region_id', '=', region_id)]" options="{'no_open': True, 'no_create': True}"/>
                             <field name="ics_id" invisible="health_system != 'nhs_england'" domain="[('icb_id', '=', icb_id)]" options="{'no_open': True, 'no_create': True}"/>
                             <field name="health_board_id" invisible="health_system != 'nhs_scotland'" required="health_system == 'nhs_scotland'" domain="[('region_id', '=', region_id)]" options="{'no_open': True, 'no_create': True}"/>
@@ -173,17 +186,17 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Workflow Audit Trail" name="audit_trail">
-                            <field name="state_log_ids" readonly="1">
-                                <list default_order="change_date desc">
-                                    <field name="change_date"/>
-                                    <field name="from_state"/>
-                                    <field name="to_state"/>
-                                    <field name="reason"/>
-                                    <field name="user_id"/>
-                                </list>
-                            </field>
-                        </page>
+<!--                        <page string="Workflow Audit Trail" name="audit_trail">-->
+<!--                            <field name="state_log_ids" readonly="1">-->
+<!--                                <list default_order="change_date desc">-->
+<!--                                    <field name="change_date"/>-->
+<!--                                    <field name="from_state"/>-->
+<!--                                    <field name="to_state"/>-->
+<!--                                    <field name="reason"/>-->
+<!--                                    <field name="user_id"/>-->
+<!--                                </list>-->
+<!--                            </field>-->
+<!--                        </page>-->
                         <page string="Description &amp; Notes" name="description_notes">
                             <field name="description" placeholder="Describe clinical specialties, main referral centers, patient demographics, or strategy..."/>
                         </page>

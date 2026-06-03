@@ -2,7 +2,7 @@
 <odoo>
     <data noupdate="1">
         <!-- ============================================================
-             NORTH EAST AND YORKSHIRE REGION (4)
+             NORTH EAST AND YORKSHIRE REGION
         ============================================================ -->
         <record id="icb_humber_yorkshire" model="nhs.icb">
             <field name="name">NHS Humber and North Yorkshire ICB</field>
@@ -57,7 +57,7 @@
         </record>
 
         <!-- ============================================================
-             MIDLANDS REGION (11)
+             MIDLANDS REGION
         ============================================================ -->
         <record id="icb_birmingham_solihull" model="nhs.icb">
             <field name="name">NHS Birmingham and Solihull ICB</field>
@@ -137,7 +137,7 @@
         </record>
 
         <!-- ============================================================
-             EAST OF ENGLAND REGION (6)
+             EAST OF ENGLAND REGION
         ============================================================ -->
         <record id="icb_bedfordshire_luton_mk" model="nhs.icb">
             <field name="name">NHS Bedfordshire, Luton and Milton Keynes ICB</field>
@@ -182,7 +182,7 @@
         </record>
 
         <!-- ============================================================
-             LONDON REGION (5)
+             LONDON REGION
         ============================================================ -->
         <record id="icb_north_central_london" model="nhs.icb">
             <field name="name">NHS North Central London ICB</field>
@@ -220,7 +220,7 @@
         </record>
 
         <!-- ============================================================
-             SOUTH EAST REGION (6)
+             SOUTH EAST REGION
         ============================================================ -->
         <record id="icb_bucks_oxford_berkshire" model="nhs.icb">
             <field name="name">NHS Buckinghamshire, Oxfordshire and Berkshire West ICB</field>
@@ -265,7 +265,7 @@
         </record>
 
         <!-- ============================================================
-             SOUTH WEST REGION (7)
+             SOUTH WEST REGION
         ============================================================ -->
         <record id="icb_bath_swindon_wiltshire" model="nhs.icb">
             <field name="name">NHS Bath and North East Somerset, Swindon and Wiltshire ICB</field>

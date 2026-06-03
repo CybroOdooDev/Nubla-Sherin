@@ -1,4 +1,24 @@
 # -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError, UserError
 
@@ -45,6 +65,7 @@ class NhsTrust(models.Model):
         required=True, 
         tracking=True, 
         index=True,
+        domain="[('health_system', 'in', (health_system, 'both'))]",
         help="Classification. Dropdown is filtered by health_system."
     )
     foundation_trust = fields.Boolean(
@@ -83,6 +104,7 @@ class NhsTrust(models.Model):
         required=True, 
         index=True, 
         tracking=True,
+        domain="[('health_system', '=', health_system)]",
         help="Region — filtered to those matching the chosen health_system. Required for all trusts."
     )
     icb_id = fields.Many2one(
@@ -220,6 +242,7 @@ class NhsTrust(models.Model):
         default='draft', 
         tracking=True, 
         index=True,
+        copy=False,
         help="Selection: draft / under_review / active / special_measures / merging / dissolved. Default: 'draft'. DO NOT write to this field directly — write() is overridden to raise UserError unless approved_state_change context is set. Use State Change Wizard."
     )
     
@@ -296,6 +319,9 @@ class NhsTrust(models.Model):
                 'trust_type_id': [('health_system', 'in', ('nhs_england', 'both'))]
             }}
         elif self.health_system == 'nhs_scotland':
+            self.foundation_trust = False
+            self.foundation_authorised_date = False
+            self.companies_house_number = False
             return {'domain': {
                 'region_id': [('health_system', '=', 'nhs_scotland')],
                 'trust_type_id': [('health_system', 'in', ('nhs_scotland', 'both'))]
@@ -358,8 +384,44 @@ class NhsTrust(models.Model):
             vals['ods_code'] = vals['ods_code'].upper()
         return super(NhsTrust, self).write(vals)
 
+    def copy_data(self, default=None):
+        default = dict(default or {})
+        vals_list = super().copy_data(default=default)
+        if 'name' not in default:
+            for trust, vals in zip(self, vals_list):
+                vals['name'] = self.env._("%s (copy)", trust.name)
+        if 'ods_code' not in default:
+            for trust, vals in zip(self, vals_list):
+                base_code = (trust.ods_code or '').upper()
+                import random
+                import string
+                chars = string.ascii_uppercase + string.digits
+                new_code = base_code
+                found = False
+                for _ in range(100):
+                    if len(base_code) < 5:
+                        new_code = (base_code + random.choice(chars))[:5]
+                    else:
+                        new_code = base_code[:4] + random.choice(chars)
+                    
+                    if not self.env['nhs.trust'].search_count([('ods_code', '=', new_code)]):
+                        found = True
+                        break
+                
+                if not found:
+                    for _ in range(100):
+                        new_code = ''.join(random.choices(chars, k=5))
+                        if not self.env['nhs.trust'].search_count([('ods_code', '=', new_code)]):
+                            found = True
+                            break
+                            
+                vals['ods_code'] = new_code
+        return vals_list
+
     def action_open_state_change_wizard(self):
         self.ensure_one()
+        ctx = dict(self.env.context)
+        ctx['default_trust_id'] = self.id
         return {
             'name': 'NHS Trust State Transition',
             'type': 'ir.actions.act_window',
@@ -367,7 +429,13 @@ class NhsTrust(models.Model):
             'view_mode': 'form',
             'view_id': self.env.ref('odoo_nhs_trust_management.view_nhs_trust_state_change_wizard_form').id,
             'target': 'new',
-            'context': {
-                'default_trust_id': self.id,
-            }
+            'context': ctx
         }
+
+    def unlink(self):
+        for trust in self:
+            if trust.state != 'draft':
+                raise UserError('You cannot delete an NHS Trust that is not in Draft state! Only Draft trusts can be deleted.')
+            if 'site_ids' in self._fields and trust.site_ids:
+                raise UserError(f"You cannot delete NHS Trust '{trust.name}' because it still has associated sites. Please remove or transfer all sites first.")
+        return super(NhsTrust, self).unlink()

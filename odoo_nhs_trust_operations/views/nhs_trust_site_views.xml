@@ -84,9 +84,9 @@
                                    required="has_ae_department"/>
                         </group>
                         <group string="Capacity">
-                            <field name="bed_capacity"/>
-                            <field name="icu_bed_capacity"/>
-                            <field name="operating_theatres"/>
+                            <field name="bed_capacity" invisible="site_type not in ('acute_hospital', 'teaching_hospital', 'community_hospital', 'mental_health_unit')"/>
+                            <field name="icu_bed_capacity" invisible="site_type not in ('acute_hospital', 'teaching_hospital', 'community_hospital', 'mental_health_unit')"/>
+                            <field name="operating_theatres" invisible="site_type not in ('acute_hospital', 'teaching_hospital', 'community_hospital', 'mental_health_unit')"/>
                             <field name="opening_hours"/>
                         </group>
                     </group>
@@ -185,7 +185,7 @@
                                         <field name="city"/>
                                     </div>
                                     <div class="mt-1">
-                                        <span class="badge text-bg-info me-1">
+                                        <span class="badge text-bg-info me-1" invisible="site_type not in ('acute_hospital', 'teaching_hospital', 'community_hospital', 'mental_health_unit')">
                                             <i class="fa fa-bed me-1"/>
                                             <field name="bed_capacity"/> beds
                                         </span>
