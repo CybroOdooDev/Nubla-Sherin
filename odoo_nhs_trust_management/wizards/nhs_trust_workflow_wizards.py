@@ -27,11 +27,16 @@ class NhsTrustMergeWizard(models.TransientModel):
     _description = 'NHS Trust Merger Wizard'
 
     source_trust_id = fields.Many2one('nhs.trust', string='Source Trust', required=True, readonly=True)
+    source_region_id = fields.Many2one(
+        'nhs.region',
+        related='source_trust_id.region_id',
+        string='Source Region'
+    )
     target_trust_id = fields.Many2one(
         'nhs.trust', 
         string='Target Trust (to merge into)', 
         required=True, 
-        domain="[('id', '!=', source_trust_id), ('state', '=', 'active')]"
+        domain="[('id', '!=', source_trust_id), ('state', '=', 'active'), ('region_id', '=', source_region_id)]"
     )
     merge_date = fields.Date(string='Merger Date', required=True, default=fields.Date.context_today)
     reason = fields.Text(string='Justification / Legal Order Reference', required=True)
@@ -43,6 +48,13 @@ class NhsTrustMergeWizard(models.TransientModel):
         for wiz in self:
             if not wiz.reason or len(wiz.reason.strip()) < 5:
                 raise ValidationError('A minimum of 5 characters is required for merger justification!')
+
+    @api.constrains('source_trust_id', 'target_trust_id')
+    def _check_merge_regions(self):
+        for wiz in self:
+            if wiz.source_trust_id and wiz.target_trust_id:
+                if wiz.source_trust_id.region_id != wiz.target_trust_id.region_id:
+                    raise ValidationError('You can only merge trusts that belong to the same NHS Region!')
 
     def action_confirm_merge(self):
         self.ensure_one()
@@ -78,15 +90,15 @@ class NhsTrustMergeWizard(models.TransientModel):
         source.with_context(approved_state_change=True).write({'state': 'merging'})
 
         # 5. Log details in chatter of both trusts
-        source_message = f"This trust has been merged into <b>{target.name}</b> on {self.merge_date}.<br/>"
+        source_message = f"This trust has been merged into {target.name} on {self.merge_date}.\n"
         if transferred_site_names:
-            source_message += f"Sites transferred to target trust: {', '.join(transferred_site_names)}.<br/>"
+            source_message += f"Sites transferred to target trust: {', '.join(transferred_site_names)}.\n"
         source_message += f"Reason: {self.reason}"
         source.message_post(body=source_message)
 
-        target_message = f"NHS Trust merger executed: <b>{source.name}</b> has been merged into this trust.<br/>"
+        target_message = f"NHS Trust merger executed: {source.name} has been merged into this trust.\n"
         if transferred_site_names:
-            target_message += f"Transferred sites: {', '.join(transferred_site_names)}.<br/>"
+            target_message += f"Transferred sites: {', '.join(transferred_site_names)}.\n"
         target_message += f"Reason: {self.reason}"
         target.message_post(body=target_message)
 
@@ -131,12 +143,12 @@ class NhsTrustDissolveWizard(models.TransientModel):
             trust.board_member_ids.write({'nhs_trust_id': False})
 
         # 4. Set state of trust to dissolved
-        trust.with_context(approved_state_change=True).write({'state': 'dissolved', 'active': False})
+        trust.with_context(approved_state_change=True).write({'state': 'dissolved'})
 
         # 5. Log details in chatter
-        message = f"This trust has been dissolved on {self.dissolve_date}.<br/>"
+        message = f"This trust has been dissolved on {self.dissolve_date}.\n"
         if self.archive_sites:
-            message += "All associated sites have been archived.<br/>"
+            message += "All associated sites have been archived.\n"
         message += f"Reason: {self.reason}"
         trust.message_post(body=message)
 

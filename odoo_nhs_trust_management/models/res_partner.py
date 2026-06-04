@@ -48,7 +48,9 @@ class ResPartner(models.Model):
     ], 
         string='Board Role', 
         index=True,
-        help="Selection: chair / vice_chair / ceo / medical_director / director_of_nursing / finance_director / coo / exec_director / ned / associate_ned / governor / other. NED = Non-Executive Director (independent oversight role)."
+        help="Selection: chair / vice_chair / ceo / medical_director / director_of_nursing / "
+             "finance_director / coo / exec_director / ned / associate_ned / governor / other."
+             " NED = Non-Executive Director (independent oversight role)."
     )
     is_voting_member = fields.Boolean(
         string='Voting Member', 

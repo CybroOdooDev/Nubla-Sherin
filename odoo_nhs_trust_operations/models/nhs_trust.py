@@ -26,10 +26,11 @@ class NhsTrustOperations(models.Model):
     """Extends nhs.trust with operational fields: sites, CQC, financials, workforce."""
     _inherit = 'nhs.trust'
 
-    # ── CQC (England only) ──────────────────────────────────────────────────
+    # ── CQC (England only)
     cqc_provider_id = fields.Char(
         string='CQC Provider ID',
-        help="Care Quality Commission registered provider ID (e.g. '1-101677898'). England only — hidden for Scotland."
+        help="Care Quality Commission registered provider ID (e.g. '1-101677898')."
+             " England only — hidden for Scotland."
     )
     cqc_registration_status = fields.Selection([
         ('registered', 'Registered'),
@@ -40,15 +41,17 @@ class NhsTrustOperations(models.Model):
     ],
         string='CQC Registration Status',
         default='registered',
-        help="Auto-set to 'not_applicable' when switching to Scotland (Scotland uses Healthcare Improvement Scotland, not CQC)."
+        help="Auto-set to 'not_applicable' when switching to Scotland (Scotland uses Healthcare"
+             " Improvement Scotland, not CQC)."
     )
 
-    # ── Sites & Departments ─────────────────────────────────────────────────
+    # ── Sites & Departments
     site_ids = fields.One2many(
         'nhs.trust.site',
         'trust_id',
         string='Sites',
-        help="All sites belonging to the trust (hospitals, clinics, ambulance stations, admin buildings). Populated when Sites are created."
+        help="All sites belonging to the trust (hospitals, clinics, ambulance stations, "
+             "admin buildings). Populated when Sites are created."
     )
     site_count = fields.Integer(
         string='Site Count',
@@ -61,18 +64,19 @@ class NhsTrustOperations(models.Model):
         help="Sum of departments across all sites. Computed via site_ids.department_ids."
     )
 
-    # ── Workforce ───────────────────────────────────────────────────────────
+    # ── Workforce
     total_workforce = fields.Integer(
         string='Total Workforce (FTE)',
         help="Total full-time-equivalent staff. Manually maintained — should match the latest NHS workforce statistics return."
     )
 
-    # ── Bed Capacity ────────────────────────────────────────────────────────
+    # ── Bed Capacity
     total_bed_capacity = fields.Integer(
         string='Total Bed Capacity',
         compute='_compute_total_bed_capacity',
         store=True,
-        help="Total available beds across all sites. Computed as SUM(site_ids.bed_capacity). If manual_bed_capacity is set, that value overrides the computed sum."
+        help="Total available beds across all sites. Computed as SUM(site_ids.bed_capacity)."
+             " If manual_bed_capacity is set, that value overrides the computed sum."
     )
     manual_bed_capacity = fields.Integer(
         string='Manual Bed Capacity Override',
@@ -80,7 +84,7 @@ class NhsTrustOperations(models.Model):
         help="Override value for total_bed_capacity. Leave at 0 to use the computed sum from sites."
     )
 
-    # ── Financials ──────────────────────────────────────────────────────────
+    # ── Financials
     currency_id = fields.Many2one(
         'res.currency',
         string='Currency',
@@ -97,7 +101,8 @@ class NhsTrustOperations(models.Model):
     annual_income = fields.Monetary(
         string='Annual Income',
         currency_field='currency_id',
-        help="Actual / forecast income for the year. Includes NHS commissioning income, private patient income, other operating income."
+        help="Actual / forecast income for the year. Includes NHS commissioning income, "
+             "private patient income, other operating income."
     )
     annual_expenditure = fields.Monetary(
         string='Annual Expenditure',
@@ -119,7 +124,9 @@ class NhsTrustOperations(models.Model):
     pfi_obligations = fields.Monetary(
         string='PFI Obligations',
         currency_field='currency_id',
-        help="Outstanding Private Finance Initiative obligations. PFI is a procurement model where a private consortium funds and operates NHS estate and the Trust pays a unitary charge for 25–30 years."
+        help="Outstanding Private Finance Initiative obligations. PFI is a procurement"
+             " model where a private consortium funds and operates NHS estate "
+             "and the Trust pays a unitary charge for 25–30 years."
     )
     financial_year = fields.Char(
         string='Financial Year',

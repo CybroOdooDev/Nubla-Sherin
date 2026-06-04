@@ -44,6 +44,7 @@ class NhsTrustCqcInspection(models.Model):
         required=True,
         ondelete='cascade',
         index=True,
+        domain="[('health_system', '=', 'nhs_england')]",
         help="Parent trust. ondelete='cascade'."
     )
     inspection_date = fields.Date(
@@ -61,11 +62,15 @@ class NhsTrustCqcInspection(models.Model):
         string='Inspection Type',
         required=True,
         default='comprehensive',
-        help="Comprehensive = full assessment across all KLOEs (typical 3–5 year cycle). Focused = targeted at specific concerns. Responsive = triggered by intelligence (whistleblowing, mortality alerts). Thematic = cross-provider review on a specific topic. Follow-up = revisit after enforcement action."
+        help="Comprehensive = full assessment across all KLOEs (typical 3–5 year cycle)."
+             " Focused = targeted at specific concerns. Responsive = triggered by intelligence "
+             "(whistleblowing, mortality alerts). Thematic = cross-provider review on a specific topic."
+             " Follow-up = revisit after enforcement action."
     )
     inspector_lead = fields.Char(
         string='Lead Inspector',
-        help="Lead inspector name from the CQC report. Free-text — not linked to res.partner because CQC inspectors are not Trust contacts."
+        help="Lead inspector name from the CQC report. Free-text — not"
+             " linked to res.partner because CQC inspectors are not Trust contacts."
     )
 
     # KLOE Ratings — defined once via RATING_SELECTION constant
@@ -85,22 +90,26 @@ class NhsTrustCqcInspection(models.Model):
     effective_rating = fields.Selection(
         RATING_SELECTION,
         string='Effective',
-        help="Effective KLOE: 'Are services effective?' — evidence-based care, outcomes, multidisciplinary working, consent."
+        help="Effective KLOE: 'Are services effective?' — evidence-based care, outcomes,"
+             " multidisciplinary working, consent."
     )
     caring_rating = fields.Selection(
         RATING_SELECTION,
         string='Caring',
-        help="Caring KLOE: 'Are services caring?' — dignity, compassion, emotional support, involvement of patients & families."
+        help="Caring KLOE: 'Are services caring?' — dignity, compassion, emotional support, "
+             "involvement of patients & families."
     )
     responsive_rating = fields.Selection(
         RATING_SELECTION,
         string='Responsive',
-        help="Responsive KLOE: 'Are services responsive to people's needs?' — access, waiting times, complaints, individual needs."
+        help="Responsive KLOE: 'Are services responsive to people's needs?' — access, waiting times,"
+             " complaints, individual needs."
     )
     well_led_rating = fields.Selection(
         RATING_SELECTION,
         string='Well-Led',
-        help="Well-Led KLOE: 'Are services well-led?' — leadership, governance, culture, learning & improvement. Often the bellwether KLOE."
+        help="Well-Led KLOE: 'Are services well-led?' — leadership, governance, culture, "
+             "learning & improvement. Often the bellwether KLOE."
     )
 
     report_url = fields.Char(
@@ -113,7 +122,8 @@ class NhsTrustCqcInspection(models.Model):
         'inspection_id',
         'attachment_id',
         string='Report Attachments',
-        help="Local attachments (PDF report, action plan, board response). Many2many because the same report may be attached to multiple inspections during follow-up."
+        help="Local attachments (PDF report, action plan, board response). Many2many because the same "
+             "report may be attached to multiple inspections during follow-up."
     )
     next_inspection_due = fields.Date(
         string='Next Inspection Due',
@@ -152,3 +162,11 @@ class NhsTrustCqcInspection(models.Model):
                     raise ValidationError(
                         'Next inspection due date must be after the inspection date.'
                     )
+
+    @api.constrains('trust_id')
+    def _check_trust_id(self):
+        for rec in self:
+            if rec.trust_id and rec.trust_id.health_system != 'nhs_england':
+                raise ValidationError(
+                    'CQC Inspections are only applicable for England Trusts. Scotland Trusts are not eligible.'
+                )

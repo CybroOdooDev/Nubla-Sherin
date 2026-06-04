@@ -40,7 +40,8 @@ class NhsHealthBoard(models.Model):
         string='ODS Code', 
         required=True, 
         index=True,
-        help="Official Scottish Government Health Board code. Format S08000xxx for territorial, SBxxxx for national. Used in PHS / ISD Scotland reporting datasets — keep aligned with national codes."
+        help="Official Scottish Government Health Board code. Format S08000xxx for territorial,"
+             " SBxxxx for national. Used in PHS / ISD Scotland reporting datasets — keep aligned with national codes."
     )
     short_name = fields.Char(
         string='Short Name',
@@ -61,7 +62,9 @@ class NhsHealthBoard(models.Model):
         required=True, 
         default='territorial', 
         index=True,
-        help="Selection: 'territorial' or 'national'. Default: 'territorial'. Territorial boards serve a geographic population. National boards serve specific functions (e.g. ambulance, public health, training) Scotland-wide."
+        help="Selection: 'territorial' or 'national'. Default: 'territorial'. Territorial boards serve"
+             " a geographic population. National boards serve specific functions"
+             " (e.g. ambulance, public health, training) Scotland-wide."
     )
     population_served = fields.Integer(
         string='Population Served',

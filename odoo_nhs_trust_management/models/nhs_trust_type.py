@@ -32,18 +32,21 @@ class NhsTrustType(models.Model):
         required=True, 
         translate=True, 
         index=True,
-        help="Display name (e.g. 'Acute Trust', 'Mental Health Trust'). Translatable so multi-language deployments can localise."
+        help="Display name (e.g. 'Acute Trust', 'Mental Health Trust'). "
+             "Translatable so multi-language deployments can localise."
     )
     code = fields.Char(
         string='Code', 
         required=True, 
         index=True,
-        help="Unique short code (e.g. 'ACUTE', 'MH', 'SCO-TERR'). Used for CSV imports and Excel exports — keep stable."
+        help="Unique short code (e.g. 'ACUTE', 'MH', 'SCO-TERR'). "
+             "Used for CSV imports and Excel exports — keep stable."
     )
     sequence = fields.Integer(
         string='Sequence', 
         default=10,
-        help="Display order in the dropdown. Lower numbers appear first. Use multiples of 5 to allow insertions."
+        help="Display order in the dropdown. Lower numbers appear first. "
+             "Use multiples of 5 to allow insertions."
     )
     health_system = fields.Selection([
         ('nhs_england', 'NHS England Only'),
@@ -54,7 +57,8 @@ class NhsTrustType(models.Model):
         required=True, 
         default='both', 
         index=True,
-        help="Filters the dropdown on the Trust form so users only see types applicable to the Trust's health system."
+        help="Filters the dropdown on the Trust form so users only see "
+             "types applicable to the Trust's health system."
     )
     description = fields.Text(
         string='Description',

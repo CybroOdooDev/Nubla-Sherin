@@ -15,9 +15,7 @@
                 <field name="trust_id"/>
                 <field name="site_id"/>
                 <field name="department_type" widget="badge"/>
-                <field name="specialty_id"/>
                 <field name="head_of_department_id"/>
-                <field name="staff_count"/>
             </list>
         </field>
     </record>

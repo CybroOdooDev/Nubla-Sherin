@@ -10,6 +10,7 @@
                     <group>
                         <group string="Entities Involved">
                             <field name="source_trust_id" force_save="1"/>
+                            <field name="source_region_id" invisible="1"/>
                             <field name="target_trust_id" options="{'no_open': True, 'no_create': True}"/>
                         </group>
                         <group string="Execution Details">
@@ -55,7 +56,7 @@
                     </group>
                 </sheet>
                 <footer>
-                    <button name="action_confirm_dissolve" string="Confirm Dissolution" type="object" class="btn-danger"/>
+                    <button name="action_confirm_dissolve" string="Confirm Dissolution" type="object" class="btn-primary"/>
                     <button string="Discard" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>

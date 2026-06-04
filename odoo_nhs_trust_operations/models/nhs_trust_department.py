@@ -19,7 +19,8 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import models, fields
+from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 
 class NhsTrustDepartment(models.Model):
@@ -61,7 +62,8 @@ class NhsTrustDepartment(models.Model):
         string='Department Type',
         required=True,
         default='clinical',
-        help="Clinical = direct patient care. Corporate = HR/Finance/IT. Support = Pharmacy/Pathology/Estates. Research = R&D, trials."
+        help="Clinical = direct patient care. Corporate = HR/Finance/IT. "
+             "Support = Pharmacy/Pathology/Estates. Research = R&D, trials."
     )
     specialty_id = fields.Many2one(
         'nhs.trust.specialty',
@@ -76,7 +78,8 @@ class NhsTrustDepartment(models.Model):
     staff_count = fields.Integer(
         string='Staff Count',
         default=0,
-        help="Headcount or FTE — the choice is per the Trust's convention. Document which one in your data entry standards."
+        help="Headcount or FTE — the choice is per the Trust's convention."
+             " Document which one in your data entry standards."
     )
     phone = fields.Char(
         string='Phone',
@@ -103,3 +106,22 @@ class NhsTrustDepartment(models.Model):
             for dept, vals in zip(self, vals_list):
                 vals['name'] = ("%s (copy)", dept.name)
         return vals_list
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if 'site_id' in vals and vals['site_id']:
+                site = self.env['nhs.trust.site'].browse(vals['site_id'])
+                if site.trust_id.state == 'dissolved':
+                    raise ValidationError("You cannot create a department under a dissolved trust!")
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if 'site_id' in vals and vals['site_id']:
+            site = self.env['nhs.trust.site'].browse(vals['site_id'])
+            if site.trust_id.state == 'dissolved':
+                raise ValidationError("You cannot link a department to a site of a dissolved trust!")
+        for record in self:
+            if record.site_id.trust_id.state == 'dissolved':
+                raise ValidationError("You cannot modify a department belonging to a dissolved trust!")
+        return super().write(vals)

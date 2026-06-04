@@ -141,6 +141,9 @@
                         </group>
                     </group>
                 </page>
+                <page string="Description &amp; Notes" name="description_notes">
+                            <field name="description" placeholder="Describe clinical specialties, main referral centers, patient demographics, or strategy..."/>
+                        </page>
 
             </xpath>
 

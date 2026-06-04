@@ -20,7 +20,7 @@
 #
 #############################################################################
 from odoo import models, fields, api
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class NhsTrustSpecialty(models.Model):
@@ -75,7 +75,8 @@ class NhsTrustSite(models.Model):
     )
     code = fields.Char(
         string='ODS Sub-Code',
-        help="ODS sub-code for the site (e.g. 'RNJ12' is a sub-code of trust RNJ). Used in datasets that drill below trust level."
+        help="ODS sub-code for the site (e.g. 'RNJ12' is a sub-code of trust RNJ)."
+             " Used in datasets that drill below trust level."
     )
     trust_id = fields.Many2one(
         'nhs.trust',
@@ -99,7 +100,8 @@ class NhsTrustSite(models.Model):
         string='Site Type',
         required=True,
         default='acute_hospital',
-        help="Drives filtering and reporting. Teaching hospitals are typically the larger university-affiliated sites with research and training roles."
+        help="Drives filtering and reporting. Teaching hospitals are typically the "
+             "larger university-affiliated sites with research and training roles."
     )
 
     # Address
@@ -126,7 +128,8 @@ class NhsTrustSite(models.Model):
     latitude = fields.Float(
         string='Latitude',
         digits=(10, 7),
-        help="GPS latitude in decimal degrees (e.g. 51.5176 for London Hospital). Reserved for a future map view. 7 decimals = ~11mm precision."
+        help="GPS latitude in decimal degrees (e.g. 51.5176 for London Hospital). "
+             "Reserved for a future map view. 7 decimals = ~11mm precision."
     )
     longitude = fields.Float(
         string='Longitude',
@@ -153,7 +156,8 @@ class NhsTrustSite(models.Model):
         ('type4', 'Type 4 – Walk-in Centre / Minor Injury Unit'),
     ],
         string='A&E Type',
-        help="Only relevant if has_ae_department=True. Type 1: Major 24-hour A&E. Type 2: Single specialty. Type 3: MIU/UCC. Type 4: Walk-in."
+        help="Select the Accident & Emergency (A&E) service type available at this site."
+             "This field is applicable only if the site has an A&E department."
     )
 
     # Capacity
@@ -174,7 +178,8 @@ class NhsTrustSite(models.Model):
     )
     opening_hours = fields.Char(
         string='Opening Hours',
-        help="Free-text description (e.g. '24/7', 'Mon-Fri 08:00-18:00'). Not structured because patterns vary widely."
+        help="Free-text description (e.g. '24/7', 'Mon-Fri 08:00-18:00'). "
+             "Not structured because patterns vary widely."
     )
 
     # Relationships
@@ -228,8 +233,28 @@ class NhsTrustSite(models.Model):
                 vals['name'] = ("%s (copy)", site.name)
         return vals_list
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if 'trust_id' in vals and vals['trust_id']:
+                trust = self.env['nhs.trust'].browse(vals['trust_id'])
+                if trust.state == 'dissolved':
+                    raise ValidationError("You cannot create a site under a dissolved trust!")
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if 'trust_id' in vals and vals['trust_id']:
+            trust = self.env['nhs.trust'].browse(vals['trust_id'])
+            if trust.state == 'dissolved':
+                raise ValidationError("You cannot link a site to a dissolved trust!")
+        for record in self:
+            if record.trust_id.state == 'dissolved':
+                raise ValidationError("You cannot modify a site belonging to a dissolved trust!")
+        return super().write(vals)
+
     def unlink(self):
         for site in self:
             if site.department_ids:
-                raise UserError(f"You cannot delete Site '{site.name}' because it has associated departments. Please remove or relocate all departments first.")
+                raise UserError(f"You cannot delete Site '{site.name}' because it has associated departments. "
+                                f"Please remove or relocate all departments first.")
         return super(NhsTrustSite, self).unlink()

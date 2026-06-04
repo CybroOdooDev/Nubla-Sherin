@@ -28,7 +28,8 @@ class NhsTrustStateLog(models.Model):
     _order = 'change_date desc'
     _rec_name = 'display_name'
 
-    trust_id = fields.Many2one('nhs.trust', string='Trust Reference', required=True, ondelete='cascade', index=True)
+    trust_id = fields.Many2one('nhs.trust', string='Trust Reference',
+                               required=True, ondelete='cascade', index=True)
     from_state = fields.Selection([
         ('draft', 'Draft'),
         ('under_review', 'Under Review'),
@@ -46,7 +47,8 @@ class NhsTrustStateLog(models.Model):
         ('dissolved', 'Dissolved'),
     ], string='To State', required=True)
     reason = fields.Text(string='Justification Reason', required=True)
-    user_id = fields.Many2one('res.users', string='Changed By', required=True, default=lambda self: self.env.user, index=True)
+    user_id = fields.Many2one('res.users', string='Changed By', required=True,
+                              default=lambda self: self.env.user, index=True)
     change_date = fields.Datetime(string='Change Date & Time', required=True, default=fields.Datetime.now, index=True)
     display_name = fields.Char(string='Description', compute='_compute_display_name')
 
@@ -58,7 +60,8 @@ class NhsTrustStateLog(models.Model):
             log.display_name = f"{trust_name} → {state_label}"
 
     def write(self, vals):
-        raise UserError('Workflow change logs are immutable audit records and cannot be modified under any circumstances!')
+        raise UserError('Workflow change logs are immutable audit records and '
+                        'cannot be modified under any circumstances!')
 
     def unlink(self):
         if not self.env.user.has_group('base.group_system'):

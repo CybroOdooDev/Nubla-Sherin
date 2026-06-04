@@ -38,7 +38,8 @@ class NhsRegion(models.Model):
         string='Code', 
         required=True, 
         index=True,
-        help="Short region code (e.g. 'NEY' for England, 'SCO-N' for Scotland). Must be unique. Used in Excel exports and the PDF profile header."
+        help="Short region code (e.g. 'NEY' for England, 'SCO-N' for Scotland). "
+             "Must be unique. Used in Excel exports and the PDF profile header."
     )
     health_system = fields.Selection([
         ('nhs_england', 'NHS England'),
@@ -48,7 +49,8 @@ class NhsRegion(models.Model):
         required=True, 
         default='nhs_england', 
         index=True,
-        help="Selection: 'nhs_england' or 'nhs_scotland'. Default: 'nhs_england'. Drives downstream filtering — a region only appears in the dropdown when the Trust's health_system matches."
+        help="Selection: 'nhs_england' or 'nhs_scotland'. Default: 'nhs_england'. "
+             "Drives downstream filtering — a region only appears in the dropdown when the Trust's health_system matches."
     )
     trust_count = fields.Integer(
         string='Trusts Count', 

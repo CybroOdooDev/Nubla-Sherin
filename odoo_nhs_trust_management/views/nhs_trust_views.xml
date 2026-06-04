@@ -82,18 +82,18 @@
             <form string="NHS Trust Management">
                 <header>
                     <!-- Submit for Review -->
-                    <button name="action_open_state_change_wizard" string="Submit for Review" type="object" class="oe_highlight btn-primary" context="{'default_new_state': 'under_review'}" invisible="state != 'draft'" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    <button name="action_open_state_change_wizard" string="Submit for Review" type="object" class="oe_highlight" context="{'default_new_state': 'under_review'}" invisible="state != 'draft'" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
                     <!-- Approve & Activate -->
-                    <button name="action_open_state_change_wizard" string="Approve &amp; Activate" type="object" class="oe_highlight btn-success" context="{'default_new_state': 'active'}" invisible="state != 'under_review'" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    <button name="action_open_state_change_wizard" string="Approve &amp; Activate" type="object" class="oe_highlight" context="{'default_new_state': 'active'}" invisible="state != 'under_review'" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
                     <!-- Escalate to Special Measures -->
-                    <button name="action_open_state_change_wizard" string="Escalate to Special Measures" type="object" class="btn-warning" context="{'default_new_state': 'special_measures'}" invisible="state != 'active'" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    <button name="action_open_state_change_wizard" string="Escalate to Special Measures" type="object" class="oe_highlight" context="{'default_new_state': 'special_measures'}" invisible="state != 'active'" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
                     <!-- Revert to Active -->
-                    <button name="action_open_state_change_wizard" string="Revert to Active" type="object" class="btn-secondary" context="{'default_new_state': 'active'}" invisible="state != 'special_measures'" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    <button name="action_open_state_change_wizard" string="Revert to Active" type="object" class="oe_highlight" context="{'default_new_state': 'active'}" invisible="state != 'special_measures'" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
                     
                     <!-- Merge Trust Wizard -->
-                    <button name="%(odoo_nhs_trust_management.action_nhs_trust_merge_wizard)d" string="Merge Trust" type="action" class="btn-info" invisible="state not in ('active', 'special_measures')" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    <button name="%(odoo_nhs_trust_management.action_nhs_trust_merge_wizard)d" string="Merge Trust" type="action" class="oe_highlight" invisible="state not in ('active', 'special_measures')" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
                     <!-- Dissolve Trust Wizard -->
-                    <button name="%(odoo_nhs_trust_management.action_nhs_trust_dissolve_wizard)d" string="Dissolve Trust" type="action" class="btn-danger" invisible="state not in ('active', 'special_measures', 'merging')" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    <button name="%(odoo_nhs_trust_management.action_nhs_trust_dissolve_wizard)d" string="Dissolve Trust" type="action" class="oe_highlight" invisible="state not in ('active', 'special_measures', 'merging')" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
                     
                     <field name="state" widget="statusbar" statusbar_visible="draft,under_review,active"/>
                 </header>
@@ -186,20 +186,8 @@
                                 </list>
                             </field>
                         </page>
-<!--                        <page string="Workflow Audit Trail" name="audit_trail">-->
-<!--                            <field name="state_log_ids" readonly="1">-->
-<!--                                <list default_order="change_date desc">-->
-<!--                                    <field name="change_date"/>-->
-<!--                                    <field name="from_state"/>-->
-<!--                                    <field name="to_state"/>-->
-<!--                                    <field name="reason"/>-->
-<!--                                    <field name="user_id"/>-->
-<!--                                </list>-->
-<!--                            </field>-->
-<!--                        </page>-->
-                        <page string="Description &amp; Notes" name="description_notes">
-                            <field name="description" placeholder="Describe clinical specialties, main referral centers, patient demographics, or strategy..."/>
-                        </page>
+
+
                     </notebook>
                 </sheet>
                 <!-- Chatter & Activities -->

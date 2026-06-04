@@ -41,9 +41,7 @@
                 <field name="trust_id"/>
                 <field name="site_type"/>
                 <field name="city"/>
-                <field name="bed_capacity"/>
                 <field name="has_ae_department" widget="boolean" string="A&amp;E"/>
-                <field name="department_count" string="Depts"/>
                 <field name="active" widget="boolean_toggle" column_invisible="True"/>
             </list>
         </field>
@@ -69,9 +67,10 @@
                         </h1>
                         <h4>
                             <field name="code" placeholder="ODS Sub-Code (optional)"/>
-                            <span class="text-muted ms-2">
-                                <field name="trust_id" options="{'no_open': False}"/>
-                            </span>
+                            <div class="text-muted mt-2">
+                                <label for="trust_id" string="Parent Trust: " class="oe_inline"/>
+                                <field name="trust_id" options="{'no_open': False}" class="oe_inline"/>
+                            </div>
                         </h4>
                     </div>
 
@@ -95,12 +94,14 @@
                         <page string="Location" name="location">
                             <group>
                                 <group string="Address">
-                                    <field name="street" placeholder="Street..."/>
-                                    <field name="street2" placeholder="Street 2..."/>
-                                    <field name="city" placeholder="City..."/>
-                                    <field name="county" placeholder="County..."/>
-                                    <field name="zip" placeholder="Postcode..."/>
-                                    <field name="country_id" options="{'no_open': True, 'no_create': True}"/>
+                                    <div class="o_address_format">
+                                        <field name="street" placeholder="Street..." class="o_address_street"/>
+                                        <field name="street2" placeholder="Street 2..." class="o_address_street"/>
+                                        <field name="city" placeholder="City..." class="o_address_city"/>
+                                        <field name="county" placeholder="County..." class="o_address_state"/>
+                                        <field name="zip" placeholder="Postcode..." class="o_address_zip"/>
+                                        <field name="country_id" placeholder="Country" class="o_address_country" options="{'no_open': True, 'no_create': True}"/>
+                                    </div>
                                 </group>
                                 <group string="GPS Coordinates">
                                     <field name="latitude"/>
@@ -123,7 +124,9 @@
                         </page>
 
                         <page string="Clinical Specialties" name="specialties">
-                            <field name="specialty_ids" widget="many2many_tags"/>
+                            <group>
+                                <field name="specialty_ids" widget="many2many_tags"/>
+                            </group>
                         </page>
 
                         <page string="Departments" name="departments">

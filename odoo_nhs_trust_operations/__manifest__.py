@@ -50,16 +50,12 @@ Key Features:
     'installable': True,
     'auto_install': False,
     'data': [
-        # Security first
         'security/ir.model.access.csv',
         'security/odoo_nhs_trust_operations_security.xml',
-        # Views for new operational models
         'views/nhs_trust_department_views.xml',
         'views/nhs_trust_site_views.xml',
         'views/nhs_trust_cqc_inspection_views.xml',
-        # Inherited extension to nhs.trust form (adds tabs + stat buttons)
         'views/nhs_trust_views_inherit.xml',
-        # Menu additions
         'views/nhs_trust_menus_inherit.xml',
     ],
     'demo': [],
