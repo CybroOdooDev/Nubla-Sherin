@@ -51,6 +51,41 @@ class NhsTrustStateChangeWizard(models.TransientModel):
             if not wiz.reason or len(wiz.reason.strip()) < 5:
                 raise ValidationError('A minimum of 5 characters is required for state change justification!')
 
+    @api.constrains('new_state', 'current_state', 'trust_id')
+    def _check_state_transition(self):
+        allowed_transitions = {
+            'draft': ['under_review'],
+            'under_review': ['active'],
+            'active': ['special_measures', 'merging', 'dissolved'],
+            'special_measures': ['active', 'merging', 'dissolved'],
+            'merging': ['dissolved'],
+            'dissolved': [],
+        }
+        for wiz in self:
+            if not wiz.current_state or not wiz.new_state or wiz.new_state == wiz.current_state:
+                continue
+            allowed = allowed_transitions.get(wiz.current_state, [])
+            if wiz.trust_id.health_system == 'nhs_scotland':
+                allowed = [s for s in allowed if s != 'special_measures']
+                if wiz.new_state == 'special_measures':
+                    raise ValidationError("NHS Scotland Trusts cannot be placed in Special Measures!")
+            if wiz.new_state not in allowed:
+                state_labels = {
+                    'draft': 'Draft',
+                    'under_review': 'Under Review',
+                    'active': 'Active',
+                    'special_measures': 'Special Measures',
+                    'merging': 'Merging',
+                    'dissolved': 'Dissolved',
+                }
+                allowed_str = [state_labels.get(s, s) for s in allowed]
+                current_label = state_labels.get(wiz.current_state, wiz.current_state)
+                new_label = state_labels.get(wiz.new_state, wiz.new_state)
+                raise ValidationError(
+                    f"Invalid state transition from '{current_label}' to '{new_label}'! "
+                    f"Permitted target states from '{current_label}' are: {', '.join(allowed_str)}."
+                )
+
     def action_confirm(self):
         self.ensure_one()
         if self.new_state == self.current_state:

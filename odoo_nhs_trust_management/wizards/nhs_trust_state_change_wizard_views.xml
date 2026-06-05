@@ -7,16 +7,16 @@
             <form string="NHS Trust State Transition Confirmation">
                 <sheet>
                     <group>
+                        <field name="trust_id" readonly="1" force_save="1"/>
                         <group>
-                            <field name="trust_id" readonly="1" force_save="1"/>
                             <field name="current_state"/>
                         </group>
                         <group>
-                            <field name="new_state" widget="selection"/>
+                            <field name="new_state" readonly="1" force_save="1"/>
                         </group>
                     </group>
                     <group string="Auditable Justification Narrative">
-                        <field name="reason" nolabel="1" placeholder="Provide an explanation/justification for this state change (minimum 5 characters is required)..."/>
+                        <field name="reason" nolabel="1" placeholder="Provide an explanation/justification for this state change (minimum 5 characters is required)..." colspan="2"/>
                     </group>
                 </sheet>
                 <footer>

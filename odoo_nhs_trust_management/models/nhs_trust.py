@@ -176,6 +176,13 @@ class NhsTrust(models.Model):
         help="Standard address fields for the Trust's main / registered HQ."
              " Not synced to a res.partner because the Trust is not a contact."
     )
+    state_id = fields.Many2one(
+        'res.country.state',
+        string='State',
+        ondelete='restrict',
+        domain="[('country_id', '=?', country_id)]",
+        help="Standard Odoo state/county field for the Trust's main / registered HQ."
+    )
     zip = fields.Char(
         string='Postcode',
         help="Standard address fields for the Trust's main / registered HQ."
@@ -299,16 +306,23 @@ class NhsTrust(models.Model):
         ('ods_code_unique', 'unique(ods_code)', 'The ODS code must be unique!'),
     ]
 
-    @api.constrains('ods_code')
+    @api.constrains('ods_code', 'health_system')
     def _check_ods_code(self):
         for trust in self:
             if not trust.ods_code:
                 continue
             code = trust.ods_code
-            if not (3 <= len(code) <= 5):
-                raise ValidationError('The ODS code must be between 3 and 5 characters long!')
             if not code.isalnum():
                 raise ValidationError('The ODS code must contain alphanumeric characters only!')
+
+            if trust.health_system == 'nhs_england':
+                if not (3 <= len(code) <= 5):
+                    raise ValidationError('NHS England ODS codes must be between 3 and 5 characters long!')
+            elif trust.health_system == 'nhs_scotland':
+                if not code.startswith('S'):
+                    raise ValidationError("NHS Scotland ODS codes must start with 'S'!")
+                if not (3 <= len(code) <= 10):
+                    raise ValidationError('NHS Scotland ODS codes must be between 3 and 10 characters long!')
 
     @api.constrains('health_system', 'icb_id', 'health_board_id', 'region_id')
     def _check_geographic_fields(self):
@@ -337,6 +351,12 @@ class NhsTrust(models.Model):
                 if trust.health_board_id.region_id != trust.region_id:
                     raise ValidationError('The selected Health Board must belong to the selected NHS Region!')
 
+    @api.constrains('state', 'health_system')
+    def _check_state_health_system(self):
+        for trust in self:
+            if trust.health_system == 'nhs_scotland' and trust.state == 'special_measures':
+                raise ValidationError('NHS Scotland Trusts cannot be placed in Special Measures!')
+
     @api.onchange('health_system')
     def _onchange_health_system(self):
         self.region_id = False
@@ -356,6 +376,16 @@ class NhsTrust(models.Model):
                 'region_id': [('health_system', '=', 'nhs_scotland')],
                 'trust_type_id': [('health_system', 'in', ('nhs_scotland', 'both'))]
             }}
+
+    @api.onchange('country_id')
+    def _onchange_country_id(self):
+        if self.state_id and self.state_id.country_id != self.country_id:
+            self.state_id = False
+
+    @api.onchange('state_id')
+    def _onchange_state_id(self):
+        if self.state_id.country_id and self.country_id != self.state_id.country_id:
+            self.country_id = self.state_id.country_id
 
     @api.onchange('region_id')
     def _onchange_region_id(self):
@@ -408,9 +438,28 @@ class NhsTrust(models.Model):
 
     def write(self, vals):
         if 'state' in vals:
+            new_state = vals['state']
+            allowed_transitions = {
+                'draft': ['under_review'],
+                'under_review': ['active'],
+                'active': ['special_measures', 'merging', 'dissolved'],
+                'special_measures': ['active', 'merging', 'dissolved'],
+                'merging': ['dissolved'],
+                'dissolved': [],
+            }
             for record in self:
-                if record.state == 'dissolved':
-                    raise ValidationError("The Trust is dissolved and in a final terminal state. No further state transitions are allowed.")
+                if new_state != record.state:
+                    if record.state == 'dissolved':
+                        raise ValidationError("The Trust is dissolved and in a final terminal state. No further state transitions are allowed.")
+                    allowed = allowed_transitions.get(record.state or 'draft', [])
+                    health_system = vals.get('health_system', record.health_system)
+                    if health_system == 'nhs_scotland':
+                        allowed = [s for s in allowed if s != 'special_measures']
+                    if new_state not in allowed:
+                        raise ValidationError(
+                            f"Invalid state transition from '{record.state}' to '{new_state}'! "
+                            f"Permitted transitions from '{record.state}' are: {', '.join(allowed)}."
+                        )
             if not self.env.context.get('approved_state_change'):
                 raise UserError(
                     'Direct updates to workflow state are blocked! Please use the "Change State" action button.')

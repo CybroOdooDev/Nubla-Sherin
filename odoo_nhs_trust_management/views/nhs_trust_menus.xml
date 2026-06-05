@@ -13,6 +13,12 @@
               action="action_nhs_trust"
               sequence="5"/>
 
+    <menuitem id="menu_nhs_board_members"
+              name="Board Members"
+              parent="menu_nhs_trust_root"
+              action="action_nhs_board_members"
+              sequence="10"/>
+
     <!-- Configuration Menu -->
     <menuitem id="menu_nhs_trust_config"
               name="Configuration"

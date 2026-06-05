@@ -25,6 +25,7 @@
                 <field name="trust_id"/>
                 <field name="inspection_date"/>
                 <field name="inspection_type"/>
+                <field name="cqc_registration_status"/>
                 <field name="overall_rating" widget="badge"
                        decoration-success="overall_rating == 'outstanding'"
                        decoration-info="overall_rating == 'good'"
@@ -61,6 +62,7 @@
                         <group string="Inspection Details">
                             <field name="inspection_date"/>
                             <field name="inspection_type"/>
+                            <field name="cqc_registration_status"/>
                             <field name="inspector_lead" placeholder="Lead inspector name..."/>
                             <field name="next_inspection_due"/>
                         </group>

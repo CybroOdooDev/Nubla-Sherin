@@ -1,18 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Standalone Board Members list action (all trusts, not scoped to active_id) -->
-    <record id="action_nhs_board_members" model="ir.actions.act_window">
-        <field name="name">Board Members</field>
-        <field name="res_model">res.partner</field>
-        <field name="view_mode">list,form</field>
-        <field name="domain">[('is_nhs_board_member', '=', True)]</field>
-        <field name="context">{'default_is_nhs_board_member': True, 'default_is_company': False}</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Add a board member contact.</p>
-            <p>Board members are stored as contacts with the NHS board member flag set.</p>
-        </field>
-    </record>
-
     <!--
         Extends the nhs.trust form view defined in odoo_nhs_trust_management.
         Adds:
@@ -53,7 +40,7 @@
                        name="cqc_basic">
                     <group>
                         <field name="cqc_provider_id" placeholder="e.g. 1-101677898"/>
-                        <field name="cqc_registration_status"/>
+                        <field name="cqc_registration_status" readonly="1" force_save="1"/>
                     </group>
                     <group>
                         <field name="latest_cqc_rating" readonly="1"/>

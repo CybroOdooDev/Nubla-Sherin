@@ -22,7 +22,7 @@
                         <field name="transfer_board_members" widget="boolean_toggle"/>
                     </group>
                     <group string="Merger Reason / Legal Justification">
-                        <field name="reason" placeholder="Provide details of the merger / legal order (minimum 5 characters)..." nolabel="1"/>
+                        <field name="reason" placeholder="Provide details of the merger / legal order (minimum 5 characters)..." nolabel="1" colspan="2"/>
                     </group>
                 </sheet>
                 <footer>
@@ -52,7 +52,7 @@
                         <field name="archive_sites" widget="boolean_toggle"/>
                     </group>
                     <group string="Dissolution Reason / Justification">
-                        <field name="reason" placeholder="Provide details of the dissolution (minimum 5 characters)..." nolabel="1"/>
+                        <field name="reason" placeholder="Provide details of the dissolution (minimum 5 characters)..." nolabel="1" colspan="2"/>
                     </group>
                 </sheet>
                 <footer>

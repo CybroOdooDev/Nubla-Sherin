@@ -40,9 +40,10 @@ class NhsTrustOperations(models.Model):
         ('not_applicable', 'Not Applicable'),
     ],
         string='CQC Registration Status',
-        default='registered',
-        help="Auto-set to 'not_applicable' when switching to Scotland (Scotland uses Healthcare"
-             " Improvement Scotland, not CQC)."
+        compute='_compute_latest_cqc',
+        store=True,
+        tracking=True,
+        help="CQC Registration status computed from the latest inspection record (or 'not_applicable' for Scotland)."
     )
 
     # ── Sites & Departments
@@ -185,18 +186,29 @@ class NhsTrustOperations(models.Model):
         for trust in self:
             trust.surplus_deficit = (trust.annual_income or 0.0) - (trust.annual_expenditure or 0.0)
 
-    @api.depends('cqc_inspection_ids.overall_rating', 'cqc_inspection_ids.inspection_date')
+    @api.depends('cqc_inspection_ids.overall_rating', 'cqc_inspection_ids.inspection_date', 'cqc_inspection_ids.cqc_registration_status', 'health_system')
     def _compute_latest_cqc(self):
         for trust in self:
+            print(f"COMPUTING LATEST CQC FOR {trust.name} (health_system={trust.health_system})")
+            if trust.health_system == 'nhs_scotland':
+                trust.latest_cqc_rating = False
+                trust.latest_cqc_date = False
+                trust.cqc_registration_status = 'not_applicable'
+                print(f"SET CQC REG STATUS TO not_applicable FOR {trust.name}")
+                continue
             inspections = trust.cqc_inspection_ids.filtered('inspection_date').sorted(
                 key=lambda r: r.inspection_date, reverse=True
             )
             if inspections:
                 trust.latest_cqc_rating = inspections[0].overall_rating
                 trust.latest_cqc_date = inspections[0].inspection_date
+                trust.cqc_registration_status = inspections[0].cqc_registration_status or 'registered'
+                print(f"SET CQC REG STATUS TO {trust.cqc_registration_status} FOR {trust.name} FROM INSPECTION")
             else:
                 trust.latest_cqc_rating = False
                 trust.latest_cqc_date = False
+                trust.cqc_registration_status = 'registered'
+                print(f"SET CQC REG STATUS TO registered (no inspection) FOR {trust.name}")
 
     # ── Action Methods ──────────────────────────────────────────────────────
 

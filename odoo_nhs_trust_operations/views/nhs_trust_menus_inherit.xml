@@ -32,13 +32,6 @@
               action="action_nhs_trust_department"
               sequence="20"/>
 
-    <!-- Board Members (all board members, not scoped to a single trust) -->
-    <menuitem id="menu_nhs_trust_ops_board_members"
-              name="Board Members"
-              parent="menu_nhs_trust_operations"
-              action="action_nhs_board_members"
-              sequence="30"/>
-
     <!-- ── Compliance Parent Submenu ────────────────────────────────────── -->
     <menuitem id="menu_nhs_trust_compliance"
               name="Compliance"

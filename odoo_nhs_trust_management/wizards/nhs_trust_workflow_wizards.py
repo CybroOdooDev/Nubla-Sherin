@@ -73,7 +73,7 @@ class NhsTrustMergeWizard(models.TransientModel):
 
         # 2. Transfer Sites if selected
         transferred_site_names = []
-        if self.transfer_sites and source.site_ids:
+        if 'site_ids' in source._fields and self.transfer_sites and source.site_ids:
             sites_to_transfer = source.site_ids
             for site in sites_to_transfer:
                 transferred_site_names.append(site.name)
@@ -135,7 +135,7 @@ class NhsTrustDissolveWizard(models.TransientModel):
         })
 
         # 2. Archive Sites if selected
-        if self.archive_sites and trust.site_ids:
+        if 'site_ids' in trust._fields and self.archive_sites and trust.site_ids:
             trust.site_ids.write({'active': False})
 
         # 3. Archive Board Members (or set nhs_trust_id = False)

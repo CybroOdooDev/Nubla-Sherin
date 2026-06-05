@@ -116,6 +116,18 @@ class NhsTrustCqcInspection(models.Model):
         string='CQC Report URL',
         help="URL to the published CQC report on cqc.org.uk. Rendered with url widget."
     )
+    cqc_registration_status = fields.Selection([
+        ('registered', 'Registered'),
+        ('conditions', 'Registered with Conditions'),
+        ('suspended', 'Suspended'),
+        ('cancelled', 'Cancelled'),
+        ('not_applicable', 'Not Applicable'),
+    ],
+        string='CQC Registration Status',
+        required=True,
+        default='registered',
+        help="CQC Registration status resulting from this inspection."
+    )
     report_attachment_ids = fields.Many2many(
         'ir.attachment',
         'nhs_cqc_inspection_attachment_rel',
