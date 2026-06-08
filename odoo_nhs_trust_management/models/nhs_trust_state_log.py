@@ -35,6 +35,7 @@ class NhsTrustStateLog(models.Model):
         ('under_review', 'Under Review'),
         ('active', 'Active'),
         ('special_measures', 'Special Measures'),
+        ('suspended', 'Suspended'),
         ('merging', 'Merging'),
         ('dissolved', 'Dissolved'),
     ], string='From State')
@@ -43,6 +44,7 @@ class NhsTrustStateLog(models.Model):
         ('under_review', 'Under Review'),
         ('active', 'Active'),
         ('special_measures', 'Special Measures'),
+        ('suspended', 'Suspended'),
         ('merging', 'Merging'),
         ('dissolved', 'Dissolved'),
     ], string='To State', required=True)

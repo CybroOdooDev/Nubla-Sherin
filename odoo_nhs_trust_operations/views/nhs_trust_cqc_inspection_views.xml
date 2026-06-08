@@ -26,6 +26,9 @@
                 <field name="inspection_date"/>
                 <field name="inspection_type"/>
                 <field name="cqc_registration_status"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'under_review'"
+                       decoration-success="state == 'active'"/>
                 <field name="overall_rating" widget="badge"
                        decoration-success="overall_rating == 'outstanding'"
                        decoration-info="overall_rating == 'good'"
@@ -46,6 +49,12 @@
         <field name="model">nhs.trust.cqc.inspection</field>
         <field name="arch" type="xml">
             <form string="CQC Inspection">
+                <header>
+                    <button name="action_submit" string="Submit for Review" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve" type="object" class="oe_highlight" invisible="state != 'under_review'"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object" invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,under_review,active"/>
+                </header>
                 <sheet>
                     <div class="oe_title">
                         <label for="trust_id"/>

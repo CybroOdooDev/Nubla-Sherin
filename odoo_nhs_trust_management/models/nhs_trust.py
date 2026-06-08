@@ -266,6 +266,7 @@ class NhsTrust(models.Model):
         ('under_review', 'Under Review'),
         ('active', 'Active'),
         ('special_measures', 'Special Measures'),
+        ('suspended', 'Suspended'),
         ('merging', 'Merging'),
         ('dissolved', 'Dissolved'),
     ],
@@ -276,7 +277,7 @@ class NhsTrust(models.Model):
         index=True,
         copy=False,
         group_expand=True,
-        help="Selection: draft / under_review / active / special_measures / merging / dissolved. "
+        help="Selection: draft / under_review / active / special_measures / suspended / merging / dissolved. "
              "Default: 'draft'. DO NOT write to this field directly — write() is overridden"
              " to raise UserError unless approved_state_change context is set. Use State Change Wizard."
     )
@@ -442,8 +443,9 @@ class NhsTrust(models.Model):
             allowed_transitions = {
                 'draft': ['under_review'],
                 'under_review': ['active'],
-                'active': ['special_measures', 'merging', 'dissolved'],
-                'special_measures': ['active', 'merging', 'dissolved'],
+                'active': ['special_measures', 'suspended', 'merging', 'dissolved'],
+                'special_measures': ['active', 'suspended', 'merging', 'dissolved'],
+                'suspended': ['active', 'special_measures', 'merging', 'dissolved'],
                 'merging': ['dissolved'],
                 'dissolved': [],
             }

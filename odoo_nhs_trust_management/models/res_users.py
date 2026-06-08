@@ -30,6 +30,7 @@ class ResUsers(models.Model):
         'user_id',
         'icb_id',
         string='Allowed ICBs (England)',
+        groups='odoo_nhs_trust_management.group_nhs_trust_user',
         help='Users will only be able to see NHS Trusts associated with these Integrated Care Boards (ICBs).'
     )
     nhs_allowed_health_board_ids = fields.Many2many(
@@ -38,5 +39,6 @@ class ResUsers(models.Model):
         'user_id',
         'health_board_id',
         string='Allowed Health Boards (Scotland)',
+        groups='odoo_nhs_trust_management.group_nhs_trust_user',
         help='Users will only be able to see NHS Trusts associated with these Scottish Health Boards.'
     )

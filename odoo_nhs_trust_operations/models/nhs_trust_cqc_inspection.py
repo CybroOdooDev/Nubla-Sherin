@@ -157,6 +157,18 @@ class NhsTrustCqcInspection(models.Model):
         help="Archive flag."
     )
 
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('under_review', 'Under Review'),
+        ('active', 'Active'),
+    ],
+        string='Status',
+        required=True,
+        default='draft',
+        tracking=True,
+        help="Workflow state of this inspection record: Draft -> Under Review -> Active."
+    )
+
     @api.depends('trust_id', 'trust_id.short_name', 'trust_id.name', 'inspection_date', 'overall_rating')
     def _compute_display_name(self):
         rating_map = dict(RATING_SELECTION)
@@ -165,6 +177,18 @@ class NhsTrustCqcInspection(models.Model):
             date_str = str(rec.inspection_date) if rec.inspection_date else ''
             rating_label = rating_map.get(rec.overall_rating, '') if rec.overall_rating else ''
             rec.display_name = f"{trust_name} — {date_str} — {rating_label}"
+
+    def action_submit(self):
+        for rec in self:
+            rec.state = 'under_review'
+
+    def action_approve(self):
+        for rec in self:
+            rec.state = 'active'
+
+    def action_reset_to_draft(self):
+        for rec in self:
+            rec.state = 'draft'
 
     @api.constrains('inspection_date', 'next_inspection_due')
     def _check_dates(self):

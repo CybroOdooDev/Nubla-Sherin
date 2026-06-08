@@ -10,8 +10,9 @@
 
     <!-- Settings > Users & Companies > NHS -->
     <menuitem id="menu_settings_nhs_trust"
-              name="NHS"
+              name="NHS Trusts"
               parent="base.menu_users"
               action="action_nhs_trust_settings_create"
-              sequence="20"/>
+              sequence="20"
+              groups="odoo_nhs_trust_management.group_nhs_trust_admin"/>
 </odoo>

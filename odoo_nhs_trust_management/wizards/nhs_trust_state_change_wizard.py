@@ -32,6 +32,7 @@ class NhsTrustStateChangeWizard(models.TransientModel):
         ('under_review', 'Under Review'),
         ('active', 'Active'),
         ('special_measures', 'Special Measures'),
+        ('suspended', 'Suspended'),
         ('merging', 'Merging'),
         ('dissolved', 'Dissolved'),
     ], string='Current State', related='trust_id.state', readonly=True)
@@ -40,6 +41,7 @@ class NhsTrustStateChangeWizard(models.TransientModel):
         ('under_review', 'Under Review'),
         ('active', 'Active'),
         ('special_measures', 'Special Measures'),
+        ('suspended', 'Suspended'),
         ('merging', 'Merging'),
         ('dissolved', 'Dissolved'),
     ], string='Target State', required=True)
@@ -56,8 +58,9 @@ class NhsTrustStateChangeWizard(models.TransientModel):
         allowed_transitions = {
             'draft': ['under_review'],
             'under_review': ['active'],
-            'active': ['special_measures', 'merging', 'dissolved'],
-            'special_measures': ['active', 'merging', 'dissolved'],
+            'active': ['special_measures', 'suspended', 'merging', 'dissolved'],
+            'special_measures': ['active', 'suspended', 'merging', 'dissolved'],
+            'suspended': ['active', 'special_measures', 'merging', 'dissolved'],
             'merging': ['dissolved'],
             'dissolved': [],
         }
@@ -75,6 +78,7 @@ class NhsTrustStateChangeWizard(models.TransientModel):
                     'under_review': 'Under Review',
                     'active': 'Active',
                     'special_measures': 'Special Measures',
+                    'suspended': 'Suspended',
                     'merging': 'Merging',
                     'dissolved': 'Dissolved',
                 }

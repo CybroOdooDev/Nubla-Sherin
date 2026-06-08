@@ -4,7 +4,8 @@
     <menuitem id="menu_nhs_trust_root"
               name="Trust Management"
               web_icon="odoo_nhs_trust_management,static/description/icon.png"
-              sequence="45"/>
+              sequence="45"
+              groups="odoo_nhs_trust_management.group_nhs_trust_user"/>
 
     <!-- Submenus -->
     <menuitem id="menu_nhs_trust"
@@ -17,7 +18,7 @@
               name="Board Members"
               parent="menu_nhs_trust_root"
               action="action_nhs_board_members"
-              sequence="10"/>
+              sequence="15"/>
 
     <!-- Configuration Menu -->
     <menuitem id="menu_nhs_trust_config"
@@ -34,33 +35,26 @@
               sequence="10"/>
 
     <menuitem id="menu_nhs_trust_type"
-              name="Trust Types"
+              name="NHS Trust Types"
               parent="menu_nhs_trust_config"
               action="action_nhs_trust_type"
               sequence="20"/>
 
     <menuitem id="menu_nhs_icb"
-              name="Integrated Care Boards (ICBs)"
+              name="NHS ICBs"
               parent="menu_nhs_trust_config"
               action="action_nhs_icb"
               sequence="30"/>
 
     <menuitem id="menu_nhs_ics"
-              name="Integrated Care Systems (ICSs)"
+              name="NHS ICSs"
               parent="menu_nhs_trust_config"
               action="action_nhs_ics"
               sequence="40"/>
 
     <menuitem id="menu_nhs_health_board"
-              name="NHS Scotland Health Boards"
+              name="NHS Health Boards"
               parent="menu_nhs_trust_config"
               action="action_nhs_health_board"
               sequence="50"/>
-
-<!--    <menuitem id="menu_nhs_trust_state_log"-->
-<!--              name="Workflow Audit Logs"-->
-<!--              parent="menu_nhs_trust_config"-->
-<!--              action="action_nhs_trust_state_log"-->
-<!--              sequence="90"/>-->
 </odoo>
-

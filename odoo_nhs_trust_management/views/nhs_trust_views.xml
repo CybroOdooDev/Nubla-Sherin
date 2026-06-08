@@ -14,14 +14,14 @@
         <field name="name">nhs.trust.tree</field>
         <field name="model">nhs.trust</field>
         <field name="arch" type="xml">
-            <list string="NHS Trusts" decoration-info="state == 'under_review'" decoration-success="state == 'active'" decoration-warning="state == 'special_measures'" decoration-muted="state in ('merging', 'dissolved')">
+            <list string="NHS Trusts" decoration-info="state == 'under_review'" decoration-success="state == 'active'" decoration-warning="state in ('special_measures', 'suspended')" decoration-muted="state in ('merging', 'dissolved')">
                 <field name="ods_code"/>
                 <field name="name"/>
                 <field name="health_system"/>
                 <field name="region_id"/>
                 <field name="trust_type_id"/>
                 <field name="foundation_trust" widget="boolean"/>
-                <field name="state" widget="badge" decoration-info="state == 'under_review'" decoration-success="state == 'active'" decoration-warning="state == 'special_measures'" decoration-danger="state == 'dissolved'"/>
+                <field name="state" widget="badge" decoration-info="state == 'under_review'" decoration-success="state == 'active'" decoration-warning="state in ('special_measures', 'suspended')" decoration-danger="state == 'dissolved'"/>
             </list>
         </field>
     </record>
@@ -86,14 +86,16 @@
                     <!-- Approve & Activate -->
                     <button name="action_open_state_change_wizard" string="Approve &amp; Activate" type="object" class="oe_highlight" context="{'default_new_state': 'active'}" invisible="state != 'under_review'" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
                     <!-- Escalate to Special Measures -->
-                    <button name="action_open_state_change_wizard" string="Escalate to Special Measures" type="object" class="oe_highlight" context="{'default_new_state': 'special_measures'}" invisible="state != 'active' or health_system == 'nhs_scotland'" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    <button name="action_open_state_change_wizard" string="Escalate to Special Measures" type="object" class="oe_highlight" context="{'default_new_state': 'special_measures'}" invisible="state not in ('active', 'suspended') or health_system == 'nhs_scotland'" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    <!-- Suspend Trust -->
+                    <button name="action_open_state_change_wizard" string="Suspend Trust" type="object" class="oe_highlight" context="{'default_new_state': 'suspended'}" invisible="state not in ('active', 'special_measures')" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
                     <!-- Revert to Active -->
-                    <button name="action_open_state_change_wizard" string="Revert to Active" type="object" class="oe_highlight" context="{'default_new_state': 'active'}" invisible="state != 'special_measures' or health_system == 'nhs_scotland'" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    <button name="action_open_state_change_wizard" string="Revert to Active" type="object" class="oe_highlight" context="{'default_new_state': 'active'}" invisible="state not in ('special_measures', 'suspended') or (state == 'special_measures' and health_system == 'nhs_scotland')" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
                     
                     <!-- Merge Trust Wizard -->
-                    <button name="%(odoo_nhs_trust_management.action_nhs_trust_merge_wizard)d" string="Merge Trust" type="action" class="oe_highlight" invisible="state not in ('active', 'special_measures')" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    <button name="%(odoo_nhs_trust_management.action_nhs_trust_merge_wizard)d" string="Merge Trust" type="action" class="oe_highlight" invisible="state not in ('active', 'special_measures', 'suspended')" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
                     <!-- Dissolve Trust Wizard -->
-                    <button name="%(odoo_nhs_trust_management.action_nhs_trust_dissolve_wizard)d" string="Dissolve Trust" type="action" class="oe_highlight" invisible="state not in ('active', 'special_measures', 'merging')" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+                    <button name="%(odoo_nhs_trust_management.action_nhs_trust_dissolve_wizard)d" string="Dissolve Trust" type="action" class="oe_highlight" invisible="state not in ('active', 'special_measures', 'suspended', 'merging')" groups="odoo_nhs_trust_management.group_nhs_trust_manager,odoo_nhs_trust_management.group_nhs_trust_admin"/>
                     
                     <field name="state" widget="statusbar" statusbar_visible="draft,under_review,active"/>
                 </header>
