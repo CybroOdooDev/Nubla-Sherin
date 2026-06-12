@@ -1,4 +1,24 @@
 # -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -36,11 +56,16 @@ ODS_FIELD_MAP = {
 
 
 class OdsConflictDetector:
+    """Detect differences and potential conflicts between local trust records and ODS data."""
+
     def __init__(self, env):
+        """Initialize the conflict detector with the current Odoo environment."""
         self.env = env
 
     def detect(self, parsed: dict, trust, ods_org) -> list:
+        """Compare parsed ODS organization data against a trust record to identify field/state conflicts."""
         conflicts = []
+
 
         if ods_org and ods_org.raw_payload_hash and parsed.get('raw_payload_hash') == ods_org.raw_payload_hash:
             return []

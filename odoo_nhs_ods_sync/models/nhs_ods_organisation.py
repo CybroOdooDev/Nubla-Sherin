@@ -1,4 +1,24 @@
 # -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 import json
 import logging
 
@@ -8,6 +28,7 @@ _logger = logging.getLogger(__name__)
 
 
 class NhsOdsOrganisation(models.Model):
+    """Store cached ODS API payloads and parse organization data for Odoo models."""
     _name = 'nhs.ods.organisation'
     _inherit = ['mail.thread']
     _description = 'Cached ODS API payload for a single organisation'
@@ -48,11 +69,11 @@ class NhsOdsOrganisation(models.Model):
         string='Operational End Date',
         help="Date[Type=Operational].End — present when an organisation has been wound up.",
     )
-    address_line1 = fields.Char(string='Address Line 1')
-    address_line2 = fields.Char(string='Address Line 2')
-    city = fields.Char(string='Town / City')
-    county = fields.Char(string='County')
-    postcode = fields.Char(string='Postcode')
+    address_line1 = fields.Char(string='Address Line 1', help="Parsed street address line 1.")
+    address_line2 = fields.Char(string='Address Line 2', help="Parsed street address line 2.")
+    city = fields.Char(string='Town / City', help="Parsed town or city name.")
+    county = fields.Char(string='County', help="Parsed county name.")
+    postcode = fields.Char(string='Postcode', help="Parsed postcode.")
     country_text = fields.Char(
         string='Country (ODS)',
         help="GeoLoc.Location.Country text value. Used to resolve country_id.",
@@ -60,6 +81,14 @@ class NhsOdsOrganisation(models.Model):
     phone = fields.Char(
         string='Phone',
         help="First tel contact from the ODS payload.",
+    )
+    email = fields.Char(
+        string='Email',
+        help="First email/mailto contact from the ODS payload.",
+    )
+    website = fields.Char(
+        string='Website',
+        help="First http/https website contact from the ODS payload.",
     )
     last_change_date = fields.Date(
         string='ODS Last Change Date',
@@ -114,6 +143,7 @@ class NhsOdsOrganisation(models.Model):
 
     @api.depends('ods_code', 'name')
     def _compute_display_name(self):
+        """Compute display name formatting for the organisation."""
         for rec in self:
             if rec.ods_code and rec.name:
                 rec.display_name = f'[{rec.ods_code}] {rec.name}'
@@ -122,6 +152,7 @@ class NhsOdsOrganisation(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Override create to normalize code and casing on store."""
         for vals in vals_list:
             if vals.get('ods_code'):
                 vals['ods_code'] = vals['ods_code'].upper()
@@ -130,15 +161,19 @@ class NhsOdsOrganisation(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
+        """Override write to normalize code and casing on store."""
         if vals.get('ods_code'):
             vals['ods_code'] = vals['ods_code'].upper()
         if vals.get('name') and vals['name'].isupper():
             vals['name'] = vals['name'].title()
         return super().write(vals)
 
+
     def refresh_from_ods(self):
+        """Fetch latest organisation details from Spine API and refresh cache."""
         self.ensure_one()
         from ..services.ods_api_client import OdsApiClient
+
         from ..services.ods_payload_parser import parse_ods_payload
         client = OdsApiClient(self.env)
         raw = client.get_organisation(self.ods_code)
@@ -158,6 +193,8 @@ class NhsOdsOrganisation(models.Model):
             'postcode': parsed.get('postcode'),
             'country_text': parsed.get('country'),
             'phone': parsed.get('phone'),
+            'email': parsed.get('email'),
+            'website': parsed.get('website'),
             'last_change_date': parsed.get('last_changed_at'),
             'raw_json': json.dumps(org_data),
             'raw_payload_hash': parsed.get('raw_payload_hash'),
@@ -190,8 +227,10 @@ class NhsOdsOrganisation(models.Model):
         }
 
     def apply_to_trust(self):
+        """Create or update linked trust record based on parsed cache values."""
         self.ensure_one()
         country = self.env['res.country'].search([('name', 'ilike', self.country_text)], limit=1)
+
 
         # Resolve health_system and trust_type from role mapping
         role_mapping = self.env['nhs.ods.role.mapping'].search([
@@ -229,6 +268,7 @@ class NhsOdsOrganisation(models.Model):
         ics = False
         health_board = False
         welsh_lhb = False
+        region = False
 
         if health_system == 'nhs_england':
             if active_rels:
@@ -258,6 +298,57 @@ class NhsOdsOrganisation(models.Model):
                                     break
             if ics and not icb:
                 icb = ics.icb_id
+
+            # Try postcodes.io API lookup first
+            if not icb and self.postcode:
+                pc = self.postcode.strip().replace(' ', '').upper()
+                try:
+                    import urllib.request
+                    import json
+                    url = f'https://api.postcodes.io/postcodes/{pc}'
+                    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                    with urllib.request.urlopen(req, timeout=2) as response:
+                        res_data = json.loads(response.read().decode())
+                        result = res_data.get('result', {})
+                        api_icb_name = result.get('icb')
+                        if api_icb_name:
+                            clean_name = api_icb_name.upper().replace('INTEGRATED CARE BOARD', '').replace('ICB', '').replace('NHS', '').strip()
+                            matched_icb = self.env['nhs.icb'].search([('name', 'ilike', clean_name)], limit=1)
+                            if matched_icb:
+                                icb = matched_icb
+                        
+                        api_region_name = result.get('nhs_region')
+                        if api_region_name:
+                            matched_region = self.env['nhs.region'].search([
+                                ('name', 'ilike', api_region_name),
+                                ('health_system', '=', 'nhs_england')
+                            ], limit=1)
+                            if matched_region:
+                                region = matched_region
+                except Exception:
+                    pass
+
+            # Fallback to local database postcode prefix lookup if API lookup failed
+            if not icb and self.postcode:
+                pc = self.postcode.strip().upper()
+                outcode = pc.split()[0] if pc else ''
+                fallback_trust = self.env['nhs.trust'].search([
+                    ('zip', '=like', outcode + '%'),
+                    ('icb_id', '!=', False),
+                ], limit=1)
+                if fallback_trust:
+                    icb = fallback_trust.icb_id
+                else:
+                    import re
+                    match = re.match(r'^[A-Z]{1,2}', outcode)
+                    if match:
+                        area = match.group(0)
+                        fallback_trust = self.env['nhs.trust'].search([
+                            ('zip', '=like', area + '%'),
+                            ('icb_id', '!=', False),
+                        ], limit=1)
+                        if fallback_trust:
+                            icb = fallback_trust.icb_id
         elif health_system == 'nhs_scotland':
             board_codes = [self.ods_code] + active_rels
             health_board = self.env['nhs.health.board'].search([('code', 'in', board_codes)], limit=1)
@@ -283,6 +374,26 @@ class NhsOdsOrganisation(models.Model):
                                 health_board = matched_board
                                 health_board.code = code
                                 break
+            if not health_board and self.postcode:
+                pc = self.postcode.strip().upper()
+                outcode = pc.split()[0] if pc else ''
+                fallback_trust = self.env['nhs.trust'].search([
+                    ('zip', '=like', outcode + '%'),
+                    ('health_board_id', '!=', False),
+                ], limit=1)
+                if fallback_trust:
+                    health_board = fallback_trust.health_board_id
+                else:
+                    import re
+                    match = re.match(r'^[A-Z]{1,2}', outcode)
+                    if match:
+                        area = match.group(0)
+                        fallback_trust = self.env['nhs.trust'].search([
+                            ('zip', '=like', area + '%'),
+                            ('health_board_id', '!=', False),
+                        ], limit=1)
+                        if fallback_trust:
+                            health_board = fallback_trust.health_board_id
         elif health_system == 'nhs_wales':
             lhb_codes = [self.ods_code] + active_rels
             welsh_lhb = self.env['nhs.welsh.lhb'].search([('code', 'in', lhb_codes)], limit=1)
@@ -309,13 +420,13 @@ class NhsOdsOrganisation(models.Model):
                                 welsh_lhb.code = code
                                 break
 
-        region = False
-        if icb and icb.region_id:
-            region = icb.region_id
-        elif health_board and health_board.region_id:
-            region = health_board.region_id
-        elif welsh_lhb and welsh_lhb.region_id:
-            region = welsh_lhb.region_id
+        if not region:
+            if icb and icb.region_id:
+                region = icb.region_id
+            elif health_board and health_board.region_id:
+                region = health_board.region_id
+            elif welsh_lhb and welsh_lhb.region_id:
+                region = welsh_lhb.region_id
 
         if not region:
             region = self.env['nhs.region'].search(
@@ -331,6 +442,8 @@ class NhsOdsOrganisation(models.Model):
             'city': self.city,
             'zip': self.postcode,
             'phone': self.phone,
+            'email': self.email,
+            'website': self.website,
             'state': 'active' if self.status == 'active' else 'dissolved',
         }
         if region:
@@ -355,6 +468,10 @@ class NhsOdsOrganisation(models.Model):
 
         if self.trust_id:
             self.trust_id.with_context(**ctx).write(vals)
+            self.write({
+                'icb_id': icb.id if icb else False,
+                'health_board_id': health_board.id if health_board else False,
+            })
             return self.trust_id
         else:
             # Check if a trust with this ODS code already exists
@@ -363,14 +480,24 @@ class NhsOdsOrganisation(models.Model):
             if existing:
                 existing.with_context(**ctx).write(vals)
                 self.trust_id = existing
+                self.write({
+                    'icb_id': icb.id if icb else False,
+                    'health_board_id': health_board.id if health_board else False,
+                })
                 return existing
             trust = trust_env.create(vals)
             self.trust_id = trust
+            self.write({
+                'icb_id': icb.id if icb else False,
+                'health_board_id': health_board.id if health_board else False,
+            })
             return trust
 
     def detect_conflicts(self):
+        """Detect conflicts between ODS cache values and local trust values."""
         self.ensure_one()
         if not self.trust_id:
+
             return []
         from ..services.ods_conflict_detector import OdsConflictDetector
         import json as _json

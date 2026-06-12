@@ -1,4 +1,24 @@
 # -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 import hashlib
 import json
 import logging
@@ -56,6 +76,10 @@ def parse_ods_payload(raw: dict) -> dict:
     if not isinstance(contacts, list):
         contacts = [contacts]
     phone = next((c.get('value', '') for c in contacts if c.get('type') == 'tel'), '')
+    email = next((c.get('value', '') for c in contacts if c.get('type') in ('email', 'mailto')), '')
+    if email.lower().startswith('mailto:'):
+        email = email[7:]
+    website = next((c.get('value', '') for c in contacts if c.get('type') in ('http', 'https')), '')
 
     roles = raw.get('Roles', {}).get('Role', [])
     if not isinstance(roles, list):
@@ -106,6 +130,8 @@ def parse_ods_payload(raw: dict) -> dict:
         'postcode': postcode,
         'country': country,
         'phone': phone,
+        'email': email,
+        'website': website,
         'primary_role_code': primary_role_code,
         'all_role_codes': all_role_codes,
         'last_changed_at': last_changed_at,
@@ -115,7 +141,9 @@ def parse_ods_payload(raw: dict) -> dict:
 
 
 def _parse_date(value):
+    """Safely parse input value into a date object."""
     if not value:
+
         return None
     if isinstance(value, (date, datetime)):
         return value if isinstance(value, date) else value.date()

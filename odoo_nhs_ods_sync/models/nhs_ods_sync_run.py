@@ -1,8 +1,28 @@
 # -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 import logging
 import threading
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -19,6 +39,7 @@ ALLOWED_TRANSITIONS = {
 
 
 class NhsOdsSyncRun(models.Model):
+    """Track background sync process, audit counts, status, and error logs."""
     _name = 'nhs.ods.sync.run'
     _inherit = ['mail.thread']
     _description = 'ODS sync run history'
@@ -43,12 +64,15 @@ class NhsOdsSyncRun(models.Model):
         ('cron', 'Scheduled Cron'),
         ('api', 'API / XML-RPC'),
         ('post_install', 'Post-Install Bootstrap'),
-    ], string='Triggered By', required=True, default='manual')
+    ], string='Triggered By', required=True, default='manual',
+        help="Sync initiator (e.g. user, cron, API, bootstrap).",
+    )
     user_id = fields.Many2one(
         'res.users',
         string='Triggered By User',
         required=True,
         default=lambda self: self.env.user,
+        help="User who triggered this sync run.",
     )
     state = fields.Selection([
         ('pending', 'Pending'),
@@ -57,21 +81,58 @@ class NhsOdsSyncRun(models.Model):
         ('partial', 'Partial (with errors)'),
         ('failed', 'Failed'),
         ('cancelled', 'Cancelled'),
-    ], string='State', required=True, default='pending', tracking=True)
-    started_at = fields.Datetime(string='Started At', tracking=True)
-    completed_at = fields.Datetime(string='Completed At')
+    ], string='State', required=True, default='pending', tracking=True,
+        help="Current execution state of the sync run.",
+    )
+    started_at = fields.Datetime(
+        string='Started At',
+        tracking=True,
+        help="Timestamp when the sync execution began.",
+    )
+    completed_at = fields.Datetime(
+        string='Completed At',
+        help="Timestamp when the sync execution finished.",
+    )
     duration = fields.Float(
         string='Duration (min)',
         compute='_compute_duration',
         help="Minutes between started_at and completed_at.",
     )
-    fetched_count = fields.Integer(string='Fetched', default=0)
-    created_count = fields.Integer(string='Created', default=0)
-    updated_count = fields.Integer(string='Updated', default=0)
-    unchanged_count = fields.Integer(string='Unchanged', default=0)
-    conflict_count = fields.Integer(string='Conflicts', default=0)
-    error_count = fields.Integer(string='Errors', default=0)
-    skipped_count = fields.Integer(string='Skipped', default=0)
+    fetched_count = fields.Integer(
+        string='Fetched',
+        default=0,
+        help="Total number of organization stubs fetched from the API.",
+    )
+    created_count = fields.Integer(
+        string='Created',
+        default=0,
+        help="Number of new trusts created during this run.",
+    )
+    updated_count = fields.Integer(
+        string='Updated',
+        default=0,
+        help="Number of trusts updated during this run.",
+    )
+    unchanged_count = fields.Integer(
+        string='Unchanged',
+        default=0,
+        help="Number of trusts that were already up-to-date.",
+    )
+    conflict_count = fields.Integer(
+        string='Conflicts',
+        default=0,
+        help="Number of field conflicts detected during this run.",
+    )
+    error_count = fields.Integer(
+        string='Errors',
+        default=0,
+        help="Number of organisations that failed to sync.",
+    )
+    skipped_count = fields.Integer(
+        string='Skipped',
+        default=0,
+        help="Number of fetched organizations skipped based on mapping rules.",
+    )
     detail_ids = fields.One2many(
         'nhs.ods.sync.detail',
         'sync_run_id',
@@ -82,11 +143,15 @@ class NhsOdsSyncRun(models.Model):
         'sync_run_id',
         string='Conflict Records',
     )
-    error_log = fields.Text(string='Error Log')
+    error_log = fields.Text(
+        string='Error Log',
+        help="Contains any fatal errors or exceptions raised during execution.",
+    )
     api_base_url_used = fields.Char(
         string='API URL Used',
         required=True,
         default='https://directory.spineservices.nhs.uk/ORD/2-0-0',
+        help="API endpoint URL used for this sync run.",
     )
     delta_since = fields.Date(
         string='Delta Since',
@@ -105,6 +170,7 @@ class NhsOdsSyncRun(models.Model):
 
     @api.depends('name', 'run_type', 'state')
     def _compute_display_name(self):
+        """Compute display name including sequence reference and state."""
         type_labels = dict(self._fields['run_type'].selection)
         state_labels = dict(self._fields['state'].selection)
         for rec in self:
@@ -114,6 +180,7 @@ class NhsOdsSyncRun(models.Model):
 
     @api.depends('started_at', 'completed_at')
     def _compute_duration(self):
+        """Compute sync execution duration in minutes."""
         for rec in self:
             if rec.started_at and rec.completed_at:
                 delta = rec.completed_at - rec.started_at
@@ -121,8 +188,10 @@ class NhsOdsSyncRun(models.Model):
             else:
                 rec.duration = 0.0
 
+
     @api.model_create_multi
     def create(self, vals_list):
+        """Enforce sequence numbering for newly created sync runs."""
         seq = self.env['ir.sequence'].next_by_code('nhs.ods.sync.run')
         for vals in vals_list:
             if vals.get('name', 'New') == 'New':
@@ -130,13 +199,15 @@ class NhsOdsSyncRun(models.Model):
         return super().create(vals_list)
 
     def action_run(self):
+        """Prepare and start sync execution, spawning a background thread if needed."""
         self.ensure_one()
         if self.state not in ('pending',):
-            raise UserError(_("Only pending runs can be started."))
+            raise UserError(("Only pending runs can be started."))
         self.write({
             'state': 'running',
             'started_at': fields.Datetime.now(),
         })
+
 
         if self.run_type == 'targeted':
             # Targeted is a single API call — fast enough to run synchronously
@@ -152,21 +223,24 @@ class NhsOdsSyncRun(models.Model):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': _('Sync Started'),
-                'message': _('%s is running in the background. Refresh the page to see progress.') % self.name,
+                'title':('Sync Started'),
+                'message': ('%s is running in the background. Refresh the page to see progress.') % self.name,
                 'type': 'info',
                 'sticky': True,
             },
         }
 
     def _start_background_run(self):
+        """Spawn a background thread to process the ODS sync asynchronously."""
         run_id = self.id
+
         db_name = self.env.cr.dbname
 
         def _run():
             try:
                 import odoo
-                registry = odoo.registry(db_name)
+                from odoo.modules.registry import Registry
+                registry = Registry(db_name)
                 with registry.cursor() as cr:
                     env = odoo.api.Environment(cr, odoo.SUPERUSER_ID, {})
                     run = env['nhs.ods.sync.run'].browse(run_id)
@@ -193,7 +267,7 @@ class NhsOdsSyncRun(models.Model):
             elif self.run_type == 'targeted':
                 ods_code = self.targeted_ods_code or self.env.context.get('targeted_ods_code')
                 if not ods_code:
-                    raise UserError(_("Targeted sync requires an ODS code. Please fill in the ODS Code field."))
+                    raise UserError(("Targeted sync requires an ODS code. Please fill in the ODS Code field."))
                 engine.run_single(ods_code.strip().upper())
             elif self.run_type == 'dry_run':
                 engine.run_full()
@@ -226,18 +300,20 @@ class NhsOdsSyncRun(models.Model):
         }
 
     def action_cancel(self):
+        """Request cancellation of the background thread."""
         self.ensure_one()
         self.cancel_requested = True
         if self.state == 'pending':
             self.state = 'cancelled'
 
     def action_view_details(self):
+        """Return window action displaying detailed processed records."""
         self.ensure_one()
         list_view = self.env.ref('odoo_nhs_ods_sync.view_nhs_ods_sync_detail_list', raise_if_not_found=False)
         form_view = self.env.ref('odoo_nhs_ods_sync.view_nhs_ods_sync_detail_form', raise_if_not_found=False)
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Sync Details — %s') % self.name,
+            'name': ('Sync Details — %s') % self.name,
             'res_model': 'nhs.ods.sync.detail',
             'view_mode': 'list,form',
             'views': [(list_view.id if list_view else False, 'list'),
@@ -247,10 +323,11 @@ class NhsOdsSyncRun(models.Model):
         }
 
     def action_view_conflicts(self):
+        """Return window action displaying pending conflicts for this run."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Conflicts'),
+            'name': ('Conflicts'),
             'res_model': 'nhs.ods.sync.conflict',
             'view_mode': 'kanban,list,form',
             'domain': [('sync_run_id', '=', self.id)],
@@ -258,6 +335,7 @@ class NhsOdsSyncRun(models.Model):
         }
 
     def _get_last_sync_date(self):
+        """Determine cutoff date for delta sync based on previous runs."""
         last = self.search([
             ('id', '!=', self.id),
             ('state', 'in', ('success', 'partial')),
@@ -269,6 +347,7 @@ class NhsOdsSyncRun(models.Model):
 
     @api.model
     def _run_scheduled_delta(self):
+        """Cron entrypoint for incremental scheduled delta sync."""
         run = self.create({
             'run_type': 'incremental',
             'triggered_by': 'cron',
@@ -280,6 +359,7 @@ class NhsOdsSyncRun(models.Model):
 
     @api.model
     def _run_scheduled_full(self):
+        """Cron entrypoint for scheduled full ODS sync."""
         run = self.create({
             'run_type': 'full',
             'triggered_by': 'cron',
@@ -288,3 +368,4 @@ class NhsOdsSyncRun(models.Model):
             'started_at': fields.Datetime.now(),
         })
         run._execute_run()
+

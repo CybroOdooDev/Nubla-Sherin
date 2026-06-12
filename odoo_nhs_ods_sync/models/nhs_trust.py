@@ -1,5 +1,25 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api, _
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
+from odoo import models, fields, api
 
 PROVENANCE_WATCHED_FIELDS = (
     'name', 'ods_code', 'state', 'street', 'street2', 'city', 'zip', 'phone',
@@ -8,6 +28,7 @@ PROVENANCE_WATCHED_FIELDS = (
 
 
 class NhsTrust(models.Model):
+    """Extend core nhs.trust model to add fields and features for ODS integration."""
     _inherit = 'nhs.trust'
 
     ods_org_id = fields.Many2one(
@@ -24,6 +45,7 @@ class NhsTrust(models.Model):
         'nhs.ods.field.provenance',
         'trust_id',
         string='Field Provenance',
+        help="All field provenance records tracking modifications for this trust.",
     )
     ods_pending_conflict_count = fields.Integer(
         string='Pending Conflicts',
@@ -32,6 +54,7 @@ class NhsTrust(models.Model):
     )
 
     def _compute_ods_pending_conflict_count(self):
+        """Compute the count of pending conflicts for this trust."""
         for trust in self:
             trust.ods_pending_conflict_count = self.env['nhs.ods.sync.conflict'].search_count([
                 ('trust_id', '=', trust.id),
@@ -40,18 +63,21 @@ class NhsTrust(models.Model):
 
     @api.constrains('health_system', 'icb_id', 'health_board_id', 'region_id')
     def _check_geographic_fields(self):
+        """Bypass geographical check validation if sync is running."""
         if self.env.context.get('nhs_ods_sync'):
             return
         return super()._check_geographic_fields()
 
     @api.constrains('health_system', 'icb_id', 'health_board_id', 'welsh_lhb_id', 'region_id', 'trust_type_id')
     def _check_governance_link(self):
+        """Bypass governance check validation if sync is running."""
         if self.env.context.get('nhs_ods_sync'):
             return
         return super()._check_governance_link()
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Override create to record field provenance for manual creations."""
         records = super().create(vals_list)
         if not self.env.context.get('nhs_ods_sync'):
             for record, vals in zip(records, vals_list):
@@ -59,6 +85,7 @@ class NhsTrust(models.Model):
         return records
 
     def write(self, vals):
+        """Override write to track field provenance for manual edits and bypass state guard for sync."""
         if self.env.context.get('nhs_ods_sync') and 'state' in vals:
             state = vals.pop('state')
             result = super().write(vals)
@@ -72,6 +99,7 @@ class NhsTrust(models.Model):
         return result
 
     def _upsert_provenance(self, vals, source):
+        """Upsert the field provenance tracking entry for the specified field and source."""
         Provenance = self.env['nhs.ods.field.provenance'].sudo()
         sync_run = self.env.context.get('nhs_ods_sync_run_id')
         for fname in PROVENANCE_WATCHED_FIELDS:
@@ -99,25 +127,32 @@ class NhsTrust(models.Model):
                 })
 
     def action_refresh_from_ods(self):
+        """Query ODS API to refresh cache and apply modifications to the trust."""
         self.ensure_one()
         if not self.ods_code:
             from odoo.exceptions import UserError
-            raise UserError(_("This trust has no ODS code — cannot refresh from ODS."))
+            raise UserError(("This trust has no ODS code — cannot refresh from ODS."))
         if self.ods_org_id:
             self.ods_org_id.refresh_from_ods()
             self.ods_org_id.apply_to_trust()
         else:
             ods_org = self.env['nhs.ods.organisation'].search([('ods_code', '=', self.ods_code)], limit=1)
-            if ods_org:
-                ods_org.refresh_from_ods()
-                ods_org.apply_to_trust()
+            if not ods_org:
+                ods_org = self.env['nhs.ods.organisation'].create({
+                    'ods_code': self.ods_code,
+                    'name': self.name,
+                })
+            ods_org.refresh_from_ods()
+            ods_org.apply_to_trust()
+            self.ods_org_id = ods_org
         self.ods_last_synced_at = fields.Datetime.now()
 
     def action_view_provenance(self):
+        """Return an action displaying the field provenance details for the trust."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Field Provenance'),
+            'name': ('Field Provenance'),
             'res_model': 'nhs.ods.field.provenance',
             'view_mode': 'list',
             'domain': [('trust_id', '=', self.id)],
@@ -125,12 +160,14 @@ class NhsTrust(models.Model):
         }
 
     def action_view_conflicts(self):
+        """Return an action displaying the pending ODS conflicts for the trust."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('ODS Conflicts'),
+            'name': ('ODS Conflicts'),
             'res_model': 'nhs.ods.sync.conflict',
             'view_mode': 'kanban,list,form',
             'domain': [('trust_id', '=', self.id), ('state', '=', 'pending')],
             'context': {'default_trust_id': self.id},
         }
+

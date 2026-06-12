@@ -1,4 +1,24 @@
 # -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 import json
 import logging
 import time
@@ -20,7 +40,10 @@ COUNTRY_MAP = {
 
 
 class OdsSyncEngine:
+    """Core synchronization engine to fetch, parse, and apply ODS data to Odoo models."""
+
     def __init__(self, env, run):
+        """Initialize the sync engine with environment and run contexts."""
         self.env = env
         self.run = run
         self.api = OdsApiClient(env)
@@ -28,6 +51,7 @@ class OdsSyncEngine:
         self._is_dry_run = (run.run_type == 'dry_run')
 
     def run_full(self):
+        """Perform full synchronization for all mapped roles."""
         mappings = self.env['nhs.ods.role.mapping'].search([('active', '=', True)])
         fetched = set()
         for mapping in mappings:
@@ -45,6 +69,7 @@ class OdsSyncEngine:
         self.run.fetched_count = len(fetched)
 
     def run_delta(self, since_date):
+        """Perform incremental synchronization starting from since_date."""
         mappings = self.env['nhs.ods.role.mapping'].search([('active', '=', True)])
         fetched = set()
         for mapping in mappings:
@@ -79,23 +104,30 @@ class OdsSyncEngine:
             pass
 
     def run_single(self, ods_code):
+        """Perform targeted synchronization for a single ODS code."""
         t0 = time.monotonic()
         try:
-            raw = self.api.get_organisation(ods_code)
-            org_data = raw.get('Organisation', raw)
-            self.run.fetched_count = 1
-            self._process_org(org_data)
+            with self.env.cr.savepoint():
+                raw = self.api.get_organisation(ods_code)
+                org_data = raw.get('Organisation', raw)
+                self.run.fetched_count = 1
+                self._process_org(org_data)
         except Exception as exc:
             _logger.exception("run_single failed for %s", ods_code)
-            self._record_detail(
-                ods_code=ods_code,
-                outcome='error',
-                error_message=str(exc),
-                duration_ms=int((time.monotonic() - t0) * 1000),
-            )
-            self.run.error_count += 1
+            try:
+                with self.env.cr.savepoint():
+                    self._record_detail(
+                        ods_code=ods_code,
+                        outcome='error',
+                        error_message=str(exc),
+                        duration_ms=int((time.monotonic() - t0) * 1000),
+                    )
+                    self.run.error_count += 1
+            except Exception:
+                _logger.exception("Failed to log single error in DB for org %s", ods_code)
 
     def _extract_code(self, org_stub):
+        """Extract the ODS code from an organization stub dict or string."""
         if isinstance(org_stub, dict):
             oid = org_stub.get('OrgId', {})
             if isinstance(oid, dict):
@@ -104,28 +136,37 @@ class OdsSyncEngine:
         return ''
 
     def _process_org_stub(self, org_stub):
+        """Fetch and process details for a single organization stub in a savepoint."""
         ods_code = self._extract_code(org_stub)
         if not ods_code:
             return
+
         t0 = time.monotonic()
         try:
-            raw = self.api.get_organisation(ods_code)
-            org_data = raw.get('Organisation', raw)
-            self._process_org(org_data, duration_start=t0)
+            with self.env.cr.savepoint():
+                raw = self.api.get_organisation(ods_code)
+                org_data = raw.get('Organisation', raw)
+                self._process_org(org_data, duration_start=t0)
         except Exception as exc:
             _logger.exception("Failed to process org %s", ods_code)
-            self._record_detail(
-                ods_code=ods_code,
-                outcome='error',
-                error_message=str(exc),
-                duration_ms=int((time.monotonic() - t0) * 1000),
-            )
-            self.run.error_count += 1
-            self.run.error_log = (self.run.error_log or '') + f'\n[{ods_code}] {exc}'
+            try:
+                with self.env.cr.savepoint():
+                    self._record_detail(
+                        ods_code=ods_code,
+                        outcome='error',
+                        error_message=str(exc),
+                        duration_ms=int((time.monotonic() - t0) * 1000),
+                    )
+                    self.run.error_count += 1
+                    self.run.error_log = (self.run.error_log or '') + f'\n[{ods_code}] {exc}'
+            except Exception:
+                _logger.exception("Failed to log detail error in DB for org %s", ods_code)
 
     def _process_org(self, org_data, duration_start=None):
+        """Process a single organization's payload, handling caching, role mappings, and trust creation/updates."""
         t0 = duration_start or time.monotonic()
         try:
+
             parsed = parse_ods_payload(org_data)
         except ValueError as exc:
             _logger.warning("Skipping org — parse failed: %s", exc)
@@ -252,6 +293,7 @@ class OdsSyncEngine:
                     self.run.unchanged_count += 1
 
     def _upsert_cache(self, parsed, raw_data):
+        """Create or update the cached ODS organization payload in local database."""
         OdsOrg = self.env['nhs.ods.organisation'].sudo()
         existing = OdsOrg.search([('ods_code', '=', parsed['ods_code'])], limit=1)
         vals = {
@@ -286,6 +328,7 @@ class OdsSyncEngine:
             return OdsOrg.create(vals)
 
     def _match_trust(self, parsed):
+        """Search and match a local trust record by ODS code or ODS cache relationship."""
         Trust = self.env['nhs.trust'].sudo()
         trust = Trust.search([('ods_code', '=', parsed['ods_code'])], limit=1)
         if trust:
@@ -299,7 +342,9 @@ class OdsSyncEngine:
         return None
 
     def _create_trust(self, parsed, ods_org, role_mapping):
+        """Create a new NHS trust record dynamically mapping regional fields and relationships."""
         health_system = role_mapping.health_system if role_mapping.health_system != 'both' else 'nhs_england'
+
         country = self._resolve_country(parsed.get('country', ''))
 
         active_rels = parsed.get('active_relations', [])
@@ -435,6 +480,7 @@ class OdsSyncEngine:
         return trust
 
     def _apply_to_trust(self, parsed, trust, ods_org):
+        """Apply parsed values directly to a matched trust record, checking constraints and updating cache references."""
         country = self._resolve_country(parsed.get('country', ''))
         active_rels = parsed.get('active_relations', [])
         icb = False
@@ -538,6 +584,7 @@ class OdsSyncEngine:
         return list(vals.keys())
 
     def _compute_diff(self, parsed, trust):
+        """Compare parsed ODS data with current trust fields to produce a diff dictionary."""
         diff = {}
         field_map = {
             'name': parsed.get('name'),
@@ -553,6 +600,7 @@ class OdsSyncEngine:
         return diff
 
     def _resolve_country(self, country_text):
+        """Resolve an Odoo res.country record from a raw country text string."""
         if not country_text:
             return None
         iso = COUNTRY_MAP.get(country_text.upper())
@@ -565,6 +613,7 @@ class OdsSyncEngine:
     def _record_detail(self, ods_code, outcome, trust=None, ods_org=None,
                        changed_fields=None, error_message=None, skip_reason=None,
                        diff_json=None, duration_ms=0):
+        """Create a sync detail record mapping outcomes, errors, or skip reasons."""
         return self.env['nhs.ods.sync.detail'].sudo().create({
             'sync_run_id': self.run.id,
             'ods_code': ods_code,
@@ -579,6 +628,7 @@ class OdsSyncEngine:
         })
 
     def _record_conflicts(self, conflicts, trust, ods_org, detail):
+        """Create conflict records for any detected discrepancies on the trust."""
         for c in conflicts:
             conflict = self.env['nhs.ods.sync.conflict'].sudo().create({
                 'sync_run_id': self.run.id,
@@ -588,6 +638,7 @@ class OdsSyncEngine:
                 'field_name': c.get('field_name', ''),
                 'field_label': c.get('field_label', ''),
                 'current_value': str(c.get('current_value', '') or ''),
+
                 'ods_value': str(c.get('ods_value', '') or ''),
                 'conflict_type': c.get('type', 'field_diff'),
                 'state': 'pending',

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Tree/list view for ODS Cached Organisations (nhs.ods.organisation) -->
     <record id="view_nhs_ods_organisation_list" model="ir.ui.view">
         <field name="name">nhs.ods.organisation.list</field>
         <field name="model">nhs.ods.organisation</field>
@@ -16,6 +17,7 @@
         </field>
     </record>
 
+    <!-- Form view for ODS Cached Organisation (nhs.ods.organisation) -->
     <record id="view_nhs_ods_organisation_form" model="ir.ui.view">
         <field name="name">nhs.ods.organisation.form</field>
         <field name="model">nhs.ods.organisation</field>
@@ -36,6 +38,7 @@
                             class="btn-secondary"
                             invisible="trust_id"
                             help="Create a new NHS Trust record from this cached ODS data."/>
+                    <field name="status" widget="statusbar"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -44,7 +47,6 @@
                     </div>
                     <group>
                         <group string="Identity">
-                            <field name="status"/>
                             <field name="primary_role_code"/>
                             <field name="non_primary_role_codes"/>
                             <field name="last_change_date"/>
@@ -67,6 +69,8 @@
                             <field name="postcode"/>
                             <field name="country_text"/>
                             <field name="phone"/>
+                            <field name="email"/>
+                            <field name="website"/>
                         </group>
                     </group>
                     <group string="Dates">
@@ -94,6 +98,7 @@
         </field>
     </record>
 
+    <!-- Search view for ODS Cached Organisation (nhs.ods.organisation) -->
     <record id="view_nhs_ods_organisation_search" model="ir.ui.view">
         <field name="name">nhs.ods.organisation.search</field>
         <field name="model">nhs.ods.organisation</field>
@@ -115,6 +120,7 @@
         </field>
     </record>
 
+    <!-- Action definition for accessing ODS Cache -->
     <record id="action_nhs_ods_organisations" model="ir.actions.act_window">
         <field name="name">ODS Cache</field>
         <field name="res_model">nhs.ods.organisation</field>
