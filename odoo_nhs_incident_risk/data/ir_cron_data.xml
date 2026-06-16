@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="cron_sla_triage" model="ir.cron">
+        <field name="name">NHS: SLA triage alert</field>
+        <field name="model_id" ref="model_nhs_incident"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_sla_triage()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="cron_doc_deadlines" model="ir.cron">
+        <field name="name">NHS: Duty of Candour deadline reminders</field>
+        <field name="model_id" ref="model_nhs_duty_of_candour"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_doc_deadlines()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="cron_action_escalation" model="ir.cron">
+        <field name="name">NHS: Action overdue escalation</field>
+        <field name="model_id" ref="model_nhs_action"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_action_escalation()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="cron_risk_reviews" model="ir.cron">
+        <field name="name">NHS: Risk review reminders</field>
+        <field name="model_id" ref="model_nhs_risk"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_risk_reviews()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="cron_anonymise" model="ir.cron">
+        <field name="name">NHS: Retention anonymisation (disabled)</field>
+        <field name="model_id" ref="model_nhs_incident"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_anonymise()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">months</field>
+        <field name="active">False</field>
+    </record>
+</odoo>

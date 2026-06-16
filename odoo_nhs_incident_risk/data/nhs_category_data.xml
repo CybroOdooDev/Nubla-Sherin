@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── UNIVERSAL PARENT CATEGORIES ───────────────────────── -->
+    <record id="cat_falls" model="nhs.incident.category">
+        <field name="name">Falls</field>
+        <field name="default_response_level">aar</field>
+        <field name="riddor_hint">False</field>
+    </record>
+    <record id="cat_falls_bed" model="nhs.incident.category">
+        <field name="name">Fall from Bed</field>
+        <field name="parent_id" ref="cat_falls"/>
+        <field name="provider_types">nhs_trust,care_home,hospice,independent_hospital</field>
+    </record>
+    <record id="cat_falls_standing" model="nhs.incident.category">
+        <field name="name">Fall while Standing / Walking</field>
+        <field name="parent_id" ref="cat_falls"/>
+    </record>
+    <record id="cat_falls_equipment" model="nhs.incident.category">
+        <field name="name">Fall from Equipment / Chair</field>
+        <field name="parent_id" ref="cat_falls"/>
+    </record>
+
+    <record id="cat_medication" model="nhs.incident.category">
+        <field name="name">Medication</field>
+        <field name="default_response_level">aar</field>
+    </record>
+    <record id="cat_medication_wrong_drug" model="nhs.incident.category">
+        <field name="name">Wrong Drug</field>
+        <field name="parent_id" ref="cat_medication"/>
+    </record>
+    <record id="cat_medication_wrong_dose" model="nhs.incident.category">
+        <field name="name">Wrong Dose</field>
+        <field name="parent_id" ref="cat_medication"/>
+    </record>
+    <record id="cat_medication_omission" model="nhs.incident.category">
+        <field name="name">Omitted Dose</field>
+        <field name="parent_id" ref="cat_medication"/>
+    </record>
+    <record id="cat_medication_near_miss" model="nhs.incident.category">
+        <field name="name">Near Miss</field>
+        <field name="parent_id" ref="cat_medication"/>
+    </record>
+
+    <record id="cat_pressure_ulcers" model="nhs.incident.category">
+        <field name="name">Pressure Ulcers</field>
+        <field name="provider_types">nhs_trust,care_home,domiciliary_care,hospice</field>
+        <field name="default_response_level">aar</field>
+    </record>
+    <record id="cat_pressure_cat3" model="nhs.incident.category">
+        <field name="name">Category 3</field>
+        <field name="parent_id" ref="cat_pressure_ulcers"/>
+        <field name="default_harm_floor">moderate</field>
+    </record>
+    <record id="cat_pressure_cat4" model="nhs.incident.category">
+        <field name="name">Category 4</field>
+        <field name="parent_id" ref="cat_pressure_ulcers"/>
+        <field name="default_harm_floor">severe</field>
+        <field name="default_response_level">psii</field>
+    </record>
+
+    <record id="cat_clinical" model="nhs.incident.category">
+        <field name="name">Clinical / Treatment</field>
+        <field name="provider_types">nhs_trust,independent_hospital,gp_practice,hospice</field>
+        <field name="default_response_level">aar</field>
+    </record>
+    <record id="cat_clinical_diagnosis" model="nhs.incident.category">
+        <field name="name">Diagnostic Error</field>
+        <field name="parent_id" ref="cat_clinical"/>
+    </record>
+    <record id="cat_clinical_surgery" model="nhs.incident.category">
+        <field name="name">Surgical / Procedural</field>
+        <field name="parent_id" ref="cat_clinical"/>
+    </record>
+
+    <record id="cat_violence" model="nhs.incident.category">
+        <field name="name">Violence &amp; Aggression</field>
+        <field name="provider_types">nhs_trust,care_home,domiciliary_care</field>
+        <field name="riddor_hint">True</field>
+    </record>
+    <record id="cat_violence_patient" model="nhs.incident.category">
+        <field name="name">Service User to Staff</field>
+        <field name="parent_id" ref="cat_violence"/>
+    </record>
+    <record id="cat_violence_patient_patient" model="nhs.incident.category">
+        <field name="name">Service User to Service User</field>
+        <field name="parent_id" ref="cat_violence"/>
+    </record>
+
+    <record id="cat_staff_injury" model="nhs.incident.category">
+        <field name="name">Staff Injury</field>
+        <field name="riddor_hint">True</field>
+        <field name="default_response_level">none</field>
+    </record>
+    <record id="cat_staff_needle" model="nhs.incident.category">
+        <field name="name">Needlestick / Sharps</field>
+        <field name="parent_id" ref="cat_staff_injury"/>
+    </record>
+    <record id="cat_staff_msd" model="nhs.incident.category">
+        <field name="name">Manual Handling / MSD</field>
+        <field name="parent_id" ref="cat_staff_injury"/>
+    </record>
+
+    <record id="cat_safeguarding" model="nhs.incident.category">
+        <field name="name">Safeguarding</field>
+        <field name="default_response_level">psii</field>
+        <field name="cqc_notification_type_ids" eval="[(4, ref('cqc_type_abuse'))]"/>
+    </record>
+    <record id="cat_safeguarding_adult" model="nhs.incident.category">
+        <field name="name">Adult Safeguarding</field>
+        <field name="parent_id" ref="cat_safeguarding"/>
+    </record>
+    <record id="cat_safeguarding_child" model="nhs.incident.category">
+        <field name="name">Child Safeguarding</field>
+        <field name="parent_id" ref="cat_safeguarding"/>
+    </record>
+
+    <record id="cat_death" model="nhs.incident.category">
+        <field name="name">Death of Service User</field>
+        <field name="default_harm_floor">death</field>
+        <field name="default_response_level">psii</field>
+        <field name="cqc_notification_type_ids" eval="[(4, ref('cqc_type_death'))]"/>
+    </record>
+    <record id="cat_death_expected" model="nhs.incident.category">
+        <field name="name">Expected Death</field>
+        <field name="parent_id" ref="cat_death"/>
+    </record>
+    <record id="cat_death_unexpected" model="nhs.incident.category">
+        <field name="name">Unexpected Death</field>
+        <field name="parent_id" ref="cat_death"/>
+        <field name="default_response_level">psii</field>
+    </record>
+
+    <!-- ── GP / Primary Care categories ─────────────────────── -->
+    <record id="cat_sea" model="nhs.incident.category">
+        <field name="name">Significant Event (SEA)</field>
+        <field name="provider_types">gp_practice</field>
+        <field name="default_response_level">aar</field>
+    </record>
+    <record id="cat_sea_prescribing" model="nhs.incident.category">
+        <field name="name">Prescribing Error</field>
+        <field name="parent_id" ref="cat_sea"/>
+    </record>
+    <record id="cat_sea_results" model="nhs.incident.category">
+        <field name="name">Results Handling</field>
+        <field name="parent_id" ref="cat_sea"/>
+    </record>
+    <record id="cat_sea_access" model="nhs.incident.category">
+        <field name="name">Access / Appointment</field>
+        <field name="parent_id" ref="cat_sea"/>
+    </record>
+
+    <!-- ── Dispensing categories (pharmacy) ─────────────────── -->
+    <record id="cat_dispensing" model="nhs.incident.category">
+        <field name="name">Dispensing Error</field>
+        <field name="provider_types">pharmacy</field>
+        <field name="default_response_level">aar</field>
+    </record>
+    <record id="cat_dispensing_near_miss" model="nhs.incident.category">
+        <field name="name">Near Miss</field>
+        <field name="parent_id" ref="cat_dispensing"/>
+    </record>
+    <record id="cat_dispensing_cd" model="nhs.incident.category">
+        <field name="name">Controlled Drug Discrepancy</field>
+        <field name="parent_id" ref="cat_dispensing"/>
+    </record>
+
+    <!-- ── Missing person ─────────────────────────────────────── -->
+    <record id="cat_missing_person" model="nhs.incident.category">
+        <field name="name">Missing Person</field>
+        <field name="provider_types">care_home,domiciliary_care</field>
+        <field name="default_response_level">psii</field>
+    </record>
+    <record id="cat_missing_abscond" model="nhs.incident.category">
+        <field name="name">Absconding</field>
+        <field name="parent_id" ref="cat_missing_person"/>
+        <field name="cqc_notification_type_ids" eval="[(4, ref('cqc_type_absconding'))]"/>
+    </record>
+
+    <!-- ── Infrastructure ────────────────────────────────────── -->
+    <record id="cat_infrastructure" model="nhs.incident.category">
+        <field name="name">Infrastructure / Estates</field>
+        <field name="default_response_level">none</field>
+    </record>
+    <record id="cat_infra_fire" model="nhs.incident.category">
+        <field name="name">Fire / Evacuation</field>
+        <field name="parent_id" ref="cat_infrastructure"/>
+    </record>
+    <record id="cat_infra_equipment" model="nhs.incident.category">
+        <field name="name">Equipment Failure</field>
+        <field name="parent_id" ref="cat_infrastructure"/>
+    </record>
+    <record id="cat_infra_it" model="nhs.incident.category">
+        <field name="name">IT / System Failure</field>
+        <field name="parent_id" ref="cat_infrastructure"/>
+        <field name="cqc_notification_type_ids" eval="[(4, ref('cqc_type_service_stop'))]"/>
+    </record>
+
+    <!-- ── Contributing Factors seed data ───────────────────── -->
+    <record id="cf_patient_condition" model="nhs.contributing.factor">
+        <field name="group_name">patient</field>
+        <field name="name">Patient's clinical condition</field>
+    </record>
+    <record id="cf_patient_communication" model="nhs.contributing.factor">
+        <field name="group_name">patient</field>
+        <field name="name">Communication difficulties</field>
+    </record>
+    <record id="cf_patient_compliance" model="nhs.contributing.factor">
+        <field name="group_name">patient</field>
+        <field name="name">Non-compliance / refusal</field>
+    </record>
+    <record id="cf_task_design" model="nhs.contributing.factor">
+        <field name="group_name">task</field>
+        <field name="name">Task design / complexity</field>
+    </record>
+    <record id="cf_task_guidelines" model="nhs.contributing.factor">
+        <field name="group_name">task</field>
+        <field name="name">Guidelines unavailable or unclear</field>
+    </record>
+    <record id="cf_individual_skill" model="nhs.contributing.factor">
+        <field name="group_name">individual</field>
+        <field name="name">Skill / knowledge deficit</field>
+    </record>
+    <record id="cf_individual_fatigue" model="nhs.contributing.factor">
+        <field name="group_name">individual</field>
+        <field name="name">Fatigue / stress</field>
+    </record>
+    <record id="cf_individual_distraction" model="nhs.contributing.factor">
+        <field name="group_name">individual</field>
+        <field name="name">Distraction / interruption</field>
+    </record>
+    <record id="cf_team_communication" model="nhs.contributing.factor">
+        <field name="group_name">team</field>
+        <field name="name">Poor team communication</field>
+    </record>
+    <record id="cf_team_handover" model="nhs.contributing.factor">
+        <field name="group_name">team</field>
+        <field name="name">Inadequate handover</field>
+    </record>
+    <record id="cf_team_supervision" model="nhs.contributing.factor">
+        <field name="group_name">team</field>
+        <field name="name">Lack of supervision</field>
+    </record>
+    <record id="cf_env_staffing" model="nhs.contributing.factor">
+        <field name="group_name">environment</field>
+        <field name="name">Insufficient staffing levels</field>
+    </record>
+    <record id="cf_env_equipment" model="nhs.contributing.factor">
+        <field name="group_name">environment</field>
+        <field name="name">Equipment failure / unavailability</field>
+    </record>
+    <record id="cf_env_physical" model="nhs.contributing.factor">
+        <field name="group_name">environment</field>
+        <field name="name">Physical environment hazard</field>
+    </record>
+    <record id="cf_org_culture" model="nhs.contributing.factor">
+        <field name="group_name">organisational</field>
+        <field name="name">Safety culture issues</field>
+    </record>
+    <record id="cf_org_training" model="nhs.contributing.factor">
+        <field name="group_name">organisational</field>
+        <field name="name">Inadequate training provision</field>
+    </record>
+    <record id="cf_org_policy" model="nhs.contributing.factor">
+        <field name="group_name">organisational</field>
+        <field name="name">Policy / procedure gap</field>
+    </record>
+    <record id="cf_external_demand" model="nhs.contributing.factor">
+        <field name="group_name">external</field>
+        <field name="name">High demand / capacity pressures</field>
+    </record>
+    <record id="cf_external_supply" model="nhs.contributing.factor">
+        <field name="group_name">external</field>
+        <field name="name">Supply chain / procurement issue</field>
+    </record>
+</odoo>

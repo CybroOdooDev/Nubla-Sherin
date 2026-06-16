@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="public_report_form" name="Public Incident Report Form">
+        <t t-call="web.layout">
+            <t t-set="head">
+                <link rel="stylesheet"
+                      href="/odoo_nhs_incident_risk/static/src/css/public_form.css"/>
+            </t>
+            <div class="container py-4" id="nhs_public_form_wrap">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-8 col-lg-7">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h2 class="mb-0">
+                                    <t t-out="provider_name"/> — Report an Incident
+                                </h2>
+                                <p class="mb-0 small">
+                                    This form is for reporting safety incidents and near misses.
+                                    It should take less than 5 minutes.
+                                </p>
+                            </div>
+                            <div class="card-body">
+                                <form method="POST"
+                                      t-attf-action="/incident/report/#{token}/submit"
+                                      enctype="multipart/form-data"
+                                      id="nhs_public_report_form">
+                                    <input type="hidden" name="csrf_token"
+                                           t-att-value="request.csrf_token()"/>
+
+                                    <!-- What happened -->
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">
+                                            Type of Incident <span class="text-danger">*</span>
+                                        </label>
+                                        <select name="incident_kind" class="form-select" required="required">
+                                            <option value="incident">Patient Safety Incident</option>
+                                            <option value="risk_event">Near Miss / Hazard</option>
+                                            <option value="outcome">Harm Observed (no known incident)</option>
+                                            <option value="good_care">Good Care / Excellence</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">
+                                            Date &amp; Time of Incident <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="datetime-local" name="occurred_at"
+                                               class="form-control" required="required"/>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">
+                                            Location <span class="text-danger">*</span>
+                                        </label>
+                                        <select name="location_id" class="form-select" required="required">
+                                            <option value="">— Select location —</option>
+                                            <t t-foreach="locations" t-as="loc">
+                                                <option t-att-value="loc['id']"
+                                                        t-out="loc['complete_name']"/>
+                                            </t>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">
+                                            Category <span class="text-danger">*</span>
+                                        </label>
+                                        <select name="category_id" class="form-select" required="required">
+                                            <option value="">— Select category —</option>
+                                            <t t-foreach="categories" t-as="cat">
+                                                <option t-att-value="cat['id']"
+                                                        t-out="cat['complete_name']"/>
+                                            </t>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">
+                                            What Happened <span class="text-danger">*</span>
+                                        </label>
+                                        <small class="form-text text-muted d-block mb-1">
+                                            Please describe the event. Do NOT include full names — use initials or role only.
+                                        </small>
+                                        <textarea name="description" class="form-control"
+                                                  rows="5" required="required"
+                                                  placeholder="Describe what happened…"/>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Immediate Action Taken</label>
+                                        <textarea name="immediate_action" class="form-control"
+                                                  rows="3" placeholder="What was done at the time…"/>
+                                    </div>
+
+                                    <!-- Persons affected -->
+                                    <div class="border rounded p-3 mb-3" id="persons_section">
+                                        <h5>Person(s) Affected</h5>
+                                        <div id="person_list">
+                                            <div class="person-row row g-2 mb-2" data-index="0">
+                                                <div class="col-md-4">
+                                                    <select name="person_type_0" class="form-select">
+                                                        <option value="patient">
+                                                            <t t-out="person_label"/>
+                                                        </option>
+                                                        <option value="staff">Staff</option>
+                                                        <option value="visitor">Visitor</option>
+                                                        <option value="other">Other</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="text" name="person_name_0"
+                                                           class="form-control"
+                                                           placeholder="Name / initials (optional)"/>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <select name="person_harm_0" class="form-select">
+                                                        <option value="none">No apparent harm</option>
+                                                        <option value="low">Low harm</option>
+                                                        <option value="moderate">Moderate harm</option>
+                                                        <option value="severe">Severe harm</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                                id="add_person_btn">+ Add another person</button>
+                                    </div>
+
+                                    <!-- Anonymous toggle -->
+                                    <div class="mb-3" t-if="anonymous_allowed">
+                                        <div class="form-check">
+                                            <input type="checkbox" name="is_anonymous"
+                                                   class="form-check-input" id="anonymous_check"
+                                                   value="1"/>
+                                            <label class="form-check-label" for="anonymous_check">
+                                                Submit anonymously (your contact details will not be recorded)
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Reporter details -->
+                                    <div id="reporter_section" class="border rounded p-3 mb-3">
+                                        <h5>Your Details (optional)</h5>
+                                        <div class="row g-2">
+                                            <div class="col-md-6">
+                                                <input type="text" name="reporter_name"
+                                                       class="form-control" placeholder="Your name"/>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <input type="email" name="reporter_email"
+                                                       class="form-control"
+                                                       placeholder="Email for acknowledgement"/>
+                                            </div>
+                                            <div class="col-12">
+                                                <input type="text" name="reporter_role"
+                                                       class="form-control" placeholder="Your role"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Attachment -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Attachment (optional)</label>
+                                        <input type="file" name="attachment"
+                                               class="form-control" accept="image/*,.pdf"/>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            Submit Incident Report
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script src="/odoo_nhs_incident_risk/static/src/js/public_form.js"/>
+        </t>
+    </template>
+
+    <template id="public_report_thank_you" name="Public Report — Thank You">
+        <t t-call="web.layout">
+            <div class="container py-5">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-6 text-center">
+                        <div class="card shadow-sm">
+                            <div class="card-body py-5">
+                                <h2 class="text-success mb-3">✓ Report Submitted</h2>
+                                <p class="lead">Your reference number is:</p>
+                                <h3 class="text-primary fw-bold">
+                                    <t t-out="reference"/>
+                                </h3>
+                                <p class="mt-3">
+                                    Thank you for reporting this incident.
+                                    A trained handler will review your report within 3 working days.
+                                </p>
+                                <t t-if="email_sent">
+                                    <p class="text-muted small">
+                                        A confirmation email has been sent to the address you provided.
+                                    </p>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

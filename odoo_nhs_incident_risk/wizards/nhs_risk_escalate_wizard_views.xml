@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_risk_escalate_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.risk.escalate.wizard.form</field>
+        <field name="model">nhs.risk.escalate.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Escalate / Move Risk">
+                <group>
+                    <field name="risk_id" readonly="1"/>
+                    <field name="current_register_id" readonly="1"/>
+                    <field name="target_register_id"/>
+                    <field name="rationale" placeholder="Reason for moving this risk…"/>
+                    <field name="notify_user_ids" widget="many2many_tags"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" string="Move Risk"
+                            type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

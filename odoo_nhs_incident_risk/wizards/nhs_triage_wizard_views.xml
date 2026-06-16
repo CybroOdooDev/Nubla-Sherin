@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_triage_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.triage.wizard.form</field>
+        <field name="model">nhs.triage.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Triage Incident">
+                <group string="Confirm Details">
+                    <field name="incident_id" readonly="1"/>
+                    <field name="category_id"/>
+                    <field name="location_id"/>
+                </group>
+                <group string="Grading">
+                    <field name="harm_grade"/>
+                    <field name="physical_harm"/>
+                    <field name="psychological_harm"/>
+                    <field name="response_level"/>
+                </group>
+                <group string="Handler">
+                    <field name="handler_id"/>
+                </group>
+                <group string="Decision">
+                    <field name="decision" widget="radio"/>
+                    <field name="rejection_reason"
+                           invisible="decision != 'reject'"
+                           required="decision == 'reject'"/>
+                    <field name="duplicate_of_id"
+                           invisible="decision != 'duplicate'"
+                           required="decision == 'duplicate'"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" string="Confirm" type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_triage_wizard" model="ir.actions.act_window">
+        <field name="name">Triage Incident</field>
+        <field name="res_model">nhs.triage.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ══ INCIDENT CATEGORY CONFIG ═════════════════════════════════ -->
+    <record id="view_nhs_incident_category_list" model="ir.ui.view">
+        <field name="name">nhs.incident.category.list</field>
+        <field name="model">nhs.incident.category</field>
+        <field name="arch" type="xml">
+            <list string="Incident Categories">
+                <field name="complete_name"/>
+                <field name="provider_types"/>
+                <field name="default_response_level"/>
+                <field name="riddor_hint"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_incident_category_form" model="ir.ui.view">
+        <field name="name">nhs.incident.category.form</field>
+        <field name="model">nhs.incident.category</field>
+        <field name="arch" type="xml">
+            <form string="Incident Category">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="parent_id"/>
+                            <field name="provider_types"/>
+                        </group>
+                        <group>
+                            <field name="default_response_level"/>
+                            <field name="default_harm_floor"/>
+                            <field name="riddor_hint"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="CQC Notification Types">
+                        <field name="cqc_notification_type_ids" widget="many2many_tags" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_incident_category" model="ir.actions.act_window">
+        <field name="name">Incident Categories</field>
+        <field name="res_model">nhs.incident.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+    </record>
+
+    <!-- ══ RISK CATEGORY CONFIG ─────────────────────────────────── -->
+    <record id="view_nhs_risk_category_list" model="ir.ui.view">
+        <field name="name">nhs.risk.category.list</field>
+        <field name="model">nhs.risk.category</field>
+        <field name="arch" type="xml">
+            <list string="Risk Categories" editable="bottom">
+                <field name="name"/>
+                <field name="appetite_threshold"/>
+                <field name="description"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_nhs_risk_category" model="ir.actions.act_window">
+        <field name="name">Risk Categories</field>
+        <field name="res_model">nhs.risk.category</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ══ NOTIFICATION RULES ───────────────────────────────────── -->
+    <record id="view_nhs_notification_rule_list" model="ir.ui.view">
+        <field name="name">nhs.notification.rule.list</field>
+        <field name="model">nhs.notification.rule</field>
+        <field name="arch" type="xml">
+            <list string="Notification Rules" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="provider_type"/>
+                <field name="category_id"/>
+                <field name="min_harm_grade"/>
+                <field name="require_cqc"/>
+                <field name="require_lfpse"/>
+                <field name="suggest_riddor"/>
+                <field name="require_safeguarding"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_nhs_notification_rule" model="ir.actions.act_window">
+        <field name="name">Notification Rules</field>
+        <field name="res_model">nhs.notification.rule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ══ TERMINOLOGY ──────────────────────────────────────────── -->
+    <record id="view_nhs_terminology_list" model="ir.ui.view">
+        <field name="name">nhs.terminology.list</field>
+        <field name="model">nhs.terminology</field>
+        <field name="arch" type="xml">
+            <list string="Terminology Packs" editable="bottom">
+                <field name="provider_type"/>
+                <field name="logical_key"/>
+                <field name="label"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_nhs_terminology" model="ir.actions.act_window">
+        <field name="name">Terminology</field>
+        <field name="res_model">nhs.terminology</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ══ HOLIDAYS ─────────────────────────────────────────────── -->
+    <record id="view_nhs_holiday_list" model="ir.ui.view">
+        <field name="name">nhs.holiday.list</field>
+        <field name="model">nhs.holiday</field>
+        <field name="arch" type="xml">
+            <list string="Bank Holidays" editable="bottom">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_nhs_holiday" model="ir.actions.act_window">
+        <field name="name">Bank Holidays</field>
+        <field name="res_model">nhs.holiday</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ══ CQC NOTIFICATION TYPES ───────────────────────────────── -->
+    <record id="view_nhs_cqc_type_list" model="ir.ui.view">
+        <field name="name">nhs.cqc.notification.type.list</field>
+        <field name="model">nhs.cqc.notification.type</field>
+        <field name="arch" type="xml">
+            <list string="CQC Notification Types" editable="bottom">
+                <field name="name"/>
+                <field name="statutory_basis"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_nhs_cqc_type" model="ir.actions.act_window">
+        <field name="name">CQC Notification Types</field>
+        <field name="res_model">nhs.cqc.notification.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ══ SETTINGS ─────────────────────────────────────────────── -->
+    <record id="view_res_config_settings_nhs" model="ir.ui.view">
+        <field name="name">res.config.settings.nhs</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Quality &amp; Safety" name="odoo_nhs_incident_risk"
+                     groups="odoo_nhs_incident_risk.group_hc_quality_lead">
+                    <block title="Provider Configuration">
+                        <setting string="Provider Type">
+                            <field name="provider_type"/>
+                        </setting>
+                        <setting string="Public Incident Form">
+                            <field name="public_form_enabled"/>
+                        </setting>
+                        <setting string="Allow Anonymous Reporting">
+                            <field name="anonymous_reporting_allowed"/>
+                        </setting>
+                        <setting string="Duty of Candour Trigger Grade">
+                            <field name="doc_trigger_grade"/>
+                        </setting>
+                        <setting string="Default Incident Handler">
+                            <field name="company_handler_id"/>
+                        </setting>
+                        <setting string="Board Pack Recipients">
+                            <field name="board_pack_recipient_ids" widget="many2many_tags"/>
+                        </setting>
+                        <setting string="Public Form Token" help="Share this URL with staff for incident reporting.">
+                            <field name="public_form_token" readonly="1"/>
+                            <button name="action_regenerate_token" string="Regenerate Token"
+                                    type="object" class="btn-secondary btn-sm"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

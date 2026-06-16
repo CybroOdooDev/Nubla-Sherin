@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ══ INVESTIGATION SUMMARY PDF ═══════════════════════════════ -->
+    <record id="action_report_investigation_summary" model="ir.actions.report">
+        <field name="name">Investigation Summary</field>
+        <field name="model">nhs.investigation</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_incident_risk.report_investigation_summary</field>
+        <field name="print_report_name">'Investigation Summary - ' + object.name</field>
+    </record>
+
+    <template id="report_investigation_summary">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="inv">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Investigation Summary</h2>
+                        <h3 t-out="inv.name"/>
+                        <table class="table table-bordered table-sm">
+                            <tr>
+                                <th>Incident</th>
+                                <td t-out="inv.incident_id.name"/>
+                            </tr>
+                            <tr>
+                                <th>Response Level</th>
+                                <td t-out="dict(inv.fields_get(['response_level'])['response_level']['selection']).get(inv.response_level, inv.response_level)"/>
+                            </tr>
+                            <tr>
+                                <th>Lead Investigator</th>
+                                <td t-out="inv.lead_investigator_id.name"/>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td t-out="inv.state"/>
+                            </tr>
+                        </table>
+
+                        <t t-if="inv.terms_of_reference">
+                            <h4>Terms of Reference</h4>
+                            <p t-out="inv.terms_of_reference"/>
+                        </t>
+
+                        <h4>Chronology</h4>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date/Time</th>
+                                    <th>Entry</th>
+                                    <th>Source</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="inv.timeline_ids" t-as="tl">
+                                    <tr>
+                                        <td t-out="tl.happened_at"/>
+                                        <td t-out="tl.entry"/>
+                                        <td t-out="tl.source"/>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <t t-if="inv.contributing_factor_ids">
+                            <h4>Contributing Factors</h4>
+                            <ul>
+                                <t t-foreach="inv.contributing_factor_ids" t-as="cf">
+                                    <li><t t-out="cf.group_name"/> — <t t-out="cf.name"/></li>
+                                </t>
+                            </ul>
+                        </t>
+
+                        <h4>Findings</h4>
+                        <p t-out="inv.findings or 'Not recorded.'"/>
+
+                        <h4>Lessons Learned</h4>
+                        <p t-out="inv.lessons_learned or 'Not recorded.'"/>
+
+                        <t t-if="inv.good_practice">
+                            <h4>Areas of Good Practice</h4>
+                            <p t-out="inv.good_practice"/>
+                        </t>
+
+                        <t t-if="inv.approved_by_id">
+                            <p class="mt-4">
+                                <strong>Approved by:</strong>
+                                <t t-out="inv.approved_by_id.name"/> on
+                                <t t-out="inv.approved_at"/>
+                            </p>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ══ DUTY OF CANDOUR LETTER ═══════════════════════════════════ -->
+    <record id="action_report_doc_letter" model="ir.actions.report">
+        <field name="name">Duty of Candour Letter</field>
+        <field name="model">nhs.duty.of.candour</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_incident_risk.report_doc_letter</field>
+        <field name="print_report_name">'DoC Letter - ' + object.incident_id.name</field>
+    </record>
+
+    <template id="report_doc_letter">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <p t-out="doc.triggered_at"/>
+                        <br/>
+                        <p>Dear [Patient/Resident name],</p>
+                        <p>
+                            I am writing to you in relation to an incident that occurred on
+                            <strong t-out="doc.incident_id.occurred_at"/>
+                            involving your care at
+                            <strong t-out="doc.incident_id.company_id.name"/>.
+                        </p>
+                        <p>
+                            We are sincerely sorry that this incident occurred and for any distress
+                            it has caused you or your family.
+                        </p>
+                        <h4>What happened</h4>
+                        <p t-out="doc.incident_id.description"/>
+                        <h4>What we have done</h4>
+                        <p>
+                            We have reviewed the circumstances of this incident and will share
+                            our findings with you once our review is complete.
+                        </p>
+                        <p>
+                            This letter is provided in accordance with our Duty of Candour
+                            obligations under CQC Regulation 20. Reference: <strong t-out="doc.incident_id.name"/>
+                        </p>
+                        <p>
+                            If you have any questions or would like to discuss this further,
+                            please do not hesitate to contact us.
+                        </p>
+                        <p>Yours sincerely,</p>
+                        <br/><br/>
+                        <p>_______________________</p>
+                        <p t-out="doc.verbal_by_id.name or '[Responsible Person]'"/><br/>
+                        <p t-out="doc.incident_id.company_id.name"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

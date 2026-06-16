@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_board_pack" model="ir.actions.report">
+        <field name="name">Monthly Board Pack</field>
+        <field name="model">res.company</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_incident_risk.report_board_pack</field>
+        <field name="print_report_name">'Quality Safety Board Pack - ' + object.name</field>
+        <field name="binding_model_id" ref="base.model_res_company"/>
+    </record>
+
+    <template id="report_board_pack">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="company">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h1>Quality &amp; Safety Monthly Board Pack</h1>
+                        <h2 t-out="company.name"/>
+                        <hr/>
+
+                        <!-- Incident summary -->
+                        <h3>1. Incident Summary</h3>
+                        <t t-set="total_incidents" t-value="company.env['nhs.incident'].search_count([('company_id','=',company.id),('state','!=','rejected')])"/>
+                        <t t-set="open_incidents" t-value="company.env['nhs.incident'].search_count([('company_id','=',company.id),('state','not in',['closed','rejected','duplicate'])])"/>
+                        <t t-set="severe_incidents" t-value="company.env['nhs.incident'].search_count([('company_id','=',company.id),('harm_grade','in',['severe','death'])])"/>
+                        <table class="table table-sm">
+                            <tr><th>Total Incidents (all time)</th><td t-out="total_incidents"/></tr>
+                            <tr><th>Open Incidents</th><td t-out="open_incidents"/></tr>
+                            <tr><th>Severe / Fatal Incidents</th><td t-out="severe_incidents"/></tr>
+                        </table>
+
+                        <!-- Open DoC -->
+                        <h3>2. Duty of Candour</h3>
+                        <t t-set="open_doc" t-value="company.env['nhs.duty.of.candour'].search([('incident_id.company_id','=',company.id),('state','in',['open','overdue'])])"/>
+                        <p>Open Duty of Candour records: <strong t-out="len(open_doc)"/></p>
+                        <t t-if="open_doc">
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr><th>Incident</th><th>Triggered</th><th>Deadline</th><th>Status</th></tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="open_doc" t-as="doc">
+                                        <tr>
+                                            <td t-out="doc.incident_id.name"/>
+                                            <td t-out="doc.triggered_at"/>
+                                            <td t-out="doc.written_deadline"/>
+                                            <td t-out="doc.state"/>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <!-- Extreme risks -->
+                        <h3>3. Extreme &amp; High Risks</h3>
+                        <t t-set="extreme_risks" t-value="company.env['nhs.risk'].search([('company_id','=',company.id),('state','=','active'),('current_band','in',['extreme','high'])])"/>
+                        <p>Extreme/High risks: <strong t-out="len(extreme_risks)"/></p>
+                        <t t-if="extreme_risks">
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr><th>Ref</th><th>Title</th><th>Rating</th><th>Band</th><th>Owner</th></tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="extreme_risks" t-as="risk">
+                                        <tr>
+                                            <td t-out="risk.name"/>
+                                            <td t-out="risk.title"/>
+                                            <td t-out="risk.current_rating"/>
+                                            <td t-out="risk.current_band"/>
+                                            <td t-out="risk.risk_owner_id.name"/>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <!-- Overdue actions -->
+                        <h3>4. Overdue Actions</h3>
+                        <t t-set="overdue_actions" t-value="company.env['nhs.action'].search([('company_id','=',company.id),('state','not in',['done','cancelled']),('due_date','&lt;',fields.Date.today())])"/>
+                        <p>Overdue actions: <strong t-out="len(overdue_actions)"/></p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,41 @@
+/* NHS Incident Public Report Form — styles */
+
+#nhs_public_form_wrap {
+    min-height: 100vh;
+    background: #f0f4f8;
+}
+
+#nhs_public_form_wrap .card-header {
+    background: #005eb8 !important;   /* NHS Blue */
+}
+
+#nhs_public_form_wrap .btn-primary {
+    background: #005eb8;
+    border-color: #005eb8;
+}
+
+#nhs_public_form_wrap .btn-primary:hover {
+    background: #003f7e;
+    border-color: #003f7e;
+}
+
+#nhs_public_form_wrap .form-label.fw-bold {
+    color: #212b36;
+}
+
+#persons_section {
+    background: #fafbfc;
+}
+
+.person-row {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 0.5rem;
+}
+
+@media (max-width: 576px) {
+    .person-row .col-md-4 {
+        margin-bottom: 0.5rem;
+    }
+}
