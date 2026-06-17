@@ -39,8 +39,8 @@
                     </div>
                     <group>
                         <group>
-                            <field name="incident_id" readonly="1"/>
-                            <field name="triggered_at" readonly="1"/>
+                            <field name="incident_id" readonly="id"/>
+                            <field name="triggered_at" readonly="id"/>
                             <field name="written_deadline" readonly="1"/>
                         </group>
                     </group>
@@ -113,7 +113,7 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="incident_id" readonly="1"/>
+                            <field name="incident_id" readonly="id"/>
                             <field name="person_id"/>
                             <field name="reportable"/>
                             <field name="riddor_category" invisible="not reportable"/>
@@ -161,19 +161,24 @@
         <field name="name">nhs.cqc.notification.form</field>
         <field name="model">nhs.cqc.notification</field>
         <field name="arch" type="xml">
-            <form string="CQC Notification">
+             <form string="CQC Notification">
+                <header>
+                    <button name="action_submit" string="Submit to CQC" type="object" class="btn-primary" invisible="state != 'required'"/>
+                    <button name="action_not_required" string="Not Required" type="object" invisible="state != 'required'"/>
+                    <button name="action_required" string="Revert to Required" type="object" invisible="state == 'required'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="required,submitted,not_required"/>
+                </header>
                 <sheet>
                     <group>
                         <group>
-                            <field name="incident_id" readonly="1"/>
+                            <field name="incident_id" readonly="id"/>
                             <field name="notification_type_id"/>
                             <field name="statutory_basis" readonly="1"/>
-                            <field name="state"/>
                         </group>
                         <group>
-                            <field name="submitted_at" invisible="state != 'submitted'"/>
-                            <field name="submitted_by_id" invisible="state != 'submitted'"/>
-                            <field name="cqc_reference" invisible="state != 'submitted'"/>
+                            <field name="submitted_at" invisible="state == 'not_required'"/>
+                            <field name="submitted_by_id" invisible="state == 'not_required'"/>
+                            <field name="cqc_reference" invisible="state == 'not_required'"/>
                         </group>
                     </group>
                     <group string="Justification" invisible="state != 'not_required'">
@@ -234,17 +239,16 @@
                             <field name="file_attachment_id" invisible="not file_attachment_id"/>
                         </group>
                     </group>
-                    <group string="Incidents in this Batch">
-                        <field name="incident_ids" nolabel="1">
-                            <list>
-                                <field name="name"/>
-                                <field name="incident_kind"/>
-                                <field name="occurred_at"/>
-                                <field name="harm_grade"/>
-                                <field name="lfpse_state"/>
-                            </list>
-                        </field>
-                    </group>
+                    <separator string="Incidents in this Batch"/>
+                    <field name="incident_ids" nolabel="1">
+                        <list>
+                            <field name="name"/>
+                            <field name="incident_kind"/>
+                            <field name="occurred_at"/>
+                            <field name="harm_grade"/>
+                            <field name="lfpse_state"/>
+                        </list>
+                    </field>
                 </sheet>
             </form>
         </field>

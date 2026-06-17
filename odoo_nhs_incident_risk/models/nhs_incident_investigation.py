@@ -1,3 +1,24 @@
+# -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
@@ -9,38 +30,57 @@ class NhsInvestigation(models.Model):
     _order = 'id desc'
 
     name = fields.Char(string='Reference', required=True, readonly=True,
-                       copy=False, default='New')
+                       copy=False, default='New',
+                       help='Auto-generated unique reference for this investigation (e.g. INV/2026/00001).')
     incident_id = fields.Many2one('nhs.incident', string='Incident',
-                                  required=True, ondelete='restrict')
+                                  required=True, ondelete='restrict',
+                                  help='The patient safety incident this investigation was opened against.')
     response_level = fields.Selection([
         ('swarm', 'SWARM Huddle'),
         ('aar', 'After Action Review'),
         ('mdt_review', 'MDT Review'),
         ('psii', 'PSII — Patient Safety Incident Investigation'),
-    ], string='Response Level', required=True, tracking=True)
+    ], string='Response Level', required=True, tracking=True,
+       help='The PSIRF learning response type: SWARM for a rapid debrief, AAR for a structured review, '
+            'MDT Review for multidisciplinary input, or PSII for a formal patient safety incident investigation.')
     lead_investigator_id = fields.Many2one('res.users', string='Lead Investigator',
-                                           required=True, tracking=True)
-    team_member_ids = fields.Many2many('res.users', string='Team Members / Panel')
+                                           required=True, tracking=True,
+                                           help='The person responsible for leading and coordinating the investigation.')
+    team_member_ids = fields.Many2many('res.users', string='Team Members / Panel',
+                                       help='Additional investigators, clinicians, or panel members involved in the review.')
     terms_of_reference = fields.Text(string='Terms of Reference',
-                                     help='Required for PSII-level investigations.')
+                                     help='Required for PSII-level investigations. '
+                                          'Defines the scope, objectives, methodology, and boundaries of the investigation.')
     timeline_ids = fields.One2many('nhs.investigation.timeline', 'investigation_id',
-                                   string='Chronology')
+                                   string='Chronology',
+                                   help='A sequential log of events and actions leading up to and following the incident.')
     contributing_factor_ids = fields.Many2many('nhs.contributing.factor',
-                                               string='Contributing Factors')
-    findings = fields.Text(string='Findings')
-    lessons_learned = fields.Text(string='Lessons Learned')
-    good_practice = fields.Text(string='Areas of Good Practice')
+                                               string='Contributing Factors',
+                                               help='Factors from the Yorkshire Contributory Factors Framework that '
+                                                    'contributed to the incident (e.g. task factors, team factors, environment).')
+    findings = fields.Text(string='Findings',
+                           help='The key findings from the investigation — what happened, why, and the immediate causes.')
+    lessons_learned = fields.Text(string='Lessons Learned',
+                                  help='Learning points identified that should be shared across the organisation '
+                                       'to prevent recurrence.')
+    good_practice = fields.Text(string='Areas of Good Practice',
+                                help='Positive practice identified during the investigation that should be recognised and shared.')
     state = fields.Selection([
         ('draft', 'Draft'),
         ('in_progress', 'In Progress'),
         ('submitted', 'Submitted for Approval'),
         ('approved', 'Approved'),
-    ], string='Status', default='draft', required=True, tracking=True)
-    approved_by_id = fields.Many2one('res.users', string='Approved By')
-    approved_at = fields.Datetime(string='Approved At')
-    action_ids = fields.One2many('nhs.action', 'investigation_id', string='Actions')
+    ], string='Status', default='draft', required=True, tracking=True,
+       help='The current stage of the investigation workflow.')
+    approved_by_id = fields.Many2one('res.users', string='Approved By',
+                                     help='The Quality Lead who approved this investigation report.')
+    approved_at = fields.Datetime(string='Approved At',
+                                  help='The date and time the investigation report was formally approved.')
+    action_ids = fields.One2many('nhs.action', 'investigation_id', string='Actions',
+                                 help='Corrective and preventive actions arising from this investigation.')
     company_id = fields.Many2one('res.company', string='Company',
-                                 default=lambda self: self.env.company)
+                                 default=lambda self: self.env.company,
+                                 help='The organisation this investigation belongs to.')
 
     @api.model_create_multi
     def create(self, vals_list):

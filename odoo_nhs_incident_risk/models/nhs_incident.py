@@ -1,3 +1,24 @@
+# -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 from datetime import timedelta
 
 from odoo import api, fields, models
@@ -17,45 +38,62 @@ class NhsIncident(models.Model):
 
     # ── Identification ───────────────────────────────────────────────
     name = fields.Char(string='Reference', required=True, readonly=True,
-                       copy=False, default='New', tracking=True)
+                       copy=False, default='New', tracking=True,
+                       help='Auto-generated unique reference number for this incident (e.g. INC/2026/00001).')
     company_id = fields.Many2one('res.company', string='Organisation',
-                                 required=True, default=lambda self: self.env.company)
+                                 required=True, default=lambda self: self.env.company,
+                                 help='The NHS organisation or CQC provider this incident belongs to.')
     incident_kind = fields.Selection([
         ('incident', 'Patient Safety Incident'),
         ('risk_event', 'Near Miss / Hazard'),
         ('outcome', 'Outcome (harm without known incident)'),
         ('good_care', 'Good Care / Excellence'),
-    ], string='Event Type', required=True, default='incident', tracking=True)
+    ], string='Event Type', required=True, default='incident', tracking=True,
+       help='Classify the nature of the event: a patient safety incident, a near miss/hazard, '
+            'an adverse outcome without a known cause, or a good care example to share.')
 
     # ── When / Where ─────────────────────────────────────────────────
-    occurred_at = fields.Datetime(string='Date/Time of Incident', required=True, tracking=True)
+    occurred_at = fields.Datetime(string='Date/Time of Incident', required=True, tracking=True,
+                                  help='The date and time the event actually occurred. Cannot be set in the future.')
     reported_at = fields.Datetime(string='Date/Time Reported', required=True,
-                                  default=fields.Datetime.now)
-    location_id = fields.Many2one('nhs.location', string='Location', required=True)
+                                  default=fields.Datetime.now,
+                                  help='The date and time this incident was first reported to the system.')
+    location_id = fields.Many2one('nhs.location', string='Location', required=True,
+                                  help='The ward, department, or site where the incident occurred.')
     location_detail = fields.Char(string='Location Detail',
                                   help='e.g. Bathroom of room 12')
     category_id = fields.Many2one('nhs.incident.category', string='Category',
-                                  required=True)
+                                  required=True,
+                                  help='The incident category used for reporting and trend analysis. '
+                                       'Selecting a category may auto-set the response level and harm floor.')
 
     # ── Description ──────────────────────────────────────────────────
     description = fields.Text(
         string='What Happened',
         required=True,
         help='Describe what happened. Do NOT include full names of patients — use initials.')
-    immediate_action = fields.Text(string='Immediate Action Taken')
+    immediate_action = fields.Text(string='Immediate Action Taken',
+                                   help='Record any immediate steps taken at the time of the incident '
+                                        'to ensure patient/staff safety.')
 
     # ── Reporter ─────────────────────────────────────────────────────
-    is_anonymous = fields.Boolean(string='Anonymous Report')
-    reporter_name = fields.Char(string='Reporter Name')
-    reporter_email = fields.Char(string='Reporter Email')
-    reporter_role = fields.Char(string='Reporter Job Role')
+    is_anonymous = fields.Boolean(string='Anonymous Report',
+                                  help='Tick if the reporter wishes to remain anonymous. '
+                                       'Reporter name and contact fields will be hidden.')
+    reporter_name = fields.Char(string='Reporter Name',
+                                help='Full name of the person who reported the incident.')
+    reporter_email = fields.Char(string='Reporter Email',
+                                 help='Email address used to send acknowledgement and feedback to the reporter.')
+    reporter_role = fields.Char(string='Reporter Job Role',
+                                help='Job title or role of the reporter (e.g. Staff Nurse, Paramedic).')
     reported_via = fields.Selection([
         ('public_form', 'Public Web Form'),
         ('backend', 'Backend (direct)'),
         ('phone', 'Phone'),
         ('email', 'Email'),
         ('import', 'Import'),
-    ], string='Reported Via', required=True, default='backend')
+    ], string='Reported Via', required=True, default='backend',
+       help='The channel through which this incident was reported.')
 
     # ── Grading ──────────────────────────────────────────────────────
     harm_grade = fields.Selection([
@@ -64,33 +102,45 @@ class NhsIncident(models.Model):
         ('moderate', 'Moderate Harm'),
         ('severe', 'Severe Harm'),
         ('death', 'Death'),
-    ], string='NPSA Harm Grade', tracking=True)
+    ], string='NPSA Harm Grade', tracking=True,
+       help='The NPSA harm grading scale. Moderate harm or above triggers a Duty of Candour obligation '
+            'and may require LFPSE submission.')
     physical_harm = fields.Selection([
         ('none', 'None'),
         ('low', 'Low'),
         ('moderate', 'Moderate'),
         ('severe', 'Severe'),
         ('fatal', 'Fatal'),
-    ], string='Physical Harm (LFPSE)')
+    ], string='Physical Harm (LFPSE)',
+       help='The degree of physical harm experienced by the patient, as required for LFPSE reporting.')
     psychological_harm = fields.Selection([
         ('none', 'None'),
         ('low', 'Low'),
         ('moderate', 'Moderate'),
         ('severe', 'Severe'),
-    ], string='Psychological Harm (LFPSE)')
+    ], string='Psychological Harm (LFPSE)',
+       help='The degree of psychological harm experienced, as required for LFPSE reporting.')
     response_level = fields.Selection([
         ('none', 'No Separate Response'),
         ('swarm', 'SWARM Huddle'),
         ('aar', 'After Action Review'),
         ('mdt_review', 'MDT Review'),
         ('psii', 'PSII'),
-    ], string='PSIRF Response Level', tracking=True)
-    is_never_event = fields.Boolean(string='Never Event', tracking=True)
+    ], string='PSIRF Response Level', tracking=True,
+       help='The PSIRF-defined learning response: SWARM for immediate debrief, AAR for structured review, '
+            'MDT Review for multidisciplinary input, PSII for serious incidents requiring formal investigation.')
+    is_never_event = fields.Boolean(string='Never Event', tracking=True,
+                                    help='Tick if this is a Never Event — a serious, largely preventable patient safety incident. '
+                                         'Automatically sets response level to PSII.')
 
     # ── Safeguarding ─────────────────────────────────────────────────
-    safeguarding_flag = fields.Boolean(string='Safeguarding Concern', tracking=True)
-    safeguarding_referral_made = fields.Boolean(string='LA Referral Made')
-    safeguarding_reference = fields.Char(string='LA Reference')
+    safeguarding_flag = fields.Boolean(string='Safeguarding Concern', tracking=True,
+                                       help='Tick if this incident involves a safeguarding concern for a vulnerable adult or child. '
+                                            'Access is restricted to Safeguarding Officers.')
+    safeguarding_referral_made = fields.Boolean(string='LA Referral Made',
+                                                help='Tick if a referral has been made to the Local Authority safeguarding team.')
+    safeguarding_reference = fields.Char(string='LA Reference',
+                                         help='The reference number provided by the Local Authority for this safeguarding referral.')
 
     # ── Workflow ─────────────────────────────────────────────────────
     state = fields.Selection([
@@ -102,45 +152,67 @@ class NhsIncident(models.Model):
         ('closed', 'Closed'),
         ('rejected', 'Rejected'),
         ('duplicate', 'Duplicate'),
-    ], string='Status', default='new', required=True, tracking=True)
-    handler_id = fields.Many2one('res.users', string='Handler', tracking=True)
-    rejection_reason = fields.Text(string='Rejection Reason')
-    duplicate_of_id = fields.Many2one('nhs.incident', string='Duplicate Of')
+    ], string='Status', default='new', required=True, tracking=True,
+       help='The current workflow stage of this incident.')
+    handler_id = fields.Many2one('res.users', string='Handler', tracking=True,
+                                 help='The member of staff responsible for managing this incident through to closure.')
+    rejection_reason = fields.Text(string='Rejection Reason',
+                                   help='Explanation of why this incident report was rejected (e.g. duplicate, out of scope).')
+    duplicate_of_id = fields.Many2one('nhs.incident', string='Duplicate Of',
+                                      help='The master incident record of which this report is a duplicate.')
     related_incident_ids = fields.Many2many(
         'nhs.incident', 'nhs_incident_related_rel',
-        'incident_id', 'related_id', string='Related Incidents')
+        'incident_id', 'related_id', string='Related Incidents',
+        help='Other incidents that are related to or contextually linked with this one.')
 
     # ── Relations ────────────────────────────────────────────────────
-    risk_ids = fields.Many2many('nhs.risk', string='Related Risks')
+    risk_ids = fields.Many2many('nhs.risk', string='Related Risks',
+                                help='Risks on the risk register that are associated with this incident.')
     person_ids = fields.One2many('nhs.incident.person', 'incident_id',
-                                 string='Persons Affected')
+                                 string='Persons Affected',
+                                 help='Patients, staff, or visitors affected by this incident.')
     investigation_id = fields.Many2one('nhs.investigation', string='Investigation',
-                                       copy=False)
-    action_ids = fields.One2many('nhs.action', 'incident_id', string='Actions')
+                                       copy=False,
+                                       help='The formal investigation record linked to this incident.')
+    action_ids = fields.One2many('nhs.action', 'incident_id', string='Actions',
+                                 help='Improvement actions arising from this incident.')
     doc_id = fields.Many2one('nhs.duty.of.candour', string='Duty of Candour',
-                             copy=False)
-    riddor_id = fields.Many2one('nhs.riddor', string='RIDDOR', copy=False)
+                             copy=False,
+                             help='The Duty of Candour record auto-created when harm grade reaches the configured threshold.')
+    riddor_id = fields.Many2one('nhs.riddor', string='RIDDOR', copy=False,
+                                help='The RIDDOR determination record for this incident, if applicable.')
     cqc_notification_ids = fields.One2many('nhs.cqc.notification', 'incident_id',
-                                           string='CQC Notifications')
+                                           string='CQC Notifications',
+                                           help='CQC statutory notifications that must be submitted for this incident.')
     lfpse_state = fields.Selection([
         ('not_required', 'Not Required'),
         ('pending', 'Pending'),
         ('exported', 'Exported'),
         ('submitted', 'Submitted'),
-    ], string='LFPSE Status', default='not_required', tracking=True)
-    riddor_hint = fields.Boolean(string='RIDDOR Check Suggested', default=False)
+    ], string='LFPSE Status', default='not_required', tracking=True,
+       help='The Learn from Patient Safety Events (LFPSE) submission status for this incident.')
+    riddor_hint = fields.Boolean(string='RIDDOR Check Suggested', default=False,
+                                 help='Set automatically when incident characteristics suggest RIDDOR reporting may be required. '
+                                      'Use the RIDDOR Check button to run the determination wizard.')
 
     # ── Closure ──────────────────────────────────────────────────────
-    closed_at = fields.Datetime(string='Closed At', readonly=True)
+    closed_at = fields.Datetime(string='Closed At', readonly=True,
+                                help='The date and time this incident was formally closed.')
     days_to_close = fields.Integer(string='Days to Close (working)',
-                                   compute='_compute_days_to_close', store=True)
-    feedback_sent = fields.Boolean(string='Feedback Sent to Reporter')
+                                   compute='_compute_days_to_close', store=True,
+                                   help='Number of working days (excluding weekends and bank holidays) from reporting to closure.')
+    feedback_sent = fields.Boolean(string='Feedback Sent to Reporter',
+                                   help='Tick once feedback or an outcome summary has been sent to the original reporter.')
 
     # ── Smart button counts ───────────────────────────────────────────
-    person_count = fields.Integer(compute='_compute_counts')
-    action_count = fields.Integer(compute='_compute_counts')
-    cqc_count = fields.Integer(compute='_compute_counts')
-    risk_count = fields.Integer(compute='_compute_counts')
+    person_count = fields.Integer(compute='_compute_counts',
+                                  help='Number of persons affected by or involved in this incident.')
+    action_count = fields.Integer(compute='_compute_counts',
+                                  help='Number of corrective/preventive actions raised against this incident.')
+    cqc_count = fields.Integer(compute='_compute_counts',
+                               help='Number of CQC statutory notifications linked to this incident.')
+    risk_count = fields.Integer(compute='_compute_counts',
+                                help='Number of risk register entries associated with this incident.')
 
     @api.depends('person_ids', 'action_ids', 'cqc_notification_ids', 'risk_ids')
     def _compute_counts(self):

@@ -1,3 +1,24 @@
+# -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 from odoo import api, fields, models
 import json
 import csv
@@ -11,22 +32,34 @@ class NhsLfpseSubmission(models.Model):
     _order = 'id desc'
 
     name = fields.Char(string='Batch Reference', required=True, readonly=True,
-                       default='New', copy=False)
+                       default='New', copy=False,
+                       help='Auto-generated unique reference for this LFPSE export batch.')
     incident_ids = fields.Many2many('nhs.incident', string='Incidents',
-                                    domain=[('lfpse_state', 'in', ['pending', 'exported'])])
+                                    domain=[('lfpse_state', 'in', ['pending', 'exported'])],
+                                    help='The incidents included in this export batch. '
+                                         'Only incidents with LFPSE status "Pending" or "Exported" are eligible.')
     export_format = fields.Selection([
         ('csv', 'CSV'),
         ('json', 'JSON'),
-    ], string='Export Format', required=True, default='csv')
-    file_attachment_id = fields.Many2one('ir.attachment', string='Export File')
-    submitted = fields.Boolean(string='Submitted to LFPSE')
-    submitted_at = fields.Datetime(string='Submitted At')
-    taxonomy_version = fields.Char(string='Taxonomy Version', default='LFPSE-2023-v1')
+    ], string='Export Format', required=True, default='csv',
+       help='The file format for the LFPSE export. CSV for spreadsheet upload; '
+            'JSON for API-compatible submissions to the NHS England LFPSE portal.')
+    file_attachment_id = fields.Many2one('ir.attachment', string='Export File',
+                                         help='The generated export file attached to this batch record for download.')
+    submitted = fields.Boolean(string='Submitted to LFPSE',
+                               help='Tick once the export file has been uploaded to the NHS England LFPSE portal.')
+    submitted_at = fields.Datetime(string='Submitted At',
+                                   help='The date and time this batch was formally submitted to the LFPSE portal.')
+    taxonomy_version = fields.Char(string='Taxonomy Version', default='LFPSE-2023-v1',
+                                   help='The LFPSE taxonomy version used to format the export. '
+                                        'Update if NHS England releases a new taxonomy version.')
     state = fields.Selection([
         ('draft', 'Draft'),
         ('exported', 'Exported'),
         ('submitted', 'Submitted'),
-    ], default='draft')
+    ], default='draft',
+       help='The current status of this export batch: Draft while being prepared, '
+            'Exported once the file has been generated, Submitted once uploaded to LFPSE.')
 
     @api.model_create_multi
     def create(self, vals_list):

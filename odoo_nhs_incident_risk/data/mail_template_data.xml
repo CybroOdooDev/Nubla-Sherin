@@ -5,8 +5,8 @@
         <field name="model_id" ref="model_nhs_incident"/>
         <field name="subject">Incident Report Received — {{ object.name }}</field>
         <field name="body_html"><![CDATA[
-<p>Dear {{ object.reporter_name or 'Reporter' }},</p>
-<p>Thank you for submitting an incident report. Your reference number is <strong>{{ object.name }}</strong>.</p>
+<p>Dear <t t-out="object.reporter_name or 'Reporter'"/>,</p>
+<p>Thank you for submitting an incident report. Your reference number is <strong><t t-out="object.name"/></strong>.</p>
 <p>Our team will review your report and may contact you if we need further information.</p>
 <p>What happens next:</p>
 <ul>
@@ -25,8 +25,8 @@
         <field name="model_id" ref="model_nhs_incident"/>
         <field name="subject">Update on Your Incident Report — {{ object.name }}</field>
         <field name="body_html"><![CDATA[
-<p>Dear {{ object.reporter_name or 'Reporter' }},</p>
-<p>We are writing to let you know that your incident report <strong>{{ object.name }}</strong> has now been closed.</p>
+<p>Dear <t t-out="object.reporter_name or 'Reporter'"/>,</p>
+<p>We are writing to let you know that your incident report <strong><t t-out="object.name"/></strong> has now been closed.</p>
 <p>We would like to thank you for bringing this to our attention. Your report helps us improve safety for everyone.</p>
 <p>If you have any questions, please contact the Quality &amp; Safety team.</p>
         ]]></field>
@@ -39,10 +39,10 @@
         <field name="model_id" ref="model_nhs_incident"/>
         <field name="subject">Update on Your Incident Report — {{ object.name }}</field>
         <field name="body_html"><![CDATA[
-<p>Dear {{ object.reporter_name or 'Reporter' }},</p>
-<p>Thank you for submitting incident report <strong>{{ object.name }}</strong>.</p>
+<p>Dear <t t-out="object.reporter_name or 'Reporter'"/>,</p>
+<p>Thank you for submitting incident report <strong><t t-out="object.name"/></strong>.</p>
 <p>After review, our team has determined that this report does not meet the criteria for a formal incident record for the following reason:</p>
-<blockquote>{{ object.rejection_reason }}</blockquote>
+<blockquote><t t-out="object.rejection_reason"/></blockquote>
 <p>If you believe this decision is incorrect, please contact the Quality &amp; Safety team.</p>
         ]]></field>
         <field name="email_to">{{ object.reporter_email }}</field>
@@ -54,7 +54,7 @@
         <field name="model_id" ref="model_nhs_duty_of_candour"/>
         <field name="subject">Duty of Candour Deadline Approaching — {{ object.incident_id.name }}</field>
         <field name="body_html"><![CDATA[
-<p>This is a reminder that the Duty of Candour written notification deadline for incident <strong>{{ object.incident_id.name }}</strong> is on <strong>{{ object.written_deadline }}</strong>.</p>
+<p>This is a reminder that the Duty of Candour written notification deadline for incident <strong><t t-out="object.incident_id.name"/></strong> is on <strong><t t-out="object.written_deadline"/></strong>.</p>
 <p>Please ensure the written notification is completed and documented before the deadline.</p>
         ]]></field>
         <field name="auto_delete">True</field>
@@ -65,12 +65,12 @@
         <field name="model_id" ref="model_nhs_action"/>
         <field name="subject">OVERDUE Action — {{ object.name }}</field>
         <field name="body_html"><![CDATA[
-<p>Dear {{ object.owner_id.name }},</p>
+<p>Dear <t t-out="object.owner_id.name"/>,</p>
 <p>The following action is now overdue:</p>
 <ul>
-    <li><strong>Reference:</strong> {{ object.reference }}</li>
-    <li><strong>Title:</strong> {{ object.name }}</li>
-    <li><strong>Due Date:</strong> {{ object.due_date }}</li>
+    <li><strong>Reference:</strong> <t t-out="object.reference"/></li>
+    <li><strong>Title:</strong> <t t-out="object.name"/></li>
+    <li><strong>Due Date:</strong> <t t-out="object.due_date"/></li>
 </ul>
 <p>Please update the action record with your progress or request an extension from the Quality &amp; Safety team.</p>
         ]]></field>

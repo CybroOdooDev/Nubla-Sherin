@@ -38,7 +38,8 @@
                     ⚠ NEVER EVENT — PSII investigation required
                 </div>
                 <div class="alert alert-warning" role="alert"
-                     invisible="not safeguarding_flag">
+                     invisible="not safeguarding_flag"
+                     groups="odoo_nhs_incident_risk.group_hc_safeguarding">
                     🛡 SAFEGUARDING CONCERN — restricted access applies
                 </div>
                 <sheet>
@@ -131,25 +132,25 @@
                             </group>
                         </page>
                         <page string="Statutory">
-                            <group string="Duty of Candour" invisible="not doc_id">
-                                <field name="doc_id" readonly="1"/>
+                            <group string="Duty of Candour">
+                                <field name="doc_id" readonly="state == 'closed'" context="{'default_incident_id': id}"/>
                             </group>
-                            <group string="RIDDOR" invisible="not riddor_id">
-                                <field name="riddor_id" readonly="1"/>
+                            <group string="RIDDOR">
+                                <field name="riddor_id" readonly="state == 'closed'" context="{'default_incident_id': id}"/>
                             </group>
-                            <group string="CQC Notifications">
-                                <field name="cqc_notification_ids" nolabel="1">
-                                    <list>
-                                        <field name="notification_type_id"/>
-                                        <field name="statutory_basis"/>
-                                        <field name="state"/>
-                                        <field name="submitted_at"/>
-                                        <field name="cqc_reference"/>
-                                    </list>
-                                </field>
-                            </group>
+                            <separator string="CQC Notifications"/>
+                            <field name="cqc_notification_ids" nolabel="1">
+                                <list>
+                                    <field name="notification_type_id"/>
+                                    <field name="statutory_basis"/>
+                                    <field name="state"/>
+                                    <field name="submitted_at"/>
+                                    <field name="cqc_reference"/>
+                                </list>
+                            </field>
                         </page>
-                        <page string="Safeguarding" invisible="not safeguarding_flag">
+                        <page string="Safeguarding" invisible="not safeguarding_flag"
+                              groups="odoo_nhs_incident_risk.group_hc_safeguarding">
                             <group>
                                 <field name="safeguarding_flag"/>
                                 <field name="safeguarding_referral_made"/>
@@ -231,7 +232,7 @@
                                 <field name="category_id"/>
                                 <span t-if="record.harm_grade.raw_value"
                                       class="badge"
-                                      t-attf-class="badge #{record.harm_grade.raw_value in ('severe','death') ? 'bg-danger' : record.harm_grade.raw_value == 'moderate' ? 'bg-warning' : 'bg-secondary'}">
+                                      t-attf-class="badge #{record.harm_grade.raw_value == 'severe' || record.harm_grade.raw_value == 'death' ? 'bg-danger' : record.harm_grade.raw_value == 'moderate' ? 'bg-warning' : 'bg-secondary'}">
                                     <field name="harm_grade"/>
                                 </span>
                             </div>

@@ -1,3 +1,24 @@
+# -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 import logging
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -43,7 +64,7 @@ class NhsPublicReport(http.Controller):
         provider_type = company.provider_type or 'nhs_trust'
 
         person_label = Terminology.t('person_affected', provider_type)
-        provider_name = company.name
+        provider_name = dict(company._fields['provider_type']._description_selection(company.env)).get(provider_type, '')
 
         # Build category list (only active, leaf-level for this provider)
         categories = request.env['nhs.incident.category'].sudo().search([

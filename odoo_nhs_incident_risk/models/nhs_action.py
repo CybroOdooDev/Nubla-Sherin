@@ -1,3 +1,24 @@
+# -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 from datetime import timedelta
 
 from odoo import api, fields, models
@@ -10,42 +31,75 @@ class NhsAction(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'due_date, priority desc'
 
-    name = fields.Char(string='Action Title', required=True)
-    reference = fields.Char(string='Reference', readonly=True, copy=False, default='New')
-    description = fields.Text(string='Description / Acceptance Criteria')
+    name = fields.Char(string='Action Title', required=True,
+                       help='A concise title for this action (e.g. "Update medication double-check SOP").')
+    reference = fields.Char(string='Reference', readonly=True, copy=False, default='New',
+                            help='Auto-generated unique reference for this action (e.g. ACT/2026/00001).')
+    description = fields.Text(string='Description / Acceptance Criteria',
+                               help='A clear description of what must be done and the measurable criteria '
+                                    'that confirm the action is fully complete.')
     action_type = fields.Selection([
         ('corrective', 'Corrective'),
         ('preventive', 'Preventive'),
         ('improvement', 'Improvement'),
-    ], string='Type', required=True, default='corrective')
-    incident_id = fields.Many2one('nhs.incident', string='Incident', ondelete='restrict')
+    ], string='Type', required=True, default='corrective',
+       help='Corrective: addresses the immediate cause of an incident or risk. '
+            'Preventive: prevents a similar event occurring in future. '
+            'Improvement: enhances a process or system beyond baseline requirements.')
+    incident_id = fields.Many2one('nhs.incident', string='Incident', ondelete='restrict',
+                                  help='The incident this action was raised from. '
+                                       'An action can only be linked to one parent record.')
     investigation_id = fields.Many2one('nhs.investigation', string='Investigation',
-                                       ondelete='restrict')
-    risk_id = fields.Many2one('nhs.risk', string='Risk', ondelete='restrict')
+                                       ondelete='restrict',
+                                       help='The investigation this action was raised from. '
+                                            'An action can only be linked to one parent record.')
+    risk_id = fields.Many2one('nhs.risk', string='Risk', ondelete='restrict',
+                              help='The risk register entry this action was raised from. '
+                                   'An action can only be linked to one parent record.')
     owner_id = fields.Many2one('res.users', string='Owner', required=True,
-                               default=lambda self: self.env.user, tracking=True)
-    due_date = fields.Date(string='Due Date', required=True, tracking=True)
+                               default=lambda self: self.env.user, tracking=True,
+                               help='The person responsible for completing this action by the due date. '
+                                    'Receives an activity reminder when the action is created and escalation '
+                                    'alerts when it is approaching or past its due date.')
+    due_date = fields.Date(string='Due Date', required=True, tracking=True,
+                           help='The date by which this action must be completed. '
+                                'Overdue actions trigger automatic escalation alerts to the owner.')
     priority = fields.Selection([
         ('low', 'Low'),
         ('medium', 'Medium'),
         ('high', 'High'),
-    ], string='Priority', default='medium')
+    ], string='Priority', default='medium',
+       help='The urgency of this action. High priority actions should be monitored closely '
+            'and reported in quality governance forums.')
     state = fields.Selection([
         ('open', 'Open'),
         ('in_progress', 'In Progress'),
         ('evidence_review', 'Evidence Review'),
         ('done', 'Done'),
         ('cancelled', 'Cancelled'),
-    ], string='Status', default='open', required=True, tracking=True)
-    cancellation_reason = fields.Text(string='Cancellation Reason')
+    ], string='Status', default='open', required=True, tracking=True,
+       help='The current stage of this action: Open → In Progress → Evidence Review → Done. '
+            'Completion evidence must be recorded before moving to Evidence Review.')
+    cancellation_reason = fields.Text(string='Cancellation Reason',
+                                      help='Required when cancelling an action. Explain why this action '
+                                           'is no longer being pursued.')
     completion_evidence = fields.Text(string='Completion Evidence',
                                       help='Required before moving to Evidence Review.')
-    verified_by_id = fields.Many2one('res.users', string='Verified By')
-    verified_at = fields.Datetime(string='Verified At')
-    effectiveness_check = fields.Boolean(string='Schedule Effectiveness Check')
-    effectiveness_days = fields.Integer(string='Effectiveness Check Days', default=90)
+    verified_by_id = fields.Many2one('res.users', string='Verified By',
+                                     help='The person who independently verified that this action has been '
+                                          'completed to the required standard.')
+    verified_at = fields.Datetime(string='Verified At',
+                                  help='The date and time this action was formally verified as complete.')
+    effectiveness_check = fields.Boolean(string='Schedule Effectiveness Check',
+                                         help='When ticked, an activity is automatically scheduled after '
+                                              'the specified number of days to verify whether the action '
+                                              'has had the intended effect.')
+    effectiveness_days = fields.Integer(string='Effectiveness Check Days', default=90,
+                                        help='Number of days after completion to schedule the effectiveness '
+                                             'check activity (default: 90 days).')
     company_id = fields.Many2one('res.company', string='Company',
-                                 default=lambda self: self.env.company)
+                                 default=lambda self: self.env.company,
+                                 help='The organisation this action belongs to.')
 
     @api.model_create_multi
     def create(self, vals_list):

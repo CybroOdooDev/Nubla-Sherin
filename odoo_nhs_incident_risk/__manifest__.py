@@ -1,17 +1,38 @@
+# -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 {
     'name': 'NHS Incident & Risk Management',
-    'summary': 'Datix-class incident reporting, PSIRF investigations, Duty of '
-               'Candour, RIDDOR, CQC notifications and a 5x5 risk register — '
-               'for NHS trusts, GP practices, care homes and all CQC providers',
+    'summary': 'NHS incident, investigation, compliance and risk management system.',
+    'description': """
+Provides incident reporting, PSIRF investigations, Duty of Candour tracking, statutory compliance management,
+corrective actions, and a 5x5 risk register for NHS and healthcare organisations.
+""",
     'version': '19.0.1.0.0',
     'category': 'Healthcare/NHS',
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'license': 'OPL-1',
-    'price': 0,
-    'currency': 'EUR',
+    'license': 'LGPL-3',
     'depends': ['base', 'mail', 'portal'],
     'data': [
         'security/nhs_security.xml',

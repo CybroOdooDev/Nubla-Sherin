@@ -1,3 +1,24 @@
+# -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 from odoo import api, fields, models
 
 
@@ -15,10 +36,17 @@ class NhsProviderSetupWizard(models.TransientModel):
         ('pharmacy', 'Pharmacy'),
         ('dental', 'Dental Practice'),
     ], string='Provider Type', required=True,
-       default=lambda self: self.env.company.provider_type or 'nhs_trust')
+       default=lambda self: self.env.company.provider_type or 'nhs_trust',
+       help='Select the type of CQC-registered provider that best describes your organisation. '
+            'This setting activates the appropriate incident categories, terminology pack, '
+            'and notification rules for your provider type. It also configures the public '
+            'reporting form and generates a unique access token.')
 
     category_preview = fields.Text(string='Categories that will be activated',
-                                   compute='_compute_preview', readonly=True)
+                                   compute='_compute_preview', readonly=True,
+                                   help='Preview of the top-level incident categories that will be made available '
+                                        'for the selected provider type. Categories not applicable to your provider '
+                                        'type will be archived.')
 
     @api.depends('provider_type')
     def _compute_preview(self):

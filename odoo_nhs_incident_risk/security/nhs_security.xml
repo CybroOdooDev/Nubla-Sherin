@@ -116,5 +116,27 @@
             <field name="perm_create" eval="True"/>
             <field name="perm_unlink" eval="False"/>
         </record>
+        <!-- Safeguarding restriction on incidents -->
+        <record id="rule_incident_safeguarding_restricted" model="ir.rule">
+            <field name="name">Incident: safeguarding restricted</field>
+            <field name="model_id" ref="model_nhs_incident"/>
+            <field name="domain_force">[('safeguarding_flag', '=', False)]</field>
+            <field name="groups" eval="[(4, ref('group_hc_handler'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="rule_incident_safeguarding_allowed" model="ir.rule">
+            <field name="name">Incident: safeguarding allowed</field>
+            <field name="model_id" ref="model_nhs_incident"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_hc_safeguarding'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
     </data>
 </odoo>
