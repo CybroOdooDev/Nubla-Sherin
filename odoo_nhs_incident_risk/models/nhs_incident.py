@@ -153,6 +153,7 @@ class NhsIncident(models.Model):
         ('rejected', 'Rejected'),
         ('duplicate', 'Duplicate'),
     ], string='Status', default='new', required=True, tracking=True,
+       group_expand='_read_group_state',
        help='The current workflow stage of this incident.')
     handler_id = fields.Many2one('res.users', string='Handler', tracking=True,
                                  help='The member of staff responsible for managing this incident through to closure.')
@@ -221,6 +222,46 @@ class NhsIncident(models.Model):
             rec.action_count = len(rec.action_ids)
             rec.cqc_count = len(rec.cqc_notification_ids)
             rec.risk_count = len(rec.risk_ids)
+
+    @api.model
+    def _read_group_state(self, stages, domain, order=None, **kwargs):
+        if domain:
+            try:
+                if not isinstance(domain, (list, tuple)) and hasattr(domain, '__iter__'):
+                    domain = list(domain)
+            except Exception:
+                pass
+        state_list = ['new', 'triage', 'investigation', 'actions', 'pending_closure', 'closed', 'rejected', 'duplicate']
+        allowed_states = set()
+        has_state_filter = False
+
+        def parse_domain(dom):
+            nonlocal has_state_filter
+            if not isinstance(dom, (list, tuple)):
+                return
+            if len(dom) == 3 and dom[0] == 'state':
+                has_state_filter = True
+                op, val = dom[1], dom[2]
+                if op == '=':
+                    allowed_states.add(val)
+                elif op == 'in' and isinstance(val, (list, tuple)):
+                    allowed_states.update(val)
+                elif op == 'not in' and isinstance(val, (list, tuple)):
+                    if not allowed_states:
+                        allowed_states.update(state_list)
+                    allowed_states.difference_update(val)
+                elif op == '!=':
+                    if not allowed_states:
+                        allowed_states.update(state_list)
+                    allowed_states.discard(val)
+            else:
+                for item in dom:
+                    parse_domain(item)
+
+        parse_domain(domain)
+        if has_state_filter:
+            return [s for s in state_list if s in allowed_states]
+        return state_list
 
     @api.depends('reported_at', 'closed_at')
     def _compute_days_to_close(self):

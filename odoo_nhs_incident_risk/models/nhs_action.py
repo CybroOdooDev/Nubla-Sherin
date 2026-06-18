@@ -117,6 +117,10 @@ class NhsAction(models.Model):
     @api.constrains('incident_id', 'investigation_id', 'risk_id')
     def _check_single_parent(self):
         for rec in self:
+            # If both Incident and Investigation are linked, allow it if the investigation is for that incident
+            if rec.incident_id and rec.investigation_id and not rec.risk_id:
+                if rec.investigation_id.incident_id == rec.incident_id:
+                    continue
             parents = bool(rec.incident_id) + bool(rec.investigation_id) + bool(rec.risk_id)
             if parents > 1:
                 raise ValidationError('An action can only be linked to one parent record.')

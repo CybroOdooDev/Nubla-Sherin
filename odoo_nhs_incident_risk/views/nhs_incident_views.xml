@@ -9,7 +9,7 @@
                 <header>
                     <button name="action_open_triage_wizard" string="Triage"
                             type="object" class="btn-primary"
-                            invisible="state not in ['new', 'triage']"/>
+                            invisible="state != 'new'"/>
                     <button name="action_start_investigation" string="Start Investigation"
                             type="object" class="btn-primary"
                             invisible="state != 'triage'"/>
@@ -79,10 +79,10 @@
                         </group>
                     </group>
                     <group string="What Happened">
-                        <field name="description" nolabel="1" placeholder="Describe what happened. Do NOT include full names — use initials."/>
+                        <field name="description" nolabel="1" colspan="2" placeholder="Describe what happened. Do NOT include full names — use initials."/>
                     </group>
                     <group string="Immediate Action Taken">
-                        <field name="immediate_action" nolabel="1"/>
+                        <field name="immediate_action" nolabel="1" colspan="2"/>
                     </group>
                     <notebook>
                         <page string="Reporter">

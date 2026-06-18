@@ -65,8 +65,10 @@ class NhsRiskEscalateWizard(models.TransientModel):
         risk.with_context(nhs_workflow=True).write(
             {'register_id': self.target_register_id.id})
         risk.message_post(
-            body=f'Risk moved from <b>{old_register.name}</b> to <b>{self.target_register_id.name}</b>.<br/>'
-                 f'Rationale: {self.rationale}')
+            body='Risk moved from %s to %s. Rationale: %s' % (
+                old_register.name, self.target_register_id.name, self.rationale
+            )
+        )
 
         if self.notify_user_ids:
             for user in self.notify_user_ids:

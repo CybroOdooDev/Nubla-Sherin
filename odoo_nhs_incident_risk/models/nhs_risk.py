@@ -60,19 +60,20 @@ class NhsRisk(models.Model):
     title = fields.Char(string='Risk Title', required=True,
                         help='A concise summary of the risk, suitable for board-level reporting '
                              '(e.g. "Risk of medication error in high-dependency unit").')
-    cause = fields.Text(string='Cause (IF …)', required=True,
+    cause = fields.Text(string='Cause (IF)', required=True,
                         help='Describe the root cause or trigger condition using the format: '
                              '"IF [cause]..." — what must happen for this risk to materialise.')
-    event = fields.Text(string='Event (THEN …)', required=True,
+    event = fields.Text(string='Event (THEN)', required=True,
                         help='Describe the risk event using the format: '
                              '"THEN [event]..." — what actually goes wrong if the cause is present.')
-    effect = fields.Text(string='Effect (RESULTING IN …)', required=True,
+    effect = fields.Text(string='Effect (RESULTING IN)', required=True,
                          help='Describe the impact using the format: '
                               '"RESULTING IN [effect]..." — the harm, loss, or consequence if the event occurs.')
     category_id = fields.Many2one('nhs.risk.category', string='Category', required=True,
                                   help='The risk category (e.g. Clinical, Financial, Operational). '
                                        'Determines the risk appetite threshold for "Outside Appetite" flagging.')
     register_id = fields.Many2one('nhs.risk.register', string='Register', required=True,
+                                  default=lambda self: self.env['nhs.risk.register'].search([('tier', '=', 'local')], limit=1),
                                   help='The register this risk is currently held on. '
                                        'Use the Escalate button to move the risk between registers.')
     risk_owner_id = fields.Many2one('res.users', string='Risk Owner', required=True,
@@ -232,6 +233,13 @@ class NhsRisk(models.Model):
                and not rec.executive_lead_id:
                 raise ValidationError(
                     'An Executive Lead is required for corporate and BAF register risks.')
+
+    @api.constrains('manual_frequency_override', 'manual_frequency_days')
+    def _check_manual_frequency(self):
+        for rec in self:
+            if rec.manual_frequency_override and rec.manual_frequency_days <= 0:
+                raise ValidationError(
+                    'Manual Frequency (days) must be a positive integer greater than zero.')
 
     def action_activate(self):
         self.write({'state': 'active', 'last_reviewed_at': fields.Datetime.now()})

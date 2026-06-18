@@ -58,3 +58,14 @@ class NhsRiskRegister(models.Model):
         RiskModel = self.env['nhs.risk']
         for reg in self:
             reg.risk_count = RiskModel.search_count([('register_id', '=', reg.id)])
+
+    def action_view_risks(self):
+        self.ensure_one()
+        return {
+            'name': 'Risks',
+            'type': 'ir.actions.act_window',
+            'res_model': 'nhs.risk',
+            'view_mode': 'list,form,pivot',
+            'domain': [('register_id', '=', self.id)],
+            'context': {'default_register_id': self.id},
+        }

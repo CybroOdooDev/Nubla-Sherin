@@ -43,11 +43,11 @@
                         <field name="risk_id"/>
                     </group>
                     <group string="Description">
-                        <field name="description" nolabel="1"/>
+                        <field name="description" nolabel="1" colspan="2"/>
                     </group>
                     <group string="Completion Evidence"
                            invisible="state not in ('in_progress','evidence_review','done')">
-                        <field name="completion_evidence" nolabel="1"/>
+                        <field name="completion_evidence" nolabel="1" colspan="2"/>
                     </group>
                     <group string="Effectiveness Check">
                         <field name="effectiveness_check"/>

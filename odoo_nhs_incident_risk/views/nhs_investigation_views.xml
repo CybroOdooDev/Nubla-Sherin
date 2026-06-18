@@ -39,7 +39,7 @@
                             <field name="approved_at" readonly="1"/>
                         </group>
                     </group>
-                    <notebook>
+                    <notebook invisible="state == 'draft'">
                         <page string="Terms of Reference">
                             <field name="terms_of_reference"
                                    placeholder="Required for PSII investigations."/>
@@ -57,15 +57,17 @@
                             <field name="contributing_factor_ids" widget="many2many_checkboxes"/>
                         </page>
                         <page string="Findings &amp; Learning">
-                            <group>
-                                <field name="findings" nolabel="1"
-                                       placeholder="What the investigation found…"/>
+                            <group string="Investigation Findings">
+                                <field name="findings" nolabel="1" colspan="2"
+                                       placeholder="Provide a detailed summary of what the investigation discovered regarding the timeline, root causes, and immediate circumstances..."/>
                             </group>
                             <group string="Lessons Learned">
-                                <field name="lessons_learned" nolabel="1"/>
+                                <field name="lessons_learned" nolabel="1" colspan="2"
+                                       placeholder="Identify key learning points to prevent similar incidents (e.g., training needs, process adjustments)..."/>
                             </group>
                             <group string="Areas of Good Practice">
-                                <field name="good_practice" nolabel="1"/>
+                                <field name="good_practice" nolabel="1" colspan="2"
+                                       placeholder="Highlight what went well, positive care examples, or rapid clinical responses to share with other teams..."/>
                             </group>
                         </page>
                         <page string="Actions">

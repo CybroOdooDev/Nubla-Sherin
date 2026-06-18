@@ -34,13 +34,16 @@
                             <field name="name" readonly="1"/>
                             <field name="title"/>
                             <field name="category_id"/>
-                            <field name="register_id" readonly="1"/>
+                            <field name="register_id" readonly="state != 'draft'"/>
                         </group>
                         <group>
                             <field name="risk_owner_id"/>
                             <field name="executive_lead_id"/>
                             <field name="next_review_date" readonly="1"/>
                             <field name="outside_appetite" readonly="1"/>
+                            <field name="review_frequency_days" readonly="1"/>
+                            <field name="manual_frequency_override"/>
+                            <field name="manual_frequency_days" invisible="not manual_frequency_override" required="manual_frequency_override"/>
                         </group>
                     </group>
                     <notebook>
@@ -225,6 +228,51 @@
         <field name="res_model">nhs.risk</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('state','=','active'),('next_review_date','&lt;=',context_today())]</field>
+    </record>
+
+    <record id="view_nhs_risk_register_list" model="ir.ui.view">
+        <field name="name">nhs.risk.register.list</field>
+        <field name="model">nhs.risk.register</field>
+        <field name="arch" type="xml">
+            <list string="Risk Registers">
+                <field name="name"/>
+                <field name="tier"/>
+                <field name="owner_group_id"/>
+                <field name="risk_count"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_risk_register_form" model="ir.ui.view">
+        <field name="name">nhs.risk.register.form</field>
+        <field name="model">nhs.risk.register</field>
+        <field name="arch" type="xml">
+            <form string="Risk Register">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_risks" type="object" class="oe_stat_button" icon="oi-list">
+                            <field name="risk_count" string="Risks" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="tier"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="owner_group_id"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1" colspan="2" placeholder="Optional notes about the purpose, scope, or governance arrangements for this register…"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
     </record>
 
     <record id="action_nhs_risk_register_admin" model="ir.actions.act_window">

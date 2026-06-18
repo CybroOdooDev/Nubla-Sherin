@@ -14,7 +14,7 @@
                     <field name="new_current_likelihood"/>
                 </group>
                 <group string="Commentary">
-                    <field name="commentary" nolabel="1"
+                    <field name="commentary" nolabel="1" colspan="2"
                            placeholder="Notes, rationale, actions arising…"/>
                 </group>
                 <footer>
