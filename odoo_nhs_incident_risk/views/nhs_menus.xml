@@ -2,7 +2,7 @@
 <odoo>
     <!-- ══ ROOT APP MENU ════════════════════════════════════════════ -->
     <menuitem id="menu_nhs_root"
-              name="Quality &amp; Safety"
+              name ="Incident &amp; Risk Management"
               sequence="50"
               web_icon="odoo_nhs_incident_risk,static/description/icon.png"
               groups="odoo_nhs_incident_risk.group_hc_reporter"/>

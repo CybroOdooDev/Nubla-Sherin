@@ -4,24 +4,103 @@
         <field name="name">nhs.risk.review.wizard.form</field>
         <field name="model">nhs.risk.review.wizard</field>
         <field name="arch" type="xml">
-            <form string="Record Risk Review">
+            <form string="Review Risk">
+
+                <!-- Outside Appetite Alert -->
+                <div class="alert alert-danger mb-0" role="alert"
+                     invisible="not outside_appetite">
+                    ⚠ This risk is currently rated <b>OUTSIDE appetite</b>
+                </div>
+
+                <!-- ── Risk Identity ──────────────────────────────── -->
+                <group string="Risk Details">
+                    <group>
+                        <field name="risk_id" readonly="1"/>
+                        <field name="risk_title" readonly="1"/>
+                        <field name="risk_category_id" readonly="1"/>
+                        <field name="risk_register_id" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="risk_owner_id" readonly="1"/>
+                        <field name="executive_lead_id" readonly="1"/>
+                        <field name="next_review_date" readonly="1"/>
+                        <field name="outside_appetite" readonly="1" widget="boolean"/>
+                    </group>
+                </group>
+
+                <!-- ── Risk Description ───────────────────────────── -->
+                <group string="Risk Description">
+                    <field name="cause" readonly="1"/>
+                    <field name="event" readonly="1"/>
+                    <field name="effect" readonly="1"/>
+                </group>
+
+                <!-- ── Scores: Inherent | Current side by side ────── -->
+                <group string="Risk Scores">
+                    <group string="Inherent (No Controls)">
+                        <field name="inherent_consequence" readonly="1"/>
+                        <field name="inherent_likelihood" readonly="1"/>
+                        <field name="inherent_rating" readonly="1"/>
+                        <field name="inherent_band" readonly="1"/>
+                    </group>
+                    <group string="Current (With Controls)">
+                        <field name="current_consequence" readonly="1"/>
+                        <field name="current_likelihood" readonly="1"/>
+                        <field name="current_rating" readonly="1"/>
+                        <field name="current_band" readonly="1"/>
+                    </group>
+                </group>
+
+                <!-- ── Target Score ───────────────────────────────── -->
                 <group>
-                    <field name="risk_id" readonly="1"/>
-                    <field name="decision" widget="radio"/>
+                    <group string="Target (Post-Mitigation)">
+                        <field name="target_consequence" readonly="1"/>
+                        <field name="target_likelihood" readonly="1"/>
+                        <field name="target_rating" readonly="1"/>
+                        <field name="target_band" readonly="1"/>
+                    </group>
                 </group>
-                <group string="Re-score" invisible="decision != 'rescore'">
-                    <field name="new_current_consequence"/>
-                    <field name="new_current_likelihood"/>
+
+                <!-- ── Review Decision ────────────────────────────── -->
+                <separator string="Review Decision"/>
+
+                <group>
+                    <group>
+                        <field name="reviewed_at"/>
+                        <field name="reviewer_id"/>
+                    </group>
+                    <group>
+                        <field name="decision" widget="radio"/>
+                    </group>
                 </group>
+
+                <!-- Previous vs New scores shown when Re-scored -->
+                <group string="Score Change" invisible="decision != 'rescore'">
+                    <group string="Previous">
+                        <field name="prev_current_consequence" readonly="1"/>
+                        <field name="prev_current_likelihood" readonly="1"/>
+                    </group>
+                    <group string="New">
+                        <field name="new_current_consequence"
+                               required="decision == 'rescore'"/>
+                        <field name="new_current_likelihood"
+                               required="decision == 'rescore'"/>
+                    </group>
+                </group>
+
                 <group string="Commentary">
                     <field name="commentary" nolabel="1" colspan="2"
-                           placeholder="Notes, rationale, actions arising…"/>
+                           placeholder="Notes, rationale, actions arising…"
+                           required="decision == 'close'"/>
                 </group>
+
                 <footer>
                     <button name="action_confirm" string="Save Review"
                             type="object" class="btn-primary"/>
-                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    <button name="action_cancel" string="Cancel"
+                            type="object" class="btn-secondary"/>
                 </footer>
+
             </form>
         </field>
     </record>

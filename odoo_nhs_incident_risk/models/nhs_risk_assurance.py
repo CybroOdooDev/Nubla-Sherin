@@ -29,6 +29,9 @@ class NhsRiskAssurance(models.Model):
 
     risk_id = fields.Many2one('nhs.risk', string='Risk', required=True, ondelete='cascade',
                               help='The risk register entry this assurance is linked to.')
+    control_id = fields.Many2one('nhs.risk.control', string='Control Checked',
+                                 domain="[('risk_id', '=', risk_id)]",
+                                 help='The control measure that this assurance is checking/verifying.')
     sequence = fields.Integer(default=10,
                               help='Display order of this assurance within the risk record.')
     name = fields.Char(string='Assurance Description', required=True,

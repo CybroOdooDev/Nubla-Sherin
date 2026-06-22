@@ -63,6 +63,7 @@ corrective actions, and a 5x5 risk register for NHS and healthcare organisations
         'wizards/nhs_lfpse_export_wizard_views.xml',
         'wizards/nhs_risk_review_wizard_views.xml',
         'wizards/nhs_provider_setup_wizard_views.xml',
+        'wizards/nhs_risk_close_wizard_views.xml',
         'views/nhs_menus.xml',
     ],
     'assets': {

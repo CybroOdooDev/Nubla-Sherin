@@ -17,7 +17,7 @@
                             type="object"
                             groups="odoo_nhs_incident_risk.group_hc_risk_manager"
                             invisible="state != 'active'"/>
-                    <button name="action_close" string="Close Risk"
+                    <button name="action_open_close_wizard" string="Close Risk"
                             type="object"
                             groups="odoo_nhs_incident_risk.group_hc_quality_lead"
                             invisible="state != 'active'"/>
@@ -32,50 +32,62 @@
                     <group>
                         <group>
                             <field name="name" readonly="1"/>
-                            <field name="title"/>
-                            <field name="category_id"/>
+                            <field name="title" readonly="state == 'closed'"/>
+                            <field name="category_id" readonly="state == 'closed'"/>
                             <field name="register_id" readonly="state != 'draft'"/>
                         </group>
                         <group>
-                            <field name="risk_owner_id"/>
-                            <field name="executive_lead_id"/>
+                            <field name="risk_owner_id" readonly="state == 'closed'"/>
+                            <field name="executive_lead_id" readonly="state == 'closed'"/>
                             <field name="next_review_date" readonly="1"/>
                             <field name="outside_appetite" readonly="1"/>
                             <field name="review_frequency_days" readonly="1"/>
-                            <field name="manual_frequency_override"/>
-                            <field name="manual_frequency_days" invisible="not manual_frequency_override" required="manual_frequency_override"/>
+                            <field name="manual_frequency_override" readonly="state == 'closed'"/>
+                            <field name="manual_frequency_days"
+                                   invisible="not manual_frequency_override"
+                                   required="manual_frequency_override"
+                                   readonly="state == 'closed'"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Risk Description">
                             <group>
-                                <field name="cause" placeholder="IF [cause]…"/>
-                                <field name="event" placeholder="THEN [event]…"/>
-                                <field name="effect" placeholder="RESULTING IN [effect]…"/>
+                                <field name="cause" placeholder="IF [cause]…"
+                                       readonly="state == 'closed'"/>
+                                <field name="event" placeholder="THEN [event]…"
+                                       readonly="state == 'closed'"/>
+                                <field name="effect" placeholder="RESULTING IN [effect]…"
+                                       readonly="state == 'closed'"/>
                             </group>
                         </page>
                         <page string="Scoring">
                             <group string="Inherent Score (before controls)">
-                                <field name="inherent_consequence"/>
-                                <field name="inherent_likelihood"/>
+                                <field name="inherent_consequence"
+                                       readonly="state == 'closed'"/>
+                                <field name="inherent_likelihood"
+                                       readonly="state == 'closed'"/>
                                 <field name="inherent_rating" readonly="1"/>
                                 <field name="inherent_band" readonly="1"/>
                             </group>
                             <group string="Current Score (with existing controls)">
-                                <field name="current_consequence"/>
-                                <field name="current_likelihood"/>
+                                <field name="current_consequence"
+                                       readonly="state == 'closed'"/>
+                                <field name="current_likelihood"
+                                       readonly="state == 'closed'"/>
                                 <field name="current_rating" readonly="1"/>
                                 <field name="current_band" readonly="1"/>
                             </group>
                             <group string="Target Score (post-mitigation)">
-                                <field name="target_consequence"/>
-                                <field name="target_likelihood"/>
+                                <field name="target_consequence"
+                                       readonly="state == 'closed'"/>
+                                <field name="target_likelihood"
+                                       readonly="state == 'closed'"/>
                                 <field name="target_rating" readonly="1"/>
                                 <field name="target_band" readonly="1"/>
                             </group>
                         </page>
-                        <page string="Controls">
-                            <field name="control_ids">
+                        <page string="Controls" invisible="state == 'draft'">
+                            <field name="control_ids" readonly="state == 'closed'">
                                 <list editable="bottom">
                                     <field name="sequence" widget="handle"/>
                                     <field name="name"/>
@@ -84,19 +96,20 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Assurances">
-                            <field name="assurance_ids">
+                        <page string="Assurances" invisible="state == 'draft'">
+                            <field name="assurance_ids" readonly="state == 'closed'">
                                 <list editable="bottom">
                                     <field name="sequence" widget="handle"/>
                                     <field name="name"/>
+                                    <field name="control_id" domain="[('risk_id', '=', parent.id)]"/>
                                     <field name="line"/>
                                     <field name="assurance_gap" widget="toggle_button"/>
                                     <field name="source"/>
                                 </list>
                             </field>
                         </page>
-                        <page string="Actions">
-                            <field name="action_ids">
+                        <page string="Actions" invisible="state == 'draft'">
+                            <field name="action_ids" readonly="state == 'closed'">
                                 <list>
                                     <field name="reference"/>
                                     <field name="name"/>
@@ -106,8 +119,8 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Evidence Incidents">
-                            <field name="incident_ids">
+                        <page string="Evidence Incidents" invisible="state == 'draft'">
+                            <field name="incident_ids" readonly="state == 'closed'">
                                 <list>
                                     <field name="name"/>
                                     <field name="occurred_at"/>
@@ -116,11 +129,13 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Review Log">
-                            <field name="review_ids">
+                        <page string="Review Log" invisible="state == 'draft'">
+                            <field name="review_ids" readonly="1">
                                 <list>
                                     <field name="reviewed_at"/>
                                     <field name="reviewer_id"/>
+                                    <field name="prev_current_consequence"/>
+                                    <field name="prev_current_likelihood"/>
                                     <field name="new_current_consequence"/>
                                     <field name="new_current_likelihood"/>
                                     <field name="decision"/>
@@ -129,7 +144,7 @@
                             </field>
                         </page>
                         <page string="Closure" invisible="state != 'closed'">
-                            <field name="closure_reason"/>
+                            <field name="closure_reason" readonly="1"/>
                         </page>
                     </notebook>
                 </sheet>
@@ -149,8 +164,6 @@
                   decoration-muted="state == 'closed'">
                 <field name="name"/>
                 <field name="title"/>
-                <field name="register_id"/>
-                <field name="category_id"/>
                 <field name="risk_owner_id"/>
                 <field name="current_consequence"/>
                 <field name="current_likelihood"/>
@@ -162,8 +175,7 @@
                 <field name="target_rating" optional="show"/>
                 <field name="next_review_date"
                        decoration-danger="next_review_date and next_review_date &lt; context_today()"/>
-                <field name="outside_appetite" optional="show"/>
-                <field name="state" optional="hide"/>
+                <field name="state"/>
             </list>
         </field>
     </record>

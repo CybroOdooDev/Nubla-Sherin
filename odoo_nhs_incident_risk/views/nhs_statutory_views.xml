@@ -68,7 +68,7 @@
                                        invisible="not findings_shared_done"/>
                             </group>
                         </page>
-                        <page string="Exemption">
+                        <page string="Exemption" invisible="verbal_done and written_done and findings_shared_done">
                             <field name="exemption_reason"
                                    placeholder="Document lawful reason if contact cannot be made…"/>
                         </page>
@@ -240,7 +240,20 @@
                         </group>
                     </group>
                     <separator string="Incidents in this Batch"/>
-                    <field name="incident_ids" nolabel="1">
+                    <field name="incident_ids" nolabel="1"
+                           invisible="state == 'submitted'"
+                           domain="[('lfpse_state', 'in', ['pending', 'exported'])]">
+                        <list>
+                            <field name="name"/>
+                            <field name="incident_kind"/>
+                            <field name="occurred_at"/>
+                            <field name="harm_grade"/>
+                            <field name="lfpse_state"/>
+                        </list>
+                    </field>
+                    <field name="incident_ids" nolabel="1"
+                           invisible="state != 'submitted'"
+                           readonly="1">
                         <list>
                             <field name="name"/>
                             <field name="incident_kind"/>

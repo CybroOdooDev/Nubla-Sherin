@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ══ INCIDENT CATEGORY CONFIG ═════════════════════════════════ -->
+    <!--INCIDENT CATEGORY CONFIG -->
     <record id="view_nhs_incident_category_list" model="ir.ui.view">
         <field name="name">nhs.incident.category.list</field>
         <field name="model">nhs.incident.category</field>

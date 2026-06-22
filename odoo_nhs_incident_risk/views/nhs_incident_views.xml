@@ -85,6 +85,7 @@
                         <field name="immediate_action" nolabel="1" colspan="2"/>
                     </group>
                     <notebook>
+                        <!-- Always visible: capture reporter details at any stage -->
                         <page string="Reporter">
                             <group>
                                 <group>
@@ -98,6 +99,7 @@
                                 </group>
                             </group>
                         </page>
+                        <!-- Always visible: persons are captured from the moment of reporting -->
                         <page string="Persons Affected">
                             <field name="person_ids">
                                 <list editable="bottom">
@@ -111,7 +113,9 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Grading &amp; Response">
+                        <!-- Visible from Triage onwards: grading is set during triage -->
+                        <page string="Grading &amp; Response"
+                              invisible="state == 'new'">
                             <group>
                                 <group>
                                     <field name="harm_grade"/>
@@ -125,13 +129,16 @@
                                 </group>
                             </group>
                         </page>
+                        <!-- Visible only once an investigation record exists -->
                         <page string="Investigation"
                               invisible="not investigation_id">
                             <group>
                                 <field name="investigation_id" readonly="1"/>
                             </group>
                         </page>
-                        <page string="Statutory">
+                        <!-- Visible from Triage onwards: statutory obligations assessed at triage -->
+                        <page string="Statutory"
+                              invisible="state == 'new'">
                             <group string="Duty of Candour">
                                 <field name="doc_id" readonly="state == 'closed'" context="{'default_incident_id': id}"/>
                             </group>
@@ -149,6 +156,7 @@
                                 </list>
                             </field>
                         </page>
+                        <!-- Visible only when safeguarding flag is raised (role-restricted) -->
                         <page string="Safeguarding" invisible="not safeguarding_flag"
                               groups="odoo_nhs_incident_risk.group_hc_safeguarding">
                             <group>
@@ -157,7 +165,9 @@
                                 <field name="safeguarding_reference"/>
                             </group>
                         </page>
-                        <page string="Actions">
+                        <!-- Visible from Actions state onwards: actions are raised post-investigation -->
+                        <page string="Actions"
+                              invisible="state not in ('actions', 'pending_closure', 'closed')">
                             <field name="action_ids">
                                 <list>
                                     <field name="reference"/>
@@ -169,7 +179,9 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Linked Records">
+                        <!-- Visible from Triage onwards: linking happens after initial triage -->
+                        <page string="Linked Records"
+                              invisible="state == 'new'">
                             <group>
                                 <field name="duplicate_of_id"/>
                                 <field name="related_incident_ids" widget="many2many_tags"/>

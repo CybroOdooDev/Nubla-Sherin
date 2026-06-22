@@ -155,7 +155,7 @@
                                 <tbody>
                                     <t t-foreach="overdue_actions" t-as="act">
                                         <tr>
-                                            <td t-out="act.title"/>
+                                            <td t-out="act.name"/>
                                             <td t-out="act.owner_id.name"/>
                                             <td style="text-align: center; color: #b91c1c; font-weight: bold;" t-out="act.due_date" t-options='{"widget": "date"}'/>
                                             <td style="text-align: center; color: #b91c1c; font-weight: bold; text-transform: uppercase;">Overdue</td>

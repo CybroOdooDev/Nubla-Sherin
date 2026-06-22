@@ -35,7 +35,6 @@ class NhsLfpseSubmission(models.Model):
                        default='New', copy=False,
                        help='Auto-generated unique reference for this LFPSE export batch.')
     incident_ids = fields.Many2many('nhs.incident', string='Incidents',
-                                    domain=[('lfpse_state', 'in', ['pending', 'exported'])],
                                     help='The incidents included in this export batch. '
                                          'Only incidents with LFPSE status "Pending" or "Exported" are eligible.')
     export_format = fields.Selection([

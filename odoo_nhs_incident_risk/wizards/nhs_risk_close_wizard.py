@@ -19,10 +19,24 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from . import nhs_triage_wizard
-from . import nhs_riddor_wizard
-from . import nhs_risk_escalate_wizard
-from . import nhs_risk_review_wizard
-from . import nhs_lfpse_export_wizard
-from . import nhs_provider_setup_wizard
-from . import nhs_risk_close_wizard
+from odoo import fields, models
+
+
+class NhsRiskCloseWizard(models.TransientModel):
+    _name = 'nhs.risk.close.wizard'
+    _description = 'Close Risk Wizard'
+
+    risk_id = fields.Many2one('nhs.risk', string='Risk', required=True,
+                              help='The risk being closed.')
+    closure_reason = fields.Text(
+        string='Closure Reason', required=True,
+        help='Explain why this risk is being closed. This is saved on the risk record '
+             'and posted as a chatter message.')
+
+    def action_confirm(self):
+        self.ensure_one()
+        risk = self.risk_id
+        risk.write({'closure_reason': self.closure_reason})
+        risk.action_close()
+        risk.message_post(body='Risk closed. Reason: %s' % self.closure_reason)
+        return {'type': 'ir.actions.act_window_close'}

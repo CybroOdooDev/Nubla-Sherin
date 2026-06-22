@@ -244,6 +244,20 @@ class NhsRisk(models.Model):
     def action_activate(self):
         self.write({'state': 'active', 'last_reviewed_at': fields.Datetime.now()})
 
+    def action_open_close_wizard(self):
+        self.ensure_one()
+        if not self.env.user.has_group(
+                'odoo_nhs_incident_risk.group_hc_quality_lead'):
+            raise UserError('Only Quality Lead users can close risks.')
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Close Risk',
+            'res_model': 'nhs.risk.close.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_risk_id': self.id},
+        }
+
     def action_close(self):
         if not self.env.user.has_group(
                 'odoo_nhs_incident_risk.group_hc_quality_lead'):
