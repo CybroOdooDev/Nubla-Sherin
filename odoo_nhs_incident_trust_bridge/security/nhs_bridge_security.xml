@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Bridge record rules granting NHS Incident & Risk groups visibility
+        over NHS Trust Management hierarchy models needed by Many2one widgets.
+        No new security groups are defined — the bridge reuses groups from
+        both parent modules.
+    -->
+
+    <!-- Incident groups can read the nhs.trust record so Many2one widgets
+         render correctly when trust_id is set on an incident. -->
+    <record id="rule_nhs_trust_bridge_read_all" model="ir.rule">
+        <field name="name">NHS Trust — readable by Incident &amp; Risk groups</field>
+        <field name="model_id" ref="odoo_nhs_trust_management.model_nhs_trust"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[
+            (4, ref('odoo_nhs_incident_risk.group_hc_reporter')),
+            (4, ref('odoo_nhs_incident_risk.group_hc_handler')),
+            (4, ref('odoo_nhs_incident_risk.group_hc_investigator')),
+            (4, ref('odoo_nhs_incident_risk.group_hc_risk_manager')),
+            (4, ref('odoo_nhs_incident_risk.group_hc_quality_lead')),
+            (4, ref('odoo_nhs_incident_risk.group_hc_safeguarding')),
+        ]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Trust managers can read all incidents for cross-trust reporting. -->
+    <record id="rule_nhs_incident_trust_manager_read" model="ir.rule">
+        <field name="name">NHS Incident — Trust Managers can read all incidents</field>
+        <field name="model_id" ref="odoo_nhs_incident_risk.model_nhs_incident"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[
+            (4, ref('odoo_nhs_trust_management.group_nhs_trust_manager')),
+            (4, ref('odoo_nhs_trust_management.group_nhs_trust_admin')),
+        ]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+</odoo>

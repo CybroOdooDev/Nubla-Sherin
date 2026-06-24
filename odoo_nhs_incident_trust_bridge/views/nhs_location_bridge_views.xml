@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Extends the NHS Location form with:
+        1. trust_id and ods_site_code fields after parent_id
+        2. A trust-scoped domain on parent_id so child locations
+           stay within the same trust in the hierarchy picker
+    -->
+    <record id="view_nhs_location_form_bridge" model="ir.ui.view">
+        <field name="name">nhs.location.form.bridge</field>
+        <field name="model">nhs.location</field>
+        <field name="inherit_id" ref="odoo_nhs_incident_risk.view_nhs_location_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Scope parent_id picker to the same trust (or no trust set) -->
+            <xpath expr="//field[@name='parent_id']" position="attributes">
+                <attribute name="domain">['|', ('trust_id', '=', False), ('trust_id', '=', trust_id)]</attribute>
+            </xpath>
+
+            <!-- Add trust and ODS site code after parent_id -->
+            <xpath expr="//field[@name='parent_id']" position="after">
+                <field name="trust_id"/>
+                <field name="ods_site_code"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- ── Location list: add trust column ──────────────────────────── -->
+    <record id="view_nhs_location_list_bridge" model="ir.ui.view">
+        <field name="name">nhs.location.list.bridge</field>
+        <field name="model">nhs.location</field>
+        <field name="inherit_id" ref="odoo_nhs_incident_risk.view_nhs_location_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='complete_name']" position="after">
+                <field name="trust_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

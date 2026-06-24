@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Extends the CQC Notification form (from odoo_nhs_incident_risk) with a
+        direct link to a CQC Inspection record from odoo_nhs_trust_operations.
+
+        Flow: when a notification is submitted to CQC and a formal inspection
+        follows (or references it), the quality lead can open the notification
+        dialog and pick the inspection here — creating a traceable audit trail
+        from statutory notification → inspection finding.
+
+        Also adds a "Linked Inspection" column to the inline notification list
+        on the incident Statutory tab so quality leads can see links at a glance
+        without opening each notification individually.
+    -->
+
+    <!-- ── CQC Notification dialog: add inspection picker ────────────── -->
+    <record id="view_nhs_cqc_notification_form_bridge" model="ir.ui.view">
+        <field name="name">nhs.cqc.notification.form.bridge</field>
+        <field name="model">nhs.cqc.notification</field>
+        <field name="inherit_id" ref="odoo_nhs_incident_risk.view_nhs_cqc_notification_form"/>
+        <field name="arch" type="xml">
+            <!-- Place the inspection picker after the CQC Reference field,
+                 scoped to inspections belonging to the incident's trust. -->
+            <xpath expr="//field[@name='cqc_reference']" position="after">
+                <field name="cqc_inspection_id"
+                       invisible="state == 'not_required'"
+                       domain="[('trust_id', '=', trust_id)]"
+                       options="{'no_create': True}"
+                       help="Link this notification to the CQC inspection where it was reviewed or raised as evidence."/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ── Incident form: add inspection column to inline notification list -->
+    <record id="view_nhs_incident_cqc_notification_list_bridge" model="ir.ui.view">
+        <field name="name">nhs.incident.cqc.notification.list.bridge</field>
+        <field name="model">nhs.incident</field>
+        <field name="inherit_id" ref="odoo_nhs_incident_risk.view_nhs_incident_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='cqc_notification_ids']//field[@name='cqc_reference']"
+                   position="after">
+                <field name="cqc_inspection_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

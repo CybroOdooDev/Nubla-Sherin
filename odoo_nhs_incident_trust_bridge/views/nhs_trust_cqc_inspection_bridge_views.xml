@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Extends the CQC Inspection form (from odoo_nhs_trust_operations) with:
+        1. A smart button showing how many patient safety incidents are linked
+        2. A "Linked Incidents" tab listing those incidents
+        This closes the loop: quality leads can navigate from a CQC inspection
+        to all incidents that were flagged or referenced during that inspection.
+    -->
+    <record id="view_nhs_trust_cqc_inspection_form_bridge" model="ir.ui.view">
+        <field name="name">nhs.trust.cqc.inspection.form.bridge</field>
+        <field name="model">nhs.trust.cqc.inspection</field>
+        <field name="inherit_id" ref="odoo_nhs_trust_operations.view_nhs_trust_cqc_inspection_form"/>
+        <field name="arch" type="xml">
+
+            <!-- ── Incident smart button ───────────────────────────── -->
+            <xpath expr="//sheet/div[@class='oe_title']" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_linked_incidents"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-exclamation-triangle"
+                            invisible="incident_count == 0">
+                        <field name="incident_count" widget="statinfo" string="Incidents"/>
+                    </button>
+                </div>
+            </xpath>
+
+            <!-- ── Linked Incidents tab ────────────────────────────── -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Linked Incidents" name="linked_incidents">
+                    <group string="Patient Safety Incidents" col="1">
+                        <p class="text-muted"
+                           invisible="incident_count != 0">
+                            No incidents are currently linked to this inspection.
+                            Open an incident record and add this inspection in the
+                            Trust Context section to create a link.
+                        </p>
+                        <field name="incident_ids" nolabel="1"
+                               readonly="1"
+                               invisible="incident_count == 0">
+                            <list string="Linked Incidents"
+                                  default_order="occurred_at desc">
+                                <field name="name"/>
+                                <field name="occurred_at"/>
+                                <field name="location_id"/>
+                                <field name="category_id"/>
+                                <field name="harm_grade" widget="badge"
+                                       decoration-danger="harm_grade in ('severe','death')"
+                                       decoration-warning="harm_grade == 'moderate'"
+                                       decoration-info="harm_grade == 'low'"
+                                       decoration-muted="harm_grade == 'no_harm'"/>
+                                <field name="state" widget="badge"
+                                       decoration-success="state == 'closed'"
+                                       decoration-danger="state == 'rejected'"/>
+                            </list>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!--
+        Extends the CQC Inspection list view (from odoo_nhs_trust_operations)
+        to add a "Linked Incidents" count column so quality leads can see at
+        a glance which inspections have patient safety incidents attached.
+    -->
+    <record id="view_nhs_trust_cqc_inspection_list_bridge" model="ir.ui.view">
+        <field name="name">nhs.trust.cqc.inspection.list.bridge</field>
+        <field name="model">nhs.trust.cqc.inspection</field>
+        <field name="inherit_id" ref="odoo_nhs_trust_operations.view_nhs_trust_cqc_inspection_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='next_inspection_due']" position="before">
+                <field name="incident_count" string="Incidents" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!--
+        Extends the CQC Inspection search view to allow filtering and
+        grouping by whether incidents are linked.
+    -->
+    <record id="view_nhs_trust_cqc_inspection_search_bridge" model="ir.ui.view">
+        <field name="name">nhs.trust.cqc.inspection.search.bridge</field>
+        <field name="model">nhs.trust.cqc.inspection</field>
+        <field name="inherit_id" ref="odoo_nhs_trust_operations.view_nhs_trust_cqc_inspection_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="before">
+                <filter string="Has Linked Incidents" name="has_incidents"
+                        domain="[('incident_ids', '!=', False)]"/>
+                <filter string="No Linked Incidents" name="no_incidents"
+                        domain="[('incident_ids', '=', False)]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
