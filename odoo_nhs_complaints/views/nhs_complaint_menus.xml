@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ══════════════════════════════════════════════════════════════
+         Root Application Menu
+    ══════════════════════════════════════════════════════════════════ -->
+    <menuitem id="menu_nhs_complaints_root"
+              name="Complaints &amp; PALS"
+              sequence="20"
+              web_icon="odoo_nhs_complaints,static/description/icon.png"
+              groups="odoo_nhs_complaints.group_nhs_complaint_handler"/>
+
+    <!-- ── PALS Concerns ──────────────────────────────────────── -->
+    <menuitem id="menu_nhs_pals"
+              name="PALS Concerns"
+              parent="menu_nhs_complaints_root"
+              sequence="10"
+              groups="odoo_nhs_complaints.group_nhs_complaint_handler"/>
+
+    <menuitem id="menu_nhs_pals_open"
+              name="Open Concerns"
+              parent="menu_nhs_pals"
+              action="action_nhs_pals_concerns"
+              sequence="10"
+              groups="odoo_nhs_complaints.group_nhs_complaint_handler"/>
+
+    <!-- ── Complaints ─────────────────────────────────────────── -->
+    <menuitem id="menu_nhs_complaints"
+              name="Complaints"
+              parent="menu_nhs_complaints_root"
+              sequence="20"
+              groups="odoo_nhs_complaints.group_nhs_complaint_handler"/>
+
+    <menuitem id="menu_nhs_complaints_triage"
+              name="Inbox / Triage"
+              parent="menu_nhs_complaints"
+              action="action_nhs_complaints_triage"
+              sequence="10"
+              groups="odoo_nhs_complaints.group_nhs_complaint_handler"/>
+
+    <menuitem id="menu_nhs_complaints_all"
+              name="All Complaints"
+              parent="menu_nhs_complaints"
+              action="action_nhs_complaints_all"
+              sequence="20"
+              groups="odoo_nhs_complaints.group_nhs_complaint_handler"/>
+
+    <menuitem id="menu_nhs_complaints_my"
+              name="My Cases"
+              parent="menu_nhs_complaints"
+              action="action_nhs_complaints_my_cases"
+              sequence="30"
+              groups="odoo_nhs_complaints.group_nhs_complaint_handler"/>
+
+    <menuitem id="menu_nhs_complaints_overdue"
+              name="Overdue"
+              parent="menu_nhs_complaints"
+              action="action_nhs_complaints_overdue"
+              sequence="40"
+              groups="odoo_nhs_complaints.group_nhs_complaint_handler"/>
+
+    <menuitem id="menu_nhs_complaints_investigations"
+              name="Investigations"
+              parent="menu_nhs_complaints"
+              action="action_nhs_complaint_investigation"
+              sequence="50"
+              groups="odoo_nhs_complaints.group_nhs_complaint_handler"/>
+
+    <!-- ── PHSO ───────────────────────────────────────────────── -->
+    <menuitem id="menu_nhs_phso"
+              name="PHSO"
+              parent="menu_nhs_complaints_root"
+              sequence="30"
+              groups="odoo_nhs_complaints.group_nhs_complaint_manager"/>
+
+    <menuitem id="menu_nhs_phso_casebook"
+              name="PHSO Casebook"
+              parent="menu_nhs_phso"
+              action="action_nhs_complaint_phso"
+              sequence="10"
+              groups="odoo_nhs_complaints.group_nhs_complaint_manager"/>
+
+    <!-- ── Actions ────────────────────────────────────────────── -->
+    <menuitem id="menu_nhs_complaint_actions"
+              name="Actions"
+              parent="menu_nhs_complaints_root"
+              sequence="40"
+              groups="odoo_nhs_complaints.group_nhs_complaint_handler"/>
+
+    <menuitem id="menu_nhs_complaint_my_actions"
+              name="My Actions"
+              parent="menu_nhs_complaint_actions"
+              action="action_nhs_complaint_my_actions"
+              sequence="10"
+              groups="odoo_nhs_complaints.group_nhs_complaint_handler"/>
+
+    <menuitem id="menu_nhs_complaint_all_actions"
+              name="All Complaint Actions"
+              parent="menu_nhs_complaint_actions"
+              action="action_nhs_complaint_actions"
+              sequence="20"
+              groups="odoo_nhs_complaints.group_nhs_complaint_manager"/>
+
+    <!-- ── Reporting ──────────────────────────────────────────── -->
+    <menuitem id="menu_nhs_complaint_reporting"
+              name="Reporting"
+              parent="menu_nhs_complaints_root"
+              sequence="50"
+              groups="odoo_nhs_complaints.group_nhs_complaint_manager"/>
+
+    <menuitem id="menu_nhs_complaint_analysis"
+              name="Complaints Analysis"
+              parent="menu_nhs_complaint_reporting"
+              action="action_nhs_complaints_analysis"
+              sequence="10"
+              groups="odoo_nhs_complaints.group_nhs_complaint_manager"/>
+
+    <menuitem id="menu_nhs_ko41a_export"
+              name="KO41a Return"
+              parent="menu_nhs_complaint_reporting"
+              action="action_nhs_ko41a_export_wizard"
+              sequence="20"
+              groups="odoo_nhs_complaints.group_nhs_complaint_manager"/>
+
+    <!-- ── Configuration ──────────────────────────────────────── -->
+    <menuitem id="menu_nhs_complaint_config"
+              name="Configuration"
+              parent="menu_nhs_complaints_root"
+              sequence="90"
+              groups="odoo_nhs_complaints.group_nhs_complaint_quality_lead"/>
+
+    <menuitem id="menu_nhs_complaint_subjects"
+              name="KO41a Subjects"
+              parent="menu_nhs_complaint_config"
+              action="action_nhs_complaint_subject"
+              sequence="10"
+              groups="odoo_nhs_complaints.group_nhs_complaint_quality_lead"/>
+
+    <menuitem id="menu_nhs_complaint_timescales"
+              name="Response Timescale Presets"
+              parent="menu_nhs_complaint_config"
+              action="action_nhs_complaint_timescale"
+              sequence="20"
+              groups="odoo_nhs_complaints.group_nhs_complaint_quality_lead"/>
+
+    <menuitem id="menu_nhs_complaint_complainants"
+              name="Complainants"
+              parent="menu_nhs_complaint_config"
+              action="action_nhs_complainant"
+              sequence="30"
+              groups="odoo_nhs_complaints.group_nhs_complaint_manager"/>
+</odoo>

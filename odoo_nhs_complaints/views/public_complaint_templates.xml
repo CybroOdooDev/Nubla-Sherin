@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="public_complaint_form" name="NHS Public Complaint Submission Form">
+        <t t-call="web.layout">
+            <t t-set="head">
+                <title>Submit a Complaint or PALS Concern</title>
+                <link rel="stylesheet" href="/odoo_nhs_complaints/static/src/css/public_complaint.css"/>
+            </t>
+            <div class="container nhs-complaint-form py-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h2 class="mb-0">Submit a Complaint or PALS Concern</h2>
+                                <p class="mb-0 mt-1"><t t-esc="organisation_name"/></p>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="error">
+                                    <div class="alert alert-danger"><t t-esc="error"/></div>
+                                </t>
+                                <form method="POST" t-att-action="'/complaint/submit/' + token" enctype="multipart/form-data">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="honeypot_check" value=""/>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Type of submission</label>
+                                        <div>
+                                            <input type="radio" name="record_type" value="pals" id="type_pals" class="form-check-input" checked="checked"/>
+                                            <label for="type_pals" class="form-check-label ms-2">PALS Concern (informal — quick resolution)</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="record_type" value="complaint" id="type_complaint" class="form-check-input"/>
+                                            <label for="type_complaint" class="form-check-label ms-2">Formal Complaint (statutory process)</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="subject_summary" class="form-label fw-bold">Brief summary <span class="text-danger">*</span></label>
+                                        <input type="text" name="subject_summary" id="subject_summary" class="form-control" required="required" maxlength="200" placeholder="One-line summary of your concern…"/>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label fw-bold">Full description <span class="text-danger">*</span></label>
+                                        <textarea name="description" id="description" class="form-control" rows="6" required="required" placeholder="Please describe your complaint or concern in detail. Use initials rather than full patient names where possible."/>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="event_date" class="form-label fw-bold">When did this happen?</label>
+                                        <input type="date" name="event_date" id="event_date" class="form-control"/>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Are you the patient, or acting on someone's behalf?</label>
+                                        <div>
+                                            <input type="radio" name="is_third_party" value="0" id="is_patient" class="form-check-input" checked="checked"/>
+                                            <label for="is_patient" class="form-check-label ms-2">I am the patient</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="is_third_party" value="1" id="is_third_party" class="form-check-input"/>
+                                            <label for="is_third_party" class="form-check-label ms-2">I am acting on behalf of a patient</label>
+                                        </div>
+                                    </div>
+
+                                    <hr/>
+                                    <h5>Your contact details</h5>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input type="checkbox" name="is_anonymous" id="is_anonymous" class="form-check-input"/>
+                                            <label for="is_anonymous" class="form-check-label">I wish to remain anonymous (PALS concerns only)</label>
+                                        </div>
+                                    </div>
+
+                                    <div id="contact_fields">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="complainant_name" class="form-label">Your name</label>
+                                                <input type="text" name="complainant_name" id="complainant_name" class="form-control" placeholder="Full name"/>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="complainant_email" class="form-label">Email address</label>
+                                                <input type="email" name="complainant_email" id="complainant_email" class="form-control"/>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="complainant_phone" class="form-label">Phone number</label>
+                                            <input type="tel" name="complainant_phone" id="complainant_phone" class="form-control"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                                    </div>
+                                    <p class="text-muted small">
+                                        Your information will be handled in accordance with our privacy policy and the NHS Complaints Regulations 2009.
+                                    </p>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="public_complaint_confirm" name="NHS Public Complaint Confirmation">
+        <t t-call="web.layout">
+            <t t-set="head"><title>Complaint Submitted</title></t>
+            <div class="container py-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+                        <div class="alert alert-success text-center p-5">
+                            <h2>Thank you</h2>
+                            <p>Your submission has been received. Your reference number is:</p>
+                            <h3 class="text-primary"><t t-esc="reference"/></h3>
+                            <p class="mt-3">We will acknowledge your complaint within 3 working days and contact you to agree a response timescale.</p>
+                            <p>If you have any questions, please contact our Complaints Team.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

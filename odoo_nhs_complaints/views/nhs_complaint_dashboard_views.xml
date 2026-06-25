@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── Complaints Analysis Pivot ──────────────────────────── -->
+    <record id="view_nhs_complaints_analysis_pivot" model="ir.ui.view">
+        <field name="name">nhs.complaint.analysis.pivot</field>
+        <field name="model">nhs.complaint</field>
+        <field name="arch" type="xml">
+            <pivot string="Complaints Analysis">
+                <field name="subject_id" type="row"/>
+                <field name="location_id" type="row"/>
+                <field name="severity" type="col"/>
+                <field name="days_to_respond" type="measure"/>
+                <field name="reopened_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- ── Complaints Analysis Graph ──────────────────────────── -->
+    <record id="view_nhs_complaints_analysis_graph" model="ir.ui.view">
+        <field name="name">nhs.complaint.analysis.graph</field>
+        <field name="model">nhs.complaint</field>
+        <field name="arch" type="xml">
+            <graph string="Complaints Trend" type="line">
+                <field name="received_at" interval="month"/>
+                <field name="record_type" type="col"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- ── Action: Complaints Analysis ───────────────────────── -->
+    <record id="action_nhs_complaints_analysis" model="ir.actions.act_window">
+        <field name="name">Complaints Analysis</field>
+        <field name="res_model">nhs.complaint</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="context">{'search_default_filter_formal': 1}</field>
+    </record>
+</odoo>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── PHSO Kanban ─────────────────────────────────────────── -->
+    <record id="view_nhs_complaint_phso_kanban" model="ir.ui.view">
+        <field name="name">nhs.complaint.phso.kanban</field>
+        <field name="model">nhs.complaint.phso</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_mobile">
+                <field name="state"/>
+                <field name="complaint_id"/>
+                <field name="phso_reference"/>
+                <field name="outcome"/>
+                <field name="referred_at"/>
+                <templates>
+                    <t t-name="kanban-card">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <strong><field name="phso_reference"/></strong>
+                                <div><field name="complaint_id"/></div>
+                                <div>Referred: <field name="referred_at"/></div>
+                                <div invisible="not outcome">
+                                    <span class="badge" t-att-class="record.outcome.value == 'upheld' ? 'text-bg-danger' : record.outcome.value == 'partly_upheld' ? 'text-bg-warning' : 'text-bg-success'">
+                                        <field name="outcome"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ── PHSO List ───────────────────────────────────────────── -->
+    <record id="view_nhs_complaint_phso_list" model="ir.ui.view">
+        <field name="name">nhs.complaint.phso.list</field>
+        <field name="model">nhs.complaint.phso</field>
+        <field name="arch" type="xml">
+            <list string="PHSO Casebook">
+                <field name="phso_reference"/>
+                <field name="complaint_id"/>
+                <field name="referred_at"/>
+                <field name="state" widget="badge"
+                       decoration-info="state=='referred'"
+                       decoration-warning="state=='under_review'"
+                       decoration-success="state=='decision_made'"
+                       decoration-muted="state=='closed'"/>
+                <field name="outcome"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── PHSO Form ───────────────────────────────────────────── -->
+    <record id="view_nhs_complaint_phso_form" model="ir.ui.view">
+        <field name="name">nhs.complaint.phso.form</field>
+        <field name="model">nhs.complaint.phso</field>
+        <field name="arch" type="xml">
+            <form string="PHSO Escalation Record">
+                <header>
+                    <button name="action_mark_under_review" string="Mark Under Review" type="object"
+                            class="btn-primary" invisible="state != 'referred'"/>
+                    <button name="action_record_decision" string="Record Decision" type="object"
+                            class="btn-warning" invisible="state != 'under_review'"/>
+                    <button name="action_close" string="Close" type="object"
+                            class="btn-success" invisible="state != 'decision_made'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="referred,under_review,decision_made,closed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="complaint_id"/>
+                            <field name="phso_reference"/>
+                            <field name="referred_at"/>
+                        </group>
+                        <group>
+                            <field name="outcome"/>
+                            <field name="compensation_recommended" widget="monetary"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="PHSO Recommendations">
+                        <field name="recommendations" nolabel="1"
+                               placeholder="Recommendations issued by the PHSO…"/>
+                    </group>
+                    <group string="Actions from Recommendations">
+                        <field name="action_ids" nolabel="1">
+                            <list>
+                                <field name="name"/>
+                                <field name="owner_id"/>
+                                <field name="due_date"/>
+                                <field name="state" widget="badge"/>
+                            </list>
+                        </field>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_complaint_phso" model="ir.actions.act_window">
+        <field name="name">PHSO Casebook</field>
+        <field name="res_model">nhs.complaint.phso</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+    </record>
+</odoo>

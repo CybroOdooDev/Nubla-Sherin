@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_complaint_response_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.complaint.response.wizard.form</field>
+        <field name="model">nhs.complaint.response.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Draft and Sign Off Response">
+                <group>
+                    <field name="complaint_id" readonly="1"/>
+                </group>
+                <group string="Response Letter">
+                    <field name="response_text" nolabel="1" widget="html"
+                           placeholder="Draft the full written response here…"/>
+                </group>
+                <group string="Sign-off Options">
+                    <field name="sign_off_now"
+                           groups="odoo_nhs_complaints.group_nhs_complaint_quality_lead"/>
+                    <field name="send_immediately" invisible="not sign_off_now"/>
+                    <field name="response_method" invisible="not send_immediately"/>
+                </group>
+                <footer>
+                    <button name="action_submit_for_signoff" string="Submit for Sign-off"
+                            type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_complaint_response_wizard" model="ir.actions.act_window">
+        <field name="name">Generate Response</field>
+        <field name="res_model">nhs.complaint.response.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

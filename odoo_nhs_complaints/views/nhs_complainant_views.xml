@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── Complainant List View ────────────────────────────────── -->
+    <record id="view_nhs_complainant_list" model="ir.ui.view">
+        <field name="name">nhs.complainant.list</field>
+        <field name="model">nhs.complainant</field>
+        <field name="arch" type="xml">
+            <list string="Complainants" decoration-danger="is_vexatious">
+                <field name="name"/>
+                <field name="relationship_to_patient"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="complaint_count"/>
+                <field name="is_vexatious" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Complainant Form View ────────────────────────────────── -->
+    <record id="view_nhs_complainant_form" model="ir.ui.view">
+        <field name="name">nhs.complainant.form</field>
+        <field name="model">nhs.complainant</field>
+        <field name="arch" type="xml">
+            <form string="Complainant">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_complaints" type="object"
+                                class="oe_stat_button" icon="fa-exclamation-circle"
+                                invisible="complaint_count == 0">
+                            <field name="complaint_count" widget="statinfo" string="Complaints"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Complainant Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Contact Details">
+                            <field name="relationship_to_patient"/>
+                            <field name="email" widget="email"/>
+                            <field name="phone" widget="phone"/>
+                            <field name="partner_id"/>
+                        </group>
+                        <group string="Address">
+                            <field name="address" nolabel="1"/>
+                        </group>
+                    </group>
+                    <group string="Vexatious Flag" invisible="not is_vexatious">
+                        <field name="is_vexatious" widget="boolean_toggle"/>
+                        <field name="vexatious_note" invisible="not is_vexatious"/>
+                    </group>
+                    <group invisible="is_vexatious">
+                        <field name="is_vexatious" widget="boolean_toggle"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Complainant Search View ─────────────────────────────── -->
+    <record id="view_nhs_complainant_search" model="ir.ui.view">
+        <field name="name">nhs.complainant.search</field>
+        <field name="model">nhs.complainant</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="email"/>
+                <filter name="vexatious" string="Vexatious" domain="[('is_vexatious','=',True)]"/>
+                <filter name="repeat" string="Repeat Complainants" domain="[('complaint_count','>',1)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_relationship" string="Relationship" context="{'group_by':'relationship_to_patient'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ── Action ──────────────────────────────────────────────── -->
+    <record id="action_nhs_complainant" model="ir.actions.act_window">
+        <field name="name">Complainants</field>
+        <field name="res_model">nhs.complainant</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_nhs_complainant_search"/>
+    </record>
+</odoo>

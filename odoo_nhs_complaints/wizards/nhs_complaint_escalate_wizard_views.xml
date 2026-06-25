@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_complaint_escalate_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.complaint.escalate.wizard.form</field>
+        <field name="model">nhs.complaint.escalate.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Escalate PALS Concern to Formal Complaint">
+                <div class="alert alert-warning">
+                    <strong>You are escalating this PALS concern into a formal statutory complaint.</strong>
+                    A new COMP reference will be allocated. The original PALS reference will be retained.
+                </div>
+                <group>
+                    <group>
+                        <field name="pals_id" readonly="1"/>
+                        <field name="subject_id"/>
+                        <field name="severity"/>
+                        <field name="timescale_id"/>
+                    </group>
+                    <group>
+                        <field name="complainant_id"/>
+                    </group>
+                </group>
+                <group string="Complaint Summary">
+                    <field name="subject_summary" nolabel="1"/>
+                </group>
+                <group string="Complaint Narrative">
+                    <field name="description" nolabel="1"/>
+                </group>
+                <footer>
+                    <button name="action_escalate" string="Escalate to Formal Complaint"
+                            type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

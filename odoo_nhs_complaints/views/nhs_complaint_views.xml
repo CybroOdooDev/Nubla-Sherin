@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ══════════════════════════════════════════════════════════════
+         Search View
+    ══════════════════════════════════════════════════════════════════ -->
+    <record id="view_nhs_complaint_search" model="ir.ui.view">
+        <field name="name">nhs.complaint.search</field>
+        <field name="model">nhs.complaint</field>
+        <field name="arch" type="xml">
+            <search string="Search Complaints &amp; PALS">
+                <field name="name"/>
+                <field name="subject_summary"/>
+                <field name="complainant_id"/>
+                <field name="handler_id"/>
+                <field name="location_id"/>
+                <field name="subject_id"/>
+                <filter name="filter_pals" string="PALS Concerns" domain="[('record_type','=','pals')]"/>
+                <filter name="filter_formal" string="Formal Complaints" domain="[('record_type','=','complaint')]"/>
+                <separator/>
+                <filter name="filter_open" string="Open" domain="[('state','not in',['closed','withdrawn'])]"/>
+                <filter name="filter_overdue_ack" string="Overdue Acknowledgement"
+                        domain="[('ack_overdue','=',True)]"/>
+                <filter name="filter_overdue_response" string="Overdue Response"
+                        domain="[('response_overdue','=',True)]"/>
+                <filter name="filter_phso" string="PHSO Referred" domain="[('state','=','phso')]"/>
+                <filter name="filter_my_cases" string="My Cases" domain="[('handler_id','=',uid)]"/>
+                <separator/>
+                <filter name="filter_high_severity" string="High/Major" domain="[('severity','in',['high','major'])]"/>
+                <group name="group_by">
+                    <filter name="group_state" string="Status" context="{'group_by':'state'}"/>
+                    <filter name="group_subject" string="Subject" context="{'group_by':'subject_id'}"/>
+                    <filter name="group_severity" string="Severity" context="{'group_by':'severity'}"/>
+                    <filter name="group_handler" string="Handler" context="{'group_by':'handler_id'}"/>
+                    <filter name="group_location" string="Location" context="{'group_by':'location_id'}"/>
+                    <filter name="group_received_month" string="Month Received" context="{'group_by':'received_at:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         List View
+    ══════════════════════════════════════════════════════════════════ -->
+    <record id="view_nhs_complaint_list" model="ir.ui.view">
+        <field name="name">nhs.complaint.list</field>
+        <field name="model">nhs.complaint</field>
+        <field name="arch" type="xml">
+            <list string="Complaints &amp; PALS"
+                  decoration-danger="ack_overdue or response_overdue"
+                  decoration-info="state == 'phso'"
+                  decoration-muted="state in ['closed','withdrawn']">
+                <field name="name"/>
+                <field name="record_type" widget="badge"
+                       decoration-info="record_type=='pals'"
+                       decoration-warning="record_type=='complaint'"/>
+                <field name="subject_summary"/>
+                <field name="complainant_id"/>
+                <field name="severity" widget="badge"
+                       decoration-danger="severity in ['high','major']"
+                       decoration-warning="severity=='medium'"/>
+                <field name="received_at" widget="date"/>
+                <field name="ack_deadline" optional="show"/>
+                <field name="response_deadline"/>
+                <field name="handler_id"/>
+                <field name="state" widget="badge"
+                       decoration-success="state=='closed'"
+                       decoration-danger="state in ['re_opened','phso']"/>
+                <field name="days_to_respond" optional="show"/>
+                <field name="ack_overdue" column_invisible="1"/>
+                <field name="response_overdue" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         Kanban – Triage (Formal Complaints)
+    ══════════════════════════════════════════════════════════════════ -->
+    <record id="view_nhs_complaint_kanban_triage" model="ir.ui.view">
+        <field name="name">nhs.complaint.kanban.triage</field>
+        <field name="model">nhs.complaint</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_mobile">
+                <field name="state"/>
+                <field name="subject_summary"/>
+                <field name="severity"/>
+                <field name="ack_deadline"/>
+                <field name="complainant_id"/>
+                <field name="handler_id"/>
+                <field name="received_at"/>
+                <templates>
+                    <t t-name="kanban-card">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <strong><field name="name"/></strong>
+                                    <span class="badge ms-1" t-att-class="record.severity.value in ['high','major'] ? 'text-bg-danger' : record.severity.value == 'medium' ? 'text-bg-warning' : 'text-bg-secondary'">
+                                        <field name="severity"/>
+                                    </span>
+                                </div>
+                                <div><field name="subject_summary"/></div>
+                                <div><field name="complainant_id"/></div>
+                                <div>Received: <field name="received_at" widget="date"/></div>
+                                <div invisible="not ack_deadline">Ack deadline: <field name="ack_deadline"/></div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         Kanban – PALS Concerns
+    ══════════════════════════════════════════════════════════════════ -->
+    <record id="view_nhs_complaint_kanban_pals" model="ir.ui.view">
+        <field name="name">nhs.complaint.kanban.pals</field>
+        <field name="model">nhs.complaint</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_mobile">
+                <field name="state"/>
+                <field name="subject_summary"/>
+                <field name="received_at"/>
+                <field name="is_anonymous"/>
+                <templates>
+                    <t t-name="kanban-card">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <strong><field name="name"/></strong>
+                                <div><field name="subject_summary"/></div>
+                                <div>Received: <field name="received_at" widget="date"/></div>
+                                <div invisible="not is_anonymous"><span class="badge text-bg-secondary">Anonymous</span></div>
+                                <div>
+                                    <button name="action_escalate_to_complaint" type="object"
+                                            class="btn btn-sm btn-outline-warning mt-1"
+                                            invisible="state in ['escalated','closed']">
+                                        Escalate to Complaint
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         Calendar View
+    ══════════════════════════════════════════════════════════════════ -->
+    <record id="view_nhs_complaint_calendar" model="ir.ui.view">
+        <field name="name">nhs.complaint.calendar</field>
+        <field name="model">nhs.complaint</field>
+        <field name="arch" type="xml">
+            <calendar string="Response Deadlines" date_start="response_deadline"
+                      color="severity" mode="month">
+                <field name="name"/>
+                <field name="complainant_id"/>
+                <field name="severity"/>
+                <field name="handler_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         Pivot View
+    ══════════════════════════════════════════════════════════════════ -->
+    <record id="view_nhs_complaint_pivot" model="ir.ui.view">
+        <field name="name">nhs.complaint.pivot</field>
+        <field name="model">nhs.complaint</field>
+        <field name="arch" type="xml">
+            <pivot string="Complaints Analysis">
+                <field name="subject_id" type="row"/>
+                <field name="severity" type="col"/>
+                <field name="days_to_respond" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         Graph View
+    ══════════════════════════════════════════════════════════════════ -->
+    <record id="view_nhs_complaint_graph" model="ir.ui.view">
+        <field name="name">nhs.complaint.graph</field>
+        <field name="model">nhs.complaint</field>
+        <field name="arch" type="xml">
+            <graph string="Complaints by Subject" type="bar">
+                <field name="subject_id"/>
+                <field name="days_to_respond" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         Form View
+    ══════════════════════════════════════════════════════════════════ -->
+    <record id="view_nhs_complaint_form" model="ir.ui.view">
+        <field name="name">nhs.complaint.form</field>
+        <field name="model">nhs.complaint</field>
+        <field name="arch" type="xml">
+            <form string="Complaint / PALS Concern">
+                <header>
+                    <!-- PALS workflow buttons -->
+                    <button name="action_escalate_to_complaint" string="Escalate to Formal Complaint"
+                            type="object" class="btn-warning"
+                            invisible="record_type != 'pals' or state in ['escalated','closed','withdrawn']"/>
+                    <!-- Formal complaint workflow buttons -->
+                    <button name="action_acknowledge" string="Acknowledge" type="object"
+                            class="btn-primary"
+                            invisible="record_type != 'complaint' or state != 'received'"/>
+                    <button name="action_start_investigation" string="Begin Investigation" type="object"
+                            class="btn-primary"
+                            invisible="record_type != 'complaint' or state != 'acknowledged'"/>
+                    <button name="action_submit_response_draft" string="Submit for Sign-off" type="object"
+                            class="btn-primary"
+                            invisible="state != 'investigation'"/>
+                    <button name="action_sign_off" string="Sign Off Response" type="object"
+                            class="btn-success"
+                            invisible="state != 'awaiting_signoff'"
+                            groups="odoo_nhs_complaints.group_nhs_complaint_quality_lead"/>
+                    <button name="action_send_response" string="Send Response" type="object"
+                            class="btn-success"
+                            invisible="state not in ['awaiting_signoff','response_draft'] or not signed_off_by_id"/>
+                    <button name="action_close" string="Close" type="object"
+                            class="btn-secondary"
+                            invisible="state not in ['response_sent','resolved']"
+                            groups="odoo_nhs_complaints.group_nhs_complaint_manager"/>
+                    <button name="action_reopen" string="Re-open" type="object"
+                            class="btn-warning"
+                            invisible="state != 'closed'"/>
+                    <button name="action_escalate_phso" string="Escalate to PHSO" type="object"
+                            class="btn-danger"
+                            invisible="state not in ['response_sent','closed','re_opened']"
+                            groups="odoo_nhs_complaints.group_nhs_complaint_manager"/>
+                    <button name="action_withdraw" string="Withdraw" type="object"
+                            class="btn-secondary"
+                            invisible="state in ['closed','withdrawn']"
+                            groups="odoo_nhs_complaints.group_nhs_complaint_manager"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="received,acknowledged,investigation,awaiting_signoff,response_sent,closed"/>
+                </header>
+                <sheet>
+                    <!-- Ribbons -->
+                    <widget name="web_ribbon" title="PHSO Referred" bg_color="bg-info"
+                            invisible="state != 'phso'"/>
+                    <widget name="web_ribbon" title="Re-opened" bg_color="bg-warning"
+                            invisible="state != 're_opened'"/>
+                    <widget name="web_ribbon" title="Consent Pending" bg_color="bg-danger"
+                            invisible="not (is_third_party and consent_status in ['pending','refused'])"/>
+
+                    <!-- Smart buttons -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_correspondence" type="object"
+                                class="oe_stat_button" icon="fa-envelope">
+                            <field name="correspondence_count" widget="statinfo" string="Correspondence"/>
+                        </button>
+                        <button name="action_view_actions" type="object"
+                                class="oe_stat_button" icon="fa-check-square">
+                            <field name="action_count" widget="statinfo" string="Actions"/>
+                        </button>
+                        <button name="action_view_incidents" type="object"
+                                class="oe_stat_button" icon="fa-exclamation-triangle"
+                                invisible="incident_count == 0">
+                            <field name="incident_count" widget="statinfo" string="Incidents"/>
+                        </button>
+                        <button name="%(action_nhs_complaint_phso)d" type="action"
+                                class="oe_stat_button" icon="fa-gavel"
+                                invisible="not phso_id">
+                            <span class="o_stat_text">PHSO</span>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="record_type"/>
+                        <h1>
+                            <field name="record_type" widget="radio" options="{'horizontal': True}"/>
+                        </h1>
+                        <h2>
+                            <field name="name" readonly="1"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="Details">
+                            <field name="subject_summary"/>
+                            <field name="subject_id"/>
+                            <field name="severity"/>
+                            <field name="received_at"/>
+                            <field name="received_via"/>
+                            <field name="event_date"/>
+                            <field name="within_time_limit" readonly="1"
+                                   invisible="not event_date"/>
+                            <field name="handler_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Location">
+                            <field name="location_id"/>
+                            <field name="department_text"/>
+                            <field name="is_multi_org"/>
+                            <field name="duty_of_candour_flag"/>
+                            <field name="is_anonymous" invisible="record_type != 'pals'"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <!-- Tab 1: Complainant & Consent -->
+                        <page string="Complainant &amp; Consent">
+                            <group>
+                                <group string="Complainant">
+                                    <field name="complainant_id"
+                                           invisible="is_anonymous"/>
+                                    <field name="patient_name"/>
+                                    <field name="patient_deceased"/>
+                                    <field name="is_third_party"/>
+                                </group>
+                                <group string="Consent" invisible="not is_third_party">
+                                    <field name="consent_status"/>
+                                    <field name="consent_evidence_ref" invisible="consent_status == 'not_required'"/>
+                                </group>
+                            </group>
+                            <group string="PALS Info" invisible="record_type != 'pals'">
+                                <field name="pals_origin_ref" readonly="1" invisible="not pals_origin_ref"/>
+                                <field name="deescalated"/>
+                            </group>
+                            <group string="Complaint Info" invisible="record_type != 'complaint'">
+                                <field name="pals_origin_ref" readonly="1" invisible="not pals_origin_ref"/>
+                                <field name="reopened_count" readonly="1"/>
+                            </group>
+                        </page>
+
+                        <!-- Tab 2: Complaint Narrative -->
+                        <page string="Complaint Narrative">
+                            <field name="description" nolabel="1" placeholder="Complaint as received…"/>
+                        </page>
+
+                        <!-- Tab 3: Deadlines -->
+                        <page string="Deadlines" invisible="record_type != 'complaint'">
+                            <group>
+                                <group string="Acknowledgement">
+                                    <field name="ack_deadline" readonly="1"/>
+                                    <field name="acknowledged"/>
+                                    <field name="acknowledged_at" invisible="not acknowledged"/>
+                                </group>
+                                <group string="Response">
+                                    <field name="timescale_id"/>
+                                    <field name="response_deadline"/>
+                                    <field name="response_deadline_agreed"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Tab 4: Investigation -->
+                        <page string="Investigation" invisible="record_type != 'complaint'">
+                            <field name="investigation_id" context="{'default_complaint_id': id}"/>
+                            <separator string="Create / Link Incident"/>
+                            <div>
+                                <button name="action_create_incident" type="object"
+                                        string="Link or Create Incident" class="btn btn-sm btn-outline-primary"/>
+                            </div>
+                            <field name="linked_incident_ids" widget="many2many_tags"/>
+                            <field name="linked_risk_ids" widget="many2many_tags"/>
+                        </page>
+
+                        <!-- Tab 5: Response -->
+                        <page string="Response" invisible="record_type != 'complaint'">
+                            <group>
+                                <group>
+                                    <field name="signed_off_by_id" readonly="1"/>
+                                    <field name="signed_off_at" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="response_sent_at" readonly="1"/>
+                                    <field name="response_method"/>
+                                </group>
+                            </group>
+                            <field name="response_text" nolabel="1"
+                                   placeholder="Draft your formal written response here…"/>
+                        </page>
+
+                        <!-- Tab 6: Correspondence -->
+                        <page string="Correspondence">
+                            <field name="correspondence_ids">
+                                <list>
+                                    <field name="occurred_at" widget="datetime"/>
+                                    <field name="direction"/>
+                                    <field name="channel"/>
+                                    <field name="correspondence_type"/>
+                                    <field name="user_id"/>
+                                    <field name="summary"/>
+                                </list>
+                                <form>
+                                    <group>
+                                        <group>
+                                            <field name="direction"/>
+                                            <field name="channel"/>
+                                            <field name="correspondence_type"/>
+                                            <field name="occurred_at"/>
+                                            <field name="user_id"/>
+                                        </group>
+                                    </group>
+                                    <field name="summary" nolabel="1" placeholder="Summary of what was said or sent…"/>
+                                    <field name="attachment_ids" widget="many2many_binary"/>
+                                </form>
+                            </field>
+                        </page>
+
+                        <!-- Tab 7: Closure -->
+                        <page string="Closure">
+                            <group>
+                                <field name="closed_at" readonly="1"/>
+                                <field name="days_to_respond" readonly="1"
+                                       invisible="not days_to_respond"/>
+                                <field name="satisfaction_rating"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         Actions
+    ══════════════════════════════════════════════════════════════════ -->
+    <record id="action_nhs_pals_concerns" model="ir.actions.act_window">
+        <field name="name">PALS Concerns</field>
+        <field name="res_model">nhs.complaint</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('record_type','=','pals')]</field>
+        <field name="context">{'default_record_type': 'pals'}</field>
+        <field name="search_view_id" ref="view_nhs_complaint_search"/>
+        <field name="view_ids" eval="[(5,0,0),(0,0,{'view_mode':'kanban','view_id':ref('view_nhs_complaint_kanban_pals')}),(0,0,{'view_mode':'list','view_id':ref('view_nhs_complaint_list')}),(0,0,{'view_mode':'form','view_id':ref('view_nhs_complaint_form')})]"/>
+    </record>
+
+    <record id="action_nhs_complaints_triage" model="ir.actions.act_window">
+        <field name="name">Inbox / Triage</field>
+        <field name="res_model">nhs.complaint</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('record_type','=','complaint'),('state','in',['received','acknowledged'])]</field>
+        <field name="context">{'default_record_type': 'complaint'}</field>
+        <field name="search_view_id" ref="view_nhs_complaint_search"/>
+        <field name="view_ids" eval="[(5,0,0),(0,0,{'view_mode':'kanban','view_id':ref('view_nhs_complaint_kanban_triage')}),(0,0,{'view_mode':'list','view_id':ref('view_nhs_complaint_list')}),(0,0,{'view_mode':'form','view_id':ref('view_nhs_complaint_form')})]"/>
+    </record>
+
+    <record id="action_nhs_complaints_all" model="ir.actions.act_window">
+        <field name="name">All Complaints</field>
+        <field name="res_model">nhs.complaint</field>
+        <field name="view_mode">list,kanban,form,pivot,graph,calendar</field>
+        <field name="domain">[('record_type','=','complaint')]</field>
+        <field name="context">{'default_record_type': 'complaint'}</field>
+        <field name="search_view_id" ref="view_nhs_complaint_search"/>
+    </record>
+
+    <record id="action_nhs_complaints_my_cases" model="ir.actions.act_window">
+        <field name="name">My Cases</field>
+        <field name="res_model">nhs.complaint</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('handler_id','=',uid)]</field>
+        <field name="search_view_id" ref="view_nhs_complaint_search"/>
+    </record>
+
+    <record id="action_nhs_complaints_overdue" model="ir.actions.act_window">
+        <field name="name">Overdue</field>
+        <field name="res_model">nhs.complaint</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state','not in',['closed','withdrawn']),('record_type','=','complaint')]</field>
+        <field name="search_view_id" ref="view_nhs_complaint_search"/>
+        <field name="context">{'search_default_filter_overdue_ack': 1}</field>
+    </record>
+
+    <record id="action_nhs_complaint_actions" model="ir.actions.act_window">
+        <field name="name">All Complaint Actions</field>
+        <field name="res_model">nhs.action</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('complaint_id','!=',False)]</field>
+    </record>
+
+    <record id="action_nhs_complaint_my_actions" model="ir.actions.act_window">
+        <field name="name">My Complaint Actions</field>
+        <field name="res_model">nhs.action</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('complaint_id','!=',False),('owner_id','=',uid),('state','not in',['done','cancelled'])]</field>
+    </record>
+</odoo>

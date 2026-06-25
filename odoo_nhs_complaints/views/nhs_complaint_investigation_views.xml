@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── Investigation List ──────────────────────────────────── -->
+    <record id="view_nhs_complaint_investigation_list" model="ir.ui.view">
+        <field name="name">nhs.complaint.investigation.list</field>
+        <field name="model">nhs.complaint.investigation</field>
+        <field name="arch" type="xml">
+            <list string="Complaint Investigations" decoration-muted="state=='complete'">
+                <field name="name"/>
+                <field name="complaint_id"/>
+                <field name="lead_investigator_id"/>
+                <field name="upheld_status"/>
+                <field name="state" widget="badge"
+                       decoration-info="state=='draft'"
+                       decoration-warning="state=='in_progress'"
+                       decoration-success="state=='complete'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Investigation Form ──────────────────────────────────── -->
+    <record id="view_nhs_complaint_investigation_form" model="ir.ui.view">
+        <field name="name">nhs.complaint.investigation.form</field>
+        <field name="model">nhs.complaint.investigation</field>
+        <field name="arch" type="xml">
+            <form string="Complaint Investigation">
+                <header>
+                    <button name="action_start" string="Start Investigation" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_complete" string="Mark Complete" type="object"
+                            class="btn-success" invisible="state != 'in_progress'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,complete"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="complaint_id"/>
+                            <field name="lead_investigator_id"/>
+                            <field name="department_input_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="upheld_status"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Points of Complaint">
+                            <field name="points_of_complaint" nolabel="1" placeholder="List each discrete point raised by the complainant…"/>
+                        </page>
+                        <page string="Chronology">
+                            <field name="chronology" nolabel="1" placeholder="Sequence of events established during investigation…"/>
+                        </page>
+                        <page string="Findings">
+                            <field name="findings" nolabel="1" placeholder="Investigation findings against each point of complaint…"/>
+                        </page>
+                        <page string="Lessons Learned">
+                            <field name="lessons_learned" nolabel="1" placeholder="Learning identified — feeds corrective actions and board pack…"/>
+                        </page>
+                        <page string="Actions">
+                            <field name="action_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="owner_id"/>
+                                    <field name="due_date"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_complaint_investigation" model="ir.actions.act_window">
+        <field name="name">Investigations</field>
+        <field name="res_model">nhs.complaint.investigation</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

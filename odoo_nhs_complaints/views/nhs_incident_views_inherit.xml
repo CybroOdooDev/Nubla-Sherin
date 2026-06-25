@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Adds a Complaints smart button and linked-complaints tab to the incident form -->
+    <record id="view_nhs_incident_complaint_inherit" model="ir.ui.view">
+        <field name="name">nhs.incident.form.complaint.inherit</field>
+        <field name="model">nhs.incident</field>
+        <field name="inherit_id" ref="odoo_nhs_incident_risk.view_nhs_incident_form"/>
+        <field name="arch" type="xml">
+            <!-- Smart button -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_complaints" type="object"
+                        class="oe_stat_button" icon="fa-comments"
+                        invisible="complaint_count == 0">
+                    <field name="complaint_count" widget="statinfo" string="Complaints"/>
+                </button>
+            </xpath>
+            <!-- Linked Complaints tab inside the incident form -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Linked Complaints">
+                    <field name="complaint_ids" widget="many2many">
+                        <list>
+                            <field name="name"/>
+                            <field name="record_type"/>
+                            <field name="subject_summary"/>
+                            <field name="complainant_id"/>
+                            <field name="state" widget="badge"/>
+                            <field name="received_at" widget="date"/>
+                        </list>
+                    </field>
+                    <div>
+                        <button name="action_create_complaint_from_incident" type="object"
+                                string="Create Complaint from this Incident"
+                                class="btn btn-sm btn-outline-primary mt-2"/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
