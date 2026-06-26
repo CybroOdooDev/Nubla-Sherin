@@ -4,11 +4,11 @@
     <record id="mail_template_complaint_ack_reminder" model="mail.template">
         <field name="name">NHS Complaint – Acknowledgement Due Reminder (Internal)</field>
         <field name="model_id" ref="model_nhs_complaint"/>
-        <field name="subject">ACTION REQUIRED: Acknowledge complaint {{ object.name }} by {{ object.ack_deadline }}</field>
+        <field name="subject">ACTION REQUIRED: Acknowledge complaint {{ object.name }} by {{ format_date(object.ack_deadline) }}</field>
         <field name="body_html"><![CDATA[
 <p>This is an automated reminder.</p>
-<p>Complaint <strong>{{ object.name }}</strong> ({{ object.subject_summary }}) must be acknowledged by <strong>{{ object.ack_deadline }}</strong>.</p>
-<p><a href="/web#id={{ object.id }}&amp;model=nhs.complaint">Open complaint</a></p>
+<p>Complaint <strong><t t-out="object.name"/></strong> (<t t-out="object.subject_summary"/>) must be acknowledged by <strong><t t-out="format_date(object.ack_deadline)"/></strong>.</p>
+<p><a t-att-href="'/web#id=%s&amp;model=nhs.complaint' % object.id">Open complaint</a></p>
         ]]></field>
         <field name="auto_delete">True</field>
     </record>
@@ -17,11 +17,11 @@
     <record id="mail_template_complaint_response_reminder" model="mail.template">
         <field name="name">NHS Complaint – Response Deadline Reminder (Internal)</field>
         <field name="model_id" ref="model_nhs_complaint"/>
-        <field name="subject">Response deadline approaching: {{ object.name }} – due {{ object.response_deadline }}</field>
+        <field name="subject">Response deadline approaching: {{ object.name }} – due {{ format_date(object.response_deadline) }}</field>
         <field name="body_html"><![CDATA[
 <p>This is an automated reminder.</p>
-<p>The agreed response deadline for complaint <strong>{{ object.name }}</strong> is <strong>{{ object.response_deadline }}</strong>.</p>
-<p><a href="/web#id={{ object.id }}&amp;model=nhs.complaint">Open complaint</a></p>
+<p>The agreed response deadline for complaint <strong><t t-out="object.name"/></strong> is <strong><t t-out="format_date(object.response_deadline)"/></strong>.</p>
+<p><a t-att-href="'/web#id=%s&amp;model=nhs.complaint' % object.id">Open complaint</a></p>
         ]]></field>
         <field name="auto_delete">True</field>
     </record>
@@ -32,10 +32,12 @@
         <field name="model_id" ref="model_nhs_complaint"/>
         <field name="subject">Acknowledgement of your complaint – {{ object.name }}</field>
         <field name="body_html"><![CDATA[
-<p>Dear {{ object.complainant_id.name or 'Complainant' }},</p>
-<p>We acknowledge receipt of your complaint, reference <strong>{{ object.name }}</strong>, received on {{ object.received_at.strftime('%d %B %Y') if object.received_at else '' }}.</p>
-<p>We will investigate the matters you have raised and respond within the agreed timescale.</p>
-<p>If you have any questions, please contact our Complaints Team.</p>
+<p>Dear <t t-out="object.complainant_id.name or object.complainant_name or 'Complainant'"/>,</p>
+<p>We acknowledge receipt of your complaint, reference <strong><t t-out="object.name"/></strong>,
+received on <t t-out="format_date(object.received_at) if object.received_at else ''"/>.</p>
+<p>We will investigate the matters you have raised and aim to respond within the agreed timescale.</p>
+<p>If you have any questions in the meantime, please do not hesitate to contact our Complaints Team.</p>
+<p>Yours sincerely,<br/>Complaints Team</p>
         ]]></field>
         <field name="auto_delete">False</field>
     </record>
@@ -46,12 +48,13 @@
         <field name="model_id" ref="model_nhs_complaint"/>
         <field name="subject">Our response to your complaint – {{ object.name }}</field>
         <field name="body_html"><![CDATA[
-<p>Dear {{ object.complainant_id.name or 'Complainant' }},</p>
-<p>Please find our formal response to your complaint, reference <strong>{{ object.name }}</strong>.</p>
-<div>{{ object.response_text or '' }}</div>
-<p>If you remain dissatisfied, you may refer this complaint to the Parliamentary and Health Service Ombudsman (PHSO) at <a href="https://www.ombudsman.org.uk">www.ombudsman.org.uk</a>.</p>
-<p>Yours sincerely,</p>
-<p>{{ object.signed_off_by_id.name or 'Chief Executive' }}</p>
+<p>Dear <t t-out="object.complainant_id.name or object.complainant_name or 'Complainant'"/>,</p>
+<p>Please find our formal response to your complaint, reference <strong><t t-out="object.name"/></strong>.</p>
+<div><t t-out="object.response_text or ''"/></div>
+<p>If you remain dissatisfied with our response, you have the right to refer this matter
+to the Parliamentary and Health Service Ombudsman (PHSO)
+at <a href="https://www.ombudsman.org.uk">www.ombudsman.org.uk</a>.</p>
+<p>Yours sincerely,<br/><t t-out="object.signed_off_by_id.name or 'Chief Executive'"/></p>
         ]]></field>
         <field name="auto_delete">False</field>
     </record>

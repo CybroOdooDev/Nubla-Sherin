@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Correspondence List View -->
+    <record id="view_nhs_complaint_correspondence_list" model="ir.ui.view">
+        <field name="name">nhs.complaint.correspondence.list</field>
+        <field name="model">nhs.complaint.correspondence</field>
+        <field name="arch" type="xml">
+            <list string="Correspondence Log" default_order="occurred_at desc">
+                <field name="occurred_at"/>
+                <field name="direction" widget="badge" decoration-success="direction == 'inbound'" decoration-info="direction == 'outbound'"/>
+                <field name="channel"/>
+                <field name="correspondence_type" string="Type"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="summary"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Correspondence Form View -->
+    <record id="view_nhs_complaint_correspondence_form" model="ir.ui.view">
+        <field name="name">nhs.complaint.correspondence.form</field>
+        <field name="model">nhs.complaint.correspondence</field>
+        <field name="arch" type="xml">
+            <form string="Correspondence Log Entry">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="complaint_id" readonly="1"/>
+                            <field name="channel"/>
+                            <field name="occurred_at"/>
+                        </group>
+                        <group>
+                            <field name="direction"/>
+                            <field name="correspondence_type"/>
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Content" name="content">
+                            <group>
+                                <field name="summary" placeholder="Provide a summary or transcription of the correspondence here..." colspan="2" nolabel="1"/>
+                            </group>
+                        </page>
+                        <page string="Attachments" name="attachments">
+                            <field name="attachment_ids" widget="many2many_binary" class="oe_inline"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Correspondence Search View -->
+    <record id="view_nhs_complaint_correspondence_search" model="ir.ui.view">
+        <field name="name">nhs.complaint.correspondence.search</field>
+        <field name="model">nhs.complaint.correspondence</field>
+        <field name="arch" type="xml">
+            <search string="Search Correspondence Log">
+                <field name="complaint_id"/>
+                <field name="summary"/>
+                <field name="user_id"/>
+                <filter string="Inbound" name="inbound" domain="[('direction', '=', 'inbound')]"/>
+                <filter string="Outbound" name="outbound" domain="[('direction', '=', 'outbound')]"/>
+                <separator/>
+                <filter string="Email" name="channel_email" domain="[('channel', '=', 'email')]"/>
+                <filter string="Letter" name="channel_letter" domain="[('channel', '=', 'letter')]"/>
+                <filter string="Phone Call" name="channel_phone" domain="[('channel', '=', 'phone')]"/>
+                <filter string="In Person" name="channel_in_person" domain="[('channel', '=', 'in_person')]"/>
+                <group name="group_by">
+                    <filter string="Complaint" name="group_by_complaint" context="{'group_by': 'complaint_id'}"/>
+                    <filter string="Channel" name="group_by_channel" context="{'group_by': 'channel'}"/>
+                    <filter string="Type" name="group_by_type" context="{'group_by': 'correspondence_type'}"/>
+                    <filter string="Direction" name="group_by_direction" context="{'group_by': 'direction'}"/>
+                    <filter string="Date" name="group_by_date" context="{'group_by': 'occurred_at'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

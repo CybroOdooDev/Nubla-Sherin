@@ -22,7 +22,7 @@ _RATE_LIMIT = 10  # max submissions per IP per session lifetime
 
 class PublicComplaintController(http.Controller):
 
-    @http.route('/complaint/submit/<string:token>', auth='public', website=True, csrf=True)
+    @http.route('/complaint/submit/<string:token>', auth='public', website=True, csrf=True, methods=['GET'])
     def public_complaint_form(self, token, **kw):
         company = self._get_company_by_token(token)
         if not company:

@@ -17,19 +17,16 @@
                     </group>
                 </group>
                 <!-- Results state -->
-                <group invisible="state != 'done'">
+                <div invisible="state != 'done'" class="o_ko41a_results">
                     <field name="summary_html" nolabel="1" widget="html" readonly="1"/>
                     <div invisible="not export_file" class="mt-3">
-                        <a t-if="export_file" class="btn btn-primary">
-                            <field name="export_file" widget="binary"
-                                   filename="export_filename" string="Download CSV"/>
-                        </a>
+                        <field name="export_file" filename="export_filename" readonly="1"/>
                     </div>
                     <div invisible="unmapped_count == 0" class="alert alert-warning mt-3">
                         <strong><field name="unmapped_count"/> subject(s) lack a KO41a code.</strong>
                         Go to Configuration → KO41a Subjects to add the missing codes before submitting to NHS Digital.
                     </div>
-                </group>
+                </div>
                 <footer>
                     <button name="action_generate" string="Generate Return" type="object"
                             class="btn-primary" invisible="state != 'draft'"/>

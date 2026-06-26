@@ -5,21 +5,51 @@
         <field name="name">nhs.complaint.phso.kanban</field>
         <field name="model">nhs.complaint.phso</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="state" class="o_kanban_mobile">
+            <kanban default_group_by="state">
                 <field name="state"/>
                 <field name="complaint_id"/>
                 <field name="phso_reference"/>
                 <field name="outcome"/>
                 <field name="referred_at"/>
                 <templates>
-                    <t t-name="kanban-card">
-                        <div class="oe_kanban_card oe_kanban_global_click">
-                            <div class="oe_kanban_content">
-                                <strong><field name="phso_reference"/></strong>
-                                <div><field name="complaint_id"/></div>
-                                <div>Referred: <field name="referred_at"/></div>
+                    <t t-name="card">
+                        <div class="d-flex" style="min-height:90px;">
+                            <!-- Left accent stripe coloured by state -->
+                            <div t-attf-style="width:5px; border-radius:3px 0 0 3px; flex-shrink:0; background:#{
+                                record.state.value == 'referred'       ? '#0dcaf0' :
+                                record.state.value == 'under_review'   ? '#ffc107' :
+                                record.state.value == 'decision_made'  ? '#198754' : '#6c757d'
+                            };"/>
+                            <div class="flex-grow-1 ps-2 pe-1 py-1">
+                                <!-- Row 1: PHSO reference + state badge -->
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <strong class="text-truncate me-1" style="font-size:0.95rem;">
+                                        <field name="phso_reference"/>
+                                    </strong>
+                                    <span t-attf-class="badge rounded-pill flex-shrink-0 #{
+                                        record.state.value == 'referred'      ? 'text-bg-info' :
+                                        record.state.value == 'under_review'  ? 'text-bg-warning' :
+                                        record.state.value == 'decision_made' ? 'text-bg-success' : 'text-bg-secondary'
+                                    }" style="font-size:0.68rem;">
+                                        <field name="state"/>
+                                    </span>
+                                </div>
+                                <!-- Row 2: Related complaint -->
+                                <div class="d-flex align-items-center gap-1 mb-1" style="font-size:0.82rem; color:#555;">
+                                    <i class="fa fa-file-text-o" style="width:13px;"/>
+                                    <span class="text-truncate"><field name="complaint_id"/></span>
+                                </div>
+                                <!-- Row 3: Date referred -->
+                                <div class="d-flex align-items-center gap-1 mb-2" style="font-size:0.82rem; color:#555;">
+                                    <i class="fa fa-calendar-o" style="width:13px;"/>
+                                    <span>Referred: <field name="referred_at"/></span>
+                                </div>
+                                <!-- Row 4: Outcome badge (only when set) -->
                                 <div invisible="not outcome">
-                                    <span class="badge" t-att-class="record.outcome.value == 'upheld' ? 'text-bg-danger' : record.outcome.value == 'partly_upheld' ? 'text-bg-warning' : 'text-bg-success'">
+                                    <span t-attf-class="badge #{
+                                        record.outcome.value == 'upheld'        ? 'text-bg-danger' :
+                                        record.outcome.value == 'partly_upheld' ? 'text-bg-warning' : 'text-bg-success'
+                                    }" style="font-size:0.75rem;">
                                         <field name="outcome"/>
                                     </span>
                                 </div>
@@ -80,19 +110,18 @@
                         </group>
                     </group>
                     <group string="PHSO Recommendations">
-                        <field name="recommendations" nolabel="1"
+                        <field name="recommendations" colspan="2" nolabel="1"
                                placeholder="Recommendations issued by the PHSO…"/>
                     </group>
-                    <group string="Actions from Recommendations">
-                        <field name="action_ids" nolabel="1">
-                            <list>
-                                <field name="name"/>
-                                <field name="owner_id"/>
-                                <field name="due_date"/>
-                                <field name="state" widget="badge"/>
-                            </list>
-                        </field>
-                    </group>
+                    <separator string="Actions from Recommendations"/>
+                    <field name="action_ids" nolabel="1">
+                        <list>
+                            <field name="name" string="Action Title"/>
+                            <field name="owner_id" string="Owner"/>
+                            <field name="due_date" string="Due Date"/>
+                            <field name="state" string="Status" widget="badge"/>
+                        </list>
+                    </field>
                 </sheet>
                 <chatter/>
             </form>

@@ -18,6 +18,7 @@ class NhsIncidentComplaintsExtension(models.Model):
 
     complaint_ids = fields.Many2many(
         'nhs.complaint',
+        'nhs_complaint_incident_rel', 'incident_id', 'complaint_id',
         string='Linked Complaints',
         help='Complaints linked to this incident (inverse of nhs.complaint.linked_incident_ids).',
     )

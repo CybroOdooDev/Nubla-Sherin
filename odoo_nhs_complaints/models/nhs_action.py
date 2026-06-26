@@ -10,7 +10,7 @@
 #    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
 #
 #############################################################################
-from odoo import fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -24,6 +24,7 @@ class NhsActionComplaintsExtension(models.Model):
                               ondelete='restrict',
                               help='PHSO recommendation this action was raised from (complaint_id still set for rollup).')
 
+    @api.constrains('incident_id', 'investigation_id', 'risk_id', 'complaint_id')
     def _check_single_parent(self):
         for rec in self:
             parents = (

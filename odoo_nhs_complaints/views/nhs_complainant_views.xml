@@ -69,7 +69,7 @@
                 <field name="email"/>
                 <filter name="vexatious" string="Vexatious" domain="[('is_vexatious','=',True)]"/>
                 <filter name="repeat" string="Repeat Complainants" domain="[('complaint_count','>',1)]"/>
-                <group expand="0" string="Group By">
+                <group name="group_by">
                     <filter name="group_relationship" string="Relationship" context="{'group_by':'relationship_to_patient'}"/>
                 </group>
             </search>

@@ -15,7 +15,7 @@ import csv
 import io
 from collections import defaultdict
 
-from odoo import api, fields, models
+from odoo import fields, models
 from odoo.exceptions import UserError
 
 
@@ -82,17 +82,42 @@ class NhsKo41aExportWizard(models.TransientModel):
 
         # Build summary HTML
         total = len(complaints)
+        cell_style = 'padding: 6px 10px; border: 1px solid #dee2e6; vertical-align: top; word-break: break-word;'
         rows_html = ''.join(
-            f'<tr><td>{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td><td class="text-end">{r[3]}</td></tr>'
+            f'<tr>'
+            f'<td style="{cell_style} width:10%;">{r[0]}</td>'
+            f'<td style="{cell_style} width:40%;">{r[1]}</td>'
+            f'<td style="{cell_style} width:40%;">{r[2]}</td>'
+            f'<td style="{cell_style} width:10%; text-align:center;">{r[3]}</td>'
+            f'</tr>'
             for r in rows
         )
+        th_style = 'padding: 8px 10px; border: 1px solid #454d55; background-color: #343a40; color: #fff; font-weight: 600; white-space: nowrap;'
+        warning_html = (
+            f'<div style="padding:10px 14px; margin-bottom:12px; background:#fff3cd; border:1px solid #ffc107; border-radius:4px; color:#856404;">'
+            f'&#9888; {len(unmapped)} complaint(s) have no KO41a subject code and are marked UNMAPPED. Correct these before submission.'
+            f'</div>'
+        ) if unmapped else ''
         summary = f"""
-        <h4>KO41a Return Summary</h4>
-        <p><strong>Period:</strong> {self.date_from} to {self.date_to}</p>
-        <p><strong>Total formal complaints received:</strong> {total}</p>
-        {'<div class="alert alert-warning">⚠️ ' + str(len(unmapped)) + ' complaint(s) have no KO41a subject code and are marked UNMAPPED. Correct these before submission.</div>' if unmapped else ''}
-        <table class="table table-sm table-bordered mt-3">
-            <thead class="table-dark"><tr><th>Code</th><th>Subject</th><th>Service Area</th><th>Count</th></tr></thead>
+        <h4 style="font-size:18px; font-weight:700; color:#212529; margin:0 0 12px 0; padding:0; line-height:1.3;">KO41a Return Summary</h4>
+        <p style="margin:4px 0;"><strong>Period:</strong> {self.date_from} to {self.date_to}</p>
+        <p style="margin:4px 0 12px 0;"><strong>Total formal complaints received:</strong> {total}</p>
+        {warning_html}
+        <table style="width:100%; border-collapse:collapse; table-layout:fixed; margin-top:8px;">
+            <colgroup>
+                <col style="width:10%;">
+                <col style="width:40%;">
+                <col style="width:40%;">
+                <col style="width:10%;">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th style="{th_style}">Code</th>
+                    <th style="{th_style}">Subject</th>
+                    <th style="{th_style}">Service Area</th>
+                    <th style="{th_style} text-align:center;">Count</th>
+                </tr>
+            </thead>
             <tbody>{rows_html}</tbody>
         </table>
         """

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>NHS Complaints &amp; PALS Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { color: #005EB8; border-bottom: 3px solid #005EB8; padding-bottom: 10px; }
+        h2 { color: #003087; margin-top: 30px; }
+        h3 { color: #005EB8; }
+        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .feature-card { border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; background: #f9f9f9; }
+        .feature-card h3 { margin-top: 0; font-size: 1rem; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+        .badge-blue { background: #005EB8; color: white; }
+        .badge-green { background: #007f3b; color: white; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th { background: #005EB8; color: white; padding: 8px 12px; text-align: left; }
+        td { padding: 8px 12px; border-bottom: 1px solid #e0e0e0; }
+        tr:nth-child(even) { background: #f4f8fd; }
+        .highlight { background: #e8f4fd; border-left: 4px solid #005EB8; padding: 10px 15px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+<h1>NHS Complaints &amp; PALS Management</h1>
+<p><span class="badge badge-blue">v19.0.1.0.0</span> <span class="badge badge-green">OPL-1</span></p>
+<p>
+    <strong>Complete statutory complaints handling and PALS concern management for NHS organisations.</strong>
+    Part of the NHS Quality Suite alongside <em>NHS Incident &amp; Risk Management</em> — complaints, incidents, risks
+    and corrective actions in one integrated system.
+</p>
+
+<div class="highlight">
+    <strong>Why this module?</strong> Unlike standalone complaints tools (Datix Complaints, iCasework), a complaint here
+    sits <em>in the same system</em> as the incident it may reveal and the risk it evidences — one click from complaint
+    to incident to risk to action.
+</div>
+
+<h2>What's included</h2>
+<div class="feature-grid">
+    <div class="feature-card">
+        <h3>PALS Concern Management</h3>
+        <p>Lightweight informal path aiming at same-day / 48-hour resolution. One-click escalation into a formal complaint without re-keying.</p>
+    </div>
+    <div class="feature-card">
+        <h3>Full Statutory Complaint Lifecycle</h3>
+        <p>Capture → 3-working-day acknowledgement → investigation → CEO-signed response → closure, with re-opened and PHSO branches.</p>
+    </div>
+    <div class="feature-card">
+        <h3>Complainant &amp; Consent Handling</h3>
+        <p>Third-party representatives, advocates, MPs, solicitors, deceased-patient next-of-kin. Consent gate blocks response send until obtained.</p>
+    </div>
+    <div class="feature-card">
+        <h3>KO41a Annual Return</h3>
+        <p>Built-in KO41a-aligned subject taxonomy. Export wizard generates the annual return for NHS Digital submission with one click.</p>
+    </div>
+    <div class="feature-card">
+        <h3>PHSO Escalation Tracking</h3>
+        <p>Track referral, PHSO case reference, outcome, recommendations and resulting actions. Board-visible PHSO casebook dashboard.</p>
+    </div>
+    <div class="feature-card">
+        <h3>Incident &amp; Risk Integration</h3>
+        <p>Two-way link to nhs.incident and nhs.risk. Create or link an incident from a complaint; see linked complaints on every incident.</p>
+    </div>
+</div>
+
+<h2>Statutory Compliance</h2>
+<table>
+    <tr><th>Requirement</th><th>How Implemented</th></tr>
+    <tr><td>3-working-day acknowledgement</td><td>Computed deadline using inherited NHS working-day/holiday engine</td></tr>
+    <tr><td>Agreed response timescale</td><td>Configurable per complaint (25/40/60 wd presets), fully editable and agreed with complainant</td></tr>
+    <tr><td>CEO-signed written response</td><td>Mandatory sign-off step before response can be sent</td></tr>
+    <tr><td>PHSO right to refer</td><td>Stated in all response letter templates; PHSO escalation tracked in casebook</td></tr>
+    <tr><td>KO41a annual return</td><td>Taxonomy built in; export wizard produces CSV for NHS Digital</td></tr>
+    <tr><td>No-delete on statutory records</td><td>Record rules prevent deletion of complaints, PHSO records and correspondence</td></tr>
+</table>
+
+<h2>Security Model</h2>
+<table>
+    <tr><th>Role</th><th>Capabilities</th></tr>
+    <tr><td>Complaint Handler</td><td>Create/manage PALS and complaints, log correspondence, raise actions, run acknowledgement and investigation</td></tr>
+    <tr><td>Complaint Manager</td><td>Handler + agree timescales, vexatious flags, PHSO records, KO41a export</td></tr>
+    <tr><td>Quality Lead</td><td>Everything including CEO-delegate sign-off, configuration, all locations, restricted cases</td></tr>
+</table>
+
+<h2>Module Dependencies</h2>
+<p>Depends on <strong>odoo_nhs_incident_risk</strong> and inherits: NHS Location hierarchy, NHS Action (CAPA) model, working-day/holiday engine, provider-type adaptation layer, and security group pattern.</p>
+
+<h2>Support</h2>
+<p>For support, please contact <strong>Cybrosys Techno Solutions</strong> at <a href="https://www.cybrosys.com">www.cybrosys.com</a>.</p>
+</body>
+</html>

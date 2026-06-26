@@ -9,3 +9,5 @@ from . import nhs_complaint
 from . import nhs_incident
 from . import nhs_action
 from . import res_config_settings
+from . import nhs_ko41a_report
+

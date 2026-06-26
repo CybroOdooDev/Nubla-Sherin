@@ -73,44 +73,38 @@
     <record id="view_res_config_settings_complaint_form" model="ir.ui.view">
         <field name="name">res.config.settings.complaint.form</field>
         <field name="model">res.config.settings</field>
-        <field name="inherit_id" ref="base_setup.action_general_configuration"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[hasclass('settings')]" position="inside">
-                <div class="app_settings_block" string="NHS Complaints &amp; PALS" data-string="Complaints">
-                    <h2>NHS Complaints &amp; PALS Settings</h2>
-                    <div class="row mt16 o_settings_container">
-                        <div class="col-12 col-lg-6 o_setting_box">
-                            <div class="o_setting_left_pane">
-                                <field name="complaint_public_form_enabled" widget="boolean_toggle"/>
-                            </div>
-                            <div class="o_setting_right_pane">
-                                <label for="complaint_public_form_enabled"/>
-                                <div class="text-muted">Allow patients and relatives to submit complaints via the public web form.</div>
-                                <div class="content-group" invisible="not complaint_public_form_enabled">
-                                    <div class="mt8">
-                                        <label for="complaint_public_form_token" class="o_light_label"/>
-                                        <field name="complaint_public_form_token"/>
-                                    </div>
+            <xpath expr="//form" position="inside">
+                <app string="NHS Complaints &amp; PALS" data-string="NHS Complaints" name="nhs_complaints"
+                     groups="odoo_nhs_complaints.group_nhs_complaint_quality_lead">
+                    <block title="Complaint Portal" name="nhs_complaint_portal_block">
+                        <setting id="nhs_public_form"
+                                 help="Allow patients and relatives to submit complaints via the public web form.">
+                            <field name="complaint_public_form_enabled"/>
+                            <div class="content-group" invisible="not complaint_public_form_enabled">
+                                <div class="mt8">
+                                    <field name="complaint_public_form_token" class="o_light_label"
+                                           placeholder="Security token for portal access"/>
+                                </div>
+                                <div class="mt8">
+                                    <button name="action_generate_public_form_token" type="object" string="Generate Token" class="btn btn-secondary btn-sm me-2"/>
+                                    <button name="action_open_public_form" type="object" string="Go to Public Form" class="btn btn-link btn-sm" icon="oi-arrow-right"/>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-12 col-lg-6 o_setting_box">
-                            <div class="o_setting_left_pane"/>
-                            <div class="o_setting_right_pane">
-                                <label for="complaint_default_timescale_id"/>
-                                <field name="complaint_default_timescale_id"/>
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-6 o_setting_box">
-                            <div class="o_setting_left_pane"/>
-                            <div class="o_setting_right_pane">
-                                <label for="complaint_anonymise_after_years"/>
-                                <field name="complaint_anonymise_after_years"/>
-                                <div class="text-muted">Set 0 to disable automatic anonymisation.</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                        </setting>
+                    </block>
+                    <block title="Timescales &amp; Retention" name="nhs_complaint_timescale_block">
+                        <setting id="nhs_default_timescale"
+                                 help="Default response timescale preset applied to new formal complaints.">
+                            <field name="complaint_default_timescale_id"/>
+                        </setting>
+                        <setting id="nhs_anonymise"
+                                 help="Years after closure before automatic anonymisation. Set 0 to disable.">
+                            <field name="complaint_anonymise_after_years"/>
+                        </setting>
+                    </block>
+                </app>
             </xpath>
         </field>
     </record>

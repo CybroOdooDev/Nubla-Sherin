@@ -61,7 +61,21 @@ class NhsComplaint(models.Model):
 
     # ── Complainant & Consent ─────────────────────────────────────────
     complainant_id = fields.Many2one('nhs.complainant', string='Complainant', tracking=True,
-                                     help='The person making the complaint. Required for formal complaints.')
+                                     help='The person making the complaint. Auto-created from inline fields on Acknowledge.')
+    # Inline fields — staff fill these directly; an nhs.complainant record is
+    # auto-created/linked when the complaint is acknowledged.
+    complainant_name = fields.Char(string='Complainant Name')
+    complainant_email = fields.Char(string='Email')
+    complainant_phone = fields.Char(string='Phone')
+    complainant_relationship = fields.Selection([
+        ('self', 'Patient (self)'),
+        ('relative', 'Relative'),
+        ('carer', 'Carer'),
+        ('advocate', 'Advocate'),
+        ('mp', 'MP / Elected Representative'),
+        ('solicitor', 'Solicitor'),
+        ('other', 'Other'),
+    ], string='Relationship to Patient', default='self')
     is_third_party = fields.Boolean(string='Third-Party Representative',
                                     help='True when the complainant acts on behalf of the patient.')
     consent_status = fields.Selection([
@@ -94,8 +108,12 @@ class NhsComplaint(models.Model):
        help='Drives the suggested response timescale and prioritisation.')
     is_multi_org = fields.Boolean(string='Multi-Organisation Complaint',
                                   help='Complaint spans more than one NHS provider (joint response required).')
-    linked_incident_ids = fields.Many2many('nhs.incident', string='Linked Incidents',
-                                           help='Incidents this complaint revealed or relates to.')
+    linked_incident_ids = fields.Many2many(
+        'nhs.incident',
+        'nhs_complaint_incident_rel', 'complaint_id', 'incident_id',
+        string='Linked Incidents',
+        help='Incidents this complaint revealed or relates to.',
+    )
     linked_risk_ids = fields.Many2many('nhs.risk', string='Linked Risks',
                                        help='Systemic risks evidenced by this complaint.')
     duty_of_candour_flag = fields.Boolean(string='Duty of Candour Applies',
@@ -119,18 +137,20 @@ class NhsComplaint(models.Model):
     # ── Workflow & Response ───────────────────────────────────────────
     state = fields.Selection([
         ('received', 'Received'),
+        # PALS pathway
+        ('in_progress', 'In Progress'),
+        ('resolved', 'Resolved'),
+        # Formal complaint pathway
         ('acknowledged', 'Acknowledged'),
         ('investigation', 'Under Investigation'),
         ('response_draft', 'Response Draft'),
         ('awaiting_signoff', 'Awaiting Sign-off'),
         ('response_sent', 'Response Sent'),
+        # Shared terminal / exception states
         ('closed', 'Closed'),
         ('re_opened', 'Re-opened'),
         ('phso', 'PHSO Referred'),
         ('withdrawn', 'Withdrawn'),
-        # PALS-specific
-        ('in_progress', 'In Progress'),
-        ('resolved', 'Resolved'),
         ('escalated', 'Escalated to Complaint'),
     ], string='Status', required=True, default='received', tracking=True)
     handler_id = fields.Many2one('res.users', string='Case Handler', tracking=True,
@@ -171,9 +191,9 @@ class NhsComplaint(models.Model):
 
     # ── Overdue flags (used in list decorations) ──────────────────────
     ack_overdue = fields.Boolean(string='Acknowledgement Overdue',
-                                 compute='_compute_overdue_flags', store=False)
+                                 compute='_compute_overdue_flags', store=True)
     response_overdue = fields.Boolean(string='Response Overdue',
-                                      compute='_compute_overdue_flags', store=False)
+                                      compute='_compute_overdue_flags', store=True)
 
     # ── Smart button counts ───────────────────────────────────────────
     incident_count = fields.Integer(compute='_compute_incident_count', string='Incidents')
@@ -286,6 +306,14 @@ class NhsComplaint(models.Model):
                                       note=f'New case assigned: {rec.name}')
         return records
 
+    @api.onchange('complainant_id')
+    def _onchange_complainant_populate(self):
+        if self.complainant_id:
+            self.complainant_name = self.complainant_id.name
+            self.complainant_email = self.complainant_id.email
+            self.complainant_phone = self.complainant_id.phone
+            self.complainant_relationship = self.complainant_id.relationship_to_patient
+
     # ── Constraints ───────────────────────────────────────────────────
     @api.constrains('received_at')
     def _check_received_at(self):
@@ -294,11 +322,8 @@ class NhsComplaint(models.Model):
             if rec.received_at and rec.received_at > now:
                 raise ValidationError('Received date cannot be in the future.')
 
-    @api.constrains('record_type', 'complainant_id', 'is_anonymous')
-    def _check_complainant_required(self):
-        for rec in self:
-            if rec.record_type == 'complaint' and not rec.complainant_id and not rec.is_anonymous:
-                raise ValidationError('A complainant record is required for formal complaints.')
+    # Complainant is required to acknowledge (not on initial save) so staff
+    # can log the intake record first and add complainant details before progressing.
 
     @api.constrains('is_third_party', 'consent_status')
     def _check_consent(self):
@@ -323,6 +348,20 @@ class NhsComplaint(models.Model):
         for rec in self:
             if rec.record_type != 'complaint':
                 raise UserError('Acknowledgement applies to formal complaints only.')
+            if not rec.is_anonymous:
+                if not rec.complainant_id and not rec.complainant_name:
+                    raise UserError(
+                        'Please enter the complainant\'s name on the "Complainant & Consent" tab '
+                        'before acknowledging.'
+                    )
+                if not rec.complainant_id and rec.complainant_name:
+                    complainant = self.env['nhs.complainant'].create({
+                        'name': rec.complainant_name,
+                        'email': rec.complainant_email or False,
+                        'phone': rec.complainant_phone or False,
+                        'relationship_to_patient': rec.complainant_relationship or 'self',
+                    })
+                    rec.write({'complainant_id': complainant.id})
             rec.with_context(nhs_workflow=True).write({
                 'state': 'acknowledged',
                 'acknowledged': True,
@@ -359,17 +398,29 @@ class NhsComplaint(models.Model):
             rec.with_context(nhs_workflow=True).write({'state': 'investigation'})
 
     def action_submit_response_draft(self):
+        """Handler saves the drafted response text → moves to response_draft for review."""
         for rec in self:
             if not rec.response_text:
-                raise UserError('Please enter a draft response before submitting for sign-off.')
+                raise UserError('Please enter a draft response before saving the draft.')
+            rec.with_context(nhs_workflow=True).write({'state': 'response_draft'})
+
+    def action_submit_for_signoff(self):
+        """Draft reviewed — formally submitted to CEO/delegate for sign-off."""
+        for rec in self:
+            if not rec.response_text:
+                raise UserError('A draft response must be present before submitting for sign-off.')
+            if rec.is_third_party and rec.consent_status in ('pending', 'refused'):
+                raise UserError('Cannot submit for sign-off: consent for this third-party complaint has not been obtained.')
             rec.with_context(nhs_workflow=True).write({'state': 'awaiting_signoff'})
 
     def action_sign_off(self):
+        """CEO / quality-lead delegate stamps sign-off; response can then be sent."""
         for rec in self:
             if rec.is_third_party and rec.consent_status in ('pending', 'refused'):
                 raise UserError('Cannot sign off: consent for this third-party complaint has not been obtained.')
+            if not rec.response_text:
+                raise UserError('There is no response text to sign off.')
             rec.with_context(nhs_workflow=True).write({
-                'state': 'awaiting_signoff',
                 'signed_off_by_id': self.env.user.id,
                 'signed_off_at': fields.Datetime.now(),
             })
@@ -438,6 +489,22 @@ class NhsComplaint(models.Model):
             'target': 'new',
             'context': {'default_pals_id': self.id},
         }
+
+    def action_pals_in_progress(self):
+        for rec in self:
+            if rec.record_type != 'pals':
+                raise UserError('This action is only for PALS concerns.')
+            rec.with_context(nhs_workflow=True).write({'state': 'in_progress'})
+
+    def action_pals_resolve(self):
+        for rec in self:
+            if rec.record_type != 'pals':
+                raise UserError('This action is only for PALS concerns.')
+            rec.with_context(nhs_workflow=True).write({
+                'state': 'resolved',
+                'deescalated': True,
+            })
+
 
     def action_create_incident(self):
         return {

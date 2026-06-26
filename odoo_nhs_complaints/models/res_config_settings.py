@@ -38,3 +38,29 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='odoo_nhs_complaints.default_timescale_id',
         help='Default timescale preset applied when a new formal complaint is received.',
     )
+
+    def action_generate_public_form_token(self):
+        import secrets
+        token = secrets.token_urlsafe(16)
+        self.complaint_public_form_token = token
+        self.env['ir.config_parameter'].sudo().set_param('odoo_nhs_complaints.public_form_token', token)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
+
+    def action_open_public_form(self):
+        self.ensure_one()
+        token = self.complaint_public_form_token
+        if not token:
+            import secrets
+            token = secrets.token_urlsafe(16)
+            self.complaint_public_form_token = token
+            self.env['ir.config_parameter'].sudo().set_param('odoo_nhs_complaints.public_form_token', token)
+        url = f"/complaint/submit/{token}"
+        return {
+            'type': 'ir.actions.act_url',
+            'url': url,
+            'target': 'new',
+        }
+

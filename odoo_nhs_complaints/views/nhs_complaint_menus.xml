@@ -19,8 +19,15 @@
     <menuitem id="menu_nhs_pals_open"
               name="Open Concerns"
               parent="menu_nhs_pals"
-              action="action_nhs_pals_concerns"
+              action="action_nhs_pals_concerns_open"
               sequence="10"
+              groups="odoo_nhs_complaints.group_nhs_complaint_handler"/>
+
+    <menuitem id="menu_nhs_pals_all"
+              name="All Concerns"
+              parent="menu_nhs_pals"
+              action="action_nhs_pals_concerns_all"
+              sequence="20"
               groups="odoo_nhs_complaints.group_nhs_complaint_handler"/>
 
     <!-- ── Complaints ─────────────────────────────────────────── -->
@@ -121,7 +128,23 @@
               sequence="20"
               groups="odoo_nhs_complaints.group_nhs_complaint_manager"/>
 
+    <menuitem id="menu_nhs_complaint_board_pack"
+              name="Board Pack (PDF)"
+              parent="menu_nhs_complaint_reporting"
+              action="action_report_nhs_ko41a"
+              sequence="30"
+              groups="odoo_nhs_complaints.group_nhs_complaint_manager"/>
+
+
     <!-- ── Configuration ──────────────────────────────────────── -->
+    <record id="action_nhs_complaint_letter_templates" model="ir.actions.act_window">
+        <field name="name">Letter Templates</field>
+        <field name="res_model">mail.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('model_id.model', '=', 'nhs.complaint')]</field>
+        <field name="context">{'default_model_id': ref('model_nhs_complaint')}</field>
+    </record>
+
     <menuitem id="menu_nhs_complaint_config"
               name="Configuration"
               parent="menu_nhs_complaints_root"
@@ -142,10 +165,25 @@
               sequence="20"
               groups="odoo_nhs_complaints.group_nhs_complaint_quality_lead"/>
 
-    <menuitem id="menu_nhs_complaint_complainants"
-              name="Complainants"
+    <menuitem id="menu_nhs_complaint_letter_templates"
+              name="Letter Templates"
               parent="menu_nhs_complaint_config"
-              action="action_nhs_complainant"
-              sequence="30"
-              groups="odoo_nhs_complaints.group_nhs_complaint_manager"/>
+              action="action_nhs_complaint_letter_templates"
+              sequence="25"
+              groups="odoo_nhs_complaints.group_nhs_complaint_quality_lead"/>
+
+    <record id="action_nhs_complaint_config_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="context">{'module': 'nhs_complaints', 'bin_size': False}</field>
+    </record>
+
+    <menuitem id="menu_nhs_complaint_settings"
+              name="Settings"
+              parent="menu_nhs_complaint_config"
+              action="action_nhs_complaint_config_settings"
+              sequence="99"
+              groups="odoo_nhs_complaints.group_nhs_complaint_quality_lead"/>
+
 </odoo>

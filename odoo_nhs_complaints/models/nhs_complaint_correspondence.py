@@ -51,6 +51,18 @@ class NhsComplaintCorrespondence(models.Model):
     company_id = fields.Many2one('res.company', string='Organisation',
                                  related='complaint_id.company_id', store=True)
 
+    def _compute_display_name(self):
+        for rec in self:
+            direction_str = dict(self._fields['direction'].selection).get(rec.direction, '')
+            channel_str = dict(self._fields['channel'].selection).get(rec.channel, '')
+            date_str = rec.occurred_at.strftime('%d/%m/%Y %H:%M') if rec.occurred_at else ''
+            parts = [p for p in [direction_str, channel_str] if p]
+            label = " ".join(parts) or "Correspondence"
+            if date_str:
+                rec.display_name = f"{label} - {date_str}"
+            else:
+                rec.display_name = label
+
     def unlink(self):
         raise UserError(
             'Correspondence log entries are statutory records and cannot be deleted.'

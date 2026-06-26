@@ -11,6 +11,7 @@
 #
 #############################################################################
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 
 class NhsComplaintPhso(models.Model):
