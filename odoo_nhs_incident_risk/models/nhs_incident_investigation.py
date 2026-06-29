@@ -112,11 +112,27 @@ class NhsInvestigation(models.Model):
         if not self.env.user.has_group(
                 'odoo_nhs_incident_risk.group_hc_quality_lead'):
             raise UserError('Only Quality Lead users can approve investigations.')
+        for rec in self:
+            open_actions = rec.action_ids.filtered(
+                lambda a: a.state not in ('done', 'cancelled')
+            )
+            if open_actions:
+                titles = ', '.join(open_actions.mapped('name'))
+                raise UserError(
+                    f'Cannot approve: {len(open_actions)} action(s) must be '
+                    f'completed or cancelled before approving this investigation.\n'
+                    f'Pending: {titles}'
+                )
         self.write({
             'state': 'approved',
             'approved_by_id': self.env.user.id,
             'approved_at': fields.Datetime.now(),
         })
+        for rec in self:
+            if rec.incident_id and rec.incident_id.state == 'investigation':
+                rec.incident_id.with_context(nhs_workflow=True).write(
+                    {'state': 'actions'}
+                )
 
     def action_rework(self):
         self.write({'state': 'in_progress'})

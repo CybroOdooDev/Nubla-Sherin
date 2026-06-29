@@ -42,11 +42,6 @@ class NhsRiskReviewWizard(models.TransientModel):
         'nhs.risk', string='Risk', required=True,
         help='The risk register entry being reviewed.')
 
-    review_id = fields.Many2one(
-        'nhs.risk.review', string='Review Record',
-        help='Draft nhs.risk.review record created when the wizard opens. '
-             'Finalised on confirm, deleted on cancel.')
-
     # ── Risk context fields (related, read-only display) ──────────────
     risk_title = fields.Char(
         related='risk_id.title', string='Risk Title', readonly=True)
@@ -130,29 +125,17 @@ class NhsRiskReviewWizard(models.TransientModel):
         risk_id = res.get('risk_id') or self.env.context.get('default_risk_id')
         if risk_id:
             risk = self.env['nhs.risk'].browse(risk_id)
-            # Create a draft nhs.risk.review record immediately so review_id is set.
-            # This record is finalised in action_confirm or deleted in action_cancel.
-            review = self.env['nhs.risk.review'].create({
-                'risk_id': risk_id,
-                'reviewed_at': fields.Datetime.now(),
-                'reviewer_id': self.env.user.id,
-                'prev_current_consequence': risk.current_consequence,
-                'prev_current_likelihood': risk.current_likelihood,
-                'decision': 'no_change',
-            })
-            res['review_id'] = review.id
             res['prev_current_consequence'] = risk.current_consequence
             res['prev_current_likelihood'] = risk.current_likelihood
         return res
 
     def action_confirm(self):
-        """Write wizard inputs to the nhs.risk.review record, then update the risk."""
+        """Create a single nhs.risk.review record from the wizard inputs, then update the risk."""
         self.ensure_one()
         risk = self.risk_id
-        review = self.review_id
 
-        # Write all wizard input fields to the permanent nhs.risk.review record
         review_vals = {
+            'risk_id': risk.id,
             'reviewed_at': self.reviewed_at,
             'reviewer_id': self.reviewer_id.id,
             'commentary': self.commentary,
@@ -164,7 +147,7 @@ class NhsRiskReviewWizard(models.TransientModel):
             review_vals['new_current_consequence'] = self.new_current_consequence
             review_vals['new_current_likelihood'] = self.new_current_likelihood
 
-        review.write(review_vals)
+        self.env['nhs.risk.review'].create(review_vals)
 
         # Update the risk record
         risk.write({'last_reviewed_at': self.reviewed_at})
@@ -181,8 +164,4 @@ class NhsRiskReviewWizard(models.TransientModel):
         return {'type': 'ir.actions.act_window_close'}
 
     def action_cancel(self):
-        """Delete the draft nhs.risk.review record to avoid orphan entries."""
-        self.ensure_one()
-        if self.review_id:
-            self.review_id.unlink()
         return {'type': 'ir.actions.act_window_close'}

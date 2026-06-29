@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import api, fields, models
+from odoo import fields, models
 import uuid
 
 
@@ -97,3 +97,13 @@ class ResConfigSettings(models.TransientModel):
         self.company_id.sudo().write(
             {'public_form_token': str(uuid.uuid4()).replace('-', '')[:20]})
         return {'type': 'ir.actions.client', 'tag': 'reload'}
+
+    def action_open_public_form(self):
+        self.ensure_one()
+        token = self.company_id._get_public_form_token()
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '%s/incident/report/%s' % (base_url, token),
+            'target': 'new',
+        }

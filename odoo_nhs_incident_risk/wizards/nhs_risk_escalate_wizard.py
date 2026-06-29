@@ -19,8 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import fields, models
-from odoo.exceptions import UserError
+from odoo import api, fields, models
 
 
 class NhsRiskEscalateWizard(models.TransientModel):
@@ -37,12 +36,23 @@ class NhsRiskEscalateWizard(models.TransientModel):
         domain="[('id','!=',current_register_id)]",
         help='The register the risk should be moved to. Moving to a higher tier (e.g. Corporate, BAF) '
              'constitutes an escalation; moving to a lower tier is a de-escalation.')
+    target_tier = fields.Selection(related='target_register_id.tier', string='Target Tier', readonly=True)
+    executive_lead_id = fields.Many2one(
+        'res.users', string='Executive Lead',
+        help='Required when moving to a Corporate or BAF register. '
+             'The executive accountable for this risk at board level.')
     rationale = fields.Text(string='Rationale', required=True,
                             help='Explain the reason for this escalation or de-escalation. '
                                  'This is recorded in the review log and posted as a chatter message on the risk.')
     notify_user_ids = fields.Many2many('res.users', string='Notify Users',
                                        help='Users who should be notified of this register change. '
                                             'An activity will be created for each selected user.')
+
+    @api.onchange('target_register_id')
+    def _onchange_target_register_id(self):
+        if self.target_register_id and self.target_register_id.tier in ('corporate', 'baf'):
+            if not self.executive_lead_id and self.risk_id.executive_lead_id:
+                self.executive_lead_id = self.risk_id.executive_lead_id
 
     def action_confirm(self):
         self.ensure_one()
@@ -62,8 +72,10 @@ class NhsRiskEscalateWizard(models.TransientModel):
             'decision': decision,
         })
 
-        risk.with_context(nhs_workflow=True).write(
-            {'register_id': self.target_register_id.id})
+        vals = {'register_id': self.target_register_id.id}
+        if self.executive_lead_id:
+            vals['executive_lead_id'] = self.executive_lead_id.id
+        risk.with_context(nhs_workflow=True).write(vals)
         risk.message_post(
             body='Risk moved from %s to %s. Rationale: %s' % (
                 old_register.name, self.target_register_id.name, self.rationale

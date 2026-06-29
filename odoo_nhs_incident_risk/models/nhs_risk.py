@@ -195,11 +195,12 @@ class NhsRisk(models.Model):
                 rec[r_fld] = rating
                 rec[b_fld] = _band(rating) if rating else False
 
-    @api.depends('current_rating', 'category_id.appetite_threshold')
+    @api.depends('current_consequence', 'current_likelihood', 'category_id.appetite_threshold')
     def _compute_outside_appetite(self):
         for rec in self:
             threshold = rec.category_id.appetite_threshold if rec.category_id else 6
-            rec.outside_appetite = rec.current_rating > threshold
+            rating = int(rec.current_consequence or 0) * int(rec.current_likelihood or 0)
+            rec.outside_appetite = rating > threshold
 
     @api.depends('current_band', 'manual_frequency_override', 'manual_frequency_days')
     def _compute_review_frequency(self):

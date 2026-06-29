@@ -53,8 +53,8 @@ class NhsProviderSetupWizard(models.TransientModel):
         for rec in self:
             cats = self.env['nhs.incident.category'].search([
                 '|',
-                ('provider_types', '=', False),
-                ('provider_types', 'like', rec.provider_type),
+                ('provider_type_ids', '=', False),
+                ('provider_type_ids.code', '=', rec.provider_type),
                 ('parent_id', '=', False),
                 ('active', 'in', [True, False]),
             ])
@@ -72,10 +72,10 @@ class NhsProviderSetupWizard(models.TransientModel):
 
         # Archive categories not for this provider type
         all_cats = self.env['nhs.incident.category'].with_context(
-            active_test=False).search([('provider_types', '!=', False)])
+            active_test=False).search([('provider_type_ids', '!=', False)])
         for cat in all_cats:
-            applicable = not cat.provider_types or \
-                         self.provider_type in cat.provider_types.split(',')
+            applicable = not cat.provider_type_ids or \
+                         any(pt.code == self.provider_type for pt in cat.provider_type_ids)
             cat.write({'active': applicable})
 
         return {

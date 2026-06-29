@@ -13,9 +13,12 @@
                     <button name="action_start_investigation" string="Start Investigation"
                             type="object" class="btn-primary"
                             invisible="state != 'triage'"/>
+                    <button name="action_open_investigation" string="Open Investigation"
+                            type="object" class="btn-primary"
+                            invisible="state != 'investigation' or not investigation_id"/>
                     <button name="action_advance_to_actions" string="Advance to Actions"
                             type="object"
-                            invisible="state != 'investigation'"/>
+                            invisible="state != 'investigation' or action_count &gt; 0 or investigation_id != False"/>
                     <button name="action_request_closure" string="Request Closure"
                             type="object"
                             invisible="state != 'actions'"/>
@@ -28,7 +31,8 @@
                             invisible="not riddor_hint or riddor_id"/>
                     <button name="action_create_risk" string="Create Risk"
                             type="object"
-                            groups="odoo_nhs_incident_risk.group_hc_risk_manager"/>
+                            groups="odoo_nhs_incident_risk.group_hc_risk_manager"
+                            invisible="state == 'new' or harm_grade not in ['moderate', 'severe', 'death']"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="new,triage,investigation,actions,pending_closure,closed"/>
                 </header>
@@ -44,6 +48,11 @@
                 </div>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
+                        <button name="action_open_investigation" type="object"
+                                class="oe_stat_button" icon="fa-search"
+                                invisible="not investigation_id">
+                            <field name="investigation_count" widget="statinfo" string="Investigation"/>
+                        </button>
                         <button name="action_open_persons" type="object"
                                 class="oe_stat_button" icon="fa-users">
                             <field name="person_count" widget="statinfo" string="Persons"/>
@@ -61,6 +70,19 @@
                                 class="oe_stat_button" icon="fa-exclamation-triangle"
                                 invisible="risk_count == 0">
                             <field name="risk_count" widget="statinfo" string="Risks"/>
+                        </button>
+                        <button name="action_open_doc" type="object"
+                                class="oe_stat_button" icon="fa-balance-scale"
+                                invisible="not doc_id">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="doc_state" widget="badge"
+                                           decoration-success="doc_state == 'complete'"
+                                           decoration-warning="doc_state == 'open'"
+                                           decoration-danger="doc_state == 'overdue'"/>
+                                </span>
+                                <span class="o_stat_text">Duty of Candour</span>
+                            </div>
                         </button>
                     </div>
                     <group>
@@ -204,12 +226,10 @@
                   decoration-warning="harm_grade == 'moderate'"
                   decoration-muted="state in ('closed','rejected','duplicate')">
                 <field name="name"/>
-                <field name="incident_kind"/>
                 <field name="occurred_at"/>
-                <field name="location_id"/>
                 <field name="category_id"/>
+                <field name="location_id"/>
                 <field name="harm_grade"/>
-                <field name="response_level"/>
                 <field name="handler_id"/>
                 <field name="state" widget="badge"
                        decoration-success="state == 'closed'"
@@ -234,27 +254,85 @@
                 <field name="handler_id"/>
                 <field name="state"/>
                 <field name="reported_at"/>
+                <field name="incident_kind"/>
+                <field name="is_never_event"/>
+                <field name="safeguarding_flag"/>
+                <field name="response_level"/>
+                <field name="person_count"/>
+                <field name="action_count"/>
+
                 <templates>
                     <t t-name="card">
-                        <div class="oe_kanban_global_click">
-                            <div class="o_kanban_record_title">
-                                <strong><field name="name"/></strong>
+                        <t t-set="harm" t-value="record.harm_grade.raw_value"/>
+                        <t t-set="borderCol"
+                           t-value="harm == 'death' or harm == 'severe' ? 'var(--bs-danger)'
+                                    : harm == 'moderate' ? 'var(--bs-warning)'
+                                    : harm == 'no_harm'  ? 'var(--bs-success)'
+                                    : 'var(--bs-info)'"/>
+
+                        <div class="oe_kanban_global_click"
+                             t-attf-style="border-left: 3px solid #{borderCol};">
+
+                            <!-- Reference + Never Event -->
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <strong class="text-primary">
+                                    <field name="name"/>
+                                </strong>
+                                <span t-if="record.is_never_event.raw_value"
+                                      class="badge text-bg-danger ms-1">NE</span>
                             </div>
-                            <div>
-                                <field name="category_id"/>
-                                <span t-if="record.harm_grade.raw_value"
-                                      class="badge"
-                                      t-attf-class="badge #{record.harm_grade.raw_value == 'severe' || record.harm_grade.raw_value == 'death' ? 'bg-danger' : record.harm_grade.raw_value == 'moderate' ? 'bg-warning' : 'bg-secondary'}">
+
+                            <!-- Badges -->
+                            <div class="d-flex flex-wrap gap-1 mb-2">
+                                <span t-if="record.incident_kind.raw_value"
+                                      class="badge text-bg-info">
+                                    <field name="incident_kind"/>
+                                </span>
+                                <span t-if="harm"
+                                      t-attf-class="badge #{harm == 'death' or harm == 'severe' ? 'text-bg-danger' : harm == 'moderate' ? 'text-bg-warning' : harm == 'no_harm' ? 'text-bg-success' : 'text-bg-secondary'}">
                                     <field name="harm_grade"/>
                                 </span>
+                                <span t-if="record.safeguarding_flag.raw_value"
+                                      class="badge text-bg-warning">
+                                    <i class="fa fa-shield me-1"/>Safeguarding
+                                </span>
                             </div>
-                            <div class="text-muted">
+
+                            <!-- Category -->
+                            <div class="text-muted small mb-1">
+                                <i class="fa fa-tag me-1"/>
+                                <field name="category_id"/>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="text-muted small mb-1">
+                                <i class="fa fa-map-marker me-1"/>
                                 <field name="location_id"/>
                             </div>
-                            <div class="d-flex justify-content-between">
-                                <field name="handler_id" widget="many2one_avatar_user"/>
-                                <field name="reported_at" widget="date"/>
+
+                            <!-- Occurred -->
+                            <div class="text-muted small mb-1">
+                                <i class="fa fa-clock-o me-1"/>
+                                <field name="occurred_at" widget="datetime"/>
                             </div>
+
+                            <!-- PSIRF Response Level -->
+                            <div t-if="record.response_level.raw_value" class="mb-2">
+                                <span class="badge text-bg-light border">
+                                    <i class="fa fa-flag me-1"/>
+                                    <field name="response_level"/>
+                                </span>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="d-flex justify-content-between align-items-center pt-1 border-top">
+                                <field name="handler_id" widget="many2one_avatar_user"/>
+                                <small class="text-muted">
+                                    <i class="fa fa-calendar me-1"/>
+                                    <field name="reported_at" widget="date"/>
+                                </small>
+                            </div>
+
                         </div>
                     </t>
                 </templates>

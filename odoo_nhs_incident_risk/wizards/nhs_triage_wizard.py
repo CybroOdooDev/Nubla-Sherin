@@ -80,11 +80,18 @@ class NhsTriageWizard(models.TransientModel):
             self.category_id = self.incident_id.category_id
             self.location_id = self.incident_id.location_id
             self.response_level = self.incident_id.response_level or 'none'
+            if self.incident_id.harm_grade:
+                self.harm_grade = self.incident_id.harm_grade
+            elif self.incident_id.category_id and self.incident_id.category_id.default_harm_floor:
+                self.harm_grade = self.incident_id.category_id.default_harm_floor
 
     @api.onchange('category_id')
     def _onchange_category(self):
-        if self.category_id and self.category_id.default_response_level:
-            self.response_level = self.category_id.default_response_level
+        if self.category_id:
+            if self.category_id.default_response_level:
+                self.response_level = self.category_id.default_response_level
+            if self.category_id.default_harm_floor and not self.harm_grade:
+                self.harm_grade = self.category_id.default_harm_floor
 
     def action_confirm(self):
         self.ensure_one()

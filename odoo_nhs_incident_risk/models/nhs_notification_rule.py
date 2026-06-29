@@ -115,3 +115,18 @@ class NhsNotificationRule(models.Model):
                     })
             if rule.suggest_riddor and not incident.riddor_id:
                 incident.with_context(nhs_workflow=True).write({'riddor_hint': True})
+        # Apply riddor_hint from the category directly
+        if incident.category_id and incident.category_id.riddor_hint and not incident.riddor_id:
+            if not incident.riddor_hint:
+                incident.with_context(nhs_workflow=True).write({'riddor_hint': True})
+        # Apply CQC notification types declared directly on the category (idempotent)
+        if incident.category_id and incident.category_id.cqc_notification_type_ids:
+            for ntype in incident.category_id.cqc_notification_type_ids:
+                existing = incident.cqc_notification_ids.filtered(
+                    lambda n, nt=ntype: n.notification_type_id == nt)
+                if not existing:
+                    self.env['nhs.cqc.notification'].create({
+                        'incident_id': incident.id,
+                        'notification_type_id': ntype.id,
+                        'state': 'required',
+                    })

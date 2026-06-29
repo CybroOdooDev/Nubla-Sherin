@@ -20,7 +20,6 @@
 #
 #############################################################################
 from datetime import timedelta
-
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError, UserError
 
@@ -56,6 +55,7 @@ class NhsAction(models.Model):
     risk_id = fields.Many2one('nhs.risk', string='Risk', ondelete='restrict',
                               help='The risk register entry this action was raised from. '
                                    'An action can only be linked to one parent record.')
+    incident_risk_count = fields.Integer(related='incident_id.risk_count', store=False)
     owner_id = fields.Many2one('res.users', string='Owner', required=True,
                                default=lambda self: self.env.user, tracking=True,
                                help='The person responsible for completing this action by the due date. '
@@ -114,12 +114,56 @@ class NhsAction(models.Model):
                                   note=f'Action assigned: {rec.name}')
         return records
 
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+        # Auto-fill from investigation context
+        inv_id = res.get('investigation_id') or self.env.context.get('default_investigation_id')
+        if inv_id and not res.get('risk_id'):
+            investigation = self.env['nhs.investigation'].browse(inv_id)
+            incident = investigation.incident_id
+            if incident and incident.risk_ids:
+                res['risk_id'] = incident.risk_ids[0].id
+        # Auto-fill incident + investigation when creating from a risk context
+        risk_id = res.get('risk_id') or self.env.context.get('default_risk_id')
+        if risk_id and not res.get('incident_id'):
+            risk = self.env['nhs.risk'].browse(risk_id)
+            if risk.incident_ids:
+                incident = risk.incident_ids[0]
+                res['incident_id'] = incident.id
+                if incident.investigation_id and not res.get('investigation_id'):
+                    res['investigation_id'] = incident.investigation_id.id
+        return res
+
+    @api.onchange('risk_id')
+    def _onchange_risk_id(self):
+        if self.risk_id and self.risk_id.incident_ids:
+            if not self.incident_id:
+                incident = self.risk_id.incident_ids[0]
+                self.incident_id = incident
+                if incident.investigation_id and not self.investigation_id:
+                    self.investigation_id = incident.investigation_id
+
+    @api.onchange('investigation_id')
+    def _onchange_investigation_id(self):
+        if self.investigation_id and not self.incident_id:
+            self.incident_id = self.investigation_id.incident_id
+
     @api.constrains('incident_id', 'investigation_id', 'risk_id')
     def _check_single_parent(self):
         for rec in self:
-            # If both Incident and Investigation are linked, allow it if the investigation is for that incident
+            # incident + investigation (no risk): allowed if investigation belongs to incident
             if rec.incident_id and rec.investigation_id and not rec.risk_id:
                 if rec.investigation_id.incident_id == rec.incident_id:
+                    continue
+            # incident + risk (no investigation): allowed if risk is linked to incident
+            if rec.incident_id and rec.risk_id and not rec.investigation_id:
+                if rec.risk_id in rec.incident_id.risk_ids:
+                    continue
+            # all three: allowed when they form a consistent chain
+            if rec.incident_id and rec.investigation_id and rec.risk_id:
+                if (rec.investigation_id.incident_id == rec.incident_id
+                        and rec.risk_id in rec.incident_id.risk_ids):
                     continue
             parents = bool(rec.incident_id) + bool(rec.investigation_id) + bool(rec.risk_id)
             if parents > 1:

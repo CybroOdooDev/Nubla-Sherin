@@ -9,6 +9,10 @@
                     <field name="risk_id" readonly="1"/>
                     <field name="current_register_id" readonly="1"/>
                     <field name="target_register_id"/>
+                    <field name="target_tier" invisible="1"/>
+                    <field name="executive_lead_id"
+                           invisible="target_tier not in ('corporate', 'baf')"
+                           required="target_tier in ('corporate', 'baf')"/>
                     <field name="rationale" placeholder="Reason for moving this risk…"/>
                     <field name="notify_user_ids" widget="many2many_tags"/>
                 </group>

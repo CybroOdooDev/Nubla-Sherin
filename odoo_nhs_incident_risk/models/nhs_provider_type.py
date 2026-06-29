@@ -19,22 +19,21 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import api, fields, models
+from odoo import fields, models
 
-class ReportBoardPack(models.AbstractModel):
-    _name = 'report.odoo_nhs_incident_risk.report_board_pack'
-    _description = 'Monthly Board Pack Report Parser'
 
-    @api.model
-    def _get_report_values(self, docids, data=None):
-        # When printing from a menu item directly, docids is empty.
-        # Fallback to the current active company.
-        if not docids:
-            docids = [self.env.company.id]
-        docs = self.env['res.company'].browse(docids)
-        return {
-            'doc_ids': docids,
-            'doc_model': 'res.company',
-            'docs': docs,
-            'today_date': fields.Date.context_today(self),
-        }
+class NhsProviderType(models.Model):
+    _name = 'nhs.provider.type'
+    _description = 'NHS Provider Type'
+    _order = 'sequence, name'
+
+    code = fields.Char(string='Code', required=True, index=True,
+                       help='Internal key used in filtering logic (e.g. nhs_trust, gp_practice).')
+    name = fields.Char(string='Name', required=True,
+                       help='Display name shown on forms and settings.')
+    sequence = fields.Integer(default=10)
+    active = fields.Boolean(default=True)
+
+    _sql_constraints = [
+        ('code_unique', 'UNIQUE(code)', 'Provider type code must be unique!'),
+    ]

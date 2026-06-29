@@ -71,7 +71,8 @@
                             </group>
                         </page>
                         <page string="Actions">
-                            <field name="action_ids">
+                            <field name="action_ids"
+                                   context="{'default_incident_id': incident_id, 'default_investigation_id': id}">
                                 <list>
                                     <field name="reference"/>
                                     <field name="name"/>

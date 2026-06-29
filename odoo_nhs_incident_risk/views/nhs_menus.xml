@@ -208,6 +208,6 @@
     <menuitem id="menu_nhs_config_settings"
               name="Settings"
               parent="menu_nhs_config"
-              action="base.res_config_setting_act_window"
+              action="odoo_nhs_incident_risk.action_nhs_incident_risk_settings"
               sequence="99"/>
 </odoo>

@@ -57,8 +57,10 @@
                             <group>
                                 <field name="written_done"/>
                                 <field name="written_at" invisible="not written_done"/>
-                                <field name="written_letter_attachment_id"
+                                <field name="written_letter" widget="binary"
+                                       filename="written_letter_filename"
                                        invisible="not written_done"/>
+                                <field name="written_letter_filename" invisible="1"/>
                             </group>
                         </page>
                         <page string="Stage 3 — Findings Shared">

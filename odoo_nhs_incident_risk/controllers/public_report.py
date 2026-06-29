@@ -72,8 +72,8 @@ class NhsPublicReport(http.Controller):
         ])
         cat_list = []
         for c in categories:
-            types = c.provider_types or ''
-            if not types or provider_type in types.split(','):
+            if not c.provider_type_ids or \
+                    any(pt.code == provider_type for pt in c.provider_type_ids):
                 cat_list.append({'id': c.id, 'complete_name': c.complete_name})
 
         # Build location list

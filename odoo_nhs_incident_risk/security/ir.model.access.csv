@@ -62,3 +62,5 @@ access_nhs_risk_review_wizard_risk_manager,nhs.risk.review.wizard risk manager,m
 access_nhs_risk_review_wizard_quality,nhs.risk.review.wizard quality,model_nhs_risk_review_wizard,group_hc_quality_lead,1,1,1,1
 access_nhs_provider_setup_wizard_quality,nhs.provider.setup.wizard quality,model_nhs_provider_setup_wizard,group_hc_quality_lead,1,1,1,1
 access_nhs_risk_close_wizard_quality,nhs.risk.close.wizard quality,model_nhs_risk_close_wizard,group_hc_quality_lead,1,1,1,1
+access_nhs_provider_type_reporter,nhs.provider.type reporter,model_nhs_provider_type,group_hc_reporter,1,0,0,0
+access_nhs_provider_type_quality,nhs.provider.type quality lead,model_nhs_provider_type,group_hc_quality_lead,1,1,1,1

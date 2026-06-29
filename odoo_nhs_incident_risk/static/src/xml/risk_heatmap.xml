@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates>
+    <t t-name="odoo_nhs_incident_risk.RiskHeatmap">
+        <div class="o_action p-4">
+            <h4 class="fw-bold mb-1">Risk Heatmap — 5×5 NPSA Matrix</h4>
+            <p class="text-muted mb-4" style="font-size:0.85rem;">
+                Active risks only. Cells show count of risks at each Consequence × Likelihood score.
+                Click a highlighted cell to view the risks.
+            </p>
+
+            <t t-if="state.loading">
+                <div class="text-center py-5 text-muted">Loading…</div>
+            </t>
+            <t t-else="">
+                <div class="d-flex gap-3 align-items-start">
+
+                    <!-- Y-axis label -->
+                    <div style="writing-mode:vertical-rl;transform:rotate(180deg);font-weight:600;color:#555;font-size:0.85rem;padding-top:40px;">
+                        Consequence (Severity) ↑
+                    </div>
+
+                    <!-- Heatmap table -->
+                    <div>
+                        <table class="table table-bordered mb-2" style="width:auto;border-collapse:separate;border-spacing:3px;border:none;">
+                            <!-- Column headers (Likelihood) -->
+                            <thead>
+                                <tr>
+                                    <th style="width:55px;background:#f8f9fa;text-align:center;border-radius:4px;font-size:0.8rem;color:#888;">C \ L</th>
+                                    <t t-foreach="likelihoods" t-as="l" t-key="l">
+                                        <th style="width:100px;text-align:center;background:#f8f9fa;border-radius:4px;font-size:0.95rem;font-weight:700;color:#333;">
+                                            <t t-esc="l"/>
+                                        </th>
+                                    </t>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="consequences" t-as="c" t-key="c">
+                                    <tr>
+                                        <!-- Row header (Consequence) -->
+                                        <th style="text-align:center;background:#f8f9fa;border-radius:4px;font-size:0.95rem;font-weight:700;color:#333;vertical-align:middle;">
+                                            <t t-esc="c"/>
+                                        </th>
+                                        <t t-foreach="likelihoods" t-as="l" t-key="l">
+                                            <t t-set="cnt"   t-value="getCount(c, l)"/>
+                                            <t t-set="score" t-value="c * l"/>
+                                            <t t-set="bg"    t-value="getCellBg(c, l)"/>
+                                            <td t-att-data-c="c"
+                                                t-att-data-l="l"
+                                                t-attf-style="
+                                                    background:{{ bg }};
+                                                    color:#fff;
+                                                    width:100px;
+                                                    height:68px;
+                                                    text-align:center;
+                                                    vertical-align:middle;
+                                                    border-radius:6px;
+                                                    border:none;
+                                                    position:relative;
+                                                    cursor:{{ cnt ? 'pointer' : 'default' }};
+                                                    {{ cnt ? 'box-shadow:0 2px 8px rgba(0,0,0,0.3);' : 'opacity:0.65;' }}"
+                                                t-attf-title="C{{ c }} × L{{ l }} = {{ score }} | {{ cnt }} risk(s)"
+                                                t-on-click="onCellClick">
+                                                <!-- Risk count badge -->
+                                                <t t-if="cnt">
+                                                    <div style="font-size:1.4rem;font-weight:700;line-height:1;">
+                                                        <t t-esc="cnt"/>
+                                                    </div>
+                                                    <div style="font-size:0.7rem;opacity:0.85;">
+                                                        risk<t t-if="cnt != 1">s</t>
+                                                    </div>
+                                                </t>
+                                                <!-- Score in bottom corner when empty -->
+                                                <span style="position:absolute;bottom:3px;right:5px;font-size:0.7rem;opacity:0.7;font-weight:600;">
+                                                    <t t-esc="score"/>
+                                                </span>
+                                            </td>
+                                        </t>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- X-axis label -->
+                        <div class="text-center fw-semibold mb-3" style="color:#555;font-size:0.85rem;">
+                            Likelihood (Frequency) →
+                        </div>
+
+                        <!-- Legend -->
+                        <div class="d-flex align-items-center gap-4 flex-wrap">
+                            <t t-foreach="bands" t-as="b" t-key="b.label">
+                                <span class="d-flex align-items-center gap-2">
+                                    <span t-attf-style="display:inline-block;width:22px;height:22px;border-radius:4px;background:{{ b.bg }};"></span>
+                                    <span style="font-size:0.85rem;font-weight:500;"><t t-esc="b.label"/></span>
+                                </span>
+                            </t>
+                            <span class="text-muted" style="font-size:0.8rem;padding-left:8px;border-left:1px solid #ddd;">
+                                Click a cell with risks to view them
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

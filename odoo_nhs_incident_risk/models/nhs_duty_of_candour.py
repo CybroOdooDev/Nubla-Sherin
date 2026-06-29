@@ -19,10 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from datetime import timedelta
-
 from odoo import api, fields, models
-from odoo.exceptions import UserError
 
 
 class NhsDutyOfCandour(models.Model):
@@ -59,9 +56,10 @@ class NhsDutyOfCandour(models.Model):
                                        'Must be completed within 10 working days of the trigger.')
     written_at = fields.Datetime(string='Written Date/Time',
                                  help='The date and time the written notification was sent.')
-    written_letter_attachment_id = fields.Many2one('ir.attachment', string='Signed Letter',
-                                                   help='Upload the signed Duty of Candour letter sent to '
-                                                        'the patient or their representative.')
+    written_letter = fields.Binary(string='Signed Letter', attachment=True,
+                                   help='Upload the signed Duty of Candour letter sent to '
+                                        'the patient or their representative.')
+    written_letter_filename = fields.Char(string='Signed Letter Filename')
     # Stage 3 — findings shared
     findings_shared_done = fields.Boolean(string='Findings Shared', tracking=True,
                                           help='Tick once the investigation findings and any resulting actions '

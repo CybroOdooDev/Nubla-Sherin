@@ -20,7 +20,7 @@
 #
 #############################################################################
 from odoo import api, fields, models
-from datetime import date, timedelta
+from datetime import  timedelta
 
 
 class NhsHoliday(models.Model):

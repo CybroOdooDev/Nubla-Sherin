@@ -110,12 +110,15 @@
                         </page>
                         <page string="Actions" invisible="state == 'draft'">
                             <field name="action_ids" readonly="state == 'closed'">
-                                <list>
+                                <list open_form_view="True">
                                     <field name="reference"/>
                                     <field name="name"/>
                                     <field name="owner_id"/>
                                     <field name="due_date"/>
-                                    <field name="state"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'done'"
+                                           decoration-warning="state == 'evidence_review'"
+                                           decoration-muted="state == 'cancelled'"/>
                                 </list>
                             </field>
                         </page>
@@ -184,7 +187,7 @@
         <field name="name">nhs.risk.pivot</field>
         <field name="model">nhs.risk</field>
         <field name="arch" type="xml">
-            <pivot string="Risk Heatmap">
+            <pivot string="Risk Heatmap" js_class="nhs_risk_heatmap_pivot">
                 <field name="current_consequence" type="row"/>
                 <field name="current_likelihood" type="col"/>
             </pivot>
@@ -229,10 +232,15 @@
         <field name="name">Risk Heatmap</field>
         <field name="res_model">nhs.risk</field>
         <field name="view_mode">pivot,list</field>
-        <field name="domain">[('state','=','active')]</field>
+        <field name="domain">[('state','in',['draft','active'])]</field>
         <field name="view_ids" eval="[(5,0,0),
             (0,0,{'view_mode':'pivot','view_id':ref('view_nhs_risk_pivot')}),
             (0,0,{'view_mode':'list','view_id':ref('view_nhs_risk_list')})]"/>
+    </record>
+
+    <record id="action_nhs_risk_heatmap_client" model="ir.actions.client">
+        <field name="name">Risk Heatmap (Matrix)</field>
+        <field name="tag">nhs_risk_heatmap</field>
     </record>
 
     <record id="action_nhs_risk_reviews_due" model="ir.actions.act_window">

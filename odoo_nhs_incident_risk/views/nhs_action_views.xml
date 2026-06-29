@@ -40,7 +40,9 @@
                     <group string="Source">
                         <field name="incident_id"/>
                         <field name="investigation_id"/>
-                        <field name="risk_id"/>
+                        <field name="incident_risk_count" invisible="1"/>
+                        <field name="risk_id"
+                               invisible="not incident_id or incident_risk_count == 0"/>
                     </group>
                     <group string="Description">
                         <field name="description" nolabel="1" colspan="2"/>

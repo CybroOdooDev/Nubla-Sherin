@@ -19,6 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
+from . import nhs_provider_type
 from . import nhs_holiday
 from . import nhs_terminology
 from . import nhs_location

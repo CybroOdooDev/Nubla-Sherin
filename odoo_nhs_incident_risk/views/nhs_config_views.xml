@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <list string="Incident Categories">
                 <field name="complete_name"/>
-                <field name="provider_types"/>
+                <field name="provider_type_ids" widget="many2many_tags"/>
                 <field name="default_response_level"/>
                 <field name="riddor_hint"/>
                 <field name="active"/>
@@ -24,7 +24,7 @@
                         <group>
                             <field name="name"/>
                             <field name="parent_id"/>
-                            <field name="provider_types"/>
+                            <field name="provider_type_ids" widget="many2many_tags"/>
                         </group>
                         <group>
                             <field name="default_response_level"/>
@@ -33,9 +33,8 @@
                             <field name="active"/>
                         </group>
                     </group>
-                    <group string="CQC Notification Types">
-                        <field name="cqc_notification_type_ids" widget="many2many_tags" nolabel="1"/>
-                    </group>
+                    <separator string="CQC Notification Types"/>
+                    <field name="cqc_notification_type_ids" widget="many2many_tags" nolabel="1"/>
                 </sheet>
             </form>
         </field>
@@ -80,6 +79,7 @@
                 <field name="category_id"/>
                 <field name="min_harm_grade"/>
                 <field name="require_cqc"/>
+                <field name="cqc_notification_type_id" invisible="not require_cqc" required="require_cqc"/>
                 <field name="require_lfpse"/>
                 <field name="suggest_riddor"/>
                 <field name="require_safeguarding"/>
@@ -151,6 +151,15 @@
         <field name="view_mode">list,form</field>
     </record>
 
+    <!-- ══ SETTINGS ACTION ──────────────────────────────────────── -->
+    <record id="action_nhs_incident_risk_settings" model="ir.actions.act_window">
+        <field name="name">Incident &amp; Risk Management Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'module': 'odoo_nhs_incident_risk'}</field>
+    </record>
+
     <!-- ══ SETTINGS ─────────────────────────────────────────────── -->
     <record id="view_res_config_settings_nhs" model="ir.ui.view">
         <field name="name">res.config.settings.nhs</field>
@@ -158,7 +167,7 @@
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
-                <app string="Quality &amp; Safety" name="odoo_nhs_incident_risk"
+                <app string="Incident &amp; Risk Management" name="odoo_nhs_incident_risk"
                      groups="odoo_nhs_incident_risk.group_hc_quality_lead">
                     <block title="Provider Configuration">
                         <setting string="Provider Type">
@@ -182,7 +191,12 @@
                         <setting string="Public Form Token" help="Share this URL with staff for incident reporting.">
                             <field name="public_form_token" readonly="1"/>
                             <button name="action_regenerate_token" string="Regenerate Token"
-                                    type="object" class="btn-secondary btn-sm"/>
+                                    type="object" class="btn-primary btn-sm"/>
+                        </setting>
+                        <setting string="Open Public Form" help="Open the public incident reporting form in a new browser tab.">
+                            <button name="action_open_public_form" string="Open Public Form"
+                                    type="object" class="btn-primary btn-sm"
+                                    invisible="not public_form_enabled"/>
                         </setting>
                     </block>
                 </app>

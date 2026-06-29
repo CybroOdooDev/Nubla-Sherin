@@ -20,7 +20,6 @@
 #
 #############################################################################
 from datetime import timedelta
-
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
@@ -33,7 +32,7 @@ class NhsIncident(models.Model):
     _name = 'nhs.incident'
     _description = 'NHS Incident / Patient Safety Event'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _order = 'occurred_at desc, id desc'
+    _order = 'id desc'
     _rec_name = 'name'
 
     # ── Identification ───────────────────────────────────────────────
@@ -180,6 +179,7 @@ class NhsIncident(models.Model):
     doc_id = fields.Many2one('nhs.duty.of.candour', string='Duty of Candour',
                              copy=False,
                              help='The Duty of Candour record auto-created when harm grade reaches the configured threshold.')
+    doc_state = fields.Selection(related='doc_id.state', string='DoC Status', readonly=True)
     riddor_id = fields.Many2one('nhs.riddor', string='RIDDOR', copy=False,
                                 help='The RIDDOR determination record for this incident, if applicable.')
     cqc_notification_ids = fields.One2many('nhs.cqc.notification', 'incident_id',
@@ -214,14 +214,17 @@ class NhsIncident(models.Model):
                                help='Number of CQC statutory notifications linked to this incident.')
     risk_count = fields.Integer(compute='_compute_counts',
                                 help='Number of risk register entries associated with this incident.')
+    investigation_count = fields.Integer(compute='_compute_counts',
+                                         help='1 if a linked investigation exists, 0 otherwise.')
 
-    @api.depends('person_ids', 'action_ids', 'cqc_notification_ids', 'risk_ids')
+    @api.depends('person_ids', 'action_ids', 'cqc_notification_ids', 'risk_ids', 'investigation_id')
     def _compute_counts(self):
         for rec in self:
             rec.person_count = len(rec.person_ids)
             rec.action_count = len(rec.action_ids)
             rec.cqc_count = len(rec.cqc_notification_ids)
             rec.risk_count = len(rec.risk_ids)
+            rec.investigation_count = 1 if rec.investigation_id else 0
 
     @api.model
     def _read_group_state(self, stages, domain, order=None, **kwargs):
@@ -508,6 +511,26 @@ class NhsIncident(models.Model):
             'res_model': 'nhs.risk',
             'view_mode': 'list,form',
             'domain': [('incident_ids', 'in', [self.id])],
+        }
+
+    def action_open_investigation(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Investigation',
+            'res_model': 'nhs.investigation',
+            'view_mode': 'form',
+            'res_id': self.investigation_id.id,
+        }
+
+    def action_open_doc(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Duty of Candour',
+            'res_model': 'nhs.duty.of.candour',
+            'view_mode': 'form',
+            'res_id': self.doc_id.id,
         }
 
     @api.model

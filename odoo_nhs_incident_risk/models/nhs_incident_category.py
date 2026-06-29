@@ -39,9 +39,12 @@ class NhsIncidentCategory(models.Model):
     complete_name = fields.Char(string='Complete Name', compute='_compute_complete_name',
                                 store=True, recursive=True,
                                 help='Auto-computed full path including the parent category name.')
-    provider_types = fields.Char(
+    provider_type_ids = fields.Many2many(
+        'nhs.provider.type',
+        'nhs_incident_category_provider_type_rel',
+        'category_id', 'provider_type_id',
         string='Provider Types',
-        help='Comma-separated provider_type keys. Leave empty for all types.')
+        help='Provider types this category applies to. Leave empty = universal (all types).')
     default_response_level = fields.Selection([
         ('none', 'No separate response'),
         ('swarm', 'SWARM Huddle'),
@@ -64,8 +67,7 @@ class NhsIncidentCategory(models.Model):
                                  help='Auto-surface the RIDDOR wizard for incidents in this category.')
     cqc_notification_type_ids = fields.Many2many(
         'nhs.cqc.notification.type',
-        string='CQC Notification Types',
-        help='CQC notification types that should be created automatically for incidents in this category.')
+        string='CQC Notification Types')
     active = fields.Boolean(default=True,
                             help='Untick to archive this category. Archived categories are hidden from '
                                  'incident forms but can be restored.')
