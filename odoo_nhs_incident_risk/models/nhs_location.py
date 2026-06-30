@@ -54,6 +54,7 @@ class NhsLocation(models.Model):
                                  default=lambda self: self.env.company,
                                  help='The organisation this location belongs to.')
     default_handler_id = fields.Many2one('res.users', string='Default Handler',
+                                         default=lambda self: self.env.company.default_handler_id,
                                          help='The staff member automatically assigned as handler for new incidents '
                                               'reported at this location, if no location-specific handler is overridden.')
     active = fields.Boolean(default=True,

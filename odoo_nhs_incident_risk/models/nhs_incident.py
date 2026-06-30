@@ -155,6 +155,7 @@ class NhsIncident(models.Model):
        group_expand='_read_group_state',
        help='The current workflow stage of this incident.')
     handler_id = fields.Many2one('res.users', string='Handler', tracking=True,
+                                 default=lambda self: self.env.company.default_handler_id,
                                  help='The member of staff responsible for managing this incident through to closure.')
     rejection_reason = fields.Text(string='Rejection Reason',
                                    help='Explanation of why this incident report was rejected (e.g. duplicate, out of scope).')
@@ -295,9 +296,11 @@ class NhsIncident(models.Model):
         for rec in records:
             rec._apply_harm_rules()
             self.env['nhs.notification.rule'].evaluate(rec)
-            if not rec.handler_id and rec.location_id.default_handler_id:
-                rec.with_context(nhs_workflow=True).write(
-                    {'handler_id': rec.location_id.default_handler_id.id})
+            if not rec.handler_id:
+                handler = rec.location_id.default_handler_id or rec.company_id.default_handler_id
+                if handler:
+                    rec.with_context(nhs_workflow=True).write(
+                        {'handler_id': handler.id})
         return records
 
     def write(self, vals):
@@ -359,6 +362,11 @@ class NhsIncident(models.Model):
                 self.response_level = self.category_id.default_response_level
             if self.category_id.default_harm_floor:
                 self.harm_grade = self.category_id.default_harm_floor
+
+    @api.onchange('location_id')
+    def _onchange_location_id(self):
+        if self.location_id:
+            self.handler_id = self.location_id.default_handler_id or self.company_id.default_handler_id
 
     # ── Workflow actions ─────────────────────────────────────────────
     def action_accept(self):

@@ -76,6 +76,9 @@ corrective actions, and a 5x5 risk register for NHS and healthcare organisations
             'odoo_nhs_incident_risk/static/src/js/risk_heatmap.js',
             'odoo_nhs_incident_risk/static/src/xml/risk_heatmap.xml',
         ],
+        'web.assets_backend_lazy': [
+            'odoo_nhs_incident_risk/static/src/js/risk_heatmap_pivot.js',
+        ],
     },
     'images': ['static/description/banner.jpg'],
     'application': True,
