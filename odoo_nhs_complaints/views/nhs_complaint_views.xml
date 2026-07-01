@@ -26,6 +26,7 @@
                 <filter name="filter_my_cases" string="My Cases" domain="[('handler_id','=',uid)]"/>
                 <separator/>
                 <filter name="filter_high_severity" string="High/Major" domain="[('severity','in',['high','major'])]"/>
+                <filter name="filter_multi_org" string="Multi-Organisation" domain="[('is_multi_org','=',True)]"/>
                 <group name="group_by">
                     <filter name="group_state" string="Status" context="{'group_by':'state'}"/>
                     <filter name="group_subject" string="Subject" context="{'group_by':'subject_id'}"/>
@@ -239,7 +240,7 @@
                             type="object" class="btn-primary"
                             invisible="record_type != 'pals' or state != 'in_progress'"/>
                     <button name="action_escalate_to_complaint" string="Escalate to Complaint"
-                            type="object" class="btn-warning"
+                            type="object" class="btn-primary"
                             invisible="record_type != 'pals' or state not in ['in_progress','resolved','re_opened']"/>
 
                     <!-- ── Formal complaint workflow buttons ── -->
@@ -249,28 +250,28 @@
                     <button name="action_start_investigation" string="Begin Investigation"
                             type="object" class="btn-primary"
                             invisible="record_type != 'complaint' or state != 'acknowledged'"/>
-                    <button name="action_submit_response_draft" string="Save Response Draft"
+                    <button name="action_open_response_wizard" string="Draft &amp; Sign Off Response"
                             type="object" class="btn-primary"
-                            invisible="state != 'investigation'"/>
+                            invisible="record_type != 'complaint' or state not in ['investigation', 'response_draft', 'awaiting_signoff']"/>
                     <button name="action_submit_for_signoff" string="Submit for Sign-off"
                             type="object" class="btn-primary"
                             invisible="state != 'response_draft'"/>
                     <button name="action_sign_off" string="Sign Off Response"
-                            type="object" class="btn-success"
+                            type="object" class="btn-primary"
                             invisible="state != 'awaiting_signoff' or signed_off_by_id"
                             groups="odoo_nhs_complaints.group_nhs_complaint_quality_lead"/>
                     <button name="action_send_response" string="Send Response"
-                            type="object" class="btn-success"
+                            type="object" class="btn-primary"
                             invisible="state != 'awaiting_signoff' or not signed_off_by_id"/>
                     <button name="action_close" string="Close"
                             type="object" class="btn-secondary"
                             invisible="state not in ['response_sent','resolved']"
                             groups="odoo_nhs_complaints.group_nhs_complaint_manager"/>
                     <button name="action_reopen" string="Re-open"
-                            type="object" class="btn-warning"
+                            type="object" class="btn-primary"
                             invisible="state != 'closed'"/>
                     <button name="action_escalate_phso" string="Escalate to PHSO"
-                            type="object" class="btn-danger"
+                            type="object" class="btn-primary"
                             invisible="record_type != 'complaint' or state not in ['response_sent','closed','re_opened'] or satisfaction_rating in ['satisfied','very_satisfied']"
                             groups="odoo_nhs_complaints.group_nhs_complaint_manager"/>
                     <button name="action_withdraw" string="Withdraw"
@@ -320,6 +321,11 @@
                                 invisible="not phso_id">
                             <span class="o_stat_text">PHSO</span>
                         </button>
+                        <button name="action_open_response_view_wizard" type="object"
+                                class="oe_stat_button" icon="fa-file-text-o"
+                                invisible="record_type != 'complaint' or not response_text">
+                            <span class="o_stat_text">Response</span>
+                        </button>
                     </div>
 
                     <div class="oe_title">
@@ -354,6 +360,41 @@
                         </group>
                     </group>
 
+                    <!-- Multi-Organisation alerts -->
+                    <div class="alert alert-info mb-2" role="alert"
+                         invisible="not is_multi_org or partner_org_ids">
+                        <strong>Multi-Organisation Complaint:</strong>
+                        A joint response is required from all NHS Trusts involved.
+                        Please add all partner NHS Trusts on the <em>Multi-Organisation</em> tab and agree a response timescale with each of them.
+                    </div>
+                    <div class="alert alert-warning mb-2" role="alert"
+                         invisible="not is_multi_org or not partner_org_ids or multi_org_deadline_agreed">
+                        <strong>Multi-Organisation Complaint:</strong>
+                        Partner organisations added. Please confirm the response timescale has been agreed with all parties before submitting for sign-off.
+                    </div>
+                    <div class="alert alert-success mb-2" role="alert"
+                         invisible="not is_multi_org or not partner_org_ids or not multi_org_deadline_agreed">
+                        <strong>Multi-Organisation Complaint:</strong>
+                        All partner organisations added and response timescale agreed.
+                    </div>
+
+                    <!-- Duty of Candour status alerts -->
+                    <div class="alert alert-warning mb-2" role="alert"
+                         invisible="not duty_of_candour_flag or doc_warning != 'no_incident'">
+                        <strong>Duty of Candour:</strong> No incident is linked to this complaint yet.
+                        Use the <em>Linked Incidents &amp; Risks</em> section on the <em>Investigation</em> tab to link a related incident and progress the Duty of Candour obligation.
+                    </div>
+                    <div class="alert alert-danger mb-2" role="alert"
+                         invisible="not duty_of_candour_flag or doc_warning != 'no_doc'">
+                        <strong>Duty of Candour:</strong> The linked incident has no Duty of Candour record.
+                        Open the incident to create one.
+                    </div>
+                    <div class="alert alert-success mb-2" role="alert"
+                         invisible="not duty_of_candour_flag or doc_warning != 'ok'">
+                        <strong>Duty of Candour record exists.</strong>
+                        <field name="doc_state_summary" readonly="1" nolabel="1" class="ms-1"/>
+                    </div>
+
                     <notebook>
                         <!-- Tab 1: Complainant & Consent -->
                         <page string="Complainant &amp; Consent">
@@ -361,42 +402,52 @@
                                  invisible="record_type != 'complaint' or complainant_name or is_anonymous">
                                 Fill in the complainant's details below. A contact record is created automatically when the complaint is acknowledged.
                             </div>
+
+                            <!-- Row 1: Person Making Complaint (left) | Patient (right) -->
                             <group>
                                 <group string="Person Making This Complaint" invisible="is_anonymous">
-                                    <field name="complainant_name"
-                                           placeholder="Full name"/>
+                                    <field name="complainant_name" placeholder="Full name"/>
                                     <field name="complainant_relationship"/>
-                                    <field name="complainant_email"
-                                           placeholder="email@example.com"/>
-                                    <field name="complainant_phone"
-                                           placeholder="+44 …"/>
+                                    <field name="complainant_email" placeholder="email@example.com"/>
+                                    <field name="complainant_phone" placeholder="+44 …"/>
                                 </group>
-                                <group>
-                                    <group string="Patient">
-                                        <field name="patient_name"/>
-                                        <field name="patient_deceased"/>
-                                        <field name="is_third_party"/>
-                                    </group>
-                                    <group string="Consent" invisible="not is_third_party">
-                                        <field name="consent_status"/>
-                                        <field name="consent_evidence_ref" invisible="consent_status == 'not_required'"/>
-                                    </group>
+                                <group string="Patient">
+                                    <field name="patient_name"/>
+                                    <field name="patient_deceased"/>
+                                    <field name="is_third_party"/>
                                 </group>
                             </group>
-                            <!-- Returning complainant: link existing record (auto-fills fields above) -->
+
+                            <!-- Row 2: Consent — shown only when third-party -->
+                            <group string="Consent" invisible="not is_third_party">
+                                <group>
+                                    <field name="consent_status"/>
+                                    <field name="consent_evidence_ref"
+                                           invisible="consent_status == 'not_required'"/>
+                                </group>
+                                <group/>
+                            </group>
+
+                            <!-- Row 3: Returning complainant -->
                             <group string="Returning Complainant" invisible="is_anonymous">
                                 <field name="complainant_id"
                                        string="Link Existing Record (optional)"
                                        options="{'no_quick_create': True}"
                                        placeholder="Search by name to pre-fill details…"/>
                             </group>
-                            <group string="PALS Info" invisible="record_type != 'pals'">
-                                <field name="pals_origin_ref" readonly="1" invisible="not pals_origin_ref"/>
-                                <field name="deescalated"/>
-                            </group>
-                            <group string="Complaint Info" invisible="record_type != 'complaint'">
-                                <field name="pals_origin_ref" readonly="1" invisible="not pals_origin_ref"/>
-                                <field name="reopened_count" readonly="1"/>
+
+                            <!-- Row 4: PALS / Complaint metadata -->
+                            <group>
+                                <group string="PALS Info" invisible="record_type != 'pals'">
+                                    <field name="pals_origin_ref" readonly="1"
+                                           invisible="not pals_origin_ref"/>
+                                    <field name="deescalated"/>
+                                </group>
+                                <group string="Complaint Info" invisible="record_type != 'complaint'">
+                                    <field name="pals_origin_ref" readonly="1"
+                                           invisible="not pals_origin_ref"/>
+                                    <field name="reopened_count" readonly="1"/>
+                                </group>
                             </group>
                         </page>
 
@@ -427,8 +478,8 @@
                               invisible="record_type != 'complaint' or state not in ['investigation','response_draft','awaiting_signoff','response_sent','closed','re_opened','phso','withdrawn']">
                             <group string="Investigation Record">
                                 <field name="investigation_id"
-                                       context="{'default_complaint_id': id}"
-                                       options="{'no_quick_create': True}"/>
+                                       readonly="1"
+                                       widget="many2one_clickable"/>
                             </group>
                             <group string="Linked Incidents &amp; Risks">
                                 <group>
@@ -449,24 +500,7 @@
                             </div>
                         </page>
 
-                        <!-- Tab 5: Response — Formal only, from Investigation onwards -->
-                        <page string="Response"
-                              invisible="record_type != 'complaint' or state not in ['investigation','response_draft','awaiting_signoff','response_sent','closed','re_opened','phso','withdrawn']">
-                            <group>
-                                <group>
-                                    <field name="signed_off_by_id" readonly="1"/>
-                                    <field name="signed_off_at" readonly="1"/>
-                                </group>
-                                <group>
-                                    <field name="response_sent_at" readonly="1"/>
-                                    <field name="response_method"/>
-                                </group>
-                            </group>
-                            <field name="response_text" nolabel="1"
-                                   placeholder="Draft your formal written response here…"/>
-                        </page>
-
-                        <!-- Tab 6: Correspondence -->
+                        <!-- Tab 5: Correspondence -->
                         <page string="Correspondence">
                             <field name="correspondence_ids">
                                 <list>
@@ -496,7 +530,7 @@
                         <!-- Tab 7: Actions — PALS: always; Formal: from Investigation onwards -->
                         <page string="Actions"
                               invisible="record_type == 'complaint' and state not in ['investigation','response_draft','awaiting_signoff','response_sent','closed','re_opened','phso','withdrawn']">
-                            <field name="action_ids" context="{'default_complaint_id': id}">
+                            <field name="action_ids" context="{'default_complaint_id': id}" readonly="state in ['closed', 'withdrawn', 'resolved', 'escalated']">
                                 <list decoration-danger="due_date and due_date &lt; context_today() and state not in ('done','cancelled')"
                                       decoration-success="state == 'done'"
                                       decoration-muted="state == 'cancelled'">
@@ -520,7 +554,7 @@
                                                 type="object" class="btn-primary"
                                                 invisible="state != 'in_progress'"/>
                                         <button name="action_verify" string="Verify &amp; Close"
-                                                type="object" class="btn-success"
+                                                type="object" class="btn-primary"
                                                 groups="odoo_nhs_incident_risk.group_hc_quality_lead"
                                                 invisible="state != 'evidence_review'"/>
                                         <button name="action_cancel" string="Cancel"
@@ -564,6 +598,62 @@
                                     </group>
                                 </form>
                             </field>
+                        </page>
+
+                        <!-- Tab: Multi-Organisation — visible only when is_multi_org is ticked -->
+                        <page string="Multi-Organisation"
+                              invisible="not is_multi_org">
+                            <group>
+                                <group string="Coordination">
+                                    <field name="lead_org_id"
+                                           placeholder="Select the lead NHS body coordinating the response…"/>
+                                    <field name="multi_org_deadline_agreed"/>
+                                    <field name="all_orgs_responded" readonly="1"/>
+                                </group>
+                                <group string="Partner NHS Trusts">
+                                    <field name="partner_org_ids"
+                                           nolabel="1"
+                                           widget="many2many_tags"
+                                           placeholder="Search and add NHS Trusts involved in this complaint…"/>
+                                </group>
+                            </group>
+
+                            <separator string="Joint Response Contributions"/>
+                            <field name="org_response_ids" nolabel="1">
+                                <list editable="bottom"
+                                      decoration-success="state == 'submitted'"
+                                      decoration-warning="state == 'pending'">
+                                    <field name="org_id" string="NHS Trust"
+                                           readonly="state == 'submitted'"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'submitted'"
+                                           decoration-warning="state == 'pending'"/>
+                                    <field name="response_text" string="Response Contribution"
+                                           optional="show"/>
+                                    <field name="submitted_at" readonly="1" optional="show"/>
+                                    <field name="submitted_by_id" readonly="1" optional="show"/>
+                                    <button name="action_submit" type="object"
+                                            string="Submit Contribution"
+                                            class="btn-primary btn-sm"
+                                            invisible="state == 'submitted'"/>
+                                    <button name="action_reset_to_pending" type="object"
+                                            string="Reset"
+                                            class="btn-secondary btn-sm"
+                                            invisible="state == 'pending'"/>
+                                </list>
+                            </field>
+
+                            <div class="alert alert-info mt-2" role="alert"
+                                 invisible="all_orgs_responded">
+                                <strong>Joint Response Required:</strong>
+                                Each partner organisation must enter their response contribution and click
+                                <em>Submit Contribution</em> before this complaint can be submitted for sign-off.
+                            </div>
+                            <div class="alert alert-success mt-2" role="alert"
+                                 invisible="not all_orgs_responded">
+                                <strong>All organisations have submitted their contributions.</strong>
+                                The joint response is ready for sign-off.
+                            </div>
                         </page>
 
                         <!-- Tab 8: Closure — PALS: from Resolved; Formal: from Response Sent -->
@@ -631,6 +721,7 @@
         <field name="res_model">nhs.complaint</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('handler_id','=',uid)]</field>
+        <field name="context">{'default_handler_id': uid}</field>
         <field name="search_view_id" ref="view_nhs_complaint_search"/>
     </record>
 

@@ -9,8 +9,10 @@
                     <field name="complaint_id" readonly="1"/>
                     <field name="action" widget="radio"/>
                 </group>
+
+                <!-- Link existing incidents -->
                 <group string="Select Incidents to Link" invisible="action != 'link'">
-                    <field name="incident_ids" nolabel="1" widget="many2many">
+                    <field name="incident_ids" nolabel="1" widget="many2many" colspan="2">
                         <list>
                             <field name="name"/>
                             <field name="incident_kind"/>
@@ -19,11 +21,20 @@
                         </list>
                     </field>
                 </group>
+
+                <!-- Create new incident -->
                 <group string="New Incident Details" invisible="action != 'create'">
-                    <field name="new_incident_occurred_at"/>
-                    <field name="new_incident_description" nolabel="1"
-                           placeholder="Incident description (pre-filled from complaint)…"/>
+                    <group>
+                        <field name="new_incident_occurred_at"/>
+                        <field name="new_incident_location_id"/>
+                        <field name="new_incident_category_id"/>
+                    </group>
+                    <group>
+                        <field name="new_incident_description" nolabel="1" colspan="2"
+                               placeholder="What happened? (pre-filled from complaint narrative — do not include full patient names)"/>
+                    </group>
                 </group>
+
                 <footer>
                     <button name="action_confirm" string="Confirm" type="object" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>

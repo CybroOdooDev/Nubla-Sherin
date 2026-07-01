@@ -11,6 +11,7 @@
                 <field name="phso_reference"/>
                 <field name="outcome"/>
                 <field name="referred_at"/>
+                <field name="outcome_color"/>
                 <templates>
                     <t t-name="card">
                         <div class="d-flex" style="min-height:90px;">
@@ -44,12 +45,10 @@
                                     <i class="fa fa-calendar-o" style="width:13px;"/>
                                     <span>Referred: <field name="referred_at"/></span>
                                 </div>
-                                <!-- Row 4: Outcome badge (only when set) -->
+                                <!-- Row 4: Outcome badge using configurable colour -->
                                 <div invisible="not outcome">
-                                    <span t-attf-class="badge #{
-                                        record.outcome.value == 'upheld'        ? 'text-bg-danger' :
-                                        record.outcome.value == 'partly_upheld' ? 'text-bg-warning' : 'text-bg-success'
-                                    }" style="font-size:0.75rem;">
+                                    <span t-attf-class="badge text-bg-#{record.outcome_color.raw_value or 'secondary'}"
+                                          style="font-size:0.75rem;">
                                         <field name="outcome"/>
                                     </span>
                                 </div>
@@ -76,6 +75,7 @@
                        decoration-success="state=='decision_made'"
                        decoration-muted="state=='closed'"/>
                 <field name="outcome"/>
+                <field name="outcome_color" column_invisible="True"/>
             </list>
         </field>
     </record>
@@ -90,9 +90,9 @@
                     <button name="action_mark_under_review" string="Mark Under Review" type="object"
                             class="btn-primary" invisible="state != 'referred'"/>
                     <button name="action_record_decision" string="Record Decision" type="object"
-                            class="btn-warning" invisible="state != 'under_review'"/>
+                            class="btn-primary" invisible="state != 'under_review'"/>
                     <button name="action_close" string="Close" type="object"
-                            class="btn-success" invisible="state != 'decision_made'"/>
+                            class="btn-primary" invisible="state != 'decision_made'"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="referred,under_review,decision_made,closed"/>
                 </header>
@@ -104,17 +104,17 @@
                             <field name="referred_at"/>
                         </group>
                         <group>
-                            <field name="outcome"/>
-                            <field name="compensation_recommended" widget="monetary"/>
+                            <field name="outcome" invisible="state in ('referred', 'under_review')" readonly="state == 'closed'"/>
+                            <field name="compensation_recommended" widget="monetary" invisible="state in ('referred', 'under_review')" readonly="state == 'closed'"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
                     </group>
-                    <group string="PHSO Recommendations">
+                    <group string="PHSO Recommendations" invisible="state in ('referred', 'under_review')">
                         <field name="recommendations" colspan="2" nolabel="1"
-                               placeholder="Recommendations issued by the PHSO…"/>
+                               placeholder="Recommendations issued by the PHSO…" readonly="state == 'closed'"/>
                     </group>
-                    <separator string="Actions from Recommendations"/>
-                    <field name="action_ids" nolabel="1">
+                    <separator string="Actions from Recommendations" invisible="state in ('referred', 'under_review')"/>
+                    <field name="action_ids" nolabel="1" readonly="state != 'decision_made'" context="{'default_complaint_id': complaint_id, 'default_phso_id': id}" invisible="state in ('referred', 'under_review')">
                         <list>
                             <field name="name" string="Action Title"/>
                             <field name="owner_id" string="Owner"/>

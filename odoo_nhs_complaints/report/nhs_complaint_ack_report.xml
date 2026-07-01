@@ -7,8 +7,6 @@
         <field name="report_name">odoo_nhs_complaints.report_nhs_complaint_ack</field>
         <field name="report_file">odoo_nhs_complaints.report_nhs_complaint_ack</field>
         <field name="print_report_name">'Acknowledgement_' + object.name</field>
-        <field name="binding_model_id" ref="model_nhs_complaint"/>
-        <field name="binding_type">report</field>
     </record>
 
     <template id="report_nhs_complaint_ack">

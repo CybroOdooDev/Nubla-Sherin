@@ -9,19 +9,39 @@
 #    You can modify it under the terms of the GNU LESSER
 #    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
 #
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
 #############################################################################
 import base64
 import csv
 import io
 from collections import defaultdict
 
-from odoo import fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
 class NhsKo41aExportWizard(models.TransientModel):
     _name = 'nhs.ko41a.export.wizard'
     _description = 'KO41a Annual Return Export Wizard'
+
+    financial_year = fields.Selection([
+        ('2021-22', '2021/22  (Apr 2021 – Mar 2022)'),
+        ('2022-23', '2022/23  (Apr 2022 – Mar 2023)'),
+        ('2023-24', '2023/24  (Apr 2023 – Mar 2024)'),
+        ('2024-25', '2024/25  (Apr 2024 – Mar 2025)'),
+        ('2025-26', '2025/26  (Apr 2025 – Mar 2026)'),
+        ('2026-27', '2026/27  (Apr 2026 – Mar 2027)'),
+        ('2027-28', '2027/28  (Apr 2027 – Mar 2028)'),
+    ], string='Financial Year',
+       help='Select a financial year to auto-fill the date range, or enter dates manually.')
 
     date_from = fields.Date(string='From Date', required=True,
                             help='Financial year start (typically 1 April).')
@@ -30,7 +50,7 @@ class NhsKo41aExportWizard(models.TransientModel):
     company_id = fields.Many2one('res.company', string='Organisation',
                                  default=lambda self: self.env.company, required=True)
     include_pals = fields.Boolean(string='Include PALS Concerns',
-                                  help='Include informal PALS concerns in the export (separate from formal complaints).')
+                                  help='Include informal PALS concerns alongside formal complaints in the export.')
 
     # Result fields
     summary_html = fields.Html(string='Summary', readonly=True)
@@ -42,18 +62,27 @@ class NhsKo41aExportWizard(models.TransientModel):
         ('done', 'Ready to Download'),
     ], default='draft')
 
+    @api.onchange('financial_year')
+    def _onchange_financial_year(self):
+        if self.financial_year:
+            start_year = int(self.financial_year.split('-')[0])
+            self.date_from = fields.Date.from_string(f'{start_year}-04-01')
+            self.date_to = fields.Date.from_string(f'{start_year + 1}-03-31')
+
     def action_generate(self):
         self.ensure_one()
+        record_types = ['complaint', 'pals'] if self.include_pals else ['complaint']
         domain = [
             ('company_id', '=', self.company_id.id),
-            ('record_type', '=', 'complaint'),
+            ('record_type', 'in', record_types),
             ('received_at', '>=', fields.Datetime.from_string(str(self.date_from))),
             ('received_at', '<=', fields.Datetime.from_string(str(self.date_to) + ' 23:59:59')),
         ]
         complaints = self.env['nhs.complaint'].search(domain)
 
+        record_label = 'complaints/PALS concerns' if self.include_pals else 'formal complaints'
         if not complaints:
-            raise UserError('No formal complaints found for the selected date range and organisation.')
+            raise UserError(f'No {record_label} found for the selected date range and organisation.')
 
         aggregated = defaultdict(lambda: {'count': 0, 'complaints': []})
         unmapped = []
@@ -82,6 +111,7 @@ class NhsKo41aExportWizard(models.TransientModel):
 
         # Build summary HTML
         total = len(complaints)
+        total_label = 'Total records (complaints + PALS)' if self.include_pals else 'Total formal complaints received'
         cell_style = 'padding: 6px 10px; border: 1px solid #dee2e6; vertical-align: top; word-break: break-word;'
         rows_html = ''.join(
             f'<tr>'
@@ -101,7 +131,7 @@ class NhsKo41aExportWizard(models.TransientModel):
         summary = f"""
         <h4 style="font-size:18px; font-weight:700; color:#212529; margin:0 0 12px 0; padding:0; line-height:1.3;">KO41a Return Summary</h4>
         <p style="margin:4px 0;"><strong>Period:</strong> {self.date_from} to {self.date_to}</p>
-        <p style="margin:4px 0 12px 0;"><strong>Total formal complaints received:</strong> {total}</p>
+        <p style="margin:4px 0 12px 0;"><strong>{total_label}:</strong> {total}</p>
         {warning_html}
         <table style="width:100%; border-collapse:collapse; table-layout:fixed; margin-top:8px;">
             <colgroup>

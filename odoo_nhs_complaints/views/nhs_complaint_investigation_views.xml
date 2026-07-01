@@ -28,7 +28,7 @@
                     <button name="action_start" string="Start Investigation" type="object"
                             class="btn-primary" invisible="state != 'draft'"/>
                     <button name="action_complete" string="Mark Complete" type="object"
-                            class="btn-success" invisible="state != 'in_progress'"/>
+                            class="btn-primary" invisible="state != 'in_progress'"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,in_progress,complete"/>
                 </header>
@@ -60,7 +60,7 @@
                             <field name="lessons_learned" nolabel="1" placeholder="Learning identified — feeds corrective actions and board pack…"/>
                         </page>
                         <page string="Actions">
-                            <field name="action_ids">
+                            <field name="action_ids" readonly="state == 'complete'" context="{'default_complaint_id': complaint_id}">
                                 <list>
                                     <field name="name"/>
                                     <field name="owner_id"/>

@@ -7,8 +7,6 @@
         <field name="report_name">odoo_nhs_complaints.report_nhs_complaint_response</field>
         <field name="report_file">odoo_nhs_complaints.report_nhs_complaint_response</field>
         <field name="print_report_name">'Response_' + object.name</field>
-        <field name="binding_model_id" ref="model_nhs_complaint"/>
-        <field name="binding_type">report</field>
     </record>
 
     <template id="report_nhs_complaint_response">
@@ -27,6 +25,10 @@
                         <t t-if="o.investigation_id and o.investigation_id.points_of_complaint">
                             <h4>Points raised</h4>
                             <p style="white-space: pre-wrap;"><span t-esc="o.investigation_id.points_of_complaint"/></p>
+                        </t>
+                        <t t-if="o.investigation_id and o.investigation_id.findings">
+                            <h4>Investigation findings</h4>
+                            <p style="white-space: pre-wrap;"><span t-esc="o.investigation_id.findings"/></p>
                         </t>
                         <h4>Our response</h4>
                         <div t-out="o.response_text or ''"/>

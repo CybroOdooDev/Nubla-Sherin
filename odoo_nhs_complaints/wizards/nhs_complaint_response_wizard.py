@@ -9,6 +9,15 @@
 #    You can modify it under the terms of the GNU LESSER
 #    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
 #
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
 #############################################################################
 from odoo import api, fields, models
 from odoo.exceptions import UserError
@@ -19,7 +28,7 @@ class NhsComplaintResponseWizard(models.TransientModel):
     _description = 'Complaint Response Generation and Sign-off Wizard'
 
     complaint_id = fields.Many2one('nhs.complaint', string='Complaint', required=True)
-    response_text = fields.Html(string='Response Letter Body', required=True)
+    response_text = fields.Html(string='Response Letter Body')
     sign_off_now = fields.Boolean(string='Sign Off Immediately',
                                   help='Tick to sign off the response in this step (quality lead only).')
     send_immediately = fields.Boolean(string='Send Response Immediately After Sign-off',
@@ -28,34 +37,72 @@ class NhsComplaintResponseWizard(models.TransientModel):
         ('letter', 'Letter'), ('email', 'Email'),
     ], string='Send Method', default='email')
 
+    points_of_complaint = fields.Text(
+        string='Points of Complaint',
+        related='complaint_id.investigation_id.points_of_complaint',
+        readonly=True,
+    )
+    findings = fields.Text(
+        string='Investigation Findings',
+        related='complaint_id.investigation_id.findings',
+        readonly=True,
+    )
+
     @api.onchange('complaint_id')
     def _onchange_complaint_id(self):
         if self.complaint_id:
             self.response_text = self.complaint_id.response_text or ''
 
+    def _check_response_text(self):
+        """Raise if the response letter body is blank (handles empty HTML like <p><br></p>)."""
+        import re
+        text = self.response_text or ''
+        if not re.sub(r'<[^>]+>', '', text).strip():
+            raise UserError('Please enter a response letter before proceeding.')
+
+    def action_save_draft(self):
+        self.ensure_one()
+        self._check_response_text()
+        self.complaint_id.with_context(nhs_workflow=True).write({
+            'response_text': self.response_text,
+            'state': 'response_draft',
+        })
+        return {'type': 'ir.actions.act_window_close'}
+
+    def action_preview(self):
+        self.ensure_one()
+        self._check_response_text()
+        self.complaint_id.with_context(nhs_workflow=True).write({
+            'response_text': self.response_text,
+        })
+        return self.env.ref('odoo_nhs_complaints.action_report_nhs_complaint_response').report_action(self.complaint_id)
+
     def action_submit_for_signoff(self):
         self.ensure_one()
+        self._check_response_text()
         complaint = self.complaint_id
         if complaint.is_third_party and complaint.consent_status in ('pending', 'refused'):
             raise UserError('Cannot submit for sign-off: consent has not been obtained for this third-party complaint.')
+        
+        # Save response_text first
         complaint.with_context(nhs_workflow=True).write({
             'response_text': self.response_text,
-            'state': 'awaiting_signoff',
         })
+
         if self.sign_off_now:
             if not self.env.user.has_group('odoo_nhs_complaints.group_nhs_complaint_quality_lead'):
                 raise UserError('Only the Quality Lead or CEO delegate can sign off a response.')
-            complaint.with_context(nhs_workflow=True).write({
-                'signed_off_by_id': self.env.user.id,
-                'signed_off_at': fields.Datetime.now(),
-            })
+            
+            # Submit for sign-off (performs validation like multi-org response check)
+            complaint.action_submit_for_signoff()
+            
+            # Sign off
+            complaint.action_sign_off()
+            
             if self.send_immediately:
-                complaint.with_context(nhs_workflow=True).write({
-                    'state': 'response_sent',
-                    'response_sent_at': fields.Datetime.now(),
-                    'response_method': self.response_method,
-                })
-                template = self.env.ref('odoo_nhs_complaints.mail_template_complaint_response', raise_if_not_found=False)
-                if template:
-                    template.send_mail(complaint.id, force_send=False)
+                complaint.write({'response_method': self.response_method})
+                complaint.action_send_response()
+        else:
+            complaint.action_submit_for_signoff()
+            
         return {'type': 'ir.actions.act_window_close'}

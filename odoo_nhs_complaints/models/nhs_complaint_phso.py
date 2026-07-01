@@ -9,9 +9,18 @@
 #    You can modify it under the terms of the GNU LESSER
 #    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
 #
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
 #############################################################################
 from odoo import api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class NhsComplaintPhso(models.Model):
@@ -34,12 +43,20 @@ class NhsComplaintPhso(models.Model):
         ('decision_made', 'Decision Made'),
         ('closed', 'Closed'),
     ], string='PHSO Status', required=True, default='referred', tracking=True)
-    outcome = fields.Selection([
-        ('not_upheld', 'Not Upheld'),
-        ('partly_upheld', 'Partly Upheld'),
-        ('upheld', 'Upheld'),
-    ], string='Outcome', tracking=True,
-       help='The PHSO decision on the complaint.')
+    outcome = fields.Many2one(
+        'nhs.phso.outcome', string='Outcome', tracking=True,
+        help='The PHSO decision on the complaint. Configurable via Configuration → PHSO Outcomes.',
+    )
+    outcome_color = fields.Selection(
+        related='outcome.color', string='Outcome Colour',
+        selection=[
+            ('success', 'Green'),
+            ('warning', 'Orange'),
+            ('danger', 'Red'),
+            ('info', 'Blue'),
+            ('secondary', 'Grey'),
+        ],
+    )
     recommendations = fields.Text(string='PHSO Recommendations',
                                   help='Recommendations issued by the PHSO.')
     action_ids = fields.One2many('nhs.action', 'phso_id', string='Actions from Recommendations',
@@ -51,6 +68,13 @@ class NhsComplaintPhso(models.Model):
                                   default=lambda self: self.env.company.currency_id)
     company_id = fields.Many2one('res.company', string='Organisation',
                                  related='complaint_id.company_id', store=True)
+
+    @api.constrains('outcome', 'compensation_recommended', 'recommendations', 'state')
+    def _check_outcome_details_allowed(self):
+        for rec in self:
+            if rec.state in ('referred', 'under_review'):
+                if rec.outcome or rec.compensation_recommended or rec.recommendations:
+                    raise ValidationError('Outcome, compensation, and recommendations can only be set once a decision is made.')
 
     def unlink(self):
         raise UserError(

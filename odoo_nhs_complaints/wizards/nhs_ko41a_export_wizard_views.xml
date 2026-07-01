@@ -7,7 +7,9 @@
             <form string="KO41a Annual Return Export">
                 <!-- Configuration state -->
                 <group invisible="state != 'draft'">
-                    <group string="Date Range">
+                    <group string="Financial Year">
+                        <field name="financial_year"
+                               placeholder="Select to auto-fill dates…"/>
                         <field name="date_from"/>
                         <field name="date_to"/>
                     </group>

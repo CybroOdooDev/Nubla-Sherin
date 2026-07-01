@@ -9,6 +9,15 @@
 #    You can modify it under the terms of the GNU LESSER
 #    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
 #
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
 #############################################################################
 from datetime import timedelta
 
@@ -108,6 +117,29 @@ class NhsComplaint(models.Model):
        help='Drives the suggested response timescale and prioritisation.')
     is_multi_org = fields.Boolean(string='Multi-Organisation Complaint',
                                   help='Complaint spans more than one NHS provider (joint response required).')
+    partner_org_ids = fields.Many2many(
+        'nhs.trust',
+        'nhs_complaint_trust_rel', 'complaint_id', 'trust_id',
+        string='Partner NHS Trusts',
+        help='Other NHS Trusts involved in this complaint. Each must contribute to the joint response.',
+    )
+    lead_org_id = fields.Many2one(
+        'nhs.trust', string='Lead Organisation',
+        help='The NHS Trust responsible for coordinating the joint response.',
+    )
+    multi_org_deadline_agreed = fields.Boolean(
+        string='Timescale Agreed with All Organisations',
+        help='Confirms the response deadline has been agreed with all partner organisations.',
+    )
+    org_response_ids = fields.One2many(
+        'nhs.complaint.org.response', 'complaint_id',
+        string='Organisation Response Contributions',
+    )
+    all_orgs_responded = fields.Boolean(
+        string='All Organisations Responded',
+        compute='_compute_all_orgs_responded', store=True,
+        help='True when every partner organisation has submitted their response contribution.',
+    )
     linked_incident_ids = fields.Many2many(
         'nhs.incident',
         'nhs_complaint_incident_rel', 'complaint_id', 'incident_id',
@@ -201,6 +233,14 @@ class NhsComplaint(models.Model):
     correspondence_count = fields.Integer(compute='_compute_correspondence_count', string='Correspondence')
     action_count = fields.Integer(compute='_compute_action_count', string='Actions')
 
+    # ── Duty of Candour link status ───────────────────────────────────
+    doc_warning = fields.Selection([
+        ('no_incident', 'No Incident Linked'),
+        ('no_doc', 'No DoC Record on Incident'),
+        ('ok', 'DoC Record Exists'),
+    ], compute='_compute_doc_warning', string='DoC Warning')
+    doc_state_summary = fields.Char(compute='_compute_doc_warning', string='DoC Status')
+
     # ── Computed helpers ──────────────────────────────────────────────
     @api.depends('event_date', 'received_at')
     def _compute_within_time_limit(self):
@@ -269,6 +309,31 @@ class NhsComplaint(models.Model):
         ])
         return {h.date for h in holiday_records}
 
+    @api.depends(
+        'duty_of_candour_flag', 'linked_incident_ids',
+        'linked_incident_ids.doc_id', 'linked_incident_ids.doc_state',
+    )
+    def _compute_doc_warning(self):
+        state_labels = {'open': 'Open', 'overdue': 'Overdue', 'complete': 'Complete'}
+        for rec in self:
+            if not rec.duty_of_candour_flag:
+                rec.doc_warning = False
+                rec.doc_state_summary = False
+                continue
+            if not rec.linked_incident_ids:
+                rec.doc_warning = 'no_incident'
+                rec.doc_state_summary = False
+                continue
+            doc_incident = rec.linked_incident_ids.filtered(lambda i: i.doc_id)
+            if not doc_incident:
+                rec.doc_warning = 'no_doc'
+                rec.doc_state_summary = False
+            else:
+                inc = doc_incident[0]
+                label = state_labels.get(inc.doc_state, inc.doc_state or 'Unknown')
+                rec.doc_warning = 'ok'
+                rec.doc_state_summary = f"{inc.name} — {label}"
+
     @api.depends('linked_incident_ids')
     def _compute_incident_count(self):
         for rec in self:
@@ -289,6 +354,31 @@ class NhsComplaint(models.Model):
         for rec in self:
             rec.action_count = len(rec.action_ids)
 
+    @api.depends('org_response_ids', 'org_response_ids.state', 'is_multi_org')
+    def _compute_all_orgs_responded(self):
+        for rec in self:
+            if not rec.is_multi_org or not rec.org_response_ids:
+                rec.all_orgs_responded = False
+            else:
+                rec.all_orgs_responded = all(
+                    r.state == 'submitted' for r in rec.org_response_ids
+                )
+
+    def _sync_org_responses(self):
+        """Create/remove org response lines to mirror partner_org_ids."""
+        existing = {r.org_id.id: r for r in self.org_response_ids}
+        current_ids = set(self.partner_org_ids.ids)
+        existing_ids = set(existing.keys())
+        for pid in current_ids - existing_ids:
+            self.env['nhs.complaint.org.response'].create({
+                'complaint_id': self.id,
+                'org_id': pid,
+            })
+        for pid in existing_ids - current_ids:
+            rec = existing[pid]
+            if rec.state == 'pending':
+                rec.unlink()
+
     # ── Lifecycle create ──────────────────────────────────────────────
     @api.model_create_multi
     def create(self, vals_list):
@@ -304,7 +394,19 @@ class NhsComplaint(models.Model):
                 rec.activity_schedule('mail.mail_activity_data_todo',
                                       user_id=rec.handler_id.id,
                                       note=f'New case assigned: {rec.name}')
+            if rec.is_multi_org and rec.partner_org_ids:
+                rec._sync_org_responses()
         return records
+
+    def write(self, vals):
+        if 'state' in vals and not self.env.context.get('nhs_workflow'):
+            raise UserError('Complaint status must be changed through the workflow action buttons.')
+        result = super().write(vals)
+        if 'partner_org_ids' in vals and not self.env.context.get('skip_org_sync'):
+            for rec in self:
+                if rec.is_multi_org:
+                    rec._sync_org_responses()
+        return result
 
     @api.onchange('complainant_id')
     def _onchange_complainant_populate(self):
@@ -313,6 +415,25 @@ class NhsComplaint(models.Model):
             self.complainant_email = self.complainant_id.email
             self.complainant_phone = self.complainant_id.phone
             self.complainant_relationship = self.complainant_id.relationship_to_patient
+
+    @api.onchange('is_multi_org')
+    def _onchange_is_multi_org(self):
+        if self.is_multi_org:
+            if not self.timescale_id:
+                preset = self.env.ref(
+                    'odoo_nhs_complaints.timescale_major_negotiated',
+                    raise_if_not_found=False,
+                )
+                if preset:
+                    self.timescale_id = preset
+            if not self.lead_org_id:
+                self.lead_org_id = self.env['nhs.trust'].search(
+                    [('company_id', '=', self.env.company.id)], limit=1
+                )
+        else:
+            self.partner_org_ids = [(5, 0, 0)]
+            self.lead_org_id = False
+            self.multi_org_deadline_agreed = False
 
     # ── Constraints ───────────────────────────────────────────────────
     @api.constrains('received_at')
@@ -330,12 +451,6 @@ class NhsComplaint(models.Model):
         for rec in self:
             if rec.is_third_party and rec.consent_status == 'not_required':
                 raise ValidationError("Please set a consent status when the complainant is acting on behalf of someone else.")
-
-    # ── State guard ───────────────────────────────────────────────────
-    def write(self, vals):
-        if 'state' in vals and not self.env.context.get('nhs_workflow'):
-            raise UserError('Complaint status must be changed through the workflow action buttons.')
-        return super().write(vals)
 
     def unlink(self):
         raise UserError(
@@ -395,7 +510,16 @@ class NhsComplaint(models.Model):
 
     def action_start_investigation(self):
         for rec in self:
-            rec.with_context(nhs_workflow=True).write({'state': 'investigation'})
+            vals = {'state': 'investigation'}
+            if not rec.investigation_id:
+                # Automatically create the investigation record
+                investigation = self.env['nhs.complaint.investigation'].create({
+                    'complaint_id': rec.id,
+                    'lead_investigator_id': rec.handler_id.id or self.env.user.id,
+                    'state': 'draft',
+                })
+                vals['investigation_id'] = investigation.id
+            rec.with_context(nhs_workflow=True).write(vals)
 
     def action_submit_response_draft(self):
         """Handler saves the drafted response text → moves to response_draft for review."""
@@ -411,6 +535,23 @@ class NhsComplaint(models.Model):
                 raise UserError('A draft response must be present before submitting for sign-off.')
             if rec.is_third_party and rec.consent_status in ('pending', 'refused'):
                 raise UserError('Cannot submit for sign-off: consent for this third-party complaint has not been obtained.')
+            if rec.is_multi_org and not rec.partner_org_ids:
+                raise UserError(
+                    'This is a Multi-Organisation Complaint. '
+                    'Please add at least one partner organisation on the "Multi-Organisation" tab before submitting for sign-off.'
+                )
+            if rec.is_multi_org and not rec.multi_org_deadline_agreed:
+                raise UserError(
+                    'Multi-Organisation Complaint: please confirm the response timescale has been agreed with all partner organisations before submitting for sign-off.'
+                )
+            if rec.is_multi_org and not rec.all_orgs_responded:
+                pending = rec.org_response_ids.filtered(lambda r: r.state == 'pending')
+                names = ', '.join(pending.mapped('org_id.name'))
+                raise UserError(
+                    f'Multi-Organisation Complaint: the following organisations have not yet submitted '
+                    f'their response contribution: {names}. '
+                    f'Please ensure all contributions are submitted on the "Multi-Organisation" tab.'
+                )
             rec.with_context(nhs_workflow=True).write({'state': 'awaiting_signoff'})
 
     def action_sign_off(self):
@@ -447,6 +588,33 @@ class NhsComplaint(models.Model):
                 'summary': f'Final response sent for {rec.name}',
                 'user_id': self.env.user.id,
             })
+            if rec.is_multi_org:
+                rec._notify_partner_trusts()
+
+    def _notify_partner_trusts(self):
+        """Send the final joint response notification to all partner NHS Trusts."""
+        for trust in self.partner_org_ids.filtered(lambda t: t.email):
+            self.env['mail.mail'].sudo().create({
+                'subject': f'Joint Response — {self.name} ({self.subject_summary})',
+                'email_to': trust.email,
+                'body_html': (
+                    f'<p>Dear {trust.name} Complaints Team,</p>'
+                    f'<p>The formal response for multi-organisation complaint '
+                    f'<strong>{self.name}</strong> has now been issued to the complainant.</p>'
+                    f'<p><strong>Complaint:</strong> {self.subject_summary}<br/>'
+                    f'<strong>Lead Organisation:</strong> {self.lead_org_id.name or self.company_id.name}</p>'
+                    f'<p>Please retain this notification for your records.</p>'
+                    f'<p>Regards,<br/>Complaints Team — {self.company_id.name}</p>'
+                ),
+                'auto_delete': True,
+            }).send()
+        if self.partner_org_ids.filtered(lambda t: t.email):
+            self.message_post(
+                body=(
+                    f'Joint response notification sent to: '
+                    + ', '.join(self.partner_org_ids.filtered(lambda t: t.email).mapped('name'))
+                )
+            )
 
     def action_close(self):
         for rec in self:
@@ -511,6 +679,28 @@ class NhsComplaint(models.Model):
             'type': 'ir.actions.act_window',
             'name': 'Link / Create Incident',
             'res_model': 'nhs.complaint.link.incident.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_complaint_id': self.id},
+        }
+
+    def action_open_response_wizard(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Draft & Sign Off Response',
+            'res_model': 'nhs.complaint.response.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_complaint_id': self.id},
+        }
+
+    def action_open_response_view_wizard(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Response Details',
+            'res_model': 'nhs.complaint.response.view.wizard',
             'view_mode': 'form',
             'target': 'new',
             'context': {'default_complaint_id': self.id},
@@ -613,3 +803,4 @@ class NhsComplaint(models.Model):
                     'phone': False,
                     'address': False,
                 })
+

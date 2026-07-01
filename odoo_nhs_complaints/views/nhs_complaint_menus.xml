@@ -142,7 +142,7 @@
         <field name="res_model">mail.template</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('model_id.model', '=', 'nhs.complaint')]</field>
-        <field name="context">{'default_model_id': ref('model_nhs_complaint')}</field>
+        <field name="context" eval="{'default_model_id': ref('odoo_nhs_complaints.model_nhs_complaint')}"/>
     </record>
 
     <menuitem id="menu_nhs_complaint_config"
@@ -163,6 +163,13 @@
               parent="menu_nhs_complaint_config"
               action="action_nhs_complaint_timescale"
               sequence="20"
+              groups="odoo_nhs_complaints.group_nhs_complaint_quality_lead"/>
+
+    <menuitem id="menu_nhs_phso_outcomes"
+              name="PHSO Outcomes"
+              parent="menu_nhs_complaint_config"
+              action="action_nhs_phso_outcome"
+              sequence="22"
               groups="odoo_nhs_complaints.group_nhs_complaint_quality_lead"/>
 
     <menuitem id="menu_nhs_complaint_letter_templates"

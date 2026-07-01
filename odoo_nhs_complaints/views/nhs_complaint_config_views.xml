@@ -69,6 +69,50 @@
         <field name="view_mode">list,form</field>
     </record>
 
+    <!-- ── PHSO Outcomes Config ─────────────────────────────────── -->
+    <record id="view_nhs_phso_outcome_list" model="ir.ui.view">
+        <field name="name">nhs.phso.outcome.list</field>
+        <field name="model">nhs.phso.outcome</field>
+        <field name="arch" type="xml">
+            <list string="PHSO Outcomes" editable="bottom"
+                  decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="color" widget="badge"
+                       decoration-success="color == 'success'"
+                       decoration-warning="color == 'warning'"
+                       decoration-danger="color == 'danger'"
+                       decoration-info="color == 'info'"
+                       decoration-muted="color == 'secondary'"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_phso_outcome_form" model="ir.ui.view">
+        <field name="name">nhs.phso.outcome.form</field>
+        <field name="model">nhs.phso.outcome</field>
+        <field name="arch" type="xml">
+            <form string="PHSO Outcome">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="sequence"/>
+                        <field name="color"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_phso_outcome" model="ir.actions.act_window">
+        <field name="name">PHSO Outcomes</field>
+        <field name="res_model">nhs.phso.outcome</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'active_test': False}</field>
+    </record>
+
     <!-- ── Settings extension ──────────────────────────────────── -->
     <record id="view_res_config_settings_complaint_form" model="ir.ui.view">
         <field name="name">res.config.settings.complaint.form</field>

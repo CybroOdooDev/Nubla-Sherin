@@ -23,7 +23,7 @@
     'name': 'NHS Complaints & PALS Management',
     'summary': 'Statutory complaints handling, PALS concern resolution, KO41a '
                'returns and PHSO escalation — integrated with NHS Incident & Risk',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.2',
     'category': 'Healthcare/NHS',
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
@@ -41,6 +41,7 @@
         'data/nhs_complaint_sequence_data.xml',
         'data/nhs_complaint_subject_data.xml',
         'data/nhs_complaint_timescale_data.xml',
+        'data/nhs_phso_outcome_data.xml',
         'data/nhs_complaint_letter_templates.xml',
         'data/mail_template_data.xml',
         'data/ir_cron_data.xml',
@@ -57,11 +58,11 @@
         'wizards/nhs_complaint_response_wizard_views.xml',
         'wizards/nhs_complaint_link_incident_wizard_views.xml',
         'wizards/nhs_ko41a_export_wizard_views.xml',
-        'views/nhs_complaint_menus.xml',
-        'views/public_complaint_templates.xml',
         'report/nhs_complaint_response_report.xml',
         'report/nhs_complaint_ack_report.xml',
         'report/nhs_ko41a_report.xml',
+        'views/nhs_complaint_menus.xml',
+        'views/public_complaint_templates.xml',
     ],
     'assets': {
         'web.assets_frontend': [
