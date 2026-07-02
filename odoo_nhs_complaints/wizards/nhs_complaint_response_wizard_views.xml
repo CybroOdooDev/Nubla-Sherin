@@ -60,15 +60,19 @@
         <field name="model">nhs.complaint.response.view.wizard</field>
         <field name="arch" type="xml">
             <form string="Response Details">
-                <group string="Sign-off">
-                    <field name="signed_off_by_id" readonly="1"/>
-                    <field name="signed_off_at" readonly="1"/>
-                    <field name="response_sent_at" readonly="1"/>
-                    <field name="response_method" readonly="1"/>
+                <field name="complaint_id" invisible="1"/>
+                <group>
+                    <group string="Sign-off Details">
+                        <field name="signed_off_by_id" readonly="1"/>
+                        <field name="signed_off_at" readonly="1"/>
+                    </group>
+                    <group string="Transmission Details">
+                        <field name="response_sent_at" readonly="1"/>
+                        <field name="response_method" readonly="1"/>
+                    </group>
                 </group>
-                <group string="Response Letter">
-                    <field name="response_text" nolabel="1" readonly="1" widget="html"/>
-                </group>
+                <separator string="Response Letter"/>
+                <field name="response_text" readonly="1" widget="html" style="min-height:300px;"/>
                 <footer>
                     <button string="Close" class="btn-secondary" special="cancel"/>
                 </footer>

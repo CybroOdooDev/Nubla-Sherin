@@ -5,7 +5,7 @@
              Module Category
         ══════════════════════════════════════════════════════════════════ -->
         <record id="module_category_nhs_complaints" model="ir.module.category">
-            <field name="name">NHS Complaints &amp; PALS</field>
+            <field name="name">NHS Complaints and PALS</field>
             <field name="description">NHS Complaints and PALS Management access levels.</field>
             <field name="sequence">51</field>
         </record>

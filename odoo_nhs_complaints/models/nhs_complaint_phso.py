@@ -37,26 +37,25 @@ class NhsComplaintPhso(models.Model):
                               help='Date the complaint was referred to the PHSO.')
     phso_reference = fields.Char(string='PHSO Case Reference',
                                  help='The reference number assigned by the PHSO.')
+    complaint_subject_summary = fields.Char(
+        related='complaint_id.subject_summary', string='Complaint Subject', readonly=True)
+    complaint_severity = fields.Selection(
+        related='complaint_id.severity', string='Severity', readonly=True)
+    complaint_handler_id = fields.Many2one(
+        'res.users', related='complaint_id.handler_id', string='Case Handler', readonly=True)
     state = fields.Selection([
         ('referred', 'Referred'),
         ('under_review', 'Under Review'),
         ('decision_made', 'Decision Made'),
         ('closed', 'Closed'),
     ], string='PHSO Status', required=True, default='referred', tracking=True)
-    outcome = fields.Many2one(
-        'nhs.phso.outcome', string='Outcome', tracking=True,
-        help='The PHSO decision on the complaint. Configurable via Configuration → PHSO Outcomes.',
-    )
-    outcome_color = fields.Selection(
-        related='outcome.color', string='Outcome Colour',
-        selection=[
-            ('success', 'Green'),
-            ('warning', 'Orange'),
-            ('danger', 'Red'),
-            ('info', 'Blue'),
-            ('secondary', 'Grey'),
-        ],
-    )
+    outcome = fields.Selection([
+        ('not_upheld', 'Not Upheld'),
+        ('partly_upheld', 'Partly Upheld'),
+        ('upheld', 'Upheld'),
+    ], string='Outcome', tracking=True,
+       help='The PHSO decision on the complaint.')
+
     recommendations = fields.Text(string='PHSO Recommendations',
                                   help='Recommendations issued by the PHSO.')
     action_ids = fields.One2many('nhs.action', 'phso_id', string='Actions from Recommendations',

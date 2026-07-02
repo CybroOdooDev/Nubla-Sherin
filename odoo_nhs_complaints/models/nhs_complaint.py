@@ -106,8 +106,6 @@ class NhsComplaint(models.Model):
                                  help='KO41a-aligned subject. Two-level taxonomy for the annual return.')
     location_id = fields.Many2one('nhs.location', string='Location / Service',
                                   help='Where the matter occurred (inherited NHS location model).')
-    department_text = fields.Char(string='Department / Service (free text)',
-                                  help='Service/department when not a formal location in the hierarchy.')
     severity = fields.Selection([
         ('low', 'Low'),
         ('medium', 'Medium'),
@@ -189,6 +187,14 @@ class NhsComplaint(models.Model):
                                  help='Assigned complaints handler / case officer.')
     investigation_id = fields.Many2one('nhs.complaint.investigation', string='Investigation',
                                        help='Investigation record (formal complaints).')
+    investigation_lead_investigator_id = fields.Many2one('res.users', related='investigation_id.lead_investigator_id', readonly=False, string='Lead Investigator')
+    investigation_state = fields.Selection(related='investigation_id.state', readonly=False, string='Investigation Status')
+    investigation_department_input_ids = fields.Many2many('res.users', related='investigation_id.department_input_ids', readonly=False, string='Staff Providing Input')
+    investigation_upheld_status = fields.Selection(related='investigation_id.upheld_status', readonly=False, string='Overall Outcome')
+    investigation_points_of_complaint = fields.Text(related='investigation_id.points_of_complaint', readonly=False, string='Points of Complaint')
+    investigation_findings = fields.Text(related='investigation_id.findings', readonly=False, string='Investigation Findings')
+    investigation_lessons_learned = fields.Text(related='investigation_id.lessons_learned', readonly=False, string='Lessons Learned')
+    investigation_timeline_ids = fields.One2many('nhs.complaint.investigation.timeline', related='investigation_id.timeline_ids', readonly=False, string='Chronology')
     correspondence_ids = fields.One2many('nhs.complaint.correspondence', 'complaint_id',
                                          string='Correspondence Log')
     response_text = fields.Html(string='Draft Response',
@@ -385,7 +391,7 @@ class NhsComplaint(models.Model):
         seq = self.env['ir.sequence']
         for vals in vals_list:
             if vals.get('name', 'New') == 'New':
-                record_type = vals.get('record_type', 'pals')
+                record_type = vals.get('record_type') or self.env.context.get('default_record_type') or 'pals'
                 code = 'nhs.complaint.formal' if record_type == 'complaint' else 'nhs.complaint.pals'
                 vals['name'] = seq.next_by_code(code) or 'New'
         records = super().create(vals_list)
@@ -704,6 +710,19 @@ class NhsComplaint(models.Model):
             'view_mode': 'form',
             'target': 'new',
             'context': {'default_complaint_id': self.id},
+        }
+
+    def action_open_investigation(self):
+        self.ensure_one()
+        if not self.investigation_id:
+            return False
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Investigation',
+            'res_model': 'nhs.complaint.investigation',
+            'view_mode': 'form',
+            'res_id': self.investigation_id.id,
+            'target': 'current',
         }
 
     def action_view_incidents(self):

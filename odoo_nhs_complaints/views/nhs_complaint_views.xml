@@ -252,7 +252,7 @@
                             invisible="record_type != 'complaint' or state != 'acknowledged'"/>
                     <button name="action_open_response_wizard" string="Draft &amp; Sign Off Response"
                             type="object" class="btn-primary"
-                            invisible="record_type != 'complaint' or state not in ['investigation', 'response_draft', 'awaiting_signoff']"/>
+                            invisible="record_type != 'complaint'"/>
                     <button name="action_submit_for_signoff" string="Submit for Sign-off"
                             type="object" class="btn-primary"
                             invisible="state != 'response_draft'"/>
@@ -353,7 +353,6 @@
                         </group>
                         <group string="Location">
                             <field name="location_id"/>
-                            <field name="department_text"/>
                             <field name="is_multi_org"/>
                             <field name="duty_of_candour_flag"/>
                             <field name="is_anonymous" invisible="record_type != 'pals'"/>
@@ -475,13 +474,21 @@
 
                         <!-- Tab 4: Investigation — Formal only, from Under Investigation onwards -->
                         <page string="Investigation"
-                              invisible="record_type != 'complaint' or state not in ['investigation','response_draft','awaiting_signoff','response_sent','closed','re_opened','phso','withdrawn']">
-                            <group string="Investigation Record">
-                                <field name="investigation_id"
-                                       readonly="1"
-                                       widget="many2one_clickable"/>
+                               invisible="record_type != 'complaint' or state not in ['investigation','response_draft','awaiting_signoff','response_sent','closed','re_opened','phso','withdrawn']">
+                            <group string="Investigation Record" invisible="not investigation_id">
+                                <group>
+                                    <field name="investigation_id" readonly="1"/>
+                                </group>
+                                <group>
+                                    <button name="action_open_investigation"
+                                            type="object"
+                                            string="Open Investigation Record"
+                                            class="btn-primary"
+                                            icon="fa-external-link"/>
+                                </group>
                             </group>
-                            <group string="Linked Incidents &amp; Risks">
+
+                            <group string="Linked Incidents &amp; Risks" class="mt-4">
                                 <group>
                                     <field name="linked_incident_ids"
                                            widget="many2many_tags"
@@ -499,6 +506,7 @@
                                         class="btn btn-sm btn-outline-primary"/>
                             </div>
                         </page>
+
 
                         <!-- Tab 5: Correspondence -->
                         <page string="Correspondence">

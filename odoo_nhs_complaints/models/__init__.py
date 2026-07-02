@@ -24,9 +24,9 @@ from . import nhs_complaint_timescale
 from . import nhs_complainant
 from . import nhs_complaint_phso
 from . import nhs_complaint_investigation
+from . import nhs_complaint_investigation_timeline
 from . import nhs_complaint_correspondence
 from . import nhs_complaint_org_response
-from . import nhs_phso_outcome
 from . import nhs_complaint
 from . import nhs_incident
 from . import nhs_action

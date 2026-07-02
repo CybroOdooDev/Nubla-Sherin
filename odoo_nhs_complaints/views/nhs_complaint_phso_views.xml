@@ -11,46 +11,68 @@
                 <field name="phso_reference"/>
                 <field name="outcome"/>
                 <field name="referred_at"/>
-                <field name="outcome_color"/>
+                <field name="complaint_subject_summary"/>
+                <field name="complaint_severity"/>
+                <field name="complaint_handler_id"/>
                 <templates>
                     <t t-name="card">
-                        <div class="d-flex" style="min-height:90px;">
-                            <!-- Left accent stripe coloured by state -->
-                            <div t-attf-style="width:5px; border-radius:3px 0 0 3px; flex-shrink:0; background:#{
-                                record.state.value == 'referred'       ? '#0dcaf0' :
-                                record.state.value == 'under_review'   ? '#ffc107' :
-                                record.state.value == 'decision_made'  ? '#198754' : '#6c757d'
-                            };"/>
-                            <div class="flex-grow-1 ps-2 pe-1 py-1">
-                                <!-- Row 1: PHSO reference + state badge -->
-                                <div class="d-flex justify-content-between align-items-start mb-1">
-                                    <strong class="text-truncate me-1" style="font-size:0.95rem;">
-                                        <field name="phso_reference"/>
-                                    </strong>
-                                    <span t-attf-class="badge rounded-pill flex-shrink-0 #{
-                                        record.state.value == 'referred'      ? 'text-bg-info' :
-                                        record.state.value == 'under_review'  ? 'text-bg-warning' :
-                                        record.state.value == 'decision_made' ? 'text-bg-success' : 'text-bg-secondary'
-                                    }" style="font-size:0.68rem;">
-                                        <field name="state"/>
-                                    </span>
+                        <div class="d-flex flex-column justify-content-between p-2" style="min-height: 110px;">
+                            <!-- Header Row: Title (Complaint ID) and State Badge -->
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <span class="fw-bold text-primary" style="font-size:0.95rem;">
+                                    <field name="complaint_id"/>
+                                </span>
+                                <span t-attf-class="badge rounded-pill flex-shrink-0 #{
+                                    record.state.raw_value == 'referred'      ? 'text-bg-info' :
+                                    record.state.raw_value == 'under_review'  ? 'text-bg-warning' :
+                                    record.state.raw_value == 'decision_made' ? 'text-bg-success' : 'text-bg-secondary'
+                                }" style="font-size:0.68rem;">
+                                    <field name="state"/>
+                                </span>
+                            </div>
+
+                            <!-- Subject Summary -->
+                            <div class="mb-1" style="font-size:0.85rem; font-weight: 500; color:#333;">
+                                <field name="complaint_subject_summary"/>
+                            </div>
+
+                            <!-- Middle Section: PHSO Ref & Referred At -->
+                            <div class="d-flex flex-column gap-1 mb-2 text-muted" style="font-size:0.8rem;">
+                                <div t-if="record.phso_reference.raw_value" class="d-flex align-items-center gap-1">
+                                    <i class="fa fa-tag" style="width:13px; color:#777;"/>
+                                    <span>PHSO Ref: <field name="phso_reference"/></span>
                                 </div>
-                                <!-- Row 2: Related complaint -->
-                                <div class="d-flex align-items-center gap-1 mb-1" style="font-size:0.82rem; color:#555;">
-                                    <i class="fa fa-file-text-o" style="width:13px;"/>
-                                    <span class="text-truncate"><field name="complaint_id"/></span>
-                                </div>
-                                <!-- Row 3: Date referred -->
-                                <div class="d-flex align-items-center gap-1 mb-2" style="font-size:0.82rem; color:#555;">
-                                    <i class="fa fa-calendar-o" style="width:13px;"/>
+                                <div class="d-flex align-items-center gap-1">
+                                    <i class="fa fa-calendar-o" style="width:13px; color:#777;"/>
                                     <span>Referred: <field name="referred_at"/></span>
                                 </div>
-                                <!-- Row 4: Outcome badge using configurable colour -->
-                                <div invisible="not outcome">
-                                    <span t-attf-class="badge text-bg-#{record.outcome_color.raw_value or 'secondary'}"
-                                          style="font-size:0.75rem;">
+                            </div>
+
+                            <!-- Footer Row: Outcome/Severity on left, Assignee Avatar on right -->
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top" style="border-top-style: dashed !important; border-top-color: #ddd !important;">
+                                <!-- Left side: Severity and Outcome Badges -->
+                                <div class="d-flex gap-1 align-items-center">
+                                    <!-- Severity Badge -->
+                                    <span t-if="record.complaint_severity.raw_value" t-attf-class="badge #{
+                                        record.complaint_severity.raw_value == 'high' ? 'text-bg-danger' :
+                                        record.complaint_severity.raw_value == 'medium' ? 'text-bg-warning' : 'text-bg-light border'
+                                    }" style="font-size:0.7rem; text-transform: capitalize;">
+                                        <field name="complaint_severity"/>
+                                    </span>
+                                    
+                                    <!-- Outcome Badge -->
+                                    <span t-if="record.outcome.raw_value" t-attf-class="badge text-bg-#{
+                                        record.outcome.raw_value == 'not_upheld' ? 'success' :
+                                        record.outcome.raw_value == 'partly_upheld' ? 'warning' :
+                                        record.outcome.raw_value == 'upheld' ? 'danger' : 'secondary'
+                                    }" style="font-size:0.7rem;">
                                         <field name="outcome"/>
                                     </span>
+                                </div>
+
+                                <!-- Right side: Assignee Avatar/Name -->
+                                <div class="d-flex align-items-center gap-1" t-if="record.complaint_handler_id.raw_value">
+                                    <field name="complaint_handler_id" widget="many2one_avatar_user"/>
                                 </div>
                             </div>
                         </div>
@@ -75,7 +97,6 @@
                        decoration-success="state=='decision_made'"
                        decoration-muted="state=='closed'"/>
                 <field name="outcome"/>
-                <field name="outcome_color" column_invisible="True"/>
             </list>
         </field>
     </record>

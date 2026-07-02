@@ -22,20 +22,17 @@
 from odoo import fields, models
 
 
-class NhsPhsoOutcome(models.Model):
-    _name = 'nhs.phso.outcome'
-    _description = 'PHSO Case Outcome'
-    _order = 'sequence, name'
+class NhsComplaintInvestigationTimeline(models.Model):
+    _name = 'nhs.complaint.investigation.timeline'
+    _description = 'Complaint Investigation Chronology Entry'
+    _order = 'happened_at'
 
-    name = fields.Char(string='Outcome', required=True, translate=True)
-    sequence = fields.Integer(string='Sequence', default=10)
-    color = fields.Selection([
-        ('success', 'Green — Not Upheld'),
-        ('warning', 'Orange — Partly Upheld'),
-        ('danger', 'Red — Upheld'),
-        ('info', 'Blue'),
-        ('secondary', 'Grey'),
-    ], string='Badge Colour', default='secondary',
-       help='Colour used for this outcome on kanban cards and list badges.')
-    active = fields.Boolean(default=True,
-                            help='Uncheck to hide this outcome without deleting it.')
+    investigation_id = fields.Many2one('nhs.complaint.investigation', string='Investigation',
+                                       required=True, ondelete='cascade',
+                                       help='The investigation this chronology entry belongs to.')
+    happened_at = fields.Datetime(string='Date / Time', required=True,
+                                  help='The exact date and time this event occurred.')
+    entry = fields.Text(string='Entry', required=True,
+                        help='A factual description of what happened at this point in time.')
+    source = fields.Char(string='Evidence Source',
+                         help='e.g. Staff statement, CCTV, care notes')

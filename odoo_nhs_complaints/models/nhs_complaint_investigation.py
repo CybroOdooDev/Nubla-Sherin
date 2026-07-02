@@ -46,6 +46,7 @@ class NhsComplaintInvestigation(models.Model):
                                       help='The discrete points raised — each should be answered in the response.')
     chronology = fields.Text(string='Chronology of Events',
                              help='Sequence of events established during investigation.')
+    timeline_ids = fields.One2many('nhs.complaint.investigation.timeline', 'investigation_id', string='Chronology')
     findings = fields.Text(string='Investigation Findings',
                            help='What the investigation found against each point of complaint.')
     upheld_status = fields.Selection([

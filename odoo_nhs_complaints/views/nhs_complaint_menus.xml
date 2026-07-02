@@ -165,12 +165,6 @@
               sequence="20"
               groups="odoo_nhs_complaints.group_nhs_complaint_quality_lead"/>
 
-    <menuitem id="menu_nhs_phso_outcomes"
-              name="PHSO Outcomes"
-              parent="menu_nhs_complaint_config"
-              action="action_nhs_phso_outcome"
-              sequence="22"
-              groups="odoo_nhs_complaints.group_nhs_complaint_quality_lead"/>
 
     <menuitem id="menu_nhs_complaint_letter_templates"
               name="Letter Templates"

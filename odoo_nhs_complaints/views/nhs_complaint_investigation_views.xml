@@ -51,7 +51,13 @@
                             <field name="points_of_complaint" nolabel="1" placeholder="List each discrete point raised by the complainant…"/>
                         </page>
                         <page string="Chronology">
-                            <field name="chronology" nolabel="1" placeholder="Sequence of events established during investigation…"/>
+                            <field name="timeline_ids" mode="list">
+                                <list editable="bottom">
+                                    <field name="happened_at"/>
+                                    <field name="entry" placeholder="Observable facts..."/>
+                                    <field name="source"/>
+                                </list>
+                            </field>
                         </page>
                         <page string="Findings">
                             <field name="findings" nolabel="1" placeholder="Investigation findings against each point of complaint…"/>
