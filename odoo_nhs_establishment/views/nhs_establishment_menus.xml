@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── Root application menu ─────────────────────────────────── -->
+    <menuitem id="menu_nhs_establishment_root" name="NHS Establishment"
+              sequence="52" web_icon="odoo_nhs_establishment,static/description/icon.png"
+              groups="odoo_nhs_establishment.group_nhs_workforce_user"/>
+
+    <!-- ── Establishment ─────────────────────────────────────────── -->
+    <menuitem id="menu_nhs_establishment_main" name="Establishment"
+              parent="menu_nhs_establishment_root" sequence="10"/>
+    <menuitem id="menu_nhs_establishment_post" name="Posts"
+              parent="menu_nhs_establishment_main" action="action_nhs_establishment_post" sequence="10"/>
+    <menuitem id="menu_nhs_org_unit" name="Org Structure"
+              parent="menu_nhs_establishment_main" action="action_nhs_org_unit" sequence="20"/>
+    <menuitem id="menu_nhs_vacancy_register" name="Vacancy Register"
+              parent="menu_nhs_establishment_main" action="action_nhs_vacancy_register" sequence="30"/>
+
+    <!-- ── Change Control ────────────────────────────────────────── -->
+    <menuitem id="menu_nhs_change_control" name="Change Control"
+              parent="menu_nhs_establishment_root" sequence="20"/>
+    <menuitem id="menu_nhs_establishment_change" name="Change Requests"
+              parent="menu_nhs_change_control" action="action_nhs_establishment_change" sequence="10"/>
+    <menuitem id="menu_nhs_establishment_change_my" name="My Requests"
+              parent="menu_nhs_change_control" action="action_nhs_establishment_change_my" sequence="20"/>
+
+    <!-- ── Reporting ─────────────────────────────────────────────── -->
+    <menuitem id="menu_nhs_establishment_reporting" name="Reporting"
+              parent="menu_nhs_establishment_root" sequence="30"/>
+    <menuitem id="menu_nhs_establishment_dashboard" name="Establishment Dashboard"
+              parent="menu_nhs_establishment_reporting" action="action_nhs_establishment_dashboard_client" sequence="10"/>
+    <menuitem id="menu_nhs_establishment_by_group_band" name="By Staff Group / By Band"
+              parent="menu_nhs_establishment_reporting" action="action_nhs_establishment_by_group_band" sequence="20"/>
+    <menuitem id="menu_nhs_vacancy_hotspots" name="Vacancy Hotspots"
+              parent="menu_nhs_establishment_reporting" action="action_nhs_vacancy_hotspots" sequence="30"/>
+    <menuitem id="menu_nhs_establishment_report" name="Establishment Report (PDF)"
+              parent="menu_nhs_establishment_reporting" action="action_nhs_establishment_report_menu" sequence="40"/>
+
+    <!-- ── Configuration (manager only) ─────────────────────────── -->
+    <menuitem id="menu_nhs_establishment_config" name="Configuration"
+              parent="menu_nhs_establishment_root" sequence="90"
+              groups="odoo_nhs_establishment.group_nhs_workforce_manager"/>
+    <menuitem id="menu_nhs_afc_band" name="Agenda for Change Bands"
+              parent="menu_nhs_establishment_config" action="action_nhs_afc_band" sequence="10"/>
+    <menuitem id="menu_nhs_staff_group" name="Staff Groups"
+              parent="menu_nhs_establishment_config" action="action_nhs_staff_group" sequence="20"/>
+    <menuitem id="menu_nhs_cost_centre" name="Cost Centres"
+              parent="menu_nhs_establishment_config" action="action_nhs_cost_centre" sequence="30"/>
+    <record id="action_nhs_establishment_config_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'module': 'nhs_establishment', 'bin_size': False}</field>
+    </record>
+
+    <menuitem id="menu_nhs_establishment_settings" name="Settings"
+              parent="menu_nhs_establishment_config" sequence="40"
+              action="action_nhs_establishment_config_settings"/>
+</odoo>

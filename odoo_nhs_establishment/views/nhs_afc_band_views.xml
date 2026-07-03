@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_afc_band_list" model="ir.ui.view">
+        <field name="name">nhs.afc.band.list</field>
+        <field name="model">nhs.afc.band</field>
+        <field name="arch" type="xml">
+            <list string="Agenda for Change Bands" editable="bottom" decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="pay_point"/>
+                <field name="indicative_salary"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="post_count"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_afc_band_form" model="ir.ui.view">
+        <field name="name">nhs.afc.band.form</field>
+        <field name="model">nhs.afc.band</field>
+        <field name="arch" type="xml">
+            <form string="Agenda for Change Band">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_nhs_establishment_post)d" type="action"
+                                class="oe_stat_button" icon="fa-id-badge"
+                                context="{'search_default_groupby_band': 1}">
+                            <field name="post_count" widget="statinfo" string="Posts"/>
+                        </button>
+                    </div>
+                    <group>
+                        <field name="name"/>
+                        <field name="sequence"/>
+                        <field name="pay_point"/>
+                        <field name="indicative_salary"/>
+                        <field name="currency_id" groups="base.group_multi_currency"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_afc_band" model="ir.actions.act_window">
+        <field name="name">Agenda for Change Bands</field>
+        <field name="res_model">nhs.afc.band</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_nhs_establishment" model="ir.actions.report">
+        <field name="name">Establishment Report</field>
+        <field name="model">nhs.org.unit</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_establishment.report_nhs_establishment</field>
+        <field name="report_file">odoo_nhs_establishment.report_nhs_establishment</field>
+        <field name="print_report_name">'Establishment Report - %s' % (object.complete_name)</field>
+        <field name="binding_model_id" ref="model_nhs_org_unit"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_nhs_establishment">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="unit">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Establishment Report</h2>
+                        <h3><span t-esc="unit.complete_name"/></h3>
+                        <p>
+                            <strong>Organisation:</strong> <span t-esc="unit.company_id.name"/><br/>
+                            <strong>Generated:</strong>
+                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d %B %Y')"/>
+                        </p>
+
+                        <h4>Establishment Summary (this unit + all sub-units)</h4>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Funded FTE</th>
+                                    <th>In-Post FTE</th>
+                                    <th>Vacant FTE</th>
+                                    <th>Vacancy Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span t-esc="'%.2f' % unit.funded_fte"/></td>
+                                    <td><span t-esc="'%.2f' % unit.in_post_fte"/></td>
+                                    <td><span t-esc="'%.2f' % unit.vacant_fte"/></td>
+                                    <td><span t-esc="('%.1f' % (unit.vacancy_rate * 100.0)) + '%'"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <t t-set="posts" t-value="env['nhs.establishment.post'].search([('org_unit_id', 'child_of', unit.id), ('status', 'in', ('active', 'frozen'))])"/>
+
+                        <t t-if="posts">
+                            <h4>By Staff Group</h4>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Staff Group</th>
+                                    <th>Funded FTE</th>
+                                    <th>In-Post FTE</th>
+                                    <th>Vacant FTE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="groups" t-value="posts.mapped('staff_group_id')"/>
+                                <t t-foreach="groups" t-as="grp">
+                                    <t t-set="grp_posts" t-value="posts.filtered(lambda p: p.staff_group_id == grp)"/>
+                                    <tr>
+                                        <td><span t-esc="grp.name"/></td>
+                                        <td><span t-esc="'%.2f' % sum(grp_posts.mapped('funded_fte'))"/></td>
+                                        <td><span t-esc="'%.2f' % sum(grp_posts.mapped('in_post_fte'))"/></td>
+                                        <td><span t-esc="'%.2f' % sum(grp_posts.mapped('vacant_fte'))"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <h4>By Agenda for Change Band</h4>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Band</th>
+                                    <th>Funded FTE</th>
+                                    <th>In-Post FTE</th>
+                                    <th>Vacant FTE</th>
+                                    <th>Indicative Pay</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="bands" t-value="posts.filtered('band_id').mapped('band_id')"/>
+                                <t t-foreach="bands" t-as="band">
+                                    <t t-set="band_posts" t-value="posts.filtered(lambda p: p.band_id == band)"/>
+                                    <tr>
+                                        <td><span t-esc="band.name"/></td>
+                                        <td><span t-esc="'%.2f' % sum(band_posts.mapped('funded_fte'))"/></td>
+                                        <td><span t-esc="'%.2f' % sum(band_posts.mapped('in_post_fte'))"/></td>
+                                        <td><span t-esc="'%.2f' % sum(band_posts.mapped('vacant_fte'))"/></td>
+                                        <td><span t-esc="'%.2f' % sum(band_posts.mapped('indicative_pay'))"/></td>
+                                    </tr>
+                                </t>
+                                <t t-set="medical_posts" t-value="posts.filtered('is_medical')"/>
+                                <tr t-if="medical_posts">
+                                    <td>Medical / Non-AfC</td>
+                                    <td><span t-esc="'%.2f' % sum(medical_posts.mapped('funded_fte'))"/></td>
+                                    <td><span t-esc="'%.2f' % sum(medical_posts.mapped('in_post_fte'))"/></td>
+                                    <td><span t-esc="'%.2f' % sum(medical_posts.mapped('vacant_fte'))"/></td>
+                                    <td><span t-esc="'%.2f' % sum(medical_posts.mapped('indicative_pay'))"/></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-secondary">
+                                    <td><strong>Total</strong></td>
+                                    <td><strong><span t-esc="'%.2f' % sum(posts.mapped('funded_fte'))"/></strong></td>
+                                    <td><strong><span t-esc="'%.2f' % sum(posts.mapped('in_post_fte'))"/></strong></td>
+                                    <td><strong><span t-esc="'%.2f' % sum(posts.mapped('vacant_fte'))"/></strong></td>
+                                    <td><strong><span t-esc="'%.2f' % sum(posts.mapped('indicative_pay'))"/></strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <h4>Posts</h4>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Reference</th>
+                                    <th>Job Title</th>
+                                    <th>Team</th>
+                                    <th>Band</th>
+                                    <th>Funded</th>
+                                    <th>In-Post</th>
+                                    <th>Vacant</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="posts" t-as="post">
+                                    <tr>
+                                        <td><span t-esc="post.reference"/></td>
+                                        <td><span t-esc="post.job_title"/></td>
+                                        <td><span t-esc="post.org_unit_id.complete_name"/></td>
+                                        <td><span t-esc="post.band_id.name or 'Medical/Non-AfC'"/></td>
+                                        <td><span t-esc="'%.2f' % post.funded_fte"/></td>
+                                        <td><span t-esc="'%.2f' % post.in_post_fte"/></td>
+                                        <td><span t-esc="'%.2f' % post.vacant_fte"/></td>
+                                        <td><span t-esc="post.vacancy_status"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

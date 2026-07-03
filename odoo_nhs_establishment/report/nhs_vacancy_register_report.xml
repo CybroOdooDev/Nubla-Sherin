@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_nhs_vacancy_register" model="ir.actions.report">
+        <field name="name">Vacancy Register Report</field>
+        <field name="model">nhs.establishment.post</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_establishment.report_nhs_vacancy_register</field>
+        <field name="report_file">odoo_nhs_establishment.report_nhs_vacancy_register</field>
+        <field name="print_report_name">'Vacancy Register'</field>
+        <field name="binding_model_id" ref="model_nhs_establishment_post"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_nhs_vacancy_register">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2>Vacancy Register</h2>
+                    <p>
+                        <strong>Organisation:</strong>
+                        <span t-esc="docs[0].company_id.name if docs else ''"/><br/>
+                        <strong>Generated:</strong>
+                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d %B %Y')"/>
+                    </p>
+
+                    <t t-set="vacant_docs" t-value="docs.filtered(lambda p: p.vacancy_status in ('part_vacant', 'fully_vacant'))"/>
+                    <t t-set="frozen_docs" t-value="vacant_docs.filtered('is_frozen')"/>
+                    <t t-set="true_vacant_docs" t-value="vacant_docs - frozen_docs"/>
+
+                    <p>
+                        <strong><span t-esc="len(true_vacant_docs)"/></strong> true vacanc(y/ies),
+                        <strong><span t-esc="len(frozen_docs)"/></strong> frozen post(s) excluded from the true-vacancy count.
+                        Total vacant FTE: <strong><span t-esc="'%.2f' % sum(vacant_docs.mapped('vacant_fte'))"/></strong>.
+                    </p>
+
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr class="table-dark">
+                                <th>Reference</th>
+                                <th>Job Title</th>
+                                <th>Team</th>
+                                <th>Staff Group</th>
+                                <th>Band</th>
+                                <th>Funded FTE</th>
+                                <th>Vacant FTE</th>
+                                <th>Days Vacant</th>
+                                <th>Frozen</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="vacant_docs" t-as="post">
+                                <tr>
+                                    <td><span t-esc="post.reference"/></td>
+                                    <td><span t-esc="post.job_title"/></td>
+                                    <td><span t-esc="post.org_unit_id.complete_name"/></td>
+                                    <td><span t-esc="post.staff_group_id.name"/></td>
+                                    <td><span t-esc="post.band_id.name or 'Medical/Non-AfC'"/></td>
+                                    <td><span t-esc="'%.2f' % post.funded_fte"/></td>
+                                    <td><span t-esc="'%.2f' % post.vacant_fte"/></td>
+                                    <td><span t-esc="post.days_vacant"/></td>
+                                    <td><span t-esc="'Yes' if post.is_frozen else ''"/></td>
+                                    <td><span t-esc="post.vacancy_status"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-secondary">
+                                <td colspan="5"><strong>Total</strong></td>
+                                <td><strong><span t-esc="'%.2f' % sum(vacant_docs.mapped('funded_fte'))"/></strong></td>
+                                <td><strong><span t-esc="'%.2f' % sum(vacant_docs.mapped('vacant_fte'))"/></strong></td>
+                                <td colspan="3"/>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

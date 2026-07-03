@@ -1,0 +1,21 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nhs_org_unit_user,nhs.org.unit user,model_nhs_org_unit,group_nhs_workforce_user,1,0,0,0
+access_nhs_org_unit_officer,nhs.org.unit officer,model_nhs_org_unit,group_nhs_workforce_officer,1,1,1,0
+access_nhs_org_unit_manager,nhs.org.unit manager,model_nhs_org_unit,group_nhs_workforce_manager,1,1,1,1
+access_nhs_establishment_post_user,nhs.establishment.post user,model_nhs_establishment_post,group_nhs_workforce_user,1,0,0,0
+access_nhs_establishment_post_officer,nhs.establishment.post officer,model_nhs_establishment_post,group_nhs_workforce_officer,1,1,1,0
+access_nhs_establishment_post_manager,nhs.establishment.post manager,model_nhs_establishment_post,group_nhs_workforce_manager,1,1,1,1
+access_nhs_establishment_change_user,nhs.establishment.change user,model_nhs_establishment_change,group_nhs_workforce_user,1,0,0,0
+access_nhs_establishment_change_officer,nhs.establishment.change officer,model_nhs_establishment_change,group_nhs_workforce_officer,1,1,1,0
+access_nhs_establishment_change_manager,nhs.establishment.change manager,model_nhs_establishment_change,group_nhs_workforce_manager,1,1,1,1
+access_nhs_afc_band_user,nhs.afc.band user,model_nhs_afc_band,group_nhs_workforce_user,1,0,0,0
+access_nhs_afc_band_officer,nhs.afc.band officer,model_nhs_afc_band,group_nhs_workforce_officer,1,0,0,0
+access_nhs_afc_band_manager,nhs.afc.band manager,model_nhs_afc_band,group_nhs_workforce_manager,1,1,1,1
+access_nhs_staff_group_user,nhs.staff.group user,model_nhs_staff_group,group_nhs_workforce_user,1,0,0,0
+access_nhs_staff_group_officer,nhs.staff.group officer,model_nhs_staff_group,group_nhs_workforce_officer,1,0,0,0
+access_nhs_staff_group_manager,nhs.staff.group manager,model_nhs_staff_group,group_nhs_workforce_manager,1,1,1,1
+access_nhs_cost_centre_user,nhs.cost.centre user,model_nhs_cost_centre,group_nhs_workforce_user,1,0,0,0
+access_nhs_cost_centre_officer,nhs.cost.centre officer,model_nhs_cost_centre,group_nhs_workforce_officer,1,0,0,0
+access_nhs_cost_centre_manager,nhs.cost.centre manager,model_nhs_cost_centre,group_nhs_workforce_manager,1,1,1,1
+access_nhs_establishment_change_wizard_officer,nhs.establishment.change.wizard officer,model_nhs_establishment_change_wizard,group_nhs_workforce_officer,1,1,1,1
+access_nhs_establishment_change_wizard_manager,nhs.establishment.change.wizard manager,model_nhs_establishment_change_wizard,group_nhs_workforce_manager,1,1,1,1
