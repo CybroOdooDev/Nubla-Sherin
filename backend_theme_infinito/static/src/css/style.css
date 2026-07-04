@@ -614,18 +614,19 @@ template {
 
 #theme_editor_sidebar {
     position: fixed;
-    top: -9px;
-    left: -60px;
+    top: 0 !important;
+    right: 0 !important;
+    left: auto !important;
     width: 343px;
-    height: 100vh;
+    height: 100vh !important;
     display: flex;
-
     transition: all 300ms linear;
     z-index: 999;
-    margin-left: 1px !important;
+    margin-left: 0 !important;
     flex-direction: column;
-
-
+    border-radius: 12px 0 0 12px !important;
+    /* Rounded corners on the left for right-side placement */
+    box-shadow: -2px 0 20px rgba(0, 0, 0, 0.2) !important;
 }
 
 #main {
@@ -1650,7 +1651,7 @@ label:hover div.popover.fade.in {
 }
 
 #theme_editor_sidebar {
-    margin-left: 1587px !important;
+    margin-left: 0 !important;
     height: inherit;
 }
 
@@ -1679,10 +1680,16 @@ label:hover div.popover.fade.in {
     margin-left: -140px;
 }
 
-.sidebar_simple_editor>#theme_editor_sidebar {
-    margin-left: 60px !important;
-    margin-top: 68px !important;
-    height: 864px !important;
+.sidebar_simple_editor #theme_editor_sidebar {
+    left: 0 !important;
+    right: auto !important;
+    top: var(--infinito-navbar-height) !important;
+    height: calc(100vh - var(--infinito-navbar-height)) !important;
+    border-radius: 0 12px 12px 0 !important;
+    /* Rounded corners on the right for left-side placement */
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.2) !important;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
 }
 
 .o_action_manager {

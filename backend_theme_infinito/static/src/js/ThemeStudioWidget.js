@@ -1,5 +1,5 @@
 /** @odoo-module **/
-import { Component, useState } from "@odoo/owl";
+import {Component} from "@odoo/owl";
 
 export class ThemeStudioWidget extends Component {
     constructor() {
@@ -9,7 +9,8 @@ export class ThemeStudioWidget extends Component {
         // Load data from local storage
         this.loadData();
     }
-     /**
+
+    /**
      * Loads data from local storage.
      */
     loadData() {
@@ -18,6 +19,7 @@ export class ThemeStudioWidget extends Component {
         this.data = JSON.parse(this.localStorage.getItem('data')) || {};
         this.tool = JSON.parse(this.localStorage.getItem('tool')) || false;
     }
+
     /**
      * Saves data to local storage.
      */

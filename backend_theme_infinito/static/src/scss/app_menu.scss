@@ -153,6 +153,14 @@ text-align: center;
     left: -1px !important;
     padding: 2.5rem 0 !important;
 }
+body.infinito-advanced-sidebar-open .fullscreen-menu,
+.o_web_client.infinito-advanced-sidebar-open .fullscreen-menu {
+    left: 0 !important;
+    right: var(--infinito-advanced-sidebar-width, 343px) !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+}
 .fullscreen-menu > .search-container > button.fullscreen-close {
     position: absolute;
     top: -55%;

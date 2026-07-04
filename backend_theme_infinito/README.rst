@@ -8,13 +8,13 @@ Backend Theme Infinito
 
 Installation
 ============
-- www.odoo.com/documentation/17.0/setup/install.html
+- www.odoo.com/documentation/18.0/setup/install.html
 - Install our custom addon
 
 License
 -------
 General Public License, Version 3 (LGPL v3).
-(https://www.odoo.com/documentation/user/16.0/legal/licenses/licenses.html)
+(http://www.gnu.org/licenses/lgpl-3.0-standalone.html)
 
 Company
 -------

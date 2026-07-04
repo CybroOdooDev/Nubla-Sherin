@@ -30,10 +30,10 @@
             </div>
         </section>
     </t>
-     <!--
-    Template for the sidebar in the theme editor.
-    It contains options to customize the theme elements.
-    -->
+    <!--
+   Template for the sidebar in the theme editor.
+   It contains options to customize the theme elements.
+   -->
     <t t-name="backend_theme_infinito.theme_editor_sidebar">
         <div id="theme_editor_sidebar" class="main_sidebar">
             <div class="toggle-btn">
@@ -123,10 +123,10 @@
             </div>
         </div>
     </t>
-     <!--
-    Template for the advanced theme settings.
-    This template contains options for adjusting various settings such as time, hours, minutes, and periods.
-    -->
+    <!--
+   Template for the advanced theme settings.
+   This template contains options for adjusting various settings such as time, hours, minutes, and periods.
+   -->
     <t t-name="backend_theme_infinito.theme_advance" owl="1">
         <div id="tp-wrap" class="d-none">
             <div id="tp-box">
@@ -197,9 +197,6 @@
                                                 Loaders
                                             </h6>
                                             <div class="sub_style">
-                                                <!--                    <div class="font custom">-->
-                                                <!--                      <div class="d-flex">-->
-                                                <!--                      </div>-->
                                                 <select class="form-select infinito-form-select"
                                                         id="loader"/>
                                             </div>
@@ -571,11 +568,11 @@
                 </div>
             </div>
         </div>
-        <t t-set-slot="footer">
+                    <t t-set-slot="footer">
             <button class="btn" t-att-class="props.confirmClass"
                     t-esc="props.confirmLabel" t-on-click="_onClickApply"/>
-            <button class="btn btn-secondary"
-                    t-esc="props.cancelLabel" t-on-click="handleCloseDialog"/>
+                        <button class="btn btn-secondary"
+                                t-esc="props.cancelLabel" t-on-click="handleCloseDialog"/>
         </t>
     </Dialog>
     </t>

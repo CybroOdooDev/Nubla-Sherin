@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+      <!-- Template inherited from web.layout to add PWA support.
+         Includes manifest, app icon, and mobile theme settings. -->
     <template id="base_pwa" name="Base PWA" inherit_id="web.layout">
         <xpath expr="//head" position="inside">
             <link rel="manifest" href="/manifest/webmanifest"/>

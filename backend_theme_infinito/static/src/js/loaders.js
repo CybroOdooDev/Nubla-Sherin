@@ -1,21 +1,17 @@
 /** @odoo-module **/
-// Import necessary components from the Odoo web core library
-import { BlockUI } from "@web/core/ui/block_ui";
-import { ImportBlockUI } from "@base_import/import_block_ui";
-import { patch } from "@web/core/utils/patch";
-import { session } from "@web/session";
-const { xml } = owl;
+import {BlockUI} from "@web/core/ui/block_ui";
+import {ImportBlockUI} from "@base_import/import_block_ui";
+import {patch} from "@web/core/utils/patch";
+import {session} from "@web/session";
 
-// Patch the BlockUI component to customize loading spinner
+const {xml} = owl;
+
 patch(BlockUI.prototype, {
-  setup() {
-    // Call the setup method of the parent class
-    super.setup();
-    // Assign the loader class from session settings
-    this.loaderClass = session.loaderClass;
-  },
+    setup() {
+        super.setup();
+        this.loaderClass = session.loaderClass;
+    },
 });
-// Define the template for the BlockUI component
 BlockUI.template = xml`
     <t t-if="state.blockState === BLOCK_STATES.UNBLOCKED">
         <div/>
@@ -42,13 +38,12 @@ BlockUI.template = xml`
     </t>
 `;
 
-// Patch the Import BlockUI (used by base_import) to also use the selected loader.
-// base_import defines its own block UI template, so the web BlockUI patch doesn't apply there.
+
 patch(ImportBlockUI.prototype, {
-  setup() {
-    super.setup();
-    this.loaderClass = session.loaderClass;
-  },
+    setup() {
+        super.setup();
+        this.loaderClass = session.loaderClass;
+    },
 });
 
 ImportBlockUI.template = xml`

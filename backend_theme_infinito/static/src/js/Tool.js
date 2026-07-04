@@ -1,6 +1,6 @@
 /** @odoo-module **/
-import { Component } from "@odoo/owl";
-import { ThemeStudioWidget } from "./ThemeStudioWidget";
+import {ThemeStudioWidget} from "./ThemeStudioWidget";
+
 export class Tool extends ThemeStudioWidget {
     constructor() {
         super(...arguments);
@@ -14,6 +14,7 @@ export class Tool extends ThemeStudioWidget {
         await super.willStart();
         this.render();
     }
+
     /**
      * Renders the tool component.
      * @returns {Array} The generated style options.
@@ -27,6 +28,7 @@ export class Tool extends ThemeStudioWidget {
             return this.tool;
         }
     }
+
     /**
      * Gets the CSS style of a given class name, filtering out unwanted rules.
      * @param {string} className - The CSS class name.

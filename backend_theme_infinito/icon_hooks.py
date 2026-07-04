@@ -24,7 +24,6 @@ import base64
 
 from odoo.modules import get_module_resource
 
-
 MENU_ICON_MAP = {
     # Top-level menus whose icons are overwritten by this theme at install time.
     "Contacts": "contact.png",
@@ -70,11 +69,36 @@ def _theme_icon_b64(icon_filename):
 
 
 def icons_post_init_hook(env):
-    """Post init hook for changing menu icons.
+    """Post init hook for changing menu icons and resetting dynamic CSS.
 
     Note: This writes on existing `ir.ui.menu` records, so it must also be
     reverted on uninstall to avoid leaving permanent UI changes behind.
+    Clears any stale dynamic_css parameter (e.g. migrated from Odoo 17) so
+    the theme starts with a clean stylesheet on every fresh install.
+    Also removes the old Odoo 17 ir.asset record that bundled the physical
+    dynamic_styles.css static file, which pollutes the asset bundle when the
+    database was migrated or the Odoo 17 module path is still on the addons path.
     """
+    set_param = env['ir.config_parameter'].sudo().set_param
+
+    set_param('backend_theme_infinito.dynamic_css', '')
+
+    # Enable sidebar by default so the theme's navigation is visible on fresh installs.
+    set_param('backend_theme_infinito.is_sidebar_enabled', 'True')
+    set_param('backend_theme_infinito.is_sidebar_icon', 'True')
+    set_param('backend_theme_infinito.is_sidebar_name', 'True')
+    set_param('backend_theme_infinito.is_sidebar_company', 'True')
+    set_param('backend_theme_infinito.is_sidebar_user', 'True')
+
+    # Remove stale ir.asset record left by the Odoo 16/17 version of this theme.
+    # That version registered dynamic_styles.css as a bundle file; Odoo 18 serves
+    # it via a controller instead, so the record must not exist.
+    stale_asset = env['ir.asset'].sudo().search([
+        ('path', 'like', 'backend_theme_infinito/static/src/css/dynamic_styles.css')
+    ])
+    if stale_asset:
+        stale_asset.unlink()
+
     menus = env["ir.ui.menu"].sudo().search([("parent_id", "=", False)])
     for menu in menus:
         filename = MENU_ICON_MAP.get(menu.name)

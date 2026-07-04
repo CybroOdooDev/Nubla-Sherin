@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates id="template" xml:space="preserve">
+    <!-- Theme Studio main template for backend customization interface.
+     Includes navigation menu, responsive controls, and dynamic view components. -->
     <t t-name="backend_theme_infinito.ThemeStudioMenu">
         <section class="">
             <link rel="stylesheet"

@@ -21,11 +21,11 @@
 #############################################################################
 {
     "name": "Infinito Backend Theme",
-    "description": """Utmost and dynamic backend theme for Odoo 17""",
-    "summary": """The Backend Theme Infinito Is A Dynamic And Ultimate Theme
-     For Your Odoo V17. This Theme Will Give You A New Experience With Odoo.
-      Main Highlight Of The Theme Is You Can Dynamically Change The Colors,
-       Views, Buttons, Different Types Sidebar...Etc""",
+    "description": """Modern and customizable backend theme for Odoo 18 with dynamic colors,
+enhanced navigation, and an improved user experience""",
+    "summary": """Infinito Backend Theme for Odoo 18 provides a modern and flexible interface
+with dynamic color customization, multiple sidebar layouts, enhanced views,
+and improved navigation for a better Odoo backend experience.""",
     "category": "Themes/Backend",
     "version": "18.0.1.0.0",
     'author': 'Cybrosys Techno Solutions',
@@ -76,6 +76,9 @@
             '/backend_theme_infinito/static/src/js/style_add.js',
             '/backend_theme_infinito/static/src/js/sidebar.js',
             '/backend_theme_infinito/static/src/js/navbar.js',
+            '/backend_theme_infinito/static/src/js/webclient.js',
+            '/backend_theme_infinito/static/src/js/dropdown_item.js',
+            '/backend_theme_infinito/static/src/js/control_panel.js',
             '/backend_theme_infinito/static/src/js/theme_editor_sidebar.js',
             '/backend_theme_infinito/static/src/js/recentApps.js',
             '/backend_theme_infinito/static/src/js/editor_menu.js',

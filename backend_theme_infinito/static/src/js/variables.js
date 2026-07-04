@@ -1,5 +1,4 @@
 /** @odoo-module **/
-import { useState } from "@odoo/owl";
 /**
  * Object containing CSS variable names and their corresponding ranges for generating color variations.
  * @type {Object.<string, number[]>}
@@ -72,6 +71,7 @@ const colors = [
     ['F3F0F0', '797075', '986351', '7B4E46', '2C2B30'],
     ['F9F8F8', '93BBB8', '2BA699', 'A59D4E', '335A43'],
 ];
+
 /**
  * Function to generate a color based on the given base color and variation.
  * @param {string} cwith2 - The base color code (6 digits hex).
@@ -82,15 +82,16 @@ function to_color(cwith2, aaa) {
     const p1_x = Math.round(aaa * 255 / 100);
     const p2_x = Math.round(aaa * 255 / 100);
     const p3_x = Math.round(aaa * 255 / 100);
-    const r = parseInt(cwith2.substring(0,2), 16);
-    const g = parseInt(cwith2.substring(2,4), 16);
-    const b = parseInt(cwith2.substring(4,6), 16);
+    const r = parseInt(cwith2.substring(0, 2), 16);
+    const g = parseInt(cwith2.substring(2, 4), 16);
+    const b = parseInt(cwith2.substring(4, 6), 16);
     const r_r = Math.abs(r - p1_x);
     const r_g = Math.abs(g - p2_x);
     const r_b = Math.abs(b - p3_x);
     const result = rgbToHex(r_r, r_g, r_b);
     return result;
 }
+
 /**
  * Function to convert a component value to hexadecimal.
  * @param {number} c - The component value.
@@ -100,6 +101,7 @@ function componentToHex(c) {
     const hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
 }
+
 /**
  * Function to convert RGB components to hexadecimal color code.
  * @param {number} r - The red component.
@@ -111,4 +113,4 @@ function rgbToHex(r, g, b) {
     return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
-export { variables, colors, to_color };
+export {variables, colors, to_color};

@@ -22,7 +22,6 @@
 import json
 from odoo import http
 from odoo.http import request
-
 from odoo.modules.module import get_module_resource
 
 class BasePwa(http.Controller):
@@ -61,9 +60,7 @@ class BasePwa(http.Controller):
     def base_pwa_data(self):
         """
         Endpoint for serving the PWA manifest file.
-
-        Returns:
-            odoo.http.Response: HTTP response containing the PWA manifest data.
+        Returns: odoo.http.Response: HTTP response containing the PWA manifest data.
         """
         return request.make_response(json.dumps(self.pwa_data()),
                                      headers=[('Content-Type',

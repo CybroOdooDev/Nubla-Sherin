@@ -1,7 +1,9 @@
 .o_list_view .o_list_table tbody tr{
     @for $tr from 1 through 80 {
         &:nth-child(#{$tr}) {
-            animation: infinito_lazy_show #{$tr * .1}s ease-in;
+            /* Reduced from 0.1s per row to 0.025s so a 80-row table is fully
+               visible in ~2 s instead of 8 s. */
+            animation: infinito_lazy_show #{$tr * .025}s ease-in;
         }
     }
 }
@@ -14,7 +16,7 @@
 .o_form_view {
     .o_form_sheet_bg {
         .o_form_sheet {
-            animation: infinito_lazy_show .5s ease-in;
+            animation: infinito_lazy_show .2s ease-in;
         }
     }
 }
@@ -33,7 +35,8 @@
     .oe_kanban_card, .o_kanban_record {
         @for $tr from 1 through 80 {
             &:nth-child(#{$tr}) {
-                animation: infinito_kanban_shake #{$tr * .1}s ease-in;
+                /* Reduced stagger from 0.1s per card to 0.025s for faster render. */
+                animation: infinito_kanban_shake #{$tr * .025}s ease-in;
             }
         }
     }

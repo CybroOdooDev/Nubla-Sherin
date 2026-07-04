@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class InfinitoMenuBookmark(models.Model):
@@ -29,7 +29,12 @@ class InfinitoMenuBookmark(models.Model):
     _name = 'infinito.menu.bookmark'
     _description = 'Menu Bookmark'
 
-    name = fields.Char(related='action_id.name')
-    action_id = fields.Many2one('ir.actions.act_window')
+    name = fields.Char('Name', default='Bookmark')
+    action_id = fields.Many2one('ir.actions.actions', ondelete='cascade', db_constraint=False)
+    menu_id = fields.Many2one('ir.ui.menu', ondelete='cascade', db_constraint=False)
     url = fields.Text('Url')
     user_id = fields.Many2one('res.users')
+
+    @api.model
+    def _valid_field_parameter(self, field, name):
+        return name == 'db_constraint' or super()._valid_field_parameter(field, name)

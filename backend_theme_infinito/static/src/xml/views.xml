@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates>
-    <!--    Views-->
+   <!-- Theme Studio templates for customizing backend UI components.
+     Includes previews and styling options for views and interface elements. -->
     <t t-name="backend_theme_infinito.ThemeStudio_tree">
         <header class="main_header backend_theme_studio_menu theme_editor"/>
         <section class="main_bodY backend_theme_studio_sidebar theme_editor">

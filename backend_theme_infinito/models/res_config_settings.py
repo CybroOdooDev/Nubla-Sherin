@@ -25,7 +25,6 @@ from odoo import api, fields, models
 class ResConfigSettings(models.TransientModel):
     """
    Model representing configuration settings for the system.
-
    This model allows the administrator to configure various settings
    related to the user interface and system behavior.
    """
@@ -38,8 +37,8 @@ class ResConfigSettings(models.TransientModel):
     is_sidebar_icon = fields.Boolean('Sidebar icon Enabled', default=True)
     is_sidebar_name = fields.Boolean('Sidebar name Enabled', default=True)
     is_sidebar_company = fields.Boolean('Sidebar Company Enabled',
-                                        default=False)
-    is_sidebar_user = fields.Boolean('Sidebar User Enabled', default=False)
+                                        default=True)
+    is_sidebar_user = fields.Boolean('Sidebar User Enabled', default=True)
     is_recent_apps = fields.Boolean('Recent Apps Enabled', default=False)
     is_fullscreen_app = fields.Boolean('Full screen Apps Enabled',
                                        default=False)
@@ -77,13 +76,13 @@ class ResConfigSettings(models.TransientModel):
         res['is_fullscreen_enabled'] = get_param(
             'backend_theme_infinito.is_fullscreen_enabled', default=False)
         res['is_sidebar_icon'] = get_param(
-            'backend_theme_infinito.is_sidebar_icon', default=False)
+            'backend_theme_infinito.is_sidebar_icon', default=True)
         res['is_sidebar_name'] = get_param(
-            'backend_theme_infinito.is_sidebar_name', default=False)
+            'backend_theme_infinito.is_sidebar_name', default=True)
         res['is_sidebar_company'] = get_param(
-            'backend_theme_infinito.is_sidebar_company', default=False)
+            'backend_theme_infinito.is_sidebar_company', default=True)
         res['is_sidebar_user'] = get_param(
-            'backend_theme_infinito.is_sidebar_user', default=False)
+            'backend_theme_infinito.is_sidebar_user', default=True)
         res['is_recent_apps'] = get_param(
             'backend_theme_infinito.is_recent_apps', default=False)
         res['is_rtl'] = get_param('backend_theme_infinito.is_rtl',

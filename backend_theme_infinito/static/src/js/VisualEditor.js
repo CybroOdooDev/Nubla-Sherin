@@ -1,11 +1,13 @@
 /** @odoo-module **/
-import { Dialog } from "@web/core/dialog/dialog";
-const { useRef, onWillStart, xml ,onMounted} = owl;
+import {Dialog} from "@web/core/dialog/dialog";
+
+const {useRef, onWillStart, xml, onMounted} = owl;
+
 /**
  * VisualEditor class for creating a visual editor dialog.
  * @extends Dialog
  */
-export class VisualEditor extends Dialog{
+export class VisualEditor extends Dialog {
     setup(element) {
         this.element = element;
         var options = {};
@@ -13,15 +15,20 @@ export class VisualEditor extends Dialog{
         options.size = 'medium';
         var self = this;
         options.buttons = [];
-        options.buttons.push({text: "Apply", classes: "btn-primary", click: function (e) {
-            self._applyStyle();
-        }});
+        options.buttons.push({
+            text: "Apply", classes: "btn-primary", click: function (e) {
+                self._applyStyle();
+            }
+        });
         options.buttons.push({text: "Cancel", close: true});
-        options.buttons.push({text: "Advanced", classes: "btn-primary", click: function (e) {
-            self._openAdvanced();
-        }});
+        options.buttons.push({
+            text: "Advanced", classes: "btn-primary", click: function (e) {
+                self._openAdvanced();
+            }
+        });
         this._super(element, options);
     }
+
     async onWillStart() {
         this.$el[0].append(this.element[0].cloneNode(true));
         this.preview = this.$(this.$el[0].firstChild);
@@ -46,6 +53,7 @@ export class VisualEditor extends Dialog{
             }
         }
     }
+
     /**
      * Handles input change event to update preview style.
      * @param {Event} e - The input change event.
@@ -69,49 +77,53 @@ export class VisualEditor extends Dialog{
                 }
             }
         }
-        if(add) {
+        if (add) {
             style.push(`${name}: ${value}`);
         }
         style = style.join(';');
         this.preview.attr('style', style);
     }
+
     /**
      * Applies the style from preview to the target element.
      */
-     _applyStyle() {
+    _applyStyle() {
         var style = this.preview.attr('style');
         this.element.attr('style', style);
     }
 }
+
 /**
  * Converts a component value to hexadecimal representation.
  * @param {number} c - The component value.
  * @returns {string} The hexadecimal representation.
  */
 function componentToHex(c) {
-       c = parseInt(c);
-      var hex = c.toString(16);
-      return hex.length == 1 ? "0" + hex : hex;
-    }
-    /**
-     * Converts RGB components to hexadecimal color code.
-     * @param {number} r - The red component.
-     * @param {number} g - The green component.
-     * @param {number} b - The blue component.
-     * @returns {string} The hexadecimal color code.
-     */
-    function rgbToHex(r, g, b) {
-      return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-    }
-    /**
-     * Calculates percentage value relative to screen width.
-     * @param {number} value - The value to convert to percentage.
-     * @returns {number} The calculated percentage value.
-     */
-     function getPercentage(value) {
-        var screenWidth = window.screen.width;
-        var perc = ( screenWidth - value ) / screenWidth;
-        return perc;
-    }
+    c = parseInt(c);
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
 
-    return VisualEditor;
+/**
+ * Converts RGB components to hexadecimal color code.
+ * @param {number} r - The red component.
+ * @param {number} g - The green component.
+ * @param {number} b - The blue component.
+ * @returns {string} The hexadecimal color code.
+ */
+function rgbToHex(r, g, b) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+/**
+ * Calculates percentage value relative to screen width.
+ * @param {number} value - The value to convert to percentage.
+ * @returns {number} The calculated percentage value.
+ */
+function getPercentage(value) {
+    var screenWidth = window.screen.width;
+    var perc = (screenWidth - value) / screenWidth;
+    return perc;
+}
+
+return VisualEditor;

@@ -36,8 +36,8 @@ class ResUser(models.Model):
     is_sidebar_icon = fields.Boolean('Sidebar icon Enabled', default=True)
     is_sidebar_name = fields.Boolean('Sidebar name Enabled', default=True)
     is_sidebar_company = fields.Boolean('Sidebar Company Enabled',
-                                        default=False)
-    is_sidebar_user = fields.Boolean('Sidebar User Enabled', default=False)
+                                        default=True)
+    is_sidebar_user = fields.Boolean('Sidebar User Enabled', default=True)
     is_recent_apps = fields.Boolean('Recent Apps Enabled', default=False)
     is_fullscreen_app = fields.Boolean('Full screen Apps Enabled',
                                        default=False)

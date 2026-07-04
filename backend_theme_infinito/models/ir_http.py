@@ -22,14 +22,23 @@
 from odoo import models
 
 
+def to_bool(value):
+    """
+    Convert ir.config_parameter values to real booleans for JS session data.
+    """
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    return str(value).strip().lower() in ('1', 'true', 't', 'yes', 'y', 'on')
+
+
 def float_to_time(time):
     """
     Convert a floating-point number representing time in hours to a string
     formatted as 'HH:MM'.
-
     Parameters:
     - time (float): The time in hours to be converted.
-
     Returns:
     - str: A string representing the time in the format 'HH:MM'.
    """
@@ -55,8 +64,8 @@ class IrHttp(models.AbstractModel):
         res = super(IrHttp, self).session_info()
         get_param = self.env['ir.config_parameter'].sudo().get_param
         if self.env.user.has_group('base.group_user'):
-            user_edit = get_param(
-                'backend_theme_infinito.is_user_edit', default=False)
+            user_edit = to_bool(get_param(
+                'backend_theme_infinito.is_user_edit', default=False))
             res['userEdit'] = user_edit
             if user_edit:
                 res['sidebar'] = self.env.user.is_sidebar_enabled
@@ -76,43 +85,45 @@ class IrHttp(models.AbstractModel):
                 res['infinitoBookmark'] = self.env.user.is_menu_bookmark
                 res['loaderClass'] = self.env.user.loader_class
             else:
-                res['sidebar'] = get_param(
-                    'backend_theme_infinito.is_sidebar_enabled', default=False)
-                res['fullscreen'] = get_param(
+                res['sidebar'] = to_bool(get_param(
+                    'backend_theme_infinito.is_sidebar_enabled', default=False))
+                res['fullscreen'] = to_bool(get_param(
                     'backend_theme_infinito.is_fullscreen_enabled',
-                    default=False)
-                res['sidebarIcon'] = get_param(
-                    'backend_theme_infinito.is_sidebar_icon', default=False)
-                res['sidebarName'] = get_param(
-                    'backend_theme_infinito.is_sidebar_name', default=False)
-                res['sidebarCompany'] = get_param(
-                    'backend_theme_infinito.is_sidebar_company', default=False)
-                res['sidebarUser'] = get_param(
-                    'backend_theme_infinito.is_sidebar_user', default=False)
-                res['recentApps'] = get_param(
-                    'backend_theme_infinito.is_recent_apps', default=False)
-                res['fullScreenApp'] = get_param(
-                    'backend_theme_infinito.is_fullscreen_app', default=False)
-                res['infinitoRtl'] = get_param(
-                    'backend_theme_infinito.is_rtl', default=False)
-                res['infinitoDark'] = get_param(
-                    'backend_theme_infinito.is_dark', default=False)
+                    default=False))
+                res['sidebarIcon'] = to_bool(get_param(
+                    'backend_theme_infinito.is_sidebar_icon', default=True))
+                res['sidebarName'] = to_bool(get_param(
+                    'backend_theme_infinito.is_sidebar_name', default=True))
+                res['sidebarCompany'] = to_bool(get_param(
+                    'backend_theme_infinito.is_sidebar_company', default=True))
+                res['sidebarUser'] = to_bool(get_param(
+                    'backend_theme_infinito.is_sidebar_user', default=True))
+                res['recentApps'] = to_bool(get_param(
+                    'backend_theme_infinito.is_recent_apps', default=False))
+                res['fullScreenApp'] = to_bool(get_param(
+                    'backend_theme_infinito.is_fullscreen_app', default=False))
+                res['infinitoRtl'] = to_bool(get_param(
+                    'backend_theme_infinito.is_rtl', default=False))
+                res['infinitoDark'] = to_bool(get_param(
+                    'backend_theme_infinito.is_dark', default=False))
                 res['infinitoDarkMode'] = get_param(
                     'backend_theme_infinito.dark_mode', default=False)
                 res['infinitoDarkStart'] = float_to_time(get_param(
                     'backend_theme_infinito.dark_start', default=19.0))
                 res['infinitoDarkEnd'] = float_to_time(get_param(
                     'backend_theme_infinito.dark_end', default=5.0))
-                res['infinitoBookmark'] = get_param(
-                    'backend_theme_infinito.is_menu_bookmark', default=False)
+                res['infinitoBookmark'] = to_bool(get_param(
+                    'backend_theme_infinito.is_menu_bookmark', default=False))
                 res['loaderClass'] = get_param(
                     'backend_theme_infinito.loader_class', default=False)
             menu_bookmark = self.env['infinito.menu.bookmark'].sudo(). \
                 search([('user_id', '=', self.env.user.id)])
             list_bookmark = []
             for bookmark in menu_bookmark:
-                bkm = bookmark.read(['action_id', 'url', 'name'])[0]
-                bkm['short_name'] = bkm['name'][:2].upper()
+                bkm = bookmark.read(['action_id', 'menu_id', 'url', 'name'])[0]
+                name_val = bkm.get('name') or 'Bookmark'
+                bkm['name'] = name_val
+                bkm['short_name'] = name_val[:2].upper()
                 list_bookmark.append(bkm)
             res['infinitoBookmarks'] = menu_bookmark.action_id.ids
             res['infinitoMenuBookmarks'] = list_bookmark

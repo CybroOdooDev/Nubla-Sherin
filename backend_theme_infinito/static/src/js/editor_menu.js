@@ -1,12 +1,8 @@
 /** @odoo-module **/
-import { ThemeStudioWidget } from "./ThemeStudioWidget";
-import { Component, useState, mount, xml, onWillStart, useEnv, onMounted } from "@odoo/owl";
-import { session } from "@web/session";
-import { TimePicker } from "./timepicker";
-import { rpc } from "@web/core/network/rpc";
-import { BlockUI } from "@web/core/ui/block_ui";
-import { Dialog } from "@web/core/dialog/dialog";
-import { useService } from "@web/core/utils/hooks";
+import {Component, useState, xml, onMounted} from "@odoo/owl";
+import {session} from "@web/session";
+import {TimePicker} from "./timepicker";
+import {rpc} from "@web/core/network/rpc";
 
 export class Counter extends Component {
     static template = xml`
@@ -389,6 +385,7 @@ export class Counter extends Component {
                 </div>
             </div>
         </t>`;
+
     /**
      * Setup function to initialize the state and perform actions on component mount.
      */
@@ -462,6 +459,7 @@ export class Counter extends Component {
     async renderData() {
 
     }
+
     /**
      * Method to close the component and reload the page.
      * This method triggers a click event on the element with the ID 'hamburger' and reloads the page.
@@ -474,6 +472,7 @@ export class Counter extends Component {
         }
         location.reload();
     }
+
     /**
      * Asynchronously saves the changes made by the user.
      * This method collects values from various toggler elements, updates session variables,
@@ -517,11 +516,11 @@ export class Counter extends Component {
             let result;
             if (isUserEdit) {
                 result = await rpc('/theme_studio/set_advanced_data_user', {
-                    args: [{ vals }]
+                    args: [{vals}]
                 });
             } else {
                 result = await rpc('/theme_studio/set_advanced_data', {
-                    args: [{ vals }]
+                    args: [{vals}]
                 });
             }
 
@@ -555,13 +554,14 @@ export class Counter extends Component {
             alert('Failed to save: ' + (error.message || 'Unknown error'));
         }
     }
+
     /**
      * Reloads the window to discard changes and close the component.
      */
     _Close_changes() {
-        // Reload the window to discard changes and close the component
         window.location.reload();
     }
+
     /**
      * Handles the change event when the loader selection is modified.
      * @param {Event} ev - The event object representing the change event.
@@ -589,6 +589,7 @@ export class Counter extends Component {
             }
         }, 3000)
     }
+
     /**
      * Handles the change event when the time selection is modified.
      * @param {Event} ev - The event object representing the change event.
@@ -598,6 +599,7 @@ export class Counter extends Component {
         this.darkStartFloat = this.timeToFloat(ev.target.value);
         this.darkStart = ev.target.value;
     }
+
     /**
      * Handles the change event when the second time selection is modified.
      * @param {Event} ev - The event object representing the change event.
@@ -607,21 +609,22 @@ export class Counter extends Component {
         this.darkEndFloat = this.timeToFloat(ev.target.value);
         this.darkEnd = ev.target.value;
     }
+
     /**
      * Handles the change event when the dark mode option is modified.
      * @param {Event} ev - The event object representing the change event.
      */
     _OnChangeDark(ev) {
-        // Call the showDarkOptions method with the checked status of the target element
         this.showDarkOptions(ev.target.checked);
         console.log("DHDHHHHHHHHHHH")
         console.log("djjj")
 
     }
+
     /**
-    * Displays or hides dark mode options based on the toggle status.
-    * @param {boolean} toggle - The toggle status indicating whether to show or hide the dark mode options.
-    */
+     * Displays or hides dark mode options based on the toggle status.
+     * @param {boolean} toggle - The toggle status indicating whether to show or hide the dark mode options.
+     */
     showDarkOptions(toggle) {
         // Toggle display of dark switch based on the toggle status
         const darkSwitch = document.querySelector('.dark-switch');
@@ -644,10 +647,11 @@ export class Counter extends Component {
             }
         }
     }
+
     /**
-    * Handles the change event when the dark mode setting is modified.
-    * @param {Event} ev - The event object representing the change event.
-    */
+     * Handles the change event when the dark mode setting is modified.
+     * @param {Event} ev - The event object representing the change event.
+     */
     onChangeDarkMode(ev) {
         const target = ev.target.closest('a');
         if (target) {
@@ -662,6 +666,7 @@ export class Counter extends Component {
             }
         }
     }
+
     /**
      * Converts time string (HH:MM) to float (HH.MM).
      * @param {string} time - Time in HH:MM format.
@@ -687,11 +692,12 @@ export class Counter extends Component {
         }
     }
 }
+
 export class EditorMenu extends Component {
     static template = xml` <t t-name="backend_theme_infinito.sidebar_simple_editor">
         <div class="sidebar_simple_editor">
             <Counter/>
         </div>
     </t>`;
-    static components = { Counter };
+    static components = {Counter};
 }

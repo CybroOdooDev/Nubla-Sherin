@@ -1,8 +1,6 @@
 /** @odoo-module **/
-import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
-const { onMounted, mount } = owl
-import { EditorClientAction } from "./editor_client_action"
+import {registry} from "@web/core/registry";
+
 /**
  * EditorService module for managing editor-related functionality.
  */
@@ -20,7 +18,8 @@ export const EditorService = {
         function _getCurrentAction() {
             return currentController ? currentController.action : null;
         }
-         /**
+
+        /**
          * Opens the editor.
          */
         async function open() {
@@ -31,6 +30,7 @@ export const EditorService = {
                 target: "current",
             });
         }
+
         return {
             open
         };
