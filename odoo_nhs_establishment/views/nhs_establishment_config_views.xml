@@ -45,12 +45,77 @@
         <field name="name">nhs.cost.centre.list</field>
         <field name="model">nhs.cost.centre</field>
         <field name="arch" type="xml">
-            <list string="Cost Centres" editable="bottom" decoration-muted="not active">
+            <list string="Cost Centres" decoration-muted="not active"
+                  decoration-danger="budget_amount and budget_variance &lt; 0">
                 <field name="code"/>
                 <field name="name"/>
                 <field name="company_id" groups="base.group_multi_company"/>
+                <field name="funded_fte" sum="Funded FTE"/>
+                <field name="vacant_fte" sum="Vacant FTE"/>
+                <field name="budget_amount" sum="Annual Budget"/>
+                <field name="indicative_pay_total" sum="Indicative Annual Spend"/>
+                <field name="budget_variance" sum="Budget Variance"/>
+                <field name="budget_utilization" widget="percentage" optional="hide"/>
                 <field name="active" column_invisible="True"/>
             </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_cost_centre_form" model="ir.ui.view">
+        <field name="name">nhs.cost.centre.form</field>
+        <field name="model">nhs.cost.centre</field>
+        <field name="arch" type="xml">
+            <form string="Cost Centre">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_posts" type="object"
+                                class="oe_stat_button" icon="fa-users">
+                            <field name="post_count" widget="statinfo" string="Posts"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Main Theatres"/></h1>
+                    </div>
+                    <group>
+                        <group string="Reference">
+                            <field name="code"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group string="Budget">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="budget_amount"/>
+                            <field name="indicative_pay_total"/>
+                            <field name="budget_variance"/>
+                            <field name="budget_utilization" widget="percentage"/>
+                        </group>
+                    </group>
+                    <group string="Establishment">
+                        <group>
+                            <field name="funded_fte"/>
+                            <field name="in_post_fte"/>
+                            <field name="vacant_fte"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_cost_centre_search" model="ir.ui.view">
+        <field name="name">nhs.cost.centre.search</field>
+        <field name="model">nhs.cost.centre</field>
+        <field name="arch" type="xml">
+            <search string="Search Cost Centres">
+                <field name="name"/>
+                <field name="code"/>
+                <filter string="Over Budget" name="filter_over_budget"
+                        domain="[('budget_amount', '>', 0), ('budget_variance', '&lt;', 0)]"/>
+                <filter string="Archived" name="filter_archived" domain="[('active', '=', False)]"/>
+            </search>
         </field>
     </record>
 
@@ -58,6 +123,7 @@
         <field name="name">Cost Centres</field>
         <field name="res_model">nhs.cost.centre</field>
         <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_nhs_cost_centre_search"/>
     </record>
 
     <!-- ── Settings extension ──────────────────────────────────── -->

@@ -1,5 +1,0 @@
-id,name,code,unit_type,parent_id/id,cost_centre
-OU_SURGERY,Surgery,,directorate,,
-OU_THEATRES,Theatres,,division,OU_SURGERY,
-OU_MAIN_THEATRES,Main Theatres,,department,OU_THEATRES,CC-100
-OU_THEATRE3_TEAM,Theatre 3 Nursing Team,,team,OU_MAIN_THEATRES,CC-100

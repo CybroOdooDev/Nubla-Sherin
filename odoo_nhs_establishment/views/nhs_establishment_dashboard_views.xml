@@ -153,7 +153,7 @@
         <field name="code">
 posts = env['nhs.establishment.post'].search([
     ('vacancy_status', 'in', ['part_vacant', 'fully_vacant']),
-    ('status', '!=', 'deleted')
+    ('status', 'in', ['active', 'frozen'])
 ])
 action = env.ref('odoo_nhs_establishment.action_report_nhs_vacancy_register').report_action(posts)
         </field>

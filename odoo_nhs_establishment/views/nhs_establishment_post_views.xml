@@ -239,6 +239,7 @@
                     <filter string="Org Unit" name="groupby_org_unit" context="{'group_by': 'org_unit_id'}"/>
                     <filter string="Staff Group" name="groupby_staff_group" context="{'group_by': 'staff_group_id'}"/>
                     <filter string="Band" name="groupby_band" context="{'group_by': 'band_id'}"/>
+                    <filter string="Cost Centre" name="groupby_cost_centre" context="{'group_by': 'cost_centre'}"/>
                     <filter string="Vacancy Status" name="groupby_vacancy_status" context="{'group_by': 'vacancy_status'}"/>
                 </group>
             </search>
@@ -264,7 +265,7 @@
         <field name="name">Vacancy Register</field>
         <field name="res_model">nhs.establishment.post</field>
         <field name="view_mode">list,form</field>
-        <field name="domain">[('vacancy_status','in',('part_vacant','fully_vacant')),('is_frozen','=',False)]</field>
+        <field name="domain">[('status','=','active'),('vacancy_status','in',('part_vacant','fully_vacant')),('is_frozen','=',False)]</field>
         <field name="search_view_id" ref="view_nhs_establishment_post_search"/>
         <field name="context">{'search_default_groupby_org_unit': 0}</field>
         <field name="help" type="html">

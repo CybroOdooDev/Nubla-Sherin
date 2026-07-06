@@ -1,2 +1,0 @@
-id,job_title,org_unit_id/id,staff_group_id/id,band_id/id,is_medical,funded_fte,funded_headcount,in_post_fte,in_post_headcount,cost_centre,contracted_hours,contract_type,status
-POST_DEMO_1,Band 5 Theatre Nurse,OU_THEATRE3_TEAM,odoo_nhs_establishment.staff_group_nursing_midwifery,odoo_nhs_establishment.afc_band_5,0,4.0,4,3.0,3,CC-100,37.5,permanent,active

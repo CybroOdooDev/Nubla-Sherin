@@ -16,6 +16,7 @@ export class NhsEstablishmentDashboardAction extends Component {
             bands: [],
             hotspots: [],
             payBudgets: [],
+            costCentres: [],
         });
         onWillStart(() => this._loadData());
     }
@@ -35,6 +36,14 @@ export class NhsEstablishmentDashboardAction extends Component {
             [["funded_fte", ">", 0]],
             ["name", "complete_name", "funded_fte", "in_post_fte", "vacant_fte", "vacancy_rate", "manager_id"],
             { order: "vacancy_rate desc", limit: 5 }
+        );
+
+        // Load cost-centre budgets, worst utilisation first
+        const costCentres = await this.orm.searchRead(
+            "nhs.cost.centre",
+            [["budget_amount", ">", 0]],
+            ["name", "code", "budget_amount", "indicative_pay_total", "budget_variance", "budget_utilization"],
+            { order: "budget_utilization desc", limit: 5 }
         );
 
         // Process summary
@@ -109,7 +118,15 @@ export class NhsEstablishmentDashboardAction extends Component {
             };
         });
         this.state.payBudgets = payBudgets;
+        this.state.costCentres = costCentres.map(cc => ({
+            ...cc,
+            budget_utilization: (cc.budget_utilization || 0) * 100,
+        }));
         this.state.loading = false;
+    }
+
+    async refresh() {
+        await this._loadData();
     }
 
     formatFTE(val) {
@@ -125,11 +142,15 @@ export class NhsEstablishmentDashboardAction extends Component {
     }
 
     async openDetails(viewName, resModel, domain = [], context = {}) {
+        const viewTypes = "pivot_row_groupby" in context || "pivot_measures" in context
+            ? ["pivot", "list"]
+            : ["list", "form"];
         await this.action.doAction({
             type: "ir.actions.act_window",
             name: viewName,
             res_model: resModel,
-            view_mode: "list,form",
+            views: viewTypes.map((v) => [false, v]),
+            view_mode: viewTypes.join(","),
             domain: domain,
             context: context,
         });
@@ -141,6 +162,16 @@ export class NhsEstablishmentDashboardAction extends Component {
             "nhs.establishment.post",
             [["org_unit_id", "child_of", hotspot.id], ["status", "in", ["active", "frozen"]]]
         );
+    }
+
+    async openCostCentre(costCentre) {
+        await this.action.doAction({
+            type: "ir.actions.act_window",
+            name: costCentre.name,
+            res_model: "nhs.cost.centre",
+            views: [[false, "form"]],
+            res_id: costCentre.id,
+        });
     }
 }
 

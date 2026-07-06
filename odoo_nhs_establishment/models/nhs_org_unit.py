@@ -19,8 +19,8 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import api, fields, models
-from odoo.exceptions import ValidationError
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError, ValidationError
 
 UNIT_TYPES = [
     ('directorate', 'Directorate'),
@@ -182,6 +182,49 @@ class NhsOrgUnit(models.Model):
     def _check_parent_recursion(self):
         if not self._check_recursion():
             raise ValidationError('You cannot create a recursive organisational hierarchy!')
+
+    @api.constrains('active')
+    def _check_archive_with_live_posts(self):
+        for unit in self:
+            if unit.active:
+                continue
+            live_posts = unit.post_ids.filtered(lambda p: p.status in ('active', 'frozen'))
+            if live_posts:
+                raise ValidationError(_(
+                    "You cannot archive '%(unit)s': it still has %(count)d active/frozen"
+                    " post(s) assigned to it (%(refs)s).\n"
+                    "Reassign those posts to another unit, or mark them as deleted first.",
+                    unit=unit.complete_name,
+                    count=len(live_posts),
+                    refs=', '.join(live_posts.mapped('reference')[:10]),
+                ))
+
+    def unlink(self):
+        for unit in self:
+            blocking_posts = self.env['nhs.establishment.post'].with_context(
+                active_test=False).search([('org_unit_id', '=', unit.id)])
+            if blocking_posts:
+                raise UserError(_(
+                    "You cannot delete '%(unit)s': %(count)d post(s) are still assigned"
+                    " to it (%(refs)s).\n"
+                    "Reassign or delete those posts first, or archive this unit instead"
+                    " of deleting it.",
+                    unit=unit.complete_name,
+                    count=len(blocking_posts),
+                    refs=', '.join(blocking_posts.mapped('reference')[:10]),
+                ))
+            blocking_children = self.with_context(active_test=False).search(
+                [('parent_id', '=', unit.id)])
+            if blocking_children:
+                raise UserError(_(
+                    "You cannot delete '%(unit)s': it still has %(count)d sub-unit(s)"
+                    " under it (%(names)s).\n"
+                    "Delete or re-parent those sub-units first.",
+                    unit=unit.complete_name,
+                    count=len(blocking_children),
+                    names=', '.join(blocking_children.mapped('complete_name')[:10]),
+                ))
+        return super().unlink()
 
     @api.model_create_multi
     def create(self, vals_list):
