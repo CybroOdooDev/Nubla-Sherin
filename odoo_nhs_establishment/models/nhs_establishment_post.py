@@ -430,6 +430,17 @@ class NhsEstablishmentPost(models.Model):
         self.write({'status': 'deleted'})
 
     @api.model
+    def get_import_templates(self):
+        """Provide the standard template offered on the Posts import screen.
+
+        The '?v=2' query string busts the browser's static-file cache after the
+        template content changes; bump it whenever the .xlsx is regenerated."""
+        return [{
+            'label': 'Import Template for Posts',
+            'template': '/odoo_nhs_establishment/static/import_templates/posts_import_template.xlsx?v=3',
+        }]
+
+    @api.model
     def _cron_check_long_vacancies(self, threshold_days=90):
         """Nightly refresh: nudge followers on posts vacant beyond the threshold
         so long-standing vacancies don't go unnoticed between reporting cycles."""

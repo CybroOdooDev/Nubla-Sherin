@@ -171,6 +171,42 @@
                                     string="Cost Centres" type="action" class="btn-link"/>
                         </setting>
                     </block>
+                    <block title="Data Import &amp; Onboarding" name="nhs_establishment_import_block">
+                        <setting id="nhs_import_org_units" string="Organisational Hierarchy"
+                                 help="Download the template, fill in one row per unit (parents above children), then use Establishment > Org Structure > ⚙ Import records.">
+                            <a class="btn-link" role="button"
+                               href="/odoo_nhs_establishment/static/import_templates/org_units_import_template.xlsx?v=3"
+                               target="_blank">
+                                <i class="oi oi-arrow-right"/> Download Org Units Template
+                            </a>
+                        </setting>
+                        <setting id="nhs_import_posts" string="Funded Posts"
+                                 help="Download the template, fill in funded FTE, band, staff group, cost centre and starting in-post FTE, then use Establishment > Posts > ⚙ Import records. Import the organisational hierarchy first.">
+                            <a class="btn-link" role="button"
+                               href="/odoo_nhs_establishment/static/import_templates/posts_import_template.xlsx?v=3"
+                               target="_blank">
+                                <i class="oi oi-arrow-right"/> Download Posts Template
+                            </a>
+                        </setting>
+                        <setting id="nhs_import_notes" string="Import Checklist" help=" ">
+                            <div class="text-muted" style="max-width: 480px;">
+                                <ol class="ps-3 mb-0">
+                                    <li>Import the organisational hierarchy first (Org Units template).</li>
+                                    <li>Import posts — funded FTE, band, staff group and cost centre together
+                                        with the starting in-post FTE, in one file.</li>
+                                    <li>In the Import wizard, untick "Create new values" for Parent Unit,
+                                        Manager / Lead, Staff Group, Agenda for Change Band and Cost Centre
+                                        columns so a typo is rejected instead of silently creating a
+                                        duplicate reference record.</li>
+                                    <li>Consider disabling Establishment Change Control (above) while
+                                        onboarding, then re-enabling it once your starting position is set —
+                                        otherwise each funded FTE cell edit will require a Change Request.</li>
+                                    <li>Once posts are imported, use the editable Posts list view to bulk
+                                        adjust Funded FTE / In-Post FTE inline without opening each form.</li>
+                                </ol>
+                            </div>
+                        </setting>
+                    </block>
                 </app>
             </xpath>
         </field>

@@ -5,7 +5,7 @@
         <field name="name">nhs.establishment.post.list</field>
         <field name="model">nhs.establishment.post</field>
         <field name="arch" type="xml">
-            <list string="Establishment Posts"
+            <list string="Establishment Posts" editable="bottom"
                   decoration-danger="vacancy_status == 'fully_vacant'"
                   decoration-warning="vacancy_status == 'part_vacant'"
                   decoration-info="vacancy_status == 'over_established'"

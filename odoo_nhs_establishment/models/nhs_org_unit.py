@@ -243,3 +243,14 @@ class NhsOrgUnit(models.Model):
             'domain': [('org_unit_id', 'child_of', self.id)],
             'context': {'default_org_unit_id': self.id},
         }
+
+    @api.model
+    def get_import_templates(self):
+        """Provide the standard template offered on the Org Structure import screen.
+
+        The '?v=2' query string busts the browser's static-file cache after the
+        template content changes; bump it whenever the .xlsx is regenerated."""
+        return [{
+            'label': 'Import Template for Org Units',
+            'template': '/odoo_nhs_establishment/static/import_templates/org_units_import_template.xlsx?v=3',
+        }]

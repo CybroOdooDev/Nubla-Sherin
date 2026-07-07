@@ -49,7 +49,7 @@ safe staffing and pay-budget planning.
     'license': 'OPL-1',
     'price': 0,
     'currency': 'EUR',
-    'depends': ['base', 'mail'],
+    'depends': ['base', 'mail', 'web_hierarchy'],
     'data': [
         'security/nhs_establishment_security.xml',
         'security/ir.model.access.csv',
@@ -73,6 +73,9 @@ safe staffing and pay-budget planning.
             'odoo_nhs_establishment/static/src/js/nhs_establishment_dashboard.js',
             'odoo_nhs_establishment/static/src/xml/nhs_establishment_dashboard.xml',
             'odoo_nhs_establishment/static/src/css/nhs_establishment_dashboard.css',
+        ],
+        'web.assets_backend_lazy': [
+            'odoo_nhs_establishment/static/src/js/hierarchy_patch.js',
         ],
     },
     'demo': [],
