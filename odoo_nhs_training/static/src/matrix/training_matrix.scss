@@ -1,0 +1,17 @@
+.o_nhs_training_matrix {
+    .o_nhs_matrix_table {
+        th, td {
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .o_nhs_matrix_member_col {
+            min-width: 160px;
+        }
+
+        .o_nhs_matrix_subject_col {
+            min-width: 110px;
+            font-size: 0.75rem;
+        }
+    }
+}

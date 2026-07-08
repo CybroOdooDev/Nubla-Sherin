@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── Root application menu ─────────────────────────────────── -->
+    <menuitem id="menu_nhs_training_root" name="NHS Training"
+              sequence="53" web_icon="odoo_nhs_training,static/description/icon.png"
+              groups="group_nhs_training_user"/>
+
+    <!-- ── Compliance ────────────────────────────────────────────── -->
+    <menuitem id="menu_nhs_training_compliance" name="Compliance"
+              parent="menu_nhs_training_root" sequence="10"/>
+    <menuitem id="menu_nhs_training_matrix" name="Training Matrix"
+              parent="menu_nhs_training_compliance" action="action_nhs_training_matrix_client" sequence="10"/>
+    <menuitem id="menu_nhs_workforce_member" name="Workforce Members"
+              parent="menu_nhs_training_compliance" action="action_nhs_workforce_member" sequence="20"/>
+    <menuitem id="menu_nhs_training_due_soon" name="Due Soon"
+              parent="menu_nhs_training_compliance" action="action_nhs_training_record_due_soon" sequence="30"/>
+    <menuitem id="menu_nhs_training_expired" name="Expired / Overdue"
+              parent="menu_nhs_training_compliance" action="action_nhs_training_record_expired" sequence="40"/>
+    <menuitem id="menu_nhs_training_bulk_completion" name="Bulk-Record Training Session"
+              parent="menu_nhs_training_compliance" action="action_nhs_bulk_completion_wizard" sequence="50"/>
+    <menuitem id="menu_nhs_training_org_hierarchy" name="Org Hierarchy"
+              parent="menu_nhs_training_compliance" action="action_nhs_training_org_unit" sequence="60"/>
+
+    <!-- ── Records ───────────────────────────────────────────────── -->
+    <menuitem id="menu_nhs_training_records" name="Records"
+              parent="menu_nhs_training_root" sequence="20"/>
+    <menuitem id="menu_nhs_training_record_all" name="Training Records"
+              parent="menu_nhs_training_records" action="action_nhs_training_record" sequence="10"/>
+    <menuitem id="menu_nhs_registration" name="Professional Registrations"
+              parent="menu_nhs_training_records" action="action_nhs_registration" sequence="20"/>
+
+    <!-- ── Requirements ──────────────────────────────────────────── -->
+    <menuitem id="menu_nhs_training_requirements" name="Requirements"
+              parent="menu_nhs_training_root" sequence="30"/>
+    <menuitem id="menu_nhs_requirement_profile" name="Requirement Profiles"
+              parent="menu_nhs_training_requirements" action="action_nhs_requirement_profile" sequence="10"/>
+    <menuitem id="menu_nhs_training_requirement_by_staff_group" name="Requirements by Staff Group"
+              parent="menu_nhs_training_requirements" action="action_nhs_training_requirement_by_staff_group" sequence="20"/>
+
+    <!-- ── Reporting ─────────────────────────────────────────────── -->
+    <menuitem id="menu_nhs_training_reporting" name="Reporting"
+              parent="menu_nhs_training_root" sequence="40"/>
+    <menuitem id="menu_nhs_training_dashboard" name="Compliance Dashboard"
+              parent="menu_nhs_training_reporting" action="action_nhs_training_dashboard_client" sequence="10"/>
+    <menuitem id="menu_nhs_training_by_team" name="By Team"
+              parent="menu_nhs_training_reporting" action="action_nhs_training_by_team" sequence="20"/>
+    <menuitem id="menu_nhs_training_by_subject" name="By Subject"
+              parent="menu_nhs_training_reporting" action="action_nhs_training_by_subject" sequence="30"/>
+    <menuitem id="menu_nhs_training_by_staff_group" name="By Staff Group"
+              parent="menu_nhs_training_reporting" action="action_nhs_training_by_staff_group" sequence="40"/>
+    <menuitem id="menu_nhs_training_report_matrix" name="Team Matrix (PDF)"
+              parent="menu_nhs_training_reporting" action="action_nhs_workforce_member" sequence="50"/>
+    <menuitem id="menu_nhs_training_report_board" name="Board Assurance (PDF)"
+              parent="menu_nhs_training_reporting" action="action_nhs_training_org_unit" sequence="60"/>
+
+    <!-- ── Configuration (manager only) ─────────────────────────── -->
+    <menuitem id="menu_nhs_training_config" name="Configuration"
+              parent="menu_nhs_training_root" sequence="90"
+              groups="group_nhs_training_manager"/>
+    <menuitem id="menu_nhs_training_subject" name="Training Subjects"
+              parent="menu_nhs_training_config" action="action_nhs_training_subject" sequence="10"/>
+    <menuitem id="menu_nhs_regulator" name="Regulators"
+              parent="menu_nhs_training_config" action="action_nhs_regulator" sequence="20"/>
+    <menuitem id="menu_nhs_training_requirement_all" name="All Requirements"
+              parent="menu_nhs_training_config" action="action_nhs_training_requirement" sequence="30"/>
+    <menuitem id="menu_nhs_training_settings" name="Settings"
+              parent="menu_nhs_training_config" action="action_nhs_training_settings" sequence="40"/>
+</odoo>

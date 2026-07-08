@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NHS Mandatory Training Register · Odoo Module</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <style>
+    body { font-family: 'Montserrat', sans-serif; background-color: #f8faff; }
+    .bg-nhs, .btn-nhs { background-color: #005EB8 !important; }
+    .text-nhs { color: #005EB8 !important; }
+    .feature-card {
+      background-color: rgba(0, 94, 184, 0.05);
+      border-radius: 16px; padding: 28px 24px;
+      border: 1px solid rgba(0, 94, 184, 0.12);
+      transition: transform 0.25s ease, box-shadow 0.25s;
+      height: 100%;
+    }
+    .feature-card:hover { transform: translateY(-6px); box-shadow: 0 20px 30px -12px rgba(0,94,184,0.15); background-color: white; }
+    .feature-card .card-icon {
+      width: 56px; height: 56px; border-radius: 12px; background-color: #005EB8;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 20px; color: #fff; font-size: 22px;
+    }
+    .feature-card .card-title { font-weight: 700; font-size: 1.15rem; color: #0b1a2e; margin-bottom: 8px; }
+    .feature-card .card-description { color: #55607a; font-size: 0.95rem; }
+    .hero { padding: 72px 0 56px; }
+    .matrix-chip { display:inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight:600; margin: 3px;}
+  </style>
+</head>
+<body>
+  <section class="hero text-center bg-nhs text-white">
+    <div class="container">
+      <h1 class="fw-bold display-5">NHS Mandatory Training Register</h1>
+      <p class="lead mt-3">
+        Statutory &amp; mandatory training compliance — the CSTF matrix, expiry tracking,
+        professional registration and team compliance reporting — on the NHS Workforce foundation.
+      </p>
+      <p class="opacity-75">Odoo 19.0 · odoo_nhs_training · Healthcare/NHS</p>
+    </div>
+  </section>
+
+  <section class="container py-5">
+    <div class="text-center mb-4">
+      <span class="matrix-chip" style="background:#d4edda;color:#155724;">Compliant</span>
+      <span class="matrix-chip" style="background:#fff3cd;color:#856404;">Due Soon</span>
+      <span class="matrix-chip" style="background:#f8d7da;color:#721c24;">Expired</span>
+      <span class="matrix-chip" style="background:#e2e3e5;color:#383d41;">Not Done</span>
+      <span class="matrix-chip" style="background:#d1ecf1;color:#0c5460;">Exempt</span>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="card-icon"><i class="fa fa-table"></i></div>
+          <div class="card-title">The Training Matrix</div>
+          <div class="card-description">Members × subjects, colour-coded by status. Click a cell to record a completion on the spot.</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="card-icon"><i class="fa fa-list-check"></i></div>
+          <div class="card-title">CSTF-Aligned Catalogue</div>
+          <div class="card-description">The eleven UK Core Skills Training subjects, with levels and refresh frequencies, seeded and editable.</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="card-icon"><i class="fa fa-sitemap"></i></div>
+          <div class="card-title">Role-Based Requirements</div>
+          <div class="card-description">Requirement profiles bundle subjects by post or staff group, with individual add/waive overrides.</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="card-icon"><i class="fa fa-hourglass-half"></i></div>
+          <div class="card-title">Automatic Expiry Engine</div>
+          <div class="card-description">Compliant / due soon / expired / exempt computed daily, with configurable lead windows and grace periods.</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="card-icon"><i class="fa fa-id-card"></i></div>
+          <div class="card-title">Professional Registration</div>
+          <div class="card-description">NMC / GMC / HCPC / GPhC / GDC registration and revalidation tracked alongside training.</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="card-icon"><i class="fa fa-chart-line"></i></div>
+          <div class="card-title">Board Assurance</div>
+          <div class="card-description">Individual, team, department and organisation compliance % against target, with CQC-ready reporting.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container py-4 text-center text-muted">
+    <p>Builds on the NHS Establishment Register — posts, staff groups and the org hierarchy are reused, not duplicated.</p>
+    <p class="small">© Cybrosys Technologies · <a href="https://www.cybrosys.com" class="text-nhs">www.cybrosys.com</a></p>
+  </section>
+</body>
+</html>

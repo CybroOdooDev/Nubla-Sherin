@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_training_record_list" model="ir.ui.view">
+        <field name="name">nhs.training.record.list</field>
+        <field name="model">nhs.training.record</field>
+        <field name="arch" type="xml">
+            <list decoration-success="status=='compliant'"
+                  decoration-warning="status=='due_soon'"
+                  decoration-danger="status=='expired'">
+                <field name="member_id"/>
+                <field name="org_unit_id"/>
+                <field name="subject_id"/>
+                <field name="completion_date"/>
+                <field name="method"/>
+                <field name="provider"/>
+                <field name="expiry_date"/>
+                <field name="status" widget="badge"/>
+                <field name="is_latest" column_invisible="1"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_training_record_form" model="ir.ui.view">
+        <field name="name">nhs.training.record.form</field>
+        <field name="model">nhs.training.record</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="compliant,due_soon,expired"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="member_id" options="{'no_create': True}"/>
+                            <field name="subject_id" options="{'no_create': True}"/>
+                            <field name="completion_date"/>
+                            <field name="method"/>
+                            <field name="provider"/>
+                        </group>
+                        <group>
+                            <field name="frequency_months"/>
+                            <field name="expiry_date"/>
+                            <field name="expiry_override"/>
+                            <field name="result"/>
+                            <field name="certificate_ref"/>
+                        </group>
+                    </group>
+                    <group string="Certificate / Evidence">
+                        <field name="attachment_ids" widget="many2many_binary" nolabel="1"/>
+                    </group>
+                    <field name="active" invisible="1"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_training_record_search" model="ir.ui.view">
+        <field name="name">nhs.training.record.search</field>
+        <field name="model">nhs.training.record</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="member_id"/>
+                <field name="subject_id"/>
+                <field name="org_unit_id"/>
+                <field name="provider"/>
+                <filter name="latest_only" string="Latest Only" domain="[('is_latest', '=', True)]"/>
+                <separator/>
+                <filter name="compliant" string="Compliant" domain="[('status', '=', 'compliant')]"/>
+                <filter name="due_soon" string="Due Soon" domain="[('status', '=', 'due_soon')]"/>
+                <filter name="expired" string="Expired" domain="[('status', '=', 'expired')]"/>
+                <group>
+                    <filter name="group_subject" string="Subject" context="{'group_by': 'subject_id'}"/>
+                    <filter name="group_team" string="Team" context="{'group_by': 'org_unit_id'}"/>
+                    <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
+                    <filter name="group_month" string="Completion Month" context="{'group_by': 'completion_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_training_record" model="ir.actions.act_window">
+        <field name="name">Training Records</field>
+        <field name="res_model">nhs.training.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_latest_only': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Record a completed training event.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_nhs_training_record_due_soon" model="ir.actions.act_window">
+        <field name="name">Due Soon</field>
+        <field name="res_model">nhs.training.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('status', '=', 'due_soon'), ('is_latest', '=', True)]</field>
+        <field name="context">{'search_default_group_team': 1}</field>
+    </record>
+
+    <record id="action_nhs_training_record_expired" model="ir.actions.act_window">
+        <field name="name">Expired / Overdue</field>
+        <field name="res_model">nhs.training.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('status', '=', 'expired'), ('is_latest', '=', True)]</field>
+        <field name="context">{'search_default_group_team': 1}</field>
+    </record>
+
+    <record id="view_nhs_training_record_pivot" model="ir.ui.view">
+        <field name="name">nhs.training.record.pivot</field>
+        <field name="model">nhs.training.record</field>
+        <field name="arch" type="xml">
+            <pivot string="Training Compliance Analysis">
+                <field name="org_unit_id" type="row"/>
+                <field name="subject_id" type="col"/>
+                <field name="status" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_nhs_training_record_graph" model="ir.ui.view">
+        <field name="name">nhs.training.record.graph</field>
+        <field name="model">nhs.training.record</field>
+        <field name="arch" type="xml">
+            <graph string="Training Compliance Analysis" type="bar">
+                <field name="subject_id"/>
+                <field name="status"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_nhs_training_by_subject" model="ir.actions.act_window">
+        <field name="name">By Subject</field>
+        <field name="res_model">nhs.training.record</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="domain">[('is_latest', '=', True)]</field>
+        <field name="context">{'search_default_group_subject': 1}</field>
+    </record>
+
+    <record id="action_nhs_training_by_team" model="ir.actions.act_window">
+        <field name="name">By Team</field>
+        <field name="res_model">nhs.training.record</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="domain">[('is_latest', '=', True)]</field>
+        <field name="context">{'search_default_group_team': 1}</field>
+    </record>
+</odoo>

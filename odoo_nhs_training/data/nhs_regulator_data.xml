@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="regulator_nmc" model="nhs.regulator">
+            <field name="name">Nursing &amp; Midwifery Council</field>
+            <field name="code">NMC</field>
+            <field name="default_cycle_months">36</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="regulator_gmc" model="nhs.regulator">
+            <field name="name">General Medical Council</field>
+            <field name="code">GMC</field>
+            <field name="default_cycle_months">12</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="regulator_hcpc" model="nhs.regulator">
+            <field name="name">Health and Care Professions Council</field>
+            <field name="code">HCPC</field>
+            <field name="default_cycle_months">24</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="regulator_gphc" model="nhs.regulator">
+            <field name="name">General Pharmaceutical Council</field>
+            <field name="code">GPhC</field>
+            <field name="default_cycle_months">12</field>
+            <field name="sequence">40</field>
+        </record>
+        <record id="regulator_gdc" model="nhs.regulator">
+            <field name="name">General Dental Council</field>
+            <field name="code">GDC</field>
+            <field name="default_cycle_months">12</field>
+            <field name="sequence">50</field>
+        </record>
+        <record id="regulator_swe" model="nhs.regulator">
+            <field name="name">Social Work England</field>
+            <field name="code">SWE</field>
+            <field name="default_cycle_months">12</field>
+            <field name="sequence">60</field>
+        </record>
+        <record id="regulator_other" model="nhs.regulator">
+            <field name="name">Other Regulator</field>
+            <field name="code">OTHER</field>
+            <field name="sequence">100</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="odoo_nhs_training.NhsTrainingDashboard" owl="1">
+        <div class="o_nhs_training_dashboard o_content p-4" style="height: 100%; overflow-y: auto;">
+            <t t-if="state.loading">
+                <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+                    <div class="spinner-border text-primary" role="status"/>
+                </div>
+            </t>
+            <t t-else="">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0"><i class="fa fa-graduation-cap me-2"/> Training Compliance Dashboard</h2>
+                    <button class="btn btn-outline-primary btn-sm" t-on-click="openAllMembers">
+                        <i class="fa fa-users me-1"/> All Members
+                    </button>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="card text-white h-100 shadow-sm" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); cursor: pointer;"
+                             t-on-click="openAllMembers">
+                            <div class="card-body">
+                                <h6 class="text-uppercase opacity-75 mb-1">Overall Compliance</h6>
+                                <h2 class="fw-bold mb-0" t-esc="state.metrics.overall_rate + '%'"/>
+                                <small class="opacity-75">Target: <t t-esc="state.metrics.target"/>%</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-white h-100 shadow-sm bg-danger" style="cursor: pointer;"
+                             t-on-click="openNonCompliant">
+                            <div class="card-body">
+                                <h6 class="text-uppercase opacity-75 mb-1">Non-Compliant Members</h6>
+                                <h2 class="fw-bold mb-0" t-esc="state.metrics.non_compliant"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-white h-100 shadow-sm bg-warning" style="cursor: pointer;"
+                             t-on-click="openDueSoon">
+                            <div class="card-body">
+                                <h6 class="text-uppercase opacity-75 mb-1">Due Soon</h6>
+                                <h2 class="fw-bold mb-0" t-esc="state.metrics.due_soon_count"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-white h-100 shadow-sm bg-dark" style="cursor: pointer;"
+                             t-on-click="openExpired">
+                            <div class="card-body">
+                                <h6 class="text-uppercase opacity-75 mb-1">Expired</h6>
+                                <h2 class="fw-bold mb-0" t-esc="state.metrics.expired_count"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header fw-bold">Weakest Subjects</div>
+                            <ul class="list-group list-group-flush">
+                                <t t-foreach="state.metrics.weakest_subjects" t-as="s" t-key="s.id">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span t-esc="s.name"/>
+                                        <span class="badge text-bg-secondary" t-esc="s.rate + '%'"/>
+                                    </li>
+                                </t>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header fw-bold">Weakest Teams</div>
+                            <ul class="list-group list-group-flush">
+                                <t t-foreach="state.metrics.weakest_teams" t-as="team" t-key="team.id">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span t-esc="team.name"/>
+                                        <span class="badge text-bg-secondary" t-esc="team.rate + '%'"/>
+                                    </li>
+                                </t>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header fw-bold">Expiring Soon Planner</div>
+                            <table class="table table-sm mb-0">
+                                <t t-foreach="state.metrics.due_soon_planner" t-as="r" t-key="r.id">
+                                    <tr style="cursor: pointer;" t-on-click="() => this.openRecord('nhs.training.record', r.id)">
+                                        <td t-esc="r.member"/>
+                                        <td t-esc="r.subject"/>
+                                        <td t-esc="r.team"/>
+                                        <td t-esc="r.expiry_date"/>
+                                    </tr>
+                                </t>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header fw-bold">Expired / Overdue Register</div>
+                            <table class="table table-sm mb-0">
+                                <t t-foreach="state.metrics.expired_register" t-as="r" t-key="r.id">
+                                    <tr style="cursor: pointer;" t-on-click="() => this.openRecord('nhs.training.record', r.id)">
+                                        <td t-esc="r.member"/>
+                                        <td t-esc="r.subject"/>
+                                        <td t-esc="r.team"/>
+                                        <td t-esc="r.expiry_date"/>
+                                    </tr>
+                                </t>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm" style="cursor: pointer;" t-on-click="openLapsedRegistrations">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">Lapsed Registrations</span>
+                                <span class="badge text-bg-danger fs-6" t-esc="state.metrics.lapsed_registration_count"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

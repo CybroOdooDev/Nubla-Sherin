@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_config_settings_nhs_training" model="ir.ui.view">
+        <field name="name">res.config.settings.nhs.training</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="NHS Training" name="odoo_nhs_training"
+                     groups="odoo_nhs_training.group_nhs_training_manager">
+                    <block title="Compliance Settings">
+                        <setting string="Due Soon Window">
+                            <span><field name="training_due_soon_days"/> days</span>
+                        </setting>
+                        <setting string="Compliance Target">
+                            <span><field name="training_compliance_target"/> %</span>
+                        </setting>
+                        <setting string="Digest Recipients">
+                            <field name="training_digest_recipients" placeholder="Comma-separated email addresses"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_nhs_training_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_res_config_settings_nhs_training"/>
+        <field name="target">current</field>
+        <field name="context">{'module': 'odoo_nhs_training'}</field>
+    </record>
+</odoo>

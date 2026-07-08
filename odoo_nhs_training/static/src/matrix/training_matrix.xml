@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="odoo_nhs_training.NhsTrainingMatrix" owl="1">
+        <div class="o_nhs_training_matrix o_content p-3" style="height: 100%; overflow: auto;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">
+                    <i class="fa fa-table me-2"/> Training Matrix
+                </h2>
+                <div class="d-flex align-items-center gap-2">
+                    <label class="mb-0 text-muted">Team:</label>
+                    <select class="form-select form-select-sm" style="width: auto;" t-on-change="onTeamChange">
+                        <option value="">All Teams</option>
+                        <t t-foreach="state.orgUnits" t-as="unit" t-key="unit.id">
+                            <option t-att-value="unit.id" t-esc="unit.complete_name"/>
+                        </t>
+                    </select>
+                </div>
+            </div>
+
+            <t t-if="state.loading">
+                <div class="d-flex justify-content-center align-items-center" style="height: 40vh;">
+                    <div class="spinner-border text-primary" role="status"/>
+                </div>
+            </t>
+            <t t-else="">
+                <div class="mb-2 d-flex gap-3 small">
+                    <span><span class="badge" style="background:#28a745;">&#160;&#160;</span> Compliant</span>
+                    <span><span class="badge" style="background:#ffc107;">&#160;&#160;</span> Due Soon</span>
+                    <span><span class="badge" style="background:#dc3545;">&#160;&#160;</span> Expired</span>
+                    <span><span class="badge" style="background:#adb5bd;">&#160;&#160;</span> Not Done</span>
+                    <span><span class="badge" style="background:#17a2b8;">&#160;&#160;</span> Exempt</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm o_nhs_matrix_table">
+                        <thead>
+                            <tr>
+                                <th class="o_nhs_matrix_member_col">Member</th>
+                                <th>Team</th>
+                                <t t-foreach="state.data.subjects" t-as="subject" t-key="subject.id">
+                                    <th class="o_nhs_matrix_subject_col" t-esc="subject.name"/>
+                                </t>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.data.members" t-as="member" t-key="member.id">
+                                <tr>
+                                    <td>
+                                        <a href="#" t-on-click.prevent="() => this.openMember(member.id)" t-esc="member.name"/>
+                                    </td>
+                                    <td class="text-muted small" t-esc="member.org_unit"/>
+                                    <t t-foreach="state.data.subjects" t-as="subject" t-key="subject.id">
+                                        <t t-set="cell" t-value="member.cells[subject.id]"/>
+                                        <td t-if="cell"
+                                            t-attf-style="background-color: {{ this.color(cell.status) }}; cursor: pointer; text-align: center;"
+                                            t-att-title="cell.expiry_date"
+                                            t-on-click="() => this.onCellClick(member.id, subject.id, cell)">
+                                            <span class="text-white small" t-esc="cell.label"/>
+                                        </td>
+                                        <td t-else="" class="bg-light"/>
+                                    </t>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>
