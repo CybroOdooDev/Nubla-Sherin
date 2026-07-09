@@ -20,6 +20,7 @@
 #
 #############################################################################
 from odoo import _, api, fields, models
+from odoo.orm.identifiers import NewId
 
 COMPLIANCE_STATUSES = [
     ('compliant', 'Compliant'),
@@ -34,6 +35,36 @@ STATUS_LABELS = {
     'not_done': 'Not Done',
     'exempt': 'Exempt',
 }
+
+
+class NhsWorkforceMemberComplianceLine(models.Model):
+    _name = 'nhs.workforce.member.compliance.line'
+    _description = 'Workforce Member Compliance Line'
+    _order = 'subject_name'
+
+    member_id = fields.Many2one(
+        'nhs.workforce.member',
+        string='Member',
+        ondelete='cascade',
+        index=True
+    )
+    subject_id = fields.Many2one(
+        'nhs.training.subject',
+        string='Subject'
+    )
+    subject_name = fields.Char(
+        related='subject_id.name',
+        string='Subject Name',
+        store=True
+    )
+    status = fields.Selection([
+        ('compliant', 'Compliant'),
+        ('due_soon', 'Due Soon'),
+        ('expired', 'Expired'),
+        ('not_done', 'Not Done'),
+        ('exempt', 'Exempt'),
+    ], string='Status')
+    expiry_date = fields.Date(string='Expiry')
 
 
 class NhsWorkforceMember(models.Model):
@@ -73,7 +104,9 @@ class NhsWorkforceMember(models.Model):
         'nhs.establishment.post',
         string='Post',
         tracking=True,
+        domain="[('status', '=', 'active')]",
         help="The post they occupy; inherits its training requirement profile."
+             " Only active posts are offered."
     )
     staff_group_id = fields.Many2one(
         'nhs.staff.group',
@@ -164,11 +197,18 @@ class NhsWorkforceMember(models.Model):
         store=True,
         help="compliant / at_risk / non_compliant against the configured target."
     )
-    required_status_html = fields.Html(
-        string='Required Subjects & Status',
-        compute='_compute_required_status_html',
-        sanitize=False,
+    compliance_line_ids = fields.One2many(
+        'nhs.workforce.member.compliance.line',
+        'member_id',
+        string='Required & Status',
         help="Each required subject with its current status and expiry."
+    )
+    required_subject_ids = fields.Many2many(
+        'nhs.training.subject',
+        compute='_compute_required_subject_ids',
+        string='Required Subjects (Set)',
+        help="The subjects resolved from this member's profile/staff-group/individual"
+             " overrides — used to restrict the Subject choice when recording training."
     )
     active = fields.Boolean(
         string='Active',
@@ -190,8 +230,11 @@ class NhsWorkforceMember(models.Model):
             if member.post_id:
                 member.org_unit_id = member.post_id.org_unit_id
                 member.staff_group_id = member.post_id.staff_group_id
-                if member.post_id.training_requirement_profile_id:
-                    member.requirement_profile_id = member.post_id.training_requirement_profile_id
+                member.requirement_profile_id = member.post_id.training_requirement_profile_id
+            else:
+                member.org_unit_id = False
+                member.staff_group_id = False
+                member.requirement_profile_id = False
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -199,9 +242,38 @@ class NhsWorkforceMember(models.Model):
             if not vals.get('reference') or vals.get('reference') == 'New':
                 vals['reference'] = self.env['ir.sequence'].next_by_code(
                     'nhs.workforce.member') or 'New'
+            if vals.get('post_id'):
+                post = self.env['nhs.establishment.post'].browse(vals['post_id'])
+                if post:
+                    if not vals.get('org_unit_id'):
+                        vals['org_unit_id'] = post.org_unit_id.id
+                    if not vals.get('staff_group_id'):
+                        vals['staff_group_id'] = post.staff_group_id.id
+                    if 'requirement_profile_id' not in vals:
+                        vals['requirement_profile_id'] = post.training_requirement_profile_id.id
         members = super().create(vals_list)
         members._prompt_induction_training()
         return members
+
+    def write(self, vals):
+        if 'post_id' in vals:
+            if vals.get('post_id'):
+                post = self.env['nhs.establishment.post'].browse(vals['post_id'])
+                if post:
+                    if 'org_unit_id' not in vals:
+                        vals['org_unit_id'] = post.org_unit_id.id
+                    if 'staff_group_id' not in vals:
+                        vals['staff_group_id'] = post.staff_group_id.id
+                    if 'requirement_profile_id' not in vals:
+                        vals['requirement_profile_id'] = post.training_requirement_profile_id.id
+            else:
+                if 'org_unit_id' not in vals:
+                    vals['org_unit_id'] = False
+                if 'staff_group_id' not in vals:
+                    vals['staff_group_id'] = False
+                if 'requirement_profile_id' not in vals:
+                    vals['requirement_profile_id'] = False
+        return super().write(vals)
 
     def _prompt_induction_training(self):
         induction_subjects = self.env['nhs.training.subject'].search([
@@ -311,15 +383,18 @@ class NhsWorkforceMember(models.Model):
             required = 0
             compliant = 0
             expired = 0
+            
             for line in lines:
                 status = member._subject_status(line['subject'], line['lead_days'], line['exempt'])
                 if status == 'exempt':
-                    continue
-                required += 1
-                if status in ('compliant', 'due_soon'):
-                    compliant += 1
-                if status == 'expired':
-                    expired += 1
+                    pass
+                else:
+                    required += 1
+                    if status in ('compliant', 'due_soon'):
+                        compliant += 1
+                    if status == 'expired':
+                        expired += 1
+                
             member.required_subject_count = required
             member.compliant_subject_count = compliant
             member.expired_subject_count = expired
@@ -333,42 +408,72 @@ class NhsWorkforceMember(models.Model):
             else:
                 member.compliance_status = 'non_compliant'
 
-    @api.depends('record_ids', 'requirement_profile_id', 'staff_group_id',
-                 'requirement_line_ids', 'compliance_pct')
-    def _compute_required_status_html(self):
-        color = {
-            'compliant': '#28a745', 'due_soon': '#ffc107', 'expired': '#dc3545',
-            'not_done': '#6c757d', 'exempt': '#17a2b8',
-        }
+            # Sync compliance lines
+            if isinstance(member.id, NewId):
+                commands = [(5, 0, 0)]
+                for line in lines:
+                    status = member._subject_status(line['subject'], line['lead_days'], line['exempt'])
+                    latest = member.record_ids.filtered(lambda r: r.subject_id.id == line['subject'].id)
+                    latest = latest.sorted('completion_date', reverse=True)[:1]
+                    expiry_date = latest.expiry_date if latest else False
+                    commands.append((0, 0, {
+                        'subject_id': line['subject'].id,
+                        'status': status,
+                        'expiry_date': expiry_date,
+                    }))
+                member.compliance_line_ids = commands
+            else:
+                existing_lines = self.env['nhs.workforce.member.compliance.line'].search([
+                    ('member_id', '=', member.id)
+                ])
+                existing_by_subject = {l.subject_id.id: l for l in existing_lines}
+                to_delete = existing_lines
+                new_vals_list = []
+                
+                for line in lines:
+                    status = member._subject_status(line['subject'], line['lead_days'], line['exempt'])
+                    latest = member.record_ids.filtered(lambda r: r.subject_id.id == line['subject'].id)
+                    latest = latest.sorted('completion_date', reverse=True)[:1]
+                    expiry_date = latest.expiry_date if latest else False
+                    
+                    vals = {
+                        'member_id': member.id,
+                        'subject_id': line['subject'].id,
+                        'status': status,
+                        'expiry_date': expiry_date,
+                    }
+                    
+                    if line['subject'].id in existing_by_subject:
+                        existing_line = existing_by_subject[line['subject'].id]
+                        if (existing_line.status != status or 
+                            existing_line.expiry_date != expiry_date):
+                            existing_line.write({
+                                'status': status,
+                                'expiry_date': expiry_date,
+                            })
+                        to_delete -= existing_line
+                    else:
+                        new_vals_list.append(vals)
+                
+                if to_delete:
+                    to_delete.unlink()
+                if new_vals_list:
+                    self.env['nhs.workforce.member.compliance.line'].create(new_vals_list)
+                
+                # Update the One2many field with the correct active database records
+                member.compliance_line_ids = self.env['nhs.workforce.member.compliance.line'].search([
+                    ('member_id', '=', member.id)
+                ])
+
+    @api.depends('requirement_profile_id', 'requirement_profile_id.requirement_ids',
+                 'staff_group_id', 'requirement_line_ids', 'requirement_line_ids.active')
+    def _compute_required_subject_ids(self):
         lines_by_member = self.get_requirement_lines()
         for member in self:
-            rows = []
-            for line in sorted(lines_by_member.get(member.id, []), key=lambda l: l['subject'].name):
-                status = member._subject_status(line['subject'], line['lead_days'], line['exempt'])
-                latest = member.record_ids.filtered(lambda r: r.subject_id.id == line['subject'].id)
-                latest = latest.sorted('completion_date', reverse=True)[:1]
-                expiry = latest.expiry_date if latest else False
-                rows.append(
-                    '<tr>'
-                    '<td>%s</td>'
-                    '<td><span style="display:inline-block;padding:2px 8px;border-radius:8px;'
-                    'color:#fff;background:%s;">%s</span></td>'
-                    '<td>%s</td>'
-                    '</tr>' % (
-                        line['subject'].complete_name,
-                        color.get(status, '#6c757d'),
-                        STATUS_LABELS.get(status, status),
-                        expiry or '',
-                    )
-                )
-            if rows:
-                member.required_status_html = (
-                    '<table class="table table-sm"><thead><tr>'
-                    '<th>Subject</th><th>Status</th><th>Expiry</th>'
-                    '</tr></thead><tbody>%s</tbody></table>' % ''.join(rows)
-                )
-            else:
-                member.required_status_html = '<p class="text-muted">No requirements resolved.</p>'
+            subjects = self.env['nhs.training.subject']
+            for line in lines_by_member.get(member.id, []):
+                subjects |= line['subject']
+            member.required_subject_ids = subjects
 
     def action_record_training(self):
         self.ensure_one()

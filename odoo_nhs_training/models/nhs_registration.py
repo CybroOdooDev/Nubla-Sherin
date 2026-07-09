@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 STATUSES = [
@@ -117,7 +117,7 @@ class NhsRegistration(models.Model):
                 reg.status = 'current'
 
     def unlink(self):
-        raise UserError(_(
+        raise UserError((
             'Professional registrations cannot be deleted, to preserve the compliance'
             ' evidence trail. Archive the record instead.'))
 

@@ -1,17 +1,41 @@
 .o_nhs_training_matrix {
     .o_nhs_matrix_table {
-        th, td {
-            white-space: nowrap;
+        border-collapse: separate;
+        border-spacing: 0;
+
+        th {
+            font-weight: 600;
+            color: #495057;
+            text-align: center;
             vertical-align: middle;
+            white-space: normal !important;
+            word-break: break-word;
+            padding: 12px 8px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        td {
+            padding: 8px;
+            vertical-align: middle;
+            border-bottom: 1px solid #dee2e6;
         }
 
         .o_nhs_matrix_member_col {
-            min-width: 160px;
+            min-width: 180px;
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .o_nhs_matrix_subject_col {
-            min-width: 110px;
-            font-size: 0.75rem;
+            min-width: 130px;
+            max-width: 180px;
+            font-size: 0.8rem;
+        }
+        
+        tr:hover td {
+            background-color: rgba(0, 0, 0, 0.015);
         }
     }
 }

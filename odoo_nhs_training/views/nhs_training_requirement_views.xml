@@ -27,9 +27,9 @@
                     <group>
                         <group>
                             <field name="subject_id" options="{'no_create': True}"/>
-                            <field name="profile_id" options="{'no_create': True}"/>
-                            <field name="staff_group_id" options="{'no_create': True}"/>
-                            <field name="member_id" options="{'no_create': True}"/>
+                            <field name="profile_id" options="{'no_create': True}" invisible="staff_group_id or member_id or context.get('hide_profile_id')"/>
+                            <field name="staff_group_id" options="{'no_create': True}" invisible="profile_id or member_id or context.get('hide_staff_group_id')"/>
+                            <field name="member_id" options="{'no_create': True}" invisible="profile_id or staff_group_id or context.get('hide_member_id')"/>
                         </group>
                         <group>
                             <field name="override_type" invisible="not member_id"/>
@@ -77,11 +77,27 @@
         <field name="context">{'search_default_by_profile': 0}</field>
     </record>
 
+    <record id="view_nhs_training_requirement_staff_group_list" model="ir.ui.view">
+        <field name="name">nhs.training.requirement.staff_group.list</field>
+        <field name="model">nhs.training.requirement</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="subject_id"/>
+                <field name="staff_group_id"/>
+                <field name="is_mandatory"/>
+                <field name="frequency_months_override"/>
+                <field name="effective_from"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
     <record id="action_nhs_training_requirement_by_staff_group" model="ir.actions.act_window">
         <field name="name">Requirements by Staff Group</field>
         <field name="res_model">nhs.training.requirement</field>
         <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_nhs_training_requirement_staff_group_list"/>
         <field name="domain">[('staff_group_id', '!=', False)]</field>
-        <field name="context">{'default_staff_group_id': False}</field>
+        <field name="context">{'default_staff_group_id': False, 'hide_profile_id': True, 'hide_member_id': True}</field>
     </record>
 </odoo>

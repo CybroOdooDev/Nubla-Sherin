@@ -12,7 +12,7 @@
                 <field name="org_unit_id"/>
                 <field name="post_id"/>
                 <field name="staff_group_id"/>
-                <field name="compliance_pct" widget="percentage"/>
+                <field name="compliance_pct" string="Compliance %"/>
                 <field name="expired_subject_count" string="Expired"/>
                 <field name="compliance_status" widget="badge"/>
                 <field name="is_leaver"/>
@@ -45,7 +45,7 @@
                                 <field name="post_id"/> — <field name="org_unit_id"/>
                             </div>
                             <div class="d-flex justify-content-between align-items-center mt-2">
-                                <field name="compliance_pct" widget="percentage"/>
+                                <span><field name="compliance_pct"/>%</span>
                                 <span t-if="record.expired_subject_count.raw_value"
                                       class="badge text-bg-danger">
                                     <field name="expired_subject_count"/> expired
@@ -97,7 +97,11 @@
                             <field name="requirement_profile_id" options="{'no_create': True}"/>
                         </group>
                         <group>
-                            <field name="compliance_pct" widget="percentage"/>
+                            <label for="compliance_pct"/>
+                            <div class="o_row">
+                                <field name="compliance_pct" class="oe_inline"/>
+                                <span>%</span>
+                            </div>
                             <field name="compliance_status" widget="badge"/>
                             <field name="required_subject_count"/>
                             <field name="expired_subject_count"/>
@@ -115,7 +119,18 @@
                     </group>
                     <notebook>
                         <page name="required_status" string="Required &amp; Status">
-                            <field name="required_status_html" nolabel="1"/>
+                            <field name="compliance_line_ids" readonly="1">
+                                <list decoration-success="status=='compliant'"
+                                      decoration-warning="status=='due_soon'"
+                                      decoration-info="status=='exempt'"
+                                      decoration-muted="status=='not_done'"
+                                      decoration-danger="status=='expired'"
+                                      create="0" delete="0" edit="0">
+                                    <field name="subject_id"/>
+                                    <field name="status" widget="badge"/>
+                                    <field name="expiry_date"/>
+                                </list>
+                            </field>
                         </page>
                         <page name="records" string="Training Records">
                             <field name="record_ids">

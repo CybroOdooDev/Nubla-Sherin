@@ -21,7 +21,7 @@
 #############################################################################
 from dateutil.relativedelta import relativedelta
 
-from odoo import _, api, fields, models
+from odoo import  api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 METHODS = [
@@ -73,6 +73,13 @@ class NhsTrainingRecord(models.Model):
         store=True,
         help="Team of the member, for grouping/filtering."
     )
+    member_required_subject_ids = fields.Many2many(
+        'nhs.training.subject',
+        related='member_id.required_subject_ids',
+        string='Member Required Subjects',
+        help="Technical field used to restrict the Subject choice to the member's"
+             " resolved requirement set."
+    )
     subject_id = fields.Many2one(
         'nhs.training.subject',
         string='Subject',
@@ -80,7 +87,8 @@ class NhsTrainingRecord(models.Model):
         ondelete='restrict',
         index=True,
         tracking=True,
-        help="Subject (and level) completed."
+        help="Subject (and level) completed. Restricted to the member's required"
+             " subjects where the member has a resolved requirement set."
     )
     completion_date = fields.Date(
         string='Completion Date',
@@ -224,10 +232,10 @@ class NhsTrainingRecord(models.Model):
         today = fields.Date.context_today(self)
         for rec in self:
             if rec.completion_date and rec.completion_date > today:
-                raise ValidationError(_('The completion date cannot be in the future.'))
+                raise ValidationError(('The completion date cannot be in the future.'))
 
     def unlink(self):
-        raise UserError(_(
+        raise UserError((
             'Training records cannot be deleted, to preserve the compliance evidence trail.'
             ' Archive the record instead.'))
 
@@ -268,8 +276,8 @@ class NhsTrainingRecord(models.Model):
                         'res_model_id': self.env['ir.model']._get_id('nhs.training.record'),
                         'res_id': rec.id,
                         'user_id': manager.id,
-                        'summary': _('%s is %s') % (rec.name, rec.status.replace('_', ' ').upper()),
-                        'note': _('%(member)s — %(subject)s expires %(expiry)s.') % {
+                        'summary': ('%s is %s') % (rec.name, rec.status.replace('_', ' ').upper()),
+                        'note': ('%(member)s — %(subject)s expires %(expiry)s.') % {
                             'member': rec.member_id.name,
                             'subject': rec.subject_id.complete_name,
                             'expiry': rec.expiry_date,

@@ -23,40 +23,44 @@
                 </div>
             </t>
             <t t-else="">
-                <div class="mb-2 d-flex gap-3 small">
-                    <span><span class="badge" style="background:#28a745;">&#160;&#160;</span> Compliant</span>
-                    <span><span class="badge" style="background:#ffc107;">&#160;&#160;</span> Due Soon</span>
-                    <span><span class="badge" style="background:#dc3545;">&#160;&#160;</span> Expired</span>
-                    <span><span class="badge" style="background:#adb5bd;">&#160;&#160;</span> Not Done</span>
-                    <span><span class="badge" style="background:#17a2b8;">&#160;&#160;</span> Exempt</span>
+                <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
+                    <span class="text-muted me-2 small fw-bold">Legend:</span>
+                    <span class="badge rounded-pill text-white px-3 py-1" style="background-color: #28a745; font-weight: 600; font-size: 0.75rem;">Compliant</span>
+                    <span class="badge rounded-pill text-dark px-3 py-1" style="background-color: #ffc107; font-weight: 600; font-size: 0.75rem;">Due Soon</span>
+                    <span class="badge rounded-pill text-white px-3 py-1" style="background-color: #dc3545; font-weight: 600; font-size: 0.75rem;">Expired</span>
+                    <span class="badge rounded-pill text-white px-3 py-1" style="background-color: #adb5bd; font-weight: 600; font-size: 0.75rem;">Not Done</span>
+                    <span class="badge rounded-pill text-white px-3 py-1" style="background-color: #17a2b8; font-weight: 600; font-size: 0.75rem;">Exempt</span>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-sm o_nhs_matrix_table">
-                        <thead>
+                <div class="table-responsive shadow-sm rounded border">
+                    <table class="table table-hover align-middle o_nhs_matrix_table mb-0">
+                        <thead class="table-light">
                             <tr>
-                                <th class="o_nhs_matrix_member_col">Member</th>
-                                <th>Team</th>
+                                <th class="o_nhs_matrix_member_col text-start ps-3">Member</th>
+                                <th class="text-start">Team</th>
                                 <t t-foreach="state.data.subjects" t-as="subject" t-key="subject.id">
-                                    <th class="o_nhs_matrix_subject_col" t-esc="subject.name"/>
+                                    <th class="o_nhs_matrix_subject_col text-center" t-esc="subject.name"/>
                                 </t>
                             </tr>
                         </thead>
                         <tbody>
                             <t t-foreach="state.data.members" t-as="member" t-key="member.id">
                                 <tr>
-                                    <td>
-                                        <a href="#" t-on-click.prevent="() => this.openMember(member.id)" t-esc="member.name"/>
+                                    <td class="ps-3 fw-bold">
+                                        <a href="#" class="text-decoration-none" t-on-click.prevent="() => this.openMember(member.id)" t-esc="member.name"/>
                                     </td>
                                     <td class="text-muted small" t-esc="member.org_unit"/>
                                     <t t-foreach="state.data.subjects" t-as="subject" t-key="subject.id">
                                         <t t-set="cell" t-value="member.cells[subject.id]"/>
                                         <td t-if="cell"
-                                            t-attf-style="background-color: {{ this.color(cell.status) }}; cursor: pointer; text-align: center;"
+                                            class="text-center"
+                                            style="cursor: pointer;"
                                             t-att-title="cell.expiry_date"
                                             t-on-click="() => this.onCellClick(member.id, subject.id, cell)">
-                                            <span class="text-white small" t-esc="cell.label"/>
+                                            <span t-attf-class="badge rounded-pill px-3 py-2 d-inline-block {{ cell.status === 'due_soon' ? 'text-dark' : 'text-white' }}"
+                                                  t-attf-style="background-color: {{ this.color(cell.status) }}; font-weight: 600; min-width: 90px;"
+                                                  t-esc="cell.label"/>
                                         </td>
-                                        <td t-else="" class="bg-light"/>
+                                        <td t-else="" class="text-center text-muted small bg-light-subtle">-</td>
                                     </t>
                                 </tr>
                             </t>

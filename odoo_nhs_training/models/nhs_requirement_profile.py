@@ -110,3 +110,14 @@ class NhsRequirementProfile(models.Model):
             'view_mode': 'list,kanban,form',
             'domain': [('requirement_profile_id', '=', self.id)],
         }
+
+    def action_assign_posts(self):
+        self.ensure_one()
+        return {
+            'name': 'Assign Posts',
+            'type': 'ir.actions.act_window',
+            'res_model': 'nhs.profile.assign.posts.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_profile_id': self.id},
+        }

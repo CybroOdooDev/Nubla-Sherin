@@ -95,6 +95,23 @@ class NhsTrainingRequirement(models.Model):
         help="Archive flag."
     )
 
+    @api.depends('subject_id', 'profile_id', 'staff_group_id', 'member_id')
+    def _compute_display_name(self):
+        for req in self:
+            target = ""
+            if req.profile_id:
+                target = req.profile_id.name
+            elif req.staff_group_id:
+                target = req.staff_group_id.name
+            elif req.member_id:
+                target = req.member_id.name
+
+            subject = req.subject_id.complete_name or req.subject_id.name or "Unknown Subject"
+            if target:
+                req.display_name = f"{target} — {subject}"
+            else:
+                req.display_name = subject
+
     @api.constrains('profile_id', 'staff_group_id', 'member_id')
     def _check_single_scope(self):
         for req in self:

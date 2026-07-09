@@ -25,21 +25,9 @@
                'subjects, role-based requirements, expiry tracking, professional '
                'registration and team compliance reporting.',
     'description': """
-NHS Mandatory Training Register
-================================
 Tracks whether every member of staff holds the statutory and mandatory training
 their role requires, and whether it is still in date — turning the training-matrix
 spreadsheet into a live, role-driven compliance system.
-
-* CSTF-aligned training-subject catalogue with levels and refresh frequencies
-* Role-based requirement matrix (staff group / post / individual overrides)
-* Completion records with automatic expiry and status (compliant/due soon/expired)
-* Professional-registration tracking (NMC / GMC / HCPC / GPhC / GDC…)
-* Individual, team, department and organisation compliance % roll-ups
-* The signature Training Matrix — members x subjects, colour-coded
-* Reminders, escalation and a weekly compliance digest
-* Board assurance, team matrix and CQC evidence-pack reporting
-* Builds on the NHS Establishment Register (posts, staff groups, org hierarchy)
 """,
     'version': '19.0.1.0.0',
     'category': 'Healthcare/NHS',
@@ -47,13 +35,12 @@ spreadsheet into a live, role-driven compliance system.
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'license': 'OPL-1',
-    'price': 0,
+    'license': 'LGPL-3',
     'currency': 'EUR',
     'depends': [
         'odoo_nhs_establishment',
         'mail',
-        'portal',
+
     ],
     'data': [
         'security/nhs_training_security.xml',
@@ -64,6 +51,7 @@ spreadsheet into a live, role-driven compliance system.
         'data/mail_template_data.xml',
         'data/ir_cron_data.xml',
         'wizards/nhs_bulk_completion_wizard_views.xml',
+        'wizards/nhs_profile_assign_posts_wizard_views.xml',
         'views/nhs_training_subject_views.xml',
         'views/nhs_requirement_profile_views.xml',
         'views/nhs_training_requirement_views.xml',
@@ -89,7 +77,7 @@ spreadsheet into a live, role-driven compliance system.
             'odoo_nhs_training/static/src/dashboard/training_dashboard.xml',
         ],
     },
-    'demo': [],
+    'images': ['static/description/banner.jpg'],
     'application': True,
     'installable': True,
     'auto_install': False,

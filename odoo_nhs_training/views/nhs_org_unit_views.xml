@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="odoo_nhs_establishment.view_nhs_org_unit_list"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='vacancy_rate']" position="after">
-                <field name="team_compliance_pct" widget="percentage" avg="Avg Training Compliance"/>
+                <field name="team_compliance_pct" string="Training Compliance %" avg="Avg Training Compliance"/>
             </xpath>
         </field>
     </record>
@@ -23,7 +23,11 @@
                 </button>
             </xpath>
             <xpath expr="//field[@name='vacancy_rate'][1]" position="after">
-                <field name="team_compliance_pct" widget="percentage"/>
+                <label for="team_compliance_pct"/>
+                <div class="o_row">
+                    <field name="team_compliance_pct" class="oe_inline"/>
+                    <span>%</span>
+                </div>
             </xpath>
         </field>
     </record>
@@ -40,7 +44,7 @@
             <xpath expr="//span[@t-if='record.vacancy_rate.raw_value or record.funded_fte.raw_value']" position="after">
                 <span t-if="record.team_required_count.raw_value"
                       t-attf-class="badge #{record.team_compliance_pct.raw_value >= 85 ? 'text-bg-success' : (record.team_compliance_pct.raw_value >= 70 ? 'text-bg-warning' : 'text-bg-danger')}">
-                    <field name="team_compliance_pct" widget="percentage"/> trained
+                    <field name="team_compliance_pct"/>% trained
                 </span>
             </xpath>
         </field>

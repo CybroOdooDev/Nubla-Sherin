@@ -26,7 +26,7 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     training_due_soon_days = fields.Integer(
-        string='Due Soon Window (Days)',
+        string='Training Due Soon Window (Days)',
         default=60,
         config_parameter='odoo_nhs_training.due_soon_days',
         help="Default number of days before expiry at which a professional registration"
@@ -40,7 +40,7 @@ class ResConfigSettings(models.TransientModel):
              " and organisation compliance is measured against."
     )
     training_digest_recipients = fields.Char(
-        string='Digest Recipients',
+        string='Training Digest Recipients',
         config_parameter='odoo_nhs_training.digest_recipients',
         help="Comma-separated fallback email addresses for the weekly compliance digest."
     )

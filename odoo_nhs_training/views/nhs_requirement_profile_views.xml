@@ -19,6 +19,10 @@
         <field name="model">nhs.requirement.profile</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <!-- <button name="action_assign_posts" type="object" string="Assign Posts"
+                            class="oe_highlight" invisible="not id"/> -->
+                </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_posts" type="object"
@@ -37,7 +41,9 @@
                             <field name="name" placeholder="e.g. Ward Nurse"/>
                         </h1>
                     </div>
-                    <field name="description" placeholder="What roles this profile suits..."/>
+                    <group>
+                        <field name="description" placeholder="What roles this profile suits..."/>
+                    </group>
                     <notebook>
                         <page name="requirements" string="Requirements">
                             <field name="requirement_ids">
@@ -46,6 +52,17 @@
                                     <field name="frequency_months_override"/>
                                     <field name="is_mandatory"/>
                                     <field name="effective_from"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="posts" string="Posts">
+                            <field name="post_ids" widget="many2many" options="{'no_create': True}" domain="[('status', '=', 'active')]">
+                                <list>
+                                    <field name="reference"/>
+                                    <field name="job_title"/>
+                                    <field name="org_unit_id"/>
+                                    <field name="staff_group_id"/>
+                                    <field name="status" widget="badge"/>
                                 </list>
                             </field>
                         </page>
