@@ -40,7 +40,13 @@ class NhsTrainingSubject(models.Model):
         required=True,
         help="Subject name (e.g. 'Safeguarding Children', 'Fire Safety')."
     )
-    level = fields.Char(
+    level = fields.Selection([
+        ('Level 1', 'Level 1'),
+        ('Level 2', 'Level 2'),
+        ('Level 3', 'Level 3'),
+        ('Level 4', 'Level 4'),
+        ('Level 5', 'Level 5'),
+    ],
         string='Level',
         help="Level where applicable (e.g. 'Level 1', 'Level 2', 'Level 3')."
              " Subject + level is the unique combination."

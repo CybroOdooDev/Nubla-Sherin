@@ -74,7 +74,7 @@
         <field name="res_model">nhs.training.requirement</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('member_id', '=', False)]</field>
-        <field name="context">{'search_default_by_profile': 0}</field>
+        <field name="context">{'search_default_by_profile': 0, 'hide_member_id': True}</field>
     </record>
 
     <record id="view_nhs_training_requirement_staff_group_list" model="ir.ui.view">

@@ -32,6 +32,7 @@ STATUS_LABELS = {
     'compliant': 'Compliant',
     'due_soon': 'Due Soon',
     'expired': 'Expired',
+    'failed': 'Failed',
     'not_done': 'Not Done',
     'exempt': 'Exempt',
 }
@@ -61,6 +62,7 @@ class NhsWorkforceMemberComplianceLine(models.Model):
         ('compliant', 'Compliant'),
         ('due_soon', 'Due Soon'),
         ('expired', 'Expired'),
+        ('failed', 'Failed'),
         ('not_done', 'Not Done'),
         ('exempt', 'Exempt'),
     ], string='Status')
@@ -125,12 +127,22 @@ class NhsWorkforceMember(models.Model):
         string='Related User',
         help="Optional link for portal self-view. Not required."
     )
+    email = fields.Char(
+        string='Email',
+        tracking=True,
+        help="Email address of the workforce member used for notifications."
+    )
     employee_id = fields.Reference(
         selection=[('hr.employee', 'Employee')],
         string='Employee',
         help="Optional soft link to an HR employee record, if the HR module happens to"
              " be installed. This module does not depend on HR and never requires it."
     )
+
+    @api.onchange('user_id')
+    def _onchange_user_id_email(self):
+        if self.user_id and self.user_id.email:
+            self.email = self.user_id.email
     start_date = fields.Date(
         string='Start Date',
         default=fields.Date.context_today,
@@ -182,6 +194,13 @@ class NhsWorkforceMember(models.Model):
         string='Expired Subjects',
         compute='_compute_compliance',
         store=True,
+    )
+    failed_subject_count = fields.Integer(
+        string='Failed Subjects',
+        compute='_compute_compliance',
+        store=True,
+        help="Required subjects whose latest attempt was recorded as a Fail — treated as"
+             " non-compliant until retaken and passed.",
     )
     compliance_pct = fields.Float(
         string='Compliance %',
@@ -383,7 +402,8 @@ class NhsWorkforceMember(models.Model):
             required = 0
             compliant = 0
             expired = 0
-            
+            failed = 0
+
             for line in lines:
                 status = member._subject_status(line['subject'], line['lead_days'], line['exempt'])
                 if status == 'exempt':
@@ -394,10 +414,13 @@ class NhsWorkforceMember(models.Model):
                         compliant += 1
                     if status == 'expired':
                         expired += 1
-                
+                    if status == 'failed':
+                        failed += 1
+
             member.required_subject_count = required
             member.compliant_subject_count = compliant
             member.expired_subject_count = expired
+            member.failed_subject_count = failed
             member.compliance_pct = (compliant / required * 100.0) if required else 100.0
             if member.is_leaver:
                 member.compliance_status = 'compliant'
@@ -516,7 +539,7 @@ class NhsWorkforceMember(models.Model):
         whether a member can safely be rostered: fully in-date on required training
         and current on any professional registration."""
         self.ensure_one()
-        if self.expired_subject_count:
+        if self.expired_subject_count or self.failed_subject_count:
             return False
         lapsed_registration = self.registration_ids.filtered(lambda r: r.status == 'lapsed')
         return not lapsed_registration

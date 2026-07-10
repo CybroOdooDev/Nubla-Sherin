@@ -8,18 +8,19 @@
                 </div>
             </t>
             <t t-else="">
-                <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-4 nhs-dashboard-header">
                     <h2 class="mb-0"><i class="fa fa-graduation-cap me-2"/> Training Compliance Dashboard</h2>
-                    <button class="btn btn-outline-primary btn-sm" t-on-click="openAllMembers">
+                    <button class="btn btn-nhs btn-sm" t-on-click="openAllMembers">
                         <i class="fa fa-users me-1"/> All Members
                     </button>
                 </div>
 
                 <div class="row g-3 mb-4">
                     <div class="col-md-3">
-                        <div class="card text-white h-100 shadow-sm" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); cursor: pointer;"
+                        <div class="card h-100 shadow-sm nhs-stat-card nhs-stat-blue"
                              t-on-click="openAllMembers">
                             <div class="card-body">
+                                <div class="nhs-stat-icon"><i class="fa fa-pie-chart"/></div>
                                 <h6 class="text-uppercase opacity-75 mb-1">Overall Compliance</h6>
                                 <h2 class="fw-bold mb-0" t-esc="state.metrics.overall_rate + '%'"/>
                                 <small class="opacity-75">Target: <t t-esc="state.metrics.target"/>%</small>
@@ -27,27 +28,30 @@
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="card text-white h-100 shadow-sm bg-danger" style="cursor: pointer;"
+                        <div class="card h-100 shadow-sm nhs-stat-card nhs-stat-red"
                              t-on-click="openNonCompliant">
                             <div class="card-body">
+                                <div class="nhs-stat-icon"><i class="fa fa-user-times"/></div>
                                 <h6 class="text-uppercase opacity-75 mb-1">Non-Compliant Members</h6>
                                 <h2 class="fw-bold mb-0" t-esc="state.metrics.non_compliant"/>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="card text-white h-100 shadow-sm bg-warning" style="cursor: pointer;"
+                        <div class="card h-100 shadow-sm nhs-stat-card nhs-stat-yellow"
                              t-on-click="openDueSoon">
                             <div class="card-body">
+                                <div class="nhs-stat-icon"><i class="fa fa-clock-o"/></div>
                                 <h6 class="text-uppercase opacity-75 mb-1">Due Soon</h6>
                                 <h2 class="fw-bold mb-0" t-esc="state.metrics.due_soon_count"/>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="card text-white h-100 shadow-sm bg-dark" style="cursor: pointer;"
+                        <div class="card h-100 shadow-sm nhs-stat-card nhs-stat-dark"
                              t-on-click="openExpired">
                             <div class="card-body">
+                                <div class="nhs-stat-icon"><i class="fa fa-ban"/></div>
                                 <h6 class="text-uppercase opacity-75 mb-1">Expired</h6>
                                 <h2 class="fw-bold mb-0" t-esc="state.metrics.expired_count"/>
                             </div>
@@ -55,73 +59,93 @@
                     </div>
                 </div>
 
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <div class="card h-100 shadow-sm">
-                            <div class="card-header fw-bold">Weakest Subjects</div>
-                            <ul class="list-group list-group-flush">
-                                <t t-foreach="state.metrics.weakest_subjects" t-as="s" t-key="s.id">
-                                    <li class="list-group-item d-flex justify-content-between">
-                                        <span t-esc="s.name"/>
-                                        <span class="badge text-bg-secondary" t-esc="s.rate + '%'"/>
-                                    </li>
-                                </t>
-                            </ul>
+                <t t-set="show_subjects" t-value="state.metrics.weakest_subjects &amp;&amp; state.metrics.weakest_subjects.length &gt; 0"/>
+                <t t-set="show_teams" t-value="state.metrics.weakest_teams &amp;&amp; state.metrics.weakest_teams.length &gt; 0"/>
+                <t t-if="show_subjects || show_teams">
+                    <div class="row g-3 mb-4">
+                        <div t-attf-class="col-md-{{ show_subjects &amp;&amp; show_teams ? '6' : '12' }}" t-if="show_subjects">
+                            <div class="card h-100 shadow-sm nhs-panel">
+                                <div class="card-header"><i class="fa fa-book me-2"/>Weakest Subjects</div>
+                                <ul class="list-group list-group-flush">
+                                    <t t-foreach="state.metrics.weakest_subjects" t-as="s" t-key="s.id">
+                                        <li class="list-group-item">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span t-esc="s.name"/>
+                                                <span t-attf-class="badge nhs-badge-{{ getRateLevel(s.rate) }}" t-esc="s.rate + '%'"/>
+                                            </div>
+                                            <div class="nhs-progress">
+                                                <div t-attf-class="nhs-progress-bar nhs-progress-{{ getRateLevel(s.rate) }}"
+                                                     t-attf-style="width: {{ s.rate }}%;"/>
+                                            </div>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </div>
+                        </div>
+                        <div t-attf-class="col-md-{{ show_subjects &amp;&amp; show_teams ? '6' : '12' }}" t-if="show_teams">
+                            <div class="card h-100 shadow-sm nhs-panel">
+                                <div class="card-header"><i class="fa fa-users me-2"/>Weakest Teams</div>
+                                <ul class="list-group list-group-flush">
+                                    <t t-foreach="state.metrics.weakest_teams" t-as="team" t-key="team.id">
+                                        <li class="list-group-item">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span t-esc="team.name"/>
+                                                <span t-attf-class="badge nhs-badge-{{ getRateLevel(team.rate) }}" t-esc="team.rate + '%'"/>
+                                            </div>
+                                            <div class="nhs-progress">
+                                                <div t-attf-class="nhs-progress-bar nhs-progress-{{ getRateLevel(team.rate) }}"
+                                                     t-attf-style="width: {{ team.rate }}%;"/>
+                                            </div>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="card h-100 shadow-sm">
-                            <div class="card-header fw-bold">Weakest Teams</div>
-                            <ul class="list-group list-group-flush">
-                                <t t-foreach="state.metrics.weakest_teams" t-as="team" t-key="team.id">
-                                    <li class="list-group-item d-flex justify-content-between">
-                                        <span t-esc="team.name"/>
-                                        <span class="badge text-bg-secondary" t-esc="team.rate + '%'"/>
-                                    </li>
-                                </t>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                </t>
 
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <div class="card h-100 shadow-sm">
-                            <div class="card-header fw-bold">Expiring Soon Planner</div>
-                            <table class="table table-sm mb-0">
-                                <t t-foreach="state.metrics.due_soon_planner" t-as="r" t-key="r.id">
-                                    <tr style="cursor: pointer;" t-on-click="() => this.openRecord('nhs.training.record', r.id)">
-                                        <td t-esc="r.member"/>
-                                        <td t-esc="r.subject"/>
-                                        <td t-esc="r.team"/>
-                                        <td t-esc="r.expiry_date"/>
-                                    </tr>
-                                </t>
-                            </table>
+                <t t-set="show_planner" t-value="state.metrics.due_soon_planner &amp;&amp; state.metrics.due_soon_planner.length &gt; 0"/>
+                <t t-set="show_register" t-value="state.metrics.expired_register &amp;&amp; state.metrics.expired_register.length &gt; 0"/>
+                <t t-if="show_planner || show_register">
+                    <div class="row g-3 mb-4">
+                        <div t-attf-class="col-md-{{ show_planner &amp;&amp; show_register ? '6' : '12' }}" t-if="show_planner">
+                            <div class="card h-100 shadow-sm nhs-panel">
+                                <div class="card-header"><i class="fa fa-calendar me-2"/>Expiring Soon Planner</div>
+                                <table class="table table-sm mb-0">
+                                    <t t-foreach="state.metrics.due_soon_planner" t-as="r" t-key="r.id">
+                                        <tr t-on-click="() => this.openRecord('nhs.training.record', r.id)">
+                                            <td t-esc="r.member"/>
+                                            <td t-esc="r.subject"/>
+                                            <td t-esc="r.team"/>
+                                            <td><span class="badge nhs-badge-warn" t-esc="r.expiry_date"/></td>
+                                        </tr>
+                                    </t>
+                                </table>
+                            </div>
+                        </div>
+                        <div t-attf-class="col-md-{{ show_planner &amp;&amp; show_register ? '6' : '12' }}" t-if="show_register">
+                            <div class="card h-100 shadow-sm nhs-panel">
+                                <div class="card-header"><i class="fa fa-exclamation-triangle me-2"/>Expired / Overdue Register</div>
+                                <table class="table table-sm mb-0">
+                                    <t t-foreach="state.metrics.expired_register" t-as="r" t-key="r.id">
+                                        <tr t-on-click="() => this.openRecord('nhs.training.record', r.id)">
+                                            <td t-esc="r.member"/>
+                                            <td t-esc="r.subject"/>
+                                            <td t-esc="r.team"/>
+                                            <td><span class="badge nhs-badge-bad" t-esc="r.expiry_date"/></td>
+                                        </tr>
+                                    </t>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="card h-100 shadow-sm">
-                            <div class="card-header fw-bold">Expired / Overdue Register</div>
-                            <table class="table table-sm mb-0">
-                                <t t-foreach="state.metrics.expired_register" t-as="r" t-key="r.id">
-                                    <tr style="cursor: pointer;" t-on-click="() => this.openRecord('nhs.training.record', r.id)">
-                                        <td t-esc="r.member"/>
-                                        <td t-esc="r.subject"/>
-                                        <td t-esc="r.team"/>
-                                        <td t-esc="r.expiry_date"/>
-                                    </tr>
-                                </t>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                </t>
 
-                <div class="row g-3">
+                <div class="row g-3" t-if="state.metrics.lapsed_registration_count &gt; 0">
                     <div class="col-md-4">
-                        <div class="card h-100 shadow-sm" style="cursor: pointer;" t-on-click="openLapsedRegistrations">
+                        <div class="card h-100 shadow-sm nhs-lapsed-card" t-on-click="openLapsedRegistrations">
                             <div class="card-body d-flex justify-content-between align-items-center">
-                                <span class="fw-bold">Lapsed Registrations</span>
+                                <span class="fw-bold"><i class="fa fa-history me-2 text-danger"/>Lapsed Registrations</span>
                                 <span class="badge text-bg-danger fs-6" t-esc="state.metrics.lapsed_registration_count"/>
                             </div>
                         </div>

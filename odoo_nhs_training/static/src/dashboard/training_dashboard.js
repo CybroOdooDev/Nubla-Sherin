@@ -20,6 +20,16 @@ export class NhsTrainingDashboard extends Component {
         });
     }
 
+    getRateLevel(rate) {
+        if (rate >= 80) {
+            return "good";
+        }
+        if (rate >= 50) {
+            return "warn";
+        }
+        return "bad";
+    }
+
     openAction(resModel, viewMode, domain, context) {
         const views = viewMode.split(",").map((mode) => [false, mode]);
         this.action.doAction({

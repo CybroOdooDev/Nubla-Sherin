@@ -6,11 +6,12 @@ import { useService } from "@web/core/utils/hooks";
 
 
 const STATUS_COLORS = {
-    compliant: "#28a745",
-    due_soon: "#ffc107",
-    expired: "#dc3545",
-    not_done: "#adb5bd",
-    exempt: "#17a2b8",
+    compliant: "#137333",
+    due_soon: "#b06000",
+    expired: "#c5221f",
+    failed: "#8b1538",
+    not_done: "#5f6368",
+    exempt: "#1a73e8",
 };
 
 export class NhsTrainingMatrix extends Component {

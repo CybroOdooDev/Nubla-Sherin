@@ -23,7 +23,7 @@ from odoo import api, fields, models
 
 STATUS_LABELS = {
     'compliant': 'Compliant', 'due_soon': 'Due Soon', 'expired': 'Expired',
-    'not_done': 'Not Done', 'exempt': 'Exempt',
+    'failed': 'Failed', 'not_done': 'Not Done', 'exempt': 'Exempt',
 }
 
 
@@ -114,6 +114,21 @@ class ReportTrainingBoard(models.AbstractModel):
             'staff_group_stats': sorted(staff_group_stats, key=lambda s: s['rate']),
             'team_stats': sorted(team_stats, key=lambda s: s['rate']),
             'lapsed_registrations': lapsed,
+            'generated_on': fields.Date.context_today(self),
+        }
+
+
+class ReportTrainingCertificate(models.AbstractModel):
+    _name = 'report.odoo_nhs_training.report_nhs_training_certificate_view'
+    _description = 'Certificate of Completion QWeb PDF Report Parser'
+
+    @api.model
+    def _get_report_values(self, docids, data=None):
+        records = self.env['nhs.training.record'].browse(docids)
+        return {
+            'doc_ids': records.ids,
+            'doc_model': 'nhs.training.record',
+            'docs': records,
             'generated_on': fields.Date.context_today(self),
         }
 

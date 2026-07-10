@@ -32,7 +32,7 @@
                                     <td><t t-out="row['member'].name"/></td>
                                     <td><t t-out="row['member'].org_unit_id.name"/></td>
                                     <t t-foreach="row['cells']" t-as="cell">
-                                        <td t-attf-style="text-align:center; #{cell['status'] == 'compliant' and 'background-color:#d4edda;' or cell['status'] == 'due_soon' and 'background-color:#fff3cd;' or cell['status'] == 'expired' and 'background-color:#f8d7da;' or cell['status'] == 'exempt' and 'background-color:#d1ecf1;' or ''}">
+                                        <td t-attf-style="text-align:center; #{cell['status'] == 'compliant' and 'background-color:#d4edda;' or cell['status'] == 'due_soon' and 'background-color:#fff3cd;' or cell['status'] == 'expired' and 'background-color:#f8d7da;' or cell['status'] == 'failed' and 'background-color:#f1aeb5;' or cell['status'] == 'exempt' and 'background-color:#d1ecf1;' or ''}">
                                             <t t-out="cell['label']"/>
                                         </td>
                                     </t>

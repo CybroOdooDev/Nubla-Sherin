@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <list decoration-success="status=='compliant'"
                   decoration-warning="status=='due_soon'"
-                  decoration-danger="status=='expired'">
+                  decoration-danger="status in ('expired', 'failed')">
                 <field name="member_id"/>
                 <field name="org_unit_id"/>
                 <field name="subject_id"/>
@@ -27,7 +27,9 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <field name="status" widget="statusbar" statusbar_visible="compliant,due_soon,expired"/>
+                    <button name="%(report_nhs_training_certificate)d" type="action"
+                            string="Print Certificate" class="oe_highlight" invisible="not id"/>
+                    <field name="status" widget="statusbar" statusbar_visible="compliant,due_soon,expired,failed"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -77,6 +79,7 @@
                 <filter name="compliant" string="Compliant" domain="[('status', '=', 'compliant')]"/>
                 <filter name="due_soon" string="Due Soon" domain="[('status', '=', 'due_soon')]"/>
                 <filter name="expired" string="Expired" domain="[('status', '=', 'expired')]"/>
+                <filter name="failed" string="Failed" domain="[('status', '=', 'failed')]"/>
                 <group>
                     <filter name="group_subject" string="Subject" context="{'group_by': 'subject_id'}"/>
                     <filter name="group_team" string="Team" context="{'group_by': 'org_unit_id'}"/>

@@ -36,6 +36,7 @@ STATUSES = [
     ('compliant', 'Compliant'),
     ('due_soon', 'Due Soon'),
     ('expired', 'Expired'),
+    ('failed', 'Failed'),
 ]
 
 
@@ -132,12 +133,14 @@ class NhsTrainingRecord(models.Model):
         compute='_compute_status',
         store=True,
         tracking=True,
-        help="compliant / due_soon / expired. One-off subjects are always compliant once done."
+        help="compliant / due_soon / expired / failed. One-off subjects are always compliant"
+             " once done. A Result of Fail always forces the status to failed, regardless of"
+             " expiry, until a later completion supersedes it."
     )
-    result = fields.Char(
-        string='Result',
-        help="Pass/fail or score, where relevant."
-    )
+    result = fields.Selection([
+        ('pass', 'Pass'),
+        ('fail', 'Fail'),
+    ], string='Result', help="Pass/fail result, where relevant.")
     certificate_ref = fields.Char(
         string='Certificate Reference',
     )
@@ -183,11 +186,13 @@ class NhsTrainingRecord(models.Model):
             else:
                 rec.expiry_date = False
 
-    @api.depends('expiry_date', 'subject_id.is_one_off', 'subject_id.default_lead_days')
+    @api.depends('expiry_date', 'subject_id.is_one_off', 'subject_id.default_lead_days', 'result')
     def _compute_status(self):
         today = fields.Date.context_today(self)
         for rec in self:
-            if rec.subject_id.is_one_off or not rec.expiry_date:
+            if rec.result == 'fail':
+                rec.status = 'failed'
+            elif rec.subject_id.is_one_off or not rec.expiry_date:
                 rec.status = 'compliant'
             elif rec.expiry_date < today:
                 rec.status = 'expired'
@@ -261,7 +266,7 @@ class NhsTrainingRecord(models.Model):
         activity_type = self.env.ref('mail.mail_activity_data_todo', raise_if_not_found=False)
         for rec in self.search([('status', 'in', ('due_soon', 'expired')), ('is_latest', '=', True)]):
             template = due_soon_template if rec.status == 'due_soon' else expired_template
-            if template and rec.member_id.user_id and rec.member_id.user_id.email:
+            if template and (rec.member_id.email or (rec.member_id.user_id and rec.member_id.user_id.email)):
                 template.send_mail(rec.id, force_send=True)
             manager = rec.org_unit_id.manager_id
             if manager and activity_type:

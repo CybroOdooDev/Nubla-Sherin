@@ -7,6 +7,7 @@
             <field name="prefix">WFM/%(year)s/</field>
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
+            <field name="implementation">no_gap</field>
         </record>
     </data>
 </odoo>

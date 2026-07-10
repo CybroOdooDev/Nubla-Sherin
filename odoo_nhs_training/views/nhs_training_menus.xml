@@ -16,10 +16,10 @@
               parent="menu_nhs_training_compliance" action="action_nhs_training_record_due_soon" sequence="30"/>
     <menuitem id="menu_nhs_training_expired" name="Expired / Overdue"
               parent="menu_nhs_training_compliance" action="action_nhs_training_record_expired" sequence="40"/>
-    <menuitem id="menu_nhs_training_bulk_completion" name="Bulk-Record Training Session"
-              parent="menu_nhs_training_compliance" action="action_nhs_bulk_completion_wizard" sequence="50"/>
-    <menuitem id="menu_nhs_training_org_hierarchy" name="Org Hierarchy"
-              parent="menu_nhs_training_compliance" action="action_nhs_training_org_unit" sequence="60"/>
+<!--    <menuitem id="menu_nhs_training_bulk_completion" name="Bulk-Record Training Session"-->
+<!--              parent="menu_nhs_training_compliance" action="action_nhs_bulk_completion_wizard" sequence="50"/>-->
+<!--    <menuitem id="menu_nhs_training_org_hierarchy" name="Org Hierarchy"-->
+<!--              parent="menu_nhs_training_compliance" action="action_nhs_training_org_unit" sequence="60"/>-->
 
     <!-- ── Records ───────────────────────────────────────────────── -->
     <menuitem id="menu_nhs_training_records" name="Records"
@@ -49,9 +49,9 @@
     <menuitem id="menu_nhs_training_by_staff_group" name="By Staff Group"
               parent="menu_nhs_training_reporting" action="action_nhs_training_by_staff_group" sequence="40"/>
     <menuitem id="menu_nhs_training_report_matrix" name="Team Matrix (PDF)"
-              parent="menu_nhs_training_reporting" action="action_nhs_workforce_member" sequence="50"/>
+              parent="menu_nhs_training_reporting" action="report_nhs_training_matrix" sequence="50"/>
     <menuitem id="menu_nhs_training_report_board" name="Board Assurance (PDF)"
-              parent="menu_nhs_training_reporting" action="action_nhs_training_org_unit" sequence="60"/>
+              parent="menu_nhs_training_reporting" action="report_nhs_training_board" sequence="60"/>
 
     <!-- ── Configuration (manager only) ─────────────────────────── -->
     <menuitem id="menu_nhs_training_config" name="Configuration"

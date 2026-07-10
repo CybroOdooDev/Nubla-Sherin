@@ -140,5 +140,5 @@ class NhsRegistration(models.Model):
             return
         expiring = self.search([('status', '=', 'expiring_soon')])
         for reg in expiring:
-            if reg.member_id.user_id and reg.member_id.user_id.email:
+            if reg.member_id.email or (reg.member_id.user_id and reg.member_id.user_id.email):
                 template.send_mail(reg.id, force_send=True)

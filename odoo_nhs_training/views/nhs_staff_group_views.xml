@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit Staff Group Form to add Training Requirements smart button -->
+    <record id="view_nhs_staff_group_form_inherit_training" model="ir.ui.view">
+        <field name="name">nhs.staff.group.form.inherit.training</field>
+        <field name="model">nhs.staff.group</field>
+        <field name="inherit_id" ref="odoo_nhs_establishment.view_nhs_staff_group_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_training_requirements" type="object"
+                            class="oe_stat_button" icon="fa-graduation-cap">
+                        <field name="requirement_count" widget="statinfo" string="Requirements"/>
+                    </button>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit Staff Group List to remove editable="bottom" and make rows clickable to open form -->
+    <record id="view_nhs_staff_group_list_inherit_training" model="ir.ui.view">
+        <field name="name">nhs.staff.group.list.inherit.training</field>
+        <field name="model">nhs.staff.group</field>
+        <field name="inherit_id" ref="odoo_nhs_establishment.view_nhs_staff_group_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="editable"></attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

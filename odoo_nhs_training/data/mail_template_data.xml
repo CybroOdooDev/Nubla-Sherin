@@ -5,7 +5,7 @@
             <field name="name">Training: Due Soon</field>
             <field name="model_id" ref="model_nhs_training_record"/>
             <field name="subject">Training due soon: {{ object.subject_id.complete_name }}</field>
-            <field name="email_to">{{ object.member_id.user_id.email }}</field>
+            <field name="email_to">{{ object.member_id.email or object.member_id.user_id.email }}</field>
             <field name="body_html" type="html">
                 <div>
                     <p>Hello <t t-out="object.member_id.name"/>,</p>
@@ -19,7 +19,7 @@
             <field name="name">Training: Expired</field>
             <field name="model_id" ref="model_nhs_training_record"/>
             <field name="subject">ACTION NEEDED — Training expired: {{ object.subject_id.complete_name }}</field>
-            <field name="email_to">{{ object.member_id.user_id.email }}</field>
+            <field name="email_to">{{ object.member_id.email or object.member_id.user_id.email }}</field>
             <field name="body_html" type="html">
                 <div>
                     <p>Hello <t t-out="object.member_id.name"/>,</p>
@@ -33,7 +33,7 @@
             <field name="name">Registration: Expiring Soon</field>
             <field name="model_id" ref="model_nhs_registration"/>
             <field name="subject">Professional registration expiring soon: {{ object.regulator_id.name }}</field>
-            <field name="email_to">{{ object.member_id.user_id.email }}</field>
+            <field name="email_to">{{ object.member_id.email or object.member_id.user_id.email }}</field>
             <field name="body_html" type="html">
                 <div>
                     <p>Hello <t t-out="object.member_id.name"/>,</p>
