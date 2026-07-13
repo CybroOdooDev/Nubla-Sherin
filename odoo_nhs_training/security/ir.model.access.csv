@@ -20,8 +20,6 @@ access_nhs_training_record_manager,nhs.training.record manager,model_nhs_trainin
 access_nhs_registration_user,nhs.registration user,model_nhs_registration,group_nhs_training_user,1,0,0,0
 access_nhs_registration_officer,nhs.registration officer,model_nhs_registration,group_nhs_training_officer,1,1,1,0
 access_nhs_registration_manager,nhs.registration manager,model_nhs_registration,group_nhs_training_manager,1,1,1,0
-access_nhs_bulk_completion_wizard_officer,nhs.bulk.completion.wizard officer,model_nhs_bulk_completion_wizard,group_nhs_training_officer,1,1,1,1
-access_nhs_bulk_completion_wizard_manager,nhs.bulk.completion.wizard manager,model_nhs_bulk_completion_wizard,group_nhs_training_manager,1,1,1,1
 access_nhs_profile_assign_posts_wizard_officer,nhs.profile.assign.posts.wizard officer,model_nhs_profile_assign_posts_wizard,group_nhs_training_officer,1,1,1,1
 access_nhs_profile_assign_posts_wizard_manager,nhs.profile.assign.posts.wizard manager,model_nhs_profile_assign_posts_wizard,group_nhs_training_manager,1,1,1,1
 access_nhs_workforce_member_portal,nhs.workforce.member portal,model_nhs_workforce_member,base.group_portal,1,0,0,0

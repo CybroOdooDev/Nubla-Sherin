@@ -50,7 +50,7 @@ spreadsheet into a live, role-driven compliance system.
         'data/nhs_training_subject_data.xml',
         'data/mail_template_data.xml',
         'data/ir_cron_data.xml',
-        'wizards/nhs_bulk_completion_wizard_views.xml',
+        'data/nhs_training_report_paperformat_data.xml',
         'wizards/nhs_profile_assign_posts_wizard_views.xml',
         'views/nhs_training_subject_views.xml',
         'views/nhs_requirement_profile_views.xml',

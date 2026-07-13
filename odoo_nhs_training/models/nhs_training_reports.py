@@ -26,6 +26,11 @@ STATUS_LABELS = {
     'failed': 'Failed', 'not_done': 'Not Done', 'exempt': 'Exempt',
 }
 
+# Subject columns per printed page. A landscape A4 page is wide enough for the
+# Member/Team columns plus about this many status columns before content would
+# run past the printable margin and get silently clipped by the PDF engine.
+MATRIX_SUBJECTS_PER_PAGE = 8
+
 
 class ReportTrainingMatrix(models.AbstractModel):
     _name = 'report.odoo_nhs_training.report_nhs_training_matrix_view'
@@ -54,12 +59,23 @@ class ReportTrainingMatrix(models.AbstractModel):
                 cells.append({'status': status, 'label': STATUS_LABELS.get(status, status)})
             rows.append({'member': member, 'cells': cells})
 
+        subjects_list = list(subjects)
+        chunk_starts = range(0, len(subjects_list), MATRIX_SUBJECTS_PER_PAGE) or [0]
+        pages = [{
+            'subjects': subjects_list[start:start + MATRIX_SUBJECTS_PER_PAGE],
+            'rows': [{
+                'member': row['member'],
+                'cells': row['cells'][start:start + MATRIX_SUBJECTS_PER_PAGE],
+            } for row in rows],
+        } for start in chunk_starts]
+
         return {
             'doc_ids': members.ids,
             'doc_model': 'nhs.workforce.member',
             'docs': members,
             'subjects': subjects,
             'rows': rows,
+            'pages': pages,
             'generated_on': fields.Date.context_today(self),
         }
 

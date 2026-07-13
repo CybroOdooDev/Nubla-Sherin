@@ -14,7 +14,43 @@
                     </button>
                 </div>
             </xpath>
+            <xpath expr="//sheet/group" position="after">
+                <notebook>
+                    <page name="training_requirements" string="Training Requirements">
+                        <field name="requirement_ids">
+                            <list editable="bottom">
+                                <field name="subject_id" options="{'no_create': True}"/>
+                                <field name="frequency_months_override"/>
+                                <field name="is_mandatory"/>
+                                <field name="effective_from"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+            </xpath>
         </field>
+    </record>
+
+    <record id="view_nhs_staff_group_list_by_requirements" model="ir.ui.view">
+        <field name="name">nhs.staff.group.list.by.requirements</field>
+        <field name="model">nhs.staff.group</field>
+        <field name="arch" type="xml">
+            <list string="Staff Groups">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="requirement_count"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_nhs_training_requirement_by_staff_group" model="ir.actions.act_window">
+        <field name="name">Requirements by Staff Group</field>
+        <field name="res_model">nhs.staff.group</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_nhs_staff_group_list_by_requirements"/>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
     </record>
 
     <!-- Inherit Staff Group List to remove editable="bottom" and make rows clickable to open form -->

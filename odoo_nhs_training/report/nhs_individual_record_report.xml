@@ -33,8 +33,8 @@
                                     <tr>
                                         <td><t t-out="row['subject']"/></td>
                                         <td><t t-out="row['label']"/></td>
-                                        <td><t t-out="row['completion_date'] or '—'"/></td>
-                                        <td><t t-out="row['expiry_date'] or '—'"/></td>
+                                        <td><t t-out="row['completion_date'] or '-'"/></td>
+                                        <td><t t-out="row['expiry_date'] or '-'"/></td>
                                     </tr>
                                 </t>
                             </tbody>

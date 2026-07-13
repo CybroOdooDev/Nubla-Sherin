@@ -19,5 +19,4 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from . import nhs_bulk_completion_wizard
 from . import nhs_profile_assign_posts_wizard
