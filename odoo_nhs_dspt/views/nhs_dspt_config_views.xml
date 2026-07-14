@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_config_settings_nhs_dspt" model="ir.ui.view">
+        <field name="name">res.config.settings.nhs.dspt</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="NHS DSPT" name="odoo_nhs_dspt"
+                     groups="odoo_nhs_dspt.group_nhs_dspt_manager">
+                    <block title="DSPT Settings">
+                        <setting string="Deadline Reminder Lead Time">
+                            <span><field name="dspt_deadline_reminder_days"/> days</span>
+                        </setting>
+                        <setting string="Stale Evidence Age">
+                            <span><field name="dspt_stale_evidence_months"/> months</span>
+                        </setting>
+                        <setting string="Approaching Standards Threshold">
+                            <span><field name="dspt_approaching_threshold"/> %</span>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_nhs_dspt_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_res_config_settings_nhs_dspt"/>
+        <field name="target">current</field>
+        <field name="context">{'module': 'odoo_nhs_dspt'}</field>
+    </record>
+</odoo>

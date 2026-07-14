@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="mail_template_dspt_deadline_reminder" model="mail.template">
+            <field name="name">DSPT: Deadline Approaching</field>
+            <field name="model_id" ref="model_nhs_dspt_assessment"/>
+            <field name="subject">DSPT {{ object.edition_id.name }} deadline approaching — {{ object.company_id.name }}</field>
+            <field name="email_to">{{ object.published_by_id.email or '' }}</field>
+            <field name="partner_to">{{ object.create_uid.partner_id.id }}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; font-size: 14px;">
+                    <p>The <strong t-out="object.edition_id.name or ''"/> submission deadline is
+                        <strong t-out="object.deadline or ''"/>.</p>
+                    <p>Current readiness: <strong t-out="round(object.readiness_pct, 1)"/>%
+                        — <strong t-out="object.gap_count"/> gap(s) outstanding.</p>
+                    <p>Please review the assessment and close any outstanding items before the deadline.</p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+
+        <record id="mail_template_dspt_overdue_action" model="mail.template">
+            <field name="name">DSPT: Overdue Improvement Action</field>
+            <field name="model_id" ref="model_nhs_dspt_action"/>
+            <field name="subject">Overdue DSPT improvement action — {{ object.name }}</field>
+            <field name="partner_to">{{ object.owner_id.partner_id.id }}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; font-size: 14px;">
+                    <p>The improvement action <strong t-out="object.name or ''"/> was due
+                        <strong t-out="object.target_date or ''"/> and is still
+                        <strong t-out="object.state or ''"/>.</p>
+                    <p>Please update its status or complete it as soon as possible.</p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+    </data>
+</odoo>

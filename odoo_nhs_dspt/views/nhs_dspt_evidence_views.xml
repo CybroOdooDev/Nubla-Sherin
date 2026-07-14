@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_dspt_evidence_list" model="ir.ui.view">
+        <field name="name">nhs.dspt.evidence.list</field>
+        <field name="model">nhs.dspt.evidence</field>
+        <field name="arch" type="xml">
+            <list create="0" delete="0" decoration-success="status=='met'"
+                  decoration-warning="status=='in_progress'"
+                  decoration-danger="status=='not_met'"
+                  decoration-info="status=='not_applicable'"
+                  decoration-muted="status=='not_started'">
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="standard_id"/>
+                <field name="is_mandatory"/>
+                <field name="owner_id" widget="many2one_avatar_user"/>
+                <field name="status" widget="badge"/>
+                <field name="evidence_review_date"/>
+                <field name="is_stale" widget="boolean_toggle"/>
+                <field name="assessment_id"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_dspt_evidence_kanban" model="ir.ui.view">
+        <field name="name">nhs.dspt.evidence.kanban</field>
+        <field name="model">nhs.dspt.evidence</field>
+        <field name="arch" type="xml">
+            <kanban create="0" delete="0" default_group_by="status" records_draggable="false">
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="is_mandatory"/>
+                <field name="status"/>
+                <field name="is_stale"/>
+                <field name="owner_id"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click p-2">
+                            <div class="d-flex justify-content-between">
+                                <strong><field name="reference"/></strong>
+                                <span t-if="record.is_mandatory.raw_value" class="badge text-bg-dark">Mandatory</span>
+                            </div>
+                            <div><field name="name"/></div>
+                            <div class="text-muted small">
+                                <field name="owner_id"/>
+                            </div>
+                            <span t-if="record.is_stale.raw_value" class="badge text-bg-warning">Stale</span>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_nhs_dspt_evidence_form" model="ir.ui.view">
+        <field name="name">nhs.dspt.evidence.form</field>
+        <field name="model">nhs.dspt.evidence</field>
+        <field name="arch" type="xml">
+            <form create="0" delete="0">
+                <header>
+                    <button name="action_raise_action" type="object" string="Raise Improvement Action"
+                            class="oe_highlight" invisible="status != 'not_met'"/>
+                    <button name="action_set_in_progress" type="object" string="Start Work"
+                            class="oe_highlight" invisible="status not in ('not_started', 'not_applicable')"/>
+                    <button name="action_set_met" type="object" string="Mark Met"
+                            class="oe_highlight" invisible="status != 'in_progress'"/>
+                    <button name="action_set_met" type="object" string="Mark Met"
+                            invisible="status != 'not_met'"/>
+                    <button name="action_set_not_met" type="object" string="Mark Not Met"
+                            invisible="status not in ('in_progress', 'met')"/>
+                    <button name="action_set_not_applicable" type="object" string="Mark N/A"
+                            invisible="status == 'not_applicable'"/>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="not_started,in_progress,met,not_met"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_actions" type="object"
+                                class="oe_stat_button" icon="fa-wrench">
+                            <field name="action_count" widget="statinfo" string="Actions"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Mandatory" bg_color="text-bg-danger" invisible="not is_mandatory"/>
+                    <widget name="web_ribbon" title="Stale" bg_color="text-bg-warning" invisible="not is_stale"/>
+                    <div class="oe_title">
+                        <span class="o_form_label">Reference</span>
+                        <h2><field name="reference" readonly="1"/></h2>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="assessment_id" options="{'no_create': True}"/>
+                            <field name="assertion_id" options="{'no_create': True}"/>
+                            <field name="standard_id" readonly="1"/>
+                            <field name="is_mandatory" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="owner_id"/>
+                            <field name="evidence_review_date"/>
+                            <field name="is_stale" readonly="1"/>
+                            <field name="na_reason" invisible="status != 'not_applicable'"/>
+                        </group>
+                    </group>
+                    <group string="Guidance" invisible="not guidance">
+                        <field name="guidance" nolabel="1" readonly="1"/>
+                    </group>
+                    <group string="Answer">
+                        <field name="answer" nolabel="1"/>
+                    </group>
+                    <group string="Evidence">
+                        <field name="evidence_ref"/>
+                        <field name="linked_source" placeholder="e.g. odoo_nhs_training compliance % for Ward 12"/>
+                        <field name="attachment_ids" widget="many2many_binary" string="Documents" nolabel="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_dspt_evidence_search" model="ir.ui.view">
+        <field name="name">nhs.dspt.evidence.search</field>
+        <field name="model">nhs.dspt.evidence</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="standard_id"/>
+                <field name="owner_id"/>
+                <field name="assessment_id"/>
+                <filter name="my_items" string="My Evidence" domain="[('owner_id', '=', uid)]"/>
+                <separator/>
+                <filter name="mandatory" string="Mandatory" domain="[('is_mandatory', '=', True)]"/>
+                <filter name="not_met" string="Not Met" domain="[('status', '=', 'not_met')]"/>
+                <filter name="stale" string="Stale" domain="[('is_stale', '=', True)]"/>
+                <group>
+                    <filter name="group_standard" string="Standard" context="{'group_by': 'standard_id'}"/>
+                    <filter name="group_owner" string="Owner" context="{'group_by': 'owner_id'}"/>
+                    <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
+                    <filter name="group_assessment" string="Assessment" context="{'group_by': 'assessment_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_dspt_evidence" model="ir.actions.act_window">
+        <field name="name">Evidence Library</field>
+        <field name="res_model">nhs.dspt.evidence</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Evidence items appear once you generate an assessment's lines.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_nhs_dspt_evidence_stale" model="ir.actions.act_window">
+        <field name="name">Stale Evidence</field>
+        <field name="res_model">nhs.dspt.evidence</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_stale', '=', True)]</field>
+        <field name="context">{'search_default_group_standard': 1}</field>
+    </record>
+
+    <record id="action_nhs_dspt_my_items" model="ir.actions.act_window">
+        <field name="name">My Items</field>
+        <field name="res_model">nhs.dspt.evidence</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('owner_id', '=', uid)]</field>
+        <field name="context">{'search_default_group_status': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Evidence items assigned to you will appear here.
+            </p>
+        </field>
+    </record>
+</odoo>

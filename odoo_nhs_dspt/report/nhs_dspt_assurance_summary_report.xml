@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="report_nhs_dspt_assurance_summary" model="ir.actions.report">
+        <field name="name">DSPT Assurance Summary</field>
+        <field name="model">nhs.dspt.assessment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_dspt.report_nhs_dspt_assurance_summary_view</field>
+        <field name="report_file">odoo_nhs_dspt.report_nhs_dspt_assurance_summary_view</field>
+        <field name="binding_model_id" ref="model_nhs_dspt_assessment"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'DSPT Assurance Summary - %s' % (object.company_id.name)</field>
+    </record>
+
+    <template id="report_nhs_dspt_assurance_summary_view">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="assessment">
+                <div class="page" style="padding: 0;">
+                    <div style="border: 3px solid #005EB8; padding: 6px;">
+                        <div style="border: 1px solid #FFB81C; padding: 44px 56px 36px; text-align: center;
+                                    font-family: Arial, Helvetica, sans-serif;">
+
+                            <div style="color:#425563; letter-spacing: 3px; font-size: 12px; text-transform: uppercase;">
+                                <t t-out="assessment.company_id.name"/>
+                            </div>
+
+                            <div style="color:#003087; font-size: 30px; font-weight: bold; letter-spacing: 1px;
+                                        margin-top: 20px;">
+                                DSPT ASSURANCE SUMMARY
+                            </div>
+                            <div style="width: 120px; border-top: 2px solid #FFB81C; margin: 18px auto 30px;"/>
+
+                            <div style="font-size: 14px; color:#425563;">Data Security and Protection Toolkit status for</div>
+                            <div style="font-size: 22px; font-weight: bold; color:#212B32; margin: 10px 0 24px;">
+                                <t t-out="assessment.edition_id.name"/>
+                            </div>
+
+                            <div t-attf-style="display: inline-block; padding: 14px 36px; border-radius: 8px; font-size: 22px;
+                                        font-weight: bold; margin-bottom: 24px;
+                                        background-color: #{assessment.achieved_status == 'standards_met' and '#e6f4ea' or assessment.achieved_status == 'plan_in_place' and '#e8f0fe' or assessment.achieved_status == 'approaching' and '#fef7e0' or '#fce8e6'};
+                                        color: #{assessment.achieved_status == 'standards_met' and '#137333' or assessment.achieved_status == 'plan_in_place' and '#1a73e8' or assessment.achieved_status == 'approaching' and '#b06000' or '#c5221f'};">
+                                <t t-if="assessment.achieved_status == 'standards_met'">STANDARDS MET</t>
+                                <t t-elif="assessment.achieved_status == 'plan_in_place'">PLAN IN PLACE</t>
+                                <t t-elif="assessment.achieved_status == 'approaching'">APPROACHING STANDARDS</t>
+                                <t t-else="">STANDARDS NOT MET</t>
+                            </div>
+
+                            <table style="margin: 10px auto 0; font-size: 13px; color:#212B32;">
+                                <tr>
+                                    <td style="padding: 4px 18px; text-align: right; color:#425563;">Readiness</td>
+                                    <td style="padding: 4px 18px; text-align: left; font-weight: bold;">
+                                        <t t-out="round(assessment.readiness_pct, 1)"/>%
+                                    </td>
+                                </tr>
+                                <tr t-if="assessment.submission_date">
+                                    <td style="padding: 4px 18px; text-align: right; color:#425563;">Submitted</td>
+                                    <td style="padding: 4px 18px; text-align: left; font-weight: bold;">
+                                        <t t-out="assessment.submission_date"/>
+                                    </td>
+                                </tr>
+                                <tr t-if="assessment.submission_reference">
+                                    <td style="padding: 4px 18px; text-align: right; color:#425563;">Reference</td>
+                                    <td style="padding: 4px 18px; text-align: left; font-weight: bold;">
+                                        <t t-out="assessment.submission_reference"/>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <div style="margin-top: 36px; font-size: 11px; color:#425563; max-width: 480px; margin-left: auto; margin-right: auto;">
+                                This summary reflects the organisation's internal DSPT assessment position and is
+                                provided for supplier/partner assurance purposes. The authoritative record is the
+                                organisation's published submission on the NHS DSPT portal.
+                            </div>
+
+                            <div style="margin-top: 30px; font-size: 12px; color:#425563;">
+                                Generated <t t-out="generated_on"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

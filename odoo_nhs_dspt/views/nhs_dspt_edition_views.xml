@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ══════════════════════════════════════════════════════════════════
+         nhs.dspt.evidence.def
+    ══════════════════════════════════════════════════════════════════════ -->
+    <record id="view_nhs_dspt_evidence_def_list" model="ir.ui.view">
+        <field name="name">nhs.dspt.evidence.def.list</field>
+        <field name="model">nhs.dspt.evidence.def</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" decoration-muted="change_flag=='removed'">
+                <field name="sequence" widget="handle"/>
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="is_mandatory"/>
+                <field name="applies_to_profile_ids" widget="many2many_tags"/>
+                <field name="evidence_type_hint"/>
+                <field name="change_flag"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_dspt_evidence_def_form" model="ir.ui.view">
+        <field name="name">nhs.dspt.evidence.def.form</field>
+        <field name="model">nhs.dspt.evidence.def</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="reference"/>
+                        <h2><field name="reference" placeholder="e.g. 1.1.1"/></h2>
+                        <h1><field name="name" placeholder="Evidence item text/question"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="assertion_def_id" options="{'no_create': True}"/>
+                            <field name="is_mandatory"/>
+                            <field name="evidence_type_hint"/>
+                        </group>
+                        <group>
+                            <field name="applies_to_profile_ids" widget="many2many_tags"/>
+                            <field name="change_flag"/>
+                        </group>
+                    </group>
+                    <group string="Guidance">
+                        <field name="guidance" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         nhs.dspt.assertion.def
+    ══════════════════════════════════════════════════════════════════════ -->
+    <record id="view_nhs_dspt_assertion_def_list" model="ir.ui.view">
+        <field name="name">nhs.dspt.assertion.def.list</field>
+        <field name="model">nhs.dspt.assertion.def</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" decoration-muted="change_flag=='removed'">
+                <field name="sequence" widget="handle"/>
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="applies_to_profile_ids" widget="many2many_tags"/>
+                <field name="evidence_count"/>
+                <field name="change_flag"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_dspt_assertion_def_form" model="ir.ui.view">
+        <field name="name">nhs.dspt.assertion.def.form</field>
+        <field name="model">nhs.dspt.assertion.def</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="reference"/>
+                        <h2><field name="reference" placeholder="e.g. 1.1"/></h2>
+                        <h1><field name="name" placeholder="Assertion text"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="standard_id" options="{'no_create': True}"/>
+                            <field name="applies_to_profile_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="change_flag"/>
+                            <field name="evidence_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="evidence" string="Evidence Items">
+                            <field name="evidence_def_ids">
+                                <list editable="bottom">
+                                    <field name="reference"/>
+                                    <field name="name"/>
+                                    <field name="is_mandatory"/>
+                                    <field name="applies_to_profile_ids" widget="many2many_tags"/>
+                                    <field name="evidence_type_hint"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         nhs.dspt.standard
+    ══════════════════════════════════════════════════════════════════════ -->
+    <record id="view_nhs_dspt_standard_list" model="ir.ui.view">
+        <field name="name">nhs.dspt.standard.list</field>
+        <field name="model">nhs.dspt.standard</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="assertion_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_dspt_standard_form" model="ir.ui.view">
+        <field name="name">nhs.dspt.standard.form</field>
+        <field name="model">nhs.dspt.standard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Standard / theme name"/></h1>
+                    </div>
+                    <group>
+                        <field name="edition_id" options="{'no_create': True}"/>
+                        <field name="code"/>
+                    </group>
+                    <notebook>
+                        <page name="assertions" string="Assertions">
+                            <field name="assertion_def_ids">
+                                <list editable="bottom">
+                                    <field name="reference"/>
+                                    <field name="name"/>
+                                    <field name="applies_to_profile_ids" widget="many2many_tags"/>
+                                    <field name="evidence_count"/>
+                                    <field name="change_flag"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         nhs.dspt.edition
+    ══════════════════════════════════════════════════════════════════════ -->
+    <record id="view_nhs_dspt_edition_list" model="ir.ui.view">
+        <field name="name">nhs.dspt.edition.list</field>
+        <field name="model">nhs.dspt.edition</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state=='archived'" decoration-success="state=='active'">
+                <field name="name"/>
+                <field name="year"/>
+                <field name="deadline"/>
+                <field name="assertion_count"/>
+                <field name="evidence_count"/>
+                <field name="assessment_count"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_dspt_edition_form" model="ir.ui.view">
+        <field name="name">nhs.dspt.edition.form</field>
+        <field name="model">nhs.dspt.edition</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_activate" type="object" string="Set Active"
+                            class="oe_highlight" invisible="state == 'active'"/>
+                    <button name="action_archive_edition" type="object" string="Archive"
+                            invisible="state == 'archived'"/>
+                    <button name="%(action_nhs_dspt_new_edition_wizard)d" type="action"
+                            string="Clone to New Year" context="{'default_source_edition_id': id}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,archived"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_assessments" type="object"
+                                class="oe_stat_button" icon="fa-clipboard-check">
+                            <field name="assessment_count" widget="statinfo" string="Assessments"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. DSPT 2025/26"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="year"/>
+                            <field name="deadline"/>
+                        </group>
+                        <group>
+                            <field name="assertion_count"/>
+                            <field name="evidence_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="standards" string="Standards">
+                            <field name="standard_ids">
+                                <list editable="bottom">
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="assertion_count"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="notes" string="Notes">
+                            <field name="notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_dspt_edition_search" model="ir.ui.view">
+        <field name="name">nhs.dspt.edition.search</field>
+        <field name="model">nhs.dspt.edition</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="year"/>
+                <filter name="active_editions" string="Active" domain="[('state', '=', 'active')]"/>
+                <group>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_dspt_edition" model="ir.actions.act_window">
+        <field name="name">DSPT Editions</field>
+        <field name="res_model">nhs.dspt.edition</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a DSPT edition to start defining this year's standards, assertions
+                and evidence items — or clone the prior edition and adjust it.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_nhs_dspt_org_profile" model="ir.actions.act_window">
+        <field name="name">Organisation Profiles</field>
+        <field name="res_model">nhs.dspt.org.profile</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add an organisation-type profile (Trust, GP Practice, Care Provider,
+                Supplier…) to control which assertions/evidence apply.
+            </p>
+        </field>
+    </record>
+
+    <record id="view_nhs_dspt_org_profile_list" model="ir.ui.view">
+        <field name="name">nhs.dspt.org.profile.list</field>
+        <field name="model">nhs.dspt.org.profile</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_dspt_org_profile_form" model="ir.ui.view">
+        <field name="name">nhs.dspt.org.profile.form</field>
+        <field name="model">nhs.dspt.org.profile</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. NHS Trust"/></h1>
+                    </div>
+                    <group>
+                        <field name="code"/>
+                        <field name="active"/>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

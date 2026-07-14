@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_dspt_assertion_list" model="ir.ui.view">
+        <field name="name">nhs.dspt.assertion.list</field>
+        <field name="model">nhs.dspt.assertion</field>
+        <field name="arch" type="xml">
+            <list create="0" delete="0" decoration-success="status=='met'"
+                  decoration-warning="status=='in_progress'"
+                  decoration-danger="status=='not_met'"
+                  decoration-muted="status in ('not_started', 'not_applicable')">
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="standard_id"/>
+                <field name="owner_id" widget="many2one_avatar_user"/>
+                <field name="mandatory_met_count"/>
+                <field name="mandatory_total_count"/>
+                <field name="status" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_dspt_assertion_form" model="ir.ui.view">
+        <field name="name">nhs.dspt.assertion.form</field>
+        <field name="model">nhs.dspt.assertion</field>
+        <field name="arch" type="xml">
+            <form create="0" delete="0">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="not_started,in_progress,met,not_met"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_evidence" type="object"
+                                class="oe_stat_button" icon="fa-list-check">
+                            <field name="evidence_count" widget="statinfo" string="Evidence"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <span class="o_form_label">Reference</span>
+                        <h2><field name="reference" readonly="1"/></h2>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="assessment_id" options="{'no_create': True}"/>
+                            <field name="standard_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="owner_id"/>
+                            <field name="mandatory_met_count"/>
+                            <field name="mandatory_total_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="evidence" string="Evidence Items">
+                            <field name="evidence_ids">
+                                <list create="0" delete="0" editable="bottom"
+                                      decoration-success="status=='met'"
+                                      decoration-danger="status=='not_met'"
+                                      decoration-info="status=='not_applicable'">
+                                    <field name="reference"/>
+                                    <field name="name"/>
+                                    <field name="is_mandatory"/>
+                                    <field name="owner_id" widget="many2one_avatar_user"/>
+                                    <field name="status" widget="badge"/>
+                                    <field name="evidence_review_date"/>
+                                    <field name="is_stale" widget="boolean_toggle"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="notes" string="Notes">
+                            <field name="note" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_dspt_assertion_search" model="ir.ui.view">
+        <field name="name">nhs.dspt.assertion.search</field>
+        <field name="model">nhs.dspt.assertion</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="standard_id"/>
+                <field name="owner_id"/>
+                <field name="assessment_id"/>
+                <filter name="my_items" string="My Assertions" domain="[('owner_id', '=', uid)]"/>
+                <separator/>
+                <filter name="not_met" string="Not Met" domain="[('status', '=', 'not_met')]"/>
+                <filter name="in_progress" string="In Progress" domain="[('status', '=', 'in_progress')]"/>
+                <group>
+                    <filter name="group_standard" string="Standard" context="{'group_by': 'standard_id'}"/>
+                    <filter name="group_owner" string="Owner" context="{'group_by': 'owner_id'}"/>
+                    <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_dspt_assertion" model="ir.actions.act_window">
+        <field name="name">Assertions</field>
+        <field name="res_model">nhs.dspt.assertion</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

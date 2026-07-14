@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- ══════════════════════════════════════════════════════════════
+             Module Category
+        ══════════════════════════════════════════════════════════════════ -->
+        <record id="module_category_nhs_dspt" model="ir.module.category">
+            <field name="name">NHS DSPT Compliance</field>
+            <field name="description">NHS DSPT Compliance access levels.</field>
+            <field name="sequence">54</field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             Privilege (Odoo 19 — replaces category_id on res.groups)
+        ══════════════════════════════════════════════════════════════════ -->
+        <record id="privilege_dspt_access_level" model="res.groups.privilege">
+            <field name="name">DSPT Access Level</field>
+            <field name="category_id" ref="module_category_nhs_dspt"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             Groups
+        ══════════════════════════════════════════════════════════════════ -->
+        <record id="group_nhs_dspt_user" model="res.groups">
+            <field name="name">DSPT User</field>
+            <field name="privilege_id" ref="privilege_dspt_access_level"/>
+            <field name="comment">Read the assessment and complete the items assigned to them
+                as owner. For staff who own a handful of evidence items but don't run the
+                toolkit.</field>
+        </record>
+
+        <record id="group_nhs_dspt_officer" model="res.groups">
+            <field name="name">DSPT Officer</field>
+            <field name="privilege_id" ref="privilege_dspt_access_level"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_dspt_user'))]"/>
+            <field name="comment">Complete items across the assessment, manage evidence,
+                raise/manage improvement actions, run generate/carry-forward. Cannot publish
+                or edit edition definitions.</field>
+        </record>
+
+        <record id="group_nhs_dspt_manager" model="res.groups">
+            <field name="name">DSPT Manager / SIRO</field>
+            <field name="privilege_id" ref="privilege_dspt_access_level"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_dspt_officer'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+            <field name="comment">SIRO/IG-lead role: configure editions and org-type profiles,
+                publish assessments, manage everything.</field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             Record Rules — Company scoping (global: applies to every user
+             regardless of group, ANDed with every rule below).
+        ══════════════════════════════════════════════════════════════════ -->
+        <record id="rule_nhs_dspt_assessment_company" model="ir.rule">
+            <field name="name">nhs.dspt.assessment: company scope</field>
+            <field name="model_id" ref="model_nhs_dspt_assessment"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_nhs_dspt_assertion_company" model="ir.rule">
+            <field name="name">nhs.dspt.assertion: company scope</field>
+            <field name="model_id" ref="model_nhs_dspt_assertion"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_nhs_dspt_evidence_company" model="ir.rule">
+            <field name="name">nhs.dspt.evidence: company scope</field>
+            <field name="model_id" ref="model_nhs_dspt_evidence"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_nhs_dspt_action_company" model="ir.rule">
+            <field name="name">nhs.dspt.action: company scope</field>
+            <field name="model_id" ref="model_nhs_dspt_action"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             Record Rules — Owner scoping (assertion/evidence/action only).
+             group_nhs_dspt_user is narrowed to owner_id = self. Officer and
+             Manager both hold group_nhs_dspt_user too (via implied_ids), so
+             the unrestricted rule below for their own group ORs back to "no
+             extra restriction" — see ir_rule.py: rules matching a user's
+             groups are OR-ed together, then ANDed with the global rules above.
+        ══════════════════════════════════════════════════════════════════ -->
+        <record id="rule_nhs_dspt_assertion_owner" model="ir.rule">
+            <field name="name">nhs.dspt.assertion: owner scope (user)</field>
+            <field name="model_id" ref="model_nhs_dspt_assertion"/>
+            <field name="domain_force">[('owner_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_dspt_user'))]"/>
+        </record>
+
+        <record id="rule_nhs_dspt_assertion_officer_unrestricted" model="ir.rule">
+            <field name="name">nhs.dspt.assertion: unrestricted (officer+)</field>
+            <field name="model_id" ref="model_nhs_dspt_assertion"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_dspt_officer'))]"/>
+        </record>
+
+        <record id="rule_nhs_dspt_evidence_owner" model="ir.rule">
+            <field name="name">nhs.dspt.evidence: owner scope (user)</field>
+            <field name="model_id" ref="model_nhs_dspt_evidence"/>
+            <field name="domain_force">[('owner_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_dspt_user'))]"/>
+        </record>
+
+        <record id="rule_nhs_dspt_evidence_officer_unrestricted" model="ir.rule">
+            <field name="name">nhs.dspt.evidence: unrestricted (officer+)</field>
+            <field name="model_id" ref="model_nhs_dspt_evidence"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_dspt_officer'))]"/>
+        </record>
+
+        <record id="rule_nhs_dspt_action_owner" model="ir.rule">
+            <field name="name">nhs.dspt.action: owner scope (user)</field>
+            <field name="model_id" ref="model_nhs_dspt_action"/>
+            <field name="domain_force">[('owner_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_dspt_user'))]"/>
+        </record>
+
+        <record id="rule_nhs_dspt_action_officer_unrestricted" model="ir.rule">
+            <field name="name">nhs.dspt.action: unrestricted (officer+)</field>
+            <field name="model_id" ref="model_nhs_dspt_action"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_dspt_officer'))]"/>
+        </record>
+
+        <!-- Definition records (edition/standard/assertion.def/evidence.def/org.profile)
+             are shared reference data, not company-scoped — no record rules; access is
+             controlled purely by ir.model.access.csv (read-only for user/officer, full
+             for manager). -->
+    </data>
+</odoo>
