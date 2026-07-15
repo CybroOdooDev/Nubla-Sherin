@@ -19,11 +19,12 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
 class NhsDsptEdition(models.Model):
+    """Represents a version/edition of the NHS DSPT toolkit framework."""
     _name = 'nhs.dspt.edition'
     _inherit = ['mail.thread']
     _description = 'A versioned DSPT edition (toolkit year)'
@@ -69,6 +70,10 @@ class NhsDsptEdition(models.Model):
         string='Assessments',
         compute='_compute_counts',
     )
+    standard_count = fields.Integer(
+        string='Standards Count',
+        compute='_compute_standard_count',
+    )
     notes = fields.Text(
         string='Notes',
         help="What changed this edition."
@@ -83,8 +88,15 @@ class NhsDsptEdition(models.Model):
         'A DSPT edition for this year already exists.',
     )
 
+    @api.depends('standard_ids')
+    def _compute_standard_count(self):
+        """Computes the total number of standards defined in this edition."""
+        for edition in self:
+            edition.standard_count = len(edition.standard_ids)
+
     @api.depends('standard_ids.assertion_def_ids', 'standard_ids.assertion_def_ids.evidence_def_ids')
     def _compute_counts(self):
+        """Computes assertion, evidence, and assessment counts linked to this edition."""
         Assessment = self.env['nhs.dspt.assessment']
         for edition in self:
             assertions = edition.standard_ids.assertion_def_ids
@@ -93,6 +105,7 @@ class NhsDsptEdition(models.Model):
             edition.assessment_count = Assessment.search_count([('edition_id', '=', edition.id)])
 
     def action_view_assessments(self):
+        """Returns an action to view assessments for this edition."""
         self.ensure_one()
         return {
             'name': _('Assessments'),
@@ -104,15 +117,17 @@ class NhsDsptEdition(models.Model):
         }
 
     def action_activate(self):
+        """Activates the edition by changing its state to 'active'."""
         for edition in self:
             edition.state = 'active'
 
     def action_archive_edition(self):
+        """Archives the edition by changing its state to 'archived'."""
         for edition in self:
             edition.state = 'archived'
 
     def copy_edition(self, new_year, new_name=False, new_deadline=False):
-        """Deep-clone this edition's standards/assertions/evidence into a new
+        """Deep-clones this edition's standards/assertions/evidence into a new
         edition, marking every copied item 'new' by default so a reviewer can
         mark individual items 'changed'/'removed' as they adjust the clone."""
         self.ensure_one()

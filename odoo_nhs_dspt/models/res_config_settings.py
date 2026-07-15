@@ -23,6 +23,7 @@ from odoo import fields, models
 
 
 class ResConfigSettings(models.TransientModel):
+    """Inherits configuration settings to manage DSPT-specific global parameters."""
     _inherit = 'res.config.settings'
 
     dspt_deadline_reminder_days = fields.Integer(

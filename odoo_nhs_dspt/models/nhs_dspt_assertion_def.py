@@ -23,6 +23,7 @@ from odoo import api, fields, models
 
 
 class NhsDsptAssertionDef(models.Model):
+    """Represents a standard NHS DSPT assertion definition."""
     _name = 'nhs.dspt.assertion.def'
     _description = 'DSPT Assertion Definition'
     _order = 'standard_id, sequence, reference'
@@ -83,6 +84,7 @@ class NhsDsptAssertionDef(models.Model):
 
     @api.depends('evidence_def_ids')
     def _compute_evidence_count(self):
+        """Computes the total number of evidence definitions linked to this assertion."""
         for assertion_def in self:
             assertion_def.evidence_count = len(assertion_def.evidence_def_ids)
 
@@ -92,3 +94,15 @@ class NhsDsptAssertionDef(models.Model):
         to every organisation type."""
         self.ensure_one()
         return not self.applies_to_profile_ids or org_profile in self.applies_to_profile_ids
+
+    def action_open_def(self):
+        """Returns an action to open the form view of this assertion definition."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'nhs.dspt.assertion.def',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+

@@ -19,10 +19,12 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import api, fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class NhsDsptAction(models.Model):
+    """Represents an improvement action raised to address a DSPT compliance gap."""
     _name = 'nhs.dspt.action'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'DSPT Improvement Action (gap → action)'
@@ -89,6 +91,11 @@ class NhsDsptAction(models.Model):
         string='Completion Note',
         help="How the gap was closed."
     )
+    attachment_ids = fields.Many2many(
+        'ir.attachment',
+        string='Completion Evidence',
+        help="Supporting documentation showing this action was completed."
+    )
     is_overdue = fields.Boolean(
         string='Overdue',
         compute='_compute_is_overdue',
@@ -103,6 +110,7 @@ class NhsDsptAction(models.Model):
 
     @api.depends('target_date', 'state')
     def _compute_is_overdue(self):
+        """Computes whether the action is overdue based on target date and state."""
         today = fields.Date.context_today(self)
         for action in self:
             action.is_overdue = bool(
@@ -110,8 +118,21 @@ class NhsDsptAction(models.Model):
                 and action.state not in ('completed', 'verified')
             )
 
+    @api.constrains('evidence_id')
+    def _check_evidence_not_met(self):
+        """Ensures an action is only linked to an evidence item that is currently 'Not Met'."""
+        for action in self:
+            if action.evidence_id and action.evidence_id.status != 'not_met':
+                raise ValidationError(_(
+                    "An improvement action can only be raised against an evidence item "
+                    "that is marked 'Not Met'. Mark '%(evidence)s' as Not Met first, then "
+                    "use its 'Raise Improvement Action' button.",
+                    evidence=action.evidence_id.display_name,
+                ))
+
     @api.model_create_multi
     def create(self, vals_list):
+        """Creates new improvement actions and assigns a unique sequence reference."""
         for vals in vals_list:
             if not vals.get('reference') or vals.get('reference') == 'New':
                 vals['reference'] = self.env['ir.sequence'].next_by_code(
@@ -119,22 +140,36 @@ class NhsDsptAction(models.Model):
         return super().create(vals_list)
 
     def action_mark_in_progress(self):
+        """Marks the action state as 'in_progress'."""
         self.write({'state': 'in_progress'})
 
     def action_mark_completed(self):
+        """Marks the action state as 'completed', requiring a completion note and evidence attachment."""
+        for action in self:
+            if not action.completion_note:
+                raise ValidationError(_(
+                    "You must describe how the gap was closed in the Completion Note "
+                    "before marking '%(action)s' as Completed.", action=action.name))
+            if not action.attachment_ids:
+                raise ValidationError(_(
+                    "You must attach supporting evidence before marking '%(action)s' "
+                    "as Completed.", action=action.name))
         self.write({'state': 'completed'})
 
     def action_mark_verified(self):
+        """Marks the action state as 'verified' and updates originating gap status to 'met'."""
         self.write({'state': 'verified'})
         for action in self:
             if action.evidence_id and action.evidence_id.status == 'not_met':
                 action.evidence_id.status = 'met'
 
     def action_reopen(self):
+        """Re-opens a completed/verified action by setting state to 'open'."""
         self.write({'state': 'open'})
 
     @api.model
     def _cron_escalate_overdue(self):
+        """Cron job to schedule activities for overdue improvement actions."""
         self.search([])._compute_is_overdue()
         overdue = self.search([('is_overdue', '=', True)])
         manager_group = self.env.ref('odoo_nhs_dspt.group_nhs_dspt_manager', raise_if_not_found=False)

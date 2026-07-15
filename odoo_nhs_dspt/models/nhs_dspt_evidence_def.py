@@ -23,6 +23,7 @@ from odoo import fields, models
 
 
 class NhsDsptEvidenceDef(models.Model):
+    """Represents a standard NHS DSPT evidence item definition."""
     _name = 'nhs.dspt.evidence.def'
     _description = 'DSPT Evidence-Item Definition'
     _order = 'assertion_def_id, sequence, reference'
@@ -97,3 +98,15 @@ class NhsDsptEvidenceDef(models.Model):
         to every organisation type."""
         self.ensure_one()
         return not self.applies_to_profile_ids or org_profile in self.applies_to_profile_ids
+
+    def action_open_def(self):
+        """Returns an action to open the form view of this evidence definition."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'nhs.dspt.evidence.def',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>NHS DSPT Compliance</title>
+    <style>
+        body { font-family: Arial, Helvetica, sans-serif; background-color: #f0f4f5; color: #212B32; margin: 0; }
+        .container { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
+        .hero { text-align: center; padding: 32px 0 40px; }
+        .hero h1 { font-size: 2.1rem; font-weight: 700; color: #003087; margin-bottom: 12px; }
+        .hero p { font-size: 1.1rem; color: #425563; max-width: 700px; margin: 0 auto; }
+        .badge-row { display: flex; justify-content: center; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+        .badge { background: #E8F1FA; color: #005EB8; border-radius: 20px; padding: 6px 16px; font-size: 0.85rem; font-weight: 600; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0 40px; }
+        .card { background: #fff; border: 1px solid #D8DDE0; border-radius: 10px; padding: 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .card h3 { font-size: 1.05rem; color: #003087; margin: 0 0 8px; }
+        .card p { font-size: 0.92rem; color: #425563; margin: 0; line-height: 1.5; }
+        .section-title { font-size: 1.5rem; font-weight: 700; color: #003087; text-align: center; margin: 40px 0 20px; }
+        .lifecycle { background: #fff; border: 1px solid #D8DDE0; border-radius: 10px; padding: 24px; font-size: 0.95rem; color: #425563; line-height: 2; text-align: center; }
+        .lifecycle strong { color: #212B32; }
+        .faq-item { background: #fff; border: 1px solid #D8DDE0; border-radius: 10px; padding: 18px 22px; margin-bottom: 12px; }
+        .faq-item h4 { margin: 0 0 6px; color: #212B32; font-size: 1rem; }
+        .faq-item p { margin: 0; color: #425563; font-size: 0.92rem; line-height: 1.5; }
+        .note { background: #FEF7E0; border: 1px solid #FEEBC8; border-radius: 10px; padding: 16px 20px; font-size: 0.9rem; color: #8A6B0A; margin-top: 32px; }
+        .footer { text-align: center; color: #6b7280; font-size: 0.85rem; margin-top: 40px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <h1>NHS DSPT Compliance</h1>
+        <p>Manage the annual NHS Data Security and Protection Toolkit (DSPT) self-assessment —
+            assertions, evidence, ownership, gaps, improvement plans and submission — for NHS
+            organisations and every supplier handling NHS data.</p>
+        <div class="badge-row">
+            <span class="badge">Standalone — no other NHS module required</span>
+            <span class="badge">Versioned to the annual DSPT edition</span>
+            <span class="badge">For Trusts, GPs, Care Providers &amp; Suppliers</span>
+        </div>
+    </div>
+
+    <div class="section-title">What it does</div>
+    <div class="grid">
+        <div class="card">
+            <h3>Versioned DSPT Framework</h3>
+            <p>Standards, assertions and evidence items held as configurable data keyed by
+                edition/year — so next year's DSPT revision is a data change, not a rebuild.</p>
+        </div>
+        <div class="card">
+            <h3>Organisation-Type Profiles</h3>
+            <p>Trust, GP Practice, Care Provider, Supplier/Partner — each sees only the
+                assertions and evidence applicable to their organisation type.</p>
+        </div>
+        <div class="card">
+            <h3>Ownership &amp; Distributed Completion</h3>
+            <p>Every assertion and evidence item is assigned to a responsible owner, with a
+                "My Items" workspace for staff who only own a handful of items.</p>
+        </div>
+        <div class="card">
+            <h3>Evidence &amp; Stale Tracking</h3>
+            <p>Attach supporting documents to each evidence item, with a review date and an
+                automatic stale flag once it needs refreshing.</p>
+        </div>
+        <div class="card">
+            <h3>Gap-to-Action</h3>
+            <p>Any unmet mandatory item is a gap. Raise an improvement action with an owner,
+                priority and target date to build the improvement plan.</p>
+        </div>
+        <div class="card">
+            <h3>Readiness Dashboard</h3>
+            <p>Overall readiness %, gaps outstanding, overdue actions, stale evidence and a
+                deadline RAG status, all in one view.</p>
+        </div>
+    </div>
+
+    <div class="section-title">The annual cycle</div>
+    <div class="lifecycle">
+        <strong>Draft</strong> → <strong>In Progress</strong> (generate lines, carry forward last year, complete evidence)
+        → <strong>Ready</strong> (readiness computed) → <strong>Published</strong> (snapshot &amp; lock)
+        → <strong>Submitted</strong> (recorded with the NHS DSPT portal reference)
+    </div>
+
+    <div class="section-title">Reports</div>
+    <div class="grid">
+        <div class="card">
+            <h3>DSPT Status (PDF)</h3>
+            <p>Overall status, readiness by standard, and outstanding mandatory items — for
+                the board or SIRO.</p>
+        </div>
+        <div class="card">
+            <h3>Improvement Plan (PDF)</h3>
+            <p>Every improvement action needed to reach Standards Met, with owner, priority
+                and target date.</p>
+        </div>
+        <div class="card">
+            <h3>Assurance Summary (PDF)</h3>
+            <p>A shareable one-pager stating current DSPT status — designed for suppliers to
+                send to NHS customers as procurement evidence.</p>
+        </div>
+    </div>
+
+    <div class="section-title">Frequently Asked Questions</div>
+    <div class="faq-item">
+        <h4>Does this module submit the DSPT for me?</h4>
+        <p>No. It prepares and manages the assessment — gathering evidence, assigning owners,
+            tracking gaps and readiness. The official submission is still made through NHS
+            England's DSPT portal; this module records the resulting reference and date.</p>
+    </div>
+    <div class="faq-item">
+        <h4>Does it depend on the other NHS Odoo modules?</h4>
+        <p>No. It depends only on <code>base</code> and <code>mail</code>, so it installs and
+            works standalone — including for suppliers who have none of the other NHS modules.
+            Where other suite modules are present, evidence can optionally reference them.</p>
+    </div>
+    <div class="faq-item">
+        <h4>What happens when NHS England revises the DSPT next year?</h4>
+        <p>Clone the current edition to a new year, adjust the standards/assertions/evidence
+            that changed (each copy is flagged "New" for review), and next year's assessments
+            follow the new shape automatically — no code changes required.</p>
+    </div>
+    <div class="faq-item">
+        <h4>Can a published assessment still be edited?</h4>
+        <p>No. Publishing snapshots and locks the assessment. A DSPT manager can explicitly
+            re-open it, which is logged on the record's history.</p>
+    </div>
+
+    <div class="note">
+        <strong>Note:</strong> the seed DSPT edition included with this module is a representative
+        starting framework aligned to the ten National Data Guardian data-security standards —
+        it is not a verbatim copy of the full current NHS England DSPT question set. Review and
+        adjust it against the toolkit published for the year you are actually submitting.
+    </div>
+
+    <div class="footer">
+        NHS DSPT Compliance — Cybrosys Techno Solutions
+    </div>
+</div>
+</body>
+</html>

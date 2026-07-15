@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- ── List View ────────────────────────────────────────────────── -->
     <record id="view_nhs_dspt_evidence_list" model="ir.ui.view">
         <field name="name">nhs.dspt.evidence.list</field>
         <field name="model">nhs.dspt.evidence</field>
@@ -23,6 +24,7 @@
         </field>
     </record>
 
+    <!-- ── Kanban View ──────────────────────────────────────────────── -->
     <record id="view_nhs_dspt_evidence_kanban" model="ir.ui.view">
         <field name="name">nhs.dspt.evidence.kanban</field>
         <field name="model">nhs.dspt.evidence</field>
@@ -53,6 +55,7 @@
         </field>
     </record>
 
+    <!-- ── Form View ────────────────────────────────────────────────── -->
     <record id="view_nhs_dspt_evidence_form" model="ir.ui.view">
         <field name="name">nhs.dspt.evidence.form</field>
         <field name="model">nhs.dspt.evidence</field>
@@ -119,6 +122,7 @@
         </field>
     </record>
 
+    <!-- ── Search View ──────────────────────────────────────────────── -->
     <record id="view_nhs_dspt_evidence_search" model="ir.ui.view">
         <field name="name">nhs.dspt.evidence.search</field>
         <field name="model">nhs.dspt.evidence</field>
@@ -144,6 +148,7 @@
         </field>
     </record>
 
+    <!-- ── Window Actions ───────────────────────────────────────────── -->
     <record id="action_nhs_dspt_evidence" model="ir.actions.act_window">
         <field name="name">Evidence Library</field>
         <field name="res_model">nhs.dspt.evidence</field>

@@ -23,11 +23,13 @@ from odoo import api, fields, models
 
 
 class ReportDsptStatus(models.AbstractModel):
+    """Report parser for the DSPT Status PDF report."""
     _name = 'report.odoo_nhs_dspt.report_nhs_dspt_status_view'
     _description = 'DSPT Status QWeb PDF Report Parser'
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        """Prepares template values for the DSPT Status report."""
         assessments = self.env['nhs.dspt.assessment'].browse(docids) if docids else \
             self.env['nhs.dspt.assessment']._default_report_assessments()
         standard_rows = []
@@ -68,11 +70,13 @@ class ReportDsptStatus(models.AbstractModel):
 
 
 class ReportDsptImprovementPlan(models.AbstractModel):
+    """Report parser for the DSPT Improvement Plan PDF report."""
     _name = 'report.odoo_nhs_dspt.report_nhs_dspt_improvement_plan_view'
     _description = 'DSPT Improvement Plan QWeb PDF Report Parser'
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        """Prepares template values for the DSPT Improvement Plan report."""
         assessments = self.env['nhs.dspt.assessment'].browse(docids) if docids else \
             self.env['nhs.dspt.assessment']._default_report_assessments()
         action_rows = []
@@ -99,11 +103,13 @@ class ReportDsptImprovementPlan(models.AbstractModel):
 
 
 class ReportDsptAssuranceSummary(models.AbstractModel):
+    """Report parser for the DSPT Assurance Summary PDF report."""
     _name = 'report.odoo_nhs_dspt.report_nhs_dspt_assurance_summary_view'
     _description = 'DSPT Assurance Summary QWeb PDF Report Parser'
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        """Prepares template values for the DSPT Assurance Summary report."""
         assessments = self.env['nhs.dspt.assessment'].browse(docids) if docids else \
             self.env['nhs.dspt.assessment']._default_report_assessments()
         return {

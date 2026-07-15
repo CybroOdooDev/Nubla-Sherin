@@ -50,6 +50,9 @@ into a year-round, owned, evidenced and auditable process.
         'data/nhs_dspt_edition_2025_26_data.xml',
         'data/mail_template_data.xml',
         'data/ir_cron_data.xml',
+        'wizards/nhs_dspt_generate_wizard_views.xml',
+        'wizards/nhs_dspt_carry_forward_wizard_views.xml',
+        'wizards/nhs_dspt_new_edition_wizard_views.xml',
         'views/nhs_dspt_edition_views.xml',
         'views/nhs_dspt_assertion_views.xml',
         'views/nhs_dspt_evidence_views.xml',
@@ -62,7 +65,13 @@ into a year-round, owned, evidenced and auditable process.
         'report/nhs_dspt_assurance_summary_report.xml',
         'views/nhs_dspt_menus.xml',
     ],
-   
+    'assets': {
+        'web.assets_backend': [
+            'odoo_nhs_dspt/static/src/dashboard/dspt_dashboard.js',
+            'odoo_nhs_dspt/static/src/dashboard/dspt_dashboard.xml',
+            'odoo_nhs_dspt/static/src/dashboard/dspt_dashboard.scss',
+        ],
+    },
     'application': True,
     'installable': True,
     'auto_install': False,

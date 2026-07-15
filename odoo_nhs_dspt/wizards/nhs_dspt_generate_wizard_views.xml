@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_dspt_generate_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.dspt.generate.wizard.form</field>
+        <field name="model">nhs.dspt.generate.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="assessment_id" invisible="1"/>
+                <group>
+                    <field name="edition_id" readonly="1"/>
+                    <field name="org_profile_id" readonly="1"/>
+                    <field name="existing_line_count" readonly="1"/>
+                </group>
+                <p>
+                    This creates assertion and evidence lines from the edition's framework,
+                    filtered to items applicable to this organisation type. Already-generated
+                    lines are left untouched — safe to re-run after the edition gains new items.
+                </p>
+                <footer>
+                    <button name="action_confirm" type="object" string="Generate" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_dspt_generate_wizard" model="ir.actions.act_window">
+        <field name="name">Generate Assessment Lines</field>
+        <field name="res_model">nhs.dspt.generate.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

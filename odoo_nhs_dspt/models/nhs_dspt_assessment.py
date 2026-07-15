@@ -20,10 +20,11 @@
 #
 #############################################################################
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class NhsDsptAssessment(models.Model):
+    """Represents a single organisation's DSPT assessment for a specific toolkit edition."""
     _name = 'nhs.dspt.assessment'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "An organisation's DSPT assessment for an edition"
@@ -155,24 +156,45 @@ class NhsDsptAssessment(models.Model):
         string='Notes',
         help="Assessment notes/commentary."
     )
+
     active = fields.Boolean(
         string='Active',
         default=True,
     )
 
-    _company_edition_uniq = models.Constraint(
-        'unique(company_id, edition_id)',
-        'There is already a DSPT assessment for this organisation and edition.',
-    )
+
+    @api.constrains('edition_id', 'org_profile_id', 'ods_code', 'company_id')
+    def _check_unique_assessment(self):
+        """Ensures only one assessment exists per company, edition, and ODS code."""
+        for assessment in self:
+            domain = [
+                ('id', '!=', assessment.id),
+                ('edition_id', '=', assessment.edition_id.id),
+                ('org_profile_id', '=', assessment.org_profile_id.id),
+                ('company_id', '=', assessment.company_id.id),
+            ]
+            if assessment.ods_code:
+                domain.append(('ods_code', '=', assessment.ods_code))
+            else:
+                domain.append(('ods_code', 'in', [False, '']))
+
+            duplicate = self.sudo().search(domain, limit=1)
+            if duplicate:
+                raise ValidationError(_(
+                    "There is already a DSPT assessment for this organisation, edition, and ODS Code."
+                ))
+
 
     @api.depends('edition_id.name', 'company_id.name')
     def _compute_name(self):
+        """Computes a descriptive name for the assessment."""
         for assessment in self:
             assessment.name = _('%s — %s') % (assessment.edition_id.name or _('New Edition'),
                                                 assessment.company_id.name or '')
 
     @api.depends('action_ids', 'evidence_ids')
     def _compute_action_count(self):
+        """Computes action and evidence counts for the assessment."""
         for assessment in self:
             assessment.action_count = len(assessment.action_ids)
             assessment.evidence_count = len(assessment.evidence_ids)
@@ -180,6 +202,7 @@ class NhsDsptAssessment(models.Model):
     @api.depends('evidence_ids.status', 'evidence_ids.is_mandatory', 'evidence_ids.is_stale',
                  'evidence_ids.action_ids.state', 'action_ids.state')
     def _compute_readiness(self):
+        """Computes the readiness percentage, gaps, and status of the assessment."""
         approaching_threshold = float(self.env['ir.config_parameter'].sudo().get_param(
             'odoo_nhs_dspt.approaching_threshold', 80))
         for assessment in self:
@@ -203,6 +226,7 @@ class NhsDsptAssessment(models.Model):
                 assessment.achieved_status = 'not_met'
 
     def _check_not_locked(self):
+        """Raises an error if the assessment is locked due to being published/submitted."""
         for assessment in self:
             if assessment.state in ('published', 'submitted') and not self.env.user.has_group(
                     'odoo_nhs_dspt.group_nhs_dspt_manager'):
@@ -246,7 +270,7 @@ class NhsDsptAssessment(models.Model):
         return True
 
     def action_carry_forward(self, prior_assessment=None, carry_answers=True,
-                              carry_attachments=True, carry_owners=True):
+                               carry_attachments=True, carry_owners=True):
         """Pre-fill answers/evidence/owners from a prior assessment, matching
         lines by their definition's reference (stable across editions even
         when the underlying definition record is a new clone)."""
@@ -279,6 +303,7 @@ class NhsDsptAssessment(models.Model):
         return True
 
     def action_recompute(self):
+        """Forces recalculation of statuses, readiness, and returns a client notification."""
         achieved_status_labels = dict(self._fields['achieved_status'].selection)
         changes = []
         for assessment in self:
@@ -322,11 +347,13 @@ class NhsDsptAssessment(models.Model):
         }
 
     def action_mark_ready(self):
+        """Transitions the assessment state to 'ready'."""
         for assessment in self:
             assessment._check_not_locked()
             assessment.state = 'ready'
 
     def action_publish(self):
+        """Transitions the assessment state to 'published' and locks it."""
         for assessment in self:
             assessment._check_not_locked()
             assessment.write({
@@ -337,6 +364,7 @@ class NhsDsptAssessment(models.Model):
         return True
 
     def action_submit(self):
+        """Transitions the assessment state to 'submitted' once a reference is entered."""
         for assessment in self:
             if not assessment.submission_reference:
                 raise UserError(_('Enter the submission reference from the NHS DSPT portal first.'))
@@ -347,6 +375,7 @@ class NhsDsptAssessment(models.Model):
         return True
 
     def action_reopen(self):
+        """Re-opens a published/submitted assessment (manager only)."""
         for assessment in self:
             if not self.env.user.has_group('odoo_nhs_dspt.group_nhs_dspt_manager'):
                 raise UserError(_('Only a DSPT manager can re-open a published assessment.'))
@@ -355,6 +384,7 @@ class NhsDsptAssessment(models.Model):
         return True
 
     def action_view_evidence(self):
+        """Returns an action to view the assessment's evidence library."""
         self.ensure_one()
         return {
             'name': _('Evidence Library'),
@@ -366,6 +396,7 @@ class NhsDsptAssessment(models.Model):
         }
 
     def action_view_actions(self):
+        """Returns an action to view the assessment's improvement actions."""
         self.ensure_one()
         return {
             'name': _('Improvement Actions'),
@@ -440,7 +471,8 @@ class NhsDsptAssessment(models.Model):
         standard_stats = []
         for standard in assessment.assertion_ids.standard_id:
             evidence = assessment.evidence_ids.filtered(
-                lambda e, std=standard: e.standard_id == std and e.is_mandatory and e.status != 'not_applicable')
+                lambda e, std=standard: e.standard_id == std and
+                                        e.is_mandatory and e.status != 'not_applicable')
             total = len(evidence) or 1
             met = len(evidence.filtered(lambda e: e.status == 'met'))
             standard_stats.append({

@@ -23,6 +23,7 @@ from odoo import api, fields, models
 
 
 class NhsDsptStandard(models.Model):
+    """Represents a DSPT Standard or theme within a toolkit edition."""
     _name = 'nhs.dspt.standard'
     _description = 'DSPT Standard / Theme within an edition'
     _order = 'edition_id, sequence, name'
@@ -61,5 +62,18 @@ class NhsDsptStandard(models.Model):
 
     @api.depends('assertion_def_ids')
     def _compute_assertion_count(self):
+        """Computes the number of assertion definitions under this standard."""
         for standard in self:
             standard.assertion_count = len(standard.assertion_def_ids)
+
+    def action_open_standard(self):
+        """Returns an action to open the form view of this standard."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'nhs.dspt.standard',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+

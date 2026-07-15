@@ -3,6 +3,8 @@
     <!-- ══════════════════════════════════════════════════════════════════
          nhs.dspt.evidence.def
     ══════════════════════════════════════════════════════════════════════ -->
+
+    <!-- ── Evidence Def List View ───────────────────────────────────── -->
     <record id="view_nhs_dspt_evidence_def_list" model="ir.ui.view">
         <field name="name">nhs.dspt.evidence.def.list</field>
         <field name="model">nhs.dspt.evidence.def</field>
@@ -19,6 +21,7 @@
         </field>
     </record>
 
+    <!-- ── Evidence Def Form View ───────────────────────────────────── -->
     <record id="view_nhs_dspt_evidence_def_form" model="ir.ui.view">
         <field name="name">nhs.dspt.evidence.def.form</field>
         <field name="model">nhs.dspt.evidence.def</field>
@@ -52,6 +55,8 @@
     <!-- ══════════════════════════════════════════════════════════════════
          nhs.dspt.assertion.def
     ══════════════════════════════════════════════════════════════════════ -->
+
+    <!-- ── Assertion Def List View ──────────────────────────────────── -->
     <record id="view_nhs_dspt_assertion_def_list" model="ir.ui.view">
         <field name="name">nhs.dspt.assertion.def.list</field>
         <field name="model">nhs.dspt.assertion.def</field>
@@ -67,6 +72,7 @@
         </field>
     </record>
 
+    <!-- ── Assertion Def Form View ──────────────────────────────────── -->
     <record id="view_nhs_dspt_assertion_def_form" model="ir.ui.view">
         <field name="name">nhs.dspt.assertion.def.form</field>
         <field name="model">nhs.dspt.assertion.def</field>
@@ -97,6 +103,7 @@
                                     <field name="is_mandatory"/>
                                     <field name="applies_to_profile_ids" widget="many2many_tags"/>
                                     <field name="evidence_type_hint"/>
+                                    <button name="action_open_def" type="object" string="View" class="btn-link"/>
                                 </list>
                             </field>
                         </page>
@@ -109,6 +116,8 @@
     <!-- ══════════════════════════════════════════════════════════════════
          nhs.dspt.standard
     ══════════════════════════════════════════════════════════════════════ -->
+
+    <!-- ── Standard List View ───────────────────────────────────────── -->
     <record id="view_nhs_dspt_standard_list" model="ir.ui.view">
         <field name="name">nhs.dspt.standard.list</field>
         <field name="model">nhs.dspt.standard</field>
@@ -122,6 +131,7 @@
         </field>
     </record>
 
+    <!-- ── Standard Form View ───────────────────────────────────────── -->
     <record id="view_nhs_dspt_standard_form" model="ir.ui.view">
         <field name="name">nhs.dspt.standard.form</field>
         <field name="model">nhs.dspt.standard</field>
@@ -144,6 +154,7 @@
                                     <field name="applies_to_profile_ids" widget="many2many_tags"/>
                                     <field name="evidence_count"/>
                                     <field name="change_flag"/>
+                                    <button name="action_open_def" type="object" string="View" class="btn-link"/>
                                 </list>
                             </field>
                         </page>
@@ -156,6 +167,8 @@
     <!-- ══════════════════════════════════════════════════════════════════
          nhs.dspt.edition
     ══════════════════════════════════════════════════════════════════════ -->
+
+    <!-- ── Edition List View ────────────────────────────────────────── -->
     <record id="view_nhs_dspt_edition_list" model="ir.ui.view">
         <field name="name">nhs.dspt.edition.list</field>
         <field name="model">nhs.dspt.edition</field>
@@ -172,6 +185,7 @@
         </field>
     </record>
 
+    <!-- ── Edition Form View ────────────────────────────────────────── -->
     <record id="view_nhs_dspt_edition_form" model="ir.ui.view">
         <field name="name">nhs.dspt.edition.form</field>
         <field name="model">nhs.dspt.edition</field>
@@ -213,6 +227,7 @@
                                     <field name="code"/>
                                     <field name="name"/>
                                     <field name="assertion_count"/>
+                                    <button name="action_open_standard" type="object" string="View" class="btn-link"/>
                                 </list>
                             </field>
                         </page>
@@ -226,6 +241,7 @@
         </field>
     </record>
 
+    <!-- ── Edition Search View ──────────────────────────────────────── -->
     <record id="view_nhs_dspt_edition_search" model="ir.ui.view">
         <field name="name">nhs.dspt.edition.search</field>
         <field name="model">nhs.dspt.edition</field>
@@ -241,6 +257,7 @@
         </field>
     </record>
 
+    <!-- ── Edition Window Action ────────────────────────────────────── -->
     <record id="action_nhs_dspt_edition" model="ir.actions.act_window">
         <field name="name">DSPT Editions</field>
         <field name="res_model">nhs.dspt.edition</field>
@@ -253,6 +270,11 @@
         </field>
     </record>
 
+    <!-- ══════════════════════════════════════════════════════════════════
+         nhs.dspt.org.profile
+    ══════════════════════════════════════════════════════════════════════ -->
+
+    <!-- ── Org Profile Window Action ────────────────────────────────── -->
     <record id="action_nhs_dspt_org_profile" model="ir.actions.act_window">
         <field name="name">Organisation Profiles</field>
         <field name="res_model">nhs.dspt.org.profile</field>
@@ -265,6 +287,7 @@
         </field>
     </record>
 
+    <!-- ── Org Profile List View ────────────────────────────────────── -->
     <record id="view_nhs_dspt_org_profile_list" model="ir.ui.view">
         <field name="name">nhs.dspt.org.profile.list</field>
         <field name="model">nhs.dspt.org.profile</field>
@@ -278,6 +301,7 @@
         </field>
     </record>
 
+    <!-- ── Org Profile Form View ────────────────────────────────────── -->
     <record id="view_nhs_dspt_org_profile_form" model="ir.ui.view">
         <field name="name">nhs.dspt.org.profile.form</field>
         <field name="model">nhs.dspt.org.profile</field>

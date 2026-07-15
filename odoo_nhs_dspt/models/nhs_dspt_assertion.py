@@ -31,6 +31,7 @@ ASSERTION_STATUSES = [
 
 
 class NhsDsptAssertion(models.Model):
+    """Represents a specific assertion on a DSPT assessment."""
     _name = 'nhs.dspt.assertion'
     _inherit = ['mail.thread']
     _description = 'DSPT Assertion Line (on an assessment)'
@@ -115,6 +116,7 @@ class NhsDsptAssertion(models.Model):
 
     @api.depends('evidence_ids')
     def _compute_evidence_count(self):
+        """Computes total, mandatory, and met evidence item counts for this assertion."""
         for assertion in self:
             assertion.evidence_count = len(assertion.evidence_ids)
             mandatory = assertion.evidence_ids.filtered(lambda e: e.is_mandatory and e.status != 'not_applicable')
@@ -123,6 +125,7 @@ class NhsDsptAssertion(models.Model):
 
     @api.depends('evidence_ids.status', 'evidence_ids.is_mandatory')
     def _compute_status(self):
+        """Computes the overall compliance status of the assertion based on its evidence items."""
         for assertion in self:
             evidence = assertion.evidence_ids
             applicable = evidence.filtered(lambda e: e.status != 'not_applicable')
@@ -142,6 +145,7 @@ class NhsDsptAssertion(models.Model):
                 assertion.status = 'not_started'
 
     def action_view_evidence(self):
+        """Returns an action to open the evidence items related to this assertion."""
         self.ensure_one()
         return {
             'name': _('Evidence Items'),
