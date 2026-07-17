@@ -121,6 +121,13 @@ class NhsDsptAssessment(models.Model):
         store=True,
         help="Mandatory evidence items currently not met."
     )
+    gap_evidence_ids = fields.One2many(
+        'nhs.dspt.evidence',
+        'assessment_id',
+        string='Gap Evidence',
+        compute='_compute_gap_evidence_ids',
+        help="Mandatory evidence items currently not met."
+    )
     stale_evidence_count = fields.Integer(
         string='Stale Evidence',
         compute='_compute_readiness',
@@ -225,6 +232,13 @@ class NhsDsptAssessment(models.Model):
             else:
                 assessment.achieved_status = 'not_met'
 
+    @api.depends('evidence_ids.status', 'evidence_ids.is_mandatory')
+    def _compute_gap_evidence_ids(self):
+        """Computes the subset of mandatory evidence items currently not met."""
+        for assessment in self:
+            assessment.gap_evidence_ids = assessment.evidence_ids.filtered(
+                lambda e: e.is_mandatory and e.status == 'not_met')
+
     def _check_not_locked(self):
         """Raises an error if the assessment is locked due to being published/submitted."""
         for assessment in self:
@@ -273,7 +287,9 @@ class NhsDsptAssessment(models.Model):
                                carry_attachments=True, carry_owners=True):
         """Pre-fill answers/evidence/owners from a prior assessment, matching
         lines by their definition's reference (stable across editions even
-        when the underlying definition record is a new clone)."""
+        when the underlying definition record is a new clone).
+        Returns the number of evidence lines updated."""
+        updated_count = 0
         for assessment in self:
             prior = prior_assessment or assessment.prior_assessment_id
             if not prior:
@@ -300,22 +316,68 @@ class NhsDsptAssessment(models.Model):
                     vals['owner_id'] = source.owner_id.id
                 if vals:
                     evidence.write(vals)
-        return True
+                    updated_count += 1
+        return updated_count
 
     def action_recompute(self):
-        """Forces recalculation of statuses, readiness, and returns a client notification."""
+        """Forces recalculation of statuses, readiness, and returns a client notification.
+        Compares against the values the button was clicked with (passed in via context from
+        the form) rather than a fresh DB read, so the message reflects what the user was
+        actually looking at, even if the screen had gone stale since the record was loaded."""
         achieved_status_labels = dict(self._fields['achieved_status'].selection)
+        assertion_status_labels = dict(self.env['nhs.dspt.assertion']._fields['status'].selection)
+        evidence_status_labels = dict(self.env['nhs.dspt.evidence']._fields['status'].selection)
+        ctx = self.env.context
+        has_client_snapshot = len(self) == 1 and 'client_gap_count' in ctx
         changes = []
         for assessment in self:
-            before = (assessment.readiness_pct, assessment.gap_count,
-                      assessment.stale_evidence_count, assessment.achieved_status)
+            if has_client_snapshot:
+                before = (ctx.get('client_readiness_pct'), ctx.get('client_gap_count'),
+                          ctx.get('client_stale_evidence_count'), ctx.get('client_achieved_status'))
+            else:
+                before = (assessment.readiness_pct, assessment.gap_count,
+                          assessment.stale_evidence_count, assessment.achieved_status)
+            assertion_before = {a.id: a.status for a in assessment.assertion_ids}
+            evidence_before = {e.id: (e.status, e.is_stale) for e in assessment.evidence_ids}
+
             assessment.assertion_ids._compute_status()
             assessment.evidence_ids._compute_is_stale()
             assessment._compute_readiness()
+
             after = (assessment.readiness_pct, assessment.gap_count,
                       assessment.stale_evidence_count, assessment.achieved_status)
-            if before != after:
-                changes.append(_(
+
+            item_lines = []
+            for assertion in assessment.assertion_ids:
+                old_status = assertion_before.get(assertion.id)
+                if old_status is not None and old_status != assertion.status:
+                    item_lines.append(_('  • Assertion %(ref)s %(name)s: %(before)s → %(after)s') % {
+                        'ref': assertion.reference,
+                        'name': assertion.name,
+                        'before': assertion_status_labels.get(old_status, old_status),
+                        'after': assertion_status_labels.get(assertion.status, assertion.status),
+                    })
+            for evidence in assessment.evidence_ids:
+                old_status, old_stale = evidence_before.get(evidence.id, (None, None))
+                if old_status is None:
+                    continue
+                bits = []
+                if old_status != evidence.status:
+                    bits.append(_('status %(before)s → %(after)s') % {
+                        'before': evidence_status_labels.get(old_status, old_status),
+                        'after': evidence_status_labels.get(evidence.status, evidence.status),
+                    })
+                if old_stale != evidence.is_stale:
+                    bits.append(_('now stale') if evidence.is_stale else _('no longer stale'))
+                if bits:
+                    item_lines.append(_('  • Evidence %(ref)s %(name)s: %(detail)s') % {
+                        'ref': evidence.reference,
+                        'name': evidence.name,
+                        'detail': ', '.join(bits),
+                    })
+
+            if before != after or item_lines:
+                lines = [_(
                     '%(name)s: readiness %(before_pct).0f%% → %(after_pct).0f%%, '
                     'gaps %(before_gaps)d → %(after_gaps)d, '
                     'stale %(before_stale)d → %(after_stale)d, '
@@ -326,7 +388,9 @@ class NhsDsptAssessment(models.Model):
                     'before_stale': before[2], 'after_stale': after[2],
                     'before_status': achieved_status_labels.get(before[3], before[3]),
                     'after_status': achieved_status_labels.get(after[3], after[3]),
-                })
+                }]
+                lines.extend(item_lines)
+                changes.append('\n'.join(lines))
         if changes:
             title = _('Recomputed — changes found')
             message = '\n'.join(changes)
@@ -343,6 +407,7 @@ class NhsDsptAssessment(models.Model):
                 'message': message,
                 'type': notif_type,
                 'sticky': False,
+                'next': {'type': 'ir.actions.act_window_close'},
             },
         }
 
@@ -353,9 +418,19 @@ class NhsDsptAssessment(models.Model):
             assessment.state = 'ready'
 
     def action_publish(self):
-        """Transitions the assessment state to 'published' and locks it."""
+        """Transitions the assessment state to 'published' and locks it.
+        Blocks if any improvement action is not yet completed/verified."""
         for assessment in self:
             assessment._check_not_locked()
+            open_actions = assessment.action_ids.filtered(
+                lambda a: a.state not in ('completed', 'verified'))
+            if open_actions:
+                raise UserError(_(
+                    'All improvement actions must be Completed or Verified before'
+                    ' publishing. %(count)d action(s) still open: %(names)s') % {
+                    'count': len(open_actions),
+                    'names': ', '.join(open_actions.mapped('name')),
+                })
             assessment.write({
                 'state': 'published',
                 'published_by_id': self.env.user.id,

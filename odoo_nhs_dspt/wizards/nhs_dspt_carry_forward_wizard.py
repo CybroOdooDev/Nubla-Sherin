@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 
 
 class NhsDsptCarryForwardWizard(models.TransientModel):
@@ -36,11 +36,18 @@ class NhsDsptCarryForwardWizard(models.TransientModel):
         'nhs.dspt.assessment',
         string='Carry Forward From',
         required=True,
-        domain="[('id', '!=', assessment_id), ('company_id', '=', company_id)]",
+        domain="[('id', '!=', assessment_id), ('company_id', '=', company_id), "
+               "('org_profile_id', '=', org_profile_id), ('ods_code', '=', ods_code)]",
         help="Usually last year's assessment for the same organisation."
     )
     company_id = fields.Many2one(
         related='assessment_id.company_id',
+    )
+    org_profile_id = fields.Many2one(
+        related='assessment_id.org_profile_id',
+    )
+    ods_code = fields.Char(
+        related='assessment_id.ods_code',
     )
     carry_answers = fields.Boolean(
         string='Carry Forward Answers & Status',
@@ -64,7 +71,7 @@ class NhsDsptCarryForwardWizard(models.TransientModel):
     def action_confirm(self):
         """Executes the carry forward logic on the target assessment."""
         self.ensure_one()
-        self.assessment_id.action_carry_forward(
+        updated_count = self.assessment_id.action_carry_forward(
             prior_assessment=self.prior_assessment_id,
             carry_answers=self.carry_answers,
             carry_attachments=self.carry_attachments,
@@ -72,4 +79,27 @@ class NhsDsptCarryForwardWizard(models.TransientModel):
         )
         if not self.assessment_id.prior_assessment_id:
             self.assessment_id.prior_assessment_id = self.prior_assessment_id
-        return {'type': 'ir.actions.act_window_close'}
+        if updated_count:
+            title = _('Carried Forward')
+            message = _('%(count)d evidence item(s) updated from %(source)s.') % {
+                'count': updated_count,
+                'source': self.prior_assessment_id.name,
+            }
+            notif_type = 'success'
+        else:
+            title = _('Nothing Carried Forward')
+            message = _(
+                'No matching evidence references were found in %(source)s, or it has no '
+                'evidence yet. Make sure you selected the correct earlier assessment.'
+            ) % {'source': self.prior_assessment_id.name}
+            notif_type = 'warning'
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': title,
+                'message': message,
+                'type': notif_type,
+                'sticky': False,
+            },
+        }
