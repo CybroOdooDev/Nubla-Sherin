@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ══════════════════════════════════════════════════════════════════
-         nhs.dspt.evidence.def
-    ══════════════════════════════════════════════════════════════════════ -->
+    <!-- nhs.dspt.evidence.def-->
 
-    <!-- ── Evidence Def List View ───────────────────────────────────── -->
+    <!-- Evidence Def List View  -->
     <record id="view_nhs_dspt_evidence_def_list" model="ir.ui.view">
         <field name="name">nhs.dspt.evidence.def.list</field>
         <field name="model">nhs.dspt.evidence.def</field>
@@ -21,7 +19,7 @@
         </field>
     </record>
 
-    <!-- ── Evidence Def Form View ───────────────────────────────────── -->
+    <!--Evidence Def Form View  -->
     <record id="view_nhs_dspt_evidence_def_form" model="ir.ui.view">
         <field name="name">nhs.dspt.evidence.def.form</field>
         <field name="model">nhs.dspt.evidence.def</field>
@@ -45,18 +43,16 @@
                         </group>
                     </group>
                     <group string="Guidance">
-                        <field name="guidance" nolabel="1"/>
+                        <field name="guidance" nolabel="1" colspan="2"/>
                     </group>
                 </sheet>
             </form>
         </field>
     </record>
 
-    <!-- ══════════════════════════════════════════════════════════════════
-         nhs.dspt.assertion.def
-    ══════════════════════════════════════════════════════════════════════ -->
+    <!-- nhs.dspt.assertion.def -->
 
-    <!-- ── Assertion Def List View ──────────────────────────────────── -->
+    <!-- Assertion Def List View -->
     <record id="view_nhs_dspt_assertion_def_list" model="ir.ui.view">
         <field name="name">nhs.dspt.assertion.def.list</field>
         <field name="model">nhs.dspt.assertion.def</field>
@@ -72,7 +68,7 @@
         </field>
     </record>
 
-    <!-- ── Assertion Def Form View ──────────────────────────────────── -->
+    <!--  Assertion Def Form View -->
     <record id="view_nhs_dspt_assertion_def_form" model="ir.ui.view">
         <field name="name">nhs.dspt.assertion.def.form</field>
         <field name="model">nhs.dspt.assertion.def</field>
@@ -113,11 +109,9 @@
         </field>
     </record>
 
-    <!-- ══════════════════════════════════════════════════════════════════
-         nhs.dspt.standard
-    ══════════════════════════════════════════════════════════════════════ -->
+    <!-- nhs.dspt.standard-->
 
-    <!-- ── Standard List View ───────────────────────────────────────── -->
+    <!-- Standard List View -->
     <record id="view_nhs_dspt_standard_list" model="ir.ui.view">
         <field name="name">nhs.dspt.standard.list</field>
         <field name="model">nhs.dspt.standard</field>
@@ -131,7 +125,7 @@
         </field>
     </record>
 
-    <!-- ── Standard Form View ───────────────────────────────────────── -->
+    <!--  Standard Form View -->
     <record id="view_nhs_dspt_standard_form" model="ir.ui.view">
         <field name="name">nhs.dspt.standard.form</field>
         <field name="model">nhs.dspt.standard</field>
@@ -164,11 +158,9 @@
         </field>
     </record>
 
-    <!-- ══════════════════════════════════════════════════════════════════
-         nhs.dspt.edition
-    ══════════════════════════════════════════════════════════════════════ -->
+    <!-- nhs.dspt.edition -->
 
-    <!-- ── Edition List View ────────────────────────────────────────── -->
+    <!--  Edition List View  -->
     <record id="view_nhs_dspt_edition_list" model="ir.ui.view">
         <field name="name">nhs.dspt.edition.list</field>
         <field name="model">nhs.dspt.edition</field>
@@ -241,7 +233,7 @@
         </field>
     </record>
 
-    <!-- ── Edition Search View ──────────────────────────────────────── -->
+    <!-- ── Edition Search View -->
     <record id="view_nhs_dspt_edition_search" model="ir.ui.view">
         <field name="name">nhs.dspt.edition.search</field>
         <field name="model">nhs.dspt.edition</field>
@@ -270,11 +262,104 @@
         </field>
     </record>
 
-    <!-- ══════════════════════════════════════════════════════════════════
-         nhs.dspt.org.profile
-    ══════════════════════════════════════════════════════════════════════ -->
+    <!-- ── Standalone search/list/actions so Standards, Assertions and
+         Evidence Items can each be reached directly (needed for Odoo's
+         native Import feature, which requires a list view context) ── -->
 
-    <!-- ── Org Profile Window Action ────────────────────────────────── -->
+    <record id="view_nhs_dspt_standard_search" model="ir.ui.view">
+        <field name="name">nhs.dspt.standard.search</field>
+        <field name="model">nhs.dspt.standard</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="edition_id"/>
+                <group>
+                    <filter name="group_edition" string="Edition" context="{'group_by': 'edition_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_dspt_standard" model="ir.actions.act_window">
+        <field name="name">Standards</field>
+        <field name="res_model">nhs.dspt.standard</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_edition': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a standard/theme to a DSPT edition, or import a batch via
+                the Import Template for Standards.
+            </p>
+        </field>
+    </record>
+
+    <record id="view_nhs_dspt_assertion_def_search" model="ir.ui.view">
+        <field name="name">nhs.dspt.assertion.def.search</field>
+        <field name="model">nhs.dspt.assertion.def</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="standard_id"/>
+                <field name="edition_id"/>
+                <group>
+                    <filter name="group_edition" string="Edition" context="{'group_by': 'edition_id'}"/>
+                    <filter name="group_standard" string="Standard" context="{'group_by': 'standard_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_dspt_assertion_def" model="ir.actions.act_window">
+        <field name="name">Assertions</field>
+        <field name="res_model">nhs.dspt.assertion.def</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_edition': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add an assertion under a standard, or import a batch via the
+                Import Template for Assertions.
+            </p>
+        </field>
+    </record>
+
+    <record id="view_nhs_dspt_evidence_def_search" model="ir.ui.view">
+        <field name="name">nhs.dspt.evidence.def.search</field>
+        <field name="model">nhs.dspt.evidence.def</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="assertion_def_id"/>
+                <field name="standard_id"/>
+                <field name="edition_id"/>
+                <filter name="mandatory" string="Mandatory" domain="[('is_mandatory', '=', True)]"/>
+                <group>
+                    <filter name="group_edition" string="Edition" context="{'group_by': 'edition_id'}"/>
+                    <filter name="group_standard" string="Standard" context="{'group_by': 'standard_id'}"/>
+                    <filter name="group_assertion" string="Assertion" context="{'group_by': 'assertion_def_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_dspt_evidence_def" model="ir.actions.act_window">
+        <field name="name">Evidence Items</field>
+        <field name="res_model">nhs.dspt.evidence.def</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_edition': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add an evidence item under an assertion, or import a batch via
+                the Import Template for Evidence Items.
+            </p>
+        </field>
+    </record>
+
+    <!-- nhs.dspt.org.profile -->
+
+    <!--  Org Profile Window Action-->
     <record id="action_nhs_dspt_org_profile" model="ir.actions.act_window">
         <field name="name">Organisation Profiles</field>
         <field name="res_model">nhs.dspt.org.profile</field>
@@ -287,7 +372,7 @@
         </field>
     </record>
 
-    <!-- ── Org Profile List View ────────────────────────────────────── -->
+    <!-- Org Profile List View -->
     <record id="view_nhs_dspt_org_profile_list" model="ir.ui.view">
         <field name="name">nhs.dspt.org.profile.list</field>
         <field name="model">nhs.dspt.org.profile</field>
@@ -301,7 +386,7 @@
         </field>
     </record>
 
-    <!-- ── Org Profile Form View ────────────────────────────────────── -->
+    <!--  Org Profile Form View -->
     <record id="view_nhs_dspt_org_profile_form" model="ir.ui.view">
         <field name="name">nhs.dspt.org.profile.form</field>
         <field name="model">nhs.dspt.org.profile</field>

@@ -3,7 +3,7 @@
     <menuitem id="menu_nhs_dspt_root" name="DSPT Compliance" sequence="65"
               web_icon="odoo_nhs_dspt,static/description/icon.png"/>
 
-    <!-- ── Assessment ────────────────────────────────────────────── -->
+    <!-- ── Assessment  -->
     <menuitem id="menu_nhs_dspt_assessment_root" name="Assessment"
               parent="menu_nhs_dspt_root" sequence="10"/>
     <menuitem id="menu_nhs_dspt_assessment" name="DSPT Assessments"
@@ -15,7 +15,7 @@
     <menuitem id="menu_nhs_dspt_action" name="Gaps &amp; Actions"
               parent="menu_nhs_dspt_assessment_root" action="action_nhs_dspt_action" sequence="40"/>
 
-    <!-- ── Evidence ──────────────────────────────────────────────── -->
+    <!-- ── Evidence -->
     <menuitem id="menu_nhs_dspt_evidence_root" name="Evidence"
               parent="menu_nhs_dspt_root" sequence="20"/>
     <menuitem id="menu_nhs_dspt_evidence_library" name="Evidence Library"
@@ -23,7 +23,7 @@
     <menuitem id="menu_nhs_dspt_evidence_stale" name="Stale Evidence"
               parent="menu_nhs_dspt_evidence_root" action="action_nhs_dspt_evidence_stale" sequence="20"/>
 
-    <!-- ── Reporting ─────────────────────────────────────────────── -->
+    <!-- ── Reporting -->
     <menuitem id="menu_nhs_dspt_reporting" name="Reporting"
               parent="menu_nhs_dspt_root" sequence="30"/>
     <menuitem id="menu_nhs_dspt_dashboard" name="Readiness Dashboard"
@@ -35,12 +35,18 @@
     <menuitem id="menu_nhs_dspt_report_assurance_summary" name="Assurance Summary (PDF)"
               parent="menu_nhs_dspt_reporting" action="report_nhs_dspt_assurance_summary" sequence="40"/>
 
-    <!-- ── Configuration (manager only) ─────────────────────────── -->
+    <!-- ── Configuration (manager only)-->
     <menuitem id="menu_nhs_dspt_config" name="Configuration"
               parent="menu_nhs_dspt_root" sequence="90"
               groups="odoo_nhs_dspt.group_nhs_dspt_manager"/>
     <menuitem id="menu_nhs_dspt_edition" name="DSPT Editions"
               parent="menu_nhs_dspt_config" action="action_nhs_dspt_edition" sequence="10"/>
+    <menuitem id="menu_nhs_dspt_standard" name="Standards"
+              parent="menu_nhs_dspt_config" action="action_nhs_dspt_standard" sequence="11"/>
+    <menuitem id="menu_nhs_dspt_assertion_def" name="Assertions"
+              parent="menu_nhs_dspt_config" action="action_nhs_dspt_assertion_def" sequence="12"/>
+    <menuitem id="menu_nhs_dspt_evidence_def" name="Evidence Items"
+              parent="menu_nhs_dspt_config" action="action_nhs_dspt_evidence_def" sequence="13"/>
     <menuitem id="menu_nhs_dspt_org_profile" name="Organisation Profiles"
               parent="menu_nhs_dspt_config" action="action_nhs_dspt_org_profile" sequence="20"/>
     <menuitem id="menu_nhs_dspt_settings" name="Settings"

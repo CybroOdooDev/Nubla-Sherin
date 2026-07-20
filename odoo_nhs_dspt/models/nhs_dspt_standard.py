@@ -77,3 +77,11 @@ class NhsDsptStandard(models.Model):
             'target': 'current',
         }
 
+    @api.model
+    def get_import_templates(self):
+        """Import template offered on the Standards import wizard."""
+        return [{
+            'label': 'Import Template for DSPT Standards',
+            'template': '/odoo_nhs_dspt/static/import_templates/dspt_standards_import_template.xlsx',
+        }]
+

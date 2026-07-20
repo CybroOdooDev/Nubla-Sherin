@@ -28,22 +28,22 @@ class ResConfigSettings(models.TransientModel):
 
     dspt_deadline_reminder_days = fields.Integer(
         string='Deadline Reminder Lead Time (Days)',
-        config_parameter='odoo_nhs_dspt.deadline_reminder_days',
-        default=30,
+        related='company_id.dspt_deadline_reminder_days',
+        readonly=False,
         help="Send deadline reminders once an edition's deadline is within"
              " this many days."
     )
     dspt_stale_evidence_months = fields.Integer(
         string='Stale Evidence Age (Months)',
-        config_parameter='odoo_nhs_dspt.stale_evidence_months',
-        default=12,
+        related='company_id.dspt_stale_evidence_months',
+        readonly=False,
         help="Informational default review cycle for evidence without an"
              " explicit review date."
     )
     dspt_approaching_threshold = fields.Integer(
         string='Approaching Standards Threshold (%)',
-        config_parameter='odoo_nhs_dspt.approaching_threshold',
-        default=80,
+        related='company_id.dspt_approaching_threshold',
+        readonly=False,
         help="Readiness % above which an incomplete assessment is considered"
              " 'Approaching Standards' rather than 'Standards Not Met'."
     )

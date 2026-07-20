@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ── List View ────────────────────────────────────────────────── -->
+    <!-- List View  -->
     <record id="view_nhs_dspt_assessment_list" model="ir.ui.view">
         <field name="name">nhs.dspt.assessment.list</field>
         <field name="model">nhs.dspt.assessment</field>
@@ -12,6 +12,7 @@
                 <field name="name"/>
                 <field name="year"/>
                 <field name="org_profile_id"/>
+                <field name="company_id" optional="show"/>
                 <field name="readiness_pct" string="Readiness %"/>
                 <field name="gap_count"/>
                 <field name="deadline"/>
@@ -22,7 +23,7 @@
         </field>
     </record>
 
-    <!-- ── Kanban View ──────────────────────────────────────────────── -->
+    <!--  Kanban View -->
     <record id="view_nhs_dspt_assessment_kanban" model="ir.ui.view">
         <field name="name">nhs.dspt.assessment.kanban</field>
         <field name="model">nhs.dspt.assessment</field>
@@ -53,7 +54,7 @@
         </field>
     </record>
 
-    <!-- ── Form View ────────────────────────────────────────────────── -->
+    <!--  Form View  -->
     <record id="view_nhs_dspt_assessment_form" model="ir.ui.view">
         <field name="name">nhs.dspt.assessment.form</field>
         <field name="model">nhs.dspt.assessment</field>
@@ -67,6 +68,7 @@
                             context="{'default_assessment_id': id}"
                             invisible="state in ('published', 'submitted') or not evidence_ids"/>
                     <button name="action_recompute" type="object" string="Recompute"
+                            invisible="state not in ('in_progress', 'ready')"
                             context="{'client_readiness_pct': readiness_pct, 'client_gap_count': gap_count,
                                       'client_stale_evidence_count': stale_evidence_count,
                                       'client_achieved_status': achieved_status}"/>
@@ -103,6 +105,8 @@
                     <group>
                         <group>
                             <field name="edition_id" options="{'no_create': True}"
+                                   readonly="evidence_ids"/>
+                            <field name="company_id" options="{'no_create': True}"
                                    readonly="evidence_ids"/>
                             <field name="org_profile_id" options="{'no_create': True}"
                                    readonly="evidence_ids"/>
@@ -197,7 +201,7 @@
         </field>
     </record>
 
-    <!-- ── Search View ──────────────────────────────────────────────── -->
+    <!--  Search View  -->
     <record id="view_nhs_dspt_assessment_search" model="ir.ui.view">
         <field name="name">nhs.dspt.assessment.search</field>
         <field name="model">nhs.dspt.assessment</field>
@@ -217,7 +221,7 @@
         </field>
     </record>
 
-    <!-- ── Window Actions ───────────────────────────────────────────── -->
+    <!--  Window Actions  -->
     <record id="action_nhs_dspt_assessment" model="ir.actions.act_window">
         <field name="name">DSPT Assessments</field>
         <field name="res_model">nhs.dspt.assessment</field>

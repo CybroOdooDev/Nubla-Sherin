@@ -19,7 +19,8 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class NhsDsptEvidenceDef(models.Model):
@@ -109,4 +110,31 @@ class NhsDsptEvidenceDef(models.Model):
             'view_mode': 'form',
             'target': 'current',
         }
+
+    @api.constrains('reference', 'edition_id')
+    def _check_reference_unique_per_edition(self):
+        """Validates that the evidence reference is unique within its edition
+        (enforced both on manual entry and on import)."""
+        for evidence_def in self:
+            duplicate = self.search([
+                ('edition_id', '=', evidence_def.edition_id.id),
+                ('reference', '=', evidence_def.reference),
+                ('id', '!=', evidence_def.id),
+            ], limit=1)
+            if duplicate:
+                raise ValidationError(_(
+                    "Evidence reference '%(reference)s' is already used by '%(name)s'"
+                    " in edition %(edition)s. References must be unique within an edition.",
+                    reference=evidence_def.reference,
+                    name=duplicate.name,
+                    edition=evidence_def.edition_id.name,
+                ))
+
+    @api.model
+    def get_import_templates(self):
+        """Import template offered on the Evidence Items import wizard."""
+        return [{
+            'label': 'Import Template for DSPT Evidence Items',
+            'template': '/odoo_nhs_dspt/static/import_templates/dspt_evidence_items_import_template.xlsx',
+        }]
 

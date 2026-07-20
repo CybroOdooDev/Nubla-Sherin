@@ -19,6 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
+from . import res_company
 from . import nhs_dspt_org_profile
 from . import nhs_dspt_edition
 from . import nhs_dspt_standard
@@ -29,4 +30,3 @@ from . import nhs_dspt_assertion
 from . import nhs_dspt_evidence
 from . import nhs_dspt_action
 from . import res_config_settings
-from . import nhs_dspt_reports

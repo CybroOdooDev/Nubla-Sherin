@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 
 class NhsDsptCarryForwardWizard(models.TransientModel):
@@ -80,15 +80,15 @@ class NhsDsptCarryForwardWizard(models.TransientModel):
         if not self.assessment_id.prior_assessment_id:
             self.assessment_id.prior_assessment_id = self.prior_assessment_id
         if updated_count:
-            title = _('Carried Forward')
-            message = _('%(count)d evidence item(s) updated from %(source)s.') % {
+            title = ('Carried Forward')
+            message = ('%(count)d evidence item(s) updated from %(source)s.') % {
                 'count': updated_count,
                 'source': self.prior_assessment_id.name,
             }
             notif_type = 'success'
         else:
-            title = _('Nothing Carried Forward')
-            message = _(
+            title = ('Nothing Carried Forward')
+            message = (
                 'No matching evidence references were found in %(source)s, or it has no '
                 'evidence yet. Make sure you selected the correct earlier assessment.'
             ) % {'source': self.prior_assessment_id.name}

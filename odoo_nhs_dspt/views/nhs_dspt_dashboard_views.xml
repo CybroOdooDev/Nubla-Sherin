@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ── Dashboard Action ─────────────────────────────────────────── -->
+    <!--  Dashboard Action -->
     <record id="action_nhs_dspt_dashboard_client" model="ir.actions.client">
         <field name="name">Readiness Dashboard</field>
         <field name="tag">nhs_dspt_dashboard</field>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ── Settings View ────────────────────────────────────────────── -->
+    <!--  Settings View  -->
     <record id="view_res_config_settings_nhs_dspt" model="ir.ui.view">
         <field name="name">res.config.settings.nhs.dspt</field>
         <field name="model">res.config.settings</field>
@@ -25,7 +25,7 @@
         </field>
     </record>
 
-    <!-- ── Settings Window Action ───────────────────────────────────── -->
+    <!-- Settings Window Action  -->
     <record id="action_nhs_dspt_settings" model="ir.actions.act_window">
         <field name="name">Settings</field>
         <field name="res_model">res.config.settings</field>

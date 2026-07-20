@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import  api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -123,12 +123,13 @@ class NhsDsptAction(models.Model):
         """Ensures an action is only linked to an evidence item that is currently 'Not Met'."""
         for action in self:
             if action.evidence_id and action.evidence_id.status != 'not_met':
-                raise ValidationError(_(
-                    "An improvement action can only be raised against an evidence item "
-                    "that is marked 'Not Met'. Mark '%(evidence)s' as Not Met first, then "
-                    "use its 'Raise Improvement Action' button.",
-                    evidence=action.evidence_id.display_name,
-                ))
+                raise ValidationError(
+                    ("An improvement action can only be raised against an evidence item "
+                      "that is marked 'Not Met'. Mark '%(evidence)s' as Not Met first, then "
+                      "use its 'Raise Improvement Action' button.") % {
+                        'evidence': action.evidence_id.display_name,
+                    }
+                )
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -139,22 +140,43 @@ class NhsDsptAction(models.Model):
                     'nhs.dspt.action') or 'New'
         return super().create(vals_list)
 
+    def _reopen_wizard(self):
+        return {
+            'name': ('Raise Improvement Action'),
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'new',
+            'context': self.env.context,
+        }
+
     def action_mark_in_progress(self):
         """Marks the action state as 'in_progress'."""
         self.write({'state': 'in_progress'})
+        if self.env.context.get('raise_action_wizard'):
+            return self._reopen_wizard()
 
     def action_mark_completed(self):
         """Marks the action state as 'completed', requiring a completion note and evidence attachment."""
         for action in self:
             if not action.completion_note:
-                raise ValidationError(_(
-                    "You must describe how the gap was closed in the Completion Note "
-                    "before marking '%(action)s' as Completed.", action=action.name))
+                raise ValidationError(
+                    ("You must describe how the gap was closed in the Completion Note "
+                      "before marking '%(action)s' as Completed.") % {
+                        'action': action.name,
+                    }
+                )
             if not action.attachment_ids:
-                raise ValidationError(_(
-                    "You must attach supporting evidence before marking '%(action)s' "
-                    "as Completed.", action=action.name))
+                raise ValidationError(
+                    ("You must attach supporting evidence before marking '%(action)s' "
+                      "as Completed.") % {
+                        'action': action.name,
+                    }
+                )
         self.write({'state': 'completed'})
+        if self.env.context.get('raise_action_wizard'):
+            return self._reopen_wizard()
 
     def action_mark_verified(self):
         """Marks the action state as 'verified' and updates originating gap status to 'met'."""
@@ -162,10 +184,14 @@ class NhsDsptAction(models.Model):
         for action in self:
             if action.evidence_id and action.evidence_id.status == 'not_met':
                 action.evidence_id.status = 'met'
+        if self.env.context.get('raise_action_wizard'):
+            return self._reopen_wizard()
 
     def action_reopen(self):
         """Re-opens a completed/verified action by setting state to 'open'."""
         self.write({'state': 'open'})
+        if self.env.context.get('raise_action_wizard'):
+            return self._reopen_wizard()
 
     @api.model
     def _cron_escalate_overdue(self):
@@ -177,7 +203,9 @@ class NhsDsptAction(models.Model):
         if not activity_type:
             return
         for action in overdue:
-            recipients = manager_group.users if manager_group else self.env['res.users']
+            recipients = manager_group.user_ids.filtered(
+                lambda u, a=action: a.company_id.id in u.company_ids.ids
+            ) if manager_group else self.env['res.users']
             for user in recipients:
                 existing = self.env['mail.activity'].search([
                     ('res_model', '=', 'nhs.dspt.action'),

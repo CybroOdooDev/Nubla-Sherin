@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ── List View ────────────────────────────────────────────────── -->
+    <!-- List View -->
     <record id="view_nhs_dspt_action_list" model="ir.ui.view">
         <field name="name">nhs.dspt.action.list</field>
         <field name="model">nhs.dspt.action</field>
@@ -18,7 +18,7 @@
         </field>
     </record>
 
-    <!-- ── Kanban View ──────────────────────────────────────────────── -->
+    <!-- Kanban View -->
     <record id="view_nhs_dspt_action_kanban" model="ir.ui.view">
         <field name="name">nhs.dspt.action.kanban</field>
         <field name="model">nhs.dspt.action</field>
@@ -48,7 +48,7 @@
         </field>
     </record>
 
-    <!-- ── Form View ────────────────────────────────────────────────── -->
+    <!--  Form View -->
     <record id="view_nhs_dspt_action_form" model="ir.ui.view">
         <field name="name">nhs.dspt.action.form</field>
         <field name="model">nhs.dspt.action</field>
@@ -91,7 +91,7 @@
         </field>
     </record>
 
-    <!-- ── Search View ──────────────────────────────────────────────── -->
+    <!-- Search View -->
     <record id="view_nhs_dspt_action_search" model="ir.ui.view">
         <field name="name">nhs.dspt.action.search</field>
         <field name="model">nhs.dspt.action</field>
@@ -113,7 +113,7 @@
         </field>
     </record>
 
-    <!-- ── Window Action ────────────────────────────────────────────── -->
+    <!--  Window Action -->
     <record id="action_nhs_dspt_action" model="ir.actions.act_window">
         <field name="name">Gaps &amp; Actions</field>
         <field name="res_model">nhs.dspt.action</field>

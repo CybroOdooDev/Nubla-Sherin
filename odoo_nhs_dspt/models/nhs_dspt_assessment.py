@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 
@@ -187,16 +187,16 @@ class NhsDsptAssessment(models.Model):
 
             duplicate = self.sudo().search(domain, limit=1)
             if duplicate:
-                raise ValidationError(_(
+                raise ValidationError(
                     "There is already a DSPT assessment for this organisation, edition, and ODS Code."
-                ))
+                )
 
 
     @api.depends('edition_id.name', 'company_id.name')
     def _compute_name(self):
         """Computes a descriptive name for the assessment."""
         for assessment in self:
-            assessment.name = _('%s — %s') % (assessment.edition_id.name or _('New Edition'),
+            assessment.name = ('%s — %s') % (assessment.edition_id.name or ('New Edition'),
                                                 assessment.company_id.name or '')
 
     @api.depends('action_ids', 'evidence_ids')
@@ -210,9 +210,8 @@ class NhsDsptAssessment(models.Model):
                  'evidence_ids.action_ids.state', 'action_ids.state')
     def _compute_readiness(self):
         """Computes the readiness percentage, gaps, and status of the assessment."""
-        approaching_threshold = float(self.env['ir.config_parameter'].sudo().get_param(
-            'odoo_nhs_dspt.approaching_threshold', 80))
         for assessment in self:
+            approaching_threshold = assessment.company_id.dspt_approaching_threshold
             mandatory = assessment.evidence_ids.filtered(
                 lambda e: e.is_mandatory and e.status != 'not_applicable')
             total = len(mandatory)
@@ -244,9 +243,19 @@ class NhsDsptAssessment(models.Model):
         for assessment in self:
             if assessment.state in ('published', 'submitted') and not self.env.user.has_group(
                     'odoo_nhs_dspt.group_nhs_dspt_manager'):
-                raise UserError(_(
+                raise UserError((
                     'This assessment has been published and is locked. Ask a DSPT'
                     ' manager to re-open it before making changes.'))
+
+    def unlink(self):
+        """Blocks deletion of any assessment that has left the Draft state."""
+        for assessment in self:
+            if assessment.state != 'draft':
+                raise UserError((
+                    'Only assessments in Draft can be deleted. "%s" is %s — archive'
+                    ' it instead if it should no longer be worked on.') % (
+                        assessment.name, assessment.state))
+        return super().unlink()
 
     def action_generate(self):
         """Create assertion + evidence lines from the edition, filtered by the
@@ -351,7 +360,7 @@ class NhsDsptAssessment(models.Model):
             for assertion in assessment.assertion_ids:
                 old_status = assertion_before.get(assertion.id)
                 if old_status is not None and old_status != assertion.status:
-                    item_lines.append(_('  • Assertion %(ref)s %(name)s: %(before)s → %(after)s') % {
+                    item_lines.append(('  • Assertion %(ref)s %(name)s: %(before)s → %(after)s') % {
                         'ref': assertion.reference,
                         'name': assertion.name,
                         'before': assertion_status_labels.get(old_status, old_status),
@@ -363,21 +372,21 @@ class NhsDsptAssessment(models.Model):
                     continue
                 bits = []
                 if old_status != evidence.status:
-                    bits.append(_('status %(before)s → %(after)s') % {
+                    bits.append(('status %(before)s → %(after)s') % {
                         'before': evidence_status_labels.get(old_status, old_status),
                         'after': evidence_status_labels.get(evidence.status, evidence.status),
                     })
                 if old_stale != evidence.is_stale:
-                    bits.append(_('now stale') if evidence.is_stale else _('no longer stale'))
+                    bits.append(('now stale') if evidence.is_stale else ('no longer stale'))
                 if bits:
-                    item_lines.append(_('  • Evidence %(ref)s %(name)s: %(detail)s') % {
+                    item_lines.append(('  • Evidence %(ref)s %(name)s: %(detail)s') % {
                         'ref': evidence.reference,
                         'name': evidence.name,
                         'detail': ', '.join(bits),
                     })
 
             if before != after or item_lines:
-                lines = [_(
+                lines = [(
                     '%(name)s: readiness %(before_pct).0f%% → %(after_pct).0f%%, '
                     'gaps %(before_gaps)d → %(after_gaps)d, '
                     'stale %(before_stale)d → %(after_stale)d, '
@@ -392,12 +401,12 @@ class NhsDsptAssessment(models.Model):
                 lines.extend(item_lines)
                 changes.append('\n'.join(lines))
         if changes:
-            title = _('Recomputed — changes found')
+            title = ('Recomputed — changes found')
             message = '\n'.join(changes)
             notif_type = 'success'
         else:
-            title = _('Recomputed')
-            message = _('Everything was already up to date — no changes found.')
+            title = ('Recomputed')
+            message = ('Everything was already up to date — no changes found.')
             notif_type = 'info'
         return {
             'type': 'ir.actions.client',
@@ -425,7 +434,7 @@ class NhsDsptAssessment(models.Model):
             open_actions = assessment.action_ids.filtered(
                 lambda a: a.state not in ('completed', 'verified'))
             if open_actions:
-                raise UserError(_(
+                raise UserError((
                     'All improvement actions must be Completed or Verified before'
                     ' publishing. %(count)d action(s) still open: %(names)s') % {
                     'count': len(open_actions),
@@ -442,7 +451,7 @@ class NhsDsptAssessment(models.Model):
         """Transitions the assessment state to 'submitted' once a reference is entered."""
         for assessment in self:
             if not assessment.submission_reference:
-                raise UserError(_('Enter the submission reference from the NHS DSPT portal first.'))
+                raise UserError(('Enter the submission reference from the NHS DSPT portal first.'))
             assessment.write({
                 'state': 'submitted',
                 'submission_date': assessment.submission_date or fields.Date.context_today(self),
@@ -453,8 +462,8 @@ class NhsDsptAssessment(models.Model):
         """Re-opens a published/submitted assessment (manager only)."""
         for assessment in self:
             if not self.env.user.has_group('odoo_nhs_dspt.group_nhs_dspt_manager'):
-                raise UserError(_('Only a DSPT manager can re-open a published assessment.'))
-            assessment.message_post(body=_('Assessment re-opened by %s.') % self.env.user.name)
+                raise UserError(('Only a DSPT manager can re-open a published assessment.'))
+            assessment.message_post(body=('Assessment re-opened by %s.') % self.env.user.name)
             assessment.state = 'in_progress'
         return True
 
@@ -462,7 +471,7 @@ class NhsDsptAssessment(models.Model):
         """Returns an action to view the assessment's evidence library."""
         self.ensure_one()
         return {
-            'name': _('Evidence Library'),
+            'name': ('Evidence Library'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.dspt.evidence',
             'view_mode': 'list,form',
@@ -474,7 +483,7 @@ class NhsDsptAssessment(models.Model):
         """Returns an action to view the assessment's improvement actions."""
         self.ensure_one()
         return {
-            'name': _('Improvement Actions'),
+            'name': ('Improvement Actions'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.dspt.action',
             'view_mode': 'list,form',
@@ -484,10 +493,7 @@ class NhsDsptAssessment(models.Model):
 
     @api.model
     def _cron_deadline_reminders(self):
-        """Nightly reminder as an edition's deadline approaches, to assessment
-        owners and to the DSPT manager group."""
-        lead_days = int(self.env['ir.config_parameter'].sudo().get_param(
-            'odoo_nhs_dspt.deadline_reminder_days', 30))
+        """Send deadline notifications to assessment owners and managers."""
         today = fields.Date.context_today(self)
         template = self.env.ref('odoo_nhs_dspt.mail_template_dspt_deadline_reminder', raise_if_not_found=False)
         if not template:
@@ -498,6 +504,7 @@ class NhsDsptAssessment(models.Model):
         ])
         for assessment in assessments:
             days_left = (assessment.deadline - today).days
+            lead_days = assessment.company_id.dspt_deadline_reminder_days
             if 0 <= days_left <= lead_days:
                 template.send_mail(assessment.id, force_send=False)
 
@@ -520,7 +527,13 @@ class NhsDsptAssessment(models.Model):
         assessment = self.search([
             ('company_id', '=', self.env.company.id),
             ('edition_id.state', '=', 'active'),
+            ('state', 'not in', ('published', 'submitted')),
         ], limit=1, order='id desc')
+        if not assessment:
+            assessment = self.search([
+                ('company_id', '=', self.env.company.id),
+                ('edition_id.state', '=', 'active'),
+            ], limit=1, order='id desc')
         if not assessment:
             assessment = self.search([
                 ('company_id', '=', self.env.company.id),
@@ -576,7 +589,9 @@ class NhsDsptAssessment(models.Model):
             'assessment_id': assessment.id,
             'assessment_name': assessment.name,
             'readiness_pct': round(assessment.readiness_pct, 1),
-            'achieved_status': assessment.achieved_status,
+            'achieved_status': dict(
+                assessment._fields['achieved_status'].selection
+            ).get(assessment.achieved_status, ''),
             'gap_count': assessment.gap_count,
             'stale_evidence_count': assessment.stale_evidence_count,
             'overdue_action_count': len(overdue_actions),

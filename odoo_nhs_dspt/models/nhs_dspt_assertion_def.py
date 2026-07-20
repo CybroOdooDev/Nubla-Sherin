@@ -19,7 +19,8 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import api, fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class NhsDsptAssertionDef(models.Model):
@@ -87,6 +88,33 @@ class NhsDsptAssertionDef(models.Model):
         """Computes the total number of evidence definitions linked to this assertion."""
         for assertion_def in self:
             assertion_def.evidence_count = len(assertion_def.evidence_def_ids)
+
+    @api.constrains('reference', 'edition_id')
+    def _check_reference_unique_per_edition(self):
+        """Validates that the assertion reference is unique within its edition
+        (enforced both on manual entry and on import)."""
+        for assertion_def in self:
+            duplicate = self.search([
+                ('edition_id', '=', assertion_def.edition_id.id),
+                ('reference', '=', assertion_def.reference),
+                ('id', '!=', assertion_def.id),
+            ], limit=1)
+            if duplicate:
+                raise ValidationError(_(
+                    "Assertion reference '%(reference)s' is already used by '%(name)s'"
+                    " in edition %(edition)s. References must be unique within an edition.",
+                    reference=assertion_def.reference,
+                    name=duplicate.name,
+                    edition=assertion_def.edition_id.name,
+                ))
+
+    @api.model
+    def get_import_templates(self):
+        """Import template offered on the Assertions import wizard."""
+        return [{
+            'label': 'Import Template for DSPT Assertions',
+            'template': '/odoo_nhs_dspt/static/import_templates/dspt_assertions_import_template.xlsx',
+        }]
 
     def applies_to(self, org_profile):
         """True if this assertion definition is applicable to `org_profile`

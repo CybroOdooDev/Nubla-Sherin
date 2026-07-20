@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import  api, fields, models
 
 ASSERTION_STATUSES = [
     ('not_started', 'Not Started'),
@@ -148,7 +148,7 @@ class NhsDsptAssertion(models.Model):
         """Returns an action to open the evidence items related to this assertion."""
         self.ensure_one()
         return {
-            'name': _('Evidence Items'),
+            'name': ('Evidence Items'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.dspt.evidence',
             'view_mode': 'list,form',

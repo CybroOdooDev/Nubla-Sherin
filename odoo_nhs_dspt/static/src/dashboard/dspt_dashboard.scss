@@ -41,7 +41,8 @@
         font-weight: 600;
         box-shadow: 0 2px 6px rgba(0, 94, 184, 0.35);
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
             background-color: var(--nhs-dark-blue);
             border-color: var(--nhs-dark-blue);
             color: var(--nhs-white);
@@ -243,4 +244,9 @@
     .nhs-progress-bad {
         background-color: var(--nhs-red);
     }
+}
+
+/* Force smart buttons (oe_button_box) to be visible in modal dialogs */
+.modal-body .o_form_view .oe_button_box {
+    display: flex !important;
 }

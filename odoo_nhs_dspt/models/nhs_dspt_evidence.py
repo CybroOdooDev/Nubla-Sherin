@@ -19,8 +19,8 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from datetime import timedelta
-from odoo import _, api, fields, models
+from dateutil.relativedelta import relativedelta
+from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 EVIDENCE_STATUSES = [
@@ -168,11 +168,10 @@ class NhsDsptEvidence(models.Model):
     def _compute_is_stale(self):
         """Computes whether the evidence is stale based on last review date and config parameters."""
         today = fields.Date.context_today(self)
-        days = int(self.env['ir.config_parameter'].sudo().get_param(
-            'odoo_nhs_dspt.evidence_expiry_days', 365))
-        expiry_limit = today - timedelta(days=days)
         for evidence in self:
             if evidence.status == 'met' and evidence.evidence_review_date:
+                months = evidence.company_id.dspt_stale_evidence_months
+                expiry_limit = today - relativedelta(months=months)
                 evidence.is_stale = evidence.evidence_review_date < expiry_limit
             else:
                 evidence.is_stale = False
@@ -182,14 +181,14 @@ class NhsDsptEvidence(models.Model):
         for evidence in self:
             if evidence.assessment_id.state in ('published', 'submitted') and not self.env.user.has_group(
                     'odoo_nhs_dspt.group_nhs_dspt_manager'):
-                raise UserError(_(
+                raise UserError((
                     "This evidence item belongs to a published/submitted assessment and is locked."
                 ))
             if 'owner_id' in vals or 'status' in vals or 'answer' in vals or 'attachment_ids' in vals:
                 if self.env.user.has_group('odoo_nhs_dspt.group_nhs_dspt_user'):
                     if not self.env.user.has_group('odoo_nhs_dspt.group_nhs_dspt_officer'):
                         if evidence.owner_id and evidence.owner_id != self.env.user:
-                            raise UserError(_(
+                            raise UserError((
                                 "You can only update evidence items that are assigned to you."
                             ))
 
@@ -205,7 +204,7 @@ class NhsDsptEvidence(models.Model):
         """Overrides write to check permissions, enforce validation on N/A reasons, and trigger status updates."""
         self._check_evidence_permissions(vals)
         if vals.get('status') == 'not_applicable' and not vals.get('na_reason') and not self.na_reason:
-            raise ValidationError(_("You must provide an N/A Reason when marking evidence as Not Applicable."))
+            raise ValidationError(("You must provide an N/A Reason when marking evidence as Not Applicable."))
         result = super().write(vals)
         if 'status' in vals or 'evidence_review_date' in vals:
             self.assertion_id._compute_status()
@@ -214,14 +213,14 @@ class NhsDsptEvidence(models.Model):
 
     def unlink(self):
         """Overrides unlink to prevent manual deletion of evidence records."""
-        raise UserError(_("Manual deletion of evidence items is not allowed."
+        raise UserError(("Manual deletion of evidence items is not allowed."
                           " They are managed via assessment generation."))
 
     def action_raise_action(self):
         """Opens a wizard or action to raise a new improvement action linked to this evidence gap."""
         self.ensure_one()
         return {
-            'name': _('Raise Improvement Action'),
+            'name': ('Raise Improvement Action'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.dspt.action',
             'view_mode': 'form',
@@ -230,7 +229,8 @@ class NhsDsptEvidence(models.Model):
                 'default_assessment_id': self.assessment_id.id,
                 'default_evidence_id': self.id,
                 'default_owner_id': self.owner_id.id or self.env.user.id,
-                'default_name': _('Resolve compliance gap for %s') % self.name,
+                'default_name': ('Resolve compliance gap for %s') % self.name,
+                'raise_action_wizard': True,
             }
         }
 
@@ -238,7 +238,7 @@ class NhsDsptEvidence(models.Model):
         """Returns an action to view the improvement actions raised for this evidence gap."""
         self.ensure_one()
         return {
-            'name': _('Improvement Actions'),
+            'name': ('Improvement Actions'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.dspt.action',
             'view_mode': 'list,form',
@@ -255,11 +255,13 @@ class NhsDsptEvidence(models.Model):
         self.write({'status': 'in_progress'})
 
     def action_set_met(self):
-        """Sets the evidence status to 'met' and sets review date to today."""
-        self.write({
-            'status': 'met',
-            'evidence_review_date': fields.Date.context_today(self),
-        })
+        """Sets the evidence status to 'met', defaulting the review date to
+        today only if one hasn't already been set."""
+        for evidence in self:
+            vals = {'status': 'met'}
+            if not evidence.evidence_review_date:
+                vals['evidence_review_date'] = fields.Date.context_today(self)
+            evidence.write(vals)
 
     def action_set_not_met(self):
         """Sets the evidence status to 'not_met'."""
@@ -273,3 +275,12 @@ class NhsDsptEvidence(models.Model):
     def _cron_recompute_stale(self):
         """Cron job to recompute the is_stale field for all active evidence items."""
         self.search([])._compute_is_stale()
+
+    @api.model
+    def get_import_templates(self):
+        """Import template for seeding an assessment's answers/evidence history
+        (e.g. a prior year's submission not previously held in the system)."""
+        return [{
+            'label': 'Import Template for DSPT Evidence Answers (History)',
+            'template': '/odoo_nhs_dspt/static/import_templates/dspt_evidence_answers_import_template.xlsx',
+        }]

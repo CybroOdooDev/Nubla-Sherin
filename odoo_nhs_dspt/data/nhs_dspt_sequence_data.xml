@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
-        <!-- ── Sequence for DSPT Actions ─────────────────────────────── -->
+        <!-- Sequence for DSPT Actions -->
         <record id="seq_nhs_dspt_action" model="ir.sequence">
             <field name="name">NHS DSPT Improvement Action</field>
             <field name="code">nhs.dspt.action</field>

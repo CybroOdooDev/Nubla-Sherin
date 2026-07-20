@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="0">
-        <!-- ══════════════════════════════════════════════════════════════
-             Organisation-type profiles
-        ══════════════════════════════════════════════════════════════════ -->
+        <!-- Organisation-type profiles-->
         <record id="org_profile_trust" model="nhs.dspt.org.profile">
             <field name="name">NHS Trust</field>
             <field name="code">TRUST</field>
@@ -30,13 +28,11 @@
             <field name="sequence">50</field>
         </record>
 
-        <!-- ══════════════════════════════════════════════════════════════
-             DSPT Edition — seed year. NOTE: this is a representative
+        <!-- DSPT Edition — seed year. NOTE: this is a representative
              starting framework aligned to the National Data Guardian's ten
              data-security standards, NOT a verbatim copy of the full NHS
              England DSPT question set. Verify/adjust against the current
-             published toolkit before relying on it for a real submission.
-        ══════════════════════════════════════════════════════════════════ -->
+             published toolkit before relying on it for a real submission.-->
         <record id="edition_2025_26" model="nhs.dspt.edition">
             <field name="name">DSPT 2025/26</field>
             <field name="year">2025/26</field>

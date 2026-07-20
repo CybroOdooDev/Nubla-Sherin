@@ -108,7 +108,7 @@ class NhsDsptEdition(models.Model):
         """Returns an action to view assessments for this edition."""
         self.ensure_one()
         return {
-            'name': _('Assessments'),
+            'name': ('Assessments'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.dspt.assessment',
             'view_mode': 'list,form',
@@ -132,9 +132,9 @@ class NhsDsptEdition(models.Model):
         mark individual items 'changed'/'removed' as they adjust the clone."""
         self.ensure_one()
         if self.env['nhs.dspt.edition'].search_count([('year', '=', new_year)]):
-            raise UserError(_('An edition for year %s already exists.') % new_year)
+            raise UserError(('An edition for year %s already exists.') % new_year)
         new_edition = self.copy({
-            'name': new_name or _('DSPT %s') % new_year,
+            'name': new_name or ('DSPT %s') % new_year,
             'year': new_year,
             'state': 'draft',
             'deadline': new_deadline,
