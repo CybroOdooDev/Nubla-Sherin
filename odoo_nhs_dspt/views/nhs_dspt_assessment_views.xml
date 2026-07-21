@@ -110,6 +110,10 @@
                                    readonly="evidence_ids"/>
                             <field name="org_profile_id" options="{'no_create': True}"
                                    readonly="evidence_ids"/>
+                            <field name="manager_id"
+                                   domain="[('all_group_ids', 'in', [%(odoo_nhs_dspt.group_nhs_dspt_manager)d]),
+                                            ('company_ids', 'in', company_id)]"
+                                   options="{'no_create': True}"/>
                             <field name="ods_code"/>
                             <field name="prior_assessment_id" options="{'no_create': True}"
                                    domain="[('id', '!=', id), ('company_id', '=', company_id),

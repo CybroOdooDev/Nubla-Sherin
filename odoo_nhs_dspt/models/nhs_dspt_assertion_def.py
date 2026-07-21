@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -100,13 +100,14 @@ class NhsDsptAssertionDef(models.Model):
                 ('id', '!=', assertion_def.id),
             ], limit=1)
             if duplicate:
-                raise ValidationError(_(
+                raise ValidationError(
                     "Assertion reference '%(reference)s' is already used by '%(name)s'"
-                    " in edition %(edition)s. References must be unique within an edition.",
-                    reference=assertion_def.reference,
-                    name=duplicate.name,
-                    edition=assertion_def.edition_id.name,
-                ))
+                    " in edition %(edition)s. References must be unique within an edition." % {
+                        'reference': assertion_def.reference,
+                        'name': duplicate.name,
+                        'edition': assertion_def.edition_id.name,
+                    }
+                )
 
     @api.model
     def get_import_templates(self):
@@ -133,4 +134,3 @@ class NhsDsptAssertionDef(models.Model):
             'view_mode': 'form',
             'target': 'current',
         }
-

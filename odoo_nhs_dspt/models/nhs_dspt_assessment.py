@@ -143,6 +143,14 @@ class NhsDsptAssessment(models.Model):
         string='Published By',
         readonly=True,
     )
+    manager_id = fields.Many2one(
+        'res.users',
+        string='DSPT Manager',
+        tracking=True,
+        help="DSPT Manager/SIRO responsible for this assessment. Deadline"
+             " reminders are sent to them only; if left blank, no reminder"
+             " is sent."
+    )
     published_at = fields.Datetime(
         string='Published At',
         readonly=True,
@@ -501,6 +509,7 @@ class NhsDsptAssessment(models.Model):
         assessments = self.search([
             ('deadline', '!=', False),
             ('state', 'not in', ['published', 'submitted']),
+            ('manager_id', '!=', False),
         ])
         for assessment in assessments:
             days_left = (assessment.deadline - today).days

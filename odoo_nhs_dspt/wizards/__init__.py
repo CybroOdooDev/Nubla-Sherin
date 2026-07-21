@@ -22,3 +22,4 @@
 from . import nhs_dspt_generate_wizard
 from . import nhs_dspt_carry_forward_wizard
 from . import nhs_dspt_new_edition_wizard
+from . import nhs_dspt_bulk_owner_wizard

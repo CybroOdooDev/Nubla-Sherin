@@ -31,3 +31,5 @@ access_nhs_dspt_generate_wizard_manager,nhs.dspt.generate.wizard manager,model_n
 access_nhs_dspt_carry_forward_wizard_officer,nhs.dspt.carry.forward.wizard officer,model_nhs_dspt_carry_forward_wizard,group_nhs_dspt_officer,1,1,1,1
 access_nhs_dspt_carry_forward_wizard_manager,nhs.dspt.carry.forward.wizard manager,model_nhs_dspt_carry_forward_wizard,group_nhs_dspt_manager,1,1,1,1
 access_nhs_dspt_new_edition_wizard_manager,nhs.dspt.new.edition.wizard manager,model_nhs_dspt_new_edition_wizard,group_nhs_dspt_manager,1,1,1,1
+access_nhs_dspt_bulk_owner_wizard_officer,nhs.dspt.bulk.owner.wizard officer,model_nhs_dspt_bulk_owner_wizard,group_nhs_dspt_officer,1,1,1,1
+access_nhs_dspt_bulk_owner_wizard_manager,nhs.dspt.bulk.owner.wizard manager,model_nhs_dspt_bulk_owner_wizard,group_nhs_dspt_manager,1,1,1,1

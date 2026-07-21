@@ -175,6 +175,7 @@ class NhsDsptAction(models.Model):
                     }
                 )
         self.write({'state': 'completed'})
+        self.activity_feedback(['mail.mail_activity_data_todo'], feedback='Action completed.')
         if self.env.context.get('raise_action_wizard'):
             return self._reopen_wizard()
 
@@ -195,29 +196,26 @@ class NhsDsptAction(models.Model):
 
     @api.model
     def _cron_escalate_overdue(self):
-        """Cron job to schedule activities for overdue improvement actions."""
+        """Cron job to schedule an escalation activity for overdue improvement
+        actions, assigned to each action's own owner."""
         self.search([])._compute_is_overdue()
         overdue = self.search([('is_overdue', '=', True)])
-        manager_group = self.env.ref('odoo_nhs_dspt.group_nhs_dspt_manager', raise_if_not_found=False)
         activity_type = self.env.ref('mail.mail_activity_data_todo', raise_if_not_found=False)
         if not activity_type:
             return
         for action in overdue:
-            recipients = manager_group.user_ids.filtered(
-                lambda u, a=action: a.company_id.id in u.company_ids.ids
-            ) if manager_group else self.env['res.users']
-            for user in recipients:
-                existing = self.env['mail.activity'].search([
-                    ('res_model', '=', 'nhs.dspt.action'),
-                    ('res_id', '=', action.id),
-                    ('user_id', '=', user.id),
-                    ('activity_type_id', '=', activity_type.id),
-                ], limit=1)
-                if not existing:
-                    action.activity_schedule(
-                        activity_type_id=activity_type.id,
-                        user_id=user.id,
-                        summary=('Overdue DSPT improvement action'),
-                        note=('%s (owner: %s) was due %s and is still open.') % (
-                            action.name, action.owner_id.name, action.target_date),
-                    )
+            user = action.owner_id
+            existing = self.env['mail.activity'].search([
+                ('res_model', '=', 'nhs.dspt.action'),
+                ('res_id', '=', action.id),
+                ('user_id', '=', user.id),
+                ('activity_type_id', '=', activity_type.id),
+            ], limit=1)
+            if not existing:
+                action.activity_schedule(
+                    activity_type_id=activity_type.id,
+                    user_id=user.id,
+                    summary=('Overdue DSPT improvement action'),
+                    note=('%s (owner: %s) was due %s and is still open.') % (
+                        action.name, action.owner_id.name, action.target_date),
+                )

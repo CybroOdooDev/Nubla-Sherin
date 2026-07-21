@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
+    <!-- Dashboard template for displaying DSPT readiness metrics and summaries. -->
     <t t-name="odoo_nhs_dspt.NhsDsptDashboard" owl="1">
         <div class="o_nhs_dspt_dashboard o_content p-4" style="height: 100%; overflow-y: auto;">
             <t t-if="state.loading">
@@ -16,7 +17,10 @@
             </t>
             <t t-else="">
                 <div class="d-flex justify-content-between align-items-center mb-4 nhs-dspt-dashboard-header">
-                    <h2 class="mb-0"><i class="fa fa-shield me-2"/> DSPT Readiness Dashboard</h2>
+                    <div>
+                        <h2 class="mb-0"><i class="fa fa-shield me-2"/> DSPT Readiness Dashboard</h2>
+                        <div class="text-muted" t-esc="state.metrics.assessment_name"/>
+                    </div>
                     <button class="btn btn-nhs btn-sm" t-on-click="openAssessment">
                         <i class="fa fa-clipboard-check me-1"/> Open Assessment
                     </button>

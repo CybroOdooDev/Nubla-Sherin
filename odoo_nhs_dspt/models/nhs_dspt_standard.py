@@ -20,6 +20,7 @@
 #
 #############################################################################
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class NhsDsptStandard(models.Model):
@@ -66,6 +67,27 @@ class NhsDsptStandard(models.Model):
         for standard in self:
             standard.assertion_count = len(standard.assertion_def_ids)
 
+    @api.constrains('code', 'edition_id')
+    def _check_code_unique_per_edition(self):
+        """Validates that the standard reference is unique within its edition."""
+        for standard in self:
+            if not standard.code:
+                continue
+            duplicate = self.search([
+                ('edition_id', '=', standard.edition_id.id),
+                ('code', '=', standard.code),
+                ('id', '!=', standard.id),
+            ], limit=1)
+            if duplicate:
+                raise ValidationError(
+                    "Standard reference '%(code)s' is already used by '%(name)s'"
+                    " in edition %(edition)s. References must be unique within an edition." % {
+                        'code': standard.code,
+                        'name': duplicate.name,
+                        'edition': standard.edition_id.name,
+                    }
+                )
+
     def action_open_standard(self):
         """Returns an action to open the form view of this standard."""
         self.ensure_one()
@@ -84,4 +106,3 @@ class NhsDsptStandard(models.Model):
             'label': 'Import Template for DSPT Standards',
             'template': '/odoo_nhs_dspt/static/import_templates/dspt_standards_import_template.xlsx',
         }]
-

@@ -39,10 +39,7 @@ into a year-round, owned, evidenced and auditable process.
     'website': 'https://www.cybrosys.com',
     'license': 'LGPL-3',
     'currency': 'EUR',
-    'depends': [
-        'base',
-        'mail',
-    ],
+    'depends': ['base','mail'],
     'data': [
         'security/nhs_dspt_security.xml',
         'security/ir.model.access.csv',
@@ -50,9 +47,11 @@ into a year-round, owned, evidenced and auditable process.
         'data/nhs_dspt_edition_2025_26_data.xml',
         'data/mail_template_data.xml',
         'data/ir_cron_data.xml',
+        'data/nhs_dspt_baseline_data.xml',
         'wizards/nhs_dspt_generate_wizard_views.xml',
         'wizards/nhs_dspt_carry_forward_wizard_views.xml',
         'wizards/nhs_dspt_new_edition_wizard_views.xml',
+        'wizards/nhs_dspt_bulk_owner_wizard_views.xml',
         'views/nhs_dspt_edition_views.xml',
         'views/nhs_dspt_assertion_views.xml',
         'views/nhs_dspt_evidence_views.xml',

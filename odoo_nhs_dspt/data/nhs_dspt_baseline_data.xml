@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- A draft assessment for the seed edition, with no lines generated yet —
+             lets the Evidence Answers import template demonstrate seeding history
+             directly, and gives new users something to click into immediately. -->
+        <record id="demo_assessment_2025_26" model="nhs.dspt.assessment">
+            <field name="edition_id" ref="edition_2025_26"/>
+            <field name="org_profile_id" ref="org_profile_supplier"/>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="ods_code">DEMO001</field>
+        </record>
+
+        <!-- Two assertion lines on the demo assessment, so the Evidence Answers
+             import template has a real assertion_id/id to reference — Odoo's
+             generic import can only match an EXISTING many2one target via its
+             external id (or database id), never create one on the fly from
+             other fields, so these must already exist as data. -->
+        <record id="demo_assertion_line_1_1" model="nhs.dspt.assertion">
+            <field name="assessment_id" ref="demo_assessment_2025_26"/>
+            <field name="assertion_def_id" ref="assertion_1_1"/>
+        </record>
+        <record id="demo_assertion_line_2_1" model="nhs.dspt.assertion">
+            <field name="assessment_id" ref="demo_assessment_2025_26"/>
+            <field name="assertion_def_id" ref="assertion_2_1"/>
+        </record>
+
+        <!-- Demo evidence lines on the demo assessment, so the Evidence Answers
+             import template has real evidence records to reference and update. -->
+        <record id="demo_evidence_line_1_1_1" model="nhs.dspt.evidence">
+            <field name="assessment_id" ref="demo_assessment_2025_26"/>
+            <field name="assertion_id" ref="demo_assertion_line_1_1"/>
+            <field name="evidence_def_id" ref="evidence_1_1_1"/>
+            <field name="status">met</field>
+            <field name="answer">Sample answer — carried forward from last year's paper submission.</field>
+            <field name="evidence_ref">Policy ref DPO-2024-01</field>
+            <field name="evidence_review_date" eval="time.strftime('%Y-%m-%d')"/>
+            <field name="owner_id" ref="base.user_admin"/>
+        </record>
+        <record id="demo_evidence_line_2_1_1" model="nhs.dspt.evidence">
+            <field name="assessment_id" ref="demo_assessment_2025_26"/>
+            <field name="assertion_id" ref="demo_assertion_line_2_1"/>
+            <field name="evidence_def_id" ref="evidence_2_1_1"/>
+            <field name="status">met</field>
+            <field name="answer">Sample answer — carried forward from last year's paper submission.</field>
+            <field name="evidence_ref">HR training log 2024</field>
+            <field name="evidence_review_date" eval="time.strftime('%Y-%m-%d')"/>
+            <field name="owner_id" ref="base.user_admin"/>
+        </record>
+    </data>
+</odoo>
