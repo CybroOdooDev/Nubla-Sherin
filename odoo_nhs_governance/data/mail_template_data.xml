@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="mail_template_nhs_governance_action_due" model="mail.template">
+            <field name="name">NHS Governance Action Due Reminder</field>
+            <field name="model_id" ref="model_nhs_meeting_action"/>
+            <field name="subject">Governance action due: {{ object.reference }}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p>The governance action <strong><t t-out="object.name"/></strong> is due on <t t-out="object.due_date"/>.</p>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_nhs_governance_root" name="Governance" sequence="56" groups="group_nhs_gov_viewer"/>
+
+    <menuitem id="menu_nhs_governance_committees" name="Committees" parent="menu_nhs_governance_root" sequence="10"/>
+    <menuitem id="menu_nhs_committee" name="Committees &amp; Boards" parent="menu_nhs_governance_committees" action="action_nhs_committee" sequence="10"/>
+    <menuitem id="menu_nhs_director" name="Directors" parent="menu_nhs_governance_committees" action="action_nhs_director" sequence="20"/>
+
+    <menuitem id="menu_nhs_governance_meetings" name="Meetings" parent="menu_nhs_governance_root" sequence="20"/>
+    <menuitem id="menu_nhs_meeting_upcoming" name="Upcoming Meetings" parent="menu_nhs_governance_meetings" action="action_nhs_meeting_upcoming" sequence="10"/>
+    <menuitem id="menu_nhs_meeting" name="All Meetings" parent="menu_nhs_governance_meetings" action="action_nhs_meeting" sequence="20"/>
+    <menuitem id="menu_nhs_agenda_item" name="Agendas &amp; Packs" parent="menu_nhs_governance_meetings" action="action_nhs_agenda_item" sequence="30"/>
+    <menuitem id="menu_nhs_meeting_action" name="Action Log" parent="menu_nhs_governance_meetings" action="action_nhs_meeting_action" sequence="40"/>
+
+    <menuitem id="menu_nhs_governance_declarations" name="Declarations" parent="menu_nhs_governance_root" sequence="30"/>
+    <menuitem id="menu_nhs_declaration" name="Interests Register" parent="menu_nhs_governance_declarations" action="action_nhs_declaration" sequence="10"/>
+    <menuitem id="menu_nhs_declaration_annual" name="Annual Declarations" parent="menu_nhs_governance_declarations" action="action_nhs_declaration_annual" sequence="20"/>
+
+    <menuitem id="menu_nhs_governance_assurance" name="Assurance (BAF)" parent="menu_nhs_governance_root" sequence="40"/>
+    <menuitem id="menu_nhs_baf_objective" name="Strategic Objectives" parent="menu_nhs_governance_assurance" action="action_nhs_baf_objective" sequence="10"/>
+    <menuitem id="menu_nhs_baf_risk" name="Principal Risks (BAF)" parent="menu_nhs_governance_assurance" action="action_nhs_baf_risk" sequence="20"/>
+    <menuitem id="menu_nhs_baf_review" name="BAF Risks Needing Review" parent="menu_nhs_governance_assurance" action="action_nhs_governance_unreviewed_baf" sequence="30"/>
+
+    <menuitem id="menu_nhs_governance_calendar" name="Calendar" parent="menu_nhs_governance_root" action="action_nhs_governance_calendar" sequence="50"/>
+    <menuitem id="menu_nhs_cycle_of_business" name="Cycle of Business" parent="menu_nhs_governance_root" action="action_nhs_cycle_of_business" sequence="60"/>
+
+    <menuitem id="menu_nhs_governance_reporting" name="Reporting" parent="menu_nhs_governance_root" sequence="70"/>
+    <menuitem id="menu_nhs_governance_dashboard" name="Governance Dashboard" parent="menu_nhs_governance_reporting" action="action_nhs_governance_dashboard_meetings" sequence="10"/>
+    <menuitem id="menu_nhs_governance_overdue_actions" name="Overdue Actions" parent="menu_nhs_governance_reporting" action="action_nhs_governance_overdue_actions" sequence="20"/>
+
+    <menuitem id="menu_nhs_governance_config" name="Configuration" parent="menu_nhs_governance_root" groups="group_nhs_gov_manager" sequence="90"/>
+    <menuitem id="menu_nhs_governance_committee_type" name="Committee Types" parent="menu_nhs_governance_config" action="action_nhs_governance_committee_type" sequence="10"/>
+    <menuitem id="menu_nhs_governance_interest_category" name="Interest Categories" parent="menu_nhs_governance_config" action="action_nhs_governance_interest_category" sequence="20"/>
+    <menuitem id="menu_nhs_governance_assurance_line" name="Assurance Lines" parent="menu_nhs_governance_config" action="action_nhs_governance_assurance_line" sequence="30"/>
+    <menuitem id="menu_nhs_governance_settings" name="Settings" parent="menu_nhs_governance_config" action="action_nhs_governance_settings" sequence="40"/>
+</odoo>

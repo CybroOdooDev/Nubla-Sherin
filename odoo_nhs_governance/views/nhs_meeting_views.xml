@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_meeting_calendar" model="ir.ui.view">
+        <field name="name">nhs.meeting.calendar</field>
+        <field name="model">nhs.meeting</field>
+        <field name="arch" type="xml">
+            <calendar date_start="meeting_date" color="committee_id"><field name="name"/><field name="committee_id"/></calendar>
+        </field>
+    </record>
+    <record id="view_nhs_meeting_list" model="ir.ui.view">
+        <field name="name">nhs.meeting.list</field>
+        <field name="model">nhs.meeting</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="state == 'cancelled'" decoration-success="is_quorate">
+                <field name="meeting_date"/>
+                <field name="committee_id"/>
+                <field name="location"/>
+                <field name="state"/>
+                <field name="is_quorate"/>
+                <field name="pack_generated"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_nhs_meeting_form" model="ir.ui.view">
+        <field name="name">nhs.meeting.form</field>
+        <field name="model">nhs.meeting</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_populate_attendance" type="object" string="Populate Attendance" class="btn-secondary"/>
+                    <button name="action_set_agenda" type="object" string="Agenda Set" class="btn-secondary"/>
+                    <button name="action_mark_held" type="object" string="Held" class="btn-secondary"/>
+                    <button name="action_mark_minuted" type="object" string="Minuted" class="btn-secondary"/>
+                    <button name="action_close" type="object" string="Close" class="btn-primary"/>
+                    <button name="action_cancel" type="object" string="Cancel" class="btn-secondary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="scheduled,agenda_set,held,minuted,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group><field name="committee_id"/><field name="meeting_date"/><field name="location"/></group>
+                        <group><field name="is_quorate"/><field name="present_voting_count"/><field name="present_ned_count"/><field name="pack_generated"/><field name="pack_issued_date"/></group>
+                    </group>
+                    <notebook>
+                        <page string="Attendance">
+                            <field name="attendee_ids">
+                                <list editable="bottom"><field name="member_id"/><field name="director_id"/><field name="status"/><field name="note"/></list>
+                            </field>
+                        </page>
+                        <page string="Agenda &amp; Minutes"><field name="agenda_item_ids"/></page>
+                        <page string="Actions"><field name="action_ids"/></page>
+                        <page string="Declarations"><field name="declaration_ids"/></page>
+                        <page string="Overall Minutes"><field name="minutes"/></page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_nhs_meeting" model="ir.actions.act_window">
+        <field name="name">Meetings</field>
+        <field name="res_model">nhs.meeting</field>
+        <field name="view_mode">calendar,list,form</field>
+    </record>
+    <record id="action_nhs_meeting_upcoming" model="ir.actions.act_window">
+        <field name="name">Upcoming Meetings</field>
+        <field name="res_model">nhs.meeting</field>
+        <field name="view_mode">calendar,list,form</field>
+        <field name="domain">[('state', 'in', ('scheduled', 'agenda_set'))]</field>
+    </record>
+</odoo>

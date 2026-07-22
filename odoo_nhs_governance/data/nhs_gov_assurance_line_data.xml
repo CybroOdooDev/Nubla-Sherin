@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+    <record id="assurance_line_first" model="nhs.governance.assurance.line">
+        <field name="name">First Line - Operational Management</field><field name="code">first</field><field name="sequence">1</field>
+    </record>
+    <record id="assurance_line_second" model="nhs.governance.assurance.line">
+        <field name="name">Second Line - Oversight Functions</field><field name="code">second</field><field name="sequence">2</field>
+    </record>
+    <record id="assurance_line_third" model="nhs.governance.assurance.line">
+        <field name="name">Third Line - Independent Assurance</field><field name="code">third</field><field name="sequence">3</field>
+    </record>
+    </data>
+</odoo>

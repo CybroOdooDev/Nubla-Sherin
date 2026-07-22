@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_meeting_action_list" model="ir.ui.view">
+        <field name="name">nhs.meeting.action.list</field>
+        <field name="model">nhs.meeting.action</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="state == 'overdue'" decoration-success="state == 'completed'">
+                <field name="reference"/><field name="name"/><field name="committee_id"/><field name="meeting_id"/><field name="owner_user_id"/><field name="owner_director_id"/><field name="due_date"/><field name="state"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_nhs_meeting_action_form" model="ir.ui.view">
+        <field name="name">nhs.meeting.action.form</field>
+        <field name="model">nhs.meeting.action</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start" type="object" string="Start" class="btn-secondary"/>
+                    <button name="action_complete" type="object" string="Complete" class="btn-primary"/>
+                    <button name="action_defer" type="object" string="Defer" class="btn-secondary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="open,in_progress,completed,deferred,overdue"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group><field name="reference"/><field name="meeting_id"/><field name="agenda_item_id"/><field name="baf_risk_id"/></group>
+                        <group><field name="owner_user_id"/><field name="owner_director_id"/><field name="due_date"/><field name="reported_meeting_id"/></group>
+                    </group>
+                    <field name="completion_note"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_nhs_meeting_action" model="ir.actions.act_window">
+        <field name="name">Action Log</field>
+        <field name="res_model">nhs.meeting.action</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

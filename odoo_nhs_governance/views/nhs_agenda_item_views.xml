@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_agenda_item_list" model="ir.ui.view">
+        <field name="name">nhs.agenda.item.list</field>
+        <field name="model">nhs.agenda.item</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="meeting_id"/>
+                <field name="sequence"/>
+                <field name="item_number"/>
+                <field name="title"/>
+                <field name="purpose"/>
+                <field name="presenter_director_id"/>
+                <field name="is_confidential"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_nhs_agenda_item_form" model="ir.ui.view">
+        <field name="name">nhs.agenda.item.form</field>
+        <field name="model">nhs.agenda.item</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group><field name="meeting_id"/><field name="sequence"/><field name="item_number"/><field name="title"/><field name="purpose"/></group>
+                        <group><field name="presenter_director_id"/><field name="presenter_user_id"/><field name="time_allocation"/><field name="cycle_item_id"/><field name="is_confidential"/></group>
+                    </group>
+                    <notebook>
+                        <page string="Papers"><group><field name="paper_author_id"/><field name="paper_version"/><field name="paper_ids" widget="many2many_binary"/></group></page>
+                        <page string="Minute"><field name="minute_text"/></page>
+                        <page string="Decision"><field name="decision_text"/></page>
+                        <page string="Actions"><field name="action_ids"/></page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_nhs_agenda_item" model="ir.actions.act_window">
+        <field name="name">Agendas &amp; Packs</field>
+        <field name="res_model">nhs.agenda.item</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

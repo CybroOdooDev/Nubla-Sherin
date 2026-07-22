@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="seq_nhs_meeting_action" model="ir.sequence">
+        <field name="name">NHS Meeting Action</field>
+        <field name="code">nhs.meeting.action</field>
+        <field name="prefix">GOV-ACT/%(year)s/</field>
+        <field name="padding">4</field>
+    </record>
+    <record id="seq_nhs_baf_risk" model="ir.sequence">
+        <field name="name">NHS BAF Principal Risk</field>
+        <field name="code">nhs.baf.risk</field>
+        <field name="prefix">BAF/%(year)s/</field>
+        <field name="padding">4</field>
+    </record>
+</odoo>

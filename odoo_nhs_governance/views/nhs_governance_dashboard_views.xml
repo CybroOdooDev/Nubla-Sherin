@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_nhs_governance_dashboard_meetings" model="ir.actions.act_window">
+        <field name="name">Governance Dashboard</field>
+        <field name="res_model">nhs.meeting</field>
+        <field name="view_mode">list,calendar,form</field>
+        <field name="domain">[('state', 'in', ('scheduled', 'agenda_set', 'held'))]</field>
+    </record>
+    <record id="action_nhs_governance_overdue_actions" model="ir.actions.act_window">
+        <field name="name">Overdue Actions</field>
+        <field name="res_model">nhs.meeting.action</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'overdue')]</field>
+    </record>
+    <record id="action_nhs_governance_unreviewed_baf" model="ir.actions.act_window">
+        <field name="name">BAF Risks Needing Review</field>
+        <field name="res_model">nhs.baf.risk</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('last_reviewed', '=', False)]</field>
+    </record>
+</odoo>
