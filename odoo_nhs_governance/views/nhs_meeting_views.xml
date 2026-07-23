@@ -1,71 +1,217 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_nhs_meeting_calendar" model="ir.ui.view">
-        <field name="name">nhs.meeting.calendar</field>
-        <field name="model">nhs.meeting</field>
-        <field name="arch" type="xml">
-            <calendar date_start="meeting_date" color="committee_id"><field name="name"/><field name="committee_id"/></calendar>
-        </field>
-    </record>
-    <record id="view_nhs_meeting_list" model="ir.ui.view">
-        <field name="name">nhs.meeting.list</field>
-        <field name="model">nhs.meeting</field>
-        <field name="arch" type="xml">
-            <list decoration-danger="state == 'cancelled'" decoration-success="is_quorate">
-                <field name="meeting_date"/>
-                <field name="committee_id"/>
-                <field name="location"/>
-                <field name="state"/>
-                <field name="is_quorate"/>
-                <field name="pack_generated"/>
-            </list>
-        </field>
-    </record>
+    <!-- ══ MEETING FORM ═════════════════════════════════════════════ -->
     <record id="view_nhs_meeting_form" model="ir.ui.view">
         <field name="name">nhs.meeting.form</field>
         <field name="model">nhs.meeting</field>
         <field name="arch" type="xml">
-            <form>
+            <form string="Meeting">
                 <header>
-                    <button name="action_populate_attendance" type="object" string="Populate Attendance" class="btn-secondary"/>
-                    <button name="action_set_agenda" type="object" string="Agenda Set" class="btn-secondary"/>
-                    <button name="action_mark_held" type="object" string="Held" class="btn-secondary"/>
-                    <button name="action_mark_minuted" type="object" string="Minuted" class="btn-secondary"/>
-                    <button name="action_close" type="object" string="Close" class="btn-primary"/>
-                    <button name="action_cancel" type="object" string="Cancel" class="btn-secondary"/>
-                    <field name="state" widget="statusbar" statusbar_visible="scheduled,agenda_set,held,minuted,closed"/>
+                    <!-- Buttons appear in the same step-by-step order as the meeting lifecycle:
+                         build agenda -> collate papers / assemble pack -> hold meeting
+                         (attendance, quoracy, declarations) -> minute -> close. Each button is
+                         only visible for the step it belongs to, so only the current step's
+                         action(s) are ever on screen. -->
+                    <button name="action_open_agenda_from_cycle_wizard" string="Populate Agenda From Cycle"
+                            type="object" invisible="state != 'scheduled'"
+                            groups="odoo_nhs_governance.group_nhs_gov_officer"/>
+                    <button name="action_set_agenda" string="Set Agenda" type="object"
+                            class="btn-primary" invisible="state != 'scheduled'"/>
+                    <button name="action_open_board_pack_wizard" string="Assemble Pack" type="object"
+                            class="btn-primary" invisible="state != 'agenda_set'"/>
+                    <button name="action_hold" string="Mark Held" type="object"
+                            invisible="state != 'agenda_set'"/>
+                    <button name="action_minute" string="Mark Minuted" type="object"
+                            class="btn-primary" invisible="state != 'held'"/>
+                    <button name="action_close" string="Close" type="object"
+                            class="btn-primary" invisible="state != 'minuted'"/>
+                    <button name="action_open_board_pack_wizard" string="Re-Assemble Pack" type="object"
+                            invisible="state not in ('held', 'minuted', 'closed')"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ('held', 'minuted', 'closed', 'cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="scheduled,agenda_set,held,minuted,closed"/>
                 </header>
                 <sheet>
-                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <div class="alert alert-danger" role="alert" invisible="is_quorate or state == 'scheduled'">
+                        ⚠ This meeting is INQUORATE — decisions may not be valid.
+                    </div>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_pack" type="object"
+                                class="oe_stat_button" icon="fa-file-pdf-o"
+                                invisible="not pack_generated">
+                            <span class="o_stat_text">View<br/>Pack</span>
+                        </button>
+                        <field name="agenda_item_count" widget="statinfo" string="Agenda Items"
+                               class="oe_stat_button" invisible="1"/>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
                     <group>
-                        <group><field name="committee_id"/><field name="meeting_date"/><field name="location"/></group>
-                        <group><field name="is_quorate"/><field name="present_voting_count"/><field name="present_ned_count"/><field name="pack_generated"/><field name="pack_issued_date"/></group>
+                        <group>
+                            <field name="committee_id"/>
+                            <field name="meeting_date"/>
+                            <field name="location"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="is_quorate" readonly="1"/>
+                            <field name="pack_generated" readonly="1"/>
+                            <field name="cancellation_reason" invisible="state != 'cancelled'"/>
+                        </group>
                     </group>
                     <notebook>
-                        <page string="Attendance">
-                            <field name="attendee_ids">
-                                <list editable="bottom"><field name="member_id"/><field name="director_id"/><field name="status"/><field name="note"/></list>
+                        <!-- Step 1-3: build the agenda, collate papers on each item, assemble the pack. -->
+                        <page string="Agenda &amp; Papers" name="page_agenda">
+                            <field name="agenda_item_ids">
+                                <list editable="bottom">
+                                    <field name="presenter_partner_ids" column_invisible="1"/>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="item_number"/>
+                                    <field name="title"/>
+                                    <field name="purpose"/>
+                                    <field name="presenter_id"/>
+                                    <field name="time_allocation"/>
+                                    <field name="is_confidential"/>
+                                    <field name="cycle_item_id"/>
+                                </list>
+                                <form>
+                                    <group>
+                                        <field name="presenter_partner_ids" invisible="1"/>
+                                        <field name="item_number"/>
+                                        <field name="title"/>
+                                        <field name="purpose"/>
+                                        <field name="presenter_id"/>
+                                        <field name="time_allocation"/>
+                                        <field name="is_confidential"/>
+                                        <field name="cycle_item_id"/>
+                                        <field name="paper_ids" widget="many2many_binary"/>
+                                    </group>
+                                    <group string="Minute &amp; Decision">
+                                        <field name="minute_text" nolabel="1"/>
+                                        <field name="decision_text"/>
+                                        <field name="deferred_to_id"/>
+                                    </group>
+                                </form>
                             </field>
                         </page>
-                        <page string="Agenda &amp; Minutes"><field name="agenda_item_ids"/></page>
-                        <page string="Actions"><field name="action_ids"/></page>
-                        <page string="Declarations"><field name="declaration_ids"/></page>
-                        <page string="Overall Minutes"><field name="minutes"/></page>
+                        <!-- Step 4: hold the meeting - record attendance, quoracy and declarations made. -->
+                        <page string="Attendance" name="page_attendance" invisible="state == 'scheduled'">
+                            <field name="attendee_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="role"/>
+                                    <field name="status"/>
+                                    <field name="voting"/>
+                                    <field name="is_ned"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Declarations" name="page_declarations" invisible="state == 'scheduled'">
+                            <field name="declaration_ids">
+                                <list>
+                                    <field name="partner_id"/>
+                                    <field name="category_id"/>
+                                    <field name="agenda_item_id"/>
+                                    <field name="conflict_management"/>
+                                </list>
+                            </field>
+                        </page>
+                        <!-- Step 5: minutes and decisions, once the meeting has been held. -->
+                        <page string="Minutes" name="page_minutes" invisible="state in ('scheduled', 'agenda_set')">
+                            <field name="minutes"/>
+                        </page>
+                        <!-- Step 6: actions raised, tracked to completion. -->
+                        <page string="Actions" name="page_actions" invisible="state in ('scheduled', 'agenda_set')">
+                            <field name="action_ids">
+                                <list decoration-danger="state == 'overdue'" decoration-success="state == 'completed'">
+                                    <field name="reference"/>
+                                    <field name="name"/>
+                                    <field name="owner_id"/>
+                                    <field name="due_date"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
                     </notebook>
                 </sheet>
                 <chatter/>
             </form>
         </field>
     </record>
+
+    <!-- ══ MEETING LIST ═════════════════════════════════════════════ -->
+    <record id="view_nhs_meeting_list" model="ir.ui.view">
+        <field name="name">nhs.meeting.list</field>
+        <field name="model">nhs.meeting</field>
+        <field name="arch" type="xml">
+            <list string="Meetings" decoration-muted="state == 'cancelled'"
+                  decoration-danger="not is_quorate and state not in ('scheduled', 'cancelled')">
+                <field name="name"/>
+                <field name="committee_id"/>
+                <field name="meeting_date"/>
+                <field name="location"/>
+                <field name="is_quorate"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'closed'"
+                       decoration-info="state in ('scheduled', 'agenda_set')"
+                       decoration-warning="state in ('held', 'minuted')"
+                       decoration-danger="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ══ MEETING CALENDAR ═════════════════════════════════════════ -->
+    <record id="view_nhs_meeting_calendar" model="ir.ui.view">
+        <field name="name">nhs.meeting.calendar</field>
+        <field name="model">nhs.meeting</field>
+        <field name="arch" type="xml">
+            <calendar string="Meetings" date_start="meeting_date" color="committee_id" mode="month">
+                <field name="committee_id"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- ══ MEETING SEARCH ═══════════════════════════════════════════ -->
+    <record id="view_nhs_meeting_search" model="ir.ui.view">
+        <field name="name">nhs.meeting.search</field>
+        <field name="model">nhs.meeting</field>
+        <field name="arch" type="xml">
+            <search string="Search Meetings">
+                <field name="name"/>
+                <field name="committee_id"/>
+                <filter name="upcoming" string="Upcoming"
+                        domain="[('meeting_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('state', '!=', 'cancelled')]"/>
+                <filter name="inquorate" string="Inquorate"
+                        domain="[('is_quorate', '=', False), ('state', 'not in', ('scheduled', 'cancelled'))]"/>
+                <filter name="my_committees" string="My Committees"
+                        domain="[('committee_id.member_ids.user_id', '=', uid)]"/>
+                <group name="group_by">
+                    <filter name="group_committee" string="Committee" context="{'group_by': 'committee_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_month" string="Month" context="{'group_by': 'meeting_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ══ ACTIONS ══════════════════════════════════════════════════ -->
     <record id="action_nhs_meeting" model="ir.actions.act_window">
-        <field name="name">Meetings</field>
+        <field name="name">All Meetings</field>
         <field name="res_model">nhs.meeting</field>
         <field name="view_mode">calendar,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Schedule your first meeting</p>
+        </field>
     </record>
+
     <record id="action_nhs_meeting_upcoming" model="ir.actions.act_window">
         <field name="name">Upcoming Meetings</field>
         <field name="res_model">nhs.meeting</field>
-        <field name="view_mode">calendar,list,form</field>
-        <field name="domain">[('state', 'in', ('scheduled', 'agenda_set'))]</field>
+        <field name="view_mode">list,calendar,form</field>
+        <field name="domain">[('meeting_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('state', '!=', 'cancelled')]</field>
+        <field name="context">{'search_default_group_committee': 1}</field>
     </record>
 </odoo>

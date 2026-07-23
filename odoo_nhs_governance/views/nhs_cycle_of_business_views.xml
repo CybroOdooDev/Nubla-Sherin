@@ -4,19 +4,44 @@
         <field name="name">nhs.cycle.of.business.list</field>
         <field name="model">nhs.cycle.of.business</field>
         <field name="arch" type="xml">
-            <list><field name="committee_id"/><field name="sequence"/><field name="title"/><field name="frequency"/><field name="scheduled_months"/><field name="purpose"/><field name="is_statutory"/></list>
+            <list string="Cycle Of Business" editable="bottom" decoration-warning="is_statutory">
+                <field name="owner_partner_ids" column_invisible="1"/>
+                <field name="committee_id"/>
+                <field name="sequence" widget="handle"/>
+                <field name="title"/>
+                <field name="frequency"/>
+                <field name="scheduled_months" widget="many2many_tags"/>
+                <field name="purpose"/>
+                <field name="owner_id"/>
+                <field name="is_statutory"/>
+            </list>
         </field>
     </record>
-    <record id="view_nhs_cycle_of_business_form" model="ir.ui.view">
-        <field name="name">nhs.cycle.of.business.form</field>
+
+    <record id="view_nhs_cycle_of_business_search" model="ir.ui.view">
+        <field name="name">nhs.cycle.of.business.search</field>
         <field name="model">nhs.cycle.of.business</field>
         <field name="arch" type="xml">
-            <form><sheet><group><field name="committee_id"/><field name="sequence"/><field name="title"/><field name="frequency"/><field name="scheduled_months"/><field name="purpose"/><field name="owner_director_id"/><field name="is_statutory"/></group></sheet></form>
+            <search string="Search Cycle Of Business">
+                <field name="title"/>
+                <field name="committee_id"/>
+                <filter name="statutory" string="Statutory" domain="[('is_statutory', '=', True)]"/>
+                <group name="group_by">
+                    <filter name="group_committee" string="Committee" context="{'group_by': 'committee_id'}"/>
+                    <filter name="group_frequency" string="Frequency" context="{'group_by': 'frequency'}"/>
+                </group>
+            </search>
         </field>
     </record>
+
     <record id="action_nhs_cycle_of_business" model="ir.actions.act_window">
-        <field name="name">Cycle of Business</field>
+        <field name="name">Cycle Of Business</field>
         <field name="res_model">nhs.cycle.of.business</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_group_committee': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define the annual cycle of business</p>
+            <p>Standing items scheduled to specific meetings across the year — nothing statutory gets missed.</p>
+        </field>
     </record>
 </odoo>

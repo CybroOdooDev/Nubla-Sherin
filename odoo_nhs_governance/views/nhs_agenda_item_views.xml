@@ -4,37 +4,69 @@
         <field name="name">nhs.agenda.item.list</field>
         <field name="model">nhs.agenda.item</field>
         <field name="arch" type="xml">
-            <list>
+            <list string="Agenda Items" decoration-info="is_confidential">
+                <field name="presenter_partner_ids" column_invisible="1"/>
                 <field name="meeting_id"/>
-                <field name="sequence"/>
+                <field name="committee_id"/>
                 <field name="item_number"/>
                 <field name="title"/>
                 <field name="purpose"/>
-                <field name="presenter_director_id"/>
+                <field name="presenter_id"/>
                 <field name="is_confidential"/>
             </list>
         </field>
     </record>
+
     <record id="view_nhs_agenda_item_form" model="ir.ui.view">
         <field name="name">nhs.agenda.item.form</field>
         <field name="model">nhs.agenda.item</field>
         <field name="arch" type="xml">
-            <form>
+            <form string="Agenda Item">
                 <sheet>
                     <group>
-                        <group><field name="meeting_id"/><field name="sequence"/><field name="item_number"/><field name="title"/><field name="purpose"/></group>
-                        <group><field name="presenter_director_id"/><field name="presenter_user_id"/><field name="time_allocation"/><field name="cycle_item_id"/><field name="is_confidential"/></group>
+                        <group>
+                            <field name="presenter_partner_ids" invisible="1"/>
+                            <field name="meeting_id"/>
+                            <field name="item_number"/>
+                            <field name="title"/>
+                            <field name="purpose"/>
+                            <field name="presenter_id"/>
+                            <field name="time_allocation"/>
+                            <field name="is_confidential"/>
+                            <field name="cycle_item_id"/>
+                        </group>
+                        <group>
+                            <field name="paper_ids" widget="many2many_binary"/>
+                            <field name="deferred_to_id"/>
+                        </group>
                     </group>
-                    <notebook>
-                        <page string="Papers"><group><field name="paper_author_id"/><field name="paper_version"/><field name="paper_ids" widget="many2many_binary"/></group></page>
-                        <page string="Minute"><field name="minute_text"/></page>
-                        <page string="Decision"><field name="decision_text"/></page>
-                        <page string="Actions"><field name="action_ids"/></page>
-                    </notebook>
+                    <group string="Minute &amp; Decision">
+                        <field name="minute_text" nolabel="1"/>
+                        <field name="decision_text"/>
+                    </group>
                 </sheet>
             </form>
         </field>
     </record>
+
+    <record id="view_nhs_agenda_item_search" model="ir.ui.view">
+        <field name="name">nhs.agenda.item.search</field>
+        <field name="model">nhs.agenda.item</field>
+        <field name="arch" type="xml">
+            <search string="Search Agenda Items">
+                <field name="title"/>
+                <field name="meeting_id"/>
+                <field name="committee_id"/>
+                <filter name="confidential" string="Confidential" domain="[('is_confidential', '=', True)]"/>
+                <filter name="decisions" string="Decisions" domain="[('purpose', '=', 'decision')]"/>
+                <group name="group_by">
+                    <filter name="group_committee" string="Committee" context="{'group_by': 'committee_id'}"/>
+                    <filter name="group_purpose" string="Purpose" context="{'group_by': 'purpose'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <record id="action_nhs_agenda_item" model="ir.actions.act_window">
         <field name="name">Agendas &amp; Packs</field>
         <field name="res_model">nhs.agenda.item</field>

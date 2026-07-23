@@ -1,54 +1,85 @@
 # -*- coding: utf-8 -*-
-from odoo import fields, models
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
+from odoo import api, fields, models
 
 
 class NhsCycleOfBusiness(models.Model):
     _name = 'nhs.cycle.of.business'
-    _description = 'NHS Committee Cycle of Business'
+    _description = 'Cycle of Business — Standing Item'
     _order = 'committee_id, sequence, title'
+    _rec_name = 'title'
 
-    committee_id = fields.Many2one(
-        'nhs.committee',
-        required=True,
-        ondelete='cascade',
-        help="Committee this standing cycle item belongs to.",
-    )
-    company_id = fields.Many2one(
-        related='committee_id.company_id',
-        store=True,
-        help="Owning company inherited from the committee.",
-    )
-    sequence = fields.Integer(default=10, help="Ordering position in the committee cycle of business.")
-    title = fields.Char(required=True, help="Standing item title, for example Annual Accounts or BAF Review.")
+    committee_id = fields.Many2one('nhs.committee', string='Committee', required=True,
+                                   ondelete='cascade', help='The committee this standing item belongs to.')
+    title = fields.Char(string='Standing Item', required=True,
+                        help="The standing item due to come to the committee "
+                             "(e.g. 'Annual Accounts', 'Risk Register Review').")
+    sequence = fields.Integer(string='Sequence', default=10)
     frequency = fields.Selection([
         ('every_meeting', 'Every Meeting'),
-        ('monthly', 'Monthly'),
         ('quarterly', 'Quarterly'),
-        ('annually', 'Annually'),
-    ], default='annually', help="How often this standing item should come to the committee.")
-    scheduled_months = fields.Char(help='Comma-separated month numbers, for example 3,6,9,12.')
+        ('biannual', 'Bi-Annual'),
+        ('annual', 'Annual'),
+    ], string='Frequency', required=True, default='every_meeting',
+       help='How often this standing item comes to the committee.')
+    scheduled_months = fields.Many2many(
+        'nhs.gov.month', 'nhs_cob_month_rel', 'cob_id', 'month_id',
+        string='Scheduled Months',
+        help='Which calendar months this item is due, e.g. March/June/September/December for a '
+             'quarterly item. Used with Quarterly / Bi-Annual / Annual frequency to know which '
+             'specific meetings it should be pulled onto.')
     purpose = fields.Selection([
         ('decision', 'Decision'),
         ('assurance', 'Assurance'),
         ('information', 'Information'),
-        ('discussion', 'Discussion'),
-    ], default='assurance', help="Purpose of the standing item when it is added to an agenda.")
-    owner_director_id = fields.Many2one(
-        'nhs.director',
-        string='Owner / Presenter',
-        help="Director or officer responsible for bringing this item to committee.",
+    ], string='Purpose', default='assurance',
+       help='The default purpose of this standing item when it is pulled onto an agenda.')
+    owner_partner_ids = fields.Many2many(
+        'res.partner', compute='_compute_owner_partner_ids',
+        string='Allowed Owners'
     )
-    is_statutory = fields.Boolean(help="Flags statutory or annual obligations on the governance calendar.")
-    active = fields.Boolean(default=True, help="Archive flag for standing items no longer in the cycle.")
+    owner_id = fields.Many2one(
+        'res.partner', string='Item Owner',
+        domain="[('id', 'in', owner_partner_ids)]",
+        help='The item owner/presenter responsible for bringing this item.'
+    )
 
-    def is_due_for_meeting(self, meeting):
+    @api.depends('committee_id', 'committee_id.member_ids.partner_id')
+    def _compute_owner_partner_ids(self):
+        for rec in self:
+            if rec.committee_id and rec.committee_id.member_ids:
+                rec.owner_partner_ids = rec.committee_id.member_ids.mapped('partner_id')
+            else:
+                rec.owner_partner_ids = self.env['res.partner'].search([])
+    is_statutory = fields.Boolean(string='Statutory / Mandatory', default=False,
+                                  help='Flags this as a statutory or mandatory annual obligation '
+                                       '(shown on the governance calendar so nothing mandatory is missed).')
+    active = fields.Boolean(string='Active', default=True, help='Archive flag.')
+
+    def is_due_for_month(self, month):
+        """Whether this standing item is due for the given calendar month (1-12)."""
         self.ensure_one()
-        if self.frequency in ('every_meeting', 'monthly'):
+        if self.frequency == 'every_meeting':
             return True
-        if not meeting.meeting_date:
+        if not self.scheduled_months:
             return False
-        meeting_month = fields.Datetime.context_timestamp(meeting, meeting.meeting_date).month
-        months = [int(month.strip()) for month in (self.scheduled_months or '').split(',') if month.strip().isdigit()]
-        if months:
-            return meeting_month in months
-        return self.frequency == 'quarterly' and meeting_month in (3, 6, 9, 12)
+        return month in self.scheduled_months.mapped('code')

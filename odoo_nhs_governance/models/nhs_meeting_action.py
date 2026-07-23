@@ -1,91 +1,130 @@
 # -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 
 class NhsMeetingAction(models.Model):
     _name = 'nhs.meeting.action'
+    _description = 'Meeting Action (reuses the CAPA action pattern for governance actions)'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _description = 'NHS Meeting Action'
     _order = 'due_date, id'
 
-    name = fields.Char(required=True, tracking=True, help="Action description arising from a meeting or BAF gap.")
-    reference = fields.Char(
-        default='New',
-        copy=False,
-        readonly=True,
-        help="Sequenced action reference used in the committee action log.",
-    )
-    meeting_id = fields.Many2one(
-        'nhs.meeting',
-        required=True,
-        ondelete='cascade',
-        help="Source meeting where the action was raised.",
-    )
-    committee_id = fields.Many2one(
-        related='meeting_id.committee_id',
-        store=True,
-        help="Committee inherited from the source meeting for action-log grouping.",
-    )
-    company_id = fields.Many2one(
-        related='meeting_id.company_id',
-        store=True,
-        help="Owning company inherited from the source meeting.",
-    )
-    agenda_item_id = fields.Many2one(
-        'nhs.agenda.item',
-        help="Agenda item that generated the action.",
-    )
-    baf_risk_id = fields.Many2one(
-        'nhs.baf.risk',
-        string='BAF Risk',
-        help="Principal BAF risk this action helps close, usually for a control or assurance gap.",
-    )
-    owner_user_id = fields.Many2one(
-        'res.users',
-        string='Owner User',
-        tracking=True,
-        help="Odoo user responsible for completing the action.",
-    )
-    owner_director_id = fields.Many2one(
-        'nhs.director',
-        string='Owner Director',
-        tracking=True,
-        help="Director or officer responsible for completing the action.",
-    )
-    due_date = fields.Date(required=True, tracking=True, help="Deadline for completing the action.")
+    name = fields.Char(string='Action Description', required=True, help='The action description.')
+    reference = fields.Char(string='Reference', readonly=True, copy=False, default='New',
+                            help='Auto-generated unique reference (e.g. GOV-ACT/2026/00001).')
+    meeting_id = fields.Many2one('nhs.meeting', string='Source Meeting', ondelete='cascade',
+                                 help='The meeting this action was raised from, if raised at a meeting.')
+    baf_risk_id = fields.Many2one('nhs.baf.risk', string='BAF Gap', ondelete='cascade',
+                                  help='The BAF principal risk this action closes a control/assurance '
+                                       'gap for, if raised directly from a BAF review rather than a meeting.')
+    committee_id = fields.Many2one('nhs.committee', string='Committee', compute='_compute_committee_id',
+                                   store=True, help='For the committee action log.')
+    agenda_item_id = fields.Many2one('nhs.agenda.item', string='Source Item',
+                                     domain="[('meeting_id', '=', meeting_id)]",
+                                     help='The agenda item this action arose from.')
+    owner_id = fields.Many2one('res.users', string='Owner', required=True,
+                               default=lambda self: self.env.user, tracking=True,
+                               help='The person responsible for completing this action.')
+    due_date = fields.Date(string='Due Date', required=True, tracking=True, help='Deadline for this action.')
     state = fields.Selection([
         ('open', 'Open'),
         ('in_progress', 'In Progress'),
         ('completed', 'Completed'),
         ('deferred', 'Deferred'),
         ('overdue', 'Overdue'),
-    ], default='open', tracking=True, help="Action workflow status, including automatic overdue marking.")
-    completion_note = fields.Text(help="Closure note explaining how the action was completed.")
-    reported_meeting_id = fields.Many2one(
-        'nhs.meeting',
-        string='Reported At',
-        help="Meeting where completion was reported as matters arising.",
-    )
-    active = fields.Boolean(default=True, help="Archive flag; actions are archived rather than hard-deleted.")
+    ], string='Status', default='open', required=True, tracking=True,
+       help='Open / In Progress / Completed / Deferred / Overdue. The Overdue state is set '
+            'automatically by the daily escalation cron once the due date passes.')
+    completion_note = fields.Text(string='Completion Note', help='How this action was closed.')
+    reported_meeting_id = fields.Many2one('nhs.meeting', string='Reported To Meeting',
+                                          help='The meeting where completion of this action was reported '
+                                               '(matters arising).')
+    company_id = fields.Many2one('res.company', string='Company', required=True,
+                                 default=lambda self: self.env.company)
+
+    @api.constrains('meeting_id', 'baf_risk_id')
+    def _check_parent(self):
+        for rec in self:
+            if not rec.meeting_id and not rec.baf_risk_id:
+                raise UserError('A governance action must be linked to either a meeting or a BAF gap.')
+
+    @api.depends('meeting_id.committee_id', 'baf_risk_id.owning_committee_id')
+    def _compute_committee_id(self):
+        for rec in self:
+            rec.committee_id = rec.meeting_id.committee_id or rec.baf_risk_id.owning_committee_id
 
     @api.model_create_multi
     def create(self, vals_list):
+        seq = self.env['ir.sequence']
         for vals in vals_list:
             if vals.get('reference', 'New') == 'New':
-                vals['reference'] = self.env['ir.sequence'].next_by_code('nhs.meeting.action') or 'New'
-        return super().create(vals_list)
-
-    def action_refresh_overdue_status(self):
-        today = fields.Date.context_today(self)
-        for rec in self:
-            if rec.state not in ('completed', 'deferred') and rec.due_date and rec.due_date < today:
-                rec.state = 'overdue'
+                vals['reference'] = seq.next_by_code('nhs.meeting.action') or 'New'
+        records = super().create(vals_list)
+        records._check_parent()
+        for rec in records:
+            rec.activity_schedule('mail.mail_activity_data_todo', user_id=rec.owner_id.id,
+                                  note=f'Governance action assigned: {rec.name}')
+        return records
 
     def action_start(self):
         self.write({'state': 'in_progress'})
 
     def action_complete(self):
+        for rec in self:
+            if not rec.completion_note:
+                raise UserError('Please enter a completion note before marking this action complete.')
         self.write({'state': 'completed'})
 
     def action_defer(self):
         self.write({'state': 'deferred'})
+
+    def action_report_to_next_meeting(self):
+        for rec in self:
+            if not rec.meeting_id or not rec.committee_id:
+                continue
+            next_meeting = self.env['nhs.meeting'].search([
+                ('committee_id', '=', rec.committee_id.id),
+                ('meeting_date', '>', rec.meeting_id.meeting_date),
+                ('state', 'not in', ['cancelled']),
+            ], order='meeting_date', limit=1)
+            if next_meeting:
+                rec.reported_meeting_id = next_meeting.id
+
+    @api.model
+    def _cron_action_escalation(self):
+        """Overdue-action escalation to the committee chair / secretary."""
+        today = fields.Date.today()
+        actions = self.search([
+            ('state', 'not in', ['completed', 'deferred']),
+            ('due_date', '<', today),
+        ])
+        for action in actions:
+            days_over = (today - action.due_date).days
+            if action.state != 'overdue':
+                action.state = 'overdue'
+            recipients = action.committee_id.member_ids.filtered(
+                lambda m: m.role in ('chair', 'secretary')).mapped('user_id')
+            for user in recipients or action.owner_id:
+                action.activity_schedule(
+                    'mail.mail_activity_data_todo', user_id=user.id,
+                    note=f'Governance action OVERDUE by {days_over} days: {action.name}')

@@ -1,57 +1,227 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_nhs_baf_objective_list" model="ir.ui.view">
-        <field name="name">nhs.baf.objective.list</field>
-        <field name="model">nhs.baf.objective</field>
-        <field name="arch" type="xml"><list><field name="code"/><field name="name"/><field name="lead_director_id"/><field name="company_id"/></list></field>
-    </record>
+    <!-- ══ BAF OBJECTIVE ════════════════════════════════════════════ -->
     <record id="view_nhs_baf_objective_form" model="ir.ui.view">
         <field name="name">nhs.baf.objective.form</field>
         <field name="model">nhs.baf.objective</field>
         <field name="arch" type="xml">
-            <form><sheet><group><field name="code"/><field name="name"/><field name="lead_director_id"/><field name="company_id" groups="base.group_multi_company"/></group><notebook><page string="Principal Risks"><field name="risk_ids"/></page></notebook></sheet><chatter/></form>
-        </field>
-    </record>
-    <record id="view_nhs_baf_risk_list" model="ir.ui.view">
-        <field name="name">nhs.baf.risk.list</field>
-        <field name="model">nhs.baf.risk</field>
-        <field name="arch" type="xml">
-            <list decoration-danger="rag_status == 'red'" decoration-warning="rag_status == 'amber'" decoration-success="rag_status == 'green'">
-                <field name="reference"/><field name="name"/><field name="objective_id"/><field name="owning_committee_id"/><field name="current_score"/><field name="target_score"/><field name="assurance_rating"/><field name="last_reviewed"/>
-            </list>
-        </field>
-    </record>
-    <record id="view_nhs_baf_risk_form" model="ir.ui.view">
-        <field name="name">nhs.baf.risk.form</field>
-        <field name="model">nhs.baf.risk</field>
-        <field name="arch" type="xml">
-            <form>
-                <header><button name="action_review_today" type="object" string="Review Today" class="btn-primary"/></header>
+            <form string="Strategic Objective">
                 <sheet>
-                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_risks" type="object"
+                                class="oe_stat_button" icon="fa-shield">
+                            <field name="risk_count" widget="statinfo" string="Principal Risks"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Deliver safe, high-quality care"/></h1>
+                    </div>
                     <group>
-                        <group><field name="reference"/><field name="objective_id"/><field name="owning_committee_id"/><field name="lead_director_id"/><field name="operational_risk_ref"/></group>
-                        <group><field name="consequence"/><field name="likelihood"/><field name="current_score"/><field name="target_consequence"/><field name="target_likelihood"/><field name="target_score"/><field name="rag_status"/><field name="assurance_rating"/><field name="last_reviewed"/></group>
+                        <group>
+                            <field name="code"/>
+                            <field name="lead_partner_id"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="highest_current_score" readonly="1"/>
+                        </group>
                     </group>
                     <notebook>
-                        <page string="Controls"><field name="controls"/></page>
-                        <page string="Assurances"><field name="assurance_ids"/></page>
-                        <page string="Gaps"><group><field name="control_gaps"/><field name="assurance_gaps"/></group></page>
-                        <page string="Gap Actions"><field name="gap_action_ids"/></page>
+                        <page string="Principal Risks">
+                            <field name="risk_ids">
+                                <list decoration-danger="current_band == 'extreme'"
+                                      decoration-warning="current_band == 'high'">
+                                    <field name="reference"/>
+                                    <field name="name"/>
+                                    <field name="owning_committee_id"/>
+                                    <field name="current_score"/>
+                                    <field name="current_band"/>
+                                    <field name="assurance_rating"/>
+                                    <field name="last_reviewed"/>
+                                </list>
+                            </field>
+                        </page>
                     </notebook>
                 </sheet>
                 <chatter/>
             </form>
         </field>
     </record>
+
+    <record id="view_nhs_baf_objective_list" model="ir.ui.view">
+        <field name="name">nhs.baf.objective.list</field>
+        <field name="model">nhs.baf.objective</field>
+        <field name="arch" type="xml">
+            <list string="Strategic Objectives">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="lead_partner_id"/>
+                <field name="risk_count"/>
+                <field name="highest_current_score"/>
+            </list>
+        </field>
+    </record>
+
     <record id="action_nhs_baf_objective" model="ir.actions.act_window">
         <field name="name">Strategic Objectives</field>
         <field name="res_model">nhs.baf.objective</field>
         <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Set the board's strategic objectives</p>
+            <p>Then add the principal risks that threaten each one to build the BAF.</p>
+        </field>
     </record>
+
+    <!-- ══ BAF PRINCIPAL RISK ═══════════════════════════════════════ -->
+    <record id="view_nhs_baf_risk_form" model="ir.ui.view">
+        <field name="name">nhs.baf.risk.form</field>
+        <field name="model">nhs.baf.risk</field>
+        <field name="arch" type="xml">
+            <form string="Principal Risk (BAF)">
+                <header>
+                    <button name="action_mark_reviewed" string="Mark Reviewed" type="object" class="btn-primary"/>
+                    <button name="action_view_operational_risk" string="View Operational Risk" type="object"
+                            invisible="not operational_risk_ref"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="reference" readonly="1"/></h1>
+                        <h2><field name="name" placeholder="Principal risk description"/></h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="objective_id"/>
+                            <field name="owning_committee_id"/>
+                            <field name="lead_partner_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="consequence"/>
+                            <field name="likelihood"/>
+                            <field name="current_score" readonly="1"/>
+                            <field name="current_band" readonly="1" widget="badge"
+                                   decoration-success="current_band == 'low'"
+                                   decoration-warning="current_band in ('moderate', 'high')"
+                                   decoration-danger="current_band == 'extreme'"/>
+                            <field name="target_score"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="assurance_rating" widget="badge"
+                               decoration-success="assurance_rating == 'sufficient'"
+                               decoration-warning="assurance_rating == 'partial'"
+                               decoration-danger="assurance_rating == 'insufficient'"/>
+                        <field name="last_reviewed"/>
+                        <field name="operational_risk_ref"/>
+                    </group>
+                    <notebook>
+                        <page string="Controls">
+                            <field name="controls" nolabel="1"/>
+                        </page>
+                        <page string="Assurances">
+                            <field name="assurance_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="line_of_defence_id"/>
+                                    <field name="source"/>
+                                    <field name="rating"/>
+                                    <field name="date"/>
+                                    <field name="attachment_ids" widget="many2many_binary"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Gaps &amp; Actions">
+                            <group>
+                                <field name="control_gaps"/>
+                                <field name="assurance_gaps"/>
+                            </group>
+                            <field name="gap_action_ids">
+                                <list decoration-danger="state == 'overdue'" decoration-success="state == 'completed'">
+                                    <field name="reference"/>
+                                    <field name="name"/>
+                                    <field name="owner_id"/>
+                                    <field name="due_date"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_baf_risk_list" model="ir.ui.view">
+        <field name="name">nhs.baf.risk.list</field>
+        <field name="model">nhs.baf.risk</field>
+        <field name="arch" type="xml">
+            <list string="Principal Risks" decoration-danger="current_band == 'extreme'"
+                  decoration-warning="current_band == 'high'">
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="objective_id"/>
+                <field name="owning_committee_id"/>
+                <field name="consequence"/>
+                <field name="likelihood"/>
+                <field name="current_score"/>
+                <field name="current_band" widget="badge"/>
+                <field name="assurance_rating"/>
+                <field name="last_reviewed"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_baf_risk_search" model="ir.ui.view">
+        <field name="name">nhs.baf.risk.search</field>
+        <field name="model">nhs.baf.risk</field>
+        <field name="arch" type="xml">
+            <search string="Search Principal Risks">
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="objective_id"/>
+                <field name="owning_committee_id"/>
+                <filter name="extreme" string="Extreme" domain="[('current_band', '=', 'extreme')]"/>
+                <filter name="high" string="High" domain="[('current_band', '=', 'high')]"/>
+                <filter name="unreviewed" string="Never Reviewed" domain="[('last_reviewed', '=', False)]"/>
+                <group name="group_by">
+                    <filter name="group_objective" string="Objective" context="{'group_by': 'objective_id'}"/>
+                    <filter name="group_committee" string="Committee" context="{'group_by': 'owning_committee_id'}"/>
+                    <filter name="group_band" string="Band" context="{'group_by': 'current_band'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_nhs_baf_risk_pivot" model="ir.ui.view">
+        <field name="name">nhs.baf.risk.pivot</field>
+        <field name="model">nhs.baf.risk</field>
+        <field name="arch" type="xml">
+            <pivot string="BAF Heatmap">
+                <field name="consequence" type="row"/>
+                <field name="likelihood" type="col"/>
+                <field name="current_score" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
     <record id="action_nhs_baf_risk" model="ir.actions.act_window">
         <field name="name">Principal Risks (BAF)</field>
         <field name="res_model">nhs.baf.risk</field>
         <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No principal risks yet</p>
+            <p>Add a principal risk under a strategic objective: controls → assurances → gaps → actions.</p>
+        </field>
+    </record>
+
+    <record id="action_nhs_baf_heatmap" model="ir.actions.act_window">
+        <field name="name">BAF Heatmap</field>
+        <field name="res_model">nhs.baf.risk</field>
+        <field name="view_mode">pivot,list,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'pivot', 'view_id': ref('view_nhs_baf_risk_pivot')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_nhs_baf_risk_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_nhs_baf_risk_form')})]"/>
     </record>
 </odoo>

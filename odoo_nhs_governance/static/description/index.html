@@ -1,11 +1,132 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>NHS Governance Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+    <style>
+        body { font-family: "Montserrat", sans-serif; background-color: #f4f6fa; color: #17223a; }
+        .navy { background-color: #102a4a; color: #ffffff; }
+        .gold { color: #c6a24a; }
+        .feature-card { border: 1px solid #e5e9f0; border-radius: 10px; padding: 24px; height: 100%; background: #ffffff; }
+        .feature-card i { color: #102a4a; font-size: 1.6rem; margin-bottom: 10px; }
+        .section-title { font-weight: 700; color: #102a4a; }
+        .pill { display:inline-block; background:#102a4a; color:#fff; border-radius:50px; padding:6px 16px; font-size:0.85rem; margin:3px; }
+    </style>
+</head>
+
 <body>
-<section>
-    <h1>NHS Governance Management</h1>
-    <p>Board and committee governance for NHS organisations, including meeting cycles,
-        agendas, papers, minutes, actions, declarations of interest and the Board
-        Assurance Framework.</p>
-</section>
+
+<div class="navy text-center py-5">
+    <img src="banner.jpg" alt="NHS Governance Management" style="max-width:100%; border-radius: 8px;"/>
+</div>
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="section-title">NHS Governance Management</h1>
+        <p class="lead">Board &amp; committee management, meeting cycles, actions, declarations of interest
+            and the Board Assurance Framework — the corporate-governance layer of the NHS suite.</p>
+        <span class="pill">Odoo 19.0</span>
+        <span class="pill">Healthcare / NHS</span>
+        <span class="pill">Board &amp; Committee Governance</span>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <p>Built for the Company Secretary's office: run the committee structure and Terms of
+               Reference, the meeting cycle (agendas, papers, minutes), the actions arising, declarations
+               of interest, and the Board Assurance Framework (BAF) that links strategic risks to their
+               controls and assurances — one integrated governance record instead of a pack tool plus a
+               pile of spreadsheets.</p>
+        </div>
+    </div>
+
+    <h2 class="section-title text-center mb-4">Key Features</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card">
+                <i class="fa-solid fa-sitemap"></i>
+                <h5>Committee &amp; Board Register</h5>
+                <p>Board → committee → sub-committee/group hierarchy, Terms of Reference, membership,
+                   quorum rules and meeting frequency, all with ToR-review reminders.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <i class="fa-solid fa-calendar-days"></i>
+                <h5>Meeting Cycle Management</h5>
+                <p>Generate recurring meeting series, build agendas from the annual cycle of business,
+                   capture attendance with a live quoracy indicator, and assemble the full board pack.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <i class="fa-solid fa-list-check"></i>
+                <h5>Actions &amp; Matters Arising</h5>
+                <p>Decisions and actions from every meeting, tracked to completion with owners, due
+                   dates, overdue escalation and reporting back to the next meeting.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <i class="fa-solid fa-scale-balanced"></i>
+                <h5>Declarations of Interest</h5>
+                <p>A register per member — on appointment, annual refresh and at-meeting declarations —
+                   with conflict management and a curated published register output.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <i class="fa-solid fa-shield-halved"></i>
+                <h5>Board Assurance Framework</h5>
+                <p>Strategic objectives → principal risks → controls → assurances (three lines of
+                   defence) → gaps → actions, RAG-scored on the same 5×5 matrix used across the suite.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <i class="fa-solid fa-gauge-high"></i>
+                <h5>Governance Dashboard &amp; Calendar</h5>
+                <p>Upcoming meetings, overdue actions, DoI refreshes due, ToR reviews due and un-reviewed
+                   BAF risks — plus the annual cycle of business across every committee.</p>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="section-title text-center my-5">Reports</h2>
+    <div class="row g-3 text-center">
+        <div class="col-md-3"><div class="pill" style="display:block;">Board Pack (PDF)</div></div>
+        <div class="col-md-3"><div class="pill" style="display:block;">BAF Report (PDF)</div></div>
+        <div class="col-md-3"><div class="pill" style="display:block;">DoI Register (PDF)</div></div>
+        <div class="col-md-3"><div class="pill" style="display:block;">Action Log (PDF)</div></div>
+    </div>
+
+    <h2 class="section-title text-center my-5">Fits The Nubla NHS Suite</h2>
+    <div class="row">
+        <div class="col-lg-8 mx-auto text-center">
+            <p>Depends on <strong>NHS Trust Management</strong> for the organisation and director
+               structure, and soft-links to <strong>NHS Incident &amp; Risk</strong> so the BAF can
+               reference the real operational risk register where that module is installed — an
+               optional link, never a hard dependency.</p>
+        </div>
+    </div>
+
+    <hr class="my-5"/>
+    <div class="text-center">
+        <h4 class="section-title">Cybrosys Techno Solutions</h4>
+        <p>
+            <a href="https://www.cybrosys.com">www.cybrosys.com</a> &middot;
+            support@cybrosys.com
+        </p>
+    </div>
+</div>
+
 </body>
 </html>

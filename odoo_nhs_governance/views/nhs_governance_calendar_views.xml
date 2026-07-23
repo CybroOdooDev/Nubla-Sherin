@@ -1,8 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Governance calendar: all meetings, ToR reviews, DoI refreshes and statutory cycle items
+         across the year. Meetings are the primary calendar surface; ToR reviews, DoI refreshes and
+         statutory cycle-of-business items are reached from this same menu as pre-filtered lists. -->
     <record id="action_nhs_governance_calendar" model="ir.actions.act_window">
         <field name="name">Governance Calendar</field>
         <field name="res_model">nhs.meeting</field>
         <field name="view_mode">calendar,list,form</field>
+        <field name="domain">[('state', '!=', 'cancelled')]</field>
+        <field name="help" type="html">
+            <p>Meetings, ToR reviews, DoI refreshes and statutory cycle items across the year.</p>
+        </field>
+    </record>
+
+    <record id="action_nhs_governance_tor_due" model="ir.actions.act_window">
+        <field name="name">Terms of Reference Reviews Due</field>
+        <field name="res_model">nhs.committee</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('tor_review_date', '!=', False), ('tor_review_date', '&lt;=', context_today().strftime('%Y-%m-%d')), ('state', '=', 'active')]</field>
+    </record>
+
+    <record id="action_nhs_governance_statutory_items" model="ir.actions.act_window">
+        <field name="name">Statutory Cycle Items</field>
+        <field name="res_model">nhs.cycle.of.business</field>
+        <field name="view_mode">list</field>
+        <field name="domain">[('is_statutory', '=', True)]</field>
+        <field name="context">{'search_default_group_committee': 1}</field>
     </record>
 </odoo>

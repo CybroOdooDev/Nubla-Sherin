@@ -1,56 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_nhs_governance_committee_type_list" model="ir.ui.view">
-        <field name="name">nhs.governance.committee.type.list</field>
-        <field name="model">nhs.governance.committee.type</field>
-        <field name="arch" type="xml"><list editable="bottom"><field name="sequence"/><field name="name"/><field name="code"/><field name="active"/></list></field>
+    <!-- ══ COMMITTEE TYPE ═══════════════════════════════════════════ -->
+    <record id="view_nhs_committee_type_list" model="ir.ui.view">
+        <field name="name">nhs.committee.type.list</field>
+        <field name="model">nhs.committee.type</field>
+        <field name="arch" type="xml">
+            <list string="Committee Types" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active"/>
+            </list>
+        </field>
     </record>
-    <record id="action_nhs_governance_committee_type" model="ir.actions.act_window">
+
+    <record id="action_nhs_committee_type" model="ir.actions.act_window">
         <field name="name">Committee Types</field>
-        <field name="res_model">nhs.governance.committee.type</field>
+        <field name="res_model">nhs.committee.type</field>
         <field name="view_mode">list,form</field>
     </record>
-    <record id="view_nhs_governance_interest_category_list" model="ir.ui.view">
-        <field name="name">nhs.governance.interest.category.list</field>
-        <field name="model">nhs.governance.interest.category</field>
-        <field name="arch" type="xml"><list editable="bottom"><field name="sequence"/><field name="name"/><field name="code"/><field name="active"/></list></field>
+
+    <!-- ══ INTEREST CATEGORY ════════════════════════════════════════ -->
+    <record id="view_nhs_gov_interest_category_list" model="ir.ui.view">
+        <field name="name">nhs.gov.interest.category.list</field>
+        <field name="model">nhs.gov.interest.category</field>
+        <field name="arch" type="xml">
+            <list string="Interest Categories" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active"/>
+            </list>
+        </field>
     </record>
-    <record id="action_nhs_governance_interest_category" model="ir.actions.act_window">
+
+    <record id="action_nhs_gov_interest_category" model="ir.actions.act_window">
         <field name="name">Interest Categories</field>
-        <field name="res_model">nhs.governance.interest.category</field>
+        <field name="res_model">nhs.gov.interest.category</field>
         <field name="view_mode">list,form</field>
     </record>
-    <record id="view_nhs_governance_assurance_line_list" model="ir.ui.view">
-        <field name="name">nhs.governance.assurance.line.list</field>
-        <field name="model">nhs.governance.assurance.line</field>
-        <field name="arch" type="xml"><list editable="bottom"><field name="sequence"/><field name="name"/><field name="code"/><field name="active"/></list></field>
+
+    <!-- ══ ASSURANCE LINE ═══════════════════════════════════════════ -->
+    <record id="view_nhs_gov_assurance_line_list" model="ir.ui.view">
+        <field name="name">nhs.gov.assurance.line.list</field>
+        <field name="model">nhs.gov.assurance.line</field>
+        <field name="arch" type="xml">
+            <list string="Assurance Lines" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active"/>
+            </list>
+        </field>
     </record>
-    <record id="action_nhs_governance_assurance_line" model="ir.actions.act_window">
+
+    <record id="action_nhs_gov_assurance_line" model="ir.actions.act_window">
         <field name="name">Assurance Lines</field>
-        <field name="res_model">nhs.governance.assurance.line</field>
+        <field name="res_model">nhs.gov.assurance.line</field>
         <field name="view_mode">list,form</field>
     </record>
-    <record id="res_config_settings_view_form_nhs_governance" model="ir.ui.view">
-        <field name="name">res.config.settings.view.form.nhs.governance</field>
+
+    <!-- ══ SETTINGS ═════════════════════════════════════════════════ -->
+    <record id="view_nhs_governance_config_settings" model="ir.ui.view">
+        <field name="name">nhs.governance.config.settings</field>
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
-                <app data-string="NHS Governance" string="NHS Governance" name="nhs_governance">
-                    <block title="Reminder Lead Times">
-                        <setting string="ToR Review"><field name="nhs_gov_tor_review_lead_days"/></setting>
-                        <setting string="DoI Refresh"><field name="nhs_gov_doi_refresh_lead_days"/></setting>
-                        <setting string="Action Due"><field name="nhs_gov_action_due_lead_days"/></setting>
+                <app string="Governance" name="odoo_nhs_governance"
+                     groups="odoo_nhs_governance.group_nhs_gov_manager">
+                    <block title="Reminders">
+                        <setting string="ToR Review Reminder"
+                                 help="Days before a Terms of Reference review date to raise a reminder">
+                            <field name="gov_tor_review_lead_days"/>
+                        </setting>
+                        <setting string="DoI Annual Refresh Reminder"
+                                 help="Days before the annual DoI refresh anniversary to remind members">
+                            <field name="gov_doi_refresh_lead_days"/>
+                        </setting>
+                        <setting string="Action Due Reminder"
+                                 help="Days before an action due date to raise an escalation warning">
+                            <field name="gov_action_due_lead_days"/>
+                        </setting>
+                    </block>
+                    <block title="Integration">
+                        <setting string="NHS Incident &amp; Risk"
+                                 help="When installed, BAF principal risks can link to operational risks and corporate-tier risks are surfaced automatically.">
+                            <field name="gov_incident_risk_installed" readonly="1"/>
+                        </setting>
                     </block>
                 </app>
             </xpath>
         </field>
     </record>
+
     <record id="action_nhs_governance_settings" model="ir.actions.act_window">
         <field name="name">Settings</field>
         <field name="res_model">res.config.settings</field>
         <field name="view_mode">form</field>
-        <field name="target">current</field>
-        <field name="context">{'module': 'odoo_nhs_governance'}</field>
+        <field name="context">{'module': 'odoo_nhs_governance', 'bin_size': False}</field>
     </record>
 </odoo>
