@@ -26,6 +26,7 @@ class NhsAgendaItem(models.Model):
     _name = 'nhs.agenda.item'
     _description = 'Agenda Item & Paper'
     _order = 'meeting_id, sequence, id'
+    _rec_name = 'title'
 
     meeting_id = fields.Many2one('nhs.meeting', string='Meeting', required=True,
                                  ondelete='cascade', help='Owning meeting.')
@@ -69,10 +70,21 @@ class NhsAgendaItem(models.Model):
     decision_text = fields.Text(string='Decision / Resolution', help='The formal decision or resolution made.')
     deferred_to_id = fields.Many2one('nhs.meeting', string='Deferred To',
                                      help='If this item was carried forward, the meeting it moved to.')
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('completed', 'Completed'),
+        ('deferred', 'Deferred'),
+    ], string='Status', default='draft', required=True)
     active = fields.Boolean(string='Active', default=True, help='Archive flag.')
+
+    @api.onchange('deferred_to_id')
+    def _onchange_deferred_to_id(self):
+        if self.deferred_to_id:
+            self.state = 'deferred'
 
     def action_defer_to_next(self):
         for rec in self:
+            rec.state = 'deferred'
             next_meeting = self.env['nhs.meeting'].search([
                 ('committee_id', '=', rec.committee_id.id),
                 ('meeting_date', '>', rec.meeting_id.meeting_date),

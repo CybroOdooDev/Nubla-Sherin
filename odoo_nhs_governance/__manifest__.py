@@ -40,9 +40,6 @@
         'base',
         'mail',
         'odoo_nhs_trust_management',
-        # Optional soft integration with odoo_nhs_incident_risk (BAF <-> risk register)
-        # is handled at runtime (via ir.module.module state checks and a Reference/Char
-        # link field) if that module is installed; it is NOT a hard dependency.
     ],
     'data': [
         'security/nhs_governance_security.xml',
@@ -74,6 +71,13 @@
         'report/nhs_action_log_report.xml',
         'views/nhs_governance_menus.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'odoo_nhs_governance/static/src/dashboard/governance_dashboard.js',
+            'odoo_nhs_governance/static/src/dashboard/governance_dashboard.xml',
+            'odoo_nhs_governance/static/src/dashboard/governance_dashboard.scss',
+        ],
+    },
     'images': ['static/description/banner.jpg'],
     'application': True,
     'installable': True,

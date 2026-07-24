@@ -35,11 +35,13 @@ class ReportBoardPack(models.AbstractModel):
         if isinstance(docids, int):
             docids = [docids]
         docs = self.env['nhs.meeting'].browse(docids) if docids else self.env['nhs.meeting']
+        if not docs:
+            docs = self.env['nhs.meeting'].search([('state', '!=', 'cancelled')], limit=1, order='meeting_date desc') or self.env['nhs.meeting'].search([], limit=1)
         include_confidential = bool(
             (data or {}).get('include_confidential') or self.env.context.get('include_confidential')
         )
         return {
-            'doc_ids': docids,
+            'doc_ids': docs.ids,
             'doc_model': 'nhs.meeting',
             'docs': docs,
             'include_confidential': include_confidential,

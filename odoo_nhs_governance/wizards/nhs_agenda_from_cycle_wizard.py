@@ -37,9 +37,11 @@ class NhsAgendaFromCycleWizard(models.TransientModel):
         due_items = meeting.committee_id.cycle_item_ids.filtered(
             lambda item: item.active and item not in existing_cycle_items and item.is_due_for_month(month))
         sequence = (max(meeting.agenda_item_ids.mapped('sequence')) + 10) if meeting.agenda_item_ids else 10
+        item_no = len(meeting.agenda_item_ids) + 1
         for item in due_items:
             self.env['nhs.agenda.item'].create({
                 'meeting_id': meeting.id,
+                'item_number': str(item_no),
                 'title': item.title,
                 'purpose': item.purpose,
                 'presenter_id': item.owner_id.id,
@@ -47,6 +49,7 @@ class NhsAgendaFromCycleWizard(models.TransientModel):
                 'sequence': sequence,
             })
             sequence += 10
+            item_no += 1
         if meeting.state == 'scheduled':
             meeting.action_set_agenda()
         return {'type': 'ir.actions.act_window_close'}

@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Governance dashboard: upcoming meetings, overdue actions, DoI refreshes due,
-         ToR reviews due, BAF risks un-reviewed, inquorate-meeting flags. -->
+    <!-- Single Consolidated Governance Dashboard Client Action -->
+    <record id="action_nhs_governance_dashboard_client" model="ir.actions.client">
+        <field name="name">Governance Dashboard</field>
+        <field name="tag">nhs_governance_dashboard</field>
+    </record>
+
+    <!-- Governance dashboard window actions -->
     <record id="action_nhs_gov_dashboard_upcoming_meetings" model="ir.actions.act_window">
         <field name="name">Upcoming Meetings</field>
         <field name="res_model">nhs.meeting</field>

@@ -44,6 +44,11 @@ class ResPartner(models.Model):
         'nhs.declaration', 'partner_id', string='Declarations Of Interest',
         help='Their declarations of interest.')
     nhs_gov_declaration_count = fields.Integer(string='Declaration Count', compute='_compute_nhs_gov_counts')
+    nhs_is_executive = fields.Boolean(
+        string='Executive',
+        tracking=True,
+        help='Executive vs non-executive director (used for Board balance and FPPR).'
+    )
 
     @api.depends('nhs_gov_committee_membership_ids', 'nhs_gov_declaration_ids')
     def _compute_nhs_gov_counts(self):

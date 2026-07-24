@@ -77,11 +77,32 @@
         </field>
     </record>
 
+    <record id="view_nhs_declaration_annual_list" model="ir.ui.view">
+        <field name="name">nhs.declaration.annual.list</field>
+        <field name="model">nhs.declaration</field>
+        <field name="arch" type="xml">
+            <list string="Annual Declarations" create="0">
+                <field name="partner_id"/>
+                <field name="category_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="is_published"/>
+            </list>
+        </field>
+    </record>
+
     <record id="action_nhs_declaration_annual" model="ir.actions.act_window">
         <field name="name">Annual Declarations</field>
         <field name="res_model">nhs.declaration</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('event', '=', 'annual')]</field>
         <field name="context">{'default_event': 'annual', 'search_default_group_partner': 1}</field>
+    </record>
+
+    <record id="action_nhs_declaration_annual_list_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_nhs_declaration_annual_list"/>
+        <field name="act_window_id" ref="action_nhs_declaration_annual"/>
     </record>
 </odoo>

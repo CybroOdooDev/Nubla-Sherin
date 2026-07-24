@@ -20,7 +20,7 @@
 #
 #############################################################################
 from odoo import api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class NhsMeeting(models.Model):
@@ -29,8 +29,8 @@ class NhsMeeting(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'meeting_date desc'
 
-    name = fields.Char(string='Meeting', compute='_compute_name', store=True,
-                       help="e.g. 'Audit Committee — 12 May 2026'.")
+    name = fields.Char(string='Meeting', required=True, copy=False, tracking=True,
+                       help="Defaults to e.g. 'Audit Committee — 12 May 2026' but can be edited manually.")
     committee_id = fields.Many2one('nhs.committee', string='Committee', required=True,
                                    ondelete='cascade', tracking=True, help='The committee meeting.')
     company_id = fields.Many2one(related='committee_id.company_id', string='Company', store=True)
@@ -67,13 +67,23 @@ class NhsMeeting(models.Model):
                                     help='Whether the board/committee pack has been assembled for this meeting.')
     active = fields.Boolean(string='Active', default=True, help='Archive flag.')
 
-    @api.depends('committee_id.name', 'meeting_date')
-    def _compute_name(self):
+    def _default_meeting_name(self, committee, meeting_date):
+        if committee and meeting_date:
+            return f'{committee.name} — {fields.Datetime.context_timestamp(self, meeting_date).strftime("%d %b %Y")}'
+        return committee.name or 'New Meeting'
+
+    @api.onchange('committee_id', 'meeting_date')
+    def _onchange_meeting_name_suggestion(self):
         for rec in self:
-            if rec.committee_id and rec.meeting_date:
-                rec.name = f'{rec.committee_id.name} — {fields.Datetime.context_timestamp(rec, rec.meeting_date).strftime("%d %b %Y")}'
-            else:
-                rec.name = rec.committee_id.name or 'New Meeting'
+            if not rec.name:
+                rec.name = rec._default_meeting_name(rec.committee_id, rec.meeting_date)
+
+    @api.constrains('meeting_date', 'state')
+    def _check_meeting_date_not_past(self):
+        now = fields.Datetime.now()
+        for rec in self:
+            if rec.state == 'scheduled' and rec.meeting_date and rec.meeting_date < now:
+                raise ValidationError('A scheduled meeting cannot be dated in the past.')
 
     @api.depends('attendee_ids.status', 'attendee_ids.voting', 'attendee_ids.is_ned',
                  'committee_id.quorum_min', 'committee_id.quorum_min_ned')
@@ -94,6 +104,11 @@ class NhsMeeting(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        for vals in vals_list:
+            if not vals.get('name'):
+                committee = self.env['nhs.committee'].browse(vals.get('committee_id'))
+                meeting_date = fields.Datetime.to_datetime(vals.get('meeting_date'))
+                vals['name'] = self._default_meeting_name(committee, meeting_date)
         records = super().create(vals_list)
         for rec in records:
             rec._sync_attendees()
@@ -113,9 +128,15 @@ class NhsMeeting(models.Model):
                 })
 
     def action_set_agenda(self):
+        for rec in self:
+            if not rec.agenda_item_ids:
+                raise UserError('Add at least one agenda item before setting the agenda.')
         self.write({'state': 'agenda_set'})
 
     def action_hold(self):
+        for rec in self:
+            if any(item.state == 'draft' for item in rec.agenda_item_ids):
+                raise UserError('All agenda items must be marked as Completed or Deferred before the meeting can be held.')
         self.write({'state': 'held'})
 
     def action_minute(self):
@@ -155,6 +176,124 @@ class NhsMeeting(models.Model):
             'target': 'new',
             'context': {'default_meeting_id': self.id},
         }
+
+    @api.model
+    def get_governance_dashboard_data(self):
+        today = fields.Date.context_today(self)
+        today_str = today.strftime('%Y-%m-%d')
+
+        # 1. Upcoming Meetings
+        upcoming_domain = [('meeting_date', '>=', today_str), ('state', '!=', 'cancelled')]
+        upcoming_meetings_recs = self.search(upcoming_domain, limit=10, order='meeting_date asc')
+        upcoming_count = self.search_count(upcoming_domain)
+        upcoming_list = []
+        for m in upcoming_meetings_recs:
+            upcoming_list.append({
+                'id': m.id,
+                'name': m.name,
+                'committee_name': m.committee_id.name if m.committee_id else '',
+                'date': fields.Datetime.context_timestamp(m, m.meeting_date).strftime('%b %d, %Y %I:%M %p') if m.meeting_date else '',
+                'venue': m.location or '',
+                'is_quorate': m.is_quorate,
+                'state': m.state,
+                'state_label': dict(m._fields['state'].selection).get(m.state, m.state),
+            })
+
+        # 2. Inquorate Meetings
+        inquorate_domain = [('is_quorate', '=', False), ('state', 'not in', ('scheduled', 'cancelled'))]
+        inquorate_recs = self.search(inquorate_domain, limit=10, order='meeting_date desc')
+        inquorate_count = self.search_count(inquorate_domain)
+        inquorate_list = []
+        for m in inquorate_recs:
+            inquorate_list.append({
+                'id': m.id,
+                'name': m.name,
+                'committee_name': m.committee_id.name if m.committee_id else '',
+                'date': fields.Datetime.context_timestamp(m, m.meeting_date).strftime('%b %d, %Y %I:%M %p') if m.meeting_date else '',
+                'venue': m.location or '',
+                'state_label': dict(m._fields['state'].selection).get(m.state, m.state),
+            })
+
+        # 3. Overdue Actions
+        overdue_actions_domain = [('state', '=', 'overdue')]
+        overdue_actions_recs = self.env['nhs.meeting.action'].search(overdue_actions_domain, limit=10, order='due_date asc')
+        overdue_actions_count = self.env['nhs.meeting.action'].search_count(overdue_actions_domain)
+        overdue_actions_list = []
+        for act in overdue_actions_recs:
+            overdue_actions_list.append({
+                'id': act.id,
+                'name': act.name,
+                'meeting_name': act.meeting_id.name if act.meeting_id else '',
+                'assigned_to': act.owner_id.name if act.owner_id else '',
+                'due_date': act.due_date.strftime('%b %d, %Y') if act.due_date else '',
+                'state': act.state,
+            })
+
+        # 4. DoI Refreshes Due (res.partner with committee memberships)
+        doi_domain = [('nhs_gov_committee_membership_ids', '!=', False)]
+        doi_recs = self.env['res.partner'].search(doi_domain, limit=10)
+        doi_count = self.env['res.partner'].search_count(doi_domain)
+        doi_list = []
+        for p in doi_recs:
+            doi_list.append({
+                'id': p.id,
+                'name': p.name,
+                'email': p.email or '',
+                'memberships_count': len(p.nhs_gov_committee_membership_ids),
+            })
+
+        # 5. ToR Reviews Due
+        tor_domain = [('tor_review_date', '!=', False), ('tor_review_date', '<=', today_str), ('state', '=', 'active')]
+        tor_recs = self.env['nhs.committee'].search(tor_domain, limit=10)
+        tor_count = self.env['nhs.committee'].search_count(tor_domain)
+        tor_list = []
+        for c in tor_recs:
+            tor_list.append({
+                'id': c.id,
+                'name': c.name,
+                'tor_review_date': c.tor_review_date.strftime('%b %d, %Y') if c.tor_review_date else '',
+                'chair_name': c.chair_id.name if c.chair_id else '',
+            })
+
+        # 6. BAF Risks Un-Reviewed
+        baf_unreviewed_domain = [('last_reviewed', '=', False)]
+        baf_unreviewed_recs = self.env['nhs.baf.risk'].search(baf_unreviewed_domain, limit=10)
+        baf_unreviewed_count = self.env['nhs.baf.risk'].search_count(baf_unreviewed_domain)
+        baf_unreviewed_list = []
+        for r in baf_unreviewed_recs:
+            baf_unreviewed_list.append({
+                'id': r.id,
+                'name': r.name,
+                'objective_name': r.objective_id.name if r.objective_id else '',
+                'score': r.current_score,
+                'band': r.current_band,
+            })
+
+        # 7. BAF Status
+        all_baf_risks = self.env['nhs.baf.risk'].search([])
+        baf_total = len(all_baf_risks)
+        baf_bands = {'extreme': 0, 'high': 0, 'moderate': 0, 'low': 0}
+        for r in all_baf_risks:
+            if r.current_band in baf_bands:
+                baf_bands[r.current_band] += 1
+
+        return {
+            'upcoming_count': upcoming_count,
+            'upcoming_list': upcoming_list,
+            'inquorate_count': inquorate_count,
+            'inquorate_list': inquorate_list,
+            'overdue_actions_count': overdue_actions_count,
+            'overdue_actions_list': overdue_actions_list,
+            'doi_count': doi_count,
+            'doi_list': doi_list,
+            'tor_count': tor_count,
+            'tor_list': tor_list,
+            'baf_unreviewed_count': baf_unreviewed_count,
+            'baf_unreviewed_list': baf_unreviewed_list,
+            'baf_total': baf_total,
+            'baf_bands': baf_bands,
+        }
+
 
 
 class NhsMeetingAttendee(models.Model):

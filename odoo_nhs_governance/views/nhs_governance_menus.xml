@@ -136,49 +136,8 @@
     <menuitem id="menu_nhs_gov_dashboard"
               name="Governance Dashboard"
               parent="menu_nhs_gov_reporting"
+              action="action_nhs_governance_dashboard_client"
               sequence="10"/>
-
-    <menuitem id="menu_nhs_gov_dashboard_upcoming"
-              name="Upcoming Meetings"
-              parent="menu_nhs_gov_dashboard"
-              action="action_nhs_gov_dashboard_upcoming_meetings"
-              sequence="10"/>
-
-    <menuitem id="menu_nhs_gov_dashboard_inquorate"
-              name="Inquorate Meetings"
-              parent="menu_nhs_gov_dashboard"
-              action="action_nhs_gov_dashboard_inquorate"
-              sequence="20"/>
-
-    <menuitem id="menu_nhs_gov_dashboard_overdue_actions"
-              name="Overdue Actions"
-              parent="menu_nhs_gov_dashboard"
-              action="action_nhs_gov_dashboard_overdue_actions"
-              sequence="30"/>
-
-    <menuitem id="menu_nhs_gov_dashboard_doi_refresh"
-              name="DoI Refreshes Due"
-              parent="menu_nhs_gov_dashboard"
-              action="action_nhs_gov_dashboard_doi_refresh_due"
-              sequence="40"/>
-
-    <menuitem id="menu_nhs_gov_dashboard_tor_due"
-              name="ToR Reviews Due"
-              parent="menu_nhs_gov_dashboard"
-              action="action_nhs_gov_dashboard_tor_due"
-              sequence="50"/>
-
-    <menuitem id="menu_nhs_gov_dashboard_baf_unreviewed"
-              name="BAF Risks Un-Reviewed"
-              parent="menu_nhs_gov_dashboard"
-              action="action_nhs_gov_dashboard_baf_unreviewed"
-              sequence="60"/>
-
-    <menuitem id="menu_nhs_gov_dashboard_baf_status"
-              name="BAF Status"
-              parent="menu_nhs_gov_dashboard"
-              action="action_nhs_gov_dashboard_baf_status"
-              sequence="70"/>
 
     <menuitem id="menu_nhs_gov_report_board_pack"
               name="Board Pack (PDF)"

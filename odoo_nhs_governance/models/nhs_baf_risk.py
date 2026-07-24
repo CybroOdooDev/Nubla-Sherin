@@ -47,6 +47,7 @@ class NhsBafRisk(models.Model):
     owning_committee_id = fields.Many2one('nhs.committee', string='Owning Committee',
                                           help='The committee that scrutinises this risk.')
     lead_partner_id = fields.Many2one('res.partner', string='Executive Risk Owner',
+                                      domain="[('is_nhs_board_member', '=', True)]",
                                       help='Executive risk owner.')
     consequence = fields.Selection(SCORE_SEL, string='Consequence', required=True, default='1',
                                    help='Consequence score (1-5), aligned to the 5×5 matrix used in '

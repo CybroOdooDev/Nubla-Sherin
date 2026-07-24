@@ -29,9 +29,14 @@ This module is an affordable, integrated governance system that covers the WHOLE
 - ToR review date with automatic reminders; committee status history (active / dormant / disbanded).
 
 ### Membership & directors
-- Director/officer record with appointment and term dates, executive vs. non-executive flag.
+- Director/officer record with appointment and term dates, executive vs. non-executive flag — held on the
+  standard Contact (`res.partner`) record rather than a separate model, so the same board member is one
+  record across Trust Management, Governance, Sales/Invoicing, etc. (appointment/term dates and board role
+  live on the Contact via Trust Management; executive flag and FPPR fields are added by this module).
 - Fit and Proper Person Requirement (FPPR) check status and date per director.
 - A member's committee portfolio view across every board and committee they sit on.
+- Committee membership (`nhs.committee.member`) links to the person via `partner_id` on `res.partner`,
+  not a dedicated director model — reusing the same Contact used for board membership.
 
 ### Meeting cycle management
 - Generate a recurring meeting series from a committee's configured frequency.

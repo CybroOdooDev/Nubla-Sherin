@@ -183,13 +183,13 @@
             <field name="perm_unlink" eval="True"/>
         </record>
         <record id="rule_gov_agenda_item_viewer" model="ir.rule">
-            <field name="name">Agenda Item: viewer sees own committees, confidential restricted to members</field>
+            <field name="name">Agenda Item: viewer sees own committees, confidential restricted to the committee chair</field>
             <field name="model_id" ref="model_nhs_agenda_item"/>
             <field name="groups" eval="[(4, ref('group_nhs_gov_viewer'))]"/>
             <field name="domain_force">['&amp;', ('meeting_id.company_id', 'in', company_ids),
                 '&amp;', ('meeting_id.committee_id.member_ids.user_id', '=', user.id),
                 '|', ('is_confidential', '=', False),
-                ('meeting_id.committee_id.member_ids.user_id', '=', user.id)]</field>
+                ('meeting_id.committee_id.chair_id.user_ids', '=', user.id)]</field>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>

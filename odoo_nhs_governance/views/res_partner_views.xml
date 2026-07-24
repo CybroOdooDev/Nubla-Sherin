@@ -22,6 +22,7 @@
             </xpath>
             <xpath expr="//page[@name='nhs_governance']" position="inside">
                 <group string="Fit and Proper Person (FPPR)">
+                    <field name="nhs_is_executive"/>
                     <field name="nhs_gov_fppr_status" widget="badge"
                            decoration-success="nhs_gov_fppr_status == 'passed'"
                            decoration-warning="nhs_gov_fppr_status in ('not_checked', 'in_progress')"

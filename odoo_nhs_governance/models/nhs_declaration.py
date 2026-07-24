@@ -30,8 +30,21 @@ class NhsDeclaration(models.Model):
     _order = 'date_from desc, id desc'
 
     partner_id = fields.Many2one('res.partner', string='Declared By', required=True,
+                                 domain="[('is_nhs_board_member', '=', True)]",
                                  tracking=True, help='The director/officer/member who declared.')
-    company_id = fields.Many2one(related='partner_id.company_id', string='Company', store=True)
+    company_id = fields.Many2one('res.company', string='Company', required=True,
+                                 default=lambda self: self.env.company)
+    name = fields.Char(string='Reference', compute='_compute_name', store=True)
+
+    @api.depends('partner_id', 'category_id', 'date_from')
+    def _compute_name(self):
+        for rec in self:
+            if rec.partner_id and rec.category_id:
+                year = rec.date_from.strftime('%Y') if rec.date_from else ''
+                rec.name = f"{rec.partner_id.name} - {rec.category_id.name} {year}".strip()
+            else:
+                rec.name = 'New Declaration'
+
     category_id = fields.Many2one('nhs.gov.interest.category', string='Interest Category', required=True,
                                   help='Financial / non-financial professional / non-financial personal / '
                                        'loyalty / indirect / nil return.')
@@ -79,3 +92,15 @@ class NhsDeclaration(models.Model):
             raise UserError('Declarations of interest cannot be deleted — archive them instead '
                             'to preserve the governance record.')
         return super().unlink()
+
+    def action_set_noted(self):
+        self.write({'conflict_management': 'noted'})
+
+    def action_set_withdrew(self):
+        self.write({'conflict_management': 'withdrew_from_item'})
+
+    def action_set_left_room(self):
+        self.write({'conflict_management': 'left_room'})
+
+    def action_set_no_action(self):
+        self.write({'conflict_management': 'no_action'})

@@ -13,6 +13,7 @@
                 <field name="purpose"/>
                 <field name="presenter_id"/>
                 <field name="is_confidential"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'completed'" decoration-warning="state == 'deferred'"/>
             </list>
         </field>
     </record>
@@ -22,13 +23,21 @@
         <field name="model">nhs.agenda.item</field>
         <field name="arch" type="xml">
             <form string="Agenda Item">
+                <header>
+                    <field name="state" widget="statusbar" options="{'clickable': '1'}"/>
+                </header>
                 <sheet>
+                    <div class="oe_title">
+                        <label for="title"/>
+                        <h1>
+                            <field name="title" placeholder="e.g. Q3 Financial Update"/>
+                        </h1>
+                    </div>
                     <group>
                         <group>
                             <field name="presenter_partner_ids" invisible="1"/>
                             <field name="meeting_id"/>
                             <field name="item_number"/>
-                            <field name="title"/>
                             <field name="purpose"/>
                             <field name="presenter_id"/>
                             <field name="time_allocation"/>
@@ -41,7 +50,7 @@
                         </group>
                     </group>
                     <group string="Minute &amp; Decision">
-                        <field name="minute_text" nolabel="1"/>
+                        <field name="minute_text"/>
                         <field name="decision_text"/>
                     </group>
                 </sheet>
@@ -59,9 +68,14 @@
                 <field name="committee_id"/>
                 <filter name="confidential" string="Confidential" domain="[('is_confidential', '=', True)]"/>
                 <filter name="decisions" string="Decisions" domain="[('purpose', '=', 'decision')]"/>
+                <separator/>
+                <filter name="status_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="status_completed" string="Completed" domain="[('state', '=', 'completed')]"/>
+                <filter name="status_deferred" string="Deferred" domain="[('state', '=', 'deferred')]"/>
                 <group name="group_by">
                     <filter name="group_committee" string="Committee" context="{'group_by': 'committee_id'}"/>
                     <filter name="group_purpose" string="Purpose" context="{'group_by': 'purpose'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
                 </group>
             </search>
         </field>

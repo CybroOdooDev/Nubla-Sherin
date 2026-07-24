@@ -12,7 +12,8 @@
 
     <template id="report_action_log">
         <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="committee">
+            <t t-set="committees" t-value="docs or env['nhs.committee'].search([('state', '=', 'active')]) or env['nhs.committee'].search([])"/>
+            <t t-foreach="committees" t-as="committee">
                 <t t-call="web.external_layout">
                     <div class="page" style="font-family: Arial, sans-serif; color: #000000; font-size: 13px;">
                         <div class="text-center mb-4">

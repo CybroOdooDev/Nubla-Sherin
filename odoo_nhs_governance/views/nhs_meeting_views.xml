@@ -46,7 +46,7 @@
                                class="oe_stat_button" invisible="1"/>
                     </div>
                     <div class="oe_title">
-                        <h1><field name="name" readonly="1"/></h1>
+                        <h1><field name="name" placeholder="e.g. Audit Committee — 12 May 2026"/></h1>
                     </div>
                     <group>
                         <group>
@@ -65,7 +65,7 @@
                         <!-- Step 1-3: build the agenda, collate papers on each item, assemble the pack. -->
                         <page string="Agenda &amp; Papers" name="page_agenda">
                             <field name="agenda_item_ids">
-                                <list editable="bottom">
+                                <list>
                                     <field name="presenter_partner_ids" column_invisible="1"/>
                                     <field name="sequence" widget="handle"/>
                                     <field name="item_number"/>
@@ -75,24 +75,39 @@
                                     <field name="time_allocation"/>
                                     <field name="is_confidential"/>
                                     <field name="cycle_item_id"/>
+                                    <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'completed'" decoration-warning="state == 'deferred'"/>
                                 </list>
-                                <form>
-                                    <group>
-                                        <field name="presenter_partner_ids" invisible="1"/>
-                                        <field name="item_number"/>
-                                        <field name="title"/>
-                                        <field name="purpose"/>
-                                        <field name="presenter_id"/>
-                                        <field name="time_allocation"/>
-                                        <field name="is_confidential"/>
-                                        <field name="cycle_item_id"/>
-                                        <field name="paper_ids" widget="many2many_binary"/>
-                                    </group>
-                                    <group string="Minute &amp; Decision">
-                                        <field name="minute_text" nolabel="1"/>
-                                        <field name="decision_text"/>
-                                        <field name="deferred_to_id"/>
-                                    </group>
+                                <form string="Agenda Item">
+                                    <header>
+                                        <field name="state" widget="statusbar" options="{'clickable': '1'}"/>
+                                    </header>
+                                    <sheet>
+                                        <div class="oe_title">
+                                            <label for="title"/>
+                                            <h1>
+                                                <field name="title" placeholder="e.g. Q3 Financial Update"/>
+                                            </h1>
+                                        </div>
+                                        <group>
+                                            <group>
+                                                <field name="presenter_partner_ids" invisible="1"/>
+                                                <field name="item_number"/>
+                                                <field name="purpose"/>
+                                                <field name="presenter_id"/>
+                                                <field name="time_allocation"/>
+                                                <field name="is_confidential"/>
+                                                <field name="cycle_item_id"/>
+                                            </group>
+                                            <group>
+                                                <field name="paper_ids" widget="many2many_binary"/>
+                                            </group>
+                                        </group>
+                                        <group string="Minute &amp; Decision">
+                                            <field name="minute_text"/>
+                                            <field name="decision_text"/>
+                                            <field name="deferred_to_id"/>
+                                        </group>
+                                    </sheet>
                                 </form>
                             </field>
                         </page>
@@ -109,13 +124,44 @@
                             </field>
                         </page>
                         <page string="Declarations" name="page_declarations" invisible="state == 'scheduled'">
-                            <field name="declaration_ids">
+                            <field name="declaration_ids" context="{'default_event': 'at_meeting', 'default_meeting_id': id}">
                                 <list>
                                     <field name="partner_id"/>
                                     <field name="category_id"/>
                                     <field name="agenda_item_id"/>
                                     <field name="conflict_management"/>
                                 </list>
+                                <form string="Create At-Meeting Declarations">
+                                    <header>
+                                        <button name="action_set_noted" string="Noted" type="object" class="oe_highlight" invisible="conflict_management" />
+                                        <button name="action_set_withdrew" string="Withdrew From Item" type="object" class="oe_highlight" invisible="conflict_management != 'noted'" />
+                                        <button name="action_set_left_room" string="Left The Room" type="object" class="oe_highlight" invisible="conflict_management != 'withdrew_from_item'" />
+                                        <button name="action_set_no_action" string="No Action Required" type="object" class="oe_highlight" invisible="conflict_management != 'left_room'" />
+                                        <field name="conflict_management" widget="statusbar" />
+                                    </header>
+                                    <sheet>
+                                        <field name="category_code" invisible="1"/>
+                                        <group>
+                                            <group>
+                                                <field name="partner_id" domain="[('nhs_gov_committee_membership_ids.committee_id', '=', parent.committee_id)]"/>
+                                                <field name="category_id"/>
+                                                <field name="event"/>
+                                                <field name="is_published"/>
+                                            </group>
+                                            <group>
+                                                <field name="date_from"/>
+                                                <field name="date_to"/>
+                                                <field name="related_org" invisible="category_code == 'nil'"/>
+                                            </group>
+                                        </group>
+                                        <group string="NATURE OF INTEREST" invisible="category_code == 'nil'">
+                                            <field name="nature" nolabel="1"/>
+                                        </group>
+                                        <group string="CONFLICT MANAGEMENT">
+                                            <field name="agenda_item_id" domain="[('meeting_id', '=', parent.id)]"/>
+                                        </group>
+                                    </sheet>
+                                </form>
                             </field>
                         </page>
                         <!-- Step 5: minutes and decisions, once the meeting has been held. -->
