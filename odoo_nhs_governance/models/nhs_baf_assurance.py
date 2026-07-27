@@ -14,7 +14,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
@@ -29,12 +29,14 @@ class NhsBafAssurance(models.Model):
 
     risk_id = fields.Many2one('nhs.baf.risk', string='Principal Risk', required=True,
                               ondelete='cascade', help='The principal risk this assurance evidences.')
-    company_id = fields.Many2one(related='risk_id.company_id', string='Company', store=True)
+    company_id = fields.Many2one(related='risk_id.company_id', string='Company', store=True,
+                                 help='Company owning the related principal risk.')
     name = fields.Char(string='Assurance', required=True,
                        help="The assurance (e.g. 'Internal audit report on X', 'monthly performance data').")
     line_of_defence_id = fields.Many2one('nhs.gov.assurance.line', string='Line Of Defence', required=True,
                                          help="First (operational) / Second (oversight) / Third (independent).")
-    line_of_defence_code = fields.Selection(related='line_of_defence_id.code', string='Line Code', store=True)
+    line_of_defence_code = fields.Selection(related='line_of_defence_id.code', string='Line Code', store=True,
+                                            help='Underlying code of the line of defence, for filtering/grouping.')
     source = fields.Char(string='Source', help='Where the assurance comes from.')
     rating = fields.Selection([
         ('positive', 'Positive'),

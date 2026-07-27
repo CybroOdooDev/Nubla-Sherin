@@ -14,7 +14,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
@@ -34,11 +34,12 @@ class NhsCommittee(models.Model):
                        help="Committee name (e.g. 'Audit Committee').")
     committee_type_id = fields.Many2one('nhs.committee.type', string='Committee Type', required=True,
                                         help='board / committee / sub-committee / group / council of governors.')
-    committee_type_code = fields.Selection(related='committee_type_id.code', string='Type Code', store=True)
+    committee_type_code = fields.Selection(related='committee_type_id.code', string='Type Code', store=True,
+                                           help='Convenience copy of the committee type code, used in view conditions.')
     parent_id = fields.Many2one('nhs.committee', string='Reports To', index=True, ondelete='restrict',
                                 help='Reporting parent (a committee reports to the board, a sub-committee '
                                      'or group reports to a committee).')
-    parent_path = fields.Char(index=True)
+    parent_path = fields.Char(index=True, help='Technical field storing the materialized hierarchy path.')
     complete_name = fields.Char(string='Complete Name', compute='_compute_complete_name',
                                 store=True, recursive=True,
                                 help='Auto-computed breadcrumb reporting line '
@@ -73,7 +74,8 @@ class NhsCommittee(models.Model):
                                     "role 'Chair'.")
     member_ids = fields.One2many('nhs.committee.member', 'committee_id', string='Membership',
                                  help='Committee membership: members and their roles.')
-    member_count = fields.Integer(string='Members', compute='_compute_counts')
+    member_count = fields.Integer(string='Members', compute='_compute_counts',
+                                  help='Total number of committee members, shown on the Members smart button.')
     voting_member_count = fields.Integer(string='Voting Members', compute='_compute_counts',
                                          help='Number of current voting members — the ceiling '
                                               'against which Quorum (Minimum Members) is checked.')
@@ -82,12 +84,14 @@ class NhsCommittee(models.Model):
                                            'ceiling against which Quorum (Minimum NEDs) is checked.')
     meeting_ids = fields.One2many('nhs.meeting', 'committee_id', string='Meetings',
                                   help='Meetings of this committee.')
-    meeting_count = fields.Integer(string='Meeting Count', compute='_compute_counts')
+    meeting_count = fields.Integer(string='Meeting Count', compute='_compute_counts',
+                                   help='Total number of meetings held or scheduled for this committee.')
     cycle_item_ids = fields.One2many('nhs.cycle.of.business', 'committee_id', string='Cycle of Business',
                                      help='Standing items schedule for the annual cycle of business.')
     baf_risk_ids = fields.One2many('nhs.baf.risk', 'owning_committee_id', string='Principal Risks Owned',
                                    help='BAF principal risks this committee scrutinises.')
-    baf_risk_count = fields.Integer(string='Principal Risks', compute='_compute_counts')
+    baf_risk_count = fields.Integer(string='Principal Risks', compute='_compute_counts',
+                                    help='Number of BAF principal risks owned by this committee.')
     state = fields.Selection([
         ('draft', 'Draft'),
         ('active', 'Active'),
@@ -100,6 +104,7 @@ class NhsCommittee(models.Model):
 
     @api.depends('name', 'parent_id.complete_name')
     def _compute_complete_name(self):
+        """Build the breadcrumb reporting-line name from the parent chain."""
         for rec in self:
             if rec.parent_id:
                 rec.complete_name = f'{rec.parent_id.complete_name} / {rec.name}'
@@ -108,6 +113,7 @@ class NhsCommittee(models.Model):
 
     @api.depends('member_ids', 'member_ids.voting', 'member_ids.is_ned', 'meeting_ids', 'baf_risk_ids')
     def _compute_counts(self):
+        """Compute member, meeting and BAF risk counts shown on smart buttons."""
         for rec in self:
             voting_members = rec.member_ids.filtered('voting')
             rec.member_count = len(rec.member_ids)
@@ -117,15 +123,19 @@ class NhsCommittee(models.Model):
             rec.baf_risk_count = len(rec.baf_risk_ids)
 
     def action_confirm(self):
+        """Confirm a draft committee, moving it to Active status."""
         self.write({'state': 'active'})
 
     def action_disband(self):
+        """Disband the committee and archive it."""
         self.write({'state': 'disbanded', 'active': False})
 
     def action_reactivate(self):
+        """Reactivate a dormant or disbanded committee."""
         self.write({'state': 'active', 'active': True})
 
     def action_set_dormant(self):
+        """Mark the committee as Dormant."""
         self.write({'state': 'dormant'})
 
     def _sync_chair_membership(self):
@@ -149,17 +159,20 @@ class NhsCommittee(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Create committees and sync the chair's membership record."""
         records = super().create(vals_list)
         records.filtered('chair_id')._sync_chair_membership()
         return records
 
     def write(self, vals):
+        """Update committees and re-sync the chair's membership when chair_id changes."""
         result = super().write(vals)
         if 'chair_id' in vals:
             self.filtered('chair_id')._sync_chair_membership()
         return result
 
     def action_view_meetings(self):
+        """Open the list of meetings for this committee."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
@@ -171,6 +184,7 @@ class NhsCommittee(models.Model):
         }
 
     def action_view_members(self):
+        """Open the membership list for this committee."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
@@ -182,6 +196,7 @@ class NhsCommittee(models.Model):
         }
 
     def action_open_meeting_generate_wizard(self):
+        """Open the wizard to generate a series of meetings for this committee."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
@@ -196,6 +211,7 @@ class NhsCommittee(models.Model):
         }
 
     def action_view_baf_risks(self):
+        """Open the list of BAF principal risks owned by this committee."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',

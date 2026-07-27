@@ -1,49 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
+    <!-- Calendar month: January (1) -->
     <record id="gov_month_1" model="nhs.gov.month">
         <field name="name">January</field>
         <field name="code">1</field>
     </record>
+    <!-- Calendar month: February (2) -->
     <record id="gov_month_2" model="nhs.gov.month">
         <field name="name">February</field>
         <field name="code">2</field>
     </record>
+    <!-- Calendar month: March (3) -->
     <record id="gov_month_3" model="nhs.gov.month">
         <field name="name">March</field>
         <field name="code">3</field>
     </record>
+    <!-- Calendar month: April (4) -->
     <record id="gov_month_4" model="nhs.gov.month">
         <field name="name">April</field>
         <field name="code">4</field>
     </record>
+    <!-- Calendar month: May (5) -->
     <record id="gov_month_5" model="nhs.gov.month">
         <field name="name">May</field>
         <field name="code">5</field>
     </record>
+    <!-- Calendar month: June (6) -->
     <record id="gov_month_6" model="nhs.gov.month">
         <field name="name">June</field>
         <field name="code">6</field>
     </record>
+    <!-- Calendar month: July (7) -->
     <record id="gov_month_7" model="nhs.gov.month">
         <field name="name">July</field>
         <field name="code">7</field>
     </record>
+    <!-- Calendar month: August (8) -->
     <record id="gov_month_8" model="nhs.gov.month">
         <field name="name">August</field>
         <field name="code">8</field>
     </record>
+    <!-- Calendar month: September (9) -->
     <record id="gov_month_9" model="nhs.gov.month">
         <field name="name">September</field>
         <field name="code">9</field>
     </record>
+    <!-- Calendar month: October (10) -->
     <record id="gov_month_10" model="nhs.gov.month">
         <field name="name">October</field>
         <field name="code">10</field>
     </record>
+    <!-- Calendar month: November (11) -->
     <record id="gov_month_11" model="nhs.gov.month">
         <field name="name">November</field>
         <field name="code">11</field>
     </record>
+    <!-- Calendar month: December (12) -->
     <record id="gov_month_12" model="nhs.gov.month">
         <field name="name">December</field>
         <field name="code">12</field>

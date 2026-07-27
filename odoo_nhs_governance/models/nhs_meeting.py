@@ -14,7 +14,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
@@ -33,7 +33,8 @@ class NhsMeeting(models.Model):
                        help="Defaults to e.g. 'Audit Committee — 12 May 2026' but can be edited manually.")
     committee_id = fields.Many2one('nhs.committee', string='Committee', required=True,
                                    ondelete='cascade', tracking=True, help='The committee meeting.')
-    company_id = fields.Many2one(related='committee_id.company_id', string='Company', store=True)
+    company_id = fields.Many2one(related='committee_id.company_id', string='Company', store=True,
+                                 help='Company the owning committee belongs to.')
     meeting_date = fields.Datetime(string='Date / Time', required=True, tracking=True,
                                    help='Date and time of the meeting.')
     location = fields.Char(string='Venue', help='Venue / virtual meeting link descriptor.')
@@ -55,10 +56,12 @@ class NhsMeeting(models.Model):
                                 help="Present voting members meet the committee's quorum rule. "
                                      "An inquorate meeting is flagged — decisions may not be valid.")
     agenda_item_ids = fields.One2many('nhs.agenda.item', 'meeting_id', string='Agenda', help='Agenda items.')
-    agenda_item_count = fields.Integer(string='Agenda Items', compute='_compute_counts')
+    agenda_item_count = fields.Integer(string='Agenda Items', compute='_compute_counts',
+                                       help='Number of agenda items on this meeting.')
     action_ids = fields.One2many('nhs.meeting.action', 'meeting_id', string='Actions',
                                  help='Actions raised from the meeting.')
-    action_count = fields.Integer(string='Action Count', compute='_compute_counts')
+    action_count = fields.Integer(string='Action Count', compute='_compute_counts',
+                                  help='Number of actions raised from this meeting.')
     declaration_ids = fields.One2many('nhs.declaration', 'meeting_id', string='At-Meeting Declarations',
                                       help='Declarations of interest made at this meeting.')
     minutes = fields.Html(string='Minutes',
@@ -68,18 +71,21 @@ class NhsMeeting(models.Model):
     active = fields.Boolean(string='Active', default=True, help='Archive flag.')
 
     def _default_meeting_name(self, committee, meeting_date):
+        """Build the default meeting name from the committee and meeting date."""
         if committee and meeting_date:
             return f'{committee.name} — {fields.Datetime.context_timestamp(self, meeting_date).strftime("%d %b %Y")}'
         return committee.name or 'New Meeting'
 
     @api.onchange('committee_id', 'meeting_date')
     def _onchange_meeting_name_suggestion(self):
+        """Suggest a meeting name once committee and date are known, if not already set."""
         for rec in self:
             if not rec.name:
                 rec.name = rec._default_meeting_name(rec.committee_id, rec.meeting_date)
 
     @api.constrains('meeting_date', 'state')
     def _check_meeting_date_not_past(self):
+        """Prevent a scheduled meeting from being dated in the past."""
         now = fields.Datetime.now()
         for rec in self:
             if rec.state == 'scheduled' and rec.meeting_date and rec.meeting_date < now:
@@ -88,6 +94,7 @@ class NhsMeeting(models.Model):
     @api.depends('attendee_ids.status', 'attendee_ids.voting', 'attendee_ids.is_ned',
                  'committee_id.quorum_min', 'committee_id.quorum_min_ned')
     def _compute_is_quorate(self):
+        """Determine whether each meeting meets its committee's quorum rule."""
         for rec in self:
             present = rec.attendee_ids.filtered(lambda a: a.status == 'present' and a.voting)
             quorum_ok = len(present) >= (rec.committee_id.quorum_min or 0)
@@ -98,12 +105,14 @@ class NhsMeeting(models.Model):
 
     @api.depends('agenda_item_ids', 'action_ids')
     def _compute_counts(self):
+        """Compute the agenda item and action counts for each meeting."""
         for rec in self:
             rec.agenda_item_count = len(rec.agenda_item_ids)
             rec.action_count = len(rec.action_ids)
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Default the meeting name if missing, then seed attendance for committee members."""
         for vals in vals_list:
             if not vals.get('name'):
                 committee = self.env['nhs.committee'].browse(vals.get('committee_id'))
@@ -128,34 +137,41 @@ class NhsMeeting(models.Model):
                 })
 
     def action_set_agenda(self):
+        """Move the meeting to the Agenda Set state, once it has agenda items."""
         for rec in self:
             if not rec.agenda_item_ids:
                 raise UserError('Add at least one agenda item before setting the agenda.')
         self.write({'state': 'agenda_set'})
 
     def action_hold(self):
+        """Mark the meeting as held, once all agenda items are resolved."""
         for rec in self:
             if any(item.state == 'draft' for item in rec.agenda_item_ids):
                 raise UserError('All agenda items must be marked as Completed or Deferred before the meeting can be held.')
         self.write({'state': 'held'})
 
     def action_minute(self):
+        """Mark the meeting as minuted."""
         self.write({'state': 'minuted'})
 
     def action_close(self):
+        """Close the meeting."""
         self.write({'state': 'closed'})
 
     def action_cancel(self):
+        """Cancel the meeting, unless it has already been held."""
         for rec in self:
             if rec.state in ('held', 'minuted', 'closed'):
                 raise UserError('A meeting that has already been held cannot be cancelled.')
         self.write({'state': 'cancelled'})
 
     def action_view_pack(self):
+        """Open the generated board pack report for this meeting."""
         self.ensure_one()
         return self.env.ref('odoo_nhs_governance.action_report_board_pack').report_action(self)
 
     def action_open_agenda_from_cycle_wizard(self):
+        """Open the wizard to populate the agenda from the cycle of business."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
@@ -167,6 +183,7 @@ class NhsMeeting(models.Model):
         }
 
     def action_open_board_pack_wizard(self):
+        """Open the wizard to assemble the board pack for this meeting."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
@@ -179,6 +196,7 @@ class NhsMeeting(models.Model):
 
     @api.model
     def get_governance_dashboard_data(self):
+        """Aggregate the governance dashboard data: meetings, actions, DoI, ToR and BAF status."""
         today = fields.Date.context_today(self)
         today_str = today.strftime('%Y-%m-%d')
 
@@ -301,12 +319,16 @@ class NhsMeetingAttendee(models.Model):
     _description = 'Meeting Attendance Line'
     _order = 'meeting_id, id'
 
-    meeting_id = fields.Many2one('nhs.meeting', string='Meeting', required=True, ondelete='cascade')
-    committee_id = fields.Many2one(related='meeting_id.committee_id', string='Committee', store=True)
+    meeting_id = fields.Many2one('nhs.meeting', string='Meeting', required=True, ondelete='cascade',
+                                 help='The meeting this attendance line belongs to.')
+    committee_id = fields.Many2one(related='meeting_id.committee_id', string='Committee', store=True,
+                                   help='Committee holding the meeting, for filtering/grouping.')
     member_id = fields.Many2one('nhs.committee.member', string='Committee Member', required=True,
-                                ondelete='cascade')
-    name = fields.Char(related='member_id.name', string='Name', store=True)
-    role = fields.Selection(related='member_id.role', string='Role', store=True)
+                                ondelete='cascade', help='The committee member this attendance line records.')
+    name = fields.Char(related='member_id.name', string='Name', store=True,
+                       help="The member's name, mirrored for display in attendance lists.")
+    role = fields.Selection(related='member_id.role', string='Role', store=True,
+                            help="The member's role on the committee, mirrored for display.")
     status = fields.Selection([
         ('present', 'Present'),
         ('apologies', 'Apologies'),

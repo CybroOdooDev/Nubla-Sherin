@@ -14,7 +14,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
@@ -43,6 +43,7 @@ class ResConfigSettings(models.TransientModel):
              'risks can link to operational risks and corporate-tier risks are surfaced automatically.')
 
     def _compute_gov_incident_risk_installed(self):
+        """Set whether the NHS Incident & Risk module is currently installed."""
         installed = bool(self.env['ir.module.module'].sudo().search_count(
             [('name', '=', 'odoo_nhs_incident_risk'), ('state', '=', 'installed')]))
         for rec in self:

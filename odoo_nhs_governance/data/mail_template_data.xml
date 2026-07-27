@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Mail template: notifies members that a meeting pack has been issued -->
     <record id="mail_template_meeting_pack_issued" model="mail.template">
         <field name="name">NHS Governance: Board Pack Issued</field>
         <field name="model_id" ref="model_nhs_meeting"/>
@@ -13,6 +14,7 @@
         <field name="auto_delete">True</field>
     </record>
 
+    <!-- Mail template: notifies an owner that a governance action was assigned to them -->
     <record id="mail_template_action_assigned" model="mail.template">
         <field name="name">NHS Governance: Action Assigned</field>
         <field name="model_id" ref="model_nhs_meeting_action"/>
@@ -26,6 +28,7 @@
         <field name="auto_delete">True</field>
     </record>
 
+    <!-- Mail template: reminds a contact their annual declaration of interest refresh is due -->
     <record id="mail_template_doi_refresh_due" model="mail.template">
         <field name="name">NHS Governance: Annual Declaration of Interest Refresh Due</field>
         <field name="model_id" ref="base.model_res_partner"/>
@@ -39,6 +42,7 @@
         <field name="auto_delete">True</field>
     </record>
 
+    <!-- Mail template: reminds a committee that its Terms of Reference review is due -->
     <record id="mail_template_tor_review_due" model="mail.template">
         <field name="name">NHS Governance: Terms of Reference Review Due</field>
         <field name="model_id" ref="model_nhs_committee"/>

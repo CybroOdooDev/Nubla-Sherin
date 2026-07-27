@@ -14,7 +14,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
@@ -52,6 +52,7 @@ class NhsMeetingGenerateWizard(models.TransientModel):
     location = fields.Char(string='Venue', help='Venue / virtual link descriptor applied to every meeting.')
 
     def action_generate(self):
+        """Create the recurring series of meetings and return a view of the created records."""
         self.ensure_one()
         months_step = FREQUENCY_MONTHS.get(self.frequency, 1)
         meetings = self.env['nhs.meeting']

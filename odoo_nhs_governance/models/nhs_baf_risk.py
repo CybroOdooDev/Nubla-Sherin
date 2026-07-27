@@ -14,7 +14,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
@@ -43,7 +43,8 @@ class NhsBafRisk(models.Model):
                             help='Auto-generated BAF risk reference (e.g. BAF/2026/00001).')
     objective_id = fields.Many2one('nhs.baf.objective', string='Strategic Objective', required=True,
                                    ondelete='cascade', help='The objective this risk threatens.')
-    company_id = fields.Many2one(related='objective_id.company_id', string='Company', store=True)
+    company_id = fields.Many2one(related='objective_id.company_id', string='Company', store=True,
+                                 help='Company owning the related strategic objective.')
     owning_committee_id = fields.Many2one('nhs.committee', string='Owning Committee',
                                           help='The committee that scrutinises this risk.')
     lead_partner_id = fields.Many2one('res.partner', string='Executive Risk Owner',
@@ -86,6 +87,7 @@ class NhsBafRisk(models.Model):
 
     @api.depends('consequence', 'likelihood')
     def _compute_current_score(self):
+        """Derive the current risk score and RAG band from consequence and likelihood."""
         for rec in self:
             score = int(rec.consequence or 1) * int(rec.likelihood or 1)
             rec.current_score = score
@@ -98,6 +100,7 @@ class NhsBafRisk(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Assign an auto-generated BAF risk reference before creating the records."""
         seq = self.env['ir.sequence']
         for vals in vals_list:
             if vals.get('reference', 'New') == 'New':
@@ -105,9 +108,11 @@ class NhsBafRisk(models.Model):
         return super().create(vals_list)
 
     def action_mark_reviewed(self):
+        """Stamp this principal risk as reviewed today."""
         self.write({'last_reviewed': fields.Date.today()})
 
     def action_view_operational_risk(self):
+        """Open the linked operational risk record, if any and if the module is installed."""
         self.ensure_one()
         if not self.operational_risk_ref:
             return False
@@ -125,6 +130,7 @@ class NhsBafRisk(models.Model):
         }
 
     def unlink(self):
+        """Prevent deletion of BAF principal risks unless the user is a system administrator."""
         if not self.env.user.has_group('base.group_system'):
             raise UserError('BAF principal risks cannot be deleted — archive them instead to '
                             'preserve the governance record.')

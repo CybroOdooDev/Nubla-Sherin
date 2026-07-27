@@ -79,7 +79,13 @@
                                 </list>
                                 <form string="Agenda Item">
                                     <header>
-                                        <field name="state" widget="statusbar" options="{'clickable': '1'}"/>
+                                        <button name="action_mark_complete" string="Mark Complete" type="object"
+                                                class="btn-primary" invisible="state in ('completed', 'deferred')"/>
+                                        <button name="action_defer_to_next" string="Defer" type="object"
+                                                invisible="state in ('completed', 'deferred')"/>
+                                        <button name="action_reset_draft" string="Reset to Draft" type="object"
+                                                invisible="state == 'draft'"/>
+                                        <field name="state" widget="statusbar"/>
                                     </header>
                                     <sheet>
                                         <div class="oe_title">
@@ -105,7 +111,7 @@
                                         <group string="Minute &amp; Decision">
                                             <field name="minute_text"/>
                                             <field name="decision_text"/>
-                                            <field name="deferred_to_id"/>
+                                            <field name="deferred_to_id" required="state == 'deferred'"/>
                                         </group>
                                     </sheet>
                                 </form>
@@ -253,6 +259,7 @@
         </field>
     </record>
 
+    <!-- Filtered list/calendar of upcoming (non-cancelled, future-dated) meetings -->
     <record id="action_nhs_meeting_upcoming" model="ir.actions.act_window">
         <field name="name">Upcoming Meetings</field>
         <field name="res_model">nhs.meeting</field>

@@ -95,7 +95,8 @@
                                     <field name="sequence" widget="handle"/>
                                     <field name="title"/>
                                     <field name="frequency"/>
-                                    <field name="scheduled_months" widget="many2many_tags"/>
+                                    <field name="scheduled_months" widget="many2many_tags"
+                                           invisible="frequency == 'every_meeting'"/>
                                     <field name="purpose"/>
                                     <field name="owner_id"/>
                                     <field name="is_statutory"/>
@@ -171,6 +172,7 @@
         </field>
     </record>
 
+    <!-- Standalone Membership form used when opening a single member record -->
     <record id="view_nhs_committee_member_form" model="ir.ui.view">
         <field name="name">nhs.committee.member.form</field>
         <field name="model">nhs.committee.member</field>

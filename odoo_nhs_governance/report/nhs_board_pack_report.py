@@ -14,7 +14,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
@@ -28,6 +28,7 @@ class ReportBoardPack(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        """Resolve the meetings to print and whether confidential items are included."""
         if not docids and data:
             docids = data.get('doc_ids') or data.get('ids') or data.get('active_ids')
         if not docids:
@@ -36,7 +37,8 @@ class ReportBoardPack(models.AbstractModel):
             docids = [docids]
         docs = self.env['nhs.meeting'].browse(docids) if docids else self.env['nhs.meeting']
         if not docs:
-            docs = self.env['nhs.meeting'].search([('state', '!=', 'cancelled')], limit=1, order='meeting_date desc') or self.env['nhs.meeting'].search([], limit=1)
+            docs = self.env['nhs.meeting'].search([('state', '!=', 'cancelled')], limit=1,
+                                                  order='meeting_date desc') or self.env['nhs.meeting'].search([], limit=1)
         include_confidential = bool(
             (data or {}).get('include_confidential') or self.env.context.get('include_confidential')
         )

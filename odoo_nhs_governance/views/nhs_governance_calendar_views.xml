@@ -13,6 +13,7 @@
         </field>
     </record>
 
+    <!-- Pre-filtered list of committees whose Terms of Reference review date has passed -->
     <record id="action_nhs_governance_tor_due" model="ir.actions.act_window">
         <field name="name">Terms of Reference Reviews Due</field>
         <field name="res_model">nhs.committee</field>
@@ -24,6 +25,7 @@
         </field>
     </record>
 
+    <!-- Pre-filtered list of statutory/mandatory cycle-of-business items across committees -->
     <record id="action_nhs_governance_statutory_items" model="ir.actions.act_window">
         <field name="name">Statutory Cycle Items</field>
         <field name="res_model">nhs.cycle.of.business</field>

@@ -14,12 +14,13 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class NhsCycleOfBusiness(models.Model):
@@ -33,7 +34,7 @@ class NhsCycleOfBusiness(models.Model):
     title = fields.Char(string='Standing Item', required=True,
                         help="The standing item due to come to the committee "
                              "(e.g. 'Annual Accounts', 'Risk Register Review').")
-    sequence = fields.Integer(string='Sequence', default=10)
+    sequence = fields.Integer(string='Sequence', default=10, help='Ordering of this standing item within the cycle.')
     frequency = fields.Selection([
         ('every_meeting', 'Every Meeting'),
         ('quarterly', 'Quarterly'),
@@ -55,7 +56,8 @@ class NhsCycleOfBusiness(models.Model):
        help='The default purpose of this standing item when it is pulled onto an agenda.')
     owner_partner_ids = fields.Many2many(
         'res.partner', compute='_compute_owner_partner_ids',
-        string='Allowed Owners'
+        string='Allowed Owners',
+        help='Committee members eligible to be selected as Item Owner, used to restrict the domain.'
     )
     owner_id = fields.Many2one(
         'res.partner', string='Item Owner',
@@ -65,11 +67,28 @@ class NhsCycleOfBusiness(models.Model):
 
     @api.depends('committee_id', 'committee_id.member_ids.partner_id')
     def _compute_owner_partner_ids(self):
+        """Restrict allowed item owners to the owning committee's members."""
         for rec in self:
             if rec.committee_id and rec.committee_id.member_ids:
                 rec.owner_partner_ids = rec.committee_id.member_ids.mapped('partner_id')
             else:
                 rec.owner_partner_ids = self.env['res.partner'].search([])
+
+    @api.onchange('frequency')
+    def _onchange_frequency(self):
+        """Clear Scheduled Months when the frequency is switched to Every Meeting."""
+        if self.frequency == 'every_meeting':
+            self.scheduled_months = [(5, 0, 0)]
+
+    @api.constrains('frequency', 'scheduled_months')
+    def _check_scheduled_months(self):
+        """Forbid Scheduled Months on an Every Meeting standing item."""
+        for rec in self:
+            if rec.frequency == 'every_meeting' and rec.scheduled_months:
+                raise ValidationError(
+                    'An "Every Meeting" standing item is due at every meeting regardless of month — '
+                    'it cannot also have Scheduled Months set. Clear them, or change the Frequency.'
+                )
     is_statutory = fields.Boolean(string='Statutory / Mandatory', default=False,
                                   help='Flags this as a statutory or mandatory annual obligation '
                                        '(shown on the governance calendar so nothing mandatory is missed).')

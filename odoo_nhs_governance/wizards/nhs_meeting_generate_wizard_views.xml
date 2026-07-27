@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Form view for the recurring meeting series generation wizard -->
     <record id="view_nhs_meeting_generate_wizard_form" model="ir.ui.view">
         <field name="name">nhs.meeting.generate.wizard.form</field>
         <field name="model">nhs.meeting.generate.wizard</field>
@@ -20,6 +21,7 @@
         </field>
     </record>
 
+    <!-- Wizard action to launch the recurring meeting series generator -->
     <record id="action_nhs_meeting_generate_wizard" model="ir.actions.act_window">
         <field name="name">Generate Meeting Series</field>
         <field name="res_model">nhs.meeting.generate.wizard</field>

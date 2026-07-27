@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Form view for the agenda-from-cycle-of-business wizard -->
     <record id="view_nhs_agenda_from_cycle_wizard_form" model="ir.ui.view">
         <field name="name">nhs.agenda.from.cycle.wizard.form</field>
         <field name="model">nhs.agenda.from.cycle.wizard</field>

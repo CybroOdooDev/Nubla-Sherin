@@ -14,7 +14,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
@@ -38,7 +38,7 @@ class NhsGovInterestCategory(models.Model):
         ('nil', 'Nil Return'),
     ], string='Code', required=True, index=True,
        help='The NHS England Managing Conflicts of Interest guidance category this declaration falls under.')
-    sequence = fields.Integer(string='Sequence', default=10)
+    sequence = fields.Integer(string='Sequence', default=10, help='Controls the display order of categories.')
     description = fields.Text(string='Description',
                               help='Guidance on what belongs in this category, shown to members when declaring.')
     active = fields.Boolean(string='Active', default=True, help='Archive flag.')

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Report action for printing the declarations of interest register as PDF -->
     <record id="action_report_doi_register" model="ir.actions.report">
         <field name="name">Declarations Of Interest Register</field>
         <field name="model">res.company</field>
@@ -8,6 +9,7 @@
         <field name="print_report_name">'Declarations of Interest Register - ' + object.name</field>
     </record>
 
+    <!-- QWeb template rendering the published declarations table per company -->
     <template id="report_doi_register">
         <t t-call="web.html_container">
             <t t-set="companies" t-value="docs or env.company"/>

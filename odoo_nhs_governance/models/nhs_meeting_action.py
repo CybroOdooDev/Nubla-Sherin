@@ -14,7 +14,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
@@ -50,31 +50,34 @@ class NhsMeetingAction(models.Model):
         ('open', 'Open'),
         ('in_progress', 'In Progress'),
         ('completed', 'Completed'),
-        ('deferred', 'Deferred'),
         ('overdue', 'Overdue'),
     ], string='Status', default='open', required=True, tracking=True,
-       help='Open / In Progress / Completed / Deferred / Overdue. The Overdue state is set '
+       help='Open / In Progress / Completed / Overdue. The Overdue state is set '
             'automatically by the daily escalation cron once the due date passes.')
     completion_note = fields.Text(string='Completion Note', help='How this action was closed.')
     reported_meeting_id = fields.Many2one('nhs.meeting', string='Reported To Meeting',
                                           help='The meeting where completion of this action was reported '
                                                '(matters arising).')
     company_id = fields.Many2one('res.company', string='Company', required=True,
-                                 default=lambda self: self.env.company)
+                                 default=lambda self: self.env.company,
+                                 help='The company this governance action belongs to.')
 
     @api.constrains('meeting_id', 'baf_risk_id')
     def _check_parent(self):
+        """Ensure every action is linked to a meeting or a BAF gap."""
         for rec in self:
             if not rec.meeting_id and not rec.baf_risk_id:
                 raise UserError('A governance action must be linked to either a meeting or a BAF gap.')
 
     @api.depends('meeting_id.committee_id', 'baf_risk_id.owning_committee_id')
     def _compute_committee_id(self):
+        """Derive the owning committee from the source meeting or BAF risk."""
         for rec in self:
             rec.committee_id = rec.meeting_id.committee_id or rec.baf_risk_id.owning_committee_id
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Assign a sequence reference and schedule an owner activity for new actions."""
         seq = self.env['ir.sequence']
         for vals in vals_list:
             if vals.get('reference', 'New') == 'New':
@@ -87,35 +90,39 @@ class NhsMeetingAction(models.Model):
         return records
 
     def action_start(self):
+        """Mark this action as in progress."""
         self.write({'state': 'in_progress'})
 
     def action_complete(self):
+        """Mark this action as completed, requiring a completion note first."""
         for rec in self:
             if not rec.completion_note:
                 raise UserError('Please enter a completion note before marking this action complete.')
         self.write({'state': 'completed'})
 
-    def action_defer(self):
-        self.write({'state': 'deferred'})
-
     def action_report_to_next_meeting(self):
+        """Link this action to the next scheduled meeting of its committee."""
         for rec in self:
             if not rec.meeting_id or not rec.committee_id:
-                continue
+                raise UserError('This action has no source meeting/committee to report against.')
             next_meeting = self.env['nhs.meeting'].search([
                 ('committee_id', '=', rec.committee_id.id),
                 ('meeting_date', '>', rec.meeting_id.meeting_date),
                 ('state', 'not in', ['cancelled']),
             ], order='meeting_date', limit=1)
-            if next_meeting:
-                rec.reported_meeting_id = next_meeting.id
+            if not next_meeting:
+                raise UserError(
+                    'No future meeting was found for "%s" to report this action to. '
+                    'Schedule the next meeting first.' % rec.committee_id.name
+                )
+            rec.reported_meeting_id = next_meeting.id
 
     @api.model
     def _cron_action_escalation(self):
         """Overdue-action escalation to the committee chair / secretary."""
         today = fields.Date.today()
         actions = self.search([
-            ('state', 'not in', ['completed', 'deferred']),
+            ('state', '!=', 'completed'),
             ('due_date', '<', today),
         ])
         for action in actions:

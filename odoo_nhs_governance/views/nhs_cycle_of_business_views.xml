@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Editable list view of standing cycle-of-business items, highlighting statutory ones -->
     <record id="view_nhs_cycle_of_business_list" model="ir.ui.view">
         <field name="name">nhs.cycle.of.business.list</field>
         <field name="model">nhs.cycle.of.business</field>
@@ -10,7 +11,8 @@
                 <field name="sequence" widget="handle"/>
                 <field name="title"/>
                 <field name="frequency"/>
-                <field name="scheduled_months" widget="many2many_tags"/>
+                <field name="scheduled_months" widget="many2many_tags"
+                       invisible="frequency == 'every_meeting'"/>
                 <field name="purpose"/>
                 <field name="owner_id"/>
                 <field name="is_statutory"/>
@@ -18,6 +20,7 @@
         </field>
     </record>
 
+    <!-- Form view for a single standing item: frequency, scheduled months and owner -->
     <record id="view_nhs_cycle_of_business_form" model="ir.ui.view">
         <field name="name">nhs.cycle.of.business.form</field>
         <field name="model">nhs.cycle.of.business</field>
@@ -49,6 +52,7 @@
         </field>
     </record>
 
+    <!-- Search view with statutory filter and committee/frequency group-bys -->
     <record id="view_nhs_cycle_of_business_search" model="ir.ui.view">
         <field name="name">nhs.cycle.of.business.search</field>
         <field name="model">nhs.cycle.of.business</field>
@@ -65,6 +69,7 @@
         </field>
     </record>
 
+    <!-- Window action opening the Cycle Of Business list/form, grouped by committee -->
     <record id="action_nhs_cycle_of_business" model="ir.actions.act_window">
         <field name="name">Cycle Of Business</field>
         <field name="res_model">nhs.cycle.of.business</field>

@@ -48,6 +48,7 @@
         </field>
     </record>
 
+    <!-- List view of strategic objectives -->
     <record id="view_nhs_baf_objective_list" model="ir.ui.view">
         <field name="name">nhs.baf.objective.list</field>
         <field name="model">nhs.baf.objective</field>
@@ -62,6 +63,7 @@
         </field>
     </record>
 
+    <!-- Window action opening the strategic objectives list/form -->
     <record id="action_nhs_baf_objective" model="ir.actions.act_window">
         <field name="name">Strategic Objectives</field>
         <field name="res_model">nhs.baf.objective</field>
@@ -120,14 +122,28 @@
                         </page>
                         <page string="Assurances">
                             <field name="assurance_ids">
-                                <list editable="bottom">
+                                <list>
                                     <field name="name"/>
-                                    <field name="line_of_defence_id"/>
+                                    <field name="line_of_defence_id" options="{'no_create': True, 'no_open': True}"/>
                                     <field name="source"/>
                                     <field name="rating"/>
                                     <field name="date"/>
                                     <field name="attachment_ids" widget="many2many_binary"/>
                                 </list>
+                                <form string="Assurance">
+                                    <group>
+                                        <group>
+                                            <field name="name"/>
+                                            <field name="line_of_defence_id" options="{'no_create': True, 'no_open': True}"/>
+                                            <field name="source"/>
+                                        </group>
+                                        <group>
+                                            <field name="rating"/>
+                                            <field name="date"/>
+                                            <field name="attachment_ids" widget="many2many_binary"/>
+                                        </group>
+                                    </group>
+                                </form>
                             </field>
                         </page>
                         <page string="Gaps &amp; Actions">
@@ -152,6 +168,7 @@
         </field>
     </record>
 
+    <!-- List view of principal risks, RAG-coloured by current band -->
     <record id="view_nhs_baf_risk_list" model="ir.ui.view">
         <field name="name">nhs.baf.risk.list</field>
         <field name="model">nhs.baf.risk</field>
@@ -172,6 +189,7 @@
         </field>
     </record>
 
+    <!-- Search view for filtering/grouping principal risks -->
     <record id="view_nhs_baf_risk_search" model="ir.ui.view">
         <field name="name">nhs.baf.risk.search</field>
         <field name="model">nhs.baf.risk</field>
@@ -193,6 +211,18 @@
         </field>
     </record>
 
+    <!-- Window action opening the principal risks list/form -->
+    <record id="action_nhs_baf_risk" model="ir.actions.act_window">
+        <field name="name">Principal Risks (BAF)</field>
+        <field name="res_model">nhs.baf.risk</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No principal risks yet</p>
+            <p>Add a principal risk under a strategic objective: controls → assurances → gaps → actions.</p>
+        </field>
+    </record>
+
+    <!-- Pivot view plotting risk score by consequence and likelihood -->
     <record id="view_nhs_baf_risk_pivot" model="ir.ui.view">
         <field name="name">nhs.baf.risk.pivot</field>
         <field name="model">nhs.baf.risk</field>
@@ -205,16 +235,7 @@
         </field>
     </record>
 
-    <record id="action_nhs_baf_risk" model="ir.actions.act_window">
-        <field name="name">Principal Risks (BAF)</field>
-        <field name="res_model">nhs.baf.risk</field>
-        <field name="view_mode">list,form</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">No principal risks yet</p>
-            <p>Add a principal risk under a strategic objective: controls → assurances → gaps → actions.</p>
-        </field>
-    </record>
-
+    <!-- Window action opening the BAF heatmap in pivot/list/form modes -->
     <record id="action_nhs_baf_heatmap" model="ir.actions.act_window">
         <field name="name">BAF Heatmap</field>
         <field name="res_model">nhs.baf.risk</field>

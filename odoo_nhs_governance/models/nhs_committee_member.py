@@ -14,7 +14,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
@@ -55,13 +55,15 @@ class NhsCommitteeMember(models.Model):
     voting = fields.Boolean(string='Voting Member', default=True,
                             help='Whether this member votes and counts toward quoracy. '
                                  'Attendees / in-attendance members are typically non-voting.')
-    company_id = fields.Many2one(related='committee_id.company_id', string='Company', store=True)
+    company_id = fields.Many2one(related='committee_id.company_id', string='Company', store=True,
+                                 help='Owning company, taken from the related committee.')
     active = fields.Boolean(string='Active', default=True, help='Archive flag.')
 
     _DIRECTORY_SYNC_ROLES = {'chair', 'vice_chair', 'member'}
 
     @api.onchange('partner_id')
     def _onchange_partner_ned(self):
+        """Default is_ned from the selected partner's NHS board role."""
         if self.partner_id.nhs_board_role:
             role = self.env['nhs.board.role'].search(
                 [('code', '=', self.partner_id.nhs_board_role)], limit=1)
@@ -70,10 +72,12 @@ class NhsCommitteeMember(models.Model):
 
     @api.onchange('partner_id')
     def _onchange_partner_user(self):
+        """Default the linked user from the selected partner's user account."""
         self.user_id = self.partner_id.user_ids[:1]
 
     @api.onchange('role')
     def _onchange_role_voting(self):
+        """Mark attendee/in-attendance roles as non-voting by default."""
         if self.role in ('attendee', 'in_attendance'):
             self.voting = False
 
@@ -99,11 +103,13 @@ class NhsCommitteeMember(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Create memberships and sync the partner's board member directory."""
         records = super().create(vals_list)
         records._sync_board_member_directory()
         return records
 
     def write(self, vals):
+        """Update memberships and re-sync the board member directory when partner/role changes."""
         result = super().write(vals)
         if {'partner_id', 'role'} & set(vals):
             self._sync_board_member_directory()

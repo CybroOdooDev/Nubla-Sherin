@@ -14,12 +14,13 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 
 class NhsAgendaItem(models.Model):
@@ -30,8 +31,9 @@ class NhsAgendaItem(models.Model):
 
     meeting_id = fields.Many2one('nhs.meeting', string='Meeting', required=True,
                                  ondelete='cascade', help='Owning meeting.')
-    committee_id = fields.Many2one(related='meeting_id.committee_id', string='Committee', store=True)
-    sequence = fields.Integer(string='Sequence', default=10)
+    committee_id = fields.Many2one(related='meeting_id.committee_id', string='Committee', store=True,
+                                   help='Committee owning the meeting, for filtering/grouping.')
+    sequence = fields.Integer(string='Sequence', default=10, help='Ordering of this item within the agenda.')
     item_number = fields.Char(string='Item No.', help='Agenda item number (e.g. "4.1").')
     title = fields.Char(string='Title', required=True, help='Agenda item title.')
     purpose = fields.Selection([
@@ -42,7 +44,8 @@ class NhsAgendaItem(models.Model):
     ], string='Purpose', default='information', help='The purpose of this agenda item.')
     presenter_partner_ids = fields.Many2many(
         'res.partner', compute='_compute_presenter_partner_ids',
-        string='Allowed Presenters'
+        string='Allowed Presenters',
+        help='Committee members eligible to be selected as Presenter, used to restrict the domain.'
     )
     presenter_id = fields.Many2one(
         'res.partner', string='Presenter',
@@ -52,6 +55,7 @@ class NhsAgendaItem(models.Model):
 
     @api.depends('committee_id', 'committee_id.member_ids.partner_id')
     def _compute_presenter_partner_ids(self):
+        """Restrict allowed presenters to the owning committee's members."""
         for rec in self:
             if rec.committee_id and rec.committee_id.member_ids:
                 rec.presenter_partner_ids = rec.committee_id.member_ids.mapped('partner_id')
@@ -74,29 +78,49 @@ class NhsAgendaItem(models.Model):
         ('draft', 'Draft'),
         ('completed', 'Completed'),
         ('deferred', 'Deferred'),
-    ], string='Status', default='draft', required=True)
+    ], string='Status', default='draft', required=True, help='Lifecycle status of this agenda item.')
     active = fields.Boolean(string='Active', default=True, help='Archive flag.')
+
+    @api.constrains('state', 'deferred_to_id')
+    def _check_deferred_to_id(self):
+        """Require a target meeting whenever an agenda item is marked as deferred."""
+        for rec in self:
+            if rec.state == 'deferred' and not rec.deferred_to_id:
+                raise UserError('Please set "Deferred To" before marking an agenda item as Deferred.')
 
     @api.onchange('deferred_to_id')
     def _onchange_deferred_to_id(self):
+        """Switch the item to Deferred as soon as a Deferred To meeting is set."""
         if self.deferred_to_id:
             self.state = 'deferred'
 
+    def action_mark_complete(self):
+        """Mark the agenda item as completed."""
+        self.write({'state': 'completed'})
+
+    def action_reset_draft(self):
+        """Reset the agenda item back to draft and clear any deferral."""
+        self.write({'state': 'draft', 'deferred_to_id': False})
+
     def action_defer_to_next(self):
+        """Defer the agenda item by copying it onto the next scheduled meeting."""
         for rec in self:
-            rec.state = 'deferred'
             next_meeting = self.env['nhs.meeting'].search([
                 ('committee_id', '=', rec.committee_id.id),
                 ('meeting_date', '>', rec.meeting_id.meeting_date),
                 ('state', 'not in', ['cancelled']),
             ], order='meeting_date', limit=1)
-            if next_meeting:
-                self.env['nhs.agenda.item'].create({
-                    'meeting_id': next_meeting.id,
-                    'title': rec.title,
-                    'purpose': rec.purpose,
-                    'presenter_id': rec.presenter_id.id,
-                    'cycle_item_id': rec.cycle_item_id.id,
-                    'is_confidential': rec.is_confidential,
-                })
-                rec.deferred_to_id = next_meeting.id
+            if not next_meeting:
+                raise UserError(
+                    'No future meeting was found to defer "%s" to. '
+                    'Schedule the next meeting first, or set "Deferred To" manually.' % rec.title
+                )
+            self.env['nhs.agenda.item'].create({
+                'meeting_id': next_meeting.id,
+                'title': rec.title,
+                'purpose': rec.purpose,
+                'presenter_id': rec.presenter_id.id,
+                'cycle_item_id': rec.cycle_item_id.id,
+                'is_confidential': rec.is_confidential,
+            })
+            rec.write({'state': 'deferred', 'deferred_to_id': next_meeting.id})

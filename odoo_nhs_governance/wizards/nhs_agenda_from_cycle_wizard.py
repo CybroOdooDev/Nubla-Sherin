@@ -14,7 +14,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
@@ -30,6 +30,7 @@ class NhsAgendaFromCycleWizard(models.TransientModel):
                                  help='The meeting to build the agenda for.')
 
     def action_populate(self):
+        """Create agenda items for cycle-of-business entries due this meeting's month."""
         self.ensure_one()
         meeting = self.meeting_id
         month = fields.Datetime.context_timestamp(self, meeting.meeting_date).month

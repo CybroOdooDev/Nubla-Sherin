@@ -13,16 +13,18 @@
               parent="menu_nhs_gov_root"
               sequence="10"/>
 
+    <!-- Menu: list of committees and boards -->
     <menuitem id="menu_nhs_gov_committees_boards"
               name="Committees &amp; Boards"
               parent="menu_nhs_gov_committees"
               action="action_nhs_committee"
               sequence="10"/>
 
+    <!-- Menu: governance-owned directors register (FPPR, executive flag, term dates) -->
     <menuitem id="menu_nhs_gov_directors"
               name="Directors"
               parent="menu_nhs_gov_committees"
-              action="odoo_nhs_trust_management.action_nhs_board_members"
+              action="action_nhs_gov_director"
               sequence="20"/>
 
     <!-- ══ MEETINGS ═════════════════════════════════════════════════ -->
@@ -31,24 +33,28 @@
               parent="menu_nhs_gov_root"
               sequence="20"/>
 
+    <!-- Menu: meetings scheduled in the future -->
     <menuitem id="menu_nhs_gov_meetings_upcoming"
               name="Upcoming Meetings"
               parent="menu_nhs_gov_meetings"
               action="action_nhs_meeting_upcoming"
               sequence="10"/>
 
+    <!-- Menu: full meeting history -->
     <menuitem id="menu_nhs_gov_meetings_all"
               name="All Meetings"
               parent="menu_nhs_gov_meetings"
               action="action_nhs_meeting"
               sequence="20"/>
 
+    <!-- Menu: agenda items and assembled meeting packs -->
     <menuitem id="menu_nhs_gov_agendas_packs"
               name="Agendas &amp; Packs"
               parent="menu_nhs_gov_meetings"
               action="action_nhs_agenda_item"
               sequence="30"/>
 
+    <!-- Menu: log of actions raised from meetings -->
     <menuitem id="menu_nhs_gov_action_log"
               name="Action Log"
               parent="menu_nhs_gov_meetings"
@@ -61,12 +67,14 @@
               parent="menu_nhs_gov_root"
               sequence="30"/>
 
+    <!-- Menu: register of declared interests -->
     <menuitem id="menu_nhs_gov_interests_register"
               name="Interests Register"
               parent="menu_nhs_gov_declarations"
               action="action_nhs_declaration"
               sequence="10"/>
 
+    <!-- Menu: yearly declaration-of-interest refresh campaigns -->
     <menuitem id="menu_nhs_gov_annual_declarations"
               name="Annual Declarations"
               parent="menu_nhs_gov_declarations"
@@ -79,18 +87,21 @@
               parent="menu_nhs_gov_root"
               sequence="40"/>
 
+    <!-- Menu: strategic objectives underpinning the BAF -->
     <menuitem id="menu_nhs_gov_baf_objectives"
               name="Strategic Objectives"
               parent="menu_nhs_gov_assurance"
               action="action_nhs_baf_objective"
               sequence="10"/>
 
+    <!-- Menu: BAF principal risk register -->
     <menuitem id="menu_nhs_gov_baf_risks"
               name="Principal Risks (BAF)"
               parent="menu_nhs_gov_assurance"
               action="action_nhs_baf_risk"
               sequence="20"/>
 
+    <!-- Menu: BAF risk heatmap visualisation -->
     <menuitem id="menu_nhs_gov_baf_heatmap"
               name="BAF Heatmap"
               parent="menu_nhs_gov_assurance"
@@ -103,66 +114,74 @@
               parent="menu_nhs_gov_root"
               sequence="50"/>
 
+    <!-- Menu: main governance/cycle-of-business calendar -->
     <menuitem id="menu_nhs_gov_calendar_main"
               name="Cycle of Business / Governance Calendar"
               parent="menu_nhs_gov_calendar"
               action="action_nhs_governance_calendar"
               sequence="10"/>
 
+    <!-- Menu: cycle-of-business schedule of recurring items -->
     <menuitem id="menu_nhs_gov_calendar_cob"
               name="Cycle Of Business"
-              parent="menu_nhs_gov_calendar"
+              parent="menu_nhs_gov_calendar_main"
               action="action_nhs_cycle_of_business"
-              sequence="20"/>
+              sequence="10"/>
 
-    <menuitem id="menu_nhs_gov_calendar_tor_due"
-              name="ToR Reviews Due"
-              parent="menu_nhs_gov_calendar"
-              action="action_nhs_governance_tor_due"
-              sequence="30"/>
+<!--    <menuitem id="menu_nhs_gov_calendar_tor_due"-->
+<!--              name="ToR Reviews Due"-->
+<!--              parent="menu_nhs_gov_calendar"-->
+<!--              action="action_nhs_governance_tor_due"-->
+<!--              sequence="30"/>-->
 
-    <menuitem id="menu_nhs_gov_calendar_statutory"
-              name="Statutory Items"
-              parent="menu_nhs_gov_calendar"
-              action="action_nhs_governance_statutory_items"
-              sequence="40"/>
+<!--    <menuitem id="menu_nhs_gov_calendar_statutory"-->
+<!--              name="Statutory Items"-->
+<!--              parent="menu_nhs_gov_calendar"-->
+<!--              action="action_nhs_governance_statutory_items"-->
+<!--              sequence="40"/>-->
 
-    <!-- ══ REPORTING ════════════════════════════════════════════════ -->
+    <!-- ══ REPORTING-->
     <menuitem id="menu_nhs_gov_reporting"
               name="Reporting"
               parent="menu_nhs_gov_root"
               sequence="60"/>
 
+    <!-- Menu: consolidated governance dashboard -->
     <menuitem id="menu_nhs_gov_dashboard"
               name="Governance Dashboard"
               parent="menu_nhs_gov_reporting"
               action="action_nhs_governance_dashboard_client"
               sequence="10"/>
 
+    <!-- Menu: PDF board pack report -->
     <menuitem id="menu_nhs_gov_report_board_pack"
               name="Board Pack (PDF)"
               parent="menu_nhs_gov_reporting"
               action="action_report_board_pack"
               sequence="20"/>
 
+    <!-- Menu: PDF BAF report -->
     <menuitem id="menu_nhs_gov_report_baf"
               name="BAF Report (PDF)"
               parent="menu_nhs_gov_reporting"
               action="action_report_baf"
               sequence="30"/>
 
+    <!-- Menu: PDF declaration-of-interest register report -->
     <menuitem id="menu_nhs_gov_report_doi_register"
               name="DoI Register (PDF)"
               parent="menu_nhs_gov_reporting"
               action="action_report_doi_register"
               sequence="40"/>
 
+    <!-- Menu: PDF action log report -->
     <menuitem id="menu_nhs_gov_report_action_log"
               name="Action Log (PDF)"
               parent="menu_nhs_gov_reporting"
               action="action_report_action_log"
               sequence="50"/>
 
+    <!-- Menu: attendance report (pivot/list) -->
     <menuitem id="menu_nhs_gov_report_attendance"
               name="Attendance Report"
               parent="menu_nhs_gov_reporting"
@@ -176,24 +195,28 @@
               sequence="70"
               groups="odoo_nhs_governance.group_nhs_gov_manager"/>
 
+    <!-- Menu: configure committee types -->
     <menuitem id="menu_nhs_gov_config_committee_types"
               name="Committee Types"
               parent="menu_nhs_gov_configuration"
               action="action_nhs_committee_type"
               sequence="10"/>
 
+    <!-- Menu: configure interest categories -->
     <menuitem id="menu_nhs_gov_config_interest_categories"
               name="Interest Categories"
               parent="menu_nhs_gov_configuration"
               action="action_nhs_gov_interest_category"
               sequence="20"/>
 
+    <!-- Menu: configure assurance lines -->
     <menuitem id="menu_nhs_gov_config_assurance_lines"
               name="Assurance Lines"
               parent="menu_nhs_gov_configuration"
               action="action_nhs_gov_assurance_line"
               sequence="30"/>
 
+    <!-- Menu: Governance settings screen -->
     <menuitem id="menu_nhs_gov_config_settings"
               name="Settings"
               parent="menu_nhs_gov_configuration"

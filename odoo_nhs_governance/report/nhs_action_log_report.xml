@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Report action for printing the committee action log as PDF -->
     <record id="action_report_action_log" model="ir.actions.report">
         <field name="name">Action Log</field>
         <field name="model">nhs.committee</field>
@@ -10,6 +11,7 @@
         <field name="binding_type">report</field>
     </record>
 
+    <!-- QWeb template rendering the action log table per committee -->
     <template id="report_action_log">
         <t t-call="web.html_container">
             <t t-set="committees" t-value="docs or env['nhs.committee'].search([('state', '=', 'active')]) or env['nhs.committee'].search([])"/>

@@ -14,7 +14,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
@@ -56,6 +56,7 @@
         'wizards/nhs_board_pack_wizard_views.xml',
         'views/nhs_committee_views.xml',
         'views/res_partner_views.xml',
+        'views/nhs_director_views.xml',
         'views/nhs_meeting_views.xml',
         'views/nhs_agenda_item_views.xml',
         'views/nhs_cycle_of_business_views.xml',
@@ -76,6 +77,10 @@
             'odoo_nhs_governance/static/src/dashboard/governance_dashboard.js',
             'odoo_nhs_governance/static/src/dashboard/governance_dashboard.xml',
             'odoo_nhs_governance/static/src/dashboard/governance_dashboard.scss',
+        ],
+        'web.assets_backend_lazy': [
+            'odoo_nhs_governance/static/src/baf_pivot_color/baf_pivot_color.js',
+            'odoo_nhs_governance/static/src/baf_pivot_color/baf_pivot_color.xml',
         ],
     },
     'images': ['static/description/banner.jpg'],

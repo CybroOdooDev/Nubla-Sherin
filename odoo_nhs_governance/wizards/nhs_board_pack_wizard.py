@@ -14,7 +14,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
@@ -36,6 +36,7 @@ class NhsBoardPackWizard(models.TransientModel):
                                 help='Post a notification to committee members recording issue of the pack.')
 
     def action_assemble(self):
+        """Mark the pack as generated, notify members, and return the printable report action."""
         self.ensure_one()
         meeting = self.meeting_id
         meeting.pack_generated = True

@@ -7,12 +7,14 @@
         <field name="sequence">10</field>
         <field name="description">Assurance from operational management itself — day-to-day controls, local audits and performance monitoring.</field>
     </record>
+    <!-- Second line of defence: oversight/compliance functions -->
     <record id="assurance_line_second" model="nhs.gov.assurance.line">
         <field name="name">Second Line — Oversight Functions</field>
         <field name="code">second</field>
         <field name="sequence">20</field>
         <field name="description">Assurance from oversight functions — risk management, compliance, quality governance functions independent of the front line.</field>
     </record>
+    <!-- Third line of defence: independent internal/external audit and inspection -->
     <record id="assurance_line_third" model="nhs.gov.assurance.line">
         <field name="name">Third Line — Independent Assurance</field>
         <field name="code">third</field>

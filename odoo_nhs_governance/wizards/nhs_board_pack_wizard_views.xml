@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Form view for the board pack assembly wizard -->
     <record id="view_nhs_board_pack_wizard_form" model="ir.ui.view">
         <field name="name">nhs.board.pack.wizard.form</field>
         <field name="model">nhs.board.pack.wizard</field>

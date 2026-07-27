@@ -14,7 +14,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
@@ -33,11 +33,14 @@ class NhsDeclaration(models.Model):
                                  domain="[('is_nhs_board_member', '=', True)]",
                                  tracking=True, help='The director/officer/member who declared.')
     company_id = fields.Many2one('res.company', string='Company', required=True,
-                                 default=lambda self: self.env.company)
-    name = fields.Char(string='Reference', compute='_compute_name', store=True)
+                                 default=lambda self: self.env.company,
+                                 help='The company this declaration of interest belongs to.')
+    name = fields.Char(string='Reference', compute='_compute_name', store=True,
+                       help='Auto-generated label combining the declarant, category and year.')
 
     @api.depends('partner_id', 'category_id', 'date_from')
     def _compute_name(self):
+        """Build the declaration reference label from partner, category and year."""
         for rec in self:
             if rec.partner_id and rec.category_id:
                 year = rec.date_from.strftime('%Y') if rec.date_from else ''
@@ -48,7 +51,8 @@ class NhsDeclaration(models.Model):
     category_id = fields.Many2one('nhs.gov.interest.category', string='Interest Category', required=True,
                                   help='Financial / non-financial professional / non-financial personal / '
                                        'loyalty / indirect / nil return.')
-    category_code = fields.Selection(related='category_id.code', string='Category Code', store=True)
+    category_code = fields.Selection(related='category_id.code', string='Category Code', store=True,
+                                     help='Related interest category code, used for nil-return logic.')
     nature = fields.Text(string='Nature of Interest', help='Description of the interest declared.')
     related_org = fields.Char(string='Related Organisation',
                               help='The organisation the interest relates to.')
@@ -83,24 +87,30 @@ class NhsDeclaration(models.Model):
 
     @api.onchange('category_code')
     def _onchange_category_nil(self):
+        """Clear the interest details when the category is a nil return."""
         if self.category_code == 'nil':
             self.nature = False
             self.related_org = False
 
     def unlink(self):
+        """Prevent deletion of declarations unless the user is a system admin."""
         if not self.env.user.has_group('base.group_system'):
             raise UserError('Declarations of interest cannot be deleted — archive them instead '
                             'to preserve the governance record.')
         return super().unlink()
 
     def action_set_noted(self):
+        """Record that the conflict was noted with no further action."""
         self.write({'conflict_management': 'noted'})
 
     def action_set_withdrew(self):
+        """Record that the declarant withdrew from the agenda item."""
         self.write({'conflict_management': 'withdrew_from_item'})
 
     def action_set_left_room(self):
+        """Record that the declarant left the room for this item."""
         self.write({'conflict_management': 'left_room'})
 
     def action_set_no_action(self):
+        """Record that no conflict management action was required."""
         self.write({'conflict_management': 'no_action'})

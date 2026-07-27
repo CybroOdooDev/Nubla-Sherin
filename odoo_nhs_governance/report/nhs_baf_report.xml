@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Report action generating the Board Assurance Framework PDF -->
     <record id="action_report_baf" model="ir.actions.report">
         <field name="name">BAF Report</field>
         <field name="model">res.company</field>
@@ -8,6 +9,7 @@
         <field name="print_report_name">'Board Assurance Framework - ' + object.name</field>
     </record>
 
+    <!-- QWeb template rendering objectives, risks and assurances for the BAF report -->
     <template id="report_baf">
         <t t-call="web.html_container">
             <t t-set="companies" t-value="docs or env.company"/>

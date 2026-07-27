@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- List view of agenda items across meetings, highlighting confidential items -->
     <record id="view_nhs_agenda_item_list" model="ir.ui.view">
         <field name="name">nhs.agenda.item.list</field>
         <field name="model">nhs.agenda.item</field>
@@ -18,13 +19,20 @@
         </field>
     </record>
 
+    <!-- Form view for a single agenda item: purpose, presenter, papers, minute and decision -->
     <record id="view_nhs_agenda_item_form" model="ir.ui.view">
         <field name="name">nhs.agenda.item.form</field>
         <field name="model">nhs.agenda.item</field>
         <field name="arch" type="xml">
             <form string="Agenda Item">
                 <header>
-                    <field name="state" widget="statusbar" options="{'clickable': '1'}"/>
+                    <button name="action_mark_complete" string="Mark Complete" type="object"
+                            class="btn-primary" invisible="state in ('completed', 'deferred')"/>
+                    <button name="action_defer_to_next" string="Defer" type="object"
+                            invisible="state in ('completed', 'deferred')"/>
+                    <button name="action_reset_draft" string="Reset to Draft" type="object"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -46,7 +54,7 @@
                         </group>
                         <group>
                             <field name="paper_ids" widget="many2many_binary"/>
-                            <field name="deferred_to_id"/>
+                            <field name="deferred_to_id" required="state == 'deferred'"/>
                         </group>
                     </group>
                     <group string="Minute &amp; Decision">
@@ -58,6 +66,7 @@
         </field>
     </record>
 
+    <!-- Search view with confidential/decision/status filters and group-bys for agenda items -->
     <record id="view_nhs_agenda_item_search" model="ir.ui.view">
         <field name="name">nhs.agenda.item.search</field>
         <field name="model">nhs.agenda.item</field>
@@ -81,6 +90,7 @@
         </field>
     </record>
 
+    <!-- Window action opening the Agendas & Packs list/form for agenda items -->
     <record id="action_nhs_agenda_item" model="ir.actions.act_window">
         <field name="name">Agendas &amp; Packs</field>
         <field name="res_model">nhs.agenda.item</field>

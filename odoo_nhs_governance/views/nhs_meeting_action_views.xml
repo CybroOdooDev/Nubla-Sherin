@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Form view for a single governance action -->
     <record id="view_nhs_meeting_action_form" model="ir.ui.view">
         <field name="name">nhs.meeting.action.form</field>
         <field name="model">nhs.meeting.action</field>
@@ -9,13 +10,11 @@
                     <button name="action_start" string="Start" type="object"
                             invisible="state != 'open'"/>
                     <button name="action_complete" string="Mark Complete" type="object"
-                            invisible="state in ('completed', 'deferred')" class="btn-primary"/>
-                    <button name="action_defer" string="Defer" type="object"
-                            invisible="state in ('completed', 'deferred')"/>
+                            invisible="state in ('open', 'completed')" class="btn-primary"/>
                     <button name="action_report_to_next_meeting" string="Report To Next Meeting"
-                            type="object" invisible="not meeting_id"/>
+                            type="object" invisible="state not in ('completed', 'in_progress') or not meeting_id or reported_meeting_id"/>
                     <field name="state" widget="statusbar"
-                           statusbar_visible="open,in_progress,completed"/>
+                           statusbar_visible="open,in_progress,completed,overdue"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -26,7 +25,8 @@
                             <field name="name"/>
                             <field name="committee_id" readonly="1"/>
                             <field name="meeting_id"/>
-                            <field name="agenda_item_id" domain="[('meeting_id', '=', meeting_id)]"/>
+                            <field name="agenda_item_id" domain="[('meeting_id', '=', meeting_id)]"
+                                   context="{'default_meeting_id': meeting_id}"/>
                             <field name="baf_risk_id"/>
                         </group>
                         <group>
@@ -45,12 +45,13 @@
         </field>
     </record>
 
+    <!-- List view for the governance action log -->
     <record id="view_nhs_meeting_action_list" model="ir.ui.view">
         <field name="name">nhs.meeting.action.list</field>
         <field name="model">nhs.meeting.action</field>
         <field name="arch" type="xml">
             <list string="Action Log" decoration-danger="state == 'overdue'"
-                  decoration-success="state == 'completed'" decoration-muted="state == 'deferred'">
+                  decoration-success="state == 'completed'">
                 <field name="reference"/>
                 <field name="name"/>
                 <field name="committee_id"/>
@@ -64,6 +65,7 @@
         </field>
     </record>
 
+    <!-- Search view with filters and group-bys for actions -->
     <record id="view_nhs_meeting_action_search" model="ir.ui.view">
         <field name="name">nhs.meeting.action.search</field>
         <field name="model">nhs.meeting.action</field>
@@ -74,7 +76,7 @@
                 <field name="committee_id"/>
                 <field name="owner_id"/>
                 <filter name="my_actions" string="My Actions" domain="[('owner_id', '=', uid)]"/>
-                <filter name="open" string="Open" domain="[('state', 'not in', ('completed', 'deferred'))]"/>
+                <filter name="open" string="Open" domain="[('state', '!=', 'completed')]"/>
                 <filter name="overdue" string="Overdue" domain="[('state', '=', 'overdue')]"/>
                 <group name="group_by">
                     <filter name="group_committee" string="Committee" context="{'group_by': 'committee_id'}"/>
@@ -85,6 +87,7 @@
         </field>
     </record>
 
+    <!-- Window action opening the Action Log (matters-arising) list -->
     <record id="action_nhs_meeting_action" model="ir.actions.act_window">
         <field name="name">Action Log</field>
         <field name="res_model">nhs.meeting.action</field>

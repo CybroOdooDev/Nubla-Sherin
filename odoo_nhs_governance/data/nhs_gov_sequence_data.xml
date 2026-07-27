@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Sequence: reference numbers for governance actions (GOV-ACT/year/nnnnn) -->
     <record id="seq_nhs_meeting_action" model="ir.sequence">
         <field name="name">NHS Governance Action Reference</field>
         <field name="code">nhs.meeting.action</field>
@@ -8,6 +9,7 @@
         <field name="company_id" eval="False"/>
     </record>
 
+    <!-- Sequence: reference numbers for BAF principal risks (BAF/year/nnnnn) -->
     <record id="seq_nhs_baf_risk" model="ir.sequence">
         <field name="name">NHS BAF Principal Risk Reference</field>
         <field name="code">nhs.baf.risk</field>

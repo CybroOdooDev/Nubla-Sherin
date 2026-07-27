@@ -14,7 +14,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    You should have received a copy of the GNU LESSER PUBLIC LICENSE
 #    (LGPL v3) along with this program.
 #    If not, see <http://www.gnu.org/licenses/>.
 #
@@ -39,7 +39,8 @@ class NhsBafObjective(models.Model):
                                       help='Executive lead for this objective.')
     risk_ids = fields.One2many('nhs.baf.risk', 'objective_id', string='Principal Risks',
                                help='Principal risks to this objective.')
-    risk_count = fields.Integer(string='Principal Risk Count', compute='_compute_risk_count')
+    risk_count = fields.Integer(string='Principal Risk Count', compute='_compute_risk_count',
+                                help='Number of principal risks linked to this objective.')
     highest_current_score = fields.Integer(string='Highest Current Score', compute='_compute_risk_count',
                                            help='The highest current risk score among this objective\'s '
                                                 'principal risks.')
@@ -47,11 +48,13 @@ class NhsBafObjective(models.Model):
 
     @api.depends('risk_ids', 'risk_ids.current_score')
     def _compute_risk_count(self):
+        """Count linked principal risks and derive the highest current score."""
         for rec in self:
             rec.risk_count = len(rec.risk_ids)
             rec.highest_current_score = max(rec.risk_ids.mapped('current_score') or [0])
 
     def action_view_risks(self):
+        """Open the list of principal risks linked to this objective."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
