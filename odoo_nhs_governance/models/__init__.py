@@ -23,7 +23,7 @@ from . import nhs_committee_type
 from . import nhs_gov_interest_category
 from . import nhs_gov_assurance_line
 from . import nhs_gov_month
-from . import res_partner
+from . import nhs_director
 from . import nhs_committee
 from . import nhs_committee_member
 from . import nhs_cycle_of_business

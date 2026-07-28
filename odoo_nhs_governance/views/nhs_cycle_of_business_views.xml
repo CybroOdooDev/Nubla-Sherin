@@ -6,7 +6,7 @@
         <field name="model">nhs.cycle.of.business</field>
         <field name="arch" type="xml">
             <list string="Cycle Of Business" editable="bottom" decoration-warning="is_statutory">
-                <field name="owner_partner_ids" column_invisible="1"/>
+                <field name="owner_director_ids" column_invisible="1"/>
                 <field name="committee_id"/>
                 <field name="sequence" widget="handle"/>
                 <field name="title"/>
@@ -37,11 +37,10 @@
                             <field name="frequency"/>
                             <field name="scheduled_months" widget="many2many_tags"
                                    invisible="frequency == 'every_meeting'"/>
-                            <field name="sequence"/>
                         </group>
                         <group>
                             <field name="purpose"/>
-                            <field name="owner_partner_ids" invisible="1"/>
+                            <field name="owner_director_ids" invisible="1"/>
                             <field name="owner_id"/>
                             <field name="is_statutory"/>
                             <field name="active" invisible="1"/>

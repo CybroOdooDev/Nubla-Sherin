@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ══ COMMITTEE FORM ═══════════════════════════════════════════ -->
+    <!--  COMMITTEE FORM -->
     <record id="view_nhs_committee_form" model="ir.ui.view">
         <field name="name">nhs.committee.form</field>
         <field name="model">nhs.committee</field>
@@ -8,15 +8,19 @@
             <form string="Committee">
                 <header>
                     <button name="action_confirm" string="Confirm" type="object"
+                            class="btn-primary"
                             invisible="state != 'draft'"
                             groups="odoo_nhs_governance.group_nhs_gov_officer"/>
                     <button name="action_set_dormant" string="Set Dormant" type="object"
+                            class="btn-primary"
                             invisible="state != 'active'"
                             groups="odoo_nhs_governance.group_nhs_gov_officer"/>
                     <button name="action_reactivate" string="Reactivate" type="object"
+                            class="btn-primary"
                             invisible="state not in ('dormant', 'disbanded')"
                             groups="odoo_nhs_governance.group_nhs_gov_officer"/>
                     <button name="action_disband" string="Disband" type="object"
+                            class="btn-primary"
                             invisible="state in ('disbanded', 'draft')"
                             groups="odoo_nhs_governance.group_nhs_gov_manager"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,active,dormant,disbanded"/>
@@ -78,20 +82,33 @@
                         </page>
                         <page string="Membership">
                             <field name="member_ids">
-                                <list editable="bottom">
-                                    <field name="partner_id" options="{'no_create': True}"/>
-                                    <field name="user_id"/>
+                                <list>
+                                    <field name="director_id" options="{'no_create': True}"/>
                                     <field name="role"/>
                                     <field name="is_ned"/>
                                     <field name="voting"/>
                                     <field name="term_start"/>
                                     <field name="term_end"/>
                                 </list>
+                                <form string="Committee Membership">
+                                    <group>
+                                        <group>
+                                            <field name="director_id" options="{'no_create': True}"/>
+                                            <field name="role"/>
+                                            <field name="is_ned"/>
+                                        </group>
+                                        <group>
+                                            <field name="voting"/>
+                                            <field name="term_start"/>
+                                            <field name="term_end"/>
+                                        </group>
+                                    </group>
+                                </form>
                             </field>
                         </page>
                         <page string="Cycle Of Business">
                             <field name="cycle_item_ids">
-                                <list editable="bottom">
+                                <list>
                                     <field name="sequence" widget="handle"/>
                                     <field name="title"/>
                                     <field name="frequency"/>
@@ -101,6 +118,21 @@
                                     <field name="owner_id"/>
                                     <field name="is_statutory"/>
                                 </list>
+                                <form string="Cycle Of Business Item">
+                                    <group>
+                                        <group>
+                                            <field name="title"/>
+                                            <field name="frequency"/>
+                                            <field name="scheduled_months" widget="many2many_tags"
+                                                   invisible="frequency == 'every_meeting'"/>
+                                        </group>
+                                        <group>
+                                            <field name="purpose"/>
+                                            <field name="owner_id"/>
+                                            <field name="is_statutory"/>
+                                        </group>
+                                    </group>
+                                </form>
                             </field>
                         </page>
                     </notebook>
@@ -162,7 +194,7 @@
         <field name="arch" type="xml">
             <list string="Membership" editable="bottom">
                 <field name="committee_id"/>
-                <field name="partner_id" options="{'no_create': True}"/>
+                <field name="director_id" options="{'no_create': True}"/>
                 <field name="role"/>
                 <field name="is_ned"/>
                 <field name="voting"/>
@@ -182,7 +214,7 @@
                     <group>
                         <group>
                             <field name="committee_id"/>
-                            <field name="partner_id" options="{'no_create': True}"/>
+                            <field name="director_id" options="{'no_create': True}"/>
                             <field name="user_id"/>
                         </group>
                         <group>

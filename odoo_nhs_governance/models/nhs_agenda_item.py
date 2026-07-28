@@ -42,25 +42,25 @@ class NhsAgendaItem(models.Model):
         ('information', 'Information'),
         ('discussion', 'Discussion'),
     ], string='Purpose', default='information', help='The purpose of this agenda item.')
-    presenter_partner_ids = fields.Many2many(
-        'res.partner', compute='_compute_presenter_partner_ids',
+    presenter_director_ids = fields.Many2many(
+        'nhs.director', compute='_compute_presenter_director_ids',
         string='Allowed Presenters',
         help='Committee members eligible to be selected as Presenter, used to restrict the domain.'
     )
     presenter_id = fields.Many2one(
-        'res.partner', string='Presenter',
-        domain="[('id', 'in', presenter_partner_ids)]",
+        'nhs.director', string='Presenter',
+        domain="[('id', 'in', presenter_director_ids)]",
         help='Who presents this item, selected from committee members.'
     )
 
-    @api.depends('committee_id', 'committee_id.member_ids.partner_id')
-    def _compute_presenter_partner_ids(self):
+    @api.depends('committee_id', 'committee_id.member_ids.director_id')
+    def _compute_presenter_director_ids(self):
         """Restrict allowed presenters to the owning committee's members."""
         for rec in self:
             if rec.committee_id and rec.committee_id.member_ids:
-                rec.presenter_partner_ids = rec.committee_id.member_ids.mapped('partner_id')
+                rec.presenter_director_ids = rec.committee_id.member_ids.mapped('director_id')
             else:
-                rec.presenter_partner_ids = self.env['res.partner'].search([])
+                rec.presenter_director_ids = self.env['nhs.director'].search([])
     time_allocation = fields.Integer(string='Minutes Allocated', help='Time allocated to this item, in minutes.')
     cycle_item_id = fields.Many2one('nhs.cycle.of.business', string='Standing Item',
                                     help='The cycle-of-business standing item this agenda item fulfils, '

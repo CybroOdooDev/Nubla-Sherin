@@ -13,6 +13,9 @@ access_nhs_committee_manager,nhs.committee manager,model_nhs_committee,group_nhs
 access_nhs_committee_member_viewer,nhs.committee.member viewer,model_nhs_committee_member,group_nhs_gov_viewer,1,0,0,0
 access_nhs_committee_member_officer,nhs.committee.member officer,model_nhs_committee_member,group_nhs_gov_officer,1,1,1,1
 access_nhs_committee_member_manager,nhs.committee.member manager,model_nhs_committee_member,group_nhs_gov_manager,1,1,1,1
+access_nhs_director_viewer,nhs.director viewer,model_nhs_director,group_nhs_gov_viewer,1,1,0,0
+access_nhs_director_officer,nhs.director officer,model_nhs_director,group_nhs_gov_officer,1,1,1,1
+access_nhs_director_manager,nhs.director manager,model_nhs_director,group_nhs_gov_manager,1,1,1,1
 access_nhs_cycle_of_business_viewer,nhs.cycle.of.business viewer,model_nhs_cycle_of_business,group_nhs_gov_viewer,1,0,0,0
 access_nhs_cycle_of_business_officer,nhs.cycle.of.business officer,model_nhs_cycle_of_business,group_nhs_gov_officer,1,1,1,1
 access_nhs_cycle_of_business_manager,nhs.cycle.of.business manager,model_nhs_cycle_of_business,group_nhs_gov_manager,1,1,1,1

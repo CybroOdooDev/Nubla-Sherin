@@ -14,7 +14,7 @@
     <!-- Cron: daily check that reminds members of their annual DoI refresh -->
     <record id="cron_gov_doi_refresh_reminder" model="ir.cron">
         <field name="name">NHS Governance: Annual declaration of interest refresh reminder</field>
-        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="model_id" ref="model_nhs_director"/>
         <field name="state">code</field>
         <field name="code">model._cron_doi_annual_refresh_reminder()</field>
         <field name="interval_number">1</field>

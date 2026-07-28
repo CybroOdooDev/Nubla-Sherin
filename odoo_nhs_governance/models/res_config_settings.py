@@ -37,14 +37,3 @@ class ResConfigSettings(models.TransientModel):
         string='Action Due Reminder (days)', default=3,
         config_parameter='odoo_nhs_governance.action_due_lead_days',
         help='How many days before an action/gap-action due date to raise an escalation warning.')
-    gov_incident_risk_installed = fields.Boolean(
-        string='NHS Incident & Risk Detected', compute='_compute_gov_incident_risk_installed',
-        help='Whether the odoo_nhs_incident_risk module is installed. When installed, BAF principal '
-             'risks can link to operational risks and corporate-tier risks are surfaced automatically.')
-
-    def _compute_gov_incident_risk_installed(self):
-        """Set whether the NHS Incident & Risk module is currently installed."""
-        installed = bool(self.env['ir.module.module'].sudo().search_count(
-            [('name', '=', 'odoo_nhs_incident_risk'), ('state', '=', 'installed')]))
-        for rec in self:
-            rec.gov_incident_risk_installed = installed

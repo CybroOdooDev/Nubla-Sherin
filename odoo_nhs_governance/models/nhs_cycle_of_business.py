@@ -54,25 +54,25 @@ class NhsCycleOfBusiness(models.Model):
         ('information', 'Information'),
     ], string='Purpose', default='assurance',
        help='The default purpose of this standing item when it is pulled onto an agenda.')
-    owner_partner_ids = fields.Many2many(
-        'res.partner', compute='_compute_owner_partner_ids',
+    owner_director_ids = fields.Many2many(
+        'nhs.director', compute='_compute_owner_director_ids',
         string='Allowed Owners',
         help='Committee members eligible to be selected as Item Owner, used to restrict the domain.'
     )
     owner_id = fields.Many2one(
-        'res.partner', string='Item Owner',
-        domain="[('id', 'in', owner_partner_ids)]",
+        'nhs.director', string='Item Owner',
+        domain="[('id', 'in', owner_director_ids)]",
         help='The item owner/presenter responsible for bringing this item.'
     )
 
-    @api.depends('committee_id', 'committee_id.member_ids.partner_id')
-    def _compute_owner_partner_ids(self):
+    @api.depends('committee_id', 'committee_id.member_ids.director_id')
+    def _compute_owner_director_ids(self):
         """Restrict allowed item owners to the owning committee's members."""
         for rec in self:
             if rec.committee_id and rec.committee_id.member_ids:
-                rec.owner_partner_ids = rec.committee_id.member_ids.mapped('partner_id')
+                rec.owner_director_ids = rec.committee_id.member_ids.mapped('director_id')
             else:
-                rec.owner_partner_ids = self.env['res.partner'].search([])
+                rec.owner_director_ids = self.env['nhs.director'].search([])
 
     @api.onchange('frequency')
     def _onchange_frequency(self):

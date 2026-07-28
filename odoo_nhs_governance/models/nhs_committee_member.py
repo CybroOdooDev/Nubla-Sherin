@@ -29,15 +29,16 @@ class NhsCommitteeMember(models.Model):
 
     committee_id = fields.Many2one('nhs.committee', string='Committee', required=True,
                                    ondelete='cascade', help='The committee.')
-    partner_id = fields.Many2one('res.partner', string='Member', required=True,
-                                 help='The person — board member, director or external/co-opted '
-                                      'member. Reuses the standard Contact record (the same one used '
-                                      'by NHS Trust Management for board membership).')
-    user_id = fields.Many2one('res.users', string='User',
+    director_id = fields.Many2one('nhs.director', string='Director', required=True,
+                                  ondelete='cascade', help='The person (director/officer).')
+    partner_id = fields.Many2one('res.partner', string='Contact', related='director_id.partner_id',
+                                 store=True, help='Contact/user link for external members or portal access, '
+                                                   "taken from the director's own contact link.")
+    user_id = fields.Many2one('res.users', string='User', related='director_id.user_id', store=True,
                               help='System user link, used to grant portal/system access to this member '
                                    'for their own packs, actions and declarations.')
-    name = fields.Char(string='Member Name', related='partner_id.name', store=True,
-                       help='The member name, taken from the contact record.')
+    name = fields.Char(string='Member Name', related='director_id.name', store=True,
+                       help='The member name, taken from the director record.')
     role = fields.Selection([
         ('chair', 'Chair'),
         ('vice_chair', 'Vice-Chair'),
@@ -59,58 +60,19 @@ class NhsCommitteeMember(models.Model):
                                  help='Owning company, taken from the related committee.')
     active = fields.Boolean(string='Active', default=True, help='Archive flag.')
 
-    _DIRECTORY_SYNC_ROLES = {'chair', 'vice_chair', 'member'}
+    @api.onchange('director_id')
+    def _onchange_director_ned(self):
+        """Default is_ned from the selected director's executive status."""
+        if self.director_id:
+            self.is_ned = not self.director_id.is_executive
 
-    @api.onchange('partner_id')
-    def _onchange_partner_ned(self):
-        """Default is_ned from the selected partner's NHS board role."""
-        if self.partner_id.nhs_board_role:
-            role = self.env['nhs.board.role'].search(
-                [('code', '=', self.partner_id.nhs_board_role)], limit=1)
-            if role:
-                self.is_ned = role.is_ned
-
-    @api.onchange('partner_id')
-    def _onchange_partner_user(self):
-        """Default the linked user from the selected partner's user account."""
-        self.user_id = self.partner_id.user_ids[:1]
+    @api.onchange('director_id')
+    def _onchange_director_user(self):
+        """Default the linked user from the selected director's own user account."""
+        self.user_id = self.director_id.user_id
 
     @api.onchange('role')
     def _onchange_role_voting(self):
         """Mark attendee/in-attendance roles as non-voting by default."""
         if self.role in ('attendee', 'in_attendance'):
             self.voting = False
-
-    def _sync_board_member_directory(self):
-        """Add Chair/Vice-Chair/Member roles to the linked Trust's Board Member directory
-        (res.partner.is_nhs_board_member), so they don't need to be created twice."""
-        for member in self:
-            trust = member.committee_id.trust_id
-            if not trust or not member.partner_id or member.role not in self._DIRECTORY_SYNC_ROLES:
-                continue
-            partner = member.partner_id
-            vals = {}
-            if not partner.is_nhs_board_member:
-                vals['is_nhs_board_member'] = True
-            if not partner.nhs_trust_id:
-                vals['nhs_trust_id'] = trust.id
-            if not partner.nhs_board_role:
-                # 'non_exec'/'other' only: never 'chair'/'ceo'/etc., which would hijack the
-                # Trust's own statutory field via res.partner._sync_trust_governance().
-                vals['nhs_board_role'] = 'non_exec' if member.is_ned else 'other'
-            if vals:
-                partner.sudo().write(vals)
-
-    @api.model_create_multi
-    def create(self, vals_list):
-        """Create memberships and sync the partner's board member directory."""
-        records = super().create(vals_list)
-        records._sync_board_member_directory()
-        return records
-
-    def write(self, vals):
-        """Update memberships and re-sync the board member directory when partner/role changes."""
-        result = super().write(vals)
-        if {'partner_id', 'role'} & set(vals):
-            self._sync_board_member_directory()
-        return result

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ══ MEETING FORM ═════════════════════════════════════════════ -->
+    <!--  MEETING FORM -->
     <record id="view_nhs_meeting_form" model="ir.ui.view">
         <field name="name">nhs.meeting.form</field>
         <field name="model">nhs.meeting</field>
@@ -66,7 +66,7 @@
                         <page string="Agenda &amp; Papers" name="page_agenda">
                             <field name="agenda_item_ids">
                                 <list>
-                                    <field name="presenter_partner_ids" column_invisible="1"/>
+                                    <field name="presenter_director_ids" column_invisible="1"/>
                                     <field name="sequence" widget="handle"/>
                                     <field name="item_number"/>
                                     <field name="title"/>
@@ -96,7 +96,7 @@
                                         </div>
                                         <group>
                                             <group>
-                                                <field name="presenter_partner_ids" invisible="1"/>
+                                                <field name="presenter_director_ids" invisible="1"/>
                                                 <field name="item_number"/>
                                                 <field name="purpose"/>
                                                 <field name="presenter_id"/>
@@ -132,7 +132,7 @@
                         <page string="Declarations" name="page_declarations" invisible="state == 'scheduled'">
                             <field name="declaration_ids" context="{'default_event': 'at_meeting', 'default_meeting_id': id}">
                                 <list>
-                                    <field name="partner_id"/>
+                                    <field name="director_id"/>
                                     <field name="category_id"/>
                                     <field name="agenda_item_id"/>
                                     <field name="conflict_management"/>
@@ -149,7 +149,7 @@
                                         <field name="category_code" invisible="1"/>
                                         <group>
                                             <group>
-                                                <field name="partner_id" domain="[('nhs_gov_committee_membership_ids.committee_id', '=', parent.committee_id)]"/>
+                                                <field name="director_id" domain="[('committee_membership_ids.committee_id', '=', parent.committee_id)]"/>
                                                 <field name="category_id"/>
                                                 <field name="event"/>
                                                 <field name="is_published"/>
@@ -161,7 +161,7 @@
                                             </group>
                                         </group>
                                         <group string="NATURE OF INTEREST" invisible="category_code == 'nil'">
-                                            <field name="nature" nolabel="1"/>
+                                            <field name="nature" nolabel="1" colspan="2" widget="text"/>
                                         </group>
                                         <group string="CONFLICT MANAGEMENT">
                                             <field name="agenda_item_id" domain="[('meeting_id', '=', parent.id)]"/>
@@ -193,7 +193,7 @@
         </field>
     </record>
 
-    <!-- ══ MEETING LIST ═════════════════════════════════════════════ -->
+    <!-- MEETING LIST -->
     <record id="view_nhs_meeting_list" model="ir.ui.view">
         <field name="name">nhs.meeting.list</field>
         <field name="model">nhs.meeting</field>
@@ -214,7 +214,7 @@
         </field>
     </record>
 
-    <!-- ══ MEETING CALENDAR ═════════════════════════════════════════ -->
+    <!-- MEETING CALENDAR -->
     <record id="view_nhs_meeting_calendar" model="ir.ui.view">
         <field name="name">nhs.meeting.calendar</field>
         <field name="model">nhs.meeting</field>
@@ -226,7 +226,7 @@
         </field>
     </record>
 
-    <!-- ══ MEETING SEARCH ═══════════════════════════════════════════ -->
+    <!-- MEETING SEARCH -->
     <record id="view_nhs_meeting_search" model="ir.ui.view">
         <field name="name">nhs.meeting.search</field>
         <field name="model">nhs.meeting</field>
@@ -249,7 +249,7 @@
         </field>
     </record>
 
-    <!-- ══ ACTIONS ══════════════════════════════════════════════════ -->
+    <!-- ACTIONS -->
     <record id="action_nhs_meeting" model="ir.actions.act_window">
         <field name="name">All Meetings</field>
         <field name="res_model">nhs.meeting</field>

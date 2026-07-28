@@ -29,22 +29,21 @@ class NhsDeclaration(models.Model):
     _inherit = ['mail.thread']
     _order = 'date_from desc, id desc'
 
-    partner_id = fields.Many2one('res.partner', string='Declared By', required=True,
-                                 domain="[('is_nhs_board_member', '=', True)]",
-                                 tracking=True, help='The director/officer/member who declared.')
+    director_id = fields.Many2one('nhs.director', string='Declared By', required=True,
+                                  tracking=True, help='The director/officer who declared.')
     company_id = fields.Many2one('res.company', string='Company', required=True,
                                  default=lambda self: self.env.company,
                                  help='The company this declaration of interest belongs to.')
     name = fields.Char(string='Reference', compute='_compute_name', store=True,
                        help='Auto-generated label combining the declarant, category and year.')
 
-    @api.depends('partner_id', 'category_id', 'date_from')
+    @api.depends('director_id', 'category_id', 'date_from')
     def _compute_name(self):
-        """Build the declaration reference label from partner, category and year."""
+        """Build the declaration reference label from director, category and year."""
         for rec in self:
-            if rec.partner_id and rec.category_id:
+            if rec.director_id and rec.category_id:
                 year = rec.date_from.strftime('%Y') if rec.date_from else ''
-                rec.name = f"{rec.partner_id.name} - {rec.category_id.name} {year}".strip()
+                rec.name = f"{rec.director_id.name} - {rec.category_id.name} {year}".strip()
             else:
                 rec.name = 'New Declaration'
 

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ══ ROOT APP MENU ════════════════════════════════════════════ -->
+    <!-- ROOT APP MENU  -->
     <menuitem id="menu_nhs_gov_root"
               name="Governance"
               sequence="60"
               web_icon="odoo_nhs_governance,static/description/icon.png"
               groups="odoo_nhs_governance.group_nhs_gov_viewer"/>
 
-    <!-- ══ COMMITTEES ═══════════════════════════════════════════════ -->
+    <!-- COMMITTEES -->
     <menuitem id="menu_nhs_gov_committees"
               name="Committees"
               parent="menu_nhs_gov_root"
@@ -61,7 +61,7 @@
               action="action_nhs_meeting_action"
               sequence="40"/>
 
-    <!-- ══ DECLARATIONS ═════════════════════════════════════════════ -->
+    <!-- DECLARATIONS -->
     <menuitem id="menu_nhs_gov_declarations"
               name="Declarations"
               parent="menu_nhs_gov_root"
@@ -81,7 +81,7 @@
               action="action_nhs_declaration_annual"
               sequence="20"/>
 
-    <!-- ══ ASSURANCE (BAF) ══════════════════════════════════════════ -->
+    <!-- ASSURANCE (BAF) -->
     <menuitem id="menu_nhs_gov_assurance"
               name="Assurance (BAF)"
               parent="menu_nhs_gov_root"
@@ -108,7 +108,7 @@
               action="action_nhs_baf_heatmap"
               sequence="30"/>
 
-    <!-- ══ CALENDAR ═════════════════════════════════════════════════ -->
+    <!-- CALENDAR -->
     <menuitem id="menu_nhs_gov_calendar"
               name="Calendar"
               parent="menu_nhs_gov_root"
@@ -175,11 +175,11 @@
               sequence="40"/>
 
     <!-- Menu: PDF action log report -->
-    <menuitem id="menu_nhs_gov_report_action_log"
-              name="Action Log (PDF)"
-              parent="menu_nhs_gov_reporting"
-              action="action_report_action_log"
-              sequence="50"/>
+<!--    <menuitem id="menu_nhs_gov_report_action_log"-->
+<!--              name="Action Log (PDF)"-->
+<!--              parent="menu_nhs_gov_reporting"-->
+<!--              action="action_report_action_log"-->
+<!--              sequence="50"/>-->
 
     <!-- Menu: attendance report (pivot/list) -->
     <menuitem id="menu_nhs_gov_report_attendance"
@@ -188,7 +188,7 @@
               action="action_nhs_gov_attendance_report"
               sequence="60"/>
 
-    <!-- ══ CONFIGURATION (manager only) ════════════════════════════ -->
+    <!-- CONFIGURATION (manager only)-->
     <menuitem id="menu_nhs_gov_configuration"
               name="Configuration"
               parent="menu_nhs_gov_root"

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Governance calendar: all meetings, ToR reviews, DoI refreshes and statutory cycle items
-         across the year. Meetings are the primary calendar surface; ToR reviews, DoI refreshes and
-         statutory cycle-of-business items are reached from this same menu as pre-filtered lists. -->
+         across the year. -->
     <record id="action_nhs_governance_calendar" model="ir.actions.act_window">
         <field name="name">Governance Calendar</field>
         <field name="res_model">nhs.meeting</field>

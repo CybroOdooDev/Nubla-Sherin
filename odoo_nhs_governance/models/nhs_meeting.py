@@ -247,17 +247,17 @@ class NhsMeeting(models.Model):
                 'state': act.state,
             })
 
-        # 4. DoI Refreshes Due (res.partner with committee memberships)
-        doi_domain = [('nhs_gov_committee_membership_ids', '!=', False)]
-        doi_recs = self.env['res.partner'].search(doi_domain, limit=10)
-        doi_count = self.env['res.partner'].search_count(doi_domain)
+        # 4. DoI Refreshes Due (nhs.director with committee memberships)
+        doi_domain = [('committee_membership_ids', '!=', False)]
+        doi_recs = self.env['nhs.director'].search(doi_domain, limit=10)
+        doi_count = self.env['nhs.director'].search_count(doi_domain)
         doi_list = []
-        for p in doi_recs:
+        for d in doi_recs:
             doi_list.append({
-                'id': p.id,
-                'name': p.name,
-                'email': p.email or '',
-                'memberships_count': len(p.nhs_gov_committee_membership_ids),
+                'id': d.id,
+                'name': d.name,
+                'email': d.partner_id.email or '',
+                'memberships_count': len(d.committee_membership_ids),
             })
 
         # 5. ToR Reviews Due

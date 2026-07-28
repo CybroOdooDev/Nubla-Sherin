@@ -34,9 +34,8 @@ class NhsBafObjective(models.Model):
                                  default=lambda self: self.env.company,
                                  help='Owning organisation.')
     code = fields.Char(string='Reference', help='Objective reference (e.g. "SO1").')
-    lead_partner_id = fields.Many2one('res.partner', string='Executive Lead',
-                                      domain="[('is_nhs_board_member', '=', True)]",
-                                      help='Executive lead for this objective.')
+    lead_director_id = fields.Many2one('nhs.director', string='Executive Lead',
+                                       help='Executive lead for this objective.')
     risk_ids = fields.One2many('nhs.baf.risk', 'objective_id', string='Principal Risks',
                                help='Principal risks to this objective.')
     risk_count = fields.Integer(string='Principal Risk Count', compute='_compute_risk_count',

@@ -6,7 +6,7 @@
         <field name="model">nhs.agenda.item</field>
         <field name="arch" type="xml">
             <list string="Agenda Items" decoration-info="is_confidential">
-                <field name="presenter_partner_ids" column_invisible="1"/>
+                <field name="presenter_director_ids" column_invisible="1"/>
                 <field name="meeting_id"/>
                 <field name="committee_id"/>
                 <field name="item_number"/>
@@ -43,7 +43,7 @@
                     </div>
                     <group>
                         <group>
-                            <field name="presenter_partner_ids" invisible="1"/>
+                            <field name="presenter_director_ids" invisible="1"/>
                             <field name="meeting_id"/>
                             <field name="item_number"/>
                             <field name="purpose"/>

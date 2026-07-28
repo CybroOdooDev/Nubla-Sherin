@@ -55,7 +55,6 @@
         'wizards/nhs_agenda_from_cycle_wizard_views.xml',
         'wizards/nhs_board_pack_wizard_views.xml',
         'views/nhs_committee_views.xml',
-        'views/res_partner_views.xml',
         'views/nhs_director_views.xml',
         'views/nhs_meeting_views.xml',
         'views/nhs_agenda_item_views.xml',

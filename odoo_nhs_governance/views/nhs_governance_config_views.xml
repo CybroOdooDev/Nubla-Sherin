@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ══ COMMITTEE TYPE ═══════════════════════════════════════════ -->
+    <!--  COMMITTEE TYPE -->
     <record id="view_nhs_committee_type_list" model="ir.ui.view">
         <field name="name">nhs.committee.type.list</field>
         <field name="model">nhs.committee.type</field>
@@ -21,7 +21,7 @@
         <field name="view_mode">list,form</field>
     </record>
 
-    <!-- ══ INTEREST CATEGORY ════════════════════════════════════════ -->
+    <!-- INTEREST CATEGORY -->
     <record id="view_nhs_gov_interest_category_list" model="ir.ui.view">
         <field name="name">nhs.gov.interest.category.list</field>
         <field name="model">nhs.gov.interest.category</field>
@@ -42,7 +42,7 @@
         <field name="view_mode">list,form</field>
     </record>
 
-    <!-- ══ ASSURANCE LINE ═══════════════════════════════════════════ -->
+    <!-- ASSURANCE LINE-->
     <record id="view_nhs_gov_assurance_line_list" model="ir.ui.view">
         <field name="name">nhs.gov.assurance.line.list</field>
         <field name="model">nhs.gov.assurance.line</field>
@@ -63,7 +63,7 @@
         <field name="view_mode">list,form</field>
     </record>
 
-    <!-- ══ SETTINGS ═════════════════════════════════════════════════ -->
+    <!--SETTINGS  -->
     <record id="view_nhs_governance_config_settings" model="ir.ui.view">
         <field name="name">nhs.governance.config.settings</field>
         <field name="model">res.config.settings</field>
@@ -84,12 +84,6 @@
                         <setting string="Action Due Reminder"
                                  help="Days before an action due date to raise an escalation warning">
                             <field name="gov_action_due_lead_days"/>
-                        </setting>
-                    </block>
-                    <block title="Integration">
-                        <setting string="NHS Incident &amp; Risk"
-                                 help="When installed, BAF principal risks can link to operational risks and corporate-tier risks are surfaced automatically.">
-                            <field name="gov_incident_risk_installed" readonly="1"/>
                         </setting>
                     </block>
                 </app>

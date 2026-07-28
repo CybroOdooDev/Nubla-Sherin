@@ -67,11 +67,9 @@ class NhsCommittee(models.Model):
         ('annual', 'Annual'),
         ('ad_hoc', 'Ad-hoc'),
     ], string='Meeting Frequency', help='How often this committee meets.')
-    chair_id = fields.Many2one('res.partner', string='Chair',
-                               domain="[('nhs_trust_id', '=', trust_id), ('is_nhs_board_member', '=', True)]",
-                               help='The committee chair, picked from the board members of the linked Trust. '
-                                    'Selecting a chair here also adds/updates their Membership record with '
-                                    "role 'Chair'.")
+    chair_id = fields.Many2one('nhs.director', string='Chair',
+                               help='The committee chair. Selecting a chair here also adds/updates '
+                                    "their Membership record with role 'Chair'.")
     member_ids = fields.One2many('nhs.committee.member', 'committee_id', string='Membership',
                                  help='Committee membership: members and their roles.')
     member_count = fields.Integer(string='Members', compute='_compute_counts',
@@ -144,17 +142,17 @@ class NhsCommittee(models.Model):
         for committee in self:
             if not committee.chair_id:
                 continue
-            chair_member = committee.member_ids.filtered(lambda m: m.partner_id == committee.chair_id)
+            chair_member = committee.member_ids.filtered(lambda m: m.director_id == committee.chair_id)
             if chair_member:
                 chair_member.filtered(lambda m: m.role != 'chair').write({'role': 'chair'})
             else:
                 self.env['nhs.committee.member'].create({
                     'committee_id': committee.id,
-                    'partner_id': committee.chair_id.id,
+                    'director_id': committee.chair_id.id,
                     'role': 'chair',
                 })
             other_chairs = committee.member_ids.filtered(
-                lambda m: m.role == 'chair' and m.partner_id != committee.chair_id)
+                lambda m: m.role == 'chair' and m.director_id != committee.chair_id)
             other_chairs.write({'role': 'member'})
 
     @api.model_create_multi
