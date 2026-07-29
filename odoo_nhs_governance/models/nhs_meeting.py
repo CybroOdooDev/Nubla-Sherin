@@ -19,6 +19,8 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
+import re
+
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
@@ -28,6 +30,8 @@ class NhsMeeting(models.Model):
     _description = 'A committee/board meeting'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'meeting_date desc'
+
+    _STATE_SEQUENCE = ['scheduled', 'agenda_set', 'held', 'minuted', 'closed']
 
     name = fields.Char(string='Meeting', required=True, copy=False, tracking=True,
                        help="Defaults to e.g. 'Audit Committee — 12 May 2026' but can be edited manually.")
@@ -71,10 +75,10 @@ class NhsMeeting(models.Model):
     active = fields.Boolean(string='Active', default=True, help='Archive flag.')
 
     def _default_meeting_name(self, committee, meeting_date):
-        """Build the default meeting name from the committee and meeting date."""
+        """Build the default meeting name from the committee and meeting date, if both are known."""
         if committee and meeting_date:
             return f'{committee.name} — {fields.Datetime.context_timestamp(self, meeting_date).strftime("%d %b %Y")}'
-        return committee.name or 'New Meeting'
+        return committee.name or False
 
     @api.onchange('committee_id', 'meeting_date')
     def _onchange_meeting_name_suggestion(self):
@@ -90,6 +94,18 @@ class NhsMeeting(models.Model):
         for rec in self:
             if rec.state == 'scheduled' and rec.meeting_date and rec.meeting_date < now:
                 raise ValidationError('A scheduled meeting cannot be dated in the past.')
+
+    @api.constrains('committee_id')
+    def _check_committee_active(self):
+        """A meeting may only be created for a committee/board that is Active — a Draft,
+        Dormant or Disbanded committee should not be generating new meetings."""
+        for rec in self:
+            if rec.committee_id and rec.committee_id.state != 'active':
+                raise ValidationError(
+                    'Meetings can only be created for an active committee or board — "%s" is '
+                    'currently %s.' % (rec.committee_id.name,
+                                       dict(rec.committee_id._fields['state'].selection).get(
+                                           rec.committee_id.state)))
 
     @api.depends('attendee_ids.status', 'attendee_ids.voting', 'attendee_ids.is_ned',
                  'committee_id.quorum_min', 'committee_id.quorum_min_ned')
@@ -136,18 +152,46 @@ class NhsMeeting(models.Model):
                     'is_ned': member.is_ned,
                 })
 
+    def write(self, vals):
+        """Validate state changes against the meeting lifecycle, whichever way they're made —
+        via an action button or by clicking directly on the statusbar."""
+        old_states = {rec.id: rec.state for rec in self} if 'state' in vals else {}
+        res = super().write(vals)
+        for rec in self:
+            if rec.id in old_states and old_states[rec.id] != rec.state:
+                rec._check_state_transition(old_states[rec.id])
+        return res
+
+    def _check_state_transition(self, old_state):
+        """Enforce the meeting lifecycle rules for a state change from old_state to self.state."""
+        self.ensure_one()
+        new_state = self.state
+        if new_state == 'cancelled':
+            if old_state in ('held', 'minuted', 'closed'):
+                raise UserError('A meeting that has already been held cannot be cancelled.')
+            return
+        if old_state == 'cancelled':
+            raise UserError('A cancelled meeting cannot change state.')
+        if old_state not in self._STATE_SEQUENCE or new_state not in self._STATE_SEQUENCE \
+                or self._STATE_SEQUENCE.index(new_state) != self._STATE_SEQUENCE.index(old_state) + 1:
+            raise UserError('Meetings must move through each stage in order — '
+                             'you cannot jump straight from "%s" to "%s". Please save any pending '
+                             'changes and use the stage buttons instead.'
+                             % (dict(self._fields['state'].selection).get(old_state, old_state),
+                                dict(self._fields['state'].selection).get(new_state, new_state)))
+        if new_state == 'agenda_set' and not self.agenda_item_ids:
+            raise UserError('Add at least one agenda item before setting the agenda.')
+        if new_state == 'held' and any(item.state == 'draft' for item in self.agenda_item_ids):
+            raise UserError('All agenda items must be marked as Completed or Deferred before the meeting can be held.')
+        if new_state == 'minuted' and not re.sub('<[^<]+?>', '', self.minutes or '').strip():
+            raise UserError('Add the minutes of the meeting before marking it as minuted.')
+
     def action_set_agenda(self):
         """Move the meeting to the Agenda Set state, once it has agenda items."""
-        for rec in self:
-            if not rec.agenda_item_ids:
-                raise UserError('Add at least one agenda item before setting the agenda.')
         self.write({'state': 'agenda_set'})
 
     def action_hold(self):
         """Mark the meeting as held, once all agenda items are resolved."""
-        for rec in self:
-            if any(item.state == 'draft' for item in rec.agenda_item_ids):
-                raise UserError('All agenda items must be marked as Completed or Deferred before the meeting can be held.')
         self.write({'state': 'held'})
 
     def action_minute(self):
@@ -160,9 +204,6 @@ class NhsMeeting(models.Model):
 
     def action_cancel(self):
         """Cancel the meeting, unless it has already been held."""
-        for rec in self:
-            if rec.state in ('held', 'minuted', 'closed'):
-                raise UserError('A meeting that has already been held cannot be cancelled.')
         self.write({'state': 'cancelled'})
 
     def action_view_pack(self):
@@ -232,8 +273,10 @@ class NhsMeeting(models.Model):
                 'state_label': dict(m._fields['state'].selection).get(m.state, m.state),
             })
 
-        # 3. Overdue Actions
-        overdue_actions_domain = [('state', '=', 'overdue')]
+        # 3. Overdue Actions (Explicitly overdue OR open/in progress but past due date)
+        today = fields.Date.context_today(self)
+        overdue_actions_domain = ['|', ('state', '=', 'overdue'),
+                                  '&', ('state', 'in', ['open', 'in_progress']), ('due_date', '<', today)]
         overdue_actions_recs = self.env['nhs.meeting.action'].search(overdue_actions_domain, limit=10, order='due_date asc')
         overdue_actions_count = self.env['nhs.meeting.action'].search_count(overdue_actions_domain)
         overdue_actions_list = []
@@ -256,7 +299,7 @@ class NhsMeeting(models.Model):
             doi_list.append({
                 'id': d.id,
                 'name': d.name,
-                'email': d.partner_id.email or '',
+                'email': d.email or '',
                 'memberships_count': len(d.committee_membership_ids),
             })
 

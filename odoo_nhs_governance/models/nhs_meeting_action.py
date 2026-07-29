@@ -84,9 +84,12 @@ class NhsMeetingAction(models.Model):
                 vals['reference'] = seq.next_by_code('nhs.meeting.action') or 'New'
         records = super().create(vals_list)
         records._check_parent()
+        template = self.env.ref('odoo_nhs_governance.mail_template_action_assigned', raise_if_not_found=False)
         for rec in records:
             rec.activity_schedule('mail.mail_activity_data_todo', user_id=rec.owner_id.id,
                                   note=f'Governance action assigned: {rec.name}')
+            if template and rec.owner_id.email:
+                template.send_mail(rec.id, force_send=False)
         return records
 
     def action_start(self):

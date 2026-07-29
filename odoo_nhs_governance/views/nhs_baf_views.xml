@@ -93,7 +93,7 @@
                     <group>
                         <group>
                             <field name="objective_id"/>
-                            <field name="owning_committee_id"/>
+                            <field name="owning_committee_id" domain="[('state', '=', 'active')]"/>
                             <field name="lead_director_id"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
@@ -109,12 +109,13 @@
                         </group>
                     </group>
                     <group>
-                        <field name="assurance_rating" widget="badge"
-                               decoration-success="assurance_rating == 'sufficient'"
-                               decoration-warning="assurance_rating == 'partial'"
-                               decoration-danger="assurance_rating == 'insufficient'"/>
-                        <field name="last_reviewed"/>
-                        <field name="operational_risk_ref"/>
+                        <group>
+                            <field name="assurance_rating" widget="radio" options="{'horizontal': true}"/>
+                            <field name="last_reviewed"/>
+                        </group>
+                        <group>
+                            <field name="operational_risk_ref"/>
+                        </group>
                     </group>
                     <notebook>
                         <page string="Controls">

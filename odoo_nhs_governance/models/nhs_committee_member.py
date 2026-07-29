@@ -39,6 +39,9 @@ class NhsCommitteeMember(models.Model):
                                    'for their own packs, actions and declarations.')
     name = fields.Char(string='Member Name', related='director_id.name', store=True,
                        help='The member name, taken from the director record.')
+    email = fields.Char(string='Email', related='director_id.email', store=True,
+                        help="The member's correspondence email, taken from the director record — "
+                             'edit it on the Director form.')
     role = fields.Selection([
         ('chair', 'Chair'),
         ('vice_chair', 'Vice-Chair'),

@@ -27,7 +27,7 @@
                             <field name="meeting_id"/>
                             <field name="agenda_item_id" domain="[('meeting_id', '=', meeting_id)]"
                                    context="{'default_meeting_id': meeting_id}"/>
-                            <field name="baf_risk_id"/>
+                            <field name="baf_risk_id" domain="[('owning_committee_id', '=', committee_id)]"/>
                         </group>
                         <group>
                             <field name="owner_id"/>

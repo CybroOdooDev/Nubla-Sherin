@@ -20,7 +20,7 @@
 #
 #############################################################################
 from odoo import api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 SCORE_SEL = [(str(i), str(i)) for i in range(1, 6)]
 SCORE_BANDS = [
@@ -83,6 +83,18 @@ class NhsBafRisk(models.Model):
              "target model as soon as a value is assigned.")
     last_reviewed = fields.Date(string='Last Reviewed', tracking=True, help='Last BAF review date.')
     active = fields.Boolean(string='Active', default=True, help='Archive flag.')
+
+    @api.constrains('owning_committee_id')
+    def _check_owning_committee_active(self):
+        """A principal risk may only be owned by a committee/board that is Active — a Draft,
+        Dormant or Disbanded committee should not be taking on new risks."""
+        for rec in self:
+            if rec.owning_committee_id and rec.owning_committee_id.state != 'active':
+                raise ValidationError(
+                    'A principal risk can only be owned by an active committee or board — "%s" '
+                    'is currently %s.' % (rec.owning_committee_id.name,
+                                          dict(rec.owning_committee_id._fields['state'].selection).get(
+                                              rec.owning_committee_id.state)))
 
     @api.depends('consequence', 'likelihood')
     def _compute_current_score(self):

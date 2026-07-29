@@ -52,15 +52,6 @@ class NhsAgendaItem(models.Model):
         domain="[('id', 'in', presenter_director_ids)]",
         help='Who presents this item, selected from committee members.'
     )
-
-    @api.depends('committee_id', 'committee_id.member_ids.director_id')
-    def _compute_presenter_director_ids(self):
-        """Restrict allowed presenters to the owning committee's members."""
-        for rec in self:
-            if rec.committee_id and rec.committee_id.member_ids:
-                rec.presenter_director_ids = rec.committee_id.member_ids.mapped('director_id')
-            else:
-                rec.presenter_director_ids = self.env['nhs.director'].search([])
     time_allocation = fields.Integer(string='Minutes Allocated', help='Time allocated to this item, in minutes.')
     cycle_item_id = fields.Many2one('nhs.cycle.of.business', string='Standing Item',
                                     help='The cycle-of-business standing item this agenda item fulfils, '
@@ -81,6 +72,15 @@ class NhsAgendaItem(models.Model):
     ], string='Status', default='draft', required=True, help='Lifecycle status of this agenda item.')
     active = fields.Boolean(string='Active', default=True, help='Archive flag.')
 
+    @api.depends('committee_id', 'committee_id.member_ids.director_id')
+    def _compute_presenter_director_ids(self):
+        """Restrict allowed presenters to the owning committee's members."""
+        for rec in self:
+            if rec.committee_id and rec.committee_id.member_ids:
+                rec.presenter_director_ids = rec.committee_id.member_ids.mapped('director_id')
+            else:
+                rec.presenter_director_ids = self.env['nhs.director'].search([])
+
     @api.constrains('state', 'deferred_to_id')
     def _check_deferred_to_id(self):
         """Require a target meeting whenever an agenda item is marked as deferred."""
@@ -97,6 +97,7 @@ class NhsAgendaItem(models.Model):
     def action_mark_complete(self):
         """Mark the agenda item as completed."""
         self.write({'state': 'completed'})
+        return {'type': 'ir.actions.act_window_close'}
 
     def action_reset_draft(self):
         """Reset the agenda item back to draft and clear any deferral."""
@@ -124,3 +125,4 @@ class NhsAgendaItem(models.Model):
                 'is_confidential': rec.is_confidential,
             })
             rec.write({'state': 'deferred', 'deferred_to_id': next_meeting.id})
+        return {'type': 'ir.actions.act_window_close'}

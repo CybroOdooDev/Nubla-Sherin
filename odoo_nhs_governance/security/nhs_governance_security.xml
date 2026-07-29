@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="0">
-        <!-- ══════════════════════════════════════════════════════════
-             MODULE CATEGORY / PRIVILEGE
-        ══════════════════════════════════════════════════════════ -->
+        <!-- MODULE CATEGORY / PRIVILEGE-->
         <record id="module_category_nhs_governance" model="ir.module.category">
             <field name="name">Governance</field>
             <field name="description">NHS Governance Management access levels.</field>
@@ -17,9 +15,7 @@
             <field name="sequence">10</field>
         </record>
 
-        <!-- ══════════════════════════════════════════════════════════
-             GROUPS
-        ══════════════════════════════════════════════════════════ -->
+        <!-- GROUPS-->
         <record id="group_nhs_gov_viewer" model="res.groups">
             <field name="name">Governance Viewer</field>
             <field name="privilege_id" ref="privilege_nhs_gov_access_level"/>
@@ -45,9 +41,7 @@
             <field name="comment">Full control including configuration and disbanding committees.</field>
         </record>
 
-        <!-- ══════════════════════════════════════════════════════════
-             RECORD RULES — nhs.committee
-        ══════════════════════════════════════════════════════════ -->
+        <!-- RECORD RULES — nhs.committee-->
         <record id="rule_gov_committee_manager" model="ir.rule">
             <field name="name">Committee: manager full access</field>
             <field name="model_id" ref="model_nhs_committee"/>
@@ -82,10 +76,8 @@
             <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- ══════════════════════════════════════════════════════════
-             RECORD RULES — nhs.committee.member / nhs.cycle.of.business
-             (scoped through the parent committee's company + membership)
-        ══════════════════════════════════════════════════════════ -->
+        <!-- RECORD RULES — nhs.committee.member / nhs.cycle.of.business
+             (scoped through the parent committee's company + membership)-->
         <record id="rule_gov_committee_member_officer" model="ir.rule">
             <field name="name">Committee Member: officer/manager company scope</field>
             <field name="model_id" ref="model_nhs_committee_member"/>
@@ -133,9 +125,7 @@
             <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- ══════════════════════════════════════════════════════════
-             RECORD RULES — nhs.meeting / nhs.meeting.attendee / nhs.agenda.item
-        ══════════════════════════════════════════════════════════ -->
+        <!-- RECORD RULES — nhs.meeting / nhs.meeting.attendee / nhs.agenda.item -->
         <record id="rule_gov_meeting_officer" model="ir.rule">
             <field name="name">Meeting: officer/manager company scope</field>
             <field name="model_id" ref="model_nhs_meeting"/>
@@ -209,9 +199,7 @@
             <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- ══════════════════════════════════════════════════════════
-             RECORD RULES — nhs.meeting.action (own actions for viewer)
-        ══════════════════════════════════════════════════════════ -->
+        <!-- RECORD RULES — nhs.meeting.action (own actions for viewer) -->
         <record id="rule_gov_action_officer" model="ir.rule">
             <field name="name">Action: officer/manager company scope</field>
             <field name="model_id" ref="model_nhs_meeting_action"/>
@@ -234,10 +222,8 @@
             <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- ══════════════════════════════════════════════════════════
-             RECORD RULES — nhs.declaration (own declarations for viewer;
-             sensitive personal data — access controlled)
-        ══════════════════════════════════════════════════════════ -->
+        <!-- RECORD RULES — nhs.declaration (own declarations for viewer;
+             sensitive personal data — access controlled) -->
         <record id="rule_gov_declaration_officer" model="ir.rule">
             <field name="name">Declaration: officer/manager company scope</field>
             <field name="model_id" ref="model_nhs_declaration"/>
@@ -260,10 +246,8 @@
             <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- ══════════════════════════════════════════════════════════
-             RECORD RULES — nhs.director (its own model; company-scoped like the
-             rest of the register, plus a director can always see/edit their own record)
-        ══════════════════════════════════════════════════════════ -->
+        <!-- RECORD RULES — nhs.director (its own model; company-scoped like the
+             rest of the register, plus a director can always see/edit their own record)-->
         <record id="rule_gov_director_officer" model="ir.rule">
             <field name="name">Director: officer/manager company scope</field>
             <field name="model_id" ref="model_nhs_director"/>
@@ -298,10 +282,8 @@
             <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- ══════════════════════════════════════════════════════════
-             RECORD RULES — BAF (company-wide read for viewer; BAF is board-level,
-             less restrictive)
-        ══════════════════════════════════════════════════════════ -->
+        <!-- RECORD RULES — BAF (company-wide read for viewer; BAF is board-level,
+             less restrictive)-->
         <record id="rule_gov_baf_objective_officer" model="ir.rule">
             <field name="name">BAF Objective: officer/manager company scope</field>
             <field name="model_id" ref="model_nhs_baf_objective"/>

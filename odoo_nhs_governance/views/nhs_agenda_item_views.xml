@@ -6,7 +6,6 @@
         <field name="model">nhs.agenda.item</field>
         <field name="arch" type="xml">
             <list string="Agenda Items" decoration-info="is_confidential">
-                <field name="presenter_director_ids" column_invisible="1"/>
                 <field name="meeting_id"/>
                 <field name="committee_id"/>
                 <field name="item_number"/>
@@ -26,13 +25,14 @@
         <field name="arch" type="xml">
             <form string="Agenda Item">
                 <header>
+                    <field name="id" invisible="1"/>
                     <button name="action_mark_complete" string="Mark Complete" type="object"
                             class="btn-primary" invisible="state in ('completed', 'deferred')"/>
                     <button name="action_defer_to_next" string="Defer" type="object"
                             invisible="state in ('completed', 'deferred')"/>
                     <button name="action_reset_draft" string="Reset to Draft" type="object"
                             invisible="state == 'draft'"/>
-                    <field name="state" widget="statusbar"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,completed,deferred" options="{'clickable': '1'}"/>
                 </header>
                 <sheet>
                     <div class="oe_title">

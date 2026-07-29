@@ -91,6 +91,18 @@ class NhsDeclaration(models.Model):
             self.nature = False
             self.related_org = False
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Create declarations and confirm receipt by email for the Annual Refresh trigger only —
+        On Appointment, At Meeting and Ad-hoc declarations don't get this confirmation."""
+        records = super().create(vals_list)
+        template = self.env.ref('odoo_nhs_governance.mail_template_doi_annual_confirmed',
+                                raise_if_not_found=False)
+        if template:
+            for rec in records.filtered(lambda d: d.event == 'annual' and d.director_id.email):
+                template.send_mail(rec.id, force_send=False)
+        return records
+
     def unlink(self):
         """Prevent deletion of declarations unless the user is a system admin."""
         if not self.env.user.has_group('base.group_system'):

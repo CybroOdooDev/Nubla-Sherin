@@ -55,6 +55,9 @@ class NhsDirector(models.Model):
     partner_id = fields.Many2one(
         'res.partner', string='Contact',
         help='Optional link to a Contact record, e.g. for correspondence.')
+    email = fields.Char(string='Email', tracking=True,
+                        help='Correspondence email — used to send meeting packs, action assignments and '
+                             'reminders (ToR review, DoI refresh) to this director.')
     user_id = fields.Many2one(
         'res.users', string='User',
         help='Optional system user link, used to grant portal/system access to this director '
@@ -79,6 +82,7 @@ class NhsDirector(models.Model):
         for rec in self:
             rec.committee_count = len(rec.committee_membership_ids)
             rec.declaration_count = len(rec.declaration_ids)
+
 
     def action_view_committees(self):
         """Open the list of committee memberships held by this director."""
@@ -128,6 +132,7 @@ class NhsDirector(models.Model):
             'odoo_nhs_governance.doi_refresh_lead_days', 30))
         cutoff = fields.Date.today() - timedelta(days=365 - lead_days)
         directors = self.search([('committee_membership_ids', '!=', False)])
+        template = self.env.ref('odoo_nhs_governance.mail_template_doi_refresh_due', raise_if_not_found=False)
         for director in directors:
             last_declaration = director.declaration_ids.filtered(
                 lambda d: d.event in ('appointment', 'annual')).sorted('date_from', reverse=True)[:1]
@@ -136,3 +141,5 @@ class NhsDirector(models.Model):
                     'mail.mail_activity_data_todo',
                     user_id=director.user_id.id or self.env.user.id,
                     note=f'Annual declaration of interest refresh due for {director.name}.')
+                if template and director.email:
+                    template.send_mail(director.id, force_send=False)

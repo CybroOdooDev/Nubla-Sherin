@@ -21,6 +21,7 @@
 #############################################################################
 from datetime import timedelta
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 
 class NhsCommittee(models.Model):
@@ -90,6 +91,9 @@ class NhsCommittee(models.Model):
                                    help='BAF principal risks this committee scrutinises.')
     baf_risk_count = fields.Integer(string='Principal Risks', compute='_compute_counts',
                                     help='Number of BAF principal risks owned by this committee.')
+    tor_reminder_email = fields.Char(string='ToR Reminder Contact', compute='_compute_tor_reminder_email',
+                                     help='Best-available recipient for the ToR-review-due reminder: '
+                                          'the chair, else the committee secretary, else the company email.')
     state = fields.Selection([
         ('draft', 'Draft'),
         ('active', 'Active'),
@@ -119,6 +123,19 @@ class NhsCommittee(models.Model):
             rec.voting_ned_count = len(voting_members.filtered('is_ned'))
             rec.meeting_count = len(rec.meeting_ids)
             rec.baf_risk_count = len(rec.baf_risk_ids)
+
+    @api.depends('chair_id.email', 'member_ids.role', 'member_ids.director_id.email',
+                 'company_id.email')
+    def _compute_tor_reminder_email(self):
+        """Pick the best-available recipient for the ToR-review-due reminder: the chair,
+        else the committee secretary, else the company email — so the reminder always has
+        somewhere to go, even for a committee with no chair assigned yet."""
+        for rec in self:
+            secretary = rec.member_ids.filtered(lambda m: m.role == 'secretary')[:1]
+            rec.tor_reminder_email = (rec.chair_id.email
+                                      or secretary.director_id.email
+                                      or rec.company_id.email
+                                      or False)
 
     def action_confirm(self):
         """Confirm a draft committee, moving it to Active status."""
@@ -196,6 +213,8 @@ class NhsCommittee(models.Model):
     def action_open_meeting_generate_wizard(self):
         """Open the wizard to generate a series of meetings for this committee."""
         self.ensure_one()
+        if self.state != 'active':
+            raise UserError('Meetings can only be generated for an active committee or board.')
         return {
             'type': 'ir.actions.act_window',
             'name': 'Generate Meeting Series',
@@ -233,9 +252,12 @@ class NhsCommittee(models.Model):
             ('tor_review_date', '<=', warn_date),
             ('state', '=', 'active'),
         ])
+        template = self.env.ref('odoo_nhs_governance.mail_template_tor_review_due', raise_if_not_found=False)
         for committee in committees:
             committee.activity_schedule(
                 'mail.mail_activity_data_todo',
                 date_deadline=committee.tor_review_date,
                 note=f'Terms of Reference review due for {committee.name} on {committee.tor_review_date}.',
             )
+            if template and committee.tor_reminder_email:
+                template.send_mail(committee.id, force_send=False)

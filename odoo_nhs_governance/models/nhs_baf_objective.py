@@ -37,7 +37,7 @@ class NhsBafObjective(models.Model):
     lead_director_id = fields.Many2one('nhs.director', string='Executive Lead',
                                        help='Executive lead for this objective.')
     risk_ids = fields.One2many('nhs.baf.risk', 'objective_id', string='Principal Risks',
-                               help='Principal risks to this objective.')
+                               copy=True, help='Principal risks to this objective.')
     risk_count = fields.Integer(string='Principal Risk Count', compute='_compute_risk_count',
                                 help='Number of principal risks linked to this objective.')
     highest_current_score = fields.Integer(string='Highest Current Score', compute='_compute_risk_count',
@@ -63,3 +63,11 @@ class NhsBafObjective(models.Model):
             'domain': [('objective_id', '=', self.id)],
             'context': {'default_objective_id': self.id},
         }
+
+    def copy(self, default=None):
+        """Append (copy) to the reference when duplicating an objective."""
+        self.ensure_one()
+        default = dict(default or {})
+        if 'code' not in default and self.code:
+            default['code'] = f"{self.code} (copy)"
+        return super().copy(default)

@@ -50,7 +50,7 @@
                     </div>
                     <group>
                         <group>
-                            <field name="committee_id"/>
+                            <field name="committee_id" domain="[('state', '=', 'active')]"/>
                             <field name="meeting_date"/>
                             <field name="location"/>
                             <field name="company_id" groups="base.group_multi_company"/>
@@ -64,9 +64,8 @@
                     <notebook>
                         <!-- Step 1-3: build the agenda, collate papers on each item, assemble the pack. -->
                         <page string="Agenda &amp; Papers" name="page_agenda">
-                            <field name="agenda_item_ids">
+                            <field name="agenda_item_ids" context="{'default_meeting_id': id}" invisible="state != 'scheduled'">
                                 <list>
-                                    <field name="presenter_director_ids" column_invisible="1"/>
                                     <field name="sequence" widget="handle"/>
                                     <field name="item_number"/>
                                     <field name="title"/>
@@ -79,13 +78,14 @@
                                 </list>
                                 <form string="Agenda Item">
                                     <header>
+                                        <field name="id" invisible="1"/>
                                         <button name="action_mark_complete" string="Mark Complete" type="object"
                                                 class="btn-primary" invisible="state in ('completed', 'deferred')"/>
                                         <button name="action_defer_to_next" string="Defer" type="object"
                                                 invisible="state in ('completed', 'deferred')"/>
                                         <button name="action_reset_draft" string="Reset to Draft" type="object"
                                                 invisible="state == 'draft'"/>
-                                        <field name="state" widget="statusbar"/>
+                                        <field name="state" widget="statusbar" statusbar_visible="draft,completed,deferred" options="{'clickable': '1'}"/>
                                     </header>
                                     <sheet>
                                         <div class="oe_title">
@@ -97,6 +97,60 @@
                                         <group>
                                             <group>
                                                 <field name="presenter_director_ids" invisible="1"/>
+                                                <field name="meeting_id"/>
+                                                <field name="item_number"/>
+                                                <field name="purpose"/>
+                                                <field name="presenter_id"/>
+                                                <field name="time_allocation"/>
+                                                <field name="is_confidential"/>
+                                                <field name="cycle_item_id"/>
+                                            </group>
+                                            <group>
+                                                <field name="paper_ids" widget="many2many_binary"/>
+                                            </group>
+                                        </group>
+                                        <group string="Minute &amp; Decision">
+                                            <field name="minute_text"/>
+                                            <field name="decision_text"/>
+                                            <field name="deferred_to_id" required="state == 'deferred'"/>
+                                        </group>
+                                    </sheet>
+                                </form>
+                            </field>
+                            <field name="agenda_item_ids" context="{'default_meeting_id': id}" invisible="state == 'scheduled'">
+                                <list create="0" delete="0">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="item_number"/>
+                                    <field name="title"/>
+                                    <field name="purpose"/>
+                                    <field name="presenter_id"/>
+                                    <field name="time_allocation"/>
+                                    <field name="is_confidential"/>
+                                    <field name="cycle_item_id"/>
+                                    <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'completed'" decoration-warning="state == 'deferred'"/>
+                                </list>
+                                <form string="Agenda Item">
+                                    <header>
+                                        <field name="id" invisible="1"/>
+                                        <button name="action_mark_complete" string="Mark Complete" type="object"
+                                                class="btn-primary" invisible="state in ('completed', 'deferred')"/>
+                                        <button name="action_defer_to_next" string="Defer" type="object"
+                                                invisible="state in ('completed', 'deferred')"/>
+                                        <button name="action_reset_draft" string="Reset to Draft" type="object"
+                                                invisible="state == 'draft'"/>
+                                        <field name="state" widget="statusbar" statusbar_visible="draft,completed,deferred" options="{'clickable': '1'}"/>
+                                    </header>
+                                    <sheet>
+                                        <div class="oe_title">
+                                            <label for="title"/>
+                                            <h1>
+                                                <field name="title" placeholder="e.g. Q3 Financial Update"/>
+                                            </h1>
+                                        </div>
+                                        <group>
+                                            <group>
+                                                <field name="presenter_director_ids" invisible="1"/>
+                                                <field name="meeting_id"/>
                                                 <field name="item_number"/>
                                                 <field name="purpose"/>
                                                 <field name="presenter_id"/>
@@ -120,7 +174,7 @@
                         <!-- Step 4: hold the meeting - record attendance, quoracy and declarations made. -->
                         <page string="Attendance" name="page_attendance" invisible="state == 'scheduled'">
                             <field name="attendee_ids">
-                                <list editable="bottom">
+                                <list editable="bottom" create="0" delete="0">
                                     <field name="name"/>
                                     <field name="role"/>
                                     <field name="status"/>
@@ -143,7 +197,7 @@
                                         <button name="action_set_withdrew" string="Withdrew From Item" type="object" class="oe_highlight" invisible="conflict_management != 'noted'" />
                                         <button name="action_set_left_room" string="Left The Room" type="object" class="oe_highlight" invisible="conflict_management != 'withdrew_from_item'" />
                                         <button name="action_set_no_action" string="No Action Required" type="object" class="oe_highlight" invisible="conflict_management != 'left_room'" />
-                                        <field name="conflict_management" widget="statusbar" />
+                                        <field name="conflict_management" widget="statusbar" statusbar_visible="noted,withdrew_from_item,left_room,no_action"/>
                                     </header>
                                     <sheet>
                                         <field name="category_code" invisible="1"/>
@@ -172,11 +226,12 @@
                         </page>
                         <!-- Step 5: minutes and decisions, once the meeting has been held. -->
                         <page string="Minutes" name="page_minutes" invisible="state in ('scheduled', 'agenda_set')">
-                            <field name="minutes"/>
+                            <field name="minutes" placeholder="Enter the minutes of this meeting..."
+                                   required="state == 'held'"/>
                         </page>
                         <!-- Step 6: actions raised, tracked to completion. -->
                         <page string="Actions" name="page_actions" invisible="state in ('scheduled', 'agenda_set')">
-                            <field name="action_ids">
+                            <field name="action_ids" context="{'default_meeting_id': id}">
                                 <list decoration-danger="state == 'overdue'" decoration-success="state == 'completed'">
                                     <field name="reference"/>
                                     <field name="name"/>
@@ -184,6 +239,35 @@
                                     <field name="due_date"/>
                                     <field name="state"/>
                                 </list>
+                                <form string="Governance Action">
+                                    <header>
+                                        <button name="action_start" string="Start" type="object"
+                                                invisible="state != 'open'"/>
+                                        <button name="action_complete" string="Mark Complete" type="object"
+                                                invisible="state in ('open', 'completed')" class="btn-primary"/>
+                                        <field name="state" widget="statusbar"
+                                               statusbar_visible="open,in_progress,completed,overdue"/>
+                                    </header>
+                                    <sheet>
+                                        <div class="oe_title">
+                                            <label for="name"/>
+                                            <h1><field name="name" placeholder="e.g. Update the risk register"/></h1>
+                                        </div>
+                                        <group>
+                                            <group>
+                                                <field name="meeting_id"/>
+                                                <field name="agenda_item_id" domain="[('meeting_id', '=', meeting_id)]"/>
+                                            </group>
+                                            <group>
+                                                <field name="owner_id"/>
+                                                <field name="due_date"/>
+                                            </group>
+                                        </group>
+                                        <group string="Completion">
+                                            <field name="completion_note" nolabel="1"/>
+                                        </group>
+                                    </sheet>
+                                </form>
                             </field>
                         </page>
                     </notebook>

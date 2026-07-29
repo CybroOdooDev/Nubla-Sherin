@@ -47,9 +47,9 @@ class NhsBoardPackWizard(models.TransientModel):
             template = self.env.ref('odoo_nhs_governance.mail_template_meeting_pack_issued',
                                     raise_if_not_found=False)
             if template:
-                for member in meeting.committee_id.member_ids.filtered('user_id'):
+                for member in meeting.committee_id.member_ids.filtered('email'):
                     template.send_mail(meeting.id, force_send=False,
-                                       email_values={'email_to': member.user_id.partner_id.email})
+                                       email_values={'email_to': member.email})
         return self.env.ref('odoo_nhs_governance.action_report_board_pack').with_context(
             include_confidential=self.include_confidential
         ).report_action(meeting, data={
