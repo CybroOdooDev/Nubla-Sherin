@@ -29,13 +29,7 @@ class NhsCommitteeType(models.Model):
 
     name = fields.Char(string='Name', required=True, translate=True,
                        help="Display name (e.g. 'Standing Committee', 'Council of Governors').")
-    code = fields.Selection([
-        ('board', 'Board'),
-        ('committee', 'Standing Committee'),
-        ('sub_committee', 'Sub-Committee'),
-        ('group', 'Group'),
-        ('council_of_governors', 'Council of Governors'),
-    ], string='Code', required=True, index=True,
+    code = fields.Char(string='Code', required=True, index=True,
        help='The structural role this type plays in the reporting hierarchy — drives '
             'default behaviour such as whether a quorum rule or council-of-governors '
             'specific menus apply.')

@@ -35,7 +35,7 @@ class NhsCommittee(models.Model):
                        help="Committee name (e.g. 'Audit Committee').")
     committee_type_id = fields.Many2one('nhs.committee.type', string='Committee Type', required=True,
                                         help='board / committee / sub-committee / group / council of governors.')
-    committee_type_code = fields.Selection(related='committee_type_id.code', string='Type Code', store=True,
+    committee_type_code = fields.Char(related='committee_type_id.code', string='Type Code', store=True,
                                            help='Convenience copy of the committee type code, used in view conditions.')
     parent_id = fields.Many2one('nhs.committee', string='Reports To', index=True, ondelete='restrict',
                                 help='Reporting parent (a committee reports to the board, a sub-committee '

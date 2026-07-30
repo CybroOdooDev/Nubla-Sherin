@@ -97,7 +97,6 @@ class NhsAgendaItem(models.Model):
     def action_mark_complete(self):
         """Mark the agenda item as completed."""
         self.write({'state': 'completed'})
-        return {'type': 'ir.actions.act_window_close'}
 
     def action_reset_draft(self):
         """Reset the agenda item back to draft and clear any deferral."""
@@ -125,4 +124,3 @@ class NhsAgendaItem(models.Model):
                 'is_confidential': rec.is_confidential,
             })
             rec.write({'state': 'deferred', 'deferred_to_id': next_meeting.id})
-        return {'type': 'ir.actions.act_window_close'}

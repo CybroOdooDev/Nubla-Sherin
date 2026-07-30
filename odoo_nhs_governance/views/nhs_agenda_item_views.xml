@@ -27,12 +27,12 @@
                 <header>
                     <field name="id" invisible="1"/>
                     <button name="action_mark_complete" string="Mark Complete" type="object"
-                            class="btn-primary" invisible="state in ('completed', 'deferred')"/>
+                            class="btn-primary" invisible="state in ('completed', 'deferred') or not id"/>
                     <button name="action_defer_to_next" string="Defer" type="object"
-                            invisible="state in ('completed', 'deferred')"/>
+                            invisible="state in ('completed', 'deferred') or not id"/>
                     <button name="action_reset_draft" string="Reset to Draft" type="object"
-                            invisible="state == 'draft'"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,completed,deferred" options="{'clickable': '1'}"/>
+                            invisible="state == 'draft' or not id"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,completed,deferred" options="{'clickable': '1'}" readonly="not id"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -47,6 +47,7 @@
                             <field name="meeting_id"/>
                             <field name="item_number"/>
                             <field name="purpose"/>
+                            <field name="state" widget="radio" options="{'horizontal': true}" invisible="id" string="Initial Status"/>
                             <field name="presenter_id"/>
                             <field name="time_allocation"/>
                             <field name="is_confidential"/>

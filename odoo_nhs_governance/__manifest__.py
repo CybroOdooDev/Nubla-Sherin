@@ -35,12 +35,7 @@
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'license': 'LGPL-3',
-    'depends': [
-        'base',
-        'mail',
-        'odoo_nhs_trust_management',
-    ],
+    'depends': ['base','mail','odoo_nhs_trust_management'],
     'data': [
         'security/nhs_governance_security.xml',
         'security/ir.model.access.csv',
@@ -83,6 +78,7 @@
         ],
     },
     'images': ['static/description/banner.jpg'],
+    'license': 'LGPL-3',
     'application': True,
     'installable': True,
     'auto_install': False,

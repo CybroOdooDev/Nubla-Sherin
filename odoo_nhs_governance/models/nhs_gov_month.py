@@ -34,5 +34,5 @@ class NhsGovMonth(models.Model):
 
     _code_unique = models.Constraint(
         'UNIQUE(code)',
-        'A month record already exists for this month number.',
+        'A month already exists for this code.',
     )
