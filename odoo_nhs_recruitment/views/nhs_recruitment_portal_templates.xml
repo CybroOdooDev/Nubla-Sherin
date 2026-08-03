@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Public-facing QWeb templates (no login required) for the token-based
+         vacancy list, application form and post-submission thank-you page -->
+
+    <template id="public_vacancy_list" name="Public Vacancy List">
+        <t t-call="web.layout">
+            <t t-set="head">
+                <t t-call-assets="web.assets_frontend" t-js="false"/>
+                <t t-call-assets="web.assets_frontend" t-css="false"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <title>Current Vacancies</title>
+            </t>
+            <div class="container py-5">
+                <h2 class="mb-4 text-center"><t t-out="company.name"/> — Current Vacancies</h2>
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-10 col-lg-8">
+                        <div t-if="not vacancies" class="alert alert-info">
+                            There are no open vacancies at this time.
+                        </div>
+                        <div t-foreach="vacancies" t-as="vacancy" class="card mb-3 shadow-sm">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1"><t t-out="vacancy.name"/></h5>
+                                    <span class="text-muted" t-out="vacancy.band_id.name or ''"/>
+                                </div>
+                                <a class="btn btn-primary"
+                                   t-attf-href="/jobs/apply/#{token}/#{vacancy.id}">Apply</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="public_application_form" name="Public Application Form">
+        <t t-call="web.layout">
+            <t t-set="head">
+                <t t-call-assets="web.assets_frontend" t-js="false"/>
+                <t t-call-assets="web.assets_frontend" t-css="false"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <title>Apply — <t t-out="vacancy.name"/></title>
+            </t>
+            <div id="nhs_public_form_wrap" class="d-flex align-items-center justify-content-center py-5">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-md-10 col-lg-8">
+                            <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
+                                <div class="card-header bg-primary text-white p-4">
+                                    <h2 class="mb-1 fw-bold text-center">
+                                        Apply — <t t-out="vacancy.name"/>
+                                    </h2>
+                                </div>
+                                <div class="card-body p-4 p-md-5">
+                                    <div t-if="error" class="alert alert-danger" t-out="error"/>
+                                    <form method="POST"
+                                          t-attf-action="/jobs/apply/#{token}/#{vacancy.id}/submit"
+                                          enctype="multipart/form-data" id="nhs_public_application_form">
+                                        <input type="hidden" name="csrf_token"
+                                               t-att-value="request.csrf_token()"/>
+                                        <!-- Honeypot: hidden from real users via CSS, bots tend to fill every field -->
+                                        <div style="position:absolute;left:-9999px;" aria-hidden="true">
+                                            <input type="text" name="website_url" tabindex="-1" autocomplete="off"/>
+                                        </div>
+
+                                        <h5 class="mt-2 mb-3">Your Details</h5>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                                            <input type="text" name="name" class="form-control" required="required"/>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                                                <input type="email" name="email" class="form-control" required="required"/>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Phone</label>
+                                                <input type="tel" name="phone" class="form-control"/>
+                                            </div>
+                                        </div>
+
+                                        <h5 class="mt-4 mb-3">Application</h5>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Supporting Statement</label>
+                                            <textarea name="supporting_statement" class="form-control" rows="6"
+                                                      placeholder="Tell us how you meet the person specification"/>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Employment History</label>
+                                            <textarea name="employment_history" class="form-control" rows="4"/>
+                                        </div>
+
+                                        <h5 class="mt-4 mb-3">Eligibility Pre-Screen</h5>
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" name="right_to_work_flagged" value="1"/>
+                                            <label class="form-check-label">
+                                                I may need a visa / have time-limited right to work in the UK
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input type="checkbox" class="form-check-input" name="registration_flagged" value="1"/>
+                                            <label class="form-check-label">
+                                                My professional registration needs review (e.g. pending, conditional)
+                                            </label>
+                                        </div>
+
+                                        <hr/>
+                                        <h5 class="mt-3 mb-2">Equality &amp; Diversity Monitoring</h5>
+                                        <p class="text-muted small">
+                                            Optional. Collected separately and NEVER shown to the selection panel —
+                                            used only for anonymous, aggregate monitoring.
+                                        </p>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Age Band</label>
+                                                <select name="age_band" class="form-select">
+                                                    <option value="">Prefer not to say</option>
+                                                    <option value="16_24">16-24</option>
+                                                    <option value="25_34">25-34</option>
+                                                    <option value="35_44">35-44</option>
+                                                    <option value="45_54">45-54</option>
+                                                    <option value="55_64">55-64</option>
+                                                    <option value="65_plus">65+</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Sex</label>
+                                                <select name="sex" class="form-select">
+                                                    <option value="">Prefer not to say</option>
+                                                    <option value="female">Female</option>
+                                                    <option value="male">Male</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Ethnicity</label>
+                                            <select name="ethnicity" class="form-select">
+                                                <option value="">Prefer not to say</option>
+                                                <option value="white">White</option>
+                                                <option value="mixed">Mixed / Multiple Ethnic Groups</option>
+                                                <option value="asian">Asian / Asian British</option>
+                                                <option value="black">Black / African / Caribbean / Black British</option>
+                                                <option value="other">Other Ethnic Group</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="form-label">Disability</label>
+                                            <select name="disability" class="form-select">
+                                                <option value="">Prefer not to say</option>
+                                                <option value="yes">Yes</option>
+                                                <option value="no">No</option>
+                                            </select>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary btn-lg w-100">Submit Application</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="public_application_thank_you" name="Public Application Thank You">
+        <t t-call="web.layout">
+            <t t-set="head">
+                <t t-call-assets="web.assets_frontend" t-js="false"/>
+                <t t-call-assets="web.assets_frontend" t-css="false"/>
+                <title>Application Received</title>
+            </t>
+            <div class="container py-5 text-center">
+                <h2 class="mb-3">Thank you for your application</h2>
+                <p t-if="reference != 'RATE_LIMITED'">
+                    Your application reference is <strong t-out="reference"/>.
+                    We will be in touch about the next steps.
+                </p>
+                <p t-else="">
+                    Too many submissions have been received from this connection recently.
+                    Please try again later.
+                </p>
+            </div>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_application_kanban" model="ir.ui.view">
+        <field name="name">nhs.application.kanban</field>
+        <field name="model">nhs.application</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="stage" records_draggable="1">
+                <field name="name"/>
+                <field name="candidate_id"/>
+                <field name="vacancy_id"/>
+                <field name="shortlist_score"/>
+                <field name="duplicate_warning"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <strong><field name="candidate_id"/></strong>
+                            <div><field name="vacancy_id"/></div>
+                            <div><field name="name"/></div>
+                            <div t-if="record.duplicate_warning.raw_value" class="badge text-bg-danger">
+                                Possible duplicate
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_nhs_application_list" model="ir.ui.view">
+        <field name="name">nhs.application.list</field>
+        <field name="model">nhs.application</field>
+        <field name="arch" type="xml">
+            <list string="Applications">
+                <field name="name"/>
+                <field name="candidate_id"/>
+                <field name="vacancy_id"/>
+                <field name="stage" widget="badge"/>
+                <field name="shortlist_score"/>
+                <field name="source"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_application_form" model="ir.ui.view">
+        <field name="name">nhs.application.form</field>
+        <field name="model">nhs.application</field>
+        <field name="arch" type="xml">
+            <form string="Application">
+                <header>
+                    <button name="action_start_shortlisting" type="object" string="Start Shortlisting"
+                            class="btn-primary" invisible="stage != 'received'"/>
+                    <button name="action_shortlist_decide" type="object" string="Apply Shortlist Decision"
+                            invisible="stage != 'shortlisting' or not shortlist_outcome"/>
+                    <button name="action_make_offer" type="object" string="Make Offer"
+                            class="btn-primary" invisible="stage != 'interview'"/>
+                    <button name="action_send_acknowledgement" type="object" string="Send Acknowledgement"
+                            invisible="acknowledged"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            invisible="stage in ('hired', 'rejected', 'withdrawn')"
+                            confirm="Reject this application?"/>
+                    <button name="action_withdraw" type="object" string="Withdraw"
+                            invisible="stage in ('hired', 'rejected', 'withdrawn')"/>
+                    <field name="stage" widget="statusbar"
+                           statusbar_visible="received,shortlisting,shortlisted,interview,offered,hired"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not duplicate_warning">
+                        This candidate has applied to this vacancy more than once.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="vacancy_id"/>
+                            <field name="candidate_id"/>
+                            <field name="source"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="shortlist_score" readonly="1"/>
+                            <field name="shortlist_outcome"/>
+                            <field name="shortlist_reason"
+                                   invisible="shortlist_outcome != 'not_shortlisted'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Application">
+                            <group>
+                                <field name="right_to_work_flagged"/>
+                                <field name="registration_flagged"/>
+                            </group>
+                            <field name="supporting_statement"/>
+                            <field name="employment_history"/>
+                            <field name="cv_attachment_ids" widget="many2many_binary"/>
+                        </page>
+                        <page string="Shortlisting Scores">
+                            <field name="score_line_ids">
+                                <list editable="bottom">
+                                    <field name="criterion_id"/>
+                                    <field name="score"/>
+                                    <field name="notes"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Interviews">
+                            <field name="interview_ids">
+                                <list>
+                                    <field name="interview_datetime"/>
+                                    <field name="location"/>
+                                    <field name="invite_status"/>
+                                    <field name="outcome"/>
+                                    <field name="total_score"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Offer" invisible="not offer_id">
+                            <field name="offer_id" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_application_search" model="ir.ui.view">
+        <field name="name">nhs.application.search</field>
+        <field name="model">nhs.application</field>
+        <field name="arch" type="xml">
+            <search string="Applications">
+                <field name="name"/>
+                <field name="candidate_id"/>
+                <field name="vacancy_id"/>
+                <filter string="Received" name="received" domain="[('stage', '=', 'received')]"/>
+                <filter string="Shortlisting" name="shortlisting" domain="[('stage', '=', 'shortlisting')]"/>
+                <filter string="Interview" name="interview" domain="[('stage', '=', 'interview')]"/>
+                <group>
+                    <filter string="Stage" name="group_stage" context="{'group_by': 'stage'}"/>
+                    <filter string="Vacancy" name="group_vacancy" context="{'group_by': 'vacancy_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_application" model="ir.actions.act_window">
+        <field name="name">Applications</field>
+        <field name="res_model">nhs.application</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_nhs_application_search"/>
+    </record>
+</odoo>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_candidate_list" model="ir.ui.view">
+        <field name="name">nhs.candidate.list</field>
+        <field name="model">nhs.candidate</field>
+        <field name="arch" type="xml">
+            <list string="Candidates" decoration-muted="is_anonymised">
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="email"/>
+                <field name="is_internal"/>
+                <field name="application_count"/>
+                <field name="talent_pool_consent"/>
+                <field name="retention_expiry"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_candidate_form" model="ir.ui.view">
+        <field name="name">nhs.candidate.form</field>
+        <field name="model">nhs.candidate</field>
+        <field name="arch" type="xml">
+            <form string="Candidate">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_nhs_application)d" type="action"
+                                class="oe_stat_button" icon="fa-file-text"
+                                context="{'search_default_candidate_id': id}">
+                            <field name="application_count" widget="statinfo" string="Applications"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                        <span><field name="reference" readonly="1"/></span>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="email"/>
+                            <field name="phone"/>
+                            <field name="is_internal"/>
+                        </group>
+                        <group>
+                            <field name="talent_pool_consent"/>
+                            <field name="retention_expiry" readonly="1"/>
+                            <field name="portal_user_id"/>
+                            <field name="is_anonymised" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_candidate_search" model="ir.ui.view">
+        <field name="name">nhs.candidate.search</field>
+        <field name="model">nhs.candidate</field>
+        <field name="arch" type="xml">
+            <search string="Candidates">
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="email"/>
+                <filter string="Talent Pool" name="talent_pool" domain="[('talent_pool_consent', '=', True)]"/>
+                <filter string="Internal" name="internal" domain="[('is_internal', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_candidate" model="ir.actions.act_window">
+        <field name="name">Candidates</field>
+        <field name="res_model">nhs.candidate</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_nhs_candidate_search"/>
+    </record>
+
+    <record id="action_nhs_candidate_talent_pool" model="ir.actions.act_window">
+        <field name="name">Talent Pool</field>
+        <field name="res_model">nhs.candidate</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('talent_pool_consent', '=', True)]</field>
+        <field name="search_view_id" ref="view_nhs_candidate_search"/>
+    </record>
+</odoo>

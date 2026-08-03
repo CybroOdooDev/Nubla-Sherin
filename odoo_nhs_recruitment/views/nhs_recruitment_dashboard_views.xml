@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vacancy analytics: ageing, time-to-hire, volumes by stage -->
+    <record id="view_nhs_vacancy_graph" model="ir.ui.view">
+        <field name="name">nhs.vacancy.graph</field>
+        <field name="model">nhs.vacancy</field>
+        <field name="arch" type="xml">
+            <graph string="Vacancies" type="bar">
+                <field name="state"/>
+                <field name="time_to_hire" type="measure"/>
+                <field name="days_open" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_nhs_vacancy_pivot" model="ir.ui.view">
+        <field name="name">nhs.vacancy.pivot</field>
+        <field name="model">nhs.vacancy</field>
+        <field name="arch" type="xml">
+            <pivot string="Vacancies">
+                <field name="org_unit_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="time_to_hire" type="measure"/>
+                <field name="days_open" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_nhs_recruitment_dashboard" model="ir.actions.act_window">
+        <field name="name">Recruitment Dashboard</field>
+        <field name="res_model">nhs.vacancy</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="context">{'search_default_group_state': 1}</field>
+    </record>
+
+    <!-- Stage conversion / funnel -->
+    <record id="view_nhs_application_pivot" model="ir.ui.view">
+        <field name="name">nhs.application.pivot</field>
+        <field name="model">nhs.application</field>
+        <field name="arch" type="xml">
+            <pivot string="Stage Conversion">
+                <field name="vacancy_id" type="row"/>
+                <field name="stage" type="col"/>
+                <field name="shortlist_score" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_nhs_application_graph" model="ir.ui.view">
+        <field name="name">nhs.application.graph</field>
+        <field name="model">nhs.application</field>
+        <field name="arch" type="xml">
+            <graph string="Stage Conversion" type="bar">
+                <field name="stage"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_nhs_time_to_hire" model="ir.actions.act_window">
+        <field name="name">Time-to-Hire / Funnel</field>
+        <field name="res_model">nhs.application</field>
+        <field name="view_mode">graph,pivot,list</field>
+    </record>
+
+    <!-- Equality monitoring (aggregate only) -->
+    <record id="action_nhs_equality_monitoring" model="ir.actions.act_window">
+        <field name="name">Equality Monitoring (Aggregate)</field>
+        <field name="res_model">nhs.equality.monitoring</field>
+        <field name="view_mode">pivot,graph,list</field>
+    </record>
+</odoo>

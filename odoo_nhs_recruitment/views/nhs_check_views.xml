@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_check_list" model="ir.ui.view">
+        <field name="name">nhs.check.list</field>
+        <field name="model">nhs.check</field>
+        <field name="arch" type="xml">
+            <list string="Pre-Employment Checks" decoration-success="status == 'cleared'"
+                  decoration-danger="status == 'concern'" decoration-muted="status == 'not_required'">
+                <field name="candidate_id"/>
+                <field name="check_type_id"/>
+                <field name="level"/>
+                <field name="status" widget="badge"/>
+                <field name="verified_date"/>
+                <field name="expiry_date"/>
+                <field name="is_sensitive"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_check_form" model="ir.ui.view">
+        <field name="name">nhs.check.form</field>
+        <field name="model">nhs.check</field>
+        <field name="arch" type="xml">
+            <form string="Pre-Employment Check">
+                <header>
+                    <button name="action_mark_in_progress" type="object" string="Mark In Progress"
+                            invisible="status != 'not_started'"/>
+                    <button name="action_mark_cleared" type="object" string="Mark Cleared"
+                            class="btn-primary" invisible="status == 'cleared'"/>
+                    <button name="action_mark_concern" type="object" string="Flag Concern"
+                            invisible="status == 'concern'"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="offer_id" readonly="1"/>
+                            <field name="candidate_id" readonly="1"/>
+                            <field name="check_type_id" readonly="1"/>
+                            <field name="level"/>
+                            <field name="is_sensitive"/>
+                        </group>
+                        <group>
+                            <field name="verified_by_id" readonly="1"/>
+                            <field name="verified_date" readonly="1"/>
+                            <field name="expiry_date"/>
+                            <field name="reference_number"/>
+                        </group>
+                    </group>
+                    <group string="Evidence (Restricted)">
+                        <field name="detail"/>
+                        <field name="attachment_ids" widget="many2many_binary"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_check_search" model="ir.ui.view">
+        <field name="name">nhs.check.search</field>
+        <field name="model">nhs.check</field>
+        <field name="arch" type="xml">
+            <search string="Pre-Employment Checks">
+                <field name="candidate_id"/>
+                <field name="check_type_id"/>
+                <filter string="In Progress" name="in_progress" domain="[('status', '=', 'in_progress')]"/>
+                <filter string="Outstanding" name="outstanding"
+                        domain="[('status', 'in', ('not_started', 'in_progress'))]"/>
+                <filter string="Concerns" name="concerns" domain="[('status', '=', 'concern')]"/>
+                <group>
+                    <filter string="Candidate" name="group_candidate" context="{'group_by': 'candidate_id'}"/>
+                    <filter string="Check Type" name="group_type" context="{'group_by': 'check_type_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_check" model="ir.actions.act_window">
+        <field name="name">Pre-Employment Checks</field>
+        <field name="res_model">nhs.check</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_nhs_check_search"/>
+    </record>
+
+    <record id="action_nhs_check_in_progress" model="ir.actions.act_window">
+        <field name="name">Checks in Progress</field>
+        <field name="res_model">nhs.check</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('status', '=', 'in_progress')]</field>
+        <field name="search_view_id" ref="view_nhs_check_search"/>
+    </record>
+
+    <record id="action_nhs_check_outstanding" model="ir.actions.act_window">
+        <field name="name">Outstanding by Starter</field>
+        <field name="res_model">nhs.check</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('status', 'in', ('not_started', 'in_progress'))]</field>
+        <field name="context">{'search_default_group_candidate': 1}</field>
+        <field name="search_view_id" ref="view_nhs_check_search"/>
+    </record>
+</odoo>

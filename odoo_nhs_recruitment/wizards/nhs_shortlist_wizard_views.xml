@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_shortlist_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.shortlist.wizard.form</field>
+        <field name="model">nhs.shortlist.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Shortlist Applications">
+                <field name="vacancy_id" invisible="1"/>
+                <field name="line_ids">
+                    <list editable="bottom">
+                        <field name="candidate_id" readonly="1"/>
+                        <field name="shortlist_score" readonly="1"/>
+                        <field name="outcome"/>
+                        <field name="reason"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_apply" type="object" string="Apply" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_shortlist_wizard" model="ir.actions.act_window">
+        <field name="name">Shortlist Applications</field>
+        <field name="res_model">nhs.shortlist.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

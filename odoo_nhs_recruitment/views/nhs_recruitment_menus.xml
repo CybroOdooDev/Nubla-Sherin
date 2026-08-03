@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_nhs_recruitment_root" name="Recruitment"
+              sequence="54" web_icon="odoo_nhs_recruitment,static/description/icon.png"
+              groups="odoo_nhs_recruitment.group_nhs_recruit_viewer"/>
+
+    <!-- Vacancies -->
+    <menuitem id="menu_nhs_recruitment_vacancies" name="Vacancies"
+              parent="menu_nhs_recruitment_root" sequence="10"/>
+    <menuitem id="menu_nhs_vacancy" name="Vacancies"
+              parent="menu_nhs_recruitment_vacancies" action="action_nhs_vacancy" sequence="10"/>
+    <menuitem id="menu_nhs_vacancy_my" name="My Vacancies"
+              parent="menu_nhs_recruitment_vacancies" action="action_nhs_vacancy_my" sequence="20"/>
+    <menuitem id="menu_nhs_vacancy_approvals" name="Approvals"
+              parent="menu_nhs_recruitment_vacancies" action="action_nhs_vacancy_approvals" sequence="30"
+              groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
+
+    <!-- Pipeline -->
+    <menuitem id="menu_nhs_recruitment_pipeline" name="Pipeline"
+              parent="menu_nhs_recruitment_root" sequence="20"/>
+    <menuitem id="menu_nhs_application" name="Applications"
+              parent="menu_nhs_recruitment_pipeline" action="action_nhs_application" sequence="10"/>
+    <menuitem id="menu_nhs_interview" name="Interviews"
+              parent="menu_nhs_recruitment_pipeline" action="action_nhs_interview" sequence="20"/>
+    <menuitem id="menu_nhs_offer" name="Offers"
+              parent="menu_nhs_recruitment_pipeline" action="action_nhs_offer" sequence="30"/>
+
+    <!-- Pre-Employment Checks -->
+    <menuitem id="menu_nhs_recruitment_checks" name="Pre-Employment Checks"
+              parent="menu_nhs_recruitment_root" sequence="30"
+              groups="odoo_nhs_recruitment.group_nhs_recruit_checks"/>
+    <menuitem id="menu_nhs_check_in_progress" name="Checks in Progress"
+              parent="menu_nhs_recruitment_checks" action="action_nhs_check_in_progress" sequence="10"/>
+    <menuitem id="menu_nhs_check_outstanding" name="Outstanding by Starter"
+              parent="menu_nhs_recruitment_checks" action="action_nhs_check_outstanding" sequence="20"/>
+
+    <!-- Candidates -->
+    <menuitem id="menu_nhs_recruitment_candidates" name="Candidates"
+              parent="menu_nhs_recruitment_root" sequence="40"/>
+    <menuitem id="menu_nhs_candidate" name="Candidates"
+              parent="menu_nhs_recruitment_candidates" action="action_nhs_candidate" sequence="10"/>
+    <menuitem id="menu_nhs_candidate_talent_pool" name="Talent Pool"
+              parent="menu_nhs_recruitment_candidates" action="action_nhs_candidate_talent_pool" sequence="20"/>
+
+    <!-- Reporting -->
+    <menuitem id="menu_nhs_recruitment_reporting" name="Reporting"
+              parent="menu_nhs_recruitment_root" sequence="50"
+              groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
+    <menuitem id="menu_nhs_recruitment_dashboard" name="Recruitment Dashboard"
+              parent="menu_nhs_recruitment_reporting" action="action_nhs_recruitment_dashboard" sequence="10"/>
+    <menuitem id="menu_nhs_time_to_hire" name="Time-to-Hire / Funnel"
+              parent="menu_nhs_recruitment_reporting" action="action_nhs_time_to_hire" sequence="20"/>
+    <menuitem id="menu_nhs_equality_monitoring" name="Equality Monitoring"
+              parent="menu_nhs_recruitment_reporting" action="action_nhs_equality_monitoring" sequence="30"
+              groups="odoo_nhs_recruitment.group_nhs_recruit_manager"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_nhs_recruitment_config" name="Configuration"
+              parent="menu_nhs_recruitment_root" sequence="60"
+              groups="odoo_nhs_recruitment.group_nhs_recruit_manager"/>
+    <menuitem id="menu_nhs_check_type" name="Check Types"
+              parent="menu_nhs_recruitment_config" action="action_nhs_check_type" sequence="10"/>
+    <menuitem id="menu_nhs_check_profile" name="Check Profiles"
+              parent="menu_nhs_recruitment_config" action="action_nhs_check_profile" sequence="20"/>
+    <menuitem id="menu_nhs_person_spec" name="Person-Spec Templates"
+              parent="menu_nhs_recruitment_config" action="action_nhs_person_spec" sequence="30"/>
+    <menuitem id="menu_nhs_recruitment_channel" name="Advertising Channels"
+              parent="menu_nhs_recruitment_config" action="action_nhs_recruitment_channel" sequence="40"/>
+    <menuitem id="menu_nhs_recruitment_settings" name="Settings"
+              parent="menu_nhs_recruitment_config" action="action_nhs_recruitment_config_settings" sequence="50"/>
+</odoo>

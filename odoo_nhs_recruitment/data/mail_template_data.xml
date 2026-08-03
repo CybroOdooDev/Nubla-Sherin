@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="mail_template_application_ack" model="mail.template">
+            <field name="name">Recruitment: Application Acknowledgement</field>
+            <field name="model_id" ref="model_nhs_application"/>
+            <field name="email_from">{{ (user.email_formatted or '') }}</field>
+            <field name="email_to">{{ object.candidate_id.email or '' }}</field>
+            <field name="subject">We've received your application — {{ object.name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p>Dear <t t-out="object.candidate_id.name or ''">Candidate</t>,</p>
+                    <p>Thank you for your application for
+                        <strong><t t-out="object.vacancy_id.name or ''">Vacancy</t></strong>.
+                    </p>
+                    <p>Your application reference is <strong><t t-out="object.name or ''">APP/2026/00001</t></strong>.
+                        We will be in touch about the next steps.</p>
+                    <p>Kind regards,<br/>Recruitment Team</p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <record id="mail_template_interview_invite" model="mail.template">
+            <field name="name">Recruitment: Interview Invitation</field>
+            <field name="model_id" ref="model_nhs_interview"/>
+            <field name="email_from">{{ (user.email_formatted or '') }}</field>
+            <field name="email_to">{{ object.application_id.candidate_id.email or '' }}</field>
+            <field name="subject">Interview invitation — {{ object.vacancy_id.name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p>Dear <t t-out="object.application_id.candidate_id.name or ''">Candidate</t>,</p>
+                    <p>We would like to invite you to interview for
+                        <strong><t t-out="object.vacancy_id.name or ''">Vacancy</t></strong>.
+                    </p>
+                    <ul>
+                        <li><strong>Date &amp; time:</strong> <t t-out="object.interview_datetime or ''"/></li>
+                        <li><strong>Location:</strong> <t t-out="object.location or ''"/></li>
+                    </ul>
+                    <p>Please confirm your attendance at your earliest convenience.</p>
+                    <p>Kind regards,<br/>Recruitment Team</p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <record id="mail_template_application_reject" model="mail.template">
+            <field name="name">Recruitment: Application Outcome (Unsuccessful)</field>
+            <field name="model_id" ref="model_nhs_application"/>
+            <field name="email_from">{{ (user.email_formatted or '') }}</field>
+            <field name="email_to">{{ object.candidate_id.email or '' }}</field>
+            <field name="subject">Application outcome — {{ object.vacancy_id.name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p>Dear <t t-out="object.candidate_id.name or ''">Candidate</t>,</p>
+                    <p>Thank you for your interest in
+                        <strong><t t-out="object.vacancy_id.name or ''">Vacancy</t></strong>.
+                        After careful consideration, we are unable to take your application further on this occasion.
+                    </p>
+                    <p>We wish you every success with your future applications.</p>
+                    <p>Kind regards,<br/>Recruitment Team</p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <record id="mail_template_offer_made" model="mail.template">
+            <field name="name">Recruitment: Offer of Employment</field>
+            <field name="model_id" ref="model_nhs_offer"/>
+            <field name="email_from">{{ (user.email_formatted or '') }}</field>
+            <field name="email_to">{{ object.candidate_id.email or '' }}</field>
+            <field name="subject">Offer of employment — {{ object.vacancy_id.name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p>Dear <t t-out="object.candidate_id.name or ''">Candidate</t>,</p>
+                    <p>We are pleased to offer you the post of
+                        <strong><t t-out="object.vacancy_id.name or ''">Vacancy</t></strong>,
+                        subject to satisfactory completion of the NHS Employment Check Standards.
+                    </p>
+                    <p>Please see the attached offer letter for full details.</p>
+                    <p>Kind regards,<br/>Recruitment Team</p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+    </data>
+</odoo>
