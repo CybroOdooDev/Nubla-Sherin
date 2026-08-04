@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import  api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 APPLICATION_STAGES = [
@@ -62,13 +62,14 @@ class NhsApplication(models.Model):
     company_id = fields.Many2one(
         related='vacancy_id.company_id', string='Company', store=True, readonly=True)
     vacancy_id = fields.Many2one(
-        'nhs.vacancy', string='Vacancy', required=True, ondelete='restrict', tracking=True)
+        'nhs.vacancy', string='Vacancy', required=True, ondelete='restrict', tracking=True,
+        domain="[('state', 'in', ('open', 'in_progress'))]")
     candidate_id = fields.Many2one(
         'nhs.candidate', string='Candidate', required=True, ondelete='restrict', tracking=True)
     source = fields.Selection([
         ('portal', 'Public Portal'),
         ('internal', 'Internal'),
-    ], string='Source', default='portal', required=True)
+    ], string='Source', default='internal', required=True)
     supporting_statement = fields.Text(string='Supporting Statement')
     cv_attachment_ids = fields.Many2many('ir.attachment', string='CV / Documents')
     employment_history = fields.Text(string='Employment History')
@@ -158,17 +159,18 @@ class NhsApplication(models.Model):
     def action_start_shortlisting(self):
         for application in self:
             if application.stage != 'received':
-                raise UserError(_('Only received applications can start shortlisting.'))
-        self.write({'stage': 'shortlisting'})
+                raise UserError(('Only received applications can start shortlisting.'))
+        for application in self:
+            application.stage = 'interview' if application.interview_ids else 'shortlisting'
 
     def action_shortlist_decide(self):
         """Apply the recorded shortlist_outcome to the pipeline stage."""
         today = fields.Date.context_today(self)
         for application in self:
             if not application.shortlist_outcome:
-                raise UserError(_('Set a shortlist outcome before deciding.'))
+                raise UserError(('Set a shortlist outcome before deciding.'))
             if application.shortlist_outcome == 'shortlisted':
-                application.stage = 'shortlisted'
+                application.stage = 'interview' if application.interview_ids else 'shortlisted'
                 application.vacancy_id.action_mark_in_progress()
             elif application.shortlist_outcome == 'not_shortlisted':
                 application.write({'stage': 'rejected', 'decision_date': today})
@@ -184,13 +186,13 @@ class NhsApplication(models.Model):
     def action_make_offer(self):
         self.ensure_one()
         if self.stage != 'interview':
-            raise UserError(_('An offer can only be made from the Interview stage.'))
+            raise UserError(('An offer can only be made from the Interview stage.'))
         if self.offer_id:
-            raise UserError(_('This application already has an offer.'))
+            raise UserError(('This application already has an offer.'))
         offer = self.env['nhs.offer'].create({'application_id': self.id})
         self.write({'stage': 'offered', 'offer_id': offer.id})
         return {
-            'name': _('Offer'),
+            'name': ('Offer'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.offer',
             'view_mode': 'form',
@@ -202,12 +204,16 @@ class NhsApplication(models.Model):
             'odoo_nhs_recruitment.mail_template_application_ack', raise_if_not_found=False)
         for application in self:
             if template and application.candidate_id.email:
-                template.send_mail(application.id, force_send=True)
+                template.send_mail(
+                    application.id, 
+                    force_send=True, 
+                    email_values={'email_to': application.candidate_id.email}
+                )
             application.acknowledged = True
 
     @api.constrains('shortlist_outcome')
     def _check_shortlist_outcome_reason(self):
         for application in self:
             if application.shortlist_outcome == 'not_shortlisted' and not application.shortlist_reason:
-                raise ValidationError(_(
+                raise ValidationError((
                     'A reason is required when an application is not shortlisted.'))

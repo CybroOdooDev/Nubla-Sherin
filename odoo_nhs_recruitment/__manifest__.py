@@ -34,13 +34,6 @@ funded establishment posts, advertises them, captures applications through a
 public portal form, shortlists and interviews candidates, makes offers, runs
 the NHS pre-employment checks, and hands the successful hire back to the
 Establishment Register as an updated in-post position.
-
-Its NHS-specific heart is the pre-employment checks — the NHS Employment
-Check Standards (identity, right to work, professional registration,
-references/employment history, criminal-record/DBS and occupational health)
-— which is what distinguishes it from a generic recruitment tool and from
-Odoo's base hr_recruitment. It is deliberately standalone of hr_recruitment,
-using the Establishment Register as its backbone.
 """,
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
@@ -68,12 +61,21 @@ using the Establishment Register as its backbone.
         'views/nhs_recruitment_portal_templates.xml',
         'views/nhs_recruitment_config_views.xml',
         'views/nhs_recruitment_dashboard_views.xml',
+        'report/nhs_vacancy_advert_report.xml',
+        'report/nhs_offer_letter_report.xml',
+        'report/nhs_shortlist_summary_report.xml',
+        'report/nhs_check_certificate_report.xml',
         'views/nhs_recruitment_menus.xml',
     ],
     'assets': {
         'web.assets_frontend': [
             'odoo_nhs_recruitment/static/src/css/public_application.css',
             'odoo_nhs_recruitment/static/src/js/public_application.js',
+        ],
+        'web.assets_backend': [
+            'odoo_nhs_recruitment/static/src/dashboard/recruitment_dashboard.js',
+            'odoo_nhs_recruitment/static/src/dashboard/recruitment_dashboard.xml',
+            'odoo_nhs_recruitment/static/src/dashboard/recruitment_dashboard.scss',
         ],
     },
     'images': ['static/description/banner.jpg'],

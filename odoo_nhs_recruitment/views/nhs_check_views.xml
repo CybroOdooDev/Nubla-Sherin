@@ -26,17 +26,22 @@
                     <button name="action_mark_in_progress" type="object" string="Mark In Progress"
                             invisible="status != 'not_started'"/>
                     <button name="action_mark_cleared" type="object" string="Mark Cleared"
-                            class="btn-primary" invisible="status == 'cleared'"/>
+                            class="btn-primary" invisible="status in ('cleared', 'not_required')"/>
                     <button name="action_mark_concern" type="object" string="Flag Concern"
-                            invisible="status == 'concern'"/>
+                            invisible="status in ('concern', 'not_required')"/>
+                    <button name="action_mark_not_required" type="object" string="Mark Not Required"
+                            invisible="status not in ('not_started', 'in_progress')"/>
                     <field name="status" widget="statusbar"/>
                 </header>
                 <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
                     <group>
                         <group>
-                            <field name="offer_id" readonly="1"/>
+                            <field name="offer_id" readonly="id"/>
                             <field name="candidate_id" readonly="1"/>
-                            <field name="check_type_id" readonly="1"/>
+                            <field name="check_type_id" readonly="id"/>
                             <field name="level"/>
                             <field name="is_sensitive"/>
                         </group>

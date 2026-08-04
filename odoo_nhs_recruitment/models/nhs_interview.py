@@ -19,8 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
-from odoo.exceptions import UserError
+from odoo import  api, fields, models
 
 
 class NhsInterviewScoreLine(models.Model):
@@ -102,6 +101,21 @@ class NhsInterview(models.Model):
             else:
                 interview.total_score = 0.0
 
+    def action_mark_accepted(self):
+        self.write({'invite_status': 'accepted'})
+
+    def action_mark_declined(self):
+        self.write({'invite_status': 'declined'})
+
+    def action_mark_rescheduled(self):
+        self.write({'invite_status': 'rescheduled'})
+
+    def action_mark_attended(self):
+        self.write({'invite_status': 'attended'})
+
+    def action_mark_no_show(self):
+        self.write({'invite_status': 'no_show'})
+
     def action_mark_appointable(self):
         self.write({'outcome': 'appointable'})
 
@@ -115,7 +129,7 @@ class NhsInterview(models.Model):
     def action_view_application(self):
         self.ensure_one()
         return {
-            'name': _('Application'),
+            'name': ('Application'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.application',
             'view_mode': 'form',

@@ -31,18 +31,34 @@
                 <field name="state"/>
                 <field name="days_open"/>
                 <field name="application_count"/>
+                <field name="hiring_manager_id"/>
+                <field name="org_unit_id"/>
+                <field name="fte"/>
+                <field name="indicative_cost"/>
                 <templates>
                     <t t-name="card">
                         <div class="oe_kanban_card oe_kanban_global_click">
-                            <strong><field name="name"/></strong>
-                            <div><field name="reference"/></div>
-                            <div>
-                                <span class="badge text-bg-info">
-                                    <field name="application_count"/> applications
-                                </span>
-                                <span t-if="record.days_open.raw_value" class="badge text-bg-warning">
-                                    <field name="days_open"/> days open
-                                </span>
+                            <div class="o_kanban_record_top mb-2">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title fs-5"><field name="name"/></strong>
+                                    <div class="text-muted"><field name="reference"/></div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div><i class="fa fa-sitemap me-1" title="Department"/> <field name="org_unit_id"/></div>
+                                <div class="mt-1"><i class="fa fa-user me-1" title="Hiring Manager"/> <field name="hiring_manager_id"/></div>
+                                <div class="mt-1 text-muted">
+                                    <i class="fa fa-clock-o me-1" title="FTE"/> <field name="fte"/> FTE
+                                </div>
+                                
+                                <div class="mt-2">
+                                    <span class="badge text-bg-info me-1" title="Total Applications">
+                                        <i class="fa fa-file-text-o"/> <field name="application_count"/> Apps
+                                    </span>
+                                    <span t-if="record.days_open.raw_value > 0" class="badge text-bg-warning" title="Days Open">
+                                        <i class="fa fa-calendar"/> <field name="days_open"/> days
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </t>
@@ -67,6 +83,9 @@
                             groups="odoo_nhs_recruitment.group_nhs_recruit_manager"/>
                     <button name="action_open" type="object" string="Open for Advertising"
                             class="btn-primary" invisible="state != 'finance_approved'"/>
+                    <button name="%(odoo_nhs_recruitment.action_nhs_shortlist_wizard)d" type="action" string="Bulk Shortlist"
+                            invisible="state not in ('open', 'in_progress')"
+                            context="{'default_vacancy_id': id}"/>
                     <button name="action_close" type="object" string="Close"
                             invisible="state not in ('open', 'in_progress', 'filled')"/>
                     <button name="action_withdraw" type="object" string="Withdraw"
@@ -167,7 +186,7 @@
     <record id="action_nhs_vacancy" model="ir.actions.act_window">
         <field name="name">Vacancies</field>
         <field name="res_model">nhs.vacancy</field>
-        <field name="view_mode">list,kanban,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="search_view_id" ref="view_nhs_vacancy_search"/>
         <field name="context">{'search_default_open': 1}</field>
     </record>

@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import  api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -45,7 +45,8 @@ class NhsOffer(models.Model):
     currency_id = fields.Many2one(related='company_id.currency_id', readonly=True)
     band_id = fields.Many2one(
         related='vacancy_id.band_id', string='Band', store=True, readonly=True)
-    pay_point = fields.Char(string='Pay Point')
+    pay_point = fields.Char(
+        string='Pay Point', related='band_id.pay_point', store=True, readonly=False)
     salary = fields.Monetary(string='Offered Salary', currency_field='currency_id')
     start_date = fields.Date(string='Proposed Start Date', tracking=True)
     fte = fields.Float(string='FTE', related='vacancy_id.fte', store=True, readonly=False)
@@ -126,7 +127,7 @@ class NhsOffer(models.Model):
             if offer.offer_type == 'unconditional':
                 continue
             if hard_gate and not offer.all_checks_cleared:
-                raise UserError(_(
+                raise UserError((
                     'All required pre-employment checks must be cleared before'
                     ' this offer can be made unconditional.'))
             offer.offer_type = 'unconditional'
@@ -134,7 +135,7 @@ class NhsOffer(models.Model):
     def action_open_onboard_wizard(self):
         self.ensure_one()
         return {
-            'name': _('Confirm Hire'),
+            'name': ('Confirm Hire'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.onboard.wizard',
             'view_mode': 'form',
@@ -145,7 +146,7 @@ class NhsOffer(models.Model):
     def action_view_checks(self):
         self.ensure_one()
         return {
-            'name': _('Pre-Employment Checks'),
+            'name': ('Pre-Employment Checks'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.check',
             'view_mode': 'list,form',

@@ -169,10 +169,17 @@
                         <setting id="nhs_recruit_public_form"
                                  help="Expose the token-gated public application form at /jobs/apply/&lt;token&gt;.">
                             <field name="nhs_recruit_public_form_enabled"/>
-                            <div invisible="not nhs_recruit_public_form_enabled">
-                                <field name="nhs_recruit_public_form_token"/>
-                                <button name="action_nhs_recruit_generate_token" type="object"
-                                        string="Generate New Token" class="btn-link" icon="oi-arrow-right"/>
+                            <div invisible="not nhs_recruit_public_form_enabled" class="mt-2">
+                                <field name="nhs_recruit_public_form_url" widget="CopyClipboardURL"
+                                       class="w-100" readonly="1"/>
+                                <div class="mt-2">
+                                    <button name="action_nhs_recruit_open_form" type="object"
+                                            string="Open Public Form" class="btn-secondary me-2"
+                                            icon="fa-external-link"/>
+                                    <button name="action_nhs_recruit_generate_token" type="object"
+                                            string="Generate New Token" class="btn-link"
+                                            icon="fa-refresh"/>
+                                </div>
                             </div>
                         </setting>
                     </block>

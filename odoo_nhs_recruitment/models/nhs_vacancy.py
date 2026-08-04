@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 VACANCY_STATES = [
@@ -71,8 +71,9 @@ class NhsVacancy(models.Model):
         required=True,
         ondelete='restrict',
         tracking=True,
-        domain="[('company_id', '=', company_id)]",
+        domain="[('company_id', '=', company_id), ('status', '=', 'active')]",
         help="The funded post being recruited to. Pulls band/staff group/FTE/unit."
+             " Only active (non-frozen) posts are offered."
     )
     org_unit_id = fields.Many2one(
         related='post_id.org_unit_id', string='Team / Department', store=True, readonly=True)
@@ -111,8 +112,7 @@ class NhsVacancy(models.Model):
         help="Which pre-employment checks apply to a successful candidate;"
              " defaulted from the post's staff group."
     )
-    state = fields.Selection(
-        VACANCY_STATES, string='Status', required=True, default='draft', tracking=True)
+    state = fields.Selection(VACANCY_STATES, string='Status', required=True, default='draft', tracking=True)
     withdrawn_reason = fields.Text(string='Withdrawal Reason')
     advert_text = fields.Html(string='Advert Text')
     advert_summary = fields.Char(string='Advert Summary')
@@ -149,7 +149,7 @@ class NhsVacancy(models.Model):
     @api.depends('post_id.job_title', 'org_unit_id.name', 'reference')
     def _compute_name(self):
         for vacancy in self:
-            title = vacancy.post_id.job_title or _('New Vacancy')
+            title = vacancy.post_id.job_title or ('New Vacancy')
             unit = vacancy.org_unit_id.name
             parts = [p for p in (title, unit) if p]
             label = ' — '.join(parts)
@@ -202,7 +202,7 @@ class NhsVacancy(models.Model):
     def _check_fte(self):
         for vacancy in self:
             if vacancy.fte <= 0:
-                raise ValidationError(_('Vacancy FTE must be greater than zero.'))
+                raise ValidationError(('Vacancy FTE must be greater than zero.'))
 
     @api.onchange('post_id')
     def _onchange_post_id(self):
@@ -226,32 +226,32 @@ class NhsVacancy(models.Model):
         for vacancy in self:
             post = vacancy.post_id
             if post.funded_fte <= 0:
-                raise UserError(_(
+                raise UserError((
                     "'%s' cannot be approved: the post has no funded FTE.") % vacancy.name)
             if post.is_frozen:
-                raise UserError(_(
+                raise UserError((
                     "'%s' cannot be approved: the post is frozen.") % vacancy.name)
             if post.vacant_fte <= 0:
-                raise UserError(_(
+                raise UserError((
                     "'%s' cannot be approved: the post has no vacant capacity.") % vacancy.name)
 
     def action_submit(self):
         for vacancy in self:
             if vacancy.state != 'draft':
-                raise UserError(_('Only draft vacancies can be submitted.'))
+                raise UserError(('Only draft vacancies can be submitted.'))
         self.write({'state': 'submitted'})
 
     def action_workforce_approve(self):
         for vacancy in self:
             if vacancy.state != 'submitted':
-                raise UserError(_('Only submitted vacancies can be workforce-approved.'))
+                raise UserError(('Only submitted vacancies can be workforce-approved.'))
             vacancy._check_post_fundable()
         self.write({'state': 'workforce_approved'})
 
     def action_finance_approve(self):
         for vacancy in self:
             if vacancy.state != 'workforce_approved':
-                raise UserError(_('Only workforce-approved vacancies can be finance-approved.'))
+                raise UserError(('Only workforce-approved vacancies can be finance-approved.'))
             vacancy._check_post_fundable()
         self.write({'state': 'finance_approved'})
 
@@ -259,7 +259,7 @@ class NhsVacancy(models.Model):
         today = fields.Date.context_today(self)
         for vacancy in self:
             if vacancy.state != 'finance_approved':
-                raise UserError(_('Only finance-approved vacancies can be opened.'))
+                raise UserError(('Only finance-approved vacancies can be opened.'))
             if not vacancy.open_date:
                 vacancy.open_date = today
         self.write({'state': 'open'})
@@ -280,13 +280,13 @@ class NhsVacancy(models.Model):
     def action_withdraw(self):
         for vacancy in self:
             if vacancy.state == 'filled':
-                raise UserError(_('A filled vacancy cannot be withdrawn.'))
+                raise UserError(('A filled vacancy cannot be withdrawn.'))
         self.write({'state': 'withdrawn'})
 
     def action_view_applications(self):
         self.ensure_one()
         return {
-            'name': _('Applications'),
+            'name': ('Applications'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.application',
             'view_mode': 'kanban,list,form',
@@ -297,7 +297,7 @@ class NhsVacancy(models.Model):
     def action_view_interviews(self):
         self.ensure_one()
         return {
-            'name': _('Interviews'),
+            'name': ('Interviews'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.interview',
             'view_mode': 'list,form',
@@ -307,7 +307,7 @@ class NhsVacancy(models.Model):
     def action_view_offers(self):
         self.ensure_one()
         return {
-            'name': _('Offers'),
+            'name': ('Offers'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.offer',
             'view_mode': 'list,form',
@@ -322,4 +322,94 @@ class NhsVacancy(models.Model):
             if vacancy.days_open and vacancy.days_open >= threshold_days \
                     and vacancy.days_open % 30 == 0:
                 vacancy.message_post(
-                    body=_("This vacancy has been open for %d days.") % vacancy.days_open)
+                    body=("This vacancy has been open for %d days.") % vacancy.days_open)
+
+    @api.model
+    def get_recruitment_dashboard_data(self):
+        """Aggregate the recruitment dashboard data: vacancy pipeline, approvals,
+        applications in flight, stage funnel, vacancy ageing and (only for
+        authorised users) pre-employment-check status. Kept as light,
+        read-only summaries — never sensitive check detail."""
+        Application = self.env['nhs.application']
+        Check = self.env['nhs.check']
+        can_view_checks = self.env.user.has_group('odoo_nhs_recruitment.group_nhs_recruit_checks') \
+            or self.env.user.has_group('odoo_nhs_recruitment.group_nhs_recruit_manager')
+
+        # 1. Open vacancy pipeline
+        open_domain = [('state', 'in', ('open', 'in_progress'))]
+        open_recs = self.search(open_domain, limit=10, order='create_date desc')
+        open_count = self.search_count(open_domain)
+        open_list = [{
+            'id': v.id,
+            'name': v.name,
+            'reference': v.reference,
+            'org_unit': v.org_unit_id.name or '',
+            'state_label': dict(v._fields['state'].selection).get(v.state, v.state),
+            'days_open': v.days_open,
+            'application_count': v.application_count,
+        } for v in open_recs]
+
+        # 2. Awaiting approval
+        approval_domain = [('state', 'in', ('submitted', 'workforce_approved'))]
+        approval_count = self.search_count(approval_domain)
+
+        # 3. Applications in flight
+        in_flight_domain = [('stage', 'not in', ('hired', 'rejected', 'withdrawn'))]
+        in_flight_count = Application.search_count(in_flight_domain)
+
+        # 4. Stage funnel (application counts per pipeline stage)
+        funnel_data = Application._read_group(
+            [], ['stage'], ['__count'])
+        funnel_counts = {stage: count for stage, count in funnel_data}
+        stage_labels = dict(Application._fields['stage'].selection)
+        funnel = [{
+            'stage': stage,
+            'label': label,
+            'count': funnel_counts.get(stage, 0),
+        } for stage, label in stage_labels.items()]
+
+        # 5. Vacancy ageing — longest-open vacancies (days_open is a live, non-stored
+        # computed field, so sort in Python rather than via ORM order)
+        ageing_candidates = self.search(open_domain)
+        ageing_sorted = ageing_candidates.sorted('days_open', reverse=True)[:10]
+        ageing_list = [{
+            'id': v.id,
+            'name': v.name,
+            'org_unit': v.org_unit_id.name or '',
+            'days_open': v.days_open,
+        } for v in ageing_sorted if v.days_open]
+
+        # 6. Time-to-hire (average, across filled vacancies)
+        filled_recs = self.search([('time_to_hire', '>', 0)])
+        avg_time_to_hire = round(
+            sum(filled_recs.mapped('time_to_hire')) / len(filled_recs), 1) if filled_recs else 0
+
+        # 7. Pre-employment checks (restricted — counts/list only for authorised users)
+        checks_outstanding_count = 0
+        checks_outstanding_list = []
+        checks_concern_count = 0
+        if can_view_checks:
+            outstanding_domain = [('status', 'in', ('not_started', 'in_progress'))]
+            checks_outstanding_count = Check.search_count(outstanding_domain)
+            outstanding_recs = Check.search(outstanding_domain, limit=10, order='id desc')
+            checks_outstanding_list = [{
+                'id': c.id,
+                'candidate': c.candidate_id.name or '',
+                'check_type': c.check_type_id.name or '',
+                'status_label': dict(c._fields['status'].selection).get(c.status, c.status),
+            } for c in outstanding_recs]
+            checks_concern_count = Check.search_count([('status', '=', 'concern')])
+
+        return {
+            'open_count': open_count,
+            'open_list': open_list,
+            'approval_count': approval_count,
+            'in_flight_count': in_flight_count,
+            'funnel': funnel,
+            'ageing_list': ageing_list,
+            'avg_time_to_hire': avg_time_to_hire,
+            'can_view_checks': can_view_checks,
+            'checks_outstanding_count': checks_outstanding_count,
+            'checks_outstanding_list': checks_outstanding_list,
+            'checks_concern_count': checks_concern_count,
+        }

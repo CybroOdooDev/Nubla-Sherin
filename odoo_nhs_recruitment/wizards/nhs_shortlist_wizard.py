@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import  api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -70,7 +70,7 @@ class NhsShortlistWizard(models.TransientModel):
         self.ensure_one()
         for line in self.line_ids:
             if line.outcome == 'not_shortlisted' and not line.reason:
-                raise UserError(_(
+                raise UserError((
                     'A reason is required for every application marked Not Shortlisted.'))
             line.application_id.write({
                 'shortlist_outcome': line.outcome,

@@ -23,10 +23,21 @@
         <field name="arch" type="xml">
             <form string="Interview">
                 <header>
+                    <button name="action_mark_accepted" type="object" string="Mark Accepted"
+                            class="btn-primary" invisible="invite_status not in ('invited', 'rescheduled')"/>
+                    <button name="action_mark_declined" type="object" string="Mark Declined"
+                            invisible="invite_status not in ('invited', 'rescheduled')"/>
+                    <button name="action_mark_rescheduled" type="object" string="Mark Rescheduled"
+                            invisible="invite_status in ('rescheduled', 'attended')"/>
+                    <button name="action_mark_attended" type="object" string="Mark Attended"
+                            class="btn-primary" invisible="invite_status != 'accepted'"/>
+                    <button name="action_mark_no_show" type="object" string="Mark No Show"
+                            invisible="invite_status != 'accepted'"/>
                     <button name="action_mark_appointable" type="object" string="Mark Appointable"
-                            class="btn-primary" invisible="outcome == 'appointable'"/>
+                            class="btn-primary"
+                            invisible="outcome == 'appointable' or invite_status != 'attended'"/>
                     <button name="action_mark_not_appointable" type="object" string="Mark Not Appointable"
-                            invisible="outcome == 'not_appointable'"/>
+                            invisible="outcome == 'not_appointable' or invite_status != 'attended'"/>
                     <field name="invite_status" widget="statusbar"/>
                 </header>
                 <sheet>
@@ -51,7 +62,7 @@
                         <page string="Scores">
                             <field name="score_line_ids">
                                 <list editable="bottom">
-                                    <field name="panellist_id"/>
+                                    <field name="panellist_id" domain="[('id', 'in', parent.panel_ids)]"/>
                                     <field name="criterion_id"/>
                                     <field name="score"/>
                                     <field name="notes"/>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_nhs_check_certificate" model="ir.actions.report">
+        <field name="name">Pre-Employment Check Completion Summary</field>
+        <field name="model">nhs.offer</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_recruitment.report_nhs_check_certificate</field>
+        <field name="report_file">odoo_nhs_recruitment.report_nhs_check_certificate</field>
+        <field name="print_report_name">'Check Completion Summary - %s' % object.name</field>
+        <field name="binding_model_id" ref="model_nhs_offer"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_nhs_check_certificate">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="offer">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Pre-Employment Check Completion Summary</h2>
+                        <p>
+                            <strong>Candidate:</strong> <span t-esc="offer.candidate_id.name"/><br/>
+                            <strong>Post:</strong> <span t-esc="offer.vacancy_id.name"/><br/>
+                            <strong>Overall Status:</strong>
+                            <span t-esc="'All Cleared' if offer.all_checks_cleared else 'Outstanding'"/>
+                        </p>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Check</th><th>Level</th><th>Status</th>
+                                    <th>Verified By</th><th>Verified Date</th><th>Expiry</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="offer.check_ids" t-as="check">
+                                    <td><span t-esc="check.check_type_id.name"/></td>
+                                    <td><span t-esc="check.level"/></td>
+                                    <td><span t-esc="check.status"/></td>
+                                    <td><span t-esc="check.verified_by_id.name"/></td>
+                                    <td><span t-esc="check.verified_date"/></td>
+                                    <td><span t-esc="check.expiry_date"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="text-muted small">
+                            This document evidences that the NHS Employment Check Standards were completed for
+                            this hire, for the purposes of CQC well-led/safe recruitment assurance.
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

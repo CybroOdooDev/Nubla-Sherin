@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -46,9 +46,13 @@ class NhsBulkCommunicateWizard(models.TransientModel):
     def action_send(self):
         self.ensure_one()
         if not self.application_ids:
-            raise UserError(_('Select at least one application.'))
+            raise UserError(('Select at least one application.'))
         for application in self.application_ids:
             if application.candidate_id.email:
-                self.template_id.send_mail(application.id, force_send=True)
+                self.template_id.send_mail(
+                    application.id, 
+                    force_send=True,
+                    email_values={'email_to': application.candidate_id.email}
+                )
                 application.acknowledged = True
         return {'type': 'ir.actions.act_window_close'}

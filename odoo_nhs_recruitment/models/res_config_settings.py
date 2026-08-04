@@ -20,7 +20,6 @@
 #
 #############################################################################
 import uuid
-
 from odoo import api, fields, models
 
 
@@ -50,6 +49,18 @@ class ResCompany(models.Model):
     nhs_recruit_public_form_token = fields.Char(
         string='Public Application Form Token', copy=False,
         help="Secret token in the public application form URL: /jobs/apply/<token>.")
+    nhs_recruit_public_form_url = fields.Char(
+        string='Public Application Form URL', compute='_compute_nhs_recruit_public_form_url',
+        help="Full link to the public vacancy list, ready to publish or share.")
+
+    @api.depends('nhs_recruit_public_form_enabled', 'nhs_recruit_public_form_token')
+    def _compute_nhs_recruit_public_form_url(self):
+        for company in self:
+            if company.nhs_recruit_public_form_enabled and company.nhs_recruit_public_form_token:
+                company.nhs_recruit_public_form_url = '%s/jobs/apply/%s' % (
+                    company.get_base_url(), company.nhs_recruit_public_form_token)
+            else:
+                company.nhs_recruit_public_form_url = False
 
     def _nhs_recruit_generate_token(self):
         for company in self:
@@ -72,10 +83,25 @@ class ResConfigSettings(models.TransientModel):
         related='company_id.nhs_recruit_public_form_enabled', readonly=False)
     nhs_recruit_public_form_token = fields.Char(
         related='company_id.nhs_recruit_public_form_token', readonly=True)
+    nhs_recruit_public_form_url = fields.Char(
+        related='company_id.nhs_recruit_public_form_url', readonly=True)
 
     def action_nhs_recruit_generate_token(self):
         self.company_id._nhs_recruit_generate_token()
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
+        }
+
+    def action_nhs_recruit_open_form(self):
+        self.ensure_one()
+        if not self.nhs_recruit_public_form_url:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'reload',
+            }
+        return {
+            'type': 'ir.actions.act_url',
+            'url': self.nhs_recruit_public_form_url,
+            'target': 'new',
         }

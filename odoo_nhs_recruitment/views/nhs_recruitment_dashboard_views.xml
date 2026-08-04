@@ -8,7 +8,6 @@
             <graph string="Vacancies" type="bar">
                 <field name="state"/>
                 <field name="time_to_hire" type="measure"/>
-                <field name="days_open" type="measure"/>
             </graph>
         </field>
     </record>
@@ -21,16 +20,23 @@
                 <field name="org_unit_id" type="row"/>
                 <field name="state" type="col"/>
                 <field name="time_to_hire" type="measure"/>
-                <field name="days_open" type="measure"/>
             </pivot>
         </field>
     </record>
 
-    <record id="action_nhs_recruitment_dashboard" model="ir.actions.act_window">
-        <field name="name">Recruitment Dashboard</field>
+    <!-- The visual KPI-card dashboard (client action) is the primary "Recruitment
+         Dashboard" menu entry; this graph/pivot/list action is kept as the
+         underlying "Vacancy Analytics" drill-down for power users. -->
+    <record id="action_nhs_vacancy_analytics" model="ir.actions.act_window">
+        <field name="name">Vacancy Analytics</field>
         <field name="res_model">nhs.vacancy</field>
         <field name="view_mode">graph,pivot,list</field>
         <field name="context">{'search_default_group_state': 1}</field>
+    </record>
+
+    <record id="action_nhs_recruitment_dashboard_client" model="ir.actions.client">
+        <field name="name">Recruitment Dashboard</field>
+        <field name="tag">nhs_recruitment_dashboard</field>
     </record>
 
     <!-- Stage conversion / funnel -->

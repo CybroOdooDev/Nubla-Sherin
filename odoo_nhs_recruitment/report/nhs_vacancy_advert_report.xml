@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_nhs_vacancy_advert" model="ir.actions.report">
+        <field name="name">Vacancy Advert / Pack</field>
+        <field name="model">nhs.vacancy</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_recruitment.report_nhs_vacancy_advert</field>
+        <field name="report_file">odoo_nhs_recruitment.report_nhs_vacancy_advert</field>
+        <field name="print_report_name">'Vacancy Advert - %s' % object.reference</field>
+        <field name="binding_model_id" ref="model_nhs_vacancy"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_nhs_vacancy_advert">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="vacancy">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2><span t-esc="vacancy.name"/></h2>
+                        <p><strong>Reference:</strong> <span t-esc="vacancy.reference"/></p>
+                        <table class="table table-sm table-borderless">
+                            <tr><td><strong>Team / Department</strong></td><td><span t-esc="vacancy.org_unit_id.name"/></td></tr>
+                            <tr><td><strong>Band</strong></td><td><span t-esc="vacancy.band_id.name or 'Medical/Non-AfC'"/></td></tr>
+                            <tr><td><strong>Staff Group</strong></td><td><span t-esc="vacancy.staff_group_id.name"/></td></tr>
+                            <tr><td><strong>FTE</strong></td><td><span t-esc="'%.2f' % vacancy.fte"/></td></tr>
+                            <tr><td><strong>Contract Type</strong></td><td><span t-esc="vacancy.contract_type"/></td></tr>
+                            <tr><td><strong>Closing Date</strong></td><td><span t-esc="vacancy.close_date"/></td></tr>
+                        </table>
+                        <h4>Advert</h4>
+                        <p t-field="vacancy.advert_text"/>
+                        <h4 t-if="vacancy.person_spec_id">Person Specification</h4>
+                        <table t-if="vacancy.person_spec_id" class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Criterion</th><th>Category</th><th>Essential/Desirable</th><th>Assessed At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="vacancy.person_spec_id.criterion_ids" t-as="criterion">
+                                    <td><span t-esc="criterion.name"/></td>
+                                    <td><span t-esc="criterion.category"/></td>
+                                    <td><span t-esc="criterion.essential"/></td>
+                                    <td><span t-esc="criterion.assessment_method"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

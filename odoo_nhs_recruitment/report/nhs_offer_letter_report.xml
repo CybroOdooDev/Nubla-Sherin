@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_nhs_offer_letter" model="ir.actions.report">
+        <field name="name">Offer Letter</field>
+        <field name="model">nhs.offer</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_recruitment.report_nhs_offer_letter</field>
+        <field name="report_file">odoo_nhs_recruitment.report_nhs_offer_letter</field>
+        <field name="print_report_name">'Offer Letter - %s' % object.name</field>
+        <field name="binding_model_id" ref="model_nhs_offer"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_nhs_offer_letter">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="offer">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Offer of Employment</h2>
+                        <p>Dear <span t-esc="offer.candidate_id.name"/>,</p>
+                        <p>
+                            We are pleased to offer you the post of
+                            <strong><span t-esc="offer.vacancy_id.name"/></strong>, on the following terms:
+                        </p>
+                        <table class="table table-sm table-borderless">
+                            <tr><td><strong>Band</strong></td><td><span t-esc="offer.band_id.name or 'Medical/Non-AfC'"/></td></tr>
+                            <tr><td><strong>Pay Point</strong></td><td><span t-esc="offer.pay_point"/></td></tr>
+                            <tr><td><strong>Salary</strong></td><td><span t-field="offer.salary" t-options="{'widget': 'monetary', 'display_currency': offer.currency_id}"/></td></tr>
+                            <tr><td><strong>FTE / Hours</strong></td><td><span t-esc="'%.2f' % offer.fte"/> FTE / <span t-esc="offer.hours"/> hrs/wk</td></tr>
+                            <tr><td><strong>Proposed Start Date</strong></td><td><span t-esc="offer.start_date"/></td></tr>
+                            <tr><td><strong>Offer Type</strong></td><td><span t-esc="offer.offer_type"/></td></tr>
+                        </table>
+                        <p t-if="offer.offer_type == 'conditional'">
+                            This offer is conditional upon satisfactory completion of the NHS Employment Check
+                            Standards (identity, right to work, professional registration, references, criminal
+                            record (DBS) and occupational health, as applicable to this role).
+                        </p>
+                        <p>Please confirm your acceptance of this offer at your earliest convenience.</p>
+                        <p>Kind regards,<br/>Recruitment Team</p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -47,7 +47,9 @@
               parent="menu_nhs_recruitment_root" sequence="50"
               groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
     <menuitem id="menu_nhs_recruitment_dashboard" name="Recruitment Dashboard"
-              parent="menu_nhs_recruitment_reporting" action="action_nhs_recruitment_dashboard" sequence="10"/>
+              parent="menu_nhs_recruitment_reporting" action="action_nhs_recruitment_dashboard_client" sequence="10"/>
+    <menuitem id="menu_nhs_vacancy_analytics" name="Vacancy Analytics"
+              parent="menu_nhs_recruitment_reporting" action="action_nhs_vacancy_analytics" sequence="15"/>
     <menuitem id="menu_nhs_time_to_hire" name="Time-to-Hire / Funnel"
               parent="menu_nhs_recruitment_reporting" action="action_nhs_time_to_hire" sequence="20"/>
     <menuitem id="menu_nhs_equality_monitoring" name="Equality Monitoring"

@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import  api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -58,7 +58,7 @@ class NhsOnboardWizard(models.TransientModel):
         offer = self.offer_id
         hard_gate = self.env.company.nhs_recruit_check_gate_hard
         if hard_gate and not offer.all_checks_cleared:
-            raise UserError(_(
+            raise UserError((
                 'All required pre-employment checks must be cleared before the'
                 ' hire can be confirmed.'))
 
