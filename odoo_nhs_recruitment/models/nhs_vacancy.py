@@ -20,7 +20,8 @@
 #
 #############################################################################
 from odoo import api, fields, models
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import AccessError, UserError, ValidationError
+from odoo.tools.float_utils import float_compare
 
 VACANCY_STATES = [
     ('draft', 'Draft'),
@@ -136,6 +137,13 @@ class NhsVacancy(models.Model):
     application_count = fields.Integer(string='Application Count', compute='_compute_application_count')
     interview_count = fields.Integer(string='Interviews', compute='_compute_application_count')
     offer_count = fields.Integer(string='Offers', compute='_compute_application_count')
+    hired_fte = fields.Float(
+        string='Hired FTE',
+        compute='_compute_hired_fte',
+        store=True,
+        digits=(16, 2),
+        help="Sum of FTE across applications hired against this vacancy so far."
+    )
     days_open = fields.Integer(string='Days Open', compute='_compute_days_open')
     filled_date = fields.Date(string='Filled Date', readonly=True)
     time_to_hire = fields.Integer(
@@ -148,6 +156,8 @@ class NhsVacancy(models.Model):
 
     @api.depends('post_id.job_title', 'org_unit_id.name', 'reference')
     def _compute_name(self):
+        """Builds the display name from the post's job title and org unit,
+        with the reference appended once assigned."""
         for vacancy in self:
             title = vacancy.post_id.job_title or ('New Vacancy')
             unit = vacancy.org_unit_id.name
@@ -160,6 +170,9 @@ class NhsVacancy(models.Model):
     @api.depends('post_id.band_id.indicative_salary', 'post_id.manual_indicative_salary',
                  'post_id.is_medical', 'fte', 'company_id.nhs_on_cost_factor')
     def _compute_indicative_cost(self):
+        """Derives indicative annual pay cost from the post's band salary
+        (or the manual medical salary for medical posts), scaled by FTE
+        and the company's on-cost factor."""
         for vacancy in self:
             post = vacancy.post_id
             on_cost = vacancy.company_id.nhs_on_cost_factor or 1.0
@@ -167,7 +180,17 @@ class NhsVacancy(models.Model):
                 post.band_id.indicative_salary or 0.0)
             vacancy.indicative_cost = base_salary * vacancy.fte * on_cost
 
+    @api.depends('application_ids.stage', 'application_ids.offer_id.fte')
+    def _compute_hired_fte(self):
+        """Sums offer FTE across applications that have reached the hired
+        stage, to track how much of the vacancy's FTE has been filled."""
+        for vacancy in self:
+            hired = vacancy.application_ids.filtered(lambda a: a.stage == 'hired')
+            vacancy.hired_fte = sum(hired.mapped('offer_id.fte'))
+
     def _compute_application_count(self):
+        """Batches application, interview and offer counts per vacancy via
+        read_group, rather than looping searches per record."""
         app_data = self.env['nhs.application']._read_group(
             [('vacancy_id', 'in', self.ids)], ['vacancy_id'], ['__count'])
         app_counts = {vac.id: count for vac, count in app_data}
@@ -183,6 +206,8 @@ class NhsVacancy(models.Model):
             vacancy.offer_count = offer_counts.get(vacancy.id, 0)
 
     def _compute_days_open(self):
+        """Days since opening, for vacancies still open or in progress;
+        zero once filled, closed, withdrawn, or never opened."""
         today = fields.Date.context_today(self)
         for vacancy in self:
             if vacancy.state in ('filled', 'closed', 'withdrawn') or not vacancy.open_date:
@@ -192,6 +217,8 @@ class NhsVacancy(models.Model):
 
     @api.depends('filled_date', 'open_date')
     def _compute_time_to_hire(self):
+        """Days elapsed between opening and being filled, once both dates
+        are known; zero otherwise."""
         for vacancy in self:
             if vacancy.filled_date and vacancy.open_date:
                 vacancy.time_to_hire = (vacancy.filled_date - vacancy.open_date).days
@@ -200,21 +227,27 @@ class NhsVacancy(models.Model):
 
     @api.constrains('fte', 'post_id')
     def _check_fte(self):
+        """Rejects vacancies with zero or negative FTE."""
         for vacancy in self:
             if vacancy.fte <= 0:
                 raise ValidationError(('Vacancy FTE must be greater than zero.'))
 
     @api.onchange('post_id')
     def _onchange_post_id(self):
+        """Defaults FTE to the post's vacant capacity (or its funded FTE)
+        and, if unset, the check profile to the staff group's default."""
         for vacancy in self:
             if vacancy.post_id:
-                vacancy.fte = vacancy.post_id.vacant_fte or vacancy.post_id.funded_fte or 1.0
+                post = vacancy.post_id
+                vacancy.fte = post.vacant_fte if post.vacant_fte > 0 else (post.funded_fte or 1.0)
                 if not vacancy.check_profile_id:
                     vacancy.check_profile_id = self.env['nhs.check.profile'] \
                         ._get_default_for_staff_group(vacancy.post_id.staff_group_id.id)
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Assigns each vacancy the next reference from its sequence unless
+        one was already supplied."""
         for vals in vals_list:
             if not vals.get('reference') or vals.get('reference') == 'New':
                 vals['reference'] = self.env['ir.sequence'].next_by_code(
@@ -236,26 +269,56 @@ class NhsVacancy(models.Model):
                     "'%s' cannot be approved: the post has no vacant capacity.") % vacancy.name)
 
     def action_submit(self):
+        """Moves a draft vacancy to submitted, then auto-advances past any
+        approval steps Settings has disabled."""
         for vacancy in self:
             if vacancy.state != 'draft':
                 raise UserError(('Only draft vacancies can be submitted.'))
         self.write({'state': 'submitted'})
+        self._auto_advance_approvals()
+
+    def _check_can_approve(self):
+        """Approvals (workforce and finance) are a Recruitment Manager
+        capability only — enforced here so it holds regardless of how the
+        transition is triggered, not just when the view button is used."""
+        if not self.env.user.has_group('odoo_nhs_recruitment.group_nhs_recruit_manager'):
+            raise AccessError(('Only a Recruitment Manager can approve a vacancy.'))
 
     def action_workforce_approve(self):
+        """Gives workforce sign-off, after re-checking the post is still
+        fundable, then auto-advances past a disabled finance approval step."""
+        self._check_can_approve()
         for vacancy in self:
             if vacancy.state != 'submitted':
                 raise UserError(('Only submitted vacancies can be workforce-approved.'))
             vacancy._check_post_fundable()
         self.write({'state': 'workforce_approved'})
+        self._auto_advance_approvals()
 
     def action_finance_approve(self):
+        """Gives finance sign-off, after re-checking the post is still
+        fundable."""
+        self._check_can_approve()
         for vacancy in self:
             if vacancy.state != 'workforce_approved':
                 raise UserError(('Only workforce-approved vacancies can be finance-approved.'))
             vacancy._check_post_fundable()
         self.write({'state': 'finance_approved'})
 
+    def _auto_advance_approvals(self):
+        """Skip the workforce/finance approval steps that Settings has switched
+        off, so a vacancy only stops for approval clicks it actually requires."""
+        for vacancy in self:
+            if vacancy.state == 'submitted' and not vacancy.company_id.nhs_recruit_workforce_approval_required:
+                vacancy._check_post_fundable()
+                vacancy.state = 'workforce_approved'
+            if vacancy.state == 'workforce_approved' and not vacancy.company_id.nhs_recruit_finance_approval_required:
+                vacancy._check_post_fundable()
+                vacancy.state = 'finance_approved'
+
     def action_open(self):
+        """Opens a finance-approved vacancy for advertising, stamping the
+        opening date the first time it's opened."""
         today = fields.Date.context_today(self)
         for vacancy in self:
             if vacancy.state != 'finance_approved':
@@ -265,6 +328,8 @@ class NhsVacancy(models.Model):
         self.write({'state': 'open'})
 
     def action_mark_in_progress(self):
+        """Flags an open vacancy as having active candidates in the
+        pipeline (e.g. once shortlisting has started)."""
         for vacancy in self:
             if vacancy.state == 'open':
                 vacancy.state = 'in_progress'
@@ -274,16 +339,29 @@ class NhsVacancy(models.Model):
         today = fields.Date.context_today(self)
         self.write({'state': 'filled', 'filled_date': today})
 
+    def _advance_after_hire(self):
+        """Called by the onboarding wizard after each hire is confirmed. A
+        vacancy's fte can represent more than one hire (e.g. 3.0 FTE across
+        3 candidates), so it should only close out once hired_fte reaches
+        the vacancy's target fte, not after the first hire."""
+        for vacancy in self:
+            if float_compare(vacancy.hired_fte, vacancy.fte, precision_digits=2) >= 0:
+                vacancy.action_mark_filled()
+                vacancy.action_close()
+
     def action_close(self):
+        """Closes the vacancy, ending recruitment activity on it."""
         self.write({'state': 'closed'})
 
     def action_withdraw(self):
+        """Withdraws the vacancy from recruitment; blocked once filled."""
         for vacancy in self:
             if vacancy.state == 'filled':
                 raise UserError(('A filled vacancy cannot be withdrawn.'))
         self.write({'state': 'withdrawn'})
 
     def action_view_applications(self):
+        """Opens this vacancy's applications in a dedicated list/kanban view."""
         self.ensure_one()
         return {
             'name': ('Applications'),
@@ -295,6 +373,7 @@ class NhsVacancy(models.Model):
         }
 
     def action_view_interviews(self):
+        """Opens this vacancy's interviews in a dedicated list view."""
         self.ensure_one()
         return {
             'name': ('Interviews'),
@@ -305,6 +384,7 @@ class NhsVacancy(models.Model):
         }
 
     def action_view_offers(self):
+        """Opens this vacancy's offers in a dedicated list view."""
         self.ensure_one()
         return {
             'name': ('Offers'),

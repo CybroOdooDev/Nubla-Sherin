@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import  api, fields, models
+from odoo import  _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 APPLICATION_STAGES = [
@@ -47,6 +47,23 @@ class NhsApplicationScoreLine(models.Model):
     score = fields.Float(string='Score', help="0 (not met) to 5 (fully met).")
     notes = fields.Char(string='Notes')
 
+    @api.constrains('criterion_id', 'application_id')
+    def _check_criterion_matches_vacancy_spec(self):
+        """Scoring is only meaningful against the vacancy's own person
+        specification — enforced here so it holds even if a score line is
+        created another way than the view's (now-filtered) picker."""
+        for line in self:
+            vacancy = line.application_id.vacancy_id
+            spec = vacancy.person_spec_id
+            if not spec:
+                raise ValidationError(_(
+                    "Set a Person Specification on vacancy '%s' before scoring "
+                    "applications against it.") % vacancy.name)
+            if line.criterion_id.spec_id != spec:
+                raise ValidationError(_(
+                    "'%s' is not a criterion of this vacancy's Person Specification "
+                    "('%s').") % (line.criterion_id.name, spec.name))
+
 
 class NhsApplication(models.Model):
     """A candidate's application to a vacancy — the recruiter's pipeline
@@ -64,6 +81,10 @@ class NhsApplication(models.Model):
     vacancy_id = fields.Many2one(
         'nhs.vacancy', string='Vacancy', required=True, ondelete='restrict', tracking=True,
         domain="[('state', 'in', ('open', 'in_progress'))]")
+    person_spec_id = fields.Many2one(
+        related='vacancy_id.person_spec_id', string='Person Specification', readonly=True,
+        help="The vacancy's person specification — shortlisting scores are recorded"
+             " only against this template's criteria.")
     candidate_id = fields.Many2one(
         'nhs.candidate', string='Candidate', required=True, ondelete='restrict', tracking=True)
     source = fields.Selection([
@@ -95,7 +116,10 @@ class NhsApplication(models.Model):
     score_line_ids = fields.One2many(
         'nhs.application.score.line', 'application_id', string='Shortlisting Scores')
     shortlist_score = fields.Float(
-        string='Shortlist Score', compute='_compute_shortlist_score', store=True)
+        string='Shortlist Score', compute='_compute_shortlist_score', store=True,
+        help="Sum of each shortlisting score line's score x its criterion's weight"
+             " (e.g. (5x3)+(4x2)+(3x1) = 26). Not normalised, so it is not on a 0-5"
+             " scale — it grows with the number of criteria and their weights.")
     shortlist_outcome = fields.Selection([
         ('shortlisted', 'Shortlisted'),
         ('not_shortlisted', 'Not Shortlisted'),
@@ -120,6 +144,8 @@ class NhsApplication(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Assigns each application its sequence reference and creates its
+        segregated equality-monitoring record, kept off the main form."""
         for vals in vals_list:
             if not vals.get('name') or vals.get('name') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code(
@@ -133,6 +159,8 @@ class NhsApplication(models.Model):
         return applications
 
     def _compute_duplicate_warning(self):
+        """Flags whether this candidate has another application against
+        the same vacancy."""
         for application in self:
             application.duplicate_warning = bool(application.candidate_id) and bool(
                 self.search_count([
@@ -143,20 +171,20 @@ class NhsApplication(models.Model):
 
     @api.depends('score_line_ids.score', 'score_line_ids.criterion_id.weight')
     def _compute_shortlist_score(self):
+        """Weighted sum of the shortlisting score lines against the person
+        specification's criterion weights, e.g. (5x3)+(4x2)+(3x1) = 26."""
         for application in self:
-            lines = application.score_line_ids
-            total_weight = sum(lines.mapped('criterion_id.weight'))
-            if total_weight:
-                application.shortlist_score = sum(
-                    line.score * line.criterion_id.weight for line in lines) / total_weight
-            else:
-                application.shortlist_score = 0.0
+            application.shortlist_score = sum(
+                line.score * line.criterion_id.weight for line in application.score_line_ids)
 
     def _compute_interview_count(self):
+        """Counts interviews linked to this application."""
         for application in self:
             application.interview_count = len(application.interview_ids)
 
     def action_start_shortlisting(self):
+        """Moves a received application into shortlisting, or straight to
+        interview if one has already been scheduled."""
         for application in self:
             if application.stage != 'received':
                 raise UserError(('Only received applications can start shortlisting.'))
@@ -176,14 +204,20 @@ class NhsApplication(models.Model):
                 application.write({'stage': 'rejected', 'decision_date': today})
 
     def action_reject(self):
+        """Rejects the application and stamps the decision date, starting
+        the unsuccessful-applicant retention clock."""
         today = fields.Date.context_today(self)
         self.write({'stage': 'rejected', 'decision_date': today})
 
     def action_withdraw(self):
+        """Marks the application withdrawn by the candidate and stamps the
+        decision date."""
         today = fields.Date.context_today(self)
         self.write({'stage': 'withdrawn', 'decision_date': today})
 
     def action_make_offer(self):
+        """Creates the offer record for this application, advances it to
+        the offered stage, and opens the new offer's form."""
         self.ensure_one()
         if self.stage != 'interview':
             raise UserError(('An offer can only be made from the Interview stage.'))
@@ -200,6 +234,9 @@ class NhsApplication(models.Model):
         }
 
     def action_send_acknowledgement(self):
+        """Emails the candidate the acknowledgement template, if configured
+        and an address is on file, and marks the application acknowledged
+        regardless so it isn't retried."""
         template = self.env.ref(
             'odoo_nhs_recruitment.mail_template_application_ack', raise_if_not_found=False)
         for application in self:
@@ -213,6 +250,8 @@ class NhsApplication(models.Model):
 
     @api.constrains('shortlist_outcome')
     def _check_shortlist_outcome_reason(self):
+        """Requires a reason whenever the shortlist outcome is negative,
+        so rejections at this stage are always justified."""
         for application in self:
             if application.shortlist_outcome == 'not_shortlisted' and not application.shortlist_reason:
                 raise ValidationError((

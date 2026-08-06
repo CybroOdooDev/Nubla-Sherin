@@ -22,3 +22,4 @@
 from . import nhs_shortlist_wizard
 from . import nhs_bulk_communicate_wizard
 from . import nhs_onboard_wizard
+from . import nhs_interview_reschedule_wizard

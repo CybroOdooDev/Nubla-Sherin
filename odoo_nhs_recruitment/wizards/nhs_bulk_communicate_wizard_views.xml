@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Wizard view: form to select mail template and send outcome to applicants -->
     <record id="view_nhs_bulk_communicate_wizard_form" model="ir.ui.view">
         <field name="name">nhs.bulk.communicate.wizard.form</field>
         <field name="model">nhs.bulk.communicate.wizard</field>
@@ -17,6 +18,7 @@
         </field>
     </record>
 
+    <!-- Wizard action: bulk-communicate outcome, bound to application list view -->
     <record id="action_nhs_bulk_communicate_wizard" model="ir.actions.act_window">
         <field name="name">Communicate Outcome</field>
         <field name="res_model">nhs.bulk.communicate.wizard</field>

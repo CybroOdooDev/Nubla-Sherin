@@ -46,6 +46,8 @@ class NhsOnboardWizard(models.TransientModel):
 
     @api.model
     def default_get(self, fields_list):
+        """Default start_date from the linked offer's start_date, or today
+        if unset, when the wizard is opened from an offer's context."""
         res = super().default_get(fields_list)
         offer_id = res.get('offer_id') or self.env.context.get('default_offer_id')
         if offer_id:
@@ -54,6 +56,10 @@ class NhsOnboardWizard(models.TransientModel):
         return res
 
     def action_confirm_hire(self):
+        """Enforce the hard check gate if configured, mark the offer and
+        application hired, credit the post's in-post FTE, optionally create
+        a training workforce member, and let the vacancy advance/close once
+        its FTE target is reached."""
         self.ensure_one()
         offer = self.offer_id
         hard_gate = self.env.company.nhs_recruit_check_gate_hard
@@ -63,14 +69,14 @@ class NhsOnboardWizard(models.TransientModel):
                 ' hire can be confirmed.'))
 
         offer.write({
-            'state': 'accepted',
+            'state': 'hired',
             'offer_type': 'unconditional',
             'start_date': self.start_date,
         })
         offer.application_id.write({'stage': 'hired'})
 
         post = offer.vacancy_id.post_id
-        post.write({'in_post_fte': post.in_post_fte + offer.vacancy_id.fte})
+        post.write({'in_post_fte': post.in_post_fte + offer.fte})
 
         if self.create_training_member and 'nhs.workforce.member' in self.env:
             self.env['nhs.workforce.member'].create({
@@ -80,6 +86,5 @@ class NhsOnboardWizard(models.TransientModel):
                 'start_date': self.start_date,
             })
 
-        offer.vacancy_id.action_mark_filled()
-        offer.vacancy_id.action_close()
+        offer.vacancy_id._advance_after_hire()
         return {'type': 'ir.actions.act_window_close'}

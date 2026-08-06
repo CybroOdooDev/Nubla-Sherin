@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Wizard view: form to set shortlist outcome/reason per application -->
     <record id="view_nhs_shortlist_wizard_form" model="ir.ui.view">
         <field name="name">nhs.shortlist.wizard.form</field>
         <field name="model">nhs.shortlist.wizard</field>
@@ -23,6 +24,7 @@
         </field>
     </record>
 
+    <!-- Wizard action: opens the shortlist-applications wizard -->
     <record id="action_nhs_shortlist_wizard" model="ir.actions.act_window">
         <field name="name">Shortlist Applications</field>
         <field name="res_model">nhs.shortlist.wizard</field>

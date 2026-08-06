@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- List view: offers, colored by all-checks-cleared or concern flag -->
     <record id="view_nhs_offer_list" model="ir.ui.view">
         <field name="name">nhs.offer.list</field>
         <field name="model">nhs.offer</field>
@@ -19,6 +20,7 @@
         </field>
     </record>
 
+    <!-- Form view: offer record with accept/unconditional/onboard workflow and checks stat button -->
     <record id="view_nhs_offer_form" model="ir.ui.view">
         <field name="name">nhs.offer.form</field>
         <field name="model">nhs.offer</field>
@@ -28,14 +30,14 @@
                     <button name="action_accept" type="object" string="Mark Accepted"
                             class="btn-primary" invisible="state != 'made'"/>
                     <button name="action_convert_unconditional" type="object" string="Make Unconditional"
-                            class="btn-primary" invisible="offer_type == 'unconditional'"/>
+                            class="btn-primary" invisible="offer_type == 'unconditional' or state != 'accepted'"/>
                     <button name="action_open_onboard_wizard" type="object" string="Confirm Hire"
                             class="btn-primary" invisible="state != 'accepted' or offer_type != 'unconditional'"/>
                     <button name="action_decline" type="object" string="Mark Declined"
-                            invisible="state in ('declined', 'withdrawn')"/>
+                            invisible="state in ('hired', 'declined', 'withdrawn')"/>
                     <button name="action_withdraw" type="object" string="Withdraw"
-                            invisible="state in ('declined', 'withdrawn')"/>
-                    <field name="state" widget="statusbar" statusbar_visible="made,accepted"/>
+                            invisible="state in ('hired', 'declined', 'withdrawn')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="made,accepted,hired"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -78,6 +80,7 @@
         </field>
     </record>
 
+    <!-- Search view: filter offers awaiting checks or ready to onboard -->
     <record id="view_nhs_offer_search" model="ir.ui.view">
         <field name="name">nhs.offer.search</field>
         <field name="model">nhs.offer</field>
@@ -96,6 +99,7 @@
         </field>
     </record>
 
+    <!-- Window action: Offers menu entry -->
     <record id="action_nhs_offer" model="ir.actions.act_window">
         <field name="name">Offers</field>
         <field name="res_model">nhs.offer</field>

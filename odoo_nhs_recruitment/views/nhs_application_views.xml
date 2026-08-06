@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Kanban view: application pipeline cards grouped by stage, with score/RTW/registration flags -->
     <record id="view_nhs_application_kanban" model="ir.ui.view">
         <field name="name">nhs.application.kanban</field>
         <field name="model">nhs.application</field>
@@ -52,6 +53,7 @@
         </field>
     </record>
 
+    <!-- List view: applications overview with stage, shortlist score and source -->
     <record id="view_nhs_application_list" model="ir.ui.view">
         <field name="name">nhs.application.list</field>
         <field name="model">nhs.application</field>
@@ -68,6 +70,7 @@
         </field>
     </record>
 
+    <!-- Form view: application record, shortlisting/interview/offer workflow buttons and tabs -->
     <record id="view_nhs_application_form" model="ir.ui.view">
         <field name="name">nhs.application.form</field>
         <field name="model">nhs.application</field>
@@ -77,16 +80,16 @@
                     <button name="action_start_shortlisting" type="object" string="Start Shortlisting"
                             class="btn-primary" invisible="stage != 'received'"/>
                     <button name="action_shortlist_decide" type="object" string="Apply Shortlist Decision"
-                            invisible="stage != 'shortlisting' or not shortlist_outcome"/>
+                            class="btn-primary" invisible="stage != 'shortlisting'"/>
                     <button name="action_make_offer" type="object" string="Make Offer"
                             class="btn-primary" invisible="stage != 'interview'"/>
                     <button name="action_send_acknowledgement" type="object" string="Send Acknowledgement"
-                            invisible="acknowledged"/>
+                            class="btn-primary" invisible="acknowledged or stage == 'received'"/>
                     <button name="action_reject" type="object" string="Reject"
-                            invisible="stage in ('hired', 'rejected', 'withdrawn')"
+                            class="btn-primary" invisible="stage in ('hired', 'rejected', 'withdrawn')"
                             confirm="Reject this application?"/>
                     <button name="action_withdraw" type="object" string="Withdraw"
-                            invisible="stage in ('hired', 'rejected', 'withdrawn')"/>
+                            class="btn-primary" invisible="stage in ('hired', 'rejected', 'withdrawn')"/>
                     <field name="stage" widget="statusbar"
                            statusbar_visible="received,shortlisting,shortlisted,interview,offered,hired"/>
                 </header>
@@ -104,9 +107,10 @@
                         <group>
                             <field name="company_id" groups="base.group_multi_company"/>
                             <field name="shortlist_score" readonly="1"/>
-                            <field name="shortlist_outcome" widget="radio" options="{'horizontal': true}"/>
+                            <field name="shortlist_outcome" widget="radio" options="{'horizontal': true}"
+                                   invisible="stage == 'received'"/>
                             <field name="shortlist_reason"
-                                   invisible="shortlist_outcome != 'not_shortlisted'"/>
+                                   invisible="stage == 'received' or shortlist_outcome != 'not_shortlisted'"/>
                         </group>
                     </group>
                     <notebook>
@@ -121,16 +125,22 @@
                             <field name="employment_history" placeholder="Details of previous employment, roles, and responsibilities..."/>
                             <field name="cv_attachment_ids" widget="many2many_binary"/>
                         </page>
-                        <page string="Shortlisting Scores">
+                        <page string="Shortlisting Scores" invisible="stage == 'received'">
+                            <field name="person_spec_id" invisible="1"/>
+                            <div class="alert alert-warning" role="alert" invisible="person_spec_id">
+                                This vacancy has no Person Specification set — set one on the
+                                vacancy before scoring this application against it.
+                            </div>
                             <field name="score_line_ids">
                                 <list editable="bottom">
-                                    <field name="criterion_id"/>
+                                    <field name="criterion_id"
+                                           domain="[('spec_id', '=', parent.person_spec_id)]"/>
                                     <field name="score"/>
                                     <field name="notes"/>
                                 </list>
                             </field>
                         </page>
-                        <page string="Interviews">
+                        <page string="Interviews" invisible="stage == 'received'">
                             <field name="interview_ids">
                                 <list>
                                     <field name="interview_datetime"/>
@@ -151,6 +161,7 @@
         </field>
     </record>
 
+    <!-- Search view: filter applications by stage, group by stage or vacancy -->
     <record id="view_nhs_application_search" model="ir.ui.view">
         <field name="name">nhs.application.search</field>
         <field name="model">nhs.application</field>
@@ -170,6 +181,7 @@
         </field>
     </record>
 
+    <!-- Window action: Applications menu entry (kanban/list/form) -->
     <record id="action_nhs_application" model="ir.actions.act_window">
         <field name="name">Applications</field>
         <field name="res_model">nhs.application</field>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Report action: vacancy advert/pack PDF including person specification -->
     <record id="action_report_nhs_vacancy_advert" model="ir.actions.report">
         <field name="name">Vacancy Advert / Pack</field>
         <field name="model">nhs.vacancy</field>

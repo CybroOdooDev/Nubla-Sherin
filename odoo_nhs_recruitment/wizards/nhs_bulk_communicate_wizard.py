@@ -37,6 +37,8 @@ class NhsBulkCommunicateWizard(models.TransientModel):
 
     @api.model
     def default_get(self, fields_list):
+        """Default application_ids from the active list-view selection when
+        invoked as a contextual action on nhs.application."""
         res = super().default_get(fields_list)
         active_ids = self.env.context.get('active_ids')
         if active_ids and self.env.context.get('active_model') == 'nhs.application':
@@ -44,6 +46,8 @@ class NhsBulkCommunicateWizard(models.TransientModel):
         return res
 
     def action_send(self):
+        """Send the chosen template to each application's candidate email
+        and flag the application as acknowledged."""
         self.ensure_one()
         if not self.application_ids:
             raise UserError(('Select at least one application.'))

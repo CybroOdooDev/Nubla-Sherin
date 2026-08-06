@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- List view: pre-employment checks, colored by cleared/concern/not-required status -->
     <record id="view_nhs_check_list" model="ir.ui.view">
         <field name="name">nhs.check.list</field>
         <field name="model">nhs.check</field>
         <field name="arch" type="xml">
-            <list string="Pre-Employment Checks" decoration-success="status == 'cleared'"
+            <list string="Pre-Employment Checks" create="false" decoration-success="status == 'cleared'"
                   decoration-danger="status == 'concern'" decoration-muted="status == 'not_required'">
                 <field name="candidate_id"/>
                 <field name="check_type_id"/>
@@ -17,16 +18,18 @@
         </field>
     </record>
 
+    <!-- Form view: single pre-employment check with status workflow buttons and restricted evidence -->
     <record id="view_nhs_check_form" model="ir.ui.view">
         <field name="name">nhs.check.form</field>
         <field name="model">nhs.check</field>
         <field name="arch" type="xml">
-            <form string="Pre-Employment Check">
+            <form string="Pre-Employment Check" create="false">
                 <header>
                     <button name="action_mark_in_progress" type="object" string="Mark In Progress"
-                            invisible="status != 'not_started'"/>
+                            class="btn-primary" invisible="status != 'not_started'"/>
                     <button name="action_mark_cleared" type="object" string="Mark Cleared"
-                            class="btn-primary" invisible="status in ('cleared', 'not_required')"/>
+                            class="btn-primary"
+                            invisible="status in ('not_started', 'cleared', 'not_required')"/>
                     <button name="action_mark_concern" type="object" string="Flag Concern"
                             invisible="status in ('concern', 'not_required')"/>
                     <button name="action_mark_not_required" type="object" string="Mark Not Required"
@@ -62,6 +65,7 @@
         </field>
     </record>
 
+    <!-- Search view: filter/group checks by status, candidate or check type -->
     <record id="view_nhs_check_search" model="ir.ui.view">
         <field name="name">nhs.check.search</field>
         <field name="model">nhs.check</field>
@@ -82,6 +86,7 @@
         </field>
     </record>
 
+    <!-- Window action: Pre-Employment Checks menu entry -->
     <record id="action_nhs_check" model="ir.actions.act_window">
         <field name="name">Pre-Employment Checks</field>
         <field name="res_model">nhs.check</field>
@@ -89,6 +94,7 @@
         <field name="search_view_id" ref="view_nhs_check_search"/>
     </record>
 
+    <!-- Window action: checks currently in progress -->
     <record id="action_nhs_check_in_progress" model="ir.actions.act_window">
         <field name="name">Checks in Progress</field>
         <field name="res_model">nhs.check</field>
@@ -97,6 +103,7 @@
         <field name="search_view_id" ref="view_nhs_check_search"/>
     </record>
 
+    <!-- Window action: outstanding checks grouped by candidate/starter -->
     <record id="action_nhs_check_outstanding" model="ir.actions.act_window">
         <field name="name">Outstanding by Starter</field>
         <field name="res_model">nhs.check</field>

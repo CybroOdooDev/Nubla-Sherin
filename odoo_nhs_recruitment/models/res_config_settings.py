@@ -55,6 +55,8 @@ class ResCompany(models.Model):
 
     @api.depends('nhs_recruit_public_form_enabled', 'nhs_recruit_public_form_token')
     def _compute_nhs_recruit_public_form_url(self):
+        """Build the public vacancy-list URL from the base URL and token, or
+        clear it if the public form is disabled or has no token yet."""
         for company in self:
             if company.nhs_recruit_public_form_enabled and company.nhs_recruit_public_form_token:
                 company.nhs_recruit_public_form_url = '%s/jobs/apply/%s' % (
@@ -63,6 +65,8 @@ class ResCompany(models.Model):
                 company.nhs_recruit_public_form_url = False
 
     def _nhs_recruit_generate_token(self):
+        """Issue a fresh random token, invalidating any previously shared
+        public application-form link."""
         for company in self:
             company.nhs_recruit_public_form_token = uuid.uuid4().hex
 
@@ -87,6 +91,8 @@ class ResConfigSettings(models.TransientModel):
         related='company_id.nhs_recruit_public_form_url', readonly=True)
 
     def action_nhs_recruit_generate_token(self):
+        """Regenerate the company's public form token and reload the settings
+        page so the new URL is displayed."""
         self.company_id._nhs_recruit_generate_token()
         return {
             'type': 'ir.actions.client',
@@ -94,6 +100,8 @@ class ResConfigSettings(models.TransientModel):
         }
 
     def action_nhs_recruit_open_form(self):
+        """Open the public application form URL in a new tab, or reload the
+        page if no URL is available yet."""
         self.ensure_one()
         if not self.nhs_recruit_public_form_url:
             return {

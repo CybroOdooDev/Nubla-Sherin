@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- List view: candidates with talent pool consent and retention expiry -->
     <record id="view_nhs_candidate_list" model="ir.ui.view">
         <field name="name">nhs.candidate.list</field>
         <field name="model">nhs.candidate</field>
@@ -17,6 +18,7 @@
         </field>
     </record>
 
+    <!-- Form view: candidate record with applications stat button and consent fields -->
     <record id="view_nhs_candidate_form" model="ir.ui.view">
         <field name="name">nhs.candidate.form</field>
         <field name="model">nhs.candidate</field>
@@ -31,11 +33,12 @@
                         </button>
                     </div>
                     <div class="oe_title">
-                        <h1><field name="name"/></h1>
-                        <span><field name="reference" readonly="1"/></span>
+                        <label for="name" />
+                        <h1><field name="name" placeholder="e.g. Jane Smith"/></h1>
                     </div>
                     <group>
                         <group>
+                            <field name="reference" readonly="1"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                             <field name="email"/>
                             <field name="phone"/>
@@ -54,6 +57,7 @@
         </field>
     </record>
 
+    <!-- Search view: filter candidates by talent pool consent or internal status -->
     <record id="view_nhs_candidate_search" model="ir.ui.view">
         <field name="name">nhs.candidate.search</field>
         <field name="model">nhs.candidate</field>
@@ -68,6 +72,7 @@
         </field>
     </record>
 
+    <!-- Kanban view: candidate cards with talent pool badge and application count -->
     <record id="view_nhs_candidate_kanban" model="ir.ui.view">
         <field name="name">nhs.candidate.kanban</field>
         <field name="model">nhs.candidate</field>
@@ -105,6 +110,7 @@
         </field>
     </record>
 
+    <!-- Window action: Candidates menu entry (kanban/list/form) -->
     <record id="action_nhs_candidate" model="ir.actions.act_window">
         <field name="name">Candidates</field>
         <field name="res_model">nhs.candidate</field>
@@ -112,11 +118,13 @@
         <field name="search_view_id" ref="view_nhs_candidate_search"/>
     </record>
 
+    <!-- Window action: Talent Pool, candidates who consented to retention -->
     <record id="action_nhs_candidate_talent_pool" model="ir.actions.act_window">
         <field name="name">Talent Pool</field>
         <field name="res_model">nhs.candidate</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('talent_pool_consent', '=', True)]</field>
+        <field name="context">{'create': False}</field>
         <field name="search_view_id" ref="view_nhs_candidate_search"/>
     </record>
 </odoo>

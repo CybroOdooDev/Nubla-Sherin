@@ -97,6 +97,7 @@ class NhsPersonSpec(models.Model):
     active = fields.Boolean(string='Active', default=True)
 
     def _compute_vacancy_count(self):
+        """Count vacancies currently using each spec, for the smart button."""
         counts = self.env['nhs.vacancy']._read_group(
             [('person_spec_id', 'in', self.ids)],
             ['person_spec_id'], ['__count'],

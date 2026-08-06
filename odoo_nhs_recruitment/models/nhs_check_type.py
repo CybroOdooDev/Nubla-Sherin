@@ -69,6 +69,7 @@ class NhsCheckProfileLine(models.Model):
     _description = 'Check profile line — a required check type within a profile'
     _order = 'sequence, id'
 
+    name = fields.Char(related='check_type_id.name', store=True)
     profile_id = fields.Many2one(
         'nhs.check.profile',
         string='Profile',

@@ -20,7 +20,6 @@
 #
 #############################################################################
 from dateutil.relativedelta import relativedelta
-
 from odoo import api, fields, models
 
 
@@ -89,6 +88,8 @@ class NhsCandidate(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Assign the next 'nhs.candidate' sequence number when none is
+        supplied."""
         for vals in vals_list:
             if not vals.get('reference') or vals.get('reference') == 'New':
                 vals['reference'] = self.env['ir.sequence'].next_by_code(
@@ -96,12 +97,17 @@ class NhsCandidate(models.Model):
         return super().create(vals_list)
 
     def _compute_application_count(self):
+        """Count the candidate's applications."""
         for candidate in self:
             candidate.application_count = len(candidate.application_ids)
 
     @api.depends('application_ids.stage', 'application_ids.decision_date', 'talent_pool_consent',
                  'company_id.nhs_recruit_retention_months')
     def _compute_retention_expiry(self):
+        """Set the anonymisation due date to the latest unsuccessful
+        decision date plus the company's retention period (default 24
+        months) for candidates who were never hired and have not given
+        talent-pool consent; otherwise leave it unset."""
         for candidate in self:
             if candidate.talent_pool_consent:
                 candidate.retention_expiry = False

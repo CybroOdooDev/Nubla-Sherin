@@ -19,7 +19,8 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import  api, fields, models
+from odoo import  _, api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class NhsInterviewScoreLine(models.Model):
@@ -36,6 +37,23 @@ class NhsInterviewScoreLine(models.Model):
     score = fields.Float(string='Score', help="0 (not met) to 5 (fully met).")
     notes = fields.Char(string='Notes')
 
+    @api.constrains('criterion_id', 'interview_id')
+    def _check_criterion_matches_vacancy_spec(self):
+        """Panel scoring is only meaningful against the vacancy's own person
+        specification — enforced here so it holds even if a score line is
+        created another way than the view's (now-filtered) picker."""
+        for line in self:
+            vacancy = line.interview_id.vacancy_id
+            spec = vacancy.person_spec_id
+            if not spec:
+                raise ValidationError(_(
+                    "Set a Person Specification on vacancy '%s' before scoring "
+                    "interviews against it.") % vacancy.name)
+            if line.criterion_id.spec_id != spec:
+                raise ValidationError(_(
+                    "'%s' is not a criterion of this vacancy's Person Specification "
+                    "('%s').") % (line.criterion_id.name, spec.name))
+
 
 class NhsInterview(models.Model):
     """An interview event for a shortlisted application: panel, schedule,
@@ -51,6 +69,10 @@ class NhsInterview(models.Model):
         related='vacancy_id.company_id', string='Company', store=True, readonly=True)
     vacancy_id = fields.Many2one(
         related='application_id.vacancy_id', string='Vacancy', store=True, readonly=True)
+    person_spec_id = fields.Many2one(
+        related='vacancy_id.person_spec_id', string='Person Specification', readonly=True,
+        help="The vacancy's person specification — panel scores are recorded"
+             " only against this template's criteria.")
     application_id = fields.Many2one(
         'nhs.application', string='Application', required=True, ondelete='cascade', tracking=True)
     interview_datetime = fields.Datetime(string='Date & Time', required=True, tracking=True)
@@ -80,6 +102,8 @@ class NhsInterview(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Assigns each interview its sequence reference and advances the
+        linked application into the interview stage."""
         for vals in vals_list:
             if not vals.get('name') or vals.get('name') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code(
@@ -92,6 +116,8 @@ class NhsInterview(models.Model):
 
     @api.depends('score_line_ids.score', 'score_line_ids.criterion_id.weight')
     def _compute_total_score(self):
+        """Weighted average of the panel's score lines against the person
+        specification's criterion weights."""
         for interview in self:
             lines = interview.score_line_ids
             total_weight = sum(lines.mapped('criterion_id.weight'))
@@ -102,24 +128,47 @@ class NhsInterview(models.Model):
                 interview.total_score = 0.0
 
     def action_mark_accepted(self):
+        """Records that the candidate accepted the interview invite."""
         self.write({'invite_status': 'accepted'})
 
     def action_mark_declined(self):
+        """Records that the candidate declined the interview invite."""
         self.write({'invite_status': 'declined'})
 
     def action_mark_rescheduled(self):
-        self.write({'invite_status': 'rescheduled'})
+        """Opens a wizard to capture the new date/time (and optionally a new
+        location) before flagging the invite as rescheduled — so the old
+        slot is never left in place by mistake."""
+        self.ensure_one()
+        return {
+            'name': _('Reschedule Interview'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'nhs.interview.reschedule.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_interview_id': self.id,
+                'default_new_datetime': self.interview_datetime,
+                'default_new_location': self.location,
+            },
+        }
 
     def action_mark_attended(self):
+        """Records that the candidate attended the interview."""
         self.write({'invite_status': 'attended'})
 
     def action_mark_no_show(self):
+        """Records that the candidate failed to attend the interview."""
         self.write({'invite_status': 'no_show'})
 
     def action_mark_appointable(self):
+        """Records the panel's verdict that the candidate is appointable."""
         self.write({'outcome': 'appointable'})
 
     def action_mark_not_appointable(self):
+        """Records the panel's verdict as not appointable, and rejects the
+        application once none of its interviews remain appointable or
+        undecided."""
         self.write({'outcome': 'not_appointable'})
         for interview in self:
             if not interview.application_id.interview_ids.filtered(
@@ -127,6 +176,7 @@ class NhsInterview(models.Model):
                 interview.application_id.action_reject()
 
     def action_view_application(self):
+        """Opens the interview's parent application form."""
         self.ensure_one()
         return {
             'name': ('Application'),

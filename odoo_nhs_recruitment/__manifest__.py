@@ -52,6 +52,7 @@ Establishment Register as an updated in-post position.
         'wizards/nhs_shortlist_wizard_views.xml',
         'wizards/nhs_bulk_communicate_wizard_views.xml',
         'wizards/nhs_onboard_wizard_views.xml',
+        'wizards/nhs_interview_reschedule_wizard_views.xml',
         'views/nhs_vacancy_views.xml',
         'views/nhs_application_views.xml',
         'views/nhs_candidate_views.xml',
@@ -80,7 +81,7 @@ Establishment Register as an updated in-post position.
     },
     'images': ['static/description/banner.jpg'],
     'license': 'LGPL-3',
-    'application': True,
     'installable': True,
     'auto_install': False,
+    'application': True,
 }

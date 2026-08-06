@@ -49,3 +49,5 @@ access_nhs_bulk_communicate_wizard_officer,nhs.bulk.communicate.wizard officer,m
 access_nhs_bulk_communicate_wizard_manager,nhs.bulk.communicate.wizard manager,model_nhs_bulk_communicate_wizard,group_nhs_recruit_manager,1,1,1,1
 access_nhs_onboard_wizard_officer,nhs.onboard.wizard officer,model_nhs_onboard_wizard,group_nhs_recruit_officer,1,1,1,1
 access_nhs_onboard_wizard_manager,nhs.onboard.wizard manager,model_nhs_onboard_wizard,group_nhs_recruit_manager,1,1,1,1
+access_nhs_interview_reschedule_wizard_officer,nhs.interview.reschedule.wizard officer,model_nhs_interview_reschedule_wizard,group_nhs_recruit_officer,1,1,1,1
+access_nhs_interview_reschedule_wizard_manager,nhs.interview.reschedule.wizard manager,model_nhs_interview_reschedule_wizard,group_nhs_recruit_manager,1,1,1,1

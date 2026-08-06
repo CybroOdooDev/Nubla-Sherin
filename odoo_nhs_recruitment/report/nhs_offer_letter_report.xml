@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Report action: offer letter PDF for a candidate's employment offer -->
     <record id="action_report_nhs_offer_letter" model="ir.actions.report">
         <field name="name">Offer Letter</field>
         <field name="model">nhs.offer</field>

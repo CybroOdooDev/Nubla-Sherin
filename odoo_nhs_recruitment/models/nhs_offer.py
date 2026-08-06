@@ -58,6 +58,7 @@ class NhsOffer(models.Model):
     state = fields.Selection([
         ('made', 'Made'),
         ('accepted', 'Accepted'),
+        ('hired', 'Hired'),
         ('declined', 'Declined'),
         ('withdrawn', 'Withdrawn'),
     ], string='Status', default='made', required=True, tracking=True)
@@ -76,6 +77,9 @@ class NhsOffer(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Assign the next 'nhs.offer' sequence number when none is
+        supplied, then generate the offer's pre-employment check set from
+        the vacancy's check profile."""
         for vals in vals_list:
             if not vals.get('name') or vals.get('name') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('nhs.offer') or 'New'
@@ -85,6 +89,9 @@ class NhsOffer(models.Model):
 
     @api.depends('check_ids.status')
     def _compute_check_status(self):
+        """Derive check_count, checks_cleared_count, all_checks_cleared
+        and has_concern from check_ids, ignoring checks marked
+        not_required."""
         for offer in self:
             checks = offer.check_ids
             required = checks.filtered(lambda c: c.status != 'not_required')
@@ -111,21 +118,32 @@ class NhsOffer(models.Model):
                 self.env['nhs.check'].sudo().create(vals_list)
 
     def action_accept(self):
+        """Mark the offer as accepted by the candidate."""
         self.write({'state': 'accepted'})
 
     def action_decline(self):
+        """Mark the offer as declined and reject the underlying
+        application."""
         for offer in self:
             offer.write({'state': 'declined'})
             offer.application_id.action_reject()
 
     def action_withdraw(self):
+        """Mark the offer as withdrawn (e.g. by the trust, before
+        acceptance)."""
         self.write({'state': 'withdrawn'})
 
     def action_convert_unconditional(self):
+        """Convert a conditional offer to unconditional; raises a
+        UserError if the hard check gate is enabled for the company and
+        not all required pre-employment checks are cleared."""
         hard_gate = self.env.company.nhs_recruit_check_gate_hard
         for offer in self:
             if offer.offer_type == 'unconditional':
                 continue
+            if offer.state != 'accepted':
+                raise UserError((
+                    'Only an accepted offer can be made unconditional.'))
             if hard_gate and not offer.all_checks_cleared:
                 raise UserError((
                     'All required pre-employment checks must be cleared before'
@@ -133,6 +151,8 @@ class NhsOffer(models.Model):
             offer.offer_type = 'unconditional'
 
     def action_open_onboard_wizard(self):
+        """Open the onboarding wizard pre-filled with this offer, to
+        confirm the hire."""
         self.ensure_one()
         return {
             'name': ('Confirm Hire'),
@@ -144,6 +164,7 @@ class NhsOffer(models.Model):
         }
 
     def action_view_checks(self):
+        """Open the list of pre-employment checks linked to this offer."""
         self.ensure_one()
         return {
             'name': ('Pre-Employment Checks'),

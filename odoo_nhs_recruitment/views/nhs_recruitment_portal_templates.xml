@@ -34,6 +34,7 @@
         </t>
     </template>
 
+    <!-- Public template: token-gated application submission form with eligibility/equality monitoring -->
     <template id="public_application_form" name="Public Application Form">
         <t t-call="web.layout">
             <t t-set="head">
@@ -164,6 +165,7 @@
         </t>
     </template>
 
+    <!-- Public template: post-submission thank-you page, or rate-limit notice -->
     <template id="public_application_thank_you" name="Public Application Thank You">
         <t t-call="web.layout">
             <t t-set="head">

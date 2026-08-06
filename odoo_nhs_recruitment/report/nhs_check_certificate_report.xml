@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Report action: pre-employment check completion summary PDF for an offer -->
     <record id="action_report_nhs_check_certificate" model="ir.actions.report">
         <field name="name">Pre-Employment Check Completion Summary</field>
         <field name="model">nhs.offer</field>

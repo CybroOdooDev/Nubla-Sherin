@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Report action: shortlisting & interview summary PDF for a vacancy -->
     <record id="action_report_nhs_shortlist_summary" model="ir.actions.report">
         <field name="name">Shortlisting &amp; Interview Summary</field>
         <field name="model">nhs.vacancy</field>

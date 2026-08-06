@@ -52,6 +52,9 @@ class NhsRecruitmentPublic(http.Controller):
     application portal, reusing the suite's proven token-gated form pattern."""
 
     def _company_from_token(self, token):
+        """Look up the company whose public-form token matches, returning
+        None if there's no match or the public application form is
+        disabled."""
         Company = request.env['res.company'].sudo()
         company = Company.search([('nhs_recruit_public_form_token', '=', token)], limit=1)
         if not company or not company.nhs_recruit_public_form_enabled:

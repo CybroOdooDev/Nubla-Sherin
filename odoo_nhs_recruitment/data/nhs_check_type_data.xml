@@ -10,6 +10,7 @@
         <field name="default_required">True</field>
     </record>
 
+    <!-- Check type: Right to Work verification -->
     <record id="check_type_rtw" model="nhs.check.type">
         <field name="name">Right to Work</field>
         <field name="code">RTW</field>
@@ -19,6 +20,7 @@
         <field name="default_required">True</field>
     </record>
 
+    <!-- Check type: professional registration and qualifications verification -->
     <record id="check_type_registration" model="nhs.check.type">
         <field name="name">Professional Registration &amp; Qualifications</field>
         <field name="code">REG</field>
@@ -28,6 +30,7 @@
         <field name="default_required">True</field>
     </record>
 
+    <!-- Check type: employment history and references verification -->
     <record id="check_type_references" model="nhs.check.type">
         <field name="name">Employment History &amp; References</field>
         <field name="code">REF</field>
@@ -37,6 +40,7 @@
         <field name="default_required">True</field>
     </record>
 
+    <!-- Check type: criminal record (DBS) check, sensitive, supports DBS level -->
     <record id="check_type_dbs" model="nhs.check.type">
         <field name="name">Criminal Record (DBS)</field>
         <field name="code">DBS</field>
@@ -46,6 +50,7 @@
         <field name="default_required">True</field>
     </record>
 
+    <!-- Check type: occupational health clearance, sensitive data -->
     <record id="check_type_oh" model="nhs.check.type">
         <field name="name">Occupational Health</field>
         <field name="code">OH</field>

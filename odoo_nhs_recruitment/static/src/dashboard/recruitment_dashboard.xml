@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
+    <!-- OWL template: KPI recruitment dashboard with stat cards, funnel and ageing panels -->
     <t t-name="odoo_nhs_recruitment.NhsRecruitmentDashboard" owl="1">
         <div class="o_nhs_recruitment_dashboard o_content p-4" style="height: 100%; overflow-y: auto;">
             <t t-if="state.loading">

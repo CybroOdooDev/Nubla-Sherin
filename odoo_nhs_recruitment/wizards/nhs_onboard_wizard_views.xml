@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Wizard view: confirm-hire form, warns if checks not all cleared -->
     <record id="view_nhs_onboard_wizard_form" model="ir.ui.view">
         <field name="name">nhs.onboard.wizard.form</field>
         <field name="model">nhs.onboard.wizard</field>
@@ -26,6 +27,7 @@
         </field>
     </record>
 
+    <!-- Wizard action: opens the confirm-hire onboarding wizard -->
     <record id="action_nhs_onboard_wizard" model="ir.actions.act_window">
         <field name="name">Confirm Hire</field>
         <field name="res_model">nhs.onboard.wizard</field>

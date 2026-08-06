@@ -52,6 +52,9 @@ class NhsShortlistWizard(models.TransientModel):
 
     @api.model
     def default_get(self, fields_list):
+        """Populate one wizard line per application still in the
+        received/shortlisting stages for the given vacancy, pre-filled with
+        any existing shortlist outcome/reason."""
         res = super().default_get(fields_list)
         vacancy_id = res.get('vacancy_id') or self.env.context.get('default_vacancy_id')
         if vacancy_id:
@@ -67,6 +70,9 @@ class NhsShortlistWizard(models.TransientModel):
         return res
 
     def action_apply(self):
+        """Require a reason for every line marked Not Shortlisted, then write
+        each line's outcome back onto its application and apply the
+        shortlist decision."""
         self.ensure_one()
         for line in self.line_ids:
             if line.outcome == 'not_shortlisted' and not line.reason:

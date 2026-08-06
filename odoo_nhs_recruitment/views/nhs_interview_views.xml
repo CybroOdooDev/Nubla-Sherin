@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- List view: interviews with invite status, outcome, score and rank -->
     <record id="view_nhs_interview_list" model="ir.ui.view">
         <field name="name">nhs.interview.list</field>
         <field name="model">nhs.interview</field>
@@ -17,6 +18,7 @@
         </field>
     </record>
 
+    <!-- Form view: interview record with invite/outcome workflow buttons and panel scores -->
     <record id="view_nhs_interview_form" model="ir.ui.view">
         <field name="name">nhs.interview.form</field>
         <field name="model">nhs.interview</field>
@@ -26,13 +28,13 @@
                     <button name="action_mark_accepted" type="object" string="Mark Accepted"
                             class="btn-primary" invisible="invite_status not in ('invited', 'rescheduled')"/>
                     <button name="action_mark_declined" type="object" string="Mark Declined"
-                            invisible="invite_status not in ('invited', 'rescheduled')"/>
+                            invisible="invite_status not in ('invited', 'rescheduled', 'accepted')"/>
                     <button name="action_mark_rescheduled" type="object" string="Mark Rescheduled"
                             invisible="invite_status in ('rescheduled', 'attended')"/>
                     <button name="action_mark_attended" type="object" string="Mark Attended"
                             class="btn-primary" invisible="invite_status != 'accepted'"/>
                     <button name="action_mark_no_show" type="object" string="Mark No Show"
-                            invisible="invite_status != 'accepted'"/>
+                            invisible="invite_status not in ('accepted', 'attended')"/>
                     <button name="action_mark_appointable" type="object" string="Mark Appointable"
                             class="btn-primary"
                             invisible="outcome == 'appointable' or invite_status != 'attended'"/>
@@ -60,10 +62,16 @@
                     </group>
                     <notebook>
                         <page string="Scores">
+                            <field name="person_spec_id" invisible="1"/>
+                            <div class="alert alert-warning" role="alert" invisible="person_spec_id">
+                                This vacancy has no Person Specification set — set one on the
+                                vacancy before scoring this interview against it.
+                            </div>
                             <field name="score_line_ids">
                                 <list editable="bottom">
                                     <field name="panellist_id" domain="[('id', 'in', parent.panel_ids)]"/>
-                                    <field name="criterion_id"/>
+                                    <field name="criterion_id"
+                                           domain="[('spec_id', '=', parent.person_spec_id)]"/>
                                     <field name="score"/>
                                     <field name="notes"/>
                                 </list>
@@ -79,6 +87,7 @@
         </field>
     </record>
 
+    <!-- Search view: filter to my panels, group interviews by vacancy or outcome -->
     <record id="view_nhs_interview_search" model="ir.ui.view">
         <field name="name">nhs.interview.search</field>
         <field name="model">nhs.interview</field>
@@ -96,6 +105,7 @@
         </field>
     </record>
 
+    <!-- Window action: Interviews menu entry -->
     <record id="action_nhs_interview" model="ir.actions.act_window">
         <field name="name">Interviews</field>
         <field name="res_model">nhs.interview</field>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
+    <!-- Sequence: vacancy reference numbers (VAC/YYYY/####) -->
     <record id="seq_nhs_vacancy" model="ir.sequence">
         <field name="name">NHS Vacancy Reference</field>
         <field name="code">nhs.vacancy</field>
@@ -8,6 +9,7 @@
         <field name="company_id" eval="False"/>
     </record>
 
+    <!-- Sequence: candidate reference numbers (CAND/YYYY/#####) -->
     <record id="seq_nhs_candidate" model="ir.sequence">
         <field name="name">NHS Candidate Reference</field>
         <field name="code">nhs.candidate</field>
@@ -16,6 +18,7 @@
         <field name="company_id" eval="False"/>
     </record>
 
+    <!-- Sequence: application reference numbers (APP/YYYY/#####) -->
     <record id="seq_nhs_application" model="ir.sequence">
         <field name="name">NHS Application Reference</field>
         <field name="code">nhs.application</field>
@@ -24,6 +27,7 @@
         <field name="company_id" eval="False"/>
     </record>
 
+    <!-- Sequence: interview reference numbers (INT/YYYY/#####) -->
     <record id="seq_nhs_interview" model="ir.sequence">
         <field name="name">NHS Interview Reference</field>
         <field name="code">nhs.interview</field>
@@ -32,6 +36,7 @@
         <field name="company_id" eval="False"/>
     </record>
 
+    <!-- Sequence: offer reference numbers (OFR/YYYY/#####) -->
     <record id="seq_nhs_offer" model="ir.sequence">
         <field name="name">NHS Offer Reference</field>
         <field name="code">nhs.offer</field>

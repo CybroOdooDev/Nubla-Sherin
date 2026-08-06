@@ -59,7 +59,7 @@ class NhsCheck(models.Model):
     )
     reference_number = fields.Char(
         string='Reference Number', help="e.g. DBS certificate number, registration PIN.")
-    detail = fields.Text(string='Detail (Sensitive)')
+    detail = fields.Text(string='Detail')
     attachment_ids = fields.Many2many('ir.attachment', string='Evidence')
     is_sensitive = fields.Boolean(
         string='Sensitive',
@@ -69,6 +69,8 @@ class NhsCheck(models.Model):
 
     @api.depends('check_type_id.name', 'candidate_id.name')
     def _compute_name(self):
+        """Build a display name from the check type and candidate,
+        falling back to the check type alone."""
         for check in self:
             if check.check_type_id and check.candidate_id:
                 check.name = f"{check.check_type_id.name} — {check.candidate_id.name}"
@@ -76,9 +78,12 @@ class NhsCheck(models.Model):
                 check.name = check.check_type_id.name or ('New Check')
 
     def action_mark_in_progress(self):
+        """Mark the check as in progress."""
         self.write({'status': 'in_progress'})
 
     def action_mark_cleared(self):
+        """Mark the check as cleared and stamp the verifying user and
+        today's date."""
         today = fields.Date.context_today(self)
         self.write({
             'status': 'cleared',
@@ -87,9 +92,13 @@ class NhsCheck(models.Model):
         })
 
     def action_mark_concern(self):
+        """Flag the check as a concern, pausing progression pending
+        review."""
         self.write({'status': 'concern'})
 
     def action_mark_not_required(self):
+        """Mark the check as not required, clearing any prior
+        verification."""
         self.write({
             'status': 'not_required',
             'verified_by_id': False,
