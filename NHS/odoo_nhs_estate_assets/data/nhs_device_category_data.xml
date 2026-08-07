@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Top-level categories -->
+        <record id="cat_infusion" model="nhs.device.category">
+            <field name="name">Infusion &amp; Dialysis Equipment</field>
+            <field name="default_life_years">7</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_monitoring" model="nhs.device.category">
+            <field name="name">Patient Monitoring &amp; Diagnostics</field>
+            <field name="default_life_years">7</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_imaging" model="nhs.device.category">
+            <field name="name">Diagnostic Imaging Equipment</field>
+            <field name="default_life_years">10</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_respiratory" model="nhs.device.category">
+            <field name="name">Respiratory &amp; Anaesthesia</field>
+            <field name="default_life_years">7</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_surgical" model="nhs.device.category">
+            <field name="name">Surgical Equipment</field>
+            <field name="default_life_years">8</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_beds" model="nhs.device.category">
+            <field name="name">Beds, Hoists &amp; Handling</field>
+            <field name="default_life_years">10</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_lab" model="nhs.device.category">
+            <field name="name">Laboratory &amp; Pathology Equipment</field>
+            <field name="default_life_years">8</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_general" model="nhs.device.category">
+            <field name="name">General Equipment &amp; Facilities</field>
+            <field name="default_life_years">5</field>
+            <field name="is_clinical">False</field>
+        </record>
+
+        <!-- Subcategories -->
+
+        <!-- Infusion Subcategories -->
+        <record id="cat_infusion_volumetric" model="nhs.device.category">
+            <field name="name">Volumetric Infusion Pumps</field>
+            <field name="parent_id" ref="cat_infusion"/>
+            <field name="default_life_years">7</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_infusion_syringe" model="nhs.device.category">
+            <field name="name">Syringe Drivers &amp; Pumps</field>
+            <field name="parent_id" ref="cat_infusion"/>
+            <field name="default_life_years">7</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_infusion_dialysis" model="nhs.device.category">
+            <field name="name">Haemodialysis Machines</field>
+            <field name="parent_id" ref="cat_infusion"/>
+            <field name="default_life_years">7</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <!-- Monitoring Subcategories -->
+        <record id="cat_monitoring_multiparameter" model="nhs.device.category">
+            <field name="name">Multi-parameter Patient Monitors</field>
+            <field name="parent_id" ref="cat_monitoring"/>
+            <field name="default_life_years">7</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_monitoring_defibrillator" model="nhs.device.category">
+            <field name="name">Defibrillators &amp; AEDs</field>
+            <field name="parent_id" ref="cat_monitoring"/>
+            <field name="default_life_years">7</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_monitoring_ecg" model="nhs.device.category">
+            <field name="name">ECG &amp; Pulse Oximeters</field>
+            <field name="parent_id" ref="cat_monitoring"/>
+            <field name="default_life_years">5</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <!-- Imaging Subcategories -->
+        <record id="cat_imaging_ultrasound" model="nhs.device.category">
+            <field name="name">Ultrasound Scanners</field>
+            <field name="parent_id" ref="cat_imaging"/>
+            <field name="default_life_years">7</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_imaging_xray" model="nhs.device.category">
+            <field name="name">Mobile &amp; Fixed X-Ray Systems</field>
+            <field name="parent_id" ref="cat_imaging"/>
+            <field name="default_life_years">10</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_imaging_ct" model="nhs.device.category">
+            <field name="name">CT Scanners</field>
+            <field name="parent_id" ref="cat_imaging"/>
+            <field name="default_life_years">10</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_imaging_mri" model="nhs.device.category">
+            <field name="name">MRI Scanners</field>
+            <field name="parent_id" ref="cat_imaging"/>
+            <field name="default_life_years">10</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <!-- Respiratory Subcategories -->
+        <record id="cat_respiratory_ventilator" model="nhs.device.category">
+            <field name="name">ICU &amp; Transport Ventilators</field>
+            <field name="parent_id" ref="cat_respiratory"/>
+            <field name="default_life_years">7</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_respiratory_anaesthesia" model="nhs.device.category">
+            <field name="name">Anaesthetic Workstations</field>
+            <field name="parent_id" ref="cat_respiratory"/>
+            <field name="default_life_years">8</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_respiratory_cpap" model="nhs.device.category">
+            <field name="name">CPAP &amp; BiPAP Units</field>
+            <field name="parent_id" ref="cat_respiratory"/>
+            <field name="default_life_years">5</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <!-- Surgical Subcategories -->
+        <record id="cat_surgical_tables" model="nhs.device.category">
+            <field name="name">Operating Tables &amp; Lights</field>
+            <field name="parent_id" ref="cat_surgical"/>
+            <field name="default_life_years">10</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_surgical_diathermy" model="nhs.device.category">
+            <field name="name">Electrosurgical &amp; Diathermy Units</field>
+            <field name="parent_id" ref="cat_surgical"/>
+            <field name="default_life_years">7</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_surgical_microscope" model="nhs.device.category">
+            <field name="name">Surgical Microscopes</field>
+            <field name="parent_id" ref="cat_surgical"/>
+            <field name="default_life_years">10</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <!-- Beds & Hoists Subcategories -->
+        <record id="cat_beds_hospital" model="nhs.device.category">
+            <field name="name">Electric Profiling Beds</field>
+            <field name="parent_id" ref="cat_beds"/>
+            <field name="default_life_years">10</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_beds_hoists" model="nhs.device.category">
+            <field name="name">Patient Lifting Hoists &amp; Slings</field>
+            <field name="parent_id" ref="cat_beds"/>
+            <field name="default_life_years">8</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_beds_mattress" model="nhs.device.category">
+            <field name="name">Dynamic Pressure Mattresses</field>
+            <field name="parent_id" ref="cat_beds"/>
+            <field name="default_life_years">5</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <!-- Laboratory Subcategories -->
+        <record id="cat_lab_centrifuge" model="nhs.device.category">
+            <field name="name">Laboratory Centrifuges</field>
+            <field name="parent_id" ref="cat_lab"/>
+            <field name="default_life_years">8</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_lab_analyser" model="nhs.device.category">
+            <field name="name">Blood Gas &amp; Pathology Analysers</field>
+            <field name="parent_id" ref="cat_lab"/>
+            <field name="default_life_years">7</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <record id="cat_lab_incubator" model="nhs.device.category">
+            <field name="name">Incubators &amp; Autoclaves</field>
+            <field name="parent_id" ref="cat_lab"/>
+            <field name="default_life_years">10</field>
+            <field name="is_clinical">True</field>
+        </record>
+
+        <!-- General Subcategories -->
+        <record id="cat_general_fridge" model="nhs.device.category">
+            <field name="name">Medical Refrigerators &amp; Freezers</field>
+            <field name="parent_id" ref="cat_general"/>
+            <field name="default_life_years">8</field>
+            <field name="is_clinical">False</field>
+        </record>
+
+        <record id="cat_general_office" model="nhs.device.category">
+            <field name="name">IT &amp; Office Equipment</field>
+            <field name="parent_id" ref="cat_general"/>
+            <field name="default_life_years">4</field>
+            <field name="is_clinical">False</field>
+        </record>
+
+        <!-- Infusion & Dialysis Equipment Default Schedules -->
+        <record id="sched_cat_infusion_ppm" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_infusion"/>
+            <field name="schedule_type_id" ref="schedule_type_ppm"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">in_house</field>
+        </record>
+        <record id="sched_cat_infusion_elec" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_infusion"/>
+            <field name="schedule_type_id" ref="schedule_type_electrical_safety"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">in_house</field>
+        </record>
+        <record id="sched_cat_infusion_calib" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_infusion"/>
+            <field name="schedule_type_id" ref="schedule_type_calibration"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">in_house</field>
+        </record>
+
+        <!-- Patient Monitoring Default Schedules -->
+        <record id="sched_cat_monitoring_ppm" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_monitoring"/>
+            <field name="schedule_type_id" ref="schedule_type_ppm"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">in_house</field>
+        </record>
+        <record id="sched_cat_monitoring_elec" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_monitoring"/>
+            <field name="schedule_type_id" ref="schedule_type_electrical_safety"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">in_house</field>
+        </record>
+
+        <!-- Diagnostic Imaging Default Schedules -->
+        <record id="sched_cat_imaging_ppm" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_imaging"/>
+            <field name="schedule_type_id" ref="schedule_type_ppm"/>
+            <field name="interval_months">6</field>
+            <field name="delivery">contractor</field>
+        </record>
+        <record id="sched_cat_imaging_elec" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_imaging"/>
+            <field name="schedule_type_id" ref="schedule_type_electrical_safety"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">contractor</field>
+        </record>
+        <record id="sched_cat_imaging_calib" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_imaging"/>
+            <field name="schedule_type_id" ref="schedule_type_calibration"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">contractor</field>
+        </record>
+
+        <!-- Respiratory Default Schedules -->
+        <record id="sched_cat_respiratory_ppm" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_respiratory"/>
+            <field name="schedule_type_id" ref="schedule_type_ppm"/>
+            <field name="interval_months">6</field>
+            <field name="delivery">in_house</field>
+        </record>
+        <record id="sched_cat_respiratory_calib" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_respiratory"/>
+            <field name="schedule_type_id" ref="schedule_type_calibration"/>
+            <field name="interval_months">6</field>
+            <field name="delivery">in_house</field>
+        </record>
+        <record id="sched_cat_respiratory_elec" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_respiratory"/>
+            <field name="schedule_type_id" ref="schedule_type_electrical_safety"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">in_house</field>
+        </record>
+
+        <!-- Surgical Default Schedules -->
+        <record id="sched_cat_surgical_ppm" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_surgical"/>
+            <field name="schedule_type_id" ref="schedule_type_ppm"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">contractor</field>
+        </record>
+        <record id="sched_cat_surgical_elec" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_surgical"/>
+            <field name="schedule_type_id" ref="schedule_type_electrical_safety"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">in_house</field>
+        </record>
+
+        <!-- Beds & Hoists Default Schedules -->
+        <record id="sched_cat_beds_ppm" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_beds"/>
+            <field name="schedule_type_id" ref="schedule_type_ppm"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">in_house</field>
+        </record>
+        <record id="sched_cat_beds_elec" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_beds"/>
+            <field name="schedule_type_id" ref="schedule_type_electrical_safety"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">in_house</field>
+        </record>
+
+        <!-- Laboratory Default Schedules -->
+        <record id="sched_cat_lab_ppm" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_lab"/>
+            <field name="schedule_type_id" ref="schedule_type_ppm"/>
+            <field name="interval_months">6</field>
+            <field name="delivery">contractor</field>
+        </record>
+        <record id="sched_cat_lab_calib" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_lab"/>
+            <field name="schedule_type_id" ref="schedule_type_calibration"/>
+            <field name="interval_months">6</field>
+            <field name="delivery">contractor</field>
+        </record>
+
+        <!-- General Equipment Default Schedules -->
+        <record id="sched_cat_general_ppm" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_general"/>
+            <field name="schedule_type_id" ref="schedule_type_ppm"/>
+            <field name="interval_months">24</field>
+            <field name="delivery">in_house</field>
+        </record>
+        <record id="sched_cat_general_elec" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_general"/>
+            <field name="schedule_type_id" ref="schedule_type_electrical_safety"/>
+            <field name="interval_months">24</field>
+            <field name="delivery">in_house</field>
+        </record>
+
+        <!-- Subcategory Default Schedules -->
+
+        <!-- Volumetric Pumps -->
+        <record id="sched_cat_infusion_volumetric_ppm" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_infusion_volumetric"/>
+            <field name="schedule_type_id" ref="schedule_type_ppm"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">in_house</field>
+        </record>
+        <record id="sched_cat_infusion_volumetric_calib" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_infusion_volumetric"/>
+            <field name="schedule_type_id" ref="schedule_type_calibration"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">in_house</field>
+        </record>
+        <record id="sched_cat_infusion_volumetric_elec" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_infusion_volumetric"/>
+            <field name="schedule_type_id" ref="schedule_type_electrical_safety"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">in_house</field>
+        </record>
+
+        <!-- Haemodialysis Machines -->
+        <record id="sched_cat_infusion_dialysis_ppm" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_infusion_dialysis"/>
+            <field name="schedule_type_id" ref="schedule_type_ppm"/>
+            <field name="interval_months">6</field>
+            <field name="delivery">contractor</field>
+        </record>
+        <record id="sched_cat_infusion_dialysis_calib" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_infusion_dialysis"/>
+            <field name="schedule_type_id" ref="schedule_type_calibration"/>
+            <field name="interval_months">6</field>
+            <field name="delivery">contractor</field>
+        </record>
+
+        <!-- Defibrillators & AEDs -->
+        <record id="sched_cat_monitoring_defib_ppm" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_monitoring_defibrillator"/>
+            <field name="schedule_type_id" ref="schedule_type_ppm"/>
+            <field name="interval_months">6</field>
+            <field name="delivery">in_house</field>
+        </record>
+        <record id="sched_cat_monitoring_defib_calib" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_monitoring_defibrillator"/>
+            <field name="schedule_type_id" ref="schedule_type_calibration"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">in_house</field>
+        </record>
+        <record id="sched_cat_monitoring_defib_elec" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_monitoring_defibrillator"/>
+            <field name="schedule_type_id" ref="schedule_type_electrical_safety"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">in_house</field>
+        </record>
+
+        <!-- Mobile & Fixed X-Ray -->
+        <record id="sched_cat_imaging_xray_ppm" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_imaging_xray"/>
+            <field name="schedule_type_id" ref="schedule_type_ppm"/>
+            <field name="interval_months">6</field>
+            <field name="delivery">contractor</field>
+        </record>
+        <record id="sched_cat_imaging_xray_rad" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_imaging_xray"/>
+            <field name="schedule_type_id" ref="schedule_type_other"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">contractor</field>
+        </record>
+
+        <!-- Patient Lifting Hoists -->
+        <record id="sched_cat_beds_hoists_ppm" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_beds_hoists"/>
+            <field name="schedule_type_id" ref="schedule_type_ppm"/>
+            <field name="interval_months">6</field>
+            <field name="delivery">in_house</field>
+        </record>
+        <record id="sched_cat_beds_hoists_loler" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_beds_hoists"/>
+            <field name="schedule_type_id" ref="schedule_type_other"/>
+            <field name="interval_months">6</field>
+            <field name="delivery">contractor</field>
+        </record>
+
+        <!-- Medical Refrigerators -->
+        <record id="sched_cat_general_fridge_ppm" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_general_fridge"/>
+            <field name="schedule_type_id" ref="schedule_type_ppm"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">contractor</field>
+        </record>
+        <record id="sched_cat_general_fridge_calib" model="nhs.device.category.schedule">
+            <field name="category_id" ref="cat_general_fridge"/>
+            <field name="schedule_type_id" ref="schedule_type_calibration"/>
+            <field name="interval_months">12</field>
+            <field name="delivery">contractor</field>
+        </record>
+    </data>
+</odoo>

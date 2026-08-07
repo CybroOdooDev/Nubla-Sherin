@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report action generating the printable Board Pack PDF for a meeting -->
+    <record id="action_report_board_pack" model="ir.actions.report">
+        <field name="name">Board Pack</field>
+        <field name="model">nhs.meeting</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_governance.report_board_pack</field>
+        <field name="print_report_name">'Board Pack - ' + object.name</field>
+        <field name="binding_model_id" ref="model_nhs_meeting"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- QWeb template rendering the Board Pack: agenda, papers, decisions, attendance and actions -->
+    <template id="report_board_pack">
+        <t t-call="web.html_container">
+            <t t-set="meetings" t-value="docs or env['nhs.meeting'].search([('state', '!=', 'cancelled')], limit=1, order='meeting_date desc') or env['nhs.meeting'].search([], limit=1)"/>
+            <t t-foreach="meetings" t-as="meeting">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: Arial, Helvetica, sans-serif; color: #212529; font-size: 13px;">
+                        <!-- Header Banner -->
+                        <div style="border-bottom: 2px solid #003087; padding-bottom: 12px; margin-bottom: 20px;">
+                            <div class="row align-items-center">
+                                <div class="col-8">
+                                    <h2 style="font-weight: 700; color: #003087; margin: 0;" t-out="meeting.name"/>
+                                    <div style="color: #6c757d; font-size: 14px; margin-top: 4px;">
+                                        <span t-out="meeting.location or 'Venue Not Specified'"/>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <span t-if="meeting.is_quorate" style="background-color: #198754; color: white; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 12px;">
+                                        QUORATE
+                                    </span>
+                                    <span t-else="" style="background-color: #dc3545; color: white; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 12px;">
+                                        NOT QUORATE
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Overall Minutes if set -->
+                        <div t-if="meeting.minutes" style="margin-bottom: 24px; padding: 12px; background-color: #f8f9fa; border-left: 4px solid #003087;">
+                            <h5 style="font-weight: bold; color: #003087; margin-bottom: 8px;">Meeting Minutes Summary</h5>
+                            <div><t t-out="meeting.minutes"/></div>
+                        </div>
+
+                        <!-- Agenda Table -->
+                        <h4 style="font-weight: bold; color: #003087; border-bottom: 1px solid #dee2e6; padding-bottom: 4px; margin-top: 20px;">
+                            Agenda
+                        </h4>
+                        <table class="table table-sm table-bordered align-middle" style="margin-bottom: 24px;">
+                            <thead>
+                                <tr style="background-color: #f1f5f9; color: #1e293b;">
+                                    <th style="width: 8%; text-align: center;">Item</th>
+                                    <th style="width: 42%;">Title</th>
+                                    <th style="width: 18%;">Purpose</th>
+                                    <th style="width: 20%;">Presenter</th>
+                                    <th style="width: 12%; text-align: center;">Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="meeting.agenda_item_ids" t-as="item">
+                                    <tr t-if="not item.is_confidential or include_confidential">
+                                        <td style="text-align: center; font-weight: bold;" t-out="item.item_number or item_index + 1"/>
+                                        <td>
+                                            <span t-out="item.title"/>
+                                            <span t-if="item.is_confidential" style="color: #dc3545; font-size: 11px; font-weight: bold; margin-left: 6px;">
+                                                [CONFIDENTIAL]
+                                            </span>
+                                        </td>
+                                        <td><span t-field="item.purpose"/></td>
+                                        <td><span t-out="item.presenter_id.name or '-'"/></td>
+                                        <td style="text-align: center;">
+                                            <span t-out="str(item.time_allocation) + ' mins' if item.time_allocation else '-'"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- Papers & Decisions -->
+                        <h4 style="font-weight: bold; color: #003087; border-bottom: 1px solid #dee2e6; padding-bottom: 4px; margin-top: 24px;">
+                            Papers &amp; Decisions
+                        </h4>
+                        <t t-foreach="meeting.agenda_item_ids" t-as="item">
+                            <div t-if="not item.is_confidential or include_confidential" 
+                                 style="margin-bottom: 16px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; background-color: #ffffff;">
+                                <div style="font-size: 14px; font-weight: bold; color: #0f172a; margin-bottom: 6px;">
+                                    Item <t t-out="item.item_number or item_index + 1"/>: <t t-out="item.title"/>
+                                    <span t-if="item.is_confidential" style="color:#dc3545; font-size: 12px; margin-left: 8px;">
+                                        (CONFIDENTIAL — PART II)
+                                    </span>
+                                </div>
+                                <div t-if="item.paper_ids" style="margin-top: 6px; margin-bottom: 6px;">
+                                    <strong style="font-size: 12px; color: #475569;">Attached Papers:</strong>
+                                    <ul style="margin-bottom: 4px; padding-left: 20px;">
+                                        <li t-foreach="item.paper_ids" t-as="paper" t-out="paper.name"/>
+                                    </ul>
+                                </div>
+                                <div t-if="item.decision_text" style="margin-top: 8px; padding: 8px 12px; background-color: #eff6ff; border-left: 3px solid #3b82f6; border-radius: 4px;">
+                                    <strong style="color: #1e40af;">Decision / Resolution:</strong>
+                                    <p style="margin: 4px 0 0 0;" t-out="item.decision_text"/>
+                                </div>
+                                <div t-if="item.minute_text" style="margin-top: 8px; padding: 8px 12px; background-color: #f8fafc; border-left: 3px solid #64748b; border-radius: 4px;">
+                                    <strong style="color: #334155;">Minute Note:</strong>
+                                    <div style="margin-top: 4px;"><t t-out="item.minute_text"/></div>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- Attendance -->
+                        <h4 style="font-weight: bold; color: #003087; border-bottom: 1px solid #dee2e6; padding-bottom: 4px; margin-top: 24px;">
+                            Attendance Record
+                        </h4>
+                        <table class="table table-sm table-bordered align-middle" style="margin-bottom: 24px;">
+                            <thead>
+                                <tr style="background-color: #f1f5f9; color: #1e293b;">
+                                    <th style="width: 45%;">Name</th>
+                                    <th style="width: 25%;">Role</th>
+                                    <th style="width: 15%; text-align: center;">Voting</th>
+                                    <th style="width: 15%; text-align: center;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="meeting.attendee_ids" t-as="att">
+                                    <td><span t-out="att.name"/></td>
+                                    <td><span t-field="att.role"/></td>
+                                    <td style="text-align: center;">
+                                        <span t-if="att.voting" style="color: #198754; font-weight: bold;">Yes</span>
+                                        <span t-else="" style="color: #6c757d;">No</span>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <span t-if="att.status == 'present'" style="color: #198754; font-weight: bold;">Present</span>
+                                        <span t-elif="att.status == 'apologies'" style="color: #fd7e14; font-weight: bold;">Apologies</span>
+                                        <span t-else="" style="color: #dc3545; font-weight: bold;">Absent</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Actions -->
+                        <h4 style="font-weight: bold; color: #003087; border-bottom: 1px solid #dee2e6; padding-bottom: 4px; margin-top: 24px;">
+                            Action Log
+                        </h4>
+                        <table class="table table-sm table-bordered align-middle">
+                            <thead>
+                                <tr style="background-color: #f1f5f9; color: #1e293b;">
+                                    <th style="width: 15%;">Reference</th>
+                                    <th style="width: 40%;">Description</th>
+                                    <th style="width: 20%;">Owner</th>
+                                    <th style="width: 13%;">Due Date</th>
+                                    <th style="width: 12%; text-align: center;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="meeting.action_ids" t-as="action">
+                                    <td style="font-weight: bold;" t-out="action.reference or '-'"/>
+                                    <td><span t-out="action.name"/></td>
+                                    <td><span t-out="action.owner_id.name or '-'"/></td>
+                                    <td><span t-field="action.due_date"/></td>
+                                    <td style="text-align: center;"><span t-field="action.state"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

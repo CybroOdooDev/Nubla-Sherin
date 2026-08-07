@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Adds an NHS Trust Allowed Scope group (ICBs / Health Boards) to the Access Rights tab, visible only to NHS Trust Administrators -->
+    <record id="view_users_form" model="ir.ui.view">
+        <field name="name">res.users.form.inherit.nhs_trust</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='access_rights']" position="inside">
+                <group name="nhs_trust_scoping" string="NHS Trust Allowed Scope" groups="odoo_nhs_trust_management.group_nhs_trust_admin">
+                    <field name="nhs_allowed_icb_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    <field name="nhs_allowed_health_board_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

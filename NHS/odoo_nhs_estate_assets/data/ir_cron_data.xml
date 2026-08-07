@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Cron to check overdue maintenance -->
+        <record id="cron_nhs_device_check_overdue" model="ir.cron">
+            <field name="name">NHS Device: Check Overdue Maintenance</field>
+            <field name="model_id" ref="model_nhs_device"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_check_overdue()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- Cron to check expiring warranties -->
+        <record id="cron_nhs_device_check_expiring" model="ir.cron">
+            <field name="name">NHS Device: Check Expiring Warranties</field>
+            <field name="model_id" ref="model_nhs_device_warranty"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_check_expiring()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- Cron to check overdue alerts -->
+        <record id="cron_nhs_device_check_alert_overdue" model="ir.cron">
+            <field name="name">NHS Device: Check Overdue Alerts</field>
+            <field name="model_id" ref="model_nhs_device_alert"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_check_overdue()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- Cron for Weekly EBME Digest -->
+        <record id="cron_nhs_device_weekly_digest" model="ir.cron">
+            <field name="name">NHS Device: Send Weekly EBME Digest</field>
+            <field name="model_id" ref="model_nhs_device"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_send_weekly_digest()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- Cron to generate maintenance requests for due schedules -->
+        <record id="cron_nhs_device_generate_maintenance_requests" model="ir.cron">
+            <field name="name">NHS Device: Generate Maintenance Requests for Due Schedules</field>
+            <field name="model_id" ref="model_nhs_device_schedule"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_generate_maintenance_requests()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

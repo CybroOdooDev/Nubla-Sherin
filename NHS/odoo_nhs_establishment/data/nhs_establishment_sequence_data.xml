@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Auto-numbers the org unit code, shared across all companies -->
+    <record id="seq_nhs_org_unit" model="ir.sequence">
+        <field name="name">NHS Org Unit Code</field>
+        <field name="code">nhs.org.unit</field>
+        <field name="prefix">OU</field>
+        <field name="padding">1</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Auto-numbers the establishment post reference, shared across all companies -->
+    <record id="seq_nhs_establishment_post" model="ir.sequence">
+        <field name="name">NHS Establishment Post Reference</field>
+        <field name="code">nhs.establishment.post</field>
+        <field name="prefix">POST</field>
+        <field name="padding">1</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Auto-numbers the establishment change request reference, shared across all companies -->
+    <record id="seq_nhs_establishment_change" model="ir.sequence">
+        <field name="name">NHS Establishment Change Reference</field>
+        <field name="code">nhs.establishment.change</field>
+        <field name="prefix">ECR</field>
+        <field name="padding">1</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

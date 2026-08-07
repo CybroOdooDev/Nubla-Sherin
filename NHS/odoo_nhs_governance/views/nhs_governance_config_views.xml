@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--  COMMITTEE TYPE -->
+    <record id="view_nhs_committee_type_list" model="ir.ui.view">
+        <field name="name">nhs.committee.type.list</field>
+        <field name="model">nhs.committee.type</field>
+        <field name="arch" type="xml">
+            <list string="Committee Types" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Window action: manage committee types -->
+    <record id="action_nhs_committee_type" model="ir.actions.act_window">
+        <field name="name">Committee Types</field>
+        <field name="res_model">nhs.committee.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- INTEREST CATEGORY -->
+    <record id="view_nhs_gov_interest_category_list" model="ir.ui.view">
+        <field name="name">nhs.gov.interest.category.list</field>
+        <field name="model">nhs.gov.interest.category</field>
+        <field name="arch" type="xml">
+            <list string="Interest Categories" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Window action: manage interest categories -->
+    <record id="action_nhs_gov_interest_category" model="ir.actions.act_window">
+        <field name="name">Interest Categories</field>
+        <field name="res_model">nhs.gov.interest.category</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ASSURANCE LINE-->
+    <record id="view_nhs_gov_assurance_line_list" model="ir.ui.view">
+        <field name="name">nhs.gov.assurance.line.list</field>
+        <field name="model">nhs.gov.assurance.line</field>
+        <field name="arch" type="xml">
+            <list string="Assurance Lines" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Window action: manage assurance lines -->
+    <record id="action_nhs_gov_assurance_line" model="ir.actions.act_window">
+        <field name="name">Assurance Lines</field>
+        <field name="res_model">nhs.gov.assurance.line</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!--SETTINGS  -->
+    <record id="view_nhs_governance_config_settings" model="ir.ui.view">
+        <field name="name">nhs.governance.config.settings</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Governance" name="odoo_nhs_governance"
+                     groups="odoo_nhs_governance.group_nhs_gov_manager">
+                    <block title="Reminders">
+                        <setting string="ToR Review Reminder"
+                                 help="Days before a Terms of Reference review date to raise a reminder">
+                            <field name="gov_tor_review_lead_days"/>
+                        </setting>
+                        <setting string="DoI Annual Refresh Reminder"
+                                 help="Days before the annual DoI refresh anniversary to remind members">
+                            <field name="gov_doi_refresh_lead_days"/>
+                        </setting>
+                        <setting string="Action Due Reminder"
+                                 help="Days before an action due date to raise an escalation warning">
+                            <field name="gov_action_due_lead_days"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Window action: open the Governance settings screen -->
+    <record id="action_nhs_governance_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="context">{'module': 'odoo_nhs_governance', 'bin_size': False}</field>
+    </record>
+</odoo>

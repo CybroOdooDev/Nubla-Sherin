@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- form VIEW - Device Passport Wizard -->
+    <record id="view_nhs_device_passport_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.device.passport.wizard.form</field>
+        <field name="model">nhs.device.passport.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Device Passport (PDF)">
+                <sheet>
+                    <div class="oe_title">
+                        <h2>Device Passport PDF Generation</h2>
+                    </div>
+                    <group>
+                        <field name="device_type" widget="radio"/>
+                        <field name="mode" widget="radio"/>
+                        <field name="category_ids" widget="many2many_tags" placeholder="Select device categories..."
+                               invisible="mode != 'category'"/>
+                    </group>
+                    <footer>
+                        <button name="action_generate_pdf"
+                                string="Generate PDF"
+                                type="object"
+                                class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

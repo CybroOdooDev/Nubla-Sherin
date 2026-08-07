@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--  Staff Group Config -->
+    <!-- Editable staff-group list, ordered/reordered via the sequence handle -->
+    <record id="view_nhs_staff_group_list" model="ir.ui.view">
+        <field name="name">nhs.staff.group.list</field>
+        <field name="model">nhs.staff.group</field>
+        <field name="arch" type="xml">
+            <list string="Staff Groups" editable="bottom" decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="is_clinical"/>
+                <field name="post_count"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Staff-group form -->
+    <record id="view_nhs_staff_group_form" model="ir.ui.view">
+        <field name="name">nhs.staff.group.form</field>
+        <field name="model">nhs.staff.group</field>
+        <field name="arch" type="xml">
+            <form string="Staff Group">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="sequence"/>
+                        <field name="is_clinical"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Window action for the Staff Groups configuration menu -->
+    <record id="action_nhs_staff_group" model="ir.actions.act_window">
+        <field name="name">Staff Groups</field>
+        <field name="res_model">nhs.staff.group</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Cost-centre list with FTE, budget and spend roll-ups; over-budget rows flagged red -->
+    <record id="view_nhs_cost_centre_list" model="ir.ui.view">
+        <field name="name">nhs.cost.centre.list</field>
+        <field name="model">nhs.cost.centre</field>
+        <field name="arch" type="xml">
+            <list string="Cost Centres" decoration-muted="not active"
+                  decoration-danger="budget_amount and budget_variance &lt; 0">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="funded_fte" sum="Funded FTE"/>
+                <field name="vacant_fte" sum="Vacant FTE"/>
+                <field name="budget_amount" sum="Annual Budget"/>
+                <field name="indicative_pay_total" sum="Indicative Annual Spend"/>
+                <field name="budget_variance" sum="Budget Variance"/>
+                <field name="budget_utilization" widget="percentage" optional="hide"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Cost-centre form, with a stat button through to its charged posts -->
+    <record id="view_nhs_cost_centre_form" model="ir.ui.view">
+        <field name="name">nhs.cost.centre.form</field>
+        <field name="model">nhs.cost.centre</field>
+        <field name="arch" type="xml">
+            <form string="Cost Centre">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_posts" type="object"
+                                class="oe_stat_button" icon="fa-users">
+                            <field name="post_count" widget="statinfo" string="Posts"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Main Theatres"/></h1>
+                    </div>
+                    <group>
+                        <group string="Reference">
+                            <field name="code"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group string="Budget">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="budget_amount"/>
+                            <field name="indicative_pay_total"/>
+                            <field name="budget_variance"/>
+                            <field name="budget_utilization" widget="percentage"/>
+                        </group>
+                    </group>
+                    <group string="Establishment">
+                        <group>
+                            <field name="funded_fte"/>
+                            <field name="in_post_fte"/>
+                            <field name="vacant_fte"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Cost-centre search, with an over-budget filter -->
+    <record id="view_nhs_cost_centre_search" model="ir.ui.view">
+        <field name="name">nhs.cost.centre.search</field>
+        <field name="model">nhs.cost.centre</field>
+        <field name="arch" type="xml">
+            <search string="Search Cost Centres">
+                <field name="name"/>
+                <field name="code"/>
+                <filter string="Over Budget" name="filter_over_budget"
+                        domain="[('budget_amount', '>', 0), ('budget_variance', '&lt;', 0)]"/>
+                <filter string="Archived" name="filter_archived" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window action for the Cost Centres configuration menu -->
+    <record id="action_nhs_cost_centre" model="ir.actions.act_window">
+        <field name="name">Cost Centres</field>
+        <field name="res_model">nhs.cost.centre</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_nhs_cost_centre_search"/>
+    </record>
+
+    <!-- Adds the NHS Establishment app page to Settings: FTE/on-cost basis,
+         change-control policy, and quick links to the reference-data lists -->
+    <record id="view_res_config_settings_nhs_establishment_form" model="ir.ui.view">
+        <field name="name">res.config.settings.nhs.establishment.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="NHS Establishment Register" data-string="NHS Establishment"
+                     name="nhs_establishment"
+                     groups="odoo_nhs_establishment.group_nhs_workforce_manager">
+                    <block title="FTE &amp; Pay-Cost Basis" name="nhs_establishment_fte_block">
+                        <setting id="nhs_full_time_hours"
+                                 help="Weekly hours that count as 1.0 FTE (NHS standard is 37.5).">
+                            <field name="nhs_full_time_hours_basis"/>
+                        </setting>
+                        <setting id="nhs_on_cost"
+                                 help="Multiplier applied to indicative salary to approximate total employment cost (employer NI, pension, etc). 1.0 = no on-costs added.">
+                            <field name="nhs_on_cost_factor"/>
+                        </setting>
+                    </block>
+                    <block title="Establishment Change Control" name="nhs_establishment_change_control_block">
+                        <setting id="nhs_change_control"
+                                 help="When enabled, changes to a post's funded FTE, band or team must be raised as an Establishment Change Request.">
+                            <field name="nhs_change_control_required"/>
+                        </setting>
+                        <setting id="nhs_change_control_single_stage"
+                                 help="Collapse workforce and finance approval into a single stage — suited to smaller providers.">
+                            <field name="nhs_change_control_single_stage"/>
+                        </setting>
+                    </block>
+                    <block title="Reference Data" name="nhs_establishment_reference_block">
+                        <setting id="nhs_afc_bands" string="Agenda for Change Bands"
+                                 help="Review indicative pay values annually against the current national pay circular.">
+                            <button name="%(action_nhs_afc_band)d" icon="oi-arrow-right"
+                                    string="Agenda for Change Bands" type="action" class="btn-link"/>
+                        </setting>
+                        <setting id="nhs_staff_groups" string="Staff Groups">
+                            <button name="%(action_nhs_staff_group)d" icon="oi-arrow-right"
+                                    string="Staff Groups" type="action" class="btn-link"/>
+                        </setting>
+                        <setting id="nhs_cost_centres" string="Cost Centres">
+                            <button name="%(action_nhs_cost_centre)d" icon="oi-arrow-right"
+                                    string="Cost Centres" type="action" class="btn-link"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

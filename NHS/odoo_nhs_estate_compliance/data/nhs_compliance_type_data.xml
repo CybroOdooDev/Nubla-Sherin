@@ -1,0 +1,744 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- WATER SAFETY - HTM 04-01, COSHH, ACOP L8     -->
+        <record id="compliance_type_water_temp_monitoring" model="nhs.compliance.type">
+            <field name="name">Temperature Monitoring</field>
+            <field name="discipline_id" ref="discipline_water"/>
+            <field name="htm_reference">HTM 04-01 / ACOP L8</field>
+            <field name="default_frequency_value">1</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">7</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_water_tank_inspection" model="nhs.compliance.type">
+            <field name="name">Tank Inspection</field>
+            <field name="discipline_id" ref="discipline_water"/>
+            <field name="htm_reference">HTM 04-01</field>
+            <field name="default_frequency_value">6</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">14</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_water_tmv" model="nhs.compliance.type">
+            <field name="name">TMV Servicing</field>
+            <field name="discipline_id" ref="discipline_water"/>
+            <field name="htm_reference">HTM 04-01</field>
+            <field name="default_frequency_value">6</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">14</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_water_flushing" model="nhs.compliance.type">
+            <field name="name">Flushing of Low-Use Outlets</field>
+            <field name="discipline_id" ref="discipline_water"/>
+            <field name="htm_reference">HTM 04-01 / ACOP L8</field>
+            <field name="default_frequency_value">1</field>
+            <field name="default_frequency_unit">week</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">medium</field>
+            <field name="default_lead_days">3</field>
+            <field name="requires_certificate" eval="False"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_water_chlorination" model="nhs.compliance.type">
+            <field name="name">Chlorination / Disinfection</field>
+            <field name="discipline_id" ref="discipline_water"/>
+            <field name="htm_reference">HTM 04-01</field>
+            <field name="default_frequency_value">1</field>
+            <field name="default_frequency_unit">year</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_water_sampling" model="nhs.compliance.type">
+            <field name="name">Legionella Sampling</field>
+            <field name="discipline_id" ref="discipline_water"/>
+            <field name="htm_reference">ACOP L8</field>
+            <field name="default_frequency_value">3</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">14</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_water_risk_assessment" model="nhs.compliance.type">
+            <field name="name">Legionella Risk Assessment</field>
+            <field name="discipline_id" ref="discipline_water"/>
+            <field name="htm_reference">ACOP L8</field>
+            <field name="default_frequency_value">1</field>
+            <field name="default_frequency_unit">year</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">60</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_water_tmv" model="nhs.compliance.type">
+            <field name="name">TMV Service</field>
+            <field name="discipline_id" ref="discipline_water"/>
+            <field name="htm_reference">HTM 04-01</field>
+            <field name="default_frequency_value">6</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">14</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- FIRE SAFETY - RRO 2005, HTM 05               -->
+        <record id="compliance_type_fire_risk_assessment" model="nhs.compliance.type">
+            <field name="name">Fire Risk Assessment (FRA)</field>
+            <field name="discipline_id" ref="discipline_fire"/>
+            <field name="htm_reference">HTM 05 / RRO 2005</field>
+            <field name="default_frequency_value">1</field>
+            <field name="default_frequency_unit">year</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">life_safety</field>
+            <field name="default_lead_days">60</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_fire_alarm" model="nhs.compliance.type">
+            <field name="name">Fire Alarm Test</field>
+            <field name="discipline_id" ref="discipline_fire"/>
+            <field name="htm_reference">HTM 05</field>
+            <field name="default_frequency_value">1</field>
+            <field name="default_frequency_unit">week</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">life_safety</field>
+            <field name="default_lead_days">3</field>
+            <field name="requires_certificate" eval="False"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_fire_detection" model="nhs.compliance.type">
+            <field name="name">Fire Alarm Detection Test</field>
+            <field name="discipline_id" ref="discipline_fire"/>
+            <field name="htm_reference">HTM 05</field>
+            <field name="default_frequency_value">6</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">life_safety</field>
+            <field name="default_lead_days">14</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_fire_emergency_lighting" model="nhs.compliance.type">
+            <field name="name">Emergency Lighting Test</field>
+            <field name="discipline_id" ref="discipline_fire"/>
+            <field name="htm_reference">HTM 05</field>
+            <field name="default_frequency_value">1</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">life_safety</field>
+            <field name="default_lead_days">7</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_fire_extinguisher" model="nhs.compliance.type">
+            <field name="name">Fire Extinguisher Service</field>
+            <field name="discipline_id" ref="discipline_fire"/>
+            <field name="htm_reference">HTM 05</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">life_safety</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_fire_door_inspection" model="nhs.compliance.type">
+            <field name="name">Fire Door Inspection</field>
+            <field name="discipline_id" ref="discipline_fire"/>
+            <field name="htm_reference">HTM 05</field>
+            <field name="default_frequency_value">6</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">life_safety</field>
+            <field name="default_lead_days">14</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_fire_evacuation_drill" model="nhs.compliance.type">
+            <field name="name">Evacuation Drill</field>
+            <field name="discipline_id" ref="discipline_fire"/>
+            <field name="htm_reference">HTM 05 / RRO 2005</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">life_safety</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="False"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_fire_compartmentation" model="nhs.compliance.type">
+            <field name="name">Compartmentation Inspection</field>
+            <field name="discipline_id" ref="discipline_fire"/>
+            <field name="htm_reference">HTM 05</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">life_safety</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_fire_alarm" model="nhs.compliance.type">
+            <field name="name">Fire Alarm Test</field>
+            <field name="discipline_id" ref="discipline_fire"/>
+            <field name="htm_reference">HTM 05</field>
+            <field name="default_frequency_value">1</field>
+            <field name="default_frequency_unit">week</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">life_safety</field>
+            <field name="default_lead_days">3</field>
+            <field name="requires_certificate" eval="False"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_fire_emergency_lighting" model="nhs.compliance.type">
+            <field name="name">Emergency Lighting Test</field>
+            <field name="discipline_id" ref="discipline_fire"/>
+            <field name="htm_reference">HTM 05</field>
+            <field name="default_frequency_value">1</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">life_safety</field>
+            <field name="default_lead_days">7</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- ELECTRICAL - HTM 06, EAWR, BS 7671           -->
+        <record id="compliance_type_electrical_eicr" model="nhs.compliance.type">
+            <field name="name">EICR Fixed-Wire Testing</field>
+            <field name="discipline_id" ref="discipline_electrical"/>
+            <field name="htm_reference">HTM 06 / BS 7671</field>
+            <field name="default_frequency_value">5</field>
+            <field name="default_frequency_unit">year</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">90</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_electrical_pat" model="nhs.compliance.type">
+            <field name="name">PAT Testing</field>
+            <field name="discipline_id" ref="discipline_electrical"/>
+            <field name="htm_reference">HTM 06 / EAWR</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">medium</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_electrical_hv_lv_maintenance" model="nhs.compliance.type">
+            <field name="name">HV/LV Switchgear Maintenance</field>
+            <field name="discipline_id" ref="discipline_electrical"/>
+            <field name="htm_reference">HTM 06</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_electrical_generator" model="nhs.compliance.type">
+            <field name="name">Standby Generator Testing</field>
+            <field name="discipline_id" ref="discipline_electrical"/>
+            <field name="htm_reference">HTM 06</field>
+            <field name="default_frequency_value">1</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">7</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_electrical_ups" model="nhs.compliance.type">
+            <field name="name">IPS/UPS Testing (Clinical Areas)</field>
+            <field name="discipline_id" ref="discipline_electrical"/>
+            <field name="htm_reference">HTM 06</field>
+            <field name="default_frequency_value">3</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">14</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_electrical_eicr" model="nhs.compliance.type">
+            <field name="name">EICR Fixed Wire Test</field>
+            <field name="discipline_id" ref="discipline_electrical"/>
+            <field name="htm_reference">HTM 06</field>
+            <field name="default_frequency_value">5</field>
+            <field name="default_frequency_unit">year</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">60</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- VENTILATION - HTM 03-01                      -->
+        <record id="compliance_type_ventilation_verification" model="nhs.compliance.type">
+            <field name="name">Ventilation System Verification</field>
+            <field name="discipline_id" ref="discipline_ventilation"/>
+            <field name="htm_reference">HTM 03-01</field>
+            <field name="default_frequency_value">6</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">14</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_ventilation_theatre" model="nhs.compliance.type">
+            <field name="name">Theatre Ventilation Validation</field>
+            <field name="discipline_id" ref="discipline_ventilation"/>
+            <field name="htm_reference">HTM 03-01</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_ventilation_filter_change" model="nhs.compliance.type">
+            <field name="name">Filter Change / Monitoring</field>
+            <field name="discipline_id" ref="discipline_ventilation"/>
+            <field name="htm_reference">HTM 03-01</field>
+            <field name="default_frequency_value">3</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">medium</field>
+            <field name="default_lead_days">14</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_ventilation_lev" model="nhs.compliance.type">
+            <field name="name">LEV Testing (COSHH)</field>
+            <field name="discipline_id" ref="discipline_ventilation"/>
+            <field name="htm_reference">HTM 03-01 / COSHH</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- ASBESTOS - CAR 2012, HTM 07                 -->
+        <record id="compliance_type_asbestos_register" model="nhs.compliance.type">
+            <field name="name">Asbestos Register Review</field>
+            <field name="discipline_id" ref="discipline_asbestos"/>
+            <field name="htm_reference">HTM 07 / CAR 2012</field>
+            <field name="default_frequency_value">6</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_asbestos_reinspection" model="nhs.compliance.type">
+            <field name="name">Asbestos Re-Inspection Survey</field>
+            <field name="discipline_id" ref="discipline_asbestos"/>
+            <field name="htm_reference">HTM 07 / CAR 2012</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">year</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">60</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_asbestos_air_monitoring" model="nhs.compliance.type">
+            <field name="name">Air Monitoring (Project-based)</field>
+            <field name="discipline_id" ref="discipline_asbestos"/>
+            <field name="htm_reference">CAR 2012</field>
+            <field name="default_frequency_value">0</field>
+            <field name="default_frequency_unit">year</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">7</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_asbestos_removal" model="nhs.compliance.type">
+            <field name="name">Asbestos Removal Tracking</field>
+            <field name="discipline_id" ref="discipline_asbestos"/>
+            <field name="htm_reference">HTM 07 / CAR 2012</field>
+            <field name="default_frequency_value">0</field>
+            <field name="default_frequency_unit">year</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">7</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_asbestos_reinspection" model="nhs.compliance.type">
+            <field name="name">Asbestos Re-Inspection</field>
+            <field name="discipline_id" ref="discipline_asbestos"/>
+            <field name="htm_reference">HTM 07</field>
+            <field name="default_frequency_value">1</field>
+            <field name="default_frequency_unit">year</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">60</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- LOLER - LOLER 1998, PUWER                    -->
+        <record id="compliance_type_loler_passenger_lift" model="nhs.compliance.type">
+            <field name="name">Passenger Lift Thorough Examination</field>
+            <field name="discipline_id" ref="discipline_loler"/>
+            <field name="htm_reference">HTM 08 / LOLER 1998</field>
+            <field name="default_frequency_value">6</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_loler_goods_lift" model="nhs.compliance.type">
+            <field name="name">Goods/Service Lift Thorough Examination</field>
+            <field name="discipline_id" ref="discipline_loler"/>
+            <field name="htm_reference">HTM 08 / LOLER 1998</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">medium</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_loler_hoist" model="nhs.compliance.type">
+            <field name="name">Hoist / Patient-Lifting Equipment Examination</field>
+            <field name="discipline_id" ref="discipline_loler"/>
+            <field name="htm_reference">LOLER 1998 / PUWER</field>
+            <field name="default_frequency_value">6</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_loler_examination" model="nhs.compliance.type">
+            <field name="name">LOLER Thorough Examination</field>
+            <field name="discipline_id" ref="discipline_loler"/>
+            <field name="htm_reference">HTM 08</field>
+            <field name="default_frequency_value">6</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- MEDICAL GAS - HTM 02-01, MGPS                -->
+        <record id="compliance_type_mgps_maintenance" model="nhs.compliance.type">
+            <field name="name">MGPS Maintenance</field>
+            <field name="discipline_id" ref="discipline_mgps"/>
+            <field name="htm_reference">HTM 02-01</field>
+            <field name="default_frequency_value">3</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">life_safety</field>
+            <field name="default_lead_days">14</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_mgps_alarm_test" model="nhs.compliance.type">
+            <field name="name">MGPS Alarm Testing</field>
+            <field name="discipline_id" ref="discipline_mgps"/>
+            <field name="htm_reference">HTM 02-01</field>
+            <field name="default_frequency_value">1</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">life_safety</field>
+            <field name="default_lead_days">7</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_mgps_quality_check" model="nhs.compliance.type">
+            <field name="name">Medical Gas Quality Checks</field>
+            <field name="discipline_id" ref="discipline_mgps"/>
+            <field name="htm_reference">HTM 02-01</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">life_safety</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_mgps_permit" model="nhs.compliance.type">
+            <field name="name">AP(MGPS) Permit-to-Work</field>
+            <field name="discipline_id" ref="discipline_mgps"/>
+            <field name="htm_reference">HTM 02-01</field>
+            <field name="default_frequency_value">0</field>
+            <field name="default_frequency_unit">year</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">life_safety</field>
+            <field name="default_lead_days">1</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- PRESSURE SYSTEMS - PSSR 2000                -->
+        <record id="compliance_type_pressure_boiler" model="nhs.compliance.type">
+            <field name="name">Boiler Written Scheme of Examination</field>
+            <field name="discipline_id" ref="discipline_pressure"/>
+            <field name="htm_reference">HTM 09 / PSSR 2000</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_pressure_autoclave" model="nhs.compliance.type">
+            <field name="name">Autoclave Examination</field>
+            <field name="discipline_id" ref="discipline_pressure"/>
+            <field name="htm_reference">PSSR 2000</field>
+            <field name="default_frequency_value">14</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_pressure_calorifier" model="nhs.compliance.type">
+            <field name="name">Calorifier Examination</field>
+            <field name="discipline_id" ref="discipline_pressure"/>
+            <field name="htm_reference">PSSR 2000</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_pressure_air_receiver" model="nhs.compliance.type">
+            <field name="name">Air Receiver Examination</field>
+            <field name="discipline_id" ref="discipline_pressure"/>
+            <field name="htm_reference">PSSR 2000</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">medium</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- GAS SAFETY - Gas Safety (I&U) Regs           -->
+        <record id="compliance_type_gas_appliance" model="nhs.compliance.type">
+            <field name="name">Gas Appliance Servicing</field>
+            <field name="discipline_id" ref="discipline_gas"/>
+            <field name="htm_reference">Gas Safety (I&amp;U) Regs</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_gas_pipework" model="nhs.compliance.type">
+            <field name="name">Gas Pipework Safety Check</field>
+            <field name="discipline_id" ref="discipline_gas"/>
+            <field name="htm_reference">Gas Safety (I&amp;U) Regs</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- LIGHTNING - BS EN 62305, HTM 11             -->
+        <record id="compliance_type_lightning_testing" model="nhs.compliance.type">
+            <field name="name">Lightning Protection System Testing</field>
+            <field name="discipline_id" ref="discipline_lightning"/>
+            <field name="htm_reference">HTM 11 / BS EN 62305</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">medium</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- DRAINAGE - HTM 07 series                     -->
+        <record id="compliance_type_drainage_inspection" model="nhs.compliance.type">
+            <field name="name">Drainage System Inspection</field>
+            <field name="discipline_id" ref="discipline_drainage"/>
+            <field name="htm_reference">HTM 07 series</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">year</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">medium</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_drainage_grease_trap" model="nhs.compliance.type">
+            <field name="name">Grease Trap Maintenance</field>
+            <field name="discipline_id" ref="discipline_drainage"/>
+            <field name="htm_reference">HTM 07 series</field>
+            <field name="default_frequency_value">3</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="False"/>
+            <field name="criticality">medium</field>
+            <field name="default_lead_days">14</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_drainage_ventilation" model="nhs.compliance.type">
+            <field name="name">Drainage Ventilation Check</field>
+            <field name="discipline_id" ref="discipline_drainage"/>
+            <field name="htm_reference">HTM 07 series</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="False"/>
+            <field name="criticality">low</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="False"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- WORKING AT HEIGHT - WAH Regs, Confined Spaces -->
+        <record id="compliance_type_height_access" model="nhs.compliance.type">
+            <field name="name">Access Safety Inspection</field>
+            <field name="discipline_id" ref="discipline_working_at_height"/>
+            <field name="htm_reference">WAH Regulations 2005</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_height_edge_protection" model="nhs.compliance.type">
+            <field name="name">Edge Protection Inspection</field>
+            <field name="discipline_id" ref="discipline_working_at_height"/>
+            <field name="htm_reference">WAH Regulations 2005</field>
+            <field name="default_frequency_value">6</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_height_mansafe" model="nhs.compliance.type">
+            <field name="name">Mansafe / Fall Arrest System Inspection</field>
+            <field name="discipline_id" ref="discipline_working_at_height"/>
+            <field name="htm_reference">WAH Regulations 2005</field>
+            <field name="default_frequency_value">6</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_height_confined_space" model="nhs.compliance.type">
+            <field name="name">Confined Space Safety Assessment</field>
+            <field name="discipline_id" ref="discipline_working_at_height"/>
+            <field name="htm_reference">Confined Spaces Regs</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="compliance_type_height_roof_access" model="nhs.compliance.type">
+            <field name="name">Roof Access Safety Inspection</field>
+            <field name="discipline_id" ref="discipline_working_at_height"/>
+            <field name="htm_reference">WAH Regulations 2005</field>
+            <field name="default_frequency_value">12</field>
+            <field name="default_frequency_unit">month</field>
+            <field name="is_statutory" eval="True"/>
+            <field name="criticality">high</field>
+            <field name="default_lead_days">30</field>
+            <field name="requires_certificate" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

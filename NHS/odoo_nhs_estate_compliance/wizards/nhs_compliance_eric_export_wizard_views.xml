@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Compliance ERIC Export Wizard Form View -->
+    <record id="view_nhs_compliance_eric_export_wizard" model="ir.ui.view">
+        <field name="name">nhs.compliance.eric.export.wizard.form</field>
+        <field name="model">nhs.compliance.eric.export.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="site_id" placeholder="All Sites"/>
+                            <field name="discipline_id" placeholder="All Disciplines"/>
+                            <field name="compliance_type_id" placeholder="All Compliance Types"
+                                   invisible="not discipline_id"/>
+                            <field name="statutory_filter" widget="radio"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_export_excel" string="Export Excel" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Compliance ERIC Export Wizard - Action -->
+    <record id="action_nhs_compliance_eric_export_wizard" model="ir.actions.act_window">
+        <field name="name">ERIC Compliance Export</field>
+        <field name="res_model">nhs.compliance.eric.export.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

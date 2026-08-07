@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard form: fields shown depend on the selected change type -->
+    <record id="view_nhs_establishment_change_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.establishment.change.wizard.form</field>
+        <field name="model">nhs.establishment.change.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Raise Establishment Change Request">
+                <group>
+                    <group>
+                        <field name="change_type"/>
+                        <field name="post_id"
+                               invisible="change_type == 'create_post'"
+                               required="change_type != 'create_post'"/>
+                        <field name="org_unit_id"
+                               invisible="change_type not in ('create_post', 'transfer')"
+                               required="change_type in ('create_post', 'transfer')"/>
+                        <field name="effective_date"/>
+                    </group>
+                    <group>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+                </group>
+                <group string="Proposed Values"
+                       invisible="change_type not in ('create_post', 'increase_fte', 'decrease_fte', 'reband')">
+                    <group invisible="change_type not in ('create_post', 'reband')">
+                        <field name="proposed_job_title" invisible="change_type != 'create_post'"/>
+                        <field name="proposed_staff_group_id" invisible="change_type != 'create_post'"/>
+                        <field name="proposed_band_id" invisible="proposed_is_medical or change_type not in ('create_post', 'reband')"/>
+                        <field name="proposed_is_medical" invisible="change_type not in ('create_post', 'reband')"/>
+                        <field name="proposed_manual_indicative_salary" invisible="not proposed_is_medical or change_type not in ('create_post', 'reband')"/>
+                    </group>
+                    <group invisible="change_type not in ('create_post', 'increase_fte', 'decrease_fte')">
+                        <field name="proposed_contracted_hours" invisible="change_type != 'create_post'"/>
+                        <field name="proposed_headcount" invisible="change_type not in ('create_post', 'increase_fte', 'decrease_fte')"/>
+                        <field name="proposed_fte" invisible="change_type not in ('create_post', 'increase_fte', 'decrease_fte')"/>
+                    </group>
+                </group>
+                <group>
+                    <field name="reason" placeholder="Business justification for this change..."/>
+                </group>
+                <group>
+                    <field name="submit_immediately"/>
+                </group>
+                <footer>
+                    <button name="action_create_request" type="object"
+                            string="Raise Change Request" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

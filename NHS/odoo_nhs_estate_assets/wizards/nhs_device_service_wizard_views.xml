@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- form VIEW - Device Service Wizard -->
+    <record id="view_nhs_device_service_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.device.service.wizard.form</field>
+        <field name="model">nhs.device.service.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Log Service">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Log Service Event</h1>
+                    </div>
+                    <group>
+                        <field name="device_id" readonly="1"/>
+                        <field name="service_type"/>
+                        <field name="service_date"/>
+                        <field name="schedule_type_id"/>
+                        <field name="outcome" widget="radio"/>
+                    </group>
+                    <group string="Service Details">
+                        <group>
+                            <field name="performed_by_id"/>
+                            <field name="contractor"/>
+                        </group>
+                        <group>
+                            <field name="downtime_hours"/>
+                            <field name="cost"/>
+                        </group>
+                    </group>
+                    <group string="Parts, Certificate &amp; Notes">
+                        <field name="parts_used" placeholder="List spare parts or materials consumed..."/>
+                        <field name="certificate_ref"/>
+                        <field name="notes"/>
+                    </group>
+                    <footer>
+                        <button name="action_log_service"
+                                string="Log Service"
+                                type="object"
+                                class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

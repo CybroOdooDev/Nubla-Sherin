@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Compliance Position Report Wizard Form View -->
+    <record id="view_nhs_compliance_position_report_wizard" model="ir.ui.view">
+        <field name="name">nhs.compliance.position.report.wizard.form</field>
+        <field name="model">nhs.compliance.position.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Compliance Position Report">
+                <sheet>
+                    <group>
+                        <field name="scope" widget="radio"/>
+                        <field name="site_id" invisible="scope != 'site'" required="scope == 'site'"/>
+                        <field name="discipline_id" invisible="scope != 'discipline'" required="scope == 'discipline'"/>
+                        <field name="statutory_filter" widget="radio"/>
+                    </group>
+                    <footer>
+                        <button name="action_print_pdf" string="Print PDF" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Compliance Position Report Wizard Form View -->
+    <record id="action_nhs_compliance_position_report_wizard" model="ir.actions.act_window">
+        <field name="name">Compliance Position Report</field>
+        <field name="res_model">nhs.compliance.position.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

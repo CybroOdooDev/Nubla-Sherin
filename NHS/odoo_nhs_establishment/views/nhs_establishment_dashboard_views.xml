@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Establishment Analysis: Pivot -->
+    <record id="view_nhs_establishment_analysis_pivot" model="ir.ui.view">
+        <field name="name">nhs.establishment.post.analysis.pivot</field>
+        <field name="model">nhs.establishment.post</field>
+        <field name="arch" type="xml">
+            <pivot string="Establishment Analysis">
+                <field name="staff_group_id" type="row"/>
+                <field name="band_id" type="row"/>
+                <field name="org_unit_id" type="col"/>
+                <field name="funded_fte" type="measure"/>
+                <field name="in_post_fte" type="measure"/>
+                <field name="vacant_fte" type="measure"/>
+                <field name="indicative_pay" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Establishment Analysis: Graph -->
+    <record id="view_nhs_establishment_analysis_graph" model="ir.ui.view">
+        <field name="name">nhs.establishment.post.analysis.graph</field>
+        <field name="model">nhs.establishment.post</field>
+        <field name="arch" type="xml">
+            <graph string="Funded vs In-Post vs Vacant FTE" type="bar">
+                <field name="staff_group_id"/>
+                <field name="funded_fte" type="measure"/>
+                <field name="in_post_fte" type="measure"/>
+                <field name="vacant_fte" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- ── Action: Establishment Dashboard ──────────────────────── -->
+    <record id="action_nhs_establishment_dashboard" model="ir.actions.act_window">
+        <field name="name">Establishment Dashboard (Pivot)</field>
+        <field name="res_model">nhs.establishment.post</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="view_id" ref="view_nhs_establishment_analysis_pivot"/>
+        <field name="context">{}</field>
+    </record>
+
+    <!-- Client action rendering the OWL establishment dashboard widget -->
+    <record id="action_nhs_establishment_dashboard_client" model="ir.actions.client">
+        <field name="name">Establishment Dashboard</field>
+        <field name="tag">nhs_establishment_dashboard</field>
+    </record>
+
+    <!--  Action: By Staff Group / By Band  -->
+    <record id="action_nhs_establishment_by_group_band" model="ir.actions.act_window">
+        <field name="name">By Staff Group / By Band</field>
+        <field name="res_model">nhs.establishment.post</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="view_id" ref="view_nhs_establishment_analysis_graph"/>
+    </record>
+
+    <!--  Vacancy Hotspots: list of units ranked by vacancy rate  -->
+    <record id="view_nhs_vacancy_hotspot_list" model="ir.ui.view">
+        <field name="name">nhs.org.unit.vacancy.hotspot.list</field>
+        <field name="model">nhs.org.unit</field>
+        <field name="arch" type="xml">
+            <list string="Vacancy Hotspots" default_order="vacancy_rate desc" create="false" edit="false">
+                <field name="complete_name"/>
+                <field name="unit_type"/>
+                <field name="manager_id"/>
+                <field name="funded_fte" sum="Funded FTE"/>
+                <field name="in_post_fte" sum="In-Post FTE"/>
+                <field name="vacant_fte" sum="Vacant FTE"/>
+                <field name="vacancy_rate" widget="percentage"
+                       decoration-danger="vacancy_rate &gt;= 0.15"
+                       decoration-warning="vacancy_rate &gt;= 0.05 and vacancy_rate &lt; 0.15"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_vacancy_hotspot_graph" model="ir.ui.view">
+        <field name="name">nhs.org.unit.vacancy.hotspot.graph</field>
+        <field name="model">nhs.org.unit</field>
+        <field name="arch" type="xml">
+            <graph string="Vacancy Hotspots" type="bar">
+                <field name="complete_name"/>
+                <field name="vacancy_rate" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_nhs_vacancy_hotspots" model="ir.actions.act_window">
+        <field name="name">Vacancy Hotspots</field>
+        <field name="res_model">nhs.org.unit</field>
+        <field name="view_mode">graph,list</field>
+        <field name="domain">[('funded_fte', '&gt;', 0)]</field>
+        <field name="context">{}</field>
+    </record>
+
+    <!-- Attach the graph view first so it's the default when the hotspots action opens -->
+    <record id="action_nhs_vacancy_hotspots_view_graph" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_nhs_vacancy_hotspot_graph"/>
+        <field name="act_window_id" ref="action_nhs_vacancy_hotspots"/>
+    </record>
+
+    <!-- List view as the secondary view mode on the hotspots action -->
+    <record id="action_nhs_vacancy_hotspots_view_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_nhs_vacancy_hotspot_list"/>
+        <field name="act_window_id" ref="action_nhs_vacancy_hotspots"/>
+    </record>
+
+    <!--  Indicative Pay-Budget View  -->
+    <record id="view_nhs_establishment_pay_budget_pivot" model="ir.ui.view">
+        <field name="name">nhs.establishment.post.pay.budget.pivot</field>
+        <field name="model">nhs.establishment.post</field>
+        <field name="arch" type="xml">
+            <pivot string="Indicative Pay Budget">
+                <field name="org_unit_id" type="row"/>
+                <field name="staff_group_id" type="col"/>
+                <field name="indicative_pay" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_nhs_establishment_pay_budget" model="ir.actions.act_window">
+        <field name="name">Indicative Pay-Budget View</field>
+        <field name="res_model">nhs.establishment.post</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="view_id" ref="view_nhs_establishment_pay_budget_pivot"/>
+    </record>
+
+    <!-- Establishment vs In-Post Trend (over time, by create_date)  -->
+    <record id="view_nhs_establishment_trend_graph" model="ir.ui.view">
+        <field name="name">nhs.establishment.post.trend.graph</field>
+        <field name="model">nhs.establishment.post</field>
+        <field name="arch" type="xml">
+            <graph string="Establishment vs In-Post Trend" type="line">
+                <field name="create_date" interval="month"/>
+                <field name="funded_fte" type="measure"/>
+                <field name="in_post_fte" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_nhs_establishment_trend" model="ir.actions.act_window">
+        <field name="name">Establishment vs In-Post Trend</field>
+        <field name="res_model">nhs.establishment.post</field>
+        <field name="view_mode">graph,pivot</field>
+        <field name="view_id" ref="view_nhs_establishment_trend_graph"/>
+    </record>
+
+    <!-- Server Action to directly generate Vacancy Register PDF -->
+    <record id="action_print_nhs_vacancy_register" model="ir.actions.server">
+        <field name="name">Vacancy Register Report (PDF)</field>
+        <field name="model_id" ref="model_nhs_establishment_post"/>
+        <field name="state">code</field>
+        <field name="code">
+posts = env['nhs.establishment.post'].search([
+    ('vacancy_status', 'in', ['part_vacant', 'fully_vacant']),
+    ('status', 'in', ['active', 'frozen'])
+])
+action = env.ref('odoo_nhs_establishment.action_report_nhs_vacancy_register').report_action(posts)
+        </field>
+    </record>
+
+    <!-- Server Action to directly generate Establishment Report PDF for all units -->
+    <record id="action_nhs_establishment_report_menu" model="ir.actions.server">
+        <field name="name">Establishment Report (PDF)</field>
+        <field name="model_id" ref="model_nhs_org_unit"/>
+        <field name="state">code</field>
+        <field name="code">
+units = env['nhs.org.unit'].search([])
+action = env.ref('odoo_nhs_establishment.action_report_nhs_establishment').report_action(units)
+        </field>
+    </record>
+</odoo>

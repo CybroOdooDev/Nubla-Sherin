@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Contractor List View -->
+    <record id="view_nhs_compliance_contractor_list" model="ir.ui.view">
+        <field name="name">nhs.compliance.contractor.list</field>
+        <field name="model">nhs.compliance.contractor</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="is_insurance_expired==True or is_accreditation_expired==True">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="discipline_ids"/>
+                <field name="insurance_expiry"/>
+                <field name="is_insurance_expired" widget="boolean"/>
+                <field name="is_accreditation_expired" widget="boolean"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Contractor Form View -->
+    <record id="view_nhs_compliance_contractor_form" model="ir.ui.view">
+        <field name="name">nhs.compliance.contractor.form</field>
+        <field name="model">nhs.compliance.contractor</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_performance" type="object" class="oe_stat_button" icon="fa-bar-chart"
+                                string="Performance">
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="partner_id"/>
+                            <field name="discipline_ids" widget="many2many_tags"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="insurance_expiry"/>
+                            <field name="is_insurance_expired"/>
+                            <field name="is_accreditation_expired"/>
+                        </group>
+                    </group>
+                    <notebook invisible="id == 0">
+                        <page name="visits" string="Visits">
+                            <field name="visit_ids"/>
+                        </page>
+                        <page string="Accreditations">
+                            <field name="accreditation_ids">
+                                <list>
+                                    <field name="accreditation_id" widget="many2one"/>
+                                    <field name="expiry_date"/>
+                                    <field name="days_remaining" />
+                                    <field name="is_expired"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Contractor Search View -->
+    <record id="view_nhs_compliance_contractor_search" model="ir.ui.view">
+        <field name="name">nhs.compliance.contractor.search</field>
+        <field name="model">nhs.compliance.contractor</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="discipline_ids"/>
+                <filter name="insurance_expired" string="Insurance Expired"
+                        domain="[('is_insurance_expired', '=', True)]"/>
+                <filter name="accreditation_expired" string="Accreditation Expired"
+                        domain="[('is_accreditation_expired', '=', True)]"/>
+                <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Contractor Visit List View -->
+    <record id="view_nhs_contractor_visit_list" model="ir.ui.view">
+        <field name="name">nhs.contractor.visit.list</field>
+        <field name="model">nhs.contractor.visit</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="contractor_id"/>
+                <field name="visit_date"/>
+                <field name="site_id"/>
+                <field name="building_id"/>
+                <field name="permit_ref"/>
+                <field name="test_ids"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Contractor Visit Form View -->
+    <record id="view_nhs_contractor_visit_form" model="ir.ui.view">
+        <field name="name">nhs.contractor.visit.form</field>
+        <field name="model">nhs.contractor.visit</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="contractor_id"/>
+                            <field name="visit_date"/>
+                            <field name="permit_ref"/>
+                        </group>
+                        <group>
+                            <field name="site_id"/>
+                            <field name="building_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+                    </group>
+                    <notebook>
+                        <page name="items" string="Compliance Items Covered">
+                            <field name="item_ids">
+                                <list>
+                                    <field name="reference"/>
+                                    <field name="name"/>
+                                    <field name="next_due_date"/>
+                                    <field name="status" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="tests" string="Tests Completed">
+                            <field name="test_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="item_id"/>
+                                    <field name="test_date"/>
+                                    <field name="outcome" widget="badge"/>
+                                    <field name="certificate_ref"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Accreditation list View -->
+    <record id="view_nhs_compliance_contractor_accreditation_list" model="ir.ui.view">
+        <field name="name">nhs.compliance.contractor.accreditation.list</field>
+        <field name="model">nhs.compliance.contractor.accreditation</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="code" string="Code"/>
+                <field name="name" string="Accreditation Name"/>
+                <field name="description" string="Description"/>
+                <field name="active" string="Active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Accreditation Form View -->
+    <record id="view_nhs_compliance_contractor_accreditation_form" model="ir.ui.view">
+        <field name="name">nhs.compliance.contractor.accreditation.form</field>
+        <field name="model">nhs.compliance.contractor.accreditation</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="code" string="Code"/>
+                            <field name="name" string="Accreditation Name"/>
+                            <field name="active" string="Active"/>
+                        </group>
+                        <group>
+                            <field name="description" string="Description"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Accreditation Search View -->
+    <record id="view_nhs_compliance_contractor_accreditation_search" model="ir.ui.view">
+        <field name="name">nhs.compliance.contractor.accreditation.search</field>
+        <field name="model">nhs.compliance.contractor.accreditation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Accreditation Name"/>
+                <field name="code" string="Code"/>
+                <field name="description" string="Description"/>
+                <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+                <filter name="inactive" string="Archived" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Contractor Action -->
+    <record id="action_nhs_compliance_contractor" model="ir.actions.act_window">
+        <field name="name">Contractors</field>
+        <field name="res_model">nhs.compliance.contractor</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Contractor Accreditation Action -->
+    <record id="action_nhs_compliance_contractor_accreditation" model="ir.actions.act_window">
+        <field name="name">Contractors Accreditation</field>
+        <field name="res_model">nhs.compliance.contractor.accreditation</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_nhs_compliance_contractor_accreditation_search"/>
+        <field name="view_id" ref="view_nhs_compliance_contractor_accreditation_list"/>
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+    </record>
+
+    <!-- Contractor Visit Action -->
+    <record id="action_nhs_contractor_visit" model="ir.actions.act_window">
+        <field name="name">Contractor Visits</field>
+        <field name="res_model">nhs.contractor.visit</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

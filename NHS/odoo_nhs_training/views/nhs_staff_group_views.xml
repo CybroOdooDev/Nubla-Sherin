@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit Staff Group Form to add Training Requirements smart button -->
+    <record id="view_nhs_staff_group_form_inherit_training" model="ir.ui.view">
+        <field name="name">nhs.staff.group.form.inherit.training</field>
+        <field name="model">nhs.staff.group</field>
+        <field name="inherit_id" ref="odoo_nhs_establishment.view_nhs_staff_group_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_training_requirements" type="object"
+                            class="oe_stat_button" icon="fa-graduation-cap">
+                        <field name="requirement_count" widget="statinfo" string="Requirements"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//sheet/group" position="after">
+                <notebook>
+                    <page name="training_requirements" string="Training Requirements">
+                        <field name="requirement_ids">
+                            <list editable="bottom">
+                                <field name="subject_id" options="{'no_create': True}"/>
+                                <field name="frequency_months_override"/>
+                                <field name="is_mandatory"/>
+                                <field name="effective_from"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- List view for nhs.staff.group showing requirement counts -->
+    <record id="view_nhs_staff_group_list_by_requirements" model="ir.ui.view">
+        <field name="name">nhs.staff.group.list.by.requirements</field>
+        <field name="model">nhs.staff.group</field>
+        <field name="arch" type="xml">
+            <list string="Staff Groups">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="requirement_count"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Window action for nhs.staff.group listing requirements by staff group -->
+    <record id="action_nhs_training_requirement_by_staff_group" model="ir.actions.act_window">
+        <field name="name">Requirements by Staff Group</field>
+        <field name="res_model">nhs.staff.group</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_nhs_staff_group_list_by_requirements"/>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+    </record>
+
+    <!-- Inherit Staff Group List to remove editable="bottom" and make rows clickable to open form -->
+    <record id="view_nhs_staff_group_list_inherit_training" model="ir.ui.view">
+        <field name="name">nhs.staff.group.list.inherit.training</field>
+        <field name="model">nhs.staff.group</field>
+        <field name="inherit_id" ref="odoo_nhs_establishment.view_nhs_staff_group_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="editable"></attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

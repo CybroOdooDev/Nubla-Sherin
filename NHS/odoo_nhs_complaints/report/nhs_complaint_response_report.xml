@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report action for the formal complaint response letter PDF -->
+    <record id="action_report_nhs_complaint_response" model="ir.actions.report">
+        <field name="name">NHS Complaint Formal Response Letter</field>
+        <field name="model">nhs.complaint</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_complaints.report_nhs_complaint_response</field>
+        <field name="report_file">odoo_nhs_complaints.report_nhs_complaint_response</field>
+        <field name="print_report_name">'Response_' + object.name</field>
+    </record>
+
+    <!-- QWeb template rendering the formal response letter: complaint summary, investigation findings, response text, outcome, learning actions and PHSO referral details -->
+    <template id="report_nhs_complaint_response">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Formal Response to Complaint</h2>
+                        <p>Date: <span t-out="context_timestamp(datetime.datetime.now()).strftime('%d %B %Y')"/></p>
+                        <p>Reference: <strong><span t-out="o.name"/></strong></p>
+                        <br/>
+                        <p>Dear <span t-out="o.complainant_id.name or 'Complainant'"/>,</p>
+                        <p>Thank you for your complaint, reference <strong><span t-out="o.name"/></strong>, received on <span t-out="o.received_at.strftime('%d %B %Y') if o.received_at else ''"/>.</p>
+                        <h4>Summary of complaint</h4>
+                        <p><span t-out="o.subject_summary"/></p>
+                        <t t-if="o.investigation_id and o.investigation_id.points_of_complaint">
+                            <h4>Points raised</h4>
+                            <p style="white-space: pre-wrap;"><span t-out="o.investigation_id.points_of_complaint"/></p>
+                        </t>
+                        <t t-if="o.investigation_id and o.investigation_id.findings">
+                            <h4>Investigation findings</h4>
+                            <p style="white-space: pre-wrap;"><span t-out="o.investigation_id.findings"/></p>
+                        </t>
+                        <h4>Our response</h4>
+                        <div t-out="o.response_text or ''"/>
+                        <t t-if="o.investigation_id and o.investigation_id.upheld_status">
+                            <h4>Outcome</h4>
+                            <p>Following our investigation, the complaint is: <strong><span t-out="dict(o.investigation_id._fields['upheld_status'].selection).get(o.investigation_id.upheld_status, '')"/></strong>.</p>
+                        </t>
+                        <t t-if="o.action_ids.filtered(lambda a: a.state not in ('done','cancelled'))">
+                            <h4>Actions and learning</h4>
+                            <p>We have identified the following improvements as a result of your complaint:</p>
+                            <ul>
+                                <t t-foreach="o.action_ids.filtered(lambda a: a.state not in ('done','cancelled'))" t-as="act">
+                                    <li><span t-out="act.name"/> (due: <span t-out="act.due_date"/>)</li>
+                                </t>
+                            </ul>
+                        </t>
+                        <p>If you remain dissatisfied with our response, you have the right to refer your complaint to the <strong>Parliamentary and Health Service Ombudsman (PHSO)</strong>:</p>
+                        <ul>
+                            <li>Website: www.ombudsman.org.uk</li>
+                            <li>Phone: 0345 015 4033</li>
+                        </ul>
+                        <br/>
+                        <p>Yours sincerely,</p>
+                        <br/><br/>
+                        <p>
+                            <strong><span t-out="o.signed_off_by_id.name or 'Chief Executive'"/></strong><br/>
+                            <span t-out="o.company_id.name"/>
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

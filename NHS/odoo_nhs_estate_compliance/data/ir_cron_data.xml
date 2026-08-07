@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Update Item Status - Runs Daily -->
+        <record id="cron_nhs_compliance_status" model="ir.cron">
+            <field name="name">NHS Compliance: Update Status</field>
+            <field name="model_id" ref="model_nhs_compliance_item"/>
+            <field name="state">code</field>
+            <field name="code">model.action_compute_status()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Send Reminders - Runs Daily -->
+        <record id="cron_nhs_compliance_reminders" model="ir.cron">
+            <field name="name">NHS Compliance: Send Reminders</field>
+            <field name="model_id" ref="model_nhs_compliance_item"/>
+            <field name="state">code</field>
+            <field name="code">model._send_reminders()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Send Escalate Overdue Items Remainders - Runs Daily -->
+        <record id="cron_nhs_compliance_escalation" model="ir.cron">
+            <field name="name">NHS Compliance: Escalate Overdue</field>
+            <field name="model_id" ref="model_nhs_compliance_item"/>
+            <field name="state">code</field>
+            <field name="code">model._escalate_overdue()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Send Weekly Digest - Runs Weekly -->
+        <record id="cron_nhs_compliance_digest" model="ir.cron">
+            <field name="name">NHS Compliance: Weekly Digest</field>
+            <field name="model_id" ref="model_nhs_compliance_item"/>
+            <field name="state">code</field>
+            <field name="code">model._send_weekly_digest()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Send Authorisation Expiry Reminders - Runs Daily -->
+        <record id="cron_nhs_authorisation_expiry_reminders" model="ir.cron">
+            <field name="name">NHS Compliance: Authorisation Expiry Reminders</field>
+            <field name="model_id" ref="model_nhs_duty_assignment"/>
+            <field name="state">code</field>
+            <field name="code">model._send_authorisation_expiry_reminders()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Send Overdue Remedial-Action Escalation Reminders - Runs Daily -->
+        <record id="cron_nhs_remedial_action_escalation" model="ir.cron">
+            <field name="name">NHS Compliance: Overdue Remedial-Action Escalation</field>
+            <field name="model_id" ref="model_nhs_compliance_remedial"/>
+            <field name="state">code</field>
+            <field name="code">model._check_overdue_remedials()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Send Contractor Expiry Reminders - Runs Daily -->
+        <record id="cron_nhs_contractor_expiry_reminders" model="ir.cron">
+            <field name="name">NHS Compliance: Contractor Expiry Reminders</field>
+            <field name="model_id" ref="model_nhs_compliance_contractor"/>
+            <field name="state">code</field>
+            <field name="code">model._check_contractor_expiry()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Send Test Certificate Expiry Reminders - Runs Daily -->
+        <record id="cron_nhs_test_certificate_expiry" model="ir.cron">
+            <field name="name">NHS Compliance: Test Certificate Expiry Reminders</field>
+            <field name="model_id" ref="model_nhs_compliance_test"/>
+            <field name="state">code</field>
+            <field name="code">model._check_test_certificate_expiry()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Send Weekly Test Digest - Runs Weekly -->
+        <record id="cron_nhs_test_digest" model="ir.cron">
+            <field name="name">NHS Compliance: Weekly Test Digest</field>
+            <field name="model_id" ref="model_nhs_compliance_test"/>
+            <field name="state">code</field>
+            <field name="code">model._send_weekly_test_digest()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

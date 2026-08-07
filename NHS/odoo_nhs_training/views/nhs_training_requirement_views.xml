@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List view for nhs.training.requirement -->
+    <record id="view_nhs_training_requirement_list" model="ir.ui.view">
+        <field name="name">nhs.training.requirement.list</field>
+        <field name="model">nhs.training.requirement</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="subject_id"/>
+                <field name="profile_id"/>
+                <field name="staff_group_id"/>
+                <field name="member_id"/>
+                <field name="override_type"/>
+                <field name="is_mandatory"/>
+                <field name="frequency_months_override"/>
+                <field name="effective_from"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view for nhs.training.requirement -->
+    <record id="view_nhs_training_requirement_form" model="ir.ui.view">
+        <field name="name">nhs.training.requirement.form</field>
+        <field name="model">nhs.training.requirement</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="subject_id" options="{'no_create': True}"/>
+                            <field name="profile_id" options="{'no_create': True}" invisible="staff_group_id or member_id or context.get('hide_profile_id')"/>
+                            <field name="staff_group_id" options="{'no_create': True}" invisible="profile_id or member_id or context.get('hide_staff_group_id')"/>
+                            <field name="member_id" options="{'no_create': True}" invisible="profile_id or staff_group_id or context.get('hide_member_id')"/>
+                        </group>
+                        <group>
+                            <field name="override_type" invisible="not member_id"/>
+                            <field name="is_mandatory"/>
+                            <field name="frequency_months_override"/>
+                            <field name="effective_from"/>
+                        </group>
+                    </group>
+                    <group string="Exemption / Waiver" invisible="override_type != 'waive'">
+                        <field name="exemption_reason" nolabel="1"/>
+                        <field name="exemption_review_date"/>
+                    </group>
+                    <field name="active" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view for nhs.training.requirement -->
+    <record id="view_nhs_training_requirement_search" model="ir.ui.view">
+        <field name="name">nhs.training.requirement.search</field>
+        <field name="model">nhs.training.requirement</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="subject_id"/>
+                <field name="profile_id"/>
+                <field name="staff_group_id"/>
+                <field name="member_id"/>
+                <filter name="by_staff_group" string="By Staff Group" domain="[('staff_group_id', '!=', False)]"/>
+                <filter name="by_profile" string="By Profile" domain="[('profile_id', '!=', False)]"/>
+                <filter name="individual" string="Individual Overrides" domain="[('member_id', '!=', False)]"/>
+                <group>
+                    <filter name="group_subject" string="Subject" context="{'group_by': 'subject_id'}"/>
+                    <filter name="group_staff_group" string="Staff Group" context="{'group_by': 'staff_group_id'}"/>
+                    <filter name="group_profile" string="Profile" context="{'group_by': 'profile_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window action for group/profile-level requirements (excludes individual overrides) -->
+    <record id="action_nhs_training_requirement" model="ir.actions.act_window">
+        <field name="name">Requirements</field>
+        <field name="res_model">nhs.training.requirement</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('member_id', '=', False)]</field>
+        <field name="context">{'search_default_by_profile': 0, 'hide_member_id': True}</field>
+    </record>
+
+</odoo>

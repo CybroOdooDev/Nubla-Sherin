@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- ── Cron: Recompute Stale Evidence -->
+        <record id="cron_nhs_dspt_recompute_stale" model="ir.cron">
+            <field name="name">NHS DSPT: Recompute Stale Evidence</field>
+            <field name="model_id" ref="model_nhs_dspt_evidence"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_recompute_stale()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- ── Cron: Assessment Deadline Reminders -->
+        <record id="cron_nhs_dspt_deadline_reminders" model="ir.cron">
+            <field name="name">NHS DSPT: Deadline Reminders</field>
+            <field name="model_id" ref="model_nhs_dspt_assessment"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_deadline_reminders()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- ── Cron: Escalate Overdue Improvement Actions -->
+        <record id="cron_nhs_dspt_escalate_overdue" model="ir.cron">
+            <field name="name">NHS DSPT: Escalate Overdue Improvement Actions</field>
+            <field name="model_id" ref="model_nhs_dspt_action"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_escalate_overdue()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

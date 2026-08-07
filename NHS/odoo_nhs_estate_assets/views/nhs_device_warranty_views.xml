@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- list VIEW - Warranties & Service Contracts -->
+    <record id="view_nhs_device_warranty_list" model="ir.ui.view">
+        <field name="name">nhs.device.warranty.list</field>
+        <field name="model">nhs.device.warranty</field>
+        <field name="arch" type="xml">
+            <list string="Warranties &amp; Service Contracts" multi_edit="1"
+                  decoration-danger="is_expiring==1">
+                <field name="device_id"/>
+                <field name="cover_type"/>
+                <field name="provider"/>
+                <field name="reference"/>
+                <field name="start_date"/>
+                <field name="expiry_date"/>
+                <field name="is_expiring"/>
+                <field name="cost"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- form VIEW - Warranties & Service Contracts -->
+    <record id="view_nhs_device_warranty_form" model="ir.ui.view">
+        <field name="name">nhs.device.warranty.form</field>
+        <field name="model">nhs.device.warranty</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_device" type="object"
+                                class="oe_stat_button" icon="fa-wrench">
+                            <span class="o_stat_text">Device</span>
+                        </button>
+                        <button name="action_view_services" type="object"
+                                class="oe_stat_button" icon="fa-wrench">
+                            <span class="o_stat_text">Services</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name" placeholder="Warranty/Contract Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="device_id" options="{'no_create': True}"/>
+                            <field name="cover_type"/>
+                            <field name="provider" invisible="cover_type == 'warranty'"/>
+                            <field name="reference" invisible="cover_type == 'warranty'"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="expiry_date"/>
+                            <field name="is_expiring"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Financial Information">
+                        <group>
+                            <field name="cost"/>
+                        </group>
+                    </group>
+                    <group string="Coverage Details">
+                        <field name="coverage"
+                               placeholder="Describe what is covered by this warranty/contract..."/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- search VIEW - Warranties & Service Contracts -->
+    <record id="view_nhs_device_warranty_search" model="ir.ui.view">
+        <field name="name">nhs.device.warranty.search</field>
+        <field name="model">nhs.device.warranty</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="device_id"/>
+                <field name="provider"/>
+                <field name="reference"/>
+                <filter name="active" string="Active" domain="[('active','=',True)]"/>
+                <filter name="archived" string="Archived" domain="[('active','=',False)]"/>
+                <filter name="expiring" string="Expiring Soon" domain="[('is_expiring','=',True)]"/>
+                <filter name="warranty" string="Warranty" domain="[('cover_type','=','warranty')]"/>
+                <filter name="service_contract" string="Service Contracts"
+                        domain="[('cover_type','=','service_contract')]"/>
+                <filter name="group_by_type" string="Type" context="{'group_by':'cover_type'}"/>
+                <filter name="group_by_device" string="Device" context="{'group_by':'device_id'}"/>
+                <filter name="group_by_provider" string="Provider" context="{'group_by':'provider'}"/>
+                <filter name="group_by_expiry" string="Expiry Date" context="{'group_by':'expiry_date'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ACTION - Warranties & Service Contracts -->
+    <record id="action_nhs_device_warranty" model="ir.actions.act_window">
+        <field name="name">Warranties &amp; Service Contracts</field>
+        <field name="res_model">nhs.device.warranty</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Track warranties and service contracts for all devices.
+                Expiring records are highlighted automatically.
+            </p>
+        </field>
+    </record>
+</odoo>

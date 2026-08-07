@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Settings View -->
+    <record id="view_res_config_settings_nhs_compliance" model="ir.ui.view">
+        <field name="name">res.config.settings.nhs</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Estate Compliance" name="odoo_nhs_estate_compliance"
+                     groups="odoo_nhs_estate_compliance.group_nhs_compliance_manager">
+                    <block title="General Settings">
+                        <setting string="Due Soon Window">
+                            <span>
+                                <field name="compliance_due_soon_days"/>
+                                days
+                            </span>
+                        </setting>
+                        <setting string="Escalation Threshold">
+                            <span>
+                                <field name="compliance_escalation_threshold"/>
+                                days
+                            </span>
+                        </setting>
+                        <setting string="Digest Recipients">
+                            <field name="compliance_digest_recipients" placeholder="Comma-separated email addresses"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Settings Action -->
+    <record id="action_nhs_compliance_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_res_config_settings_nhs_compliance"/>
+        <field name="target">current</field>
+        <field name="context">{'module': 'odoo_nhs_estate_compliance'}</field>
+    </record>
+</odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- form VIEW - Alert Response Report Wizard -->
+    <record id="view_nhs_alert_response_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.alert.response.wizard.form</field>
+        <field name="model">nhs.alert.response.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Alert Response (PDF)">
+                <sheet>
+                    <div class="oe_title">
+                        <h2>Alert Response PDF Generation</h2>
+                    </div>
+                    <group>
+                        <field name="category_ids" widget="many2many_tags"
+                               placeholder="Select categories (leave empty for all)..."/>
+                        <field name="state"/>
+                    </group>
+                    <footer>
+                        <button name="action_generate_pdf"
+                                string="Generate PDF"
+                                type="object"
+                                class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

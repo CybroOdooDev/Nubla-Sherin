@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit Maintenance Request Form View -->
+    <record id="hr_equipment_request_view_form_inherit_nhs" model="ir.ui.view">
+        <field name="name">maintenance.request.form.inherit.nhs</field>
+        <field name="model">maintenance.request</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form"/>
+        <field name="arch" type="xml">
+            <header position="inside">
+                <button name="action_create_service_record"
+                        string="Create Service Record"
+                        type="object"
+                        class="btn-primary"
+                        invisible="not is_final_stage or service_record_created"/>
+            </header>
+            <field name="equipment_id" position="after">
+                <field name="nhs_device_id" />
+                <field name="nhs_schedule_id" />
+                <field name="nhs_service_id" readonly="1" invisible="not service_record_created"/>
+                <field name="service_record_created" invisible="1"/>
+                <field name="is_final_stage" invisible="1"/>
+            </field>
+        </field>
+    </record>
+</odoo>

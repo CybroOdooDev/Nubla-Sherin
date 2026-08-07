@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Compliance Remedial List View -->
+    <record id="view_nhs_compliance_remedial_tree" model="ir.ui.view">
+        <field name="name">nhs.compliance.remedial.tree</field>
+        <field name="model">nhs.compliance.remedial</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="state in ['open']"
+                  decoration-warning="state in ['in_progress','awaiting_parts']"
+                  decoration-success="state in ['completed','verified']">
+                <field name="name"/>
+                <field name="item_id"/>
+                <field name="priority" widget="badge"/>
+                <field name="risk_rating" widget="badge"/>
+                <field name="state" widget="badge"/>
+                <field name="owner_id"/>
+                <field name="due_date"/>
+                <field name="backlog_ref"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Compliance Remedial Form View -->
+    <record id="view_nhs_compliance_remedial_form" model="ir.ui.view">
+        <field name="name">nhs.compliance.remedial.form</field>
+        <field name="model">nhs.compliance.remedial</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start_progress" type="object" string="Start Progress"
+                            class="oe_highlight"
+                            invisible="state != 'open'"/>
+                    <button name="action_await_parts" type="object" string="Await Parts"
+                            invisible="state not in ['open','in_progress']"/>
+                    <button name="action_complete" type="object" string="Complete"
+                            class="oe_highlight"
+                            invisible="state not in ['open','in_progress','awaiting_parts']"/>
+                    <button name="action_verify" type="object" string="Verify"
+                            class="oe_highlight"
+                            invisible="state != 'completed'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="open,in_progress,awaiting_parts,completed,verified"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_item" type="object"
+                                class="oe_stat_button" icon="fa-list">
+                            <span class="o_stat_text">Item</span>
+                        </button>
+                        <button name="action_view_test" type="object"
+                                class="oe_stat_button" icon="fa-history">
+                            <span class="o_stat_text">Test</span>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="item_id" readonly="id"/>
+                            <field name="test_id" readonly="id"/>
+                            <field name="owner_id"/>
+                            <field name="due_date"/>
+                        </group>
+                        <group>
+                            <field name="priority" widget="badge"/>
+                            <field name="risk_rating" widget="badge"/>
+                            <field name="backlog_ref"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description"/>
+                        <field name="completion_evidence" placeholder="Completion evidence required"/>
+                    </group>
+                    <group string="Verification" invisible="state != 'verified'">
+                        <field name="verified_by_id"/>
+                        <field name="verified_at"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Compliance Remedial Search View -->
+    <record id="view_nhs_compliance_remedial_search" model="ir.ui.view">
+        <field name="name">nhs.compliance.remedial.search</field>
+        <field name="model">nhs.compliance.remedial</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="item_id"/>
+                <field name="owner_id"/>
+                <filter name="open" string="Open" domain="[('state', '=', 'open')]"/>
+                <filter name="in_progress" string="In Progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter name="awaiting_parts" string="Awaiting Parts" domain="[('state', '=', 'awaiting_parts')]"/>
+                <filter name="completed" string="Completed" domain="[('state', '=', 'completed')]"/>
+                <filter name="verified" string="Verified" domain="[('state', '=', 'verified')]"/>
+                <group>
+                    <filter name="group_priority" string="Priority" context="{'group_by': 'priority'}"/>
+                    <filter name="group_state" string="State" context="{'group_by': 'state'}"/>
+                    <filter name="group_owner" string="Owner" context="{'group_by': 'owner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Compliance Remedial Action -->
+    <record id="action_nhs_compliance_remedial" model="ir.actions.act_window">
+        <field name="name">Remedial Actions</field>
+        <field name="res_model">nhs.compliance.remedial</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

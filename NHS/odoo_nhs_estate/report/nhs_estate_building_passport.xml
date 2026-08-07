@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Building Passport Report Action -->
+    <record id="action_report_building_passport" model="ir.actions.report">
+        <field name="name">Building Passport</field>
+        <field name="model">nhs.estate.building</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_estate.report_building_passport</field>
+        <field name="report_file">odoo_nhs_estate.report_building_passport</field>
+        <field name="binding_model_id" ref="model_nhs_estate_building"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Building Passport Report Template -->
+    <template id="report_building_passport">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 style="text-align:center; color:#005EB8;">Building Passport</h2>
+                        <h4 style="text-align:center; margin-bottom:20px;">
+                            <span t-field="doc.name"/>
+                        </h4>
+                        <table class="table table-condensed table-bordered">
+                            <tr>
+                                <td class="p-2">
+                                    <strong>Building Code:</strong>
+                                </td>
+                                <td class="p-2">
+                                    <span t-field="doc.code"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">
+                                    <strong>Site:</strong>
+                                </td>
+                                <td class="p-2">
+                                    <span t-field="doc.site_id.name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">
+                                    <strong>Status:</strong>
+                                </td>
+                                <td class="p-2">
+                                    <span t-field="doc.operational_status"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">
+                                    <strong>Build Year:</strong>
+                                </td>
+                                <td class="p-2">
+                                    <span t-field="doc.build_year"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">
+                                    <strong>GIA:</strong>
+                                </td>
+                                <td class="p-2">
+                                    <span t-field="doc.gia"/>
+                                    m²
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">
+                                    <strong>NIA:</strong>
+                                </td>
+                                <td class="p-2">
+                                    <span t-field="doc.nia"/>
+                                    m²
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">
+                                    <strong>Storeys:</strong>
+                                </td>
+                                <td class="p-2">
+                                    <span t-field="doc.storeys"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">
+                                    <strong>Floors:</strong>
+                                </td>
+                                <td class="p-2">
+                                    <span t-field="doc.floor_count"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">
+                                    <strong>Spaces:</strong>
+                                </td>
+                                <td class="p-2">
+                                    <span t-field="doc.space_count"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">
+                                    <strong>Tenure Type:</strong>
+                                </td>
+                                <td class="p-2">
+                                    <span t-field="doc.tenure_type"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">
+                                    <strong>Condition Grade:</strong>
+                                </td>
+                                <td class="p-2">
+                                    <span t-field="doc.latest_condition_grade"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">
+                                    <strong>Backlog Items:</strong>
+                                </td>
+                                <td class="p-2">
+                                    <span t-field="doc.backlog_count"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">
+                                    <strong>Total Backlog:</strong>
+                                </td>
+                                <td class="p-2">
+                                    <span t-field="doc.backlog_total"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <t t-if="doc.backlog_ids">
+                            <h4>Backlog Items</h4>
+                            <table class="table table-condensed table-bordered">
+                                <thead>
+                                    <tr style="background:#005EB8; color:white;">
+                                        <th class="p-2">Description</th>
+                                        <th class="p-2">Risk</th>
+                                        <th class="p-2">Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.backlog_ids" t-as="bl">
+                                        <td class="p-2">
+                                            <span t-field="bl.name"/>
+                                        </td>
+                                        <td class="p-2">
+                                            <span t-field="bl.risk_category"/>
+                                        </td>
+                                        <td class="p-2">
+                                            <span t-field="bl.cost_estimate"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+                        <t t-if="doc.tenure_id">
+                            <h4>Tenure Details</h4>
+                            <table class="table table-condensed table-bordered">
+                                <tr>
+                                    <td class="p-2" style="width: 30%;">
+                                        <strong>Tenure Type:</strong>
+                                    </td>
+                                    <td class="p-2">
+                                        <span t-field="doc.tenure_type"/>
+                                    </td>
+                                </tr>
+                                <t t-if="doc.tenure_type not in ['freehold','licence']">
+                                    <tr>
+                                        <td class="p-2">
+                                            <strong>Landlord:</strong>
+                                        </td>
+                                        <td class="p-2">
+                                            <span t-field="doc.tenure_id.landlord"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-if="doc.tenure_type == 'lease'">
+                                    <tr>
+                                        <td class="p-2">
+                                            <strong>Lease Start:</strong>
+                                        </td>
+                                        <td class="p-2">
+                                            <span t-field="doc.tenure_id.lease_start"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2">
+                                            <strong>Lease End:</strong>
+                                        </td>
+                                        <td class="p-2">
+                                            <span t-field="doc.tenure_id.lease_end"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2">
+                                            <strong>Lease Term (Years):</strong>
+                                        </td>
+                                        <td class="p-2">
+                                            <span t-field="doc.tenure_id.lease_term_years"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-if="doc.tenure_type == 'leasehold'">
+                                    <tr>
+                                        <td class="p-2">
+                                            <strong>Rent Amount:</strong>
+                                        </td>
+                                        <td class="p-2">
+                                            <span t-field="doc.tenure_id.rent_amount"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2">
+                                            <strong>Contract Reference:</strong>
+                                        </td>
+                                        <td class="p-2">
+                                            <span t-field="doc.tenure_id.contract_ref"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2">
+                                            <strong>Contract Start:</strong>
+                                        </td>
+                                        <td class="p-2">
+                                            <span t-field="doc.tenure_id.contract_start"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2">
+                                            <strong>Contract End:</strong>
+                                        </td>
+                                        <td class="p-2">
+                                            <span t-field="doc.tenure_id.contract_end"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-if="doc.tenure_type in ['pfi','lift','nhsps','chp']">
+                                    <tr>
+                                        <td class="p-2">
+                                            <strong>Contract Reference:</strong>
+                                        </td>
+                                        <td class="p-2">
+                                            <span t-field="doc.tenure_id.contract_ref"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2">
+                                            <strong>Contract Start:</strong>
+                                        </td>
+                                        <td class="p-2">
+                                            <span t-field="doc.tenure_id.contract_start"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2">
+                                            <strong>Contract End:</strong>
+                                        </td>
+                                        <td class="p-2">
+                                            <span t-field="doc.tenure_id.contract_end"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-if="doc.tenure_id.break_date">
+                                    <tr>
+                                        <td class="p-2">
+                                            <strong>Break Date:</strong>
+                                        </td>
+                                        <td class="p-2">
+                                            <span t-field="doc.tenure_id.break_date"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-if="doc.tenure_id.rent_review_date">
+                                    <tr>
+                                        <td class="p-2">
+                                            <strong>Rent Review Date:</strong>
+                                        </td>
+                                        <td class="p-2">
+                                            <span t-field="doc.tenure_id.rent_review_date"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-if="doc.tenure_id.expiring_soon">
+                                    <tr>
+                                        <td class="p-2">
+                                            <strong>Expiring Soon:</strong>
+                                        </td>
+                                        <td class="p-2">
+                                            <span t-field="doc.tenure_id.expiring_soon"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </table>
+                        </t>
+                        <p style="text-align:center; margin-top:30px; color:#666; font-size:10px;">
+                            Generated:
+                            <span t-esc="time.strftime('%d/%m/%Y %H:%M')"/>
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

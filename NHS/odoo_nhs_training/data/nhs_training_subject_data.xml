@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--The eleven UK Core Skills Training Framework (CSTF) subjects.-->
+        <!-- Seed data: Equality, Diversity & Human Rights (CSTF-EDHR) subject -->
+        <record id="subject_equality_diversity" model="nhs.training.subject">
+            <field name="name">Equality, Diversity &amp; Human Rights</field>
+            <field name="code">CSTF-EDHR</field>
+            <field name="training_class">statutory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">36</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Health, Safety & Welfare (CSTF-HSW) subject -->
+        <record id="subject_health_safety" model="nhs.training.subject">
+            <field name="name">Health, Safety &amp; Welfare</field>
+            <field name="code">CSTF-HSW</field>
+            <field name="training_class">statutory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">36</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Conflict Resolution (CSTF-CR) subject -->
+        <record id="subject_conflict_resolution" model="nhs.training.subject">
+            <field name="name">Conflict Resolution</field>
+            <field name="code">CSTF-CR</field>
+            <field name="training_class">mandatory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">36</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Fire Safety (CSTF-FS) subject -->
+        <record id="subject_fire_safety" model="nhs.training.subject">
+            <field name="name">Fire Safety</field>
+            <field name="code">CSTF-FS</field>
+            <field name="training_class">statutory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">12</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Infection Prevention & Control Level 1 (CSTF-IPC1) subject -->
+        <record id="subject_ipc_l1" model="nhs.training.subject">
+            <field name="name">Infection Prevention &amp; Control</field>
+            <field name="level">Level 1</field>
+            <field name="code">CSTF-IPC1</field>
+            <field name="training_class">mandatory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">12</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Infection Prevention & Control Level 2 (CSTF-IPC2) subject -->
+        <record id="subject_ipc_l2" model="nhs.training.subject">
+            <field name="name">Infection Prevention &amp; Control</field>
+            <field name="level">Level 2</field>
+            <field name="code">CSTF-IPC2</field>
+            <field name="training_class">mandatory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">12</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Moving & Handling Level 1 (CSTF-MH1) subject -->
+        <record id="subject_moving_handling_l1" model="nhs.training.subject">
+            <field name="name">Moving &amp; Handling</field>
+            <field name="level">Level 1</field>
+            <field name="code">CSTF-MH1</field>
+            <field name="training_class">statutory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">36</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Moving & Handling Level 2 (CSTF-MH2) subject -->
+        <record id="subject_moving_handling_l2" model="nhs.training.subject">
+            <field name="name">Moving &amp; Handling</field>
+            <field name="level">Level 2</field>
+            <field name="code">CSTF-MH2</field>
+            <field name="training_class">statutory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">12</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Safeguarding Adults Level 1 (CSTF-SA1) subject -->
+        <record id="subject_safeguarding_adults_l1" model="nhs.training.subject">
+            <field name="name">Safeguarding Adults</field>
+            <field name="level">Level 1</field>
+            <field name="code">CSTF-SA1</field>
+            <field name="training_class">statutory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">36</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Safeguarding Adults Level 2 (CSTF-SA2) subject -->
+        <record id="subject_safeguarding_adults_l2" model="nhs.training.subject">
+            <field name="name">Safeguarding Adults</field>
+            <field name="level">Level 2</field>
+            <field name="code">CSTF-SA2</field>
+            <field name="training_class">statutory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">36</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Safeguarding Adults Level 3 (CSTF-SA3) subject -->
+        <record id="subject_safeguarding_adults_l3" model="nhs.training.subject">
+            <field name="name">Safeguarding Adults</field>
+            <field name="level">Level 3</field>
+            <field name="code">CSTF-SA3</field>
+            <field name="training_class">statutory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">36</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Safeguarding Children Level 1 (CSTF-SC1) subject -->
+        <record id="subject_safeguarding_children_l1" model="nhs.training.subject">
+            <field name="name">Safeguarding Children</field>
+            <field name="level">Level 1</field>
+            <field name="code">CSTF-SC1</field>
+            <field name="training_class">statutory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">36</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Safeguarding Children Level 2 (CSTF-SC2) subject -->
+        <record id="subject_safeguarding_children_l2" model="nhs.training.subject">
+            <field name="name">Safeguarding Children</field>
+            <field name="level">Level 2</field>
+            <field name="code">CSTF-SC2</field>
+            <field name="training_class">statutory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">36</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Safeguarding Children Level 3 (CSTF-SC3) subject -->
+        <record id="subject_safeguarding_children_l3" model="nhs.training.subject">
+            <field name="name">Safeguarding Children</field>
+            <field name="level">Level 3</field>
+            <field name="code">CSTF-SC3</field>
+            <field name="training_class">statutory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">36</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Basic Life Support / Resuscitation (CSTF-BLS) subject -->
+        <record id="subject_bls" model="nhs.training.subject">
+            <field name="name">Basic Life Support / Resuscitation</field>
+            <field name="code">CSTF-BLS</field>
+            <field name="training_class">mandatory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">12</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Information Governance / Data Security Awareness (CSTF-IG) subject -->
+        <record id="subject_information_governance" model="nhs.training.subject">
+            <field name="name">Information Governance / Data Security Awareness</field>
+            <field name="code">CSTF-IG</field>
+            <field name="training_class">statutory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">12</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Preventing Radicalisation / Prevent-WRAP (CSTF-PREVENT) subject -->
+        <record id="subject_prevent" model="nhs.training.subject">
+            <field name="name">Preventing Radicalisation (Prevent / WRAP)</field>
+            <field name="code">CSTF-PREVENT</field>
+            <field name="training_class">statutory</field>
+            <field name="cstf_aligned" eval="True"/>
+            <field name="default_frequency_months">36</field>
+            <field name="default_lead_days">60</field>
+        </record>
+
+        <!--
+             Common one-off / role-specific / local additions.-->
+        <!-- Seed data: Local Induction (LOCAL-IND) one-off subject -->
+        <record id="subject_induction" model="nhs.training.subject">
+            <field name="name">Local Induction</field>
+            <field name="code">LOCAL-IND</field>
+            <field name="training_class">local</field>
+            <field name="is_one_off" eval="True"/>
+            <field name="default_lead_days">30</field>
+        </record>
+        <!-- Seed data: Medicines Management (ROLE-MM) role-specific subject -->
+        <record id="subject_medicines_management" model="nhs.training.subject">
+            <field name="name">Medicines Management</field>
+            <field name="code">ROLE-MM</field>
+            <field name="training_class">role_specific</field>
+            <field name="default_frequency_months">12</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Prevention & Management of Violence & Aggression (ROLE-PMVA) subject -->
+        <record id="subject_pmva" model="nhs.training.subject">
+            <field name="name">Prevention &amp; Management of Violence &amp; Aggression (PMVA)</field>
+            <field name="code">ROLE-PMVA</field>
+            <field name="training_class">role_specific</field>
+            <field name="default_frequency_months">12</field>
+            <field name="default_lead_days">60</field>
+        </record>
+        <!-- Seed data: Tissue Viability (ROLE-TV) role-specific subject -->
+        <record id="subject_tissue_viability" model="nhs.training.subject">
+            <field name="name">Tissue Viability</field>
+            <field name="code">ROLE-TV</field>
+            <field name="training_class">role_specific</field>
+            <field name="default_frequency_months">24</field>
+            <field name="default_lead_days">60</field>
+        </record>
+    </data>
+</odoo>

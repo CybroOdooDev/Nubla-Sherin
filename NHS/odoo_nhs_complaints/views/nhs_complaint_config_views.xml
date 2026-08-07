@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── KO41a Subject Config List ───────────────────────────── -->
+    <record id="view_nhs_complaint_subject_list" model="ir.ui.view">
+        <field name="name">nhs.complaint.subject.list</field>
+        <field name="model">nhs.complaint.subject</field>
+        <field name="arch" type="xml">
+            <list string="KO41a Subjects" decoration-muted="not active">
+                <field name="complete_name"/>
+                <field name="ko41a_code"/>
+                <field name="provider_types"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── KO41a Subject Config Form ───────────────────────────── -->
+    <record id="view_nhs_complaint_subject_form" model="ir.ui.view">
+        <field name="name">nhs.complaint.subject.form</field>
+        <field name="model">nhs.complaint.subject</field>
+        <field name="arch" type="xml">
+            <form string="KO41a Complaint Subject">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="parent_id"/>
+                        <field name="ko41a_code"/>
+                        <field name="provider_types"/>
+                        <field name="active"/>
+                    </group>
+                    <group string="Sub-subjects" invisible="parent_id">
+                        <field name="child_ids" nolabel="1">
+                            <list editable="bottom">
+                                <field name="name"/>
+                                <field name="ko41a_code"/>
+                                <field name="active"/>
+                            </list>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Action: KO41a Subjects (top-level subjects only) ────── -->
+    <record id="action_nhs_complaint_subject" model="ir.actions.act_window">
+        <field name="name">KO41a Subjects</field>
+        <field name="res_model">nhs.complaint.subject</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('parent_id','=',False)]</field>
+        <field name="context">{'active_test': False}</field>
+    </record>
+
+    <!-- ── Timescale Presets Config ────────────────────────────── -->
+    <record id="view_nhs_complaint_timescale_list" model="ir.ui.view">
+        <field name="name">nhs.complaint.timescale.list</field>
+        <field name="model">nhs.complaint.timescale</field>
+        <field name="arch" type="xml">
+            <list string="Response Timescale Presets" editable="top">
+                <field name="name"/>
+                <field name="working_days"/>
+                <field name="complexity"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Action: Response Timescale Presets ───────────────────── -->
+    <record id="action_nhs_complaint_timescale" model="ir.actions.act_window">
+        <field name="name">Response Timescale Presets</field>
+        <field name="res_model">nhs.complaint.timescale</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+    <!-- ── Settings extension ──────────────────────────────────── -->
+    <record id="view_res_config_settings_complaint_form" model="ir.ui.view">
+        <field name="name">res.config.settings.complaint.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="NHS Complaints &amp; PALS" data-string="NHS Complaints" name="nhs_complaints"
+                     groups="odoo_nhs_complaints.group_nhs_complaint_quality_lead">
+                    <block title="Complaint Portal" name="nhs_complaint_portal_block">
+                        <setting id="nhs_public_form"
+                                 help="Allow patients and relatives to submit complaints via the public web form.">
+                            <field name="complaint_public_form_enabled"/>
+                            <div class="content-group" invisible="not complaint_public_form_enabled">
+                                <div class="mt8">
+                                    <field name="complaint_public_form_token" class="o_light_label"
+                                           placeholder="Security token for portal access"/>
+                                </div>
+                                <div class="mt8">
+                                    <button name="action_generate_public_form_token" type="object" string="Generate Token" class="btn btn-secondary btn-sm me-2"/>
+                                    <button name="action_open_public_form" type="object" string="Go to Public Form" class="btn btn-link btn-sm" icon="oi-arrow-right"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Timescales &amp; Retention" name="nhs_complaint_timescale_block">
+                        <setting id="nhs_default_timescale"
+                                 help="Default response timescale preset applied to new formal complaints.">
+                            <field name="complaint_default_timescale_id"/>
+                        </setting>
+                        <setting id="nhs_anonymise"
+                                 help="Years after closure before automatic anonymisation. Set 0 to disable.">
+                            <field name="complaint_anonymise_after_years"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

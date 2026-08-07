@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report action: Certificate of Completion PDF -->
+    <record id="report_nhs_training_certificate" model="ir.actions.report">
+        <field name="name">Certificate of Completion</field>
+        <field name="model">nhs.training.record</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_training.report_nhs_training_certificate_view</field>
+        <field name="report_file">odoo_nhs_training.report_nhs_training_certificate_view</field>
+        <field name="binding_model_id" ref="model_nhs_training_record"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Certificate - %s' % (object.member_id.name)</field>
+    </record>
+
+    <template id="report_nhs_training_certificate_view">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="record">
+                <div class="page" style="padding: 0;">
+                    <div style="border: 3px solid #005EB8; padding: 6px;">
+                        <div style="border: 1px solid #FFB81C; padding: 40px 56px 32px;
+                                    text-align: center; font-family: Georgia, 'Times New Roman', serif;">
+
+                            <div style="color:#425563; letter-spacing: 3px; font-size: 12px; text-transform: uppercase;">
+                                <t t-out="record.company_id.name"/>
+                            </div>
+
+                            <div style="color:#003087; font-size: 34px; font-weight: bold; letter-spacing: 2px;
+                                        margin-top: 20px;">
+                                CERTIFICATE OF COMPLETION
+                            </div>
+                            <div style="width: 120px; border-top: 2px solid #FFB81C; margin: 18px auto 24px;"/>
+
+                            <t t-if="record.result != 'fail'">
+                                <div style="font-size: 14px; color:#425563;">This is to certify that</div>
+                                <div style="font-size: 28px; font-weight: bold; color:#212B32; margin: 14px 0;">
+                                    <t t-out="record.member_id.name"/>
+                                </div>
+                                <div style="font-size: 14px; color:#425563;">
+                                    has successfully completed the statutory/mandatory training
+                                </div>
+                                <div style="font-size: 22px; font-weight: bold; color:#005EB8; margin: 16px 0;">
+                                    <t t-out="record.subject_id.complete_name"/>
+                                </div>
+
+                                <table style="margin: 24px auto 0; font-size: 13px; color:#212B32;">
+                                    <tr>
+                                        <td style="padding: 4px 18px; text-align: right; color:#425563;">Completion Date</td>
+                                        <td style="padding: 4px 18px; text-align: left; font-weight: bold;">
+                                            <t t-out="record.completion_date"/>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="record.provider">
+                                        <td style="padding: 4px 18px; text-align: right; color:#425563;">Provider</td>
+                                        <td style="padding: 4px 18px; text-align: left; font-weight: bold;">
+                                            <t t-out="record.provider"/>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="record.expiry_date">
+                                        <td style="padding: 4px 18px; text-align: right; color:#425563;">Valid Until</td>
+                                        <td style="padding: 4px 18px; text-align: left; font-weight: bold;">
+                                            <t t-out="record.expiry_date"/>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="not record.expiry_date">
+                                        <td style="padding: 4px 18px; text-align: right; color:#425563;">Validity</td>
+                                        <td style="padding: 4px 18px; text-align: left; font-weight: bold;">
+                                            One-off — no expiry
+                                        </td>
+                                    </tr>
+                                </table>
+                            </t>
+                            <t t-else="">
+                                <div style="font-size: 16px; color:#8B1538; font-weight: bold; margin: 30px 0;">
+                                    This attempt was recorded as Not Passed - no certificate of completion applies.
+                                </div>
+                                <div style="font-size: 13px; color:#425563;">
+                                    <t t-out="record.member_id.name"/> - <t t-out="record.subject_id.complete_name"/>
+                                    - attempted <t t-out="record.completion_date"/>
+                                </div>
+                            </t>
+
+                            <div style="display: flex; justify-content: space-between; width: 100%;
+                                        margin-top: 40px; font-size: 12px; color:#425563;">
+                                <div style="text-align: center;">
+                                    <div style="border-top: 1px solid #D8DDE0; padding-top: 6px; width: 180px;">
+                                        Certificate Reference
+                                    </div>
+                                    <div style="font-weight: bold; color:#212B32;">
+                                        <t t-out="record.certificate_ref or 'Not yet issued'"/>
+                                    </div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="border-top: 1px solid #D8DDE0; padding-top: 6px; width: 180px;">
+                                        Date Issued
+                                    </div>
+                                    <div style="font-weight: bold; color:#212B32;">
+                                        <t t-out="generated_on"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

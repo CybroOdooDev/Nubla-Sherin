@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Views for the nhs.incident register: form/list/kanban/search/pivot/graph/calendar
+         covering the triage → investigation → actions → closure workflow, plus the
+         window actions and domains used to expose them (triage queue, all incidents,
+         my reports). -->
+    <!-- ══ INCIDENT FORM ══════════════════════════════════════════════ -->
+    <record id="view_nhs_incident_form" model="ir.ui.view">
+        <field name="name">nhs.incident.form</field>
+        <field name="model">nhs.incident</field>
+        <field name="arch" type="xml">
+            <form string="Incident">
+                <header>
+                    <!-- One button per state transition; each is hidden except in the state it applies to.
+                         Reporters can read their own incident through every state (see rule_incident_reporter_own)
+                         but have no write access to nhs.incident or the triage/RIDDOR wizards, so these
+                         transition buttons are restricted to Handler/Quality Lead to match those ACLs — otherwise
+                         a reporter watching their own report progress would see a button they can't actually use
+                         and hit an Access Error on click. -->
+                    <button name="action_open_triage_wizard" string="Triage"
+                            type="object" class="btn-primary"
+                            groups="odoo_nhs_incident_risk.group_hc_handler,odoo_nhs_incident_risk.group_hc_quality_lead"
+                            invisible="state != 'new'"/>
+                    <button name="action_start_investigation" string="Start Investigation"
+                            type="object" class="btn-primary"
+                            groups="odoo_nhs_incident_risk.group_hc_handler,odoo_nhs_incident_risk.group_hc_quality_lead"
+                            invisible="state != 'triage'"/>
+                    <button name="action_open_investigation" string="Open Investigation"
+                            type="object" class="btn-primary"
+                            invisible="state != 'investigation' or not investigation_id"/>
+                    <button name="action_advance_to_actions" string="Advance to Actions"
+                            type="object"
+                            groups="odoo_nhs_incident_risk.group_hc_handler,odoo_nhs_incident_risk.group_hc_quality_lead"
+                            invisible="state != 'investigation' or action_count &gt; 0 or investigation_id != False"/>
+                    <button name="action_request_closure" string="Request Closure"
+                            type="object"
+                            groups="odoo_nhs_incident_risk.group_hc_handler,odoo_nhs_incident_risk.group_hc_quality_lead"
+                            invisible="state != 'actions'"/>
+                    <!-- Final sign-off gated to quality leads only -->
+                    <button name="action_close" string="Close Incident"
+                            type="object" class="btn-primary"
+                            groups="odoo_nhs_incident_risk.group_hc_quality_lead"
+                            invisible="state != 'pending_closure'"/>
+                    <!-- Offered only when the heuristic (riddor_hint) suggests this may be RIDDOR-reportable -->
+                    <button name="action_open_riddor_wizard" string="RIDDOR Check"
+                            type="object"
+                            groups="odoo_nhs_incident_risk.group_hc_handler,odoo_nhs_incident_risk.group_hc_quality_lead"
+                            invisible="not riddor_hint or riddor_id"/>
+                    <!-- Only worth promoting to the risk register above a moderate harm grade -->
+                    <button name="action_create_risk" string="Create Risk"
+                            type="object"
+                            groups="odoo_nhs_incident_risk.group_hc_risk_manager"
+                            invisible="state == 'new' or harm_grade not in ['moderate', 'severe', 'death']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="new,triage,investigation,actions,pending_closure,closed"/>
+                </header>
+                <!-- Ribbons -->
+                <div class="alert alert-danger" role="alert"
+                     invisible="not is_never_event">
+                    ⚠ NEVER EVENT — PSII investigation required
+                </div>
+                <!-- Shown only to safeguarding officers, even though the flag field itself may be readable elsewhere -->
+                <div class="alert alert-warning" role="alert"
+                     invisible="not safeguarding_flag"
+                     groups="odoo_nhs_incident_risk.group_hc_safeguarding">
+                    🛡 SAFEGUARDING CONCERN — restricted access applies
+                </div>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_investigation" type="object"
+                                class="oe_stat_button" icon="fa-search"
+                                invisible="not investigation_id">
+                            <field name="investigation_count" widget="statinfo" string="Investigation"/>
+                        </button>
+                        <button name="action_open_persons" type="object"
+                                class="oe_stat_button" icon="fa-users">
+                            <field name="person_count" widget="statinfo" string="Persons"/>
+                        </button>
+                        <button name="action_open_actions" type="object"
+                                class="oe_stat_button" icon="fa-tasks">
+                            <field name="action_count" widget="statinfo" string="Actions"/>
+                        </button>
+                        <button name="action_open_cqc_notifications" type="object"
+                                class="oe_stat_button" icon="fa-bell"
+                                invisible="cqc_count == 0">
+                            <field name="cqc_count" widget="statinfo" string="CQC"/>
+                        </button>
+                        <button name="action_open_risks" type="object"
+                                class="oe_stat_button" icon="fa-exclamation-triangle"
+                                invisible="risk_count == 0">
+                            <field name="risk_count" widget="statinfo" string="Risks"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group string="Identification">
+                            <field name="name" readonly="1"/>
+                            <field name="incident_kind"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="reported_via"/>
+                        </group>
+                        <group string="When &amp; Where">
+                            <field name="occurred_at"/>
+                            <field name="reported_at"/>
+                            <field name="location_id"/>
+                            <field name="location_detail"/>
+                            <field name="category_id"/>
+                        </group>
+                    </group>
+                    <group string="What Happened">
+                        <field name="description" nolabel="1" colspan="2" placeholder="Describe what happened. Do NOT include full names — use initials."/>
+                    </group>
+                    <group string="Immediate Action Taken">
+                        <field name="immediate_action" nolabel="1" colspan="2"/>
+                    </group>
+                    <notebook>
+                        <!-- Always visible: capture reporter details at any stage -->
+                        <page string="Reporter">
+                            <group>
+                                <group>
+                                    <field name="is_anonymous"/>
+                                    <field name="reporter_name" invisible="is_anonymous"/>
+                                    <field name="reporter_email" invisible="is_anonymous"/>
+                                    <field name="reporter_role" invisible="is_anonymous"/>
+                                </group>
+                                <group>
+                                    <field name="feedback_sent"/>
+                                </group>
+                            </group>
+                        </page>
+                        <!-- Always visible: persons are captured from the moment of reporting -->
+                        <page string="Persons Affected">
+                            <field name="person_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="person_type"/>
+                                    <field name="name"/>
+                                    <field name="age_band"/>
+                                    <field name="harm_observed"/>
+                                    <field name="treatment_required"/>
+                                    <field name="injury_description"/>
+                                </list>
+                            </field>
+                        </page>
+                        <!-- Visible from Triage onwards: grading is set during triage -->
+                        <page string="Grading &amp; Response"
+                              invisible="state == 'new'">
+                            <group>
+                                <group>
+                                    <field name="harm_grade"/>
+                                    <field name="physical_harm"/>
+                                    <field name="psychological_harm"/>
+                                </group>
+                                <group>
+                                    <field name="response_level"/>
+                                    <field name="is_never_event"/>
+                                    <field name="lfpse_state"/>
+                                </group>
+                            </group>
+                        </page>
+                        <!-- Visible only once an investigation record exists -->
+                        <page string="Investigation"
+                              invisible="not investigation_id">
+                            <group>
+                                <field name="investigation_id" readonly="1"/>
+                            </group>
+                        </page>
+                        <!-- Visible from Triage onwards: statutory obligations assessed at triage -->
+                        <page string="Statutory"
+                              invisible="state == 'new'">
+                            <group string="Duty of Candour">
+                                <field name="doc_id" readonly="state == 'closed'" context="{'default_incident_id': id}"/>
+                            </group>
+                            <group string="RIDDOR">
+                                <field name="riddor_id" readonly="state == 'closed'" context="{'default_incident_id': id}"/>
+                            </group>
+                            <separator string="CQC Notifications"/>
+                            <field name="cqc_notification_ids" nolabel="1">
+                                <list>
+                                    <field name="notification_type_id"/>
+                                    <field name="statutory_basis"/>
+                                    <field name="state"/>
+                                    <field name="submitted_at"/>
+                                    <field name="cqc_reference"/>
+                                </list>
+                            </field>
+                        </page>
+                        <!-- Visible only when safeguarding flag is raised (role-restricted) -->
+                        <page string="Safeguarding" invisible="not safeguarding_flag"
+                              groups="odoo_nhs_incident_risk.group_hc_safeguarding">
+                            <group>
+                                <field name="safeguarding_flag"/>
+                                <field name="safeguarding_referral_made"/>
+                                <field name="safeguarding_reference"/>
+                            </group>
+                        </page>
+                        <!-- Visible from Actions state onwards: actions are raised post-investigation -->
+                        <page string="Actions"
+                              invisible="state not in ('actions', 'pending_closure', 'closed')">
+                            <field name="action_ids">
+                                <list>
+                                    <field name="reference"/>
+                                    <field name="name"/>
+                                    <field name="action_type"/>
+                                    <field name="owner_id"/>
+                                    <field name="due_date"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                        <!-- Visible from Triage onwards: linking happens after initial triage -->
+                        <page string="Linked Records"
+                              invisible="state == 'new'">
+                            <group>
+                                <field name="duplicate_of_id"/>
+                                <field name="related_incident_ids" widget="many2many_tags"/>
+                                <field name="risk_ids" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ══ INCIDENT LIST ════════════════════════════════════════════ -->
+    <record id="view_nhs_incident_list" model="ir.ui.view">
+        <field name="name">nhs.incident.list</field>
+        <field name="model">nhs.incident</field>
+        <field name="arch" type="xml">
+            <list string="Incidents" decoration-danger="harm_grade in ('severe','death')"
+                  decoration-warning="harm_grade == 'moderate'"
+                  decoration-muted="state in ('closed','rejected','duplicate')">
+                <field name="name"/>
+                <field name="incident_kind"/>
+                <field name="occurred_at"/>
+                <field name="location_id"/>
+                <field name="category_id"/>
+                <field name="harm_grade"/>
+                <field name="response_level"/>
+                <field name="handler_id"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'closed'"
+                       decoration-danger="state in ('rejected','duplicate')"
+                       decoration-warning="state == 'pending_closure'"
+                       decoration-info="state in ('new','triage')"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ══ TRIAGE KANBAN ════════════════════════════════════════════ -->
+    <record id="view_nhs_incident_kanban_triage" model="ir.ui.view">
+        <field name="name">nhs.incident.kanban.triage</field>
+        <field name="model">nhs.incident</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="occurred_at"/>
+                <field name="category_id"/>
+                <field name="harm_grade"/>
+                <field name="location_id"/>
+                <field name="handler_id"/>
+                <field name="state"/>
+                <field name="reported_at"/>
+                <field name="incident_kind"/>
+                <field name="is_never_event"/>
+                <field name="safeguarding_flag"/>
+                <field name="response_level"/>
+                <field name="person_count"/>
+                <field name="action_count"/>
+
+                <templates>
+                    <t t-name="card">
+                        <t t-set="harm" t-value="record.harm_grade.raw_value"/>
+                        <!-- Card left-border colour mirrors the harm grade severity -->
+                        <t t-set="borderCol"
+                           t-value="harm == 'death' or harm == 'severe' ? 'var(--bs-danger)'
+                                    : harm == 'moderate' ? 'var(--bs-warning)'
+                                    : harm == 'no_harm'  ? 'var(--bs-success)'
+                                    : 'var(--bs-info)'"/>
+
+                        <div class="oe_kanban_global_click"
+                             t-attf-style="border-left: 3px solid #{borderCol};">
+
+                            <!-- Reference + Never Event -->
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <strong class="text-primary">
+                                    <field name="name"/>
+                                </strong>
+                                <span t-if="record.is_never_event.raw_value"
+                                      class="badge text-bg-danger ms-1">NE</span>
+                            </div>
+
+                            <!-- Badges -->
+                            <div class="d-flex flex-wrap gap-1 mb-2">
+                                <span t-if="record.incident_kind.raw_value"
+                                      class="badge text-bg-info">
+                                    <field name="incident_kind"/>
+                                </span>
+                                <span t-if="harm"
+                                      t-attf-class="badge #{harm == 'death' or harm == 'severe' ? 'text-bg-danger' : harm == 'moderate' ? 'text-bg-warning' : harm == 'no_harm' ? 'text-bg-success' : 'text-bg-secondary'}">
+                                    <field name="harm_grade"/>
+                                </span>
+                                <span t-if="record.safeguarding_flag.raw_value"
+                                      class="badge text-bg-warning">
+                                    <i class="fa fa-shield me-1"/>Safeguarding
+                                </span>
+                            </div>
+
+                            <!-- Category -->
+                            <div class="text-muted small mb-1">
+                                <i class="fa fa-tag me-1" title="Category" role="img" aria-label="Category"/>
+                                <field name="category_id"/>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="text-muted small mb-1">
+                                <i class="fa fa-map-marker me-1" title="Location" role="img" aria-label="Location"/>
+                                <field name="location_id"/>
+                            </div>
+
+                            <!-- Occurred -->
+                            <div class="text-muted small mb-1">
+                                <i class="fa fa-clock-o me-1" title="Occurred at" role="img" aria-label="Occurred at"/>
+                                <field name="occurred_at" widget="datetime"/>
+                            </div>
+
+                            <!-- PSIRF Response Level -->
+                            <div t-if="record.response_level.raw_value" class="mb-2">
+                                <span class="badge text-bg-light border">
+                                    <i class="fa fa-flag me-1" title="Response level" role="img" aria-label="Response level"/>
+                                    <field name="response_level"/>
+                                </span>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="d-flex justify-content-between align-items-center pt-1 border-top">
+                                <field name="handler_id" widget="many2one_avatar_user"/>
+                                <small class="text-muted">
+                                    <i class="fa fa-calendar me-1" title="Reported at" role="img" aria-label="Reported at"/>
+                                    <field name="reported_at" widget="date"/>
+                                </small>
+                            </div>
+
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ══ SEARCH ═══════════════════════════════════════════════════ -->
+    <record id="view_nhs_incident_search" model="ir.ui.view">
+        <field name="name">nhs.incident.search</field>
+        <field name="model">nhs.incident</field>
+        <field name="arch" type="xml">
+            <search string="Search Incidents">
+                <field name="name" string="Reference"/>
+                <field name="category_id"/>
+                <field name="handler_id"/>
+                <field name="location_id"/>
+                <filter name="my_incidents" string="My Reports"
+                        domain="[('create_uid','=',uid)]"/>
+                <filter name="open" string="Open"
+                        domain="[('state','not in',['closed','rejected','duplicate'])]"/>
+                <filter name="triage_queue" string="Triage Queue"
+                        domain="[('state','in',['new','triage'])]"/>
+                <filter name="never_event" string="Never Events"
+                        domain="[('is_never_event','=',True)]"/>
+                <!-- Only offered to safeguarding officers, matching the form's restricted safeguarding page -->
+                <filter name="safeguarding" string="Safeguarding"
+                        domain="[('safeguarding_flag','=',True)]"
+                        groups="odoo_nhs_incident_risk.group_hc_safeguarding"/>
+                <separator/>
+                <filter name="no_harm" string="No Harm" domain="[('harm_grade','=','no_harm')]"/>
+                <filter name="moderate_plus" string="Moderate+ Harm"
+                        domain="[('harm_grade','in',['moderate','severe','death'])]"/>
+                <group name="group_by">
+                    <filter name="group_state" string="Status" context="{'group_by':'state'}"/>
+                    <filter name="group_category" string="Category" context="{'group_by':'category_id'}"/>
+                    <filter name="group_location" string="Location" context="{'group_by':'location_id'}"/>
+                    <filter name="group_harm" string="Harm Grade" context="{'group_by':'harm_grade'}"/>
+                    <filter name="group_month" string="Month" context="{'group_by':'occurred_at:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ══ PIVOT ════════════════════════════════════════════════════ -->
+    <record id="view_nhs_incident_pivot" model="ir.ui.view">
+        <field name="name">nhs.incident.pivot</field>
+        <field name="model">nhs.incident</field>
+        <field name="arch" type="xml">
+            <pivot string="Incident Analysis">
+                <field name="occurred_at" type="row" interval="month"/>
+                <field name="category_id" type="col"/>
+                <field name="harm_grade" type="row"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- ══ GRAPH ════════════════════════════════════════════════════ -->
+    <record id="view_nhs_incident_graph" model="ir.ui.view">
+        <field name="name">nhs.incident.graph</field>
+        <field name="model">nhs.incident</field>
+        <field name="arch" type="xml">
+            <graph string="Incident Trends" type="bar">
+                <field name="occurred_at" interval="month"/>
+                <field name="harm_grade"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- ══ CALENDAR ═════════════════════════════════════════════════ -->
+    <record id="view_nhs_incident_calendar" model="ir.ui.view">
+        <field name="name">nhs.incident.calendar</field>
+        <field name="model">nhs.incident</field>
+        <field name="arch" type="xml">
+            <calendar string="Incidents" date_start="occurred_at" color="harm_grade">
+                <field name="name"/>
+                <field name="category_id"/>
+                <field name="location_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- ══ ACTIONS ══════════════════════════════════════════════════ -->
+    <!-- (5,0,0) clears the default view list so the triage-specific kanban view is used
+         first, instead of falling back to a generic kanban view -->
+    <record id="action_nhs_incident_triage_queue" model="ir.actions.act_window">
+        <field name="name">Triage Queue</field>
+        <field name="res_model">nhs.incident</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('state','in',['new','triage'])]</field>
+        <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'kanban','view_id':ref('view_nhs_incident_kanban_triage')}),
+            (0,0,{'view_mode':'list','view_id':ref('view_nhs_incident_list')}),
+            (0,0,{'view_mode':'form','view_id':ref('view_nhs_incident_form')})]"/>
+    </record>
+
+    <record id="action_nhs_incident_all" model="ir.actions.act_window">
+        <field name="name">All Incidents</field>
+        <field name="res_model">nhs.incident</field>
+        <field name="view_mode">list,kanban,form,pivot,graph,calendar</field>
+    </record>
+
+    <record id="action_nhs_incident_my" model="ir.actions.act_window">
+        <field name="name">My Reports</field>
+        <field name="res_model">nhs.incident</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('create_uid','=',uid)]</field>
+    </record>
+
+</odoo>

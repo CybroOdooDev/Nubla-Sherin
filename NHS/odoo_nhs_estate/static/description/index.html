@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>NHS Estate Register</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+
+    <style>
+        /* Active tab styling */
+        .nav-pills .nav-link.active {
+            background-color: #005EB8 !important;
+            color: white !important;
+            border-color: #005EB8 !important;
+        }
+
+        /* Tab hover effect */
+        .nav-pills .nav-link:not(.active):hover {
+            background-color: #e9ecef !important;
+            color: #005EB8 !important;
+        }
+
+        /* Feature cards like key highlights */
+        .feature-card {
+            background-color: #8d76d51f;
+            backdrop-filter: blur(20px);
+            border-radius: 10px;
+            padding: 32px;
+            border: 2px solid #71639e1a;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            background-color: #005EB8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-card .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: black;
+            margin-bottom: 12px;
+            letter-spacing: -0.025em;
+        }
+
+        .feature-card .card-description {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 0;
+            line-height: 1.6;
+        }
+
+        /* Tab link styles */
+        .tabs-design1 .nav-pills .nav-link {
+            width: max-content;
+            border-radius: 50px;
+            margin: 0 5px;
+            padding: 12px 24px;
+            font-weight: 500;
+            border: 2px solid #e9ecef;
+            position: relative;
+            text-decoration: none;
+            color: #005EB8;
+            background: white;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tabs-design1 .nav-pills .nav-link.active {
+            background-color: #005EB8 !important;
+            color: white !important;
+            border-color: #005EB8 !important;
+        }
+
+        .tabs-design1 .nav-pills .nav-link:not(.active):hover {
+            background-color: #e9ecef !important;
+            color: #005EB8 !important;
+        }
+
+        /* FAQ details styling */
+        details summary::-webkit-details-marker {
+            display: none !important;
+        }
+        details summary {
+            list-style: none !important;
+            outline: none !important;
+        }
+        details summary:focus {
+            outline: none !important;
+        }
+        details[open] summary.accordion-button::after {
+            transform: rotate(-180deg) !important;
+        }
+    </style>
+</head>
+
+<body style="font-family: &quot;Montserrat&quot;, sans-serif;background-color: #71639e08;">
+
+<!-- ═══ HEADER WITH SUPPORTS BADGE ═══ -->
+<div class="container-fluid cmpad">
+    <div class="supports my-3 py-3"
+         style="border: 2px solid #e9ecef;padding: 0 35px;border-radius: 10px;background-color: white;">
+        <div class="row justify-content-between align-items-center">
+            <div class="col-lg-3">
+                <div class="my-3 mx-auto mx-sm-0" style="width: 250px;">
+                    <img src="//apps.odoocdn.com/apps/assets/17.0/theme_boec/images/Cybrosys.png?fcdde35"
+                         style="width: 100%;">
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="row">
+                    <div class="my-3 d-flex align-items-center justify-content-center justify-content-sm-end">
+                        <span class="me-3"><b>Supports: </b></span>
+                        <div class="text-center"
+                             style="background-color: #005EB8 !important;font-size: 1rem !important;color: #fff !important;font-weight: 500 !important;padding: 8px !important;margin: 0 3px !important;border-radius: 50px !important;min-width: 130px !important;">
+                            Community
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 10px;display: flex;justify-content: end;float: right;">
+                    <div class="d-flex align-items-center justify-content-end flex-wrap gap-2">
+                        <span class="me-3"><b>Availability: </b></span>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-center col"
+                             style="border: 2px solid #ebebeb;font-size: 1rem !important;color: #333 !important;font-weight: 500 !important;padding: 8px !important;margin: 0 3px !important;border-radius: 20px !important;min-width: 150px !important;">
+                            <img src="./assets/icons/close.png" alt="" width="18" height="18">
+                            Odoo Online
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-center col"
+                             style="border: 2px solid #ebebeb;font-size: 1rem !important;color: #333 !important;font-weight: 500 !important;padding: 8px !important;margin: 0 3px !important;border-radius: 20px !important;min-width: 150px !important;">
+                            <img src="./assets/icons/close.png" alt="" width="18" height="18">
+                            Odoo.sh
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-center col"
+                             style="border: 2px solid #ebebeb;font-size: 1rem !important;color: #333 !important;font-weight: 500 !important;padding: 8px !important;margin: 0 3px !important;border-radius: 20px !important;min-width: 150px !important;">
+                            <img src="./assets/icons/tick.png" alt="" width="18" height="18">
+                            On Premise
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ HERO SECTION ═══ -->
+<div class="container-fluid cmpad text-center py-5 py-md-3">
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="mainhead" style="font-size: 2.3rem;padding-top: 1rem;font-weight: 700;color: black;">NHS Estate
+                Register</h3>
+            <p class="para mb-4" style="font-size: 20px;color: #6b7280;">Master register of the NHS physical estate —
+                sites, buildings, floors and functional spaces. Foundation of the NHS Estates &amp; Facilities
+                vertical.</p>
+
+            <div class="d-flex justify-content-center gap-1 flex-wrap">
+                <a href="mailto:"
+                   class="contact-btn email-btn d-flex align-items-center gap-2 justify-content-center"
+                   style="position: relative;padding: 15px 25px;border: none;border-radius: 50px;font-size: 16px;font-weight: 600;text-decoration: none;color: white;cursor: pointer;min-width: 200px;justify-content: center;background-color: #4facfe">
+                    <img src="./assets/icons/mail.png" alt="" width="25" height="25">
+                    <span class="btn-text" style="font-size: 15px;letter-spacing: 0.5px;">Email Us</span>
+                </a>
+                <a href="https://wa.me/918606827707"
+                   class="contact-btn whatsapp-btn d-flex align-items-center gap-2 justify-content-center"
+                   style="position: relative;padding: 15px 25px;border: none;border-radius: 50px;font-size: 16px;font-weight: 600;text-decoration: none;color: white;cursor: pointer;min-width: 200px;justify-content: center;background-color: #25d366;">
+                    <img src="./assets/icons/whatsapp.png" alt="" width="25" height="25">
+                    <span class="btn-text" style="font-size: 15px;letter-spacing: 0.5px;">+91 86068 27707</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ KEY HIGHLIGHTS ═══ -->
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="highlights-section">
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Key
+            <span>Highlights</span></h2>
+        <div class="row" style="margin-top: 20px;">
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Estate Hierarchy</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Complete site →
+                        building → floor → space hierarchy with breadcrumbs, roll-ups, and smart navigation.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Six Facet Condition Survey</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">A–D grading across
+                        Physical, Statutory, Functional, Utilisation, Quality &amp; Energy facets.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Backlog Maintenance</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Track backlog by risk
+                        category (High/Significant/Moderate/Low) with cost estimates and ERIC-ready reporting.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Tenure &amp; Lease Management</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Manage Freehold,
+                        Leasehold, PFI, LIFT, NHSPS, CHP &amp; Licence tenures with lease expiry dashboard.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Area Roll-ups &amp; Analysis</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Automatic GIA roll-up
+                        (space→floor→building→site) with clinical/non-clinical and occupied/vacant split.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Dashboards &amp; Reports</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Estate summary,
+                        condition profile, backlog by risk, lease expiries, and Building Passport PDF reports.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ TABS: SCREENSHOTS, FEATURES, FAQ, LATEST RELEASE ═══ -->
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="tabs-design1">
+        <ul class="nav nav-pills justify-content-start justify-content-md-center pb-4"
+            style="flex-flow: nowrap;overflow: hidden;overflow-x: auto;" id="pills1" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="screenshot-tab" data-bs-toggle="pill" data-bs-target="#screenshot"
+                   role="tab" aria-controls="screenshot" aria-selected="true" href="#screenshot">
+                    Screenshot
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="features-tab" data-bs-toggle="pill" data-bs-target="#features"
+                   role="tab" aria-controls="features" aria-selected="false" href="#features">
+                    Features
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="faq-tab" data-bs-toggle="pill" data-bs-target="#faq"
+                   role="tab" aria-controls="faq" aria-selected="false" href="#faq">
+                    Frequent Questions
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="latest-release-tab" data-bs-toggle="pill" data-bs-target="#latest-release"
+                   role="tab" aria-controls="latest-release" aria-selected="false" href="#latest-release">
+                    Latest Release
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content bg-white rounded-4" style="border: 2px solid #e9ecef;border-radius: 10px;"
+             id="pills1Content">
+
+            <!-- ═══ SCREENSHOT TAB (ACTIVE BY DEFAULT) ═══ -->
+            <div class="tab-pane fade show active" id="screenshot" role="tabpanel" aria-labelledby="screenshot-tab">
+                <div class="p-3 py-md-5">
+
+                    <h2 class="mainhead text-center mb-2" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Manage <span>User Access</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Configure user roles - Estate User , Estate Officer and Estate Manager , from the Users settings
+                        page.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/user_setting.png" alt="User Access"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <h2 class="mainhead text-center mb-2" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Condition Survey <span>Roll-up Rule </span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Configure the method to compute the overall grade for the condition survey.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/estate_settings.png" alt="Configuration Settings"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <h2 class="mainhead text-center mb-2" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Estate <span>Dashboard</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Comprehensive estate overview with estate details containing site count, building count, total
+                        GIA, total
+                        backlog, and
+                        condition survey grade dstribution at a glance.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/d1.png" alt="Estate Dashboard"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/d2.png" alt="Estate Dashboard"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/d3.png" alt="Estate Dashboard"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Site <span>Management</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Create and manage sites with address, land area, operational status, and smart buttons showing
+                        building count, total GIA, and backlog.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/site1.png" alt="Site Form"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/site2.png" alt="Site Form"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/site3.png" alt="Site Form"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Site <span>Hierarchical View</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Complete site hierarchy view with its buildings,floors and spaces.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/hierarchy_view.png" alt="Site hierarchy"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Building <span>Record</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Full building details including areas, tenure, construction year, operational status, and latest
+                        condition grade displayed as a colour chip.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/build1.png" alt="Building Form"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/build2.png" alt="Building Form"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/build3.png" alt="Building Form"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/build4.png" alt="Building Form"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/build5.png" alt="Building Form"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Floor <span>Record</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Full floor details including areas, floor level, predominant function , spaces and floor plan.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/floor.png" alt="Floor Form"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Functional <span>Space Management</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Manage spaces with function, area, capacity, department, utilisation status, and
+                        clinical/non-clinical classification.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/space.png" alt="Space Form"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Six Facet <span>Condition Survey</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Record A–D grades across all six facets: Physical, Statutory, Functional, Utilisation, Quality,
+                        and Energy. Overall grade auto-calculated.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/survey.png" alt="Condition Survey"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Backlog <span>Maintenance</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Manage backlog items by risk category (High/Significant/Moderate/Low) with cost estimates,
+                        status tracking, and roll-up to building and site totals.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/backlog.png" alt="Backlog" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Tenure &amp; <span>Lease Management</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Track tenures including Freehold, Leasehold, PFI, LIFT, NHSPS, CHP, and Licence. Monitor lease
+                        expiries with automated reminders.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/tenure_record.png" alt="Tenure"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Area <span>Analysis Dashboard</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Visualise clinical vs non-clinical area split and occupied vs vacant area analysis with progress
+                        bars and colour-coded metrics.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/area_analyse.png" alt="Area Analysis"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Estate <span>/ Site PDF</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Generate comprehensive Estate / Site PDF reports with key facts, areas, buildings , six-facet
+                        condition grades, and backlog summary.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/site_pdf.png" alt="Estate / Site PDF"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Building <span>Passport PDF</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Generate comprehensive Building Passport PDF reports with key facts, areas, tenure, six-facet
+                        condition grades, and backlog summary.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/building_passport.png" alt="Building Passport"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Function <span>Taxonomy</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Editable ERIC-aligned function taxonomy with clinical/non-clinical classification supporting
+                        two-level hierarchy.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/funct.png" alt="Function Taxonomy"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ═══ FEATURES TAB (Styled like Key Highlights) ═══ -->
+            <div class="tab-pane fade" id="features" role="tabpanel" aria-labelledby="features-tab">
+                <div class="p-3 py-md-5">
+                    <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">Our
+                        <span>Features</span></h2>
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">Site → Building → Floor → Space Hierarchy</h3>
+                                <p class="card-description">Complete hierarchical structure with breadcrumb navigation
+                                    and smart roll-ups.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">Six Facet Condition Survey (A–D)</h3>
+                                <p class="card-description">Comprehensive assessment across Physical, Statutory,
+                                    Functional, Utilisation, Quality &amp; Energy.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">Backlog by Risk Category</h3>
+                                <p class="card-description">Track backlog with High/Significant/Moderate/Low risk
+                                    categories with cost estimates.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">Tenure &amp; Lease Management</h3>
+                                <p class="card-description">Manage Freehold, Leasehold, PFI, LIFT, NHSPS, CHP &amp;
+                                    Licence tenures with expiry tracking.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">GIA Roll-up &amp; Area Analysis</h3>
+                                <p class="card-description">Automatic GIA roll-up with clinical/non-clinical and
+                                    occupied/vacant split.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">Building Passport PDF Report</h3>
+                                <p class="card-description">Comprehensive PDF reports with key facts, areas, tenure,
+                                    condition grades, and backlog.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">Function Taxonomy (ERIC-aligned)</h3>
+                                <p class="card-description">Editable ERIC-aligned function taxonomy with
+                                    clinical/non-clinical classification.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">Clinical vs Non-Clinical Analysis</h3>
+                                <p class="card-description">Visualise clinical vs non-clinical area split with progress
+                                    bars and metrics.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">XLSX Import Templates</h3>
+                                <p class="card-description">Bulk import sites, buildings, floors, and spaces with
+                                    validation.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ FAQ TAB ═══ -->
+            <div class="tab-pane fade" id="faq" role="tabpanel" aria-labelledby="faq-tab">
+                <div class="p-3 py-md-5">
+
+                    <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Frequently Asked <span>Questions</span></h2>
+
+                    <div class="modern-accordion">
+                        <div class="accordion accordion-flush" id="accordionFlushExample">
+                            <details class="accordion-item loading-animation"
+                                     style="margin-bottom: 1rem;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                <summary class="accordion-button collapsed"
+                                         style="box-shadow: unset; border: none !important; padding: 1.5rem 2rem !important; font-weight: 600 !important; font-size: 1.1rem; color: #71639e !important; background-color: #e3e3f3a9 !important; position: relative; overflow: hidden; border-radius: 10px !important; cursor: pointer;"
+                                         aria-expanded="false">
+                                     What is backlog maintenance, and how is it recorded in this module?
+                                </summary>
+                                <div style="border-top: 1px solid #e2e8f0;">
+                                    <div class="accordion-body"
+                                         style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                        <p style="color: #374151; font-size: 0.95rem; margin-top: 10px;">
+                                            Backlog maintenance refers to the estimated cost of bringing
+                                            buildings and spaces up to an acceptable standard. It represents the work
+                                            that needs to
+                                            be done but hasn't been completed yet.
+                                        </p>
+                                        <p style="color: #374151; font-size: 0.95rem;">
+                                            In this module, you can record backlog items against any building or space
+                                            with:
+                                        </p>
+                                        <ul style="color: #374151; font-size: 0.95rem; padding-left: 20px;">
+                                            <li><strong>Cost estimate</strong> – The expected rectification cost</li>
+                                            <li><strong>Risk category</strong> – High / Significant / Moderate / Low
+                                                (the exact
+                                                categories required for ERIC reporting)
+                                            </li>
+                                            <li><strong>Element type</strong> – Roof, structure, fabric, mechanical,
+                                                electrical,
+                                                fire, external, or other
+                                            </li>
+                                            <li><strong>Target year</strong> – When you plan to fix it</li>
+                                            <li><strong>Status</strong> – Identified → Planned → In Progress → Resolved
+                                            </li>
+                                        </ul>
+                                        <p style="color: #374151; font-size: 0.95rem;">
+                                            The module automatically <strong>rolls up</strong> backlog costs to the
+                                            building and
+                                            site levels, giving you instant visibility of total liabilities.
+                                        </p>
+                                    </div>
+                                </div>
+                            </details>
+
+                            <details class="accordion-item loading-animation"
+                                     style="margin-bottom: 1rem;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                <summary class="accordion-button collapsed"
+                                         style="box-shadow: unset; border: none !important; padding: 1.5rem 2rem !important; font-weight: 600 !important; font-size: 1.1rem; color: #71639e !important; background-color: #e3e3f3a9 !important; position: relative; overflow: hidden; border-radius: 10px !important; cursor: pointer;"
+                                         aria-expanded="false">
+                                     How does the condition survey workflow work?
+                                </summary>
+                                <div style="border-top: 1px solid #e2e8f0;">
+                                    <div class="accordion-body"
+                                         style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                        <p style="color: #374151; font-size: 0.95rem; margin-top: 10px;">
+                                            The condition survey workflow follows the NHS Six Facet
+                                            methodology:
+                                        </p>
+                                        <p style="color: #374151; font-size: 0.95rem;">
+                                            <strong>Step 1:</strong> A surveyor assesses a building or space and scores
+                                            each of the
+                                            six facets on the A–D scale:
+                                        </p>
+                                        <div style="overflow-x: auto; margin: 10px 0;">
+                                            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                                                <tr style="background: #e9ecef;">
+                                                    <th style="padding: 8px 12px; border: 1px solid #dee2e6; text-align: left;">
+                                                        Grade
+                                                    </th>
+                                                    <th style="padding: 8px 12px; border: 1px solid #dee2e6; text-align: left;">
+                                                        Meaning
+                                                    </th>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 8px 12px; border: 1px solid #dee2e6;">
+                                                        <strong>A</strong>
+                                                    </td>
+                                                    <td style="padding: 8px 12px; border: 1px solid #dee2e6;">As new /
+                                                        excellent
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 8px 12px; border: 1px solid #dee2e6;">
+                                                        <strong>B</strong>
+                                                    </td>
+                                                    <td style="padding: 8px 12px; border: 1px solid #dee2e6;">Sound /
+                                                        operationally
+                                                        safe
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 8px 12px; border: 1px solid #dee2e6;">
+                                                        <strong>C</strong>
+                                                    </td>
+                                                    <td style="padding: 8px 12px; border: 1px solid #dee2e6;">
+                                                        Operational but needs
+                                                        major repair soon
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 8px 12px; border: 1px solid #dee2e6;">
+                                                        <strong>D</strong>
+                                                    </td>
+                                                    <td style="padding: 8px 12px; border: 1px solid #dee2e6;">
+                                                        Unacceptable / serious
+                                                        risk
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <p style="color: #374151; font-size: 0.95rem;">
+                                            <strong>Step 2:</strong> The six facets scored are: Physical condition,
+                                            Statutory
+                                            compliance, Functional suitability, Space utilisation, Quality/environment,
+                                            and Energy
+                                            performance.
+                                        </p>
+                                        <p style="color: #374151; font-size: 0.95rem;">
+                                            <strong>Step 3:</strong> The module automatically calculates the <strong>overall
+                                            grade</strong> (default: worst-of-all-facets) and updates the building's
+                                            latest
+                                            condition grade.
+                                        </p>
+                                        <p style="color: #374151; font-size: 0.95rem;">
+                                            <strong>Step 4:</strong> The survey history is preserved, allowing you to
+                                            track
+                                            condition trends over time and plan investment accordingly.
+                                        </p>
+                                    </div>
+                                </div>
+                            </details>
+
+                            <details class="accordion-item loading-animation"
+                                     style="margin-bottom: 0;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                <summary class="accordion-button collapsed"
+                                         style="box-shadow: unset; border: none !important; padding: 1.5rem 2rem !important; font-weight: 600 !important; font-size: 1.1rem; color: #71639e !important; background-color: #e3e3f3a9 !important; position: relative; overflow: hidden; border-radius: 10px !important; cursor: pointer;"
+                                         aria-expanded="false">
+                                     How do areas and measurements roll up through the hierarchy?
+                                </summary>
+                                <div style="border-top: 1px solid #e2e8f0;">
+                                    <div class="accordion-body"
+                                         style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                        <p style="color: #374151; font-size: 0.95rem; margin-top: 10px;">
+                                            The module uses a <strong>bottom-up roll-up</strong> system for
+                                            area measurements:
+                                        </p>
+                                        <div style="background: #ffffff; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #dee2e6;">
+                                            <p style="color: #374151; font-size: 0.95rem; margin: 0;">
+                                                <strong>The flow:</strong><br>
+                                                <span style="display: inline-block; background: #005eb8; color: white; padding: 4px 12px; border-radius: 20px; margin: 4px 0;">Space</span>
+                                                <span style="color: #005eb8; font-size: 1.2rem;"> → </span>
+                                                <span style="display: inline-block; background: #005eb8; color: white; padding: 4px 12px; border-radius: 20px; margin: 4px 0;">Floor</span>
+                                                <span style="color: #005eb8; font-size: 1.2rem;"> → </span>
+                                                <span style="display: inline-block; background: #005eb8; color: white; padding: 4px 12px; border-radius: 20px; margin: 4px 0;">Building</span>
+                                                <span style="color: #005eb8; font-size: 1.2rem;"> → </span>
+                                                <span style="display: inline-block; background: #005eb8; color: white; padding: 4px 12px; border-radius: 20px; margin: 4px 0;">Site</span>
+                                            </p>
+                                        </div>
+                                        <p style="color: #374151; font-size: 0.95rem;">
+                                            <strong>Example:</strong> If you have a building with three floors, each
+                                            with 500m² of
+                                            space, the building total GIA is 1,500m², and the site total GIA is the sum
+                                            of all its
+                                            buildings.
+                                        </p>
+                                        <p style="color: #374151; font-size: 0.95rem;">
+                                            <strong>Other measurements tracked:</strong>
+                                        </p>
+                                        <ul style="color: #374151; font-size: 0.95rem; padding-left: 20px;">
+                                            <li><strong>NIA</strong> (Net Internal Area) – Usable area excluding
+                                                circulation and
+                                                plant
+                                            </li>
+                                            <li><strong>Land area</strong> – In hectares at the site level</li>
+                                            <li><strong>Clinical vs non-clinical split</strong> – Automatically derived
+                                                from space
+                                                functions
+                                            </li>
+                                        </ul>
+                                        <p style="color: #374151; font-size: 0.95rem;">
+                                            All areas are stored in m² (land in hectares), with no unit mixing.
+                                        </p>
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ LATEST RELEASE TAB  ═══ -->
+            <div class="tab-pane fade" id="latest-release" role="tabpanel" aria-labelledby="latest-release-tab">
+                <div class="p-3 py-md-5 text-center">
+                    <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">Latest
+                        <span>Releases</span></h2>
+                    <div class="text-center py-5" style="color: #6b7280;">
+                        <div class="col-md-4 mb-4">
+                            <div class="release-item h-100"
+                                 style="position: relative;padding: 30px;border: 2px solid #71639e24;border-radius: 15px;">
+                                <div class="release-header d-flex align-items-center flex-wrap gap-3"
+                                     style="margin-bottom: 0.75rem;">
+                                    <div class="version"
+                                         style="font-size: 1.25rem;font-weight: 700;color: #1a202c;">Latest Release
+                                        19.0.1.0.0
+                                    </div>
+                                    <div style="padding: 0.25rem 0.75rem;border-radius: 20px;font-size: 0.75rem;font-weight: 600;text-transform: uppercase;letter-spacing: 0.5px;background-color: #9ae6b4;color: #2d7d32;border: 2px solid #68d391;"
+                                         class="add">Add
+                                    </div>
+                                    <div class="date"
+                                         style="color: #64748b;font-size: 0.875rem;font-weight: 500;gap: 0.5rem;">
+                                        <img src="./assets/icons/calendar.png" alt="" width="16" height="16"
+                                             style="margin-right: 5px;">
+                                        15th July, 2026
+                                    </div>
+                                </div>
+                                <div class="feature-list">
+                                    <div class="feature-item p-3"
+                                         style="border-radius: 5px;display: flex;align-items: center;padding: 25px;background-color: #f5f5f5e7;border-radius: 10px;text-align: left;">
+                                        <div class="feature-text"
+                                             style="color: #6b7280;line-height: 1.6;font-size: 0.95rem;">Initial Commit
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="highlights-section">
+
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Related
+            <span>Modules</span>
+        </h2>
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/base_accounting_kit"
+                   style="text-decoration: none;">
+                    <div class="highlight-card h-100 p-4" style="background-color: white;
+                       backdrop-filter: blur(20px);
+                       border-radius: 10px;
+                       padding: 32px;
+                       border: 2px solid #71639e1a;
+                       position: relative;
+                       overflow: hidden;">
+
+
+                        <div class="card-image" style="    border: 2px solid #71639e1c;
+                       margin-bottom: 1rem;
+                       border-radius: 10px;
+                       overflow: hidden;">
+                            <img src="./assets/modules/module1.gif" alt=""
+                                 style="width: 100%;border-radius: 10px;">
+                        </div>
+
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo 19 Full Accounting Kit for Community</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/hide_menu_user"
+                   style="text-decoration: none;">
+                    <div class="highlight-card h-100 p-4" style="background-color: white;
+                       backdrop-filter: blur(20px);
+                       border-radius: 10px;
+                       padding: 32px;
+                       border: 2px solid #71639e1a;
+                       position: relative;
+                       overflow: hidden;">
+
+
+                        <div class="card-image" style="    border: 2px solid #71639e1c;
+                       margin-bottom: 1rem;
+                       border-radius: 10px;
+                       overflow: hidden;">
+                            <img src="./assets/modules/module2.jpg" alt=""
+                                 style="width: 100%;border-radius: 10px;">
+                        </div>
+
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Hide Any Menu User Wise</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/base_account_budget"
+                   style="text-decoration: none;">
+                    <div class="highlight-card h-100 p-4" style="background-color: white;
+                       backdrop-filter: blur(20px);
+                       border-radius: 10px;
+                       padding: 32px;
+                       border: 2px solid #71639e1a;
+                       position: relative;
+                       overflow: hidden;">
+
+                        <div class="card-image" style="    border: 2px solid #71639e1c;
+                           margin-bottom: 1rem;
+                           border-radius: 10px;
+                           overflow: hidden;">
+                            <img src="./assets/modules/module3.jpg" alt=""
+                                 style="width: 100%;border-radius: 10px;">
+                        </div>
+
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo 19 Budget Management</h3>
+
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ═══ OUR SERVICES ═══ -->
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="highlights-section">
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Our
+            <span>Services</span></h2>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/setting.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Customization</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/imple.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Implementation</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/support.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Support</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/transfer.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Migration</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/idea.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Integration</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chat.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Consultancy</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Licensing</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/people.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Hire Odoo
+                        Developer</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Manual tab initialization for Bootstrap 5
+    document.addEventListener('DOMContentLoaded', function () {
+        var tabLinks = document.querySelectorAll('#pills1 .nav-link');
+
+        tabLinks.forEach(function (link) {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                // Remove active class from all tabs
+                tabLinks.forEach(function (l) {
+                    l.classList.remove('active');
+                    l.setAttribute('aria-selected', 'false');
+                });
+
+                // Add active class to clicked tab
+                this.classList.add('active');
+                this.setAttribute('aria-selected', 'true');
+
+                // Get target pane ID
+                var targetId = this.getAttribute('data-bs-target');
+                var targetPane = document.querySelector(targetId);
+
+                // Hide all tab panes
+                var allPanes = document.querySelectorAll('#pills1Content .tab-pane');
+                allPanes.forEach(function (pane) {
+                    pane.classList.remove('show', 'active');
+                });
+
+                // Show the target pane
+                if (targetPane) {
+                    targetPane.classList.add('show', 'active');
+                }
+            });
+        });
+    });
+</script>
+
+</html>

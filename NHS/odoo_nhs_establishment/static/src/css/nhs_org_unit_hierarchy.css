@@ -1,0 +1,15 @@
+/* The core web_hierarchy widget gives .o_hierarchy_node_header/.o_hierarchy_node_body a
+   fixed height, sized for the default (short) card content. Our Org Structure card shows
+   more lines (unit type, vacancy, manager, posts/FTE, vacant FTE), so the fixed height
+   clips content and makes it overlap the Unfold/Fold button below. Scope the override to
+   our own .o_hierarchy_node_card wrapper so other hierarchy views (e.g. HR org chart)
+   keep their original fixed sizing. */
+.o_hierarchy_node_container .o_hierarchy_node .o_hierarchy_node_card .o_hierarchy_node_header {
+    height: auto;
+    min-height: 30px;
+}
+
+.o_hierarchy_node_container .o_hierarchy_node .o_hierarchy_node_card .o_hierarchy_node_body {
+    height: auto;
+    min-height: 65px;
+}

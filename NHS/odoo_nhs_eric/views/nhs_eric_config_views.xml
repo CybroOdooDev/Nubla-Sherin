@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Configuration Settings View -->
+    <record id="view_res_config_settings_nhs_eric" model="ir.ui.view">
+        <field name="name">res.config.settings.nhs</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="ERIC Return" name="odoo_nhs_eric"
+                     groups="odoo_nhs_eric.group_nhs_eric_manager">
+                    <block title="ERIC Return Configuration">
+                        <setting string="Validation Policy" help="Determines whether validation errors block
+                        finalisation (Block) or just show warnings (Warn)">
+                            <field name="eric_validation_policy"/>
+                        </setting>
+                        <setting string="Auto-Populate on Create" help="Whether to automatically run the populate
+                         action when a new return is created.">
+                            <field name="eric_auto_populate_on_create"/>
+                        </setting>
+                        <setting string="Auto-Carry Forward Manual Items" help="Whether to automatically carry forward
+                        manual items from the prior year when creating a new return.">
+                            <field name="eric_carry_forward_manual"/>
+                        </setting>
+                        <setting string="Default Anomaly Threshold"
+                                 help="The default anomaly threshold percentage set while validating the values.">
+                            <field name="anomaly_threshold_pct"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Setting Action -->
+    <record id="action_nhs_eric_config_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_res_config_settings_nhs_eric"/>
+        <field name="target">current</field>
+        <field name="context">{'module': 'odoo_nhs_eric'}</field>
+    </record>
+
+</odoo>

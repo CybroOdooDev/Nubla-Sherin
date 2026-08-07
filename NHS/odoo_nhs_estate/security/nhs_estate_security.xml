@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="module_category_nhs_estate" model="ir.module.category">
+            <field name="name">NHS Estate Register</field>
+            <field name="description">Access levels for NHS Estate Register.</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="privilege_nhs_estate_level" model="res.groups.privilege">
+            <field name="name">NHS Estate Access Level</field>
+            <field name="category_id" ref="module_category_nhs_estate"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- Groups -->
+        <record id="group_nhs_estate_user" model="res.groups">
+            <field name="name">Estates User</field>
+            <field name="privilege_id" ref="privilege_nhs_estate_level"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="group_nhs_estate_officer" model="res.groups">
+            <field name="name">Estates Officer</field>
+            <field name="privilege_id" ref="privilege_nhs_estate_level"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_estate_user'))]"/>
+        </record>
+
+        <record id="group_nhs_estate_manager" model="res.groups">
+            <field name="name">Estates Manager</field>
+            <field name="privilege_id" ref="privilege_nhs_estate_level"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_estate_officer'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- Record Rules -->
+        <record id="rule_nhs_estate_company" model="ir.rule">
+            <field name="name">Company Rule</field>
+            <field name="model_id" ref="model_nhs_estate_site"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="rule_nhs_estate_building_company" model="ir.rule">
+            <field name="name">Company Rule - Building</field>
+            <field name="model_id" ref="model_nhs_estate_building"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="rule_nhs_estate_floor_company" model="ir.rule">
+            <field name="name">Company Rule - Floor</field>
+            <field name="model_id" ref="model_nhs_estate_floor"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="rule_nhs_estate_space_company" model="ir.rule">
+            <field name="name">Company Rule - Space</field>
+            <field name="model_id" ref="model_nhs_estate_space"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="rule_nhs_estate_tenure_company" model="ir.rule">
+            <field name="name">Company Rule - Tenure</field>
+            <field name="model_id" ref="model_nhs_estate_tenure"/>
+            <field name="domain_force">[('building_id.company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="rule_nhs_estate_condition_company" model="ir.rule">
+            <field name="name">Company Rule - Condition</field>
+            <field name="model_id" ref="model_nhs_estate_condition"/>
+            <field name="domain_force">[('building_id.company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="rule_nhs_estate_backlog_company" model="ir.rule">
+            <field name="name">Company Rule - Backlog</field>
+            <field name="model_id" ref="model_nhs_estate_backlog"/>
+            <field name="domain_force">[('building_id.company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+    </data>
+</odoo>

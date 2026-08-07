@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Admin action: sync nhs.location mirror records for all Trust Sites
+        and Trust Departments that don't yet have one.  Run this once after
+        upgrading the bridge module (or after importing Trust Sites/Departments
+        in bulk) to make them appear in the Incident Location picker.
+    -->
+    <record id="action_sync_trust_locations" model="ir.actions.server">
+        <field name="name">Sync Locations from Trust Sites &amp; Departments</field>
+        <field name="model_id" ref="odoo_nhs_incident_risk.model_nhs_location"/>
+        <field name="state">code</field>
+        <field name="code">
+# Create nhs.location mirrors for any Trust Sites without one
+sites = env['nhs.trust.site'].search([('location_id', '=', False)])
+for site in sites:
+    loc = env['nhs.location'].create({
+        'name': site.name,
+        'location_type': 'site',
+        'trust_id': site.trust_id.id,
+        'ods_site_code': site.code or False,
+        'trust_site_id': site.id,
+    })
+    site.with_context(no_location_sync=True).write({'location_id': loc.id})
+
+# Create nhs.location mirrors for any Trust Departments without one
+departments = env['nhs.trust.department'].search([('location_id', '=', False)])
+for dept in departments:
+    parent_loc = dept.site_id.location_id if dept.site_id else False
+    loc = env['nhs.location'].create({
+        'name': dept.name,
+        'location_type': 'unit',
+        'trust_id': dept.trust_id.id,
+        'parent_id': parent_loc.id if parent_loc else False,
+        'trust_department_id': dept.id,
+    })
+    dept.with_context(no_location_sync=True).write({'location_id': loc.id})
+
+site_count = len(sites)
+dept_count = len(departments)
+if site_count + dept_count > 0:
+    msg = f'Sync complete: {site_count} site(s) and {dept_count} department(s) linked to Incident locations.'
+else:
+    msg = 'Nothing to sync — all Trust Sites and Departments already have linked locations.'
+
+action = {
+    'type': 'ir.actions.client',
+    'tag': 'display_notification',
+    'params': {
+        'title': 'Trust Location Sync',
+        'message': msg,
+        'type': 'success',
+        'sticky': True,
+    },
+}
+        </field>
+        <field name="binding_model_id" ref="odoo_nhs_incident_risk.model_nhs_location"/>
+    </record>
+
+    <menuitem
+        id="menu_nhs_config_sync_trust_locations"
+        name="Sync Trust Locations"
+        parent="odoo_nhs_incident_risk.menu_nhs_config"
+        action="action_sync_trust_locations"
+        sequence="50"
+        groups="odoo_nhs_incident_risk.group_hc_quality_lead,odoo_nhs_trust_management.group_nhs_trust_admin"/>
+
+</odoo>

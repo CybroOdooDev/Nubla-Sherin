@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Extends the NHS Trust Site form (odoo_nhs_trust_operations) to show
+        the auto-created nhs.location mirror and a direct link to open it.
+    -->
+    <record id="view_nhs_trust_site_form_bridge" model="ir.ui.view">
+        <field name="name">nhs.trust.site.form.bridge</field>
+        <field name="model">nhs.trust.site</field>
+        <field name="inherit_id" ref="odoo_nhs_trust_operations.nhs_trust_site_view_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//sheet/notebook" position="before">
+                <group string="Incident &amp; Risk Location" invisible="not location_id">
+                    <field name="location_id" readonly="1"
+                           options="{'no_create': True, 'no_open': False}"
+                           help="Auto-created location record used in Incident &amp; Risk Management reporting."/>
+                </group>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

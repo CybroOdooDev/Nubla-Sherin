@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Condition Survey List View -->
+    <record id="view_nhs_estate_condition_list" model="ir.ui.view">
+        <field name="name">nhs.estate.condition.list</field>
+        <field name="model">nhs.estate.condition</field>
+        <field name="arch" type="xml">
+            <list string="Condition Surveys" decoration-danger="overall_grade=='D'"
+                  decoration-warning="overall_grade=='C'"
+                  decoration-success="overall_grade=='A'">
+                <field name="name"/>
+                <field name="building_id"/>
+                <field name="space_id" optional="hide"/>
+                <field name="survey_date"/>
+                <field name="surveyor_id"/>
+                <field name="facet_physical"/>
+                <field name="facet_statutory"/>
+                <field name="facet_functional"/>
+                <field name="facet_utilisation"/>
+                <field name="facet_quality"/>
+                <field name="facet_energy"/>
+                <field name="overall_grade" widget="badge"/>
+                <field name="next_survey_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Condition Survey Form View -->
+    <record id="view_nhs_estate_condition_form" model="ir.ui.view">
+        <field name="name">nhs.estate.condition.form</field>
+        <field name="model">nhs.estate.condition</field>
+        <field name="arch" type="xml">
+            <form string="Condition Survey">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_buildings" type="object"
+                                class="oe_stat_button" icon="fa-building">
+                            <span class="o_stat_text">Building</span>
+                        </button>
+                        <button name="action_view_documents" type="object"
+                                class="oe_stat_button" icon="fa-file">
+                            <span class="o_stat_text">Documents</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Survey Reference..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="building_id" placeholder="Building..."/>
+                            <field name="space_id" placeholder="Space..."/>
+                            <field name="survey_date"/>
+                            <field name="surveyor_id"/>
+                        </group>
+                        <group>
+                            <field name="next_survey_date"/>
+                            <field name="overall_grade" widget="badge"/>
+                        </group>
+                    </group>
+                    <group string="Six Facet Grades">
+                        <group>
+                            <field name="facet_physical"/>
+                            <field name="facet_statutory"/>
+                            <field name="facet_functional"/>
+                        </group>
+                        <group>
+                            <field name="facet_utilisation"/>
+                            <field name="facet_quality"/>
+                            <field name="facet_energy"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Documents">
+                            <group>
+                                <field name="attachment_ids" widget="many2many_binary" help="Photo Evidence"/>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Condition Survey Pivot View -->
+    <record id="view_nhs_estate_condition_pivot" model="ir.ui.view">
+        <field name="name">nhs.estate.condition.pivot</field>
+        <field name="model">nhs.estate.condition</field>
+        <field name="arch" type="xml">
+            <pivot string="Condition Survey Analysis">
+                <field name="building_id" type="row"/>
+                <field name="overall_grade" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Condition Survey Search View -->
+    <record id="view_nhs_estate_condition_search" model="ir.ui.view">
+        <field name="name">nhs.estate.condition.search</field>
+        <field name="model">nhs.estate.condition</field>
+        <field name="arch" type="xml">
+            <search string="Search Surveys">
+                <field name="name" string="Survey Reference"/>
+                <field name="building_id" string="Building"/>
+                <field name="space_id" string="Space"/>
+                <field name="overall_grade"/>
+                <filter name="grade_a" string="Grade A (Excellent)"
+                        domain="[('overall_grade', '=', 'A')]"/>
+                <filter name="grade_b" string="Grade B (Good)"
+                        domain="[('overall_grade', '=', 'B')]"/>
+                <filter name="grade_c" string="Grade C (Fair)"
+                        domain="[('overall_grade', '=', 'C')]"/>
+                <filter name="grade_d" string="Grade D (Poor)"
+                        domain="[('overall_grade', '=', 'D')]"/>
+                <filter name="group_building" string="Building"
+                        context="{'group_by': 'building_id'}"/>
+                <filter name="group_grade" string="Overall Grade"
+                        context="{'group_by': 'overall_grade'}"/>
+                <filter name="group_survey_date" string="Survey Date"
+                        context="{'group_by': 'survey_date'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Condition Survey Action -->
+    <record id="action_nhs_estate_condition" model="ir.actions.act_window">
+        <field name="name">Condition Surveys</field>
+        <field name="res_model">nhs.estate.condition</field>
+        <field name="view_mode">list,form,pivot</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first condition survey
+            </p>
+            <p>
+                Record Six Facet condition surveys for buildings and spaces.
+                Track condition grades across all facets.
+            </p>
+        </field>
+    </record>
+
+</odoo>

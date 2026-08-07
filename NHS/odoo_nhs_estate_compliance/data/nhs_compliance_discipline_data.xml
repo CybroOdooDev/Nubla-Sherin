@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- DISCIPLINES  -->
+        <record id="discipline_water" model="nhs.compliance.discipline">
+            <field name="name">Water Safety</field>
+            <field name="code">WATER</field>
+            <field name="htm_reference">HTM 04-01</field>
+            <field name="legislation_reference">COSHH, ACOP L8</field>
+        </record>
+        <record id="discipline_fire" model="nhs.compliance.discipline">
+            <field name="name">Fire Safety</field>
+            <field name="code">FIRE</field>
+            <field name="htm_reference">HTM 05</field>
+            <field name="legislation_reference">RRO 2005</field>
+        </record>
+        <record id="discipline_electrical" model="nhs.compliance.discipline">
+            <field name="name">Electrical Safety</field>
+            <field name="code">ELEC</field>
+            <field name="htm_reference">HTM 06</field>
+            <field name="legislation_reference">Electricity at Work Regs, BS 7671</field>
+        </record>
+        <record id="discipline_ventilation" model="nhs.compliance.discipline">
+            <field name="name">Ventilation Safety</field>
+            <field name="code">VENT</field>
+            <field name="htm_reference">HTM 03-01</field>
+        </record>
+        <record id="discipline_asbestos" model="nhs.compliance.discipline">
+            <field name="name">Asbestos Management</field>
+            <field name="code">ASB</field>
+            <field name="legislation_reference">Control of Asbestos Regs 2012</field>
+        </record>
+        <record id="discipline_loler" model="nhs.compliance.discipline">
+            <field name="name">Lifting (LOLER)</field>
+            <field name="code">LOLER</field>
+            <field name="legislation_reference">LOLER 1998, PUWER</field>
+        </record>
+        <record id="discipline_mgps" model="nhs.compliance.discipline">
+            <field name="name">Medical Gas (MGPS)</field>
+            <field name="code">MGPS</field>
+            <field name="htm_reference">HTM 02-01</field>
+        </record>
+        <record id="discipline_pressure" model="nhs.compliance.discipline">
+            <field name="name">Pressure Systems</field>
+            <field name="code">PSSR</field>
+            <field name="legislation_reference">PSSR 2000</field>
+        </record>
+        <record id="discipline_gas" model="nhs.compliance.discipline">
+            <field name="name">Gas Safety</field>
+            <field name="code">GAS</field>
+            <field name="legislation_reference">Gas Safety (I&amp;U) Regs</field>
+        </record>
+        <record id="discipline_lightning" model="nhs.compliance.discipline">
+            <field name="name">Lightning Protection</field>
+            <field name="code">LIGHT</field>
+            <field name="legislation_reference">BS EN 62305</field>
+        </record>
+        <record id="discipline_drainage" model="nhs.compliance.discipline">
+            <field name="name">Drainage Systems</field>
+            <field name="code">DRAIN</field>
+            <field name="htm_reference">HTM 07 series</field>
+        </record>
+        <record id="discipline_working_at_height" model="nhs.compliance.discipline">
+            <field name="name">Working at Height</field>
+            <field name="code">WAH</field>
+            <field name="legislation_reference">Confined Spaces Regs, WAH Regs</field>
+        </record>
+
+    </data>
+</odoo>

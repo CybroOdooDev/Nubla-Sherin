@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Compliance Bulk Apply Wizard Form View -->
+    <record id="view_nhs_compliance_bulk_apply_wizard" model="ir.ui.view">
+        <field name="name">nhs.compliance.bulk.apply.wizard.form</field>
+        <field name="model">nhs.compliance.bulk.apply.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="discipline_id"/>
+                            <field name="compliance_type_ids" widget="many2many_tags"/>
+                            <field name="site_ids" widget="many2many_tags" required="1"/>
+                            <field name="building_ids" widget="many2many_tags"
+                                   domain="site_ids and [('site_id', 'in', site_ids)] or []"/>
+                            <field name="start_date"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_apply" string="Apply" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Compliance Bulk Apply Wizard - Action -->
+    <record id="action_nhs_compliance_bulk_apply_wizard" model="ir.actions.act_window">
+        <field name="name">Bulk Generate Compliance Items</field>
+        <field name="res_model">nhs.compliance.bulk.apply.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- list VIEW - Alerts -->
+    <record id="view_nhs_device_alert_list" model="ir.ui.view">
+        <field name="name">nhs.device.alert.list</field>
+        <field name="model">nhs.device.alert</field>
+        <field name="arch" type="xml">
+            <list string="Safety Alerts"
+                  decoration-danger="is_overdue==True"
+                  decoration-warning="state in ['open','in_progress']"
+                  decoration-success="state=='closed'">
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="source"/>
+                <field name="issued_date"/>
+                <field name="action_deadline"/>
+                <field name="state" widget="badge"
+                       decoration-danger="is_overdue==True"
+                       decoration-warning="state in ['open','in_progress']"
+                       decoration-success="state=='closed'"/>
+                <field name="affected_count"/>
+                <field name="actioned_count"/>
+                <field name="is_overdue"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search VIEW - Alerts -->
+    <record id="view_nhs_device_alert_search" model="ir.ui.view">
+        <field name="name">nhs.device.alert.search</field>
+        <field name="model">nhs.device.alert</field>
+        <field name="arch" type="xml">
+            <search string="Search Alerts">
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="source"/>
+                <filter name="open" string="Open" domain="[('state','=','open')]"/>
+                <filter name="in_progress" string="In Progress" domain="[('state','=','in_progress')]"/>
+                <filter name="closed" string="Closed" domain="[('state','=','closed')]"/>
+                <filter name="overdue" string="Overdue" domain="[('is_overdue','=',True)]"/>
+                <filter name="active" string="Archived" domain="[('active','=',False)]"/>
+                <separator/>
+                <filter name="group_state" string="State" context="{'group_by':'state'}"/>
+                <filter name="group_source" string="Source" context="{'group_by':'source'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- form VIEW - Alerts -->
+    <record id="view_nhs_device_alert_form" model="ir.ui.view">
+        <field name="name">nhs.device.alert.form</field>
+        <field name="model">nhs.device.alert</field>
+        <field name="arch" type="xml">
+            <form string="Safety Alert">
+                <header>
+                    <button name="action_match_devices"
+                            string="Match Devices"
+                            type="object"
+                            class="btn-primary"/>
+                    <button name="action_close_alert"
+                            string="Close Alert"
+                            type="object"
+                            class="btn-primary"/>
+                    <button name="action_reopen_alert"
+                            string="Reopen"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="[('state','!=','closed')]"/>
+                    <button name="action_generate_report"
+                            string="Report"
+                            type="object"
+                            class="btn-secondary"/>
+                    <button name="action_view_affected_devices"
+                            string="Affected Devices"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="[('affected_count','=',0)]"/>
+                    <field name="state" widget="statusbar" statusbar_visible="open,in_progress,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Alert Title..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="reference"/>
+                            <field name="source"/>
+                            <field name="issued_date"/>
+                            <field name="action_deadline" decoration-danger="is_overdue==True"/>
+                            <field name="is_overdue" invisible="1"/>
+                            <field name="company_id"/>
+                        </group>
+                        <group>
+                            <field name="affected_make" placeholder="e.g. Alaris"/>
+                            <field name="affected_model" placeholder="e.g. GP"/>
+                            <field name="affected_category_id"/>
+                            <field name="affected_count"/>
+                            <field name="actioned_count"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Alert Details">
+                            <group>
+                                <field name="description" placeholder="Describe the safety alert..."/>
+                                <field name="required_action" placeholder="What action must be taken..."/>
+                            </group>
+                        </page>
+                        <page string="Affected Devices">
+                            <field name="line_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                 <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action - Alerts -->
+    <record id="action_nhs_device_alert" model="ir.actions.act_window">
+        <field name="name">Safety Alerts (MHRA/CAS)</field>
+        <field name="res_model">nhs.device.alert</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Record MHRA/CAS safety alerts and track affected devices.
+                Use the "Match Devices" button to find affected devices.
+            </p>
+        </field>
+    </record>
+
+    <!-- list VIEW - Alerts lines -->
+    <record id="view_nhs_device_alert_line_list" model="ir.ui.view">
+        <field name="name">nhs.device.alert.line.list</field>
+        <field name="model">nhs.device.alert.line</field>
+        <field name="arch" type="xml">
+            <list string="Affected Devices"
+                  decoration-danger="action_status in ['pending']"
+                  decoration-warning="action_status in ['quarantined']"
+                  decoration-success="action_status in ['actioned','not_affected']">
+                <field name="display_name"/>
+                <field name="alert_id"/>
+                <field name="device_id"/>
+                <field name="action_required"/>
+                <field name="action_status" widget="badge"
+                       decoration-danger="action_status in ['pending']"
+                       decoration-warning="action_status in ['quarantined']"
+                       decoration-success="action_status in ['actioned','not_affected']"/>
+                <field name="actioned_by_id"/>
+                <field name="actioned_date"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- search VIEW - Alerts lines -->
+    <record id="view_nhs_device_alert_line_search" model="ir.ui.view">
+        <field name="name">nhs.device.alert.line.search</field>
+        <field name="model">nhs.device.alert.line</field>
+        <field name="arch" type="xml">
+            <search string="Search Affected Devices">
+                <field name="alert_id"/>
+                <field name="device_id"/>
+                <field name="action_status"/>
+                <filter name="pending" string="Pending" domain="[('action_status','=','pending')]"/>
+                <filter name="quarantined" string="Quarantined" domain="[('action_status','=','quarantined')]"/>
+                <filter name="archived" string="Archived" domain="[('active','=',False)]"/>
+                <filter name="group_status" string="Status" context="{'group_by':'action_status'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- form VIEW - Alerts lines -->
+    <record id="view_nhs_device_alert_line_form" model="ir.ui.view">
+        <field name="name">nhs.device.alert.line.form</field>
+        <field name="model">nhs.device.alert.line</field>
+        <field name="arch" type="xml">
+            <form string="Affected Device Action">
+                <header>
+                    <button name="action_mark_pending"
+                            string="Mark Pending"
+                            type="object"
+                            class="btn-primary"
+                            invisible="action_status == 'pending'"/>
+                    <button name="action_mark_quarantined"
+                            string="Mark Quarantined"
+                            type="object"
+                            class="btn-primary"
+                            invisible="action_status == 'quarantined'"/>
+                    <button name="action_mark_actioned"
+                            string="Mark Actioned"
+                            type="object"
+                            class="btn-primary"
+                            invisible="action_status == 'actioned'"/>
+                    <button name="action_mark_not_affected"
+                            string="Mark Not Affected"
+                            type="object"
+                            class="btn-primary"
+                            invisible="action_status == 'not_affected'"/>
+                    <field name="action_status" widget="statusbar"
+                           statusbar_visible="pending,quarantined,actioned,not_affected"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_device" type="object"
+                                class="oe_stat_button" icon="fa-wrench">
+                            <span class="o_stat_text">Device</span>
+                        </button>
+                        <button name="action_view_alert" type="object"
+                                class="oe_stat_button" icon="fa-exclamation-triangle">
+                            <span class="o_stat_text">Alert</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name" placeholder="Affected Device Action..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="alert_id"/>
+                            <field name="device_id"/>
+                            <field name="action_required" placeholder="Action required for this device..."/>
+                        </group>
+                        <group>
+                            <field name="actioned_by_id" invisible="action_status in ['pending','quarantined']"/>
+                            <field name="actioned_date" invisible="action_status in ['pending','quarantined']"/>
+                            <field name="company_id"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Evidence / Response">
+                        <field name="note" placeholder="Evidence of response, findings, or additional information..."/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action - Alerts lines -->
+    <record id="action_nhs_device_alert_line" model="ir.actions.act_window">
+        <field name="name">Affected Devices</field>
+        <field name="res_model">nhs.device.alert.line</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_status': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                View all devices affected by safety alerts.
+                Track action status and evidence for each device.
+            </p>
+        </field>
+    </record>
+</odoo>

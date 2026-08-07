@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Root Menu: Estates Compliance -->
+    <menuitem id="menu_nhs_compliance_root" name="Estates Compliance"
+              web_icon="odoo_nhs_estate_compliance/static/description/icon.png"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+
+    <!-- 0. Dashboard (First Window) -->
+    <menuitem id="menu_nhs_compliance_dashboard_first" name="Dashboard" parent="menu_nhs_compliance_root"
+              sequence="1"
+              action="action_nhs_compliance_dashboard_client"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+
+    <!-- 1. Compliance -->
+    <menuitem id="menu_nhs_compliance_items" name="Compliance" parent="menu_nhs_compliance_root"
+              sequence="5"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_compliance_item_all" name="Compliance Items" parent="menu_nhs_compliance_items"
+              action="action_nhs_compliance_item"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_compliance_item_due_soon" name="Due Soon" parent="menu_nhs_compliance_items"
+              action="action_nhs_compliance_item_due_soon"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_compliance_item_overdue" name="Overdue" parent="menu_nhs_compliance_items"
+              action="action_nhs_compliance_item_overdue"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_compliance_item_failed" name="Failed &amp; Remedials" parent="menu_nhs_compliance_items"
+              action="action_nhs_compliance_item_failed"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_compliance_remedial_records" name="Remedial Records" parent="menu_nhs_compliance_items"
+              action="action_nhs_compliance_remedial"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_compliance_bulk_generate_item" name="Bulk Generate Items" parent="menu_nhs_compliance_items"
+              action="action_nhs_compliance_bulk_apply_wizard"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+
+    <!-- 2. Tests & Certificates -->
+    <menuitem id="menu_nhs_compliance_tests" name="Tests &amp; Certificates" parent="menu_nhs_compliance_root"
+              sequence="15"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_compliance_test_all" name="Test Records" parent="menu_nhs_compliance_tests"
+              action="action_nhs_compliance_test"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_compliance_certificate_register" name="Certificate Register" parent="menu_nhs_compliance_tests"
+              action="action_nhs_certificate_register"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+
+    <!-- 3. Accountable Persons -->
+    <menuitem id="menu_nhs_compliance_persons" name="Accountable Persons" parent="menu_nhs_compliance_root"
+              sequence="25"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_duty_assignment" name="Duty Assignments" parent="menu_nhs_compliance_persons"
+              action="action_nhs_duty_assignment"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_duty_role_menu" name="Duty Roles" parent="menu_nhs_compliance_persons"
+              action="action_nhs_duty_role"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+
+    <!-- 4. Contractors -->
+    <menuitem id="menu_nhs_compliance_contractors" name="Contractors" parent="menu_nhs_compliance_root"
+              sequence="35"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_compliance_contractor_all" name="Contractors" parent="menu_nhs_compliance_contractors"
+              action="action_nhs_compliance_contractor"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_contractor_visit" name="Visits" parent="menu_nhs_compliance_contractors"
+              action="action_nhs_contractor_visit"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+
+    <!-- 5. Reporting -->
+    <menuitem id="menu_nhs_compliance_reporting" name="Reporting" parent="menu_nhs_compliance_root"
+              sequence="45"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_compliance_report_position" name="Compliance Position (PDF)" parent="menu_nhs_compliance_reporting"
+              action="action_nhs_compliance_position_report_wizard"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"
+              sequence="10"/>
+    <menuitem id="menu_nhs_compliance_report_board" name="Board Assurance (PDF)" parent="menu_nhs_compliance_reporting"
+              action="report_nhs_compliance_board"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"
+              sequence="20"/>
+    <menuitem id="menu_nhs_compliance_report_certificate" name="Certificate Pack (PDF)" parent="menu_nhs_compliance_reporting"
+              action="action_nhs_certificate_pack_wizard"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"
+              sequence="30"/>
+    <menuitem id="menu_nhs_compliance_report_pam" name="PAM Evidence Extract (Excel)" parent="menu_nhs_compliance_reporting"
+              action="action_nhs_compliance_pam_wizard"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"
+              sequence="40"/>
+    <menuitem id="menu_nhs_compliance_report_eric" name="ERIC Data Extract (Excel)" parent="menu_nhs_compliance_reporting"
+              action="action_nhs_compliance_eric_export_wizard"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"
+              sequence="50"/>
+    <menuitem id="menu_nhs_compliance_report_register" name="Full Compliance Register (Excel)" parent="menu_nhs_compliance_reporting"
+              action="action_nhs_compliance_register_excel_wizard"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"
+              sequence="60"/>
+    <menuitem id="menu_nhs_compliance_planner" name="Compliance Planner" parent="menu_nhs_compliance_reporting" sequence="65"
+              action="action_nhs_compliance_planner"
+              groups="group_nhs_compliance_user,group_nhs_compliance_officer,group_nhs_compliance_manager"/>
+
+    <!-- 6. Configuration (manager only) -->
+    <menuitem id="menu_nhs_compliance_config" name="Configuration" parent="menu_nhs_compliance_root"
+              groups="group_nhs_compliance_manager" sequence="55"/>
+    <menuitem id="menu_nhs_config_disciplines_types" name="Disciplines / Compliance Types" parent="menu_nhs_compliance_config"
+              groups="group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_config_discipline" name="Disciplines" parent="menu_nhs_config_disciplines_types"
+              action="action_nhs_compliance_discipline"
+              groups="group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_config_type" name="Compliance Types" parent="menu_nhs_config_disciplines_types"
+              action="action_nhs_compliance_type"
+              groups="group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_config_contractor_accreditations" name="Contractor Accreditations" parent="menu_nhs_compliance_config"
+              action="action_nhs_compliance_contractor_accreditation"
+              groups="group_nhs_compliance_manager"/>
+    <menuitem id="menu_nhs_compliance_settings" name="Settings" parent="menu_nhs_compliance_config"
+              action="action_nhs_compliance_settings"
+              groups="group_nhs_compliance_manager"/>
+</odoo>

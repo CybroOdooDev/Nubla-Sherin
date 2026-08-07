@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Cron: daily check that raises Terms of Reference review reminders -->
+    <record id="cron_gov_tor_review_reminder" model="ir.cron">
+        <field name="name">NHS Governance: Terms of Reference review reminder</field>
+        <field name="model_id" ref="model_nhs_committee"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_tor_review_reminder()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Cron: daily check that reminds members of their annual DoI refresh -->
+    <record id="cron_gov_doi_refresh_reminder" model="ir.cron">
+        <field name="name">NHS Governance: Annual declaration of interest refresh reminder</field>
+        <field name="model_id" ref="model_nhs_director"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_doi_annual_refresh_reminder()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Cron: daily check that escalates overdue governance actions -->
+    <record id="cron_gov_action_escalation" model="ir.cron">
+        <field name="name">NHS Governance: Overdue action escalation</field>
+        <field name="model_id" ref="model_nhs_meeting_action"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_action_escalation()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+</odoo>

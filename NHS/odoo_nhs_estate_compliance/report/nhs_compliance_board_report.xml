@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Board Assurance Report - Action -->
+    <record id="report_nhs_compliance_board" model="ir.actions.report">
+        <field name="name">Board Assurance</field>
+        <field name="model">nhs.compliance.item</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_estate_compliance.report_nhs_board_view</field>
+        <field name="report_file">odoo_nhs_estate_compliance.report_nhs_board_view</field>
+    </record>
+
+    <!-- Board Assurance Report - Template -->
+    <template id="report_nhs_board_view">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page" style="font-family: 'Segoe UI', Arial, sans-serif; color: #334155; line-height: 1.5;">
+                    <!-- Title Banner -->
+                    <div class="row mb-4" style="border-bottom: 3px solid #005EB8; padding-bottom: 12px;">
+                        <div class="col-8">
+                            <h2 style="color: #005EB8; font-weight: 700; margin: 0;">NHS Estates Board Assurance
+                                Report
+                            </h2>
+                            <div class="text-muted" style="font-size: 1.15rem; font-weight: 500; margin-top: 4px;">
+                                Statutory Compliance Overview —
+                                <span style="color: #0F172A; font-weight: 600;">
+                                    <t t-out="site_name"/>
+                                </span>
+                                <t t-if="as_at_date">
+                                    (As of:
+                                    <span style="color: #0F172A; font-weight: 600;">
+                                        <t t-out="as_at_date"/>
+                                    </span>
+                                    )
+                                </t>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)"
+                                 style="max-height: 50px;" alt="Company Logo"/>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div style="border-left: 4px solid #005EB8; padding-left: 16px; background-color: #F8FAFC; padding-top: 10px; padding-bottom: 10px; border-radius: 0 6px 6px 0;">
+                                <h5 style="color: #005EB8; font-weight: 700; margin-bottom: 6px;">Executive Summary</h5>
+                                <p style="margin: 0; font-size: 0.95rem; color: #475569;">
+                                    This report provides the Estates Board with an overview of the statutory compliance
+                                    position. Standard compliance target is <strong>95%</strong>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-center mb-4 g-3">
+                        <div class="col-4">
+                            <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; background-color: #F8FAFC; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: 100%;">
+                                <h2 style="color: #15803D; font-weight: 800; margin: 0;"><t t-out="compliance_rate"/>%
+                                </h2>
+                                <div style="font-size: 0.85rem; font-weight: 600; color: #64748B; text-transform: uppercase; margin-top: 4px;">
+                                    Overall Compliance Rate
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px; height: 100%;">
+                                <h3 style="color: #16A34A; font-weight: 700; margin: 0;">
+                                    <t t-out="compliant_count"/>
+                                </h3>
+                                <div style="font-size: 0.75rem; font-weight: 600; color: #64748B; text-transform: uppercase; margin-top: 2px;">
+                                    Compliant
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px; height: 100%;">
+                                <h3 style="color: #D97706; font-weight: 700; margin: 0;">
+                                    <t t-out="due_soon_count"/>
+                                </h3>
+                                <div style="font-size: 0.75rem; font-weight: 600; color: #64748B; text-transform: uppercase; margin-top: 2px;">
+                                    Due Soon
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px; height: 100%;">
+                                <h3 style="color: #DC2626; font-weight: 700; margin: 0;">
+                                    <t t-out="overdue_count"/>
+                                </h3>
+                                <div style="font-size: 0.75rem; font-weight: 600; color: #64748B; text-transform: uppercase; margin-top: 2px;">
+                                    Overdue
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px; height: 100%;">
+                                <h3 style="color: #4B5563; font-weight: 700; margin: 0;">
+                                    <t t-out="failed_count"/>
+                                </h3>
+                                <div style="font-size: 0.75rem; font-weight: 600; color: #64748B; text-transform: uppercase; margin-top: 2px;">
+                                    Failed
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 style="color: #005EB8; font-weight: 700; margin-bottom: 12px; border-bottom: 2px solid #E2E8F0; padding-bottom: 6px;">
+                                Performance by Compliance Discipline
+                            </h5>
+                            <table class="table table-sm align-middle table-hover" style="border: 1px solid #E2E8F0;">
+                                <thead style="background-color: #005EB8; color: white;">
+                                    <tr>
+                                        <th style="padding: 10px; font-weight: 600;">Discipline Name</th>
+                                        <th style="padding: 10px; font-weight: 600;">HTM Reference</th>
+                                        <th class="text-center" style="padding: 10px; font-weight: 600;">Total
+                                            Obligations
+                                        </th>
+                                        <th class="text-center" style="padding: 10px; font-weight: 600;">Compliant</th>
+                                        <th class="text-center" style="padding: 10px; font-weight: 600;">Compliance %
+                                        </th>
+                                        <th class="text-center" style="padding: 10px; font-weight: 600;">RAG Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="discipline_stats" t-as="ds">
+                                        <tr style="border-bottom: 1px solid #E2E8F0;">
+                                            <td style="padding: 8px 10px; font-weight: 500;">
+                                                <t t-out="ds['name']"/>
+                                            </td>
+                                            <td style="padding: 8px 10px; color: #475569;">
+                                                <t t-out="ds['htm']"/>
+                                            </td>
+                                            <td class="text-center" style="padding: 8px 10px;">
+                                                <t t-out="ds['total']"/>
+                                            </td>
+                                            <td class="text-center" style="padding: 8px 10px;">
+                                                <t t-out="ds['compliant']"/>
+                                            </td>
+                                            <td class="text-center" style="padding: 8px 10px; font-weight: 600;"><t
+                                                    t-out="ds['rate']"/>%
+                                            </td>
+                                            <td class="text-center" style="padding: 8px 10px;">
+                                                <t t-if="ds['rate'] >= 95.0">
+                                                    <span class="badge rounded-pill"
+                                                          style="font-size: 0.8rem; padding: 5px 12px; background-color: #198754; color: white;">Green
+                                                    </span>
+                                                </t>
+                                                <t t-elif="ds['rate'] >= 85.0">
+                                                    <span class="badge rounded-pill"
+                                                          style="font-size: 0.8rem; padding: 5px 12px; background-color: #ffc107; color: black;">Amber
+                                                    </span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="badge rounded-pill"
+                                                          style="font-size: 0.8rem; padding: 5px 12px; background-color: #dc3545; color: white;">Red
+                                                    </span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <t t-if="site_stats">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 style="color: #005EB8; font-weight: 700; margin-bottom: 12px; border-bottom: 2px solid #E2E8F0; padding-bottom: 6px;">
+                                    Performance by Estates Site
+                                </h5>
+                                <table class="table table-sm align-middle table-hover"
+                                       style="border: 1px solid #E2E8F0;">
+                                    <thead style="background-color:grey; color: white;">
+                                        <tr>
+                                            <th style="padding: 10px; font-weight: 600;">Site Name</th>
+                                            <th class="text-center" style="padding: 10px; font-weight: 600;">Total
+                                                Obligations
+                                            </th>
+                                            <th class="text-center" style="padding: 10px; font-weight: 600;">Compliant
+                                            </th>
+                                            <th class="text-center" style="padding: 10px; font-weight: 600;">Compliance
+                                                %
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="site_stats" t-as="ss">
+                                            <tr style="border-bottom: 1px solid #E2E8F0;">
+                                                <td style="padding: 8px 10px; font-weight: 500;">
+                                                    <t t-out="ss['name']"/>
+                                                </td>
+                                                <td class="text-center" style="padding: 8px 10px;">
+                                                    <t t-out="ss['total']"/>
+                                                </td>
+                                                <td class="text-center" style="padding: 8px 10px;">
+                                                    <t t-out="ss['compliant']"/>
+                                                </td>
+                                                <td class="text-center" style="padding: 8px 10px; font-weight: 600;"><t
+                                                        t-out="ss['rate']"/>%
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </t>
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 style="color: #005EB8; font-weight: 700; margin-bottom: 12px; border-bottom: 2px solid #E2E8F0; padding-bottom: 6px;">
+                                Key Compliance Risks &amp; Overdue Items
+                            </h5>
+                            <t t-if="key_risks">
+                                <p class="text-danger" style="font-weight: 500; font-size: 0.95rem;">
+                                    The following critical or failed items require immediate action and escalation:
+                                </p>
+                                <table class="table table-sm align-middle table-hover"
+                                       style="border: 1px solid #FCA5A5;">
+                                    <thead style="background-color: #DC2626; color: white;">
+                                        <tr>
+                                            <th style="padding: 10px; font-weight: 600;">Reference</th>
+                                            <th style="padding: 10px; font-weight: 600;">Obligation Name</th>
+                                            <th style="padding: 10px; font-weight: 600;">Criticality</th>
+                                            <th style="padding: 10px; font-weight: 600;">Location</th>
+                                            <th class="text-center" style="padding: 10px; font-weight: 600;">Status</th>
+                                            <th style="padding: 10px; font-weight: 600;">Target Date</th>
+                                            <th style="padding: 10px; font-weight: 600;">Accountable Person</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="key_risks" t-as="risk">
+                                            <tr style="border-bottom: 1px solid #FEE2E2;">
+                                                <td style="padding: 8px 10px; font-weight: 600;">
+                                                    <span t-field="risk.reference"/>
+                                                </td>
+                                                <td style="padding: 8px 10px; font-weight: 500;">
+                                                    <span t-field="risk.name"/>
+                                                </td>
+                                                <td style="padding: 8px 10px; text-transform: capitalize; color: #7F1D1D;">
+                                                    <span t-field="risk.criticality"/>
+                                                </td>
+                                                <td style="padding: 8px 10px; color: #475569;">
+                                                    <span t-out="risk.building_id.name or risk.site_id.name or 'N/A'"/>
+                                                </td>
+                                                <td class="text-center" style="padding: 8px 10px;">
+                                                    <t t-set="r_status" t-value="item_statuses[risk.id]"/>
+                                                    <t t-if="r_status == 'failed'">
+                                                        <span class="badge rounded-pill"
+                                                              style="font-size: 0.8rem; padding: 5px 12px; background-color: #212529; color: white;">FAILED
+                                                        </span>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="badge rounded-pill"
+                                                              style="font-size: 0.8rem; padding: 5px 12px; background-color: #dc3545; color: white;">OVERDUE
+                                                        </span>
+                                                    </t>
+                                                </td>
+                                                <td style="padding: 8px 10px; font-weight: 500; color: #B91C1C;">
+                                                    <span t-out="risk.get_next_due_as_of(as_at_date)"/>
+                                                </td>
+                                                <td style="padding: 8px 10px;">
+                                                    <span t-field="risk.responsible_person_id.name"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </t>
+                            <t t-else="">
+                                <div style="background-color: #F0FDF4; border: 1px solid #BBF7D0; color: #166534; padding: 12px 16px; border-radius: 6px; font-weight: 500; font-size: 0.95rem;">
+                                    No critical life-safety/high risks or failed compliance tests are currently
+                                    outstanding.
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

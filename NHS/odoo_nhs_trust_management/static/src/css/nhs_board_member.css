@@ -1,0 +1,20 @@
+/* NHS Board Member - Full-width cover image in form view */
+.nhs_board_member_cover_img {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-right: 0 !important;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: block;
+}
+
+.nhs_board_member_cover_img img {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 220px !important;
+    object-fit: cover !important;
+    object-position: center top !important;
+    border-radius: 8px !important;
+    display: block !important;
+}

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Reference/lookup data for the risk module: risk categories (with board-approved
+         risk appetite thresholds), the risk register tiers (local/directorate/corporate/BAF)
+         and CQC statutory notification types used by nhs.notification.rule. -->
+
+    <!-- Risk Categories with NPSA appetite thresholds -->
+    <record id="risk_cat_clinical" model="nhs.risk.category">
+        <field name="name">Clinical / Patient Safety</field>
+        <field name="appetite_threshold">3</field>
+        <field name="description">Risks arising from clinical care and treatment.</field>
+    </record>
+    <record id="risk_cat_health_safety" model="nhs.risk.category">
+        <field name="name">Health &amp; Safety</field>
+        <field name="appetite_threshold">6</field>
+    </record>
+    <record id="risk_cat_financial" model="nhs.risk.category">
+        <field name="name">Financial</field>
+        <field name="appetite_threshold">9</field>
+    </record>
+    <record id="risk_cat_regulatory" model="nhs.risk.category">
+        <field name="name">Regulatory &amp; Compliance</field>
+        <field name="appetite_threshold">4</field>
+    </record>
+    <record id="risk_cat_workforce" model="nhs.risk.category">
+        <field name="name">Workforce</field>
+        <field name="appetite_threshold">6</field>
+    </record>
+    <record id="risk_cat_reputational" model="nhs.risk.category">
+        <field name="name">Reputational</field>
+        <field name="appetite_threshold">6</field>
+    </record>
+    <record id="risk_cat_environment" model="nhs.risk.category">
+        <field name="name">Environment &amp; Estates</field>
+        <field name="appetite_threshold">6</field>
+    </record>
+    <record id="risk_cat_it" model="nhs.risk.category">
+        <field name="name">IT &amp; Information</field>
+        <field name="appetite_threshold">6</field>
+    </record>
+
+    <!-- Default Risk Registers -->
+    <record id="risk_register_local" model="nhs.risk.register">
+        <field name="name">Local / Departmental Register</field>
+        <field name="tier">local</field>
+    </record>
+    <record id="risk_register_directorate" model="nhs.risk.register">
+        <field name="name">Directorate Register</field>
+        <field name="tier">directorate</field>
+    </record>
+    <record id="risk_register_corporate" model="nhs.risk.register">
+        <field name="name">Corporate Risk Register</field>
+        <field name="tier">corporate</field>
+    </record>
+    <record id="risk_register_baf" model="nhs.risk.register">
+        <field name="name">Board Assurance Framework (BAF)</field>
+        <field name="tier">baf</field>
+    </record>
+
+    <!-- CQC Notification Types -->
+    <record id="cqc_type_death" model="nhs.cqc.notification.type">
+        <field name="name">Death of Service User</field>
+        <field name="statutory_basis">Regulation 16</field>
+    </record>
+    <record id="cqc_type_serious_injury" model="nhs.cqc.notification.type">
+        <field name="name">Serious Injury to Service User</field>
+        <field name="statutory_basis">Regulation 16</field>
+    </record>
+    <record id="cqc_type_abuse" model="nhs.cqc.notification.type">
+        <field name="name">Abuse or Allegation of Abuse</field>
+        <field name="statutory_basis">Regulation 18</field>
+    </record>
+    <record id="cqc_type_dols" model="nhs.cqc.notification.type">
+        <field name="name">DoLS Application / Outcome</field>
+        <field name="statutory_basis">Regulation 18</field>
+    </record>
+    <record id="cqc_type_service_stop" model="nhs.cqc.notification.type">
+        <field name="name">Event Preventing Safe Service</field>
+        <field name="statutory_basis">Regulation 17</field>
+    </record>
+    <record id="cqc_type_police" model="nhs.cqc.notification.type">
+        <field name="name">Police Involvement</field>
+        <field name="statutory_basis">Regulation 18</field>
+    </record>
+    <record id="cqc_type_absconding" model="nhs.cqc.notification.type">
+        <field name="name">Absconding (Mental Health)</field>
+        <field name="statutory_basis">Regulation 18</field>
+    </record>
+</odoo>

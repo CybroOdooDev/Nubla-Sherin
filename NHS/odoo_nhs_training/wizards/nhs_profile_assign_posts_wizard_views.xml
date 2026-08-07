@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view for nhs.profile.assign.posts.wizard: pick posts to attach to a profile -->
+    <record id="view_nhs_profile_assign_posts_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.profile.assign.posts.wizard.form</field>
+        <field name="model">nhs.profile.assign.posts.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Assign Posts to Profile">
+                <group>
+                    <field name="profile_id" options="{'no_create': True}" readonly="1"/>
+                </group>
+                <group string="Posts">
+                    <field name="post_ids" nolabel="1" widget="many2many_tags"
+                           options="{'no_create': True}"/>
+                </group>
+                <p class="text-muted">
+                    Every holder of a selected post inherits this profile's training
+                    requirements. Removing a post here clears its profile — it does not
+                    delete the post.
+                </p>
+                <footer>
+                    <button name="action_confirm" type="object" string="Assign" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Window action for nhs.profile.assign.posts.wizard: opens the Assign Posts dialog -->
+    <record id="action_nhs_profile_assign_posts_wizard" model="ir.actions.act_window">
+        <field name="name">Assign Posts</field>
+        <field name="res_model">nhs.profile.assign.posts.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

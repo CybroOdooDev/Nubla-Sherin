@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Floor List View -->
+    <record id="view_nhs_estate_floor_list" model="ir.ui.view">
+        <field name="name">nhs.estate.floor.list</field>
+        <field name="model">nhs.estate.floor</field>
+        <field name="arch" type="xml">
+            <list string="Floors" multi_edit="1">
+                <field name="name"/>
+                <field name="sequence"/>
+                <field name="building_id"/>
+                <field name="site_id" optional="hide"/>
+                <field name="gia" sum="Total Gross Internal Area"/>
+                <field name="function_id"/>
+                <field name="space_count" sum="Total Spaces"/>
+                <field name="company_id" optional="hide" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Floor Form View -->
+    <record id="view_nhs_estate_floor_form" model="ir.ui.view">
+        <field name="name">nhs.estate.floor.form</field>
+        <field name="model">nhs.estate.floor</field>
+        <field name="arch" type="xml">
+            <form string="Floor">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_spaces" type="object"
+                                class="oe_stat_button" icon="fa-building">
+                            <field name="space_count" widget="statinfo" string="Spaces"/>
+                        </button>
+                        <button name="action_view_documents" type="object"
+                                class="oe_stat_button" icon="fa-file">
+                            <span class="o_stat_text">Documents</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Floor Name..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="building_id" placeholder="Building..."/>
+                        <field name="site_id" placeholder="Site..."/>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="sequence"/>
+                            <field name="gia"/>
+                            <field name="function_id"/>
+                        </group>
+                    </group>
+                    <notebook invisible="id == 0">
+                        <page string="Spaces">
+                            <field name="space_ids"/>
+                        </page>
+                        <page string="Floor Plans">
+                            <field name="floor_plan" widget="many2many_binary"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Floor Search View -->
+    <record id="view_nhs_estate_floor_search" model="ir.ui.view">
+        <field name="name">nhs.estate.floor.search</field>
+        <field name="model">nhs.estate.floor</field>
+        <field name="arch" type="xml">
+            <search string="Search Floors">
+                <field name="name" string="Floor Name"/>
+                <field name="building_id" string="Building"/>
+                <field name="site_id" string="Site"/>
+                <field name="function_id"/>
+                <filter name="group_building" string="Building"
+                        context="{'group_by': 'building_id'}"/>
+                <filter name="group_site" string="Site"
+                        context="{'group_by': 'site_id'}"/>
+                <filter name="group_function" string="Function"
+                        context="{'group_by': 'function_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Floor Kanban View -->
+    <record id="view_nhs_estate_floor_kanban" model="ir.ui.view">
+        <field name="name">nhs.estate.floor.kanban</field>
+        <field name="model">nhs.estate.floor</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="building_id" class="o_kanban_small_column">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="sequence"/>
+                <field name="building_id"/>
+                <field name="site_id"/>
+                <field name="gia"/>
+                <field name="function_id"/>
+                <field name="space_count"/>
+                <field name="floor_plan"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click o_kanban_record">
+                            <div class="oe_kanban_details d-flex flex-column justify-content-between h-100">
+                                <div>
+                                    <div class="o_kanban_record_top">
+                                        <div class="o_kanban_record_headings">
+                                            <strong class="o_kanban_record_title">
+                                                <field name="name"/>
+                                            </strong>
+                                            <div class="text-muted">
+                                                <field name="building_id"/>
+                                                <span t-if="record.building_id.raw_value">-
+                                                    <field name="site_id"/>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_body mt-2">
+                                        <div class="d-flex justify-content-between mb-2 flex-wrap gap-1">
+                                            <span class="badge text-bg-primary">
+                                                <i class="fa fa-layer-group mr-1"/>
+                                                Level
+                                                <field name="sequence"/>
+                                            </span>
+                                            <span t-if="record.function_id.raw_value" class="badge text-bg-info">
+                                                <i class="fa fa-tag mr-1"/>
+                                                <field name="function_id"/>
+                                            </span>
+                                        </div>
+                                        <div class="mt-2 text-muted">
+                                            <i class="fa fa-arrows-alt mr-1"/>
+                                            <field name="gia"/>
+                                            m²
+                                        </div>
+                                        <div class="mt-1 text-muted">
+                                            <i class="fa fa-building mr-1"/>
+                                            <field name="space_count"/>
+                                            Spaces
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom mt-3 d-flex justify-content-between align-items-center"
+                                     style="border-top: 1px solid #f3f4f6; padding-top: 8px;">
+                                    <span class="badge" style="background-color: #f3f4f6; color: #6b7280;">
+                                        <i class="fa fa-building mr-1"/>
+                                        <field name="building_id"/>
+                                    </span>
+                                    <field name="activity_ids" widget="kanban_activity"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Floor Pivot View -->
+    <record id="view_nhs_estate_floor_pivot" model="ir.ui.view">
+        <field name="name">nhs.estate.floor.pivot</field>
+        <field name="model">nhs.estate.floor</field>
+        <field name="arch" type="xml">
+            <pivot string="Floors">
+                <field name="site_id" type="row"/>
+                <field name="building_id" type="row"/>
+                <field name="function_id" type="row"/>
+                <field name="sequence" type="col"/>
+                <field name="gia" type="measure" widget="float"/>
+                <field name="space_count" type="measure" widget="integer"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Floor Action  -->
+    <record id="action_nhs_estate_floor" model="ir.actions.act_window">
+        <field name="name">Floors</field>
+        <field name="res_model">nhs.estate.floor</field>
+        <field name="view_mode">list,form,kanban,pivot</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first floor
+            </p>
+            <p>
+                Floors are the third level of the estate hierarchy.
+                Each floor belongs to a building and contains spaces.
+            </p>
+        </field>
+    </record>
+</odoo>

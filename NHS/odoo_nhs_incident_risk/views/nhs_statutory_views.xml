@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Views + window actions for the statutory/regulatory obligations linked to an
+         incident: Duty of Candour (3-stage notification), RIDDOR reporting, CQC
+         notifications, and LFPSE export batches. -->
+    <!-- ══ DUTY OF CANDOUR ══════════════════════════════════════════ -->
+    <record id="view_nhs_doc_list" model="ir.ui.view">
+        <field name="name">nhs.duty.of.candour.list</field>
+        <field name="model">nhs.duty.of.candour</field>
+        <field name="arch" type="xml">
+            <list string="Duty of Candour"
+                  decoration-danger="state == 'overdue'"
+                  decoration-warning="state == 'open' and written_deadline"
+                  decoration-success="state == 'complete'">
+                <field name="incident_id"/>
+                <field name="triggered_at"/>
+                <field name="written_deadline"/>
+                <field name="verbal_done" optional="show"/>
+                <field name="written_done" optional="show"/>
+                <field name="findings_shared_done" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'complete'"
+                       decoration-danger="state == 'overdue'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_doc_form" model="ir.ui.view">
+        <field name="name">nhs.duty.of.candour.form</field>
+        <field name="model">nhs.duty.of.candour</field>
+        <field name="arch" type="xml">
+            <form string="Duty of Candour">
+                <header>
+                    <button name="action_generate_letter" string="Generate Letter"
+                            type="object" icon="fa-envelope"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-danger" role="alert"
+                         invisible="state != 'overdue'">
+                        OVERDUE — Written notification deadline passed
+                    </div>
+                    <group>
+                        <group>
+                            <field name="incident_id" readonly="id"/>
+                            <field name="triggered_at" readonly="id"/>
+                            <field name="written_deadline" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Stage 1 — Verbal Notification">
+                            <group>
+                                <field name="verbal_done"/>
+                                <field name="verbal_at" invisible="not verbal_done"/>
+                                <field name="verbal_by_id" invisible="not verbal_done"/>
+                                <field name="verbal_notes" invisible="not verbal_done"/>
+                            </group>
+                        </page>
+                        <page string="Stage 2 — Written Notification">
+                            <group>
+                                <field name="written_done"/>
+                                <field name="written_at" invisible="not written_done"/>
+                                <field name="written_letter_attachment_id"
+                                       invisible="not written_done"/>
+                            </group>
+                        </page>
+                        <page string="Stage 3 — Findings Shared">
+                            <group>
+                                <field name="findings_shared_done"/>
+                                <field name="findings_shared_at"
+                                       invisible="not findings_shared_done"/>
+                            </group>
+                        </page>
+                        <!-- Only relevant while at least one of the three stages is still outstanding -->
+                        <page string="Exemption" invisible="verbal_done and written_done and findings_shared_done">
+                            <field name="exemption_reason"
+                                   placeholder="Document lawful reason if contact cannot be made…"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_duty_of_candour" model="ir.actions.act_window">
+        <field name="name">Duty of Candour</field>
+        <field name="res_model">nhs.duty.of.candour</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state','in',['open','overdue'])]</field>
+        <field name="context">{'search_default_open': 1}</field>
+    </record>
+
+    <!-- ══ RIDDOR LOG ════════════════════════════════════════════════ -->
+    <record id="view_nhs_riddor_list" model="ir.ui.view">
+        <field name="name">nhs.riddor.list</field>
+        <field name="model">nhs.riddor</field>
+        <field name="arch" type="xml">
+            <list string="RIDDOR Log"
+                  decoration-danger="reportable and not submitted and report_deadline">
+                <field name="incident_id"/>
+                <field name="person_id"/>
+                <field name="reportable"/>
+                <field name="riddor_category"/>
+                <field name="report_deadline"/>
+                <field name="submitted"/>
+                <field name="hse_reference"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_riddor_form" model="ir.ui.view">
+        <field name="name">nhs.riddor.form</field>
+        <field name="model">nhs.riddor</field>
+        <field name="arch" type="xml">
+            <form string="RIDDOR Record">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="incident_id" readonly="id"/>
+                            <field name="person_id"/>
+                            <field name="reportable"/>
+                            <field name="riddor_category" invisible="not reportable"/>
+                        </group>
+                        <group>
+                            <field name="report_deadline" invisible="not reportable"/>
+                            <field name="submitted" invisible="not reportable"/>
+                            <field name="submitted_at" invisible="not submitted"/>
+                            <field name="hse_reference" invisible="not submitted"/>
+                        </group>
+                    </group>
+                    <group string="Determination Log">
+                        <field name="determination_log" nolabel="1" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_riddor" model="ir.actions.act_window">
+        <field name="name">RIDDOR Log</field>
+        <field name="res_model">nhs.riddor</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ══ CQC NOTIFICATIONS ════════════════════════════════════════ -->
+    <record id="view_nhs_cqc_notification_list" model="ir.ui.view">
+        <field name="name">nhs.cqc.notification.list</field>
+        <field name="model">nhs.cqc.notification</field>
+        <field name="arch" type="xml">
+            <list string="CQC Notifications">
+                <field name="incident_id"/>
+                <field name="notification_type_id"/>
+                <field name="statutory_basis"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'submitted'"
+                       decoration-danger="state == 'required'"/>
+                <field name="submitted_at"/>
+                <field name="cqc_reference"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_cqc_notification_form" model="ir.ui.view">
+        <field name="name">nhs.cqc.notification.form</field>
+        <field name="model">nhs.cqc.notification</field>
+        <field name="arch" type="xml">
+             <form string="CQC Notification">
+                <header>
+                    <button name="action_submit" string="Submit to CQC" type="object" class="btn-primary" invisible="state != 'required'"/>
+                    <button name="action_not_required" string="Not Required" type="object" invisible="state != 'required'"/>
+                    <button name="action_required" string="Revert to Required" type="object" invisible="state == 'required'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="required,submitted,not_required"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="incident_id" readonly="id"/>
+                            <field name="notification_type_id"/>
+                            <field name="statutory_basis" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="submitted_at" invisible="state == 'not_required'"/>
+                            <field name="submitted_by_id" invisible="state == 'not_required'"/>
+                            <field name="cqc_reference" invisible="state == 'not_required'"/>
+                        </group>
+                    </group>
+                    <group string="Justification" invisible="state != 'not_required'">
+                        <field name="justification" nolabel="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_cqc_notification_menu" model="ir.actions.act_window">
+        <field name="name">CQC Notifications</field>
+        <field name="res_model">nhs.cqc.notification</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ══ LFPSE BATCHES ════════════════════════════════════════════ -->
+    <record id="view_nhs_lfpse_list" model="ir.ui.view">
+        <field name="name">nhs.lfpse.submission.list</field>
+        <field name="model">nhs.lfpse.submission</field>
+        <field name="arch" type="xml">
+            <list string="LFPSE Batches">
+                <field name="name"/>
+                <field name="export_format"/>
+                <field name="state" widget="badge"/>
+                <field name="submitted_at"/>
+                <field name="taxonomy_version"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_lfpse_form" model="ir.ui.view">
+        <field name="name">nhs.lfpse.submission.form</field>
+        <field name="model">nhs.lfpse.submission</field>
+        <field name="arch" type="xml">
+            <form string="LFPSE Batch">
+                <header>
+                    <button name="action_export" string="Generate Export File"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_mark_submitted" string="Mark Submitted"
+                            type="object"
+                            invisible="state != 'exported'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,exported,submitted"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="export_format"/>
+                            <field name="taxonomy_version"/>
+                        </group>
+                        <group>
+                            <field name="submitted"/>
+                            <field name="submitted_at" invisible="not submitted"/>
+                            <field name="file_attachment_id" invisible="not file_attachment_id"/>
+                        </group>
+                    </group>
+                    <separator string="Incidents in this Batch"/>
+                    <!-- Two mirrored fields toggle by state: editable/selectable while the batch is
+                         being assembled, then a locked read-only copy once submitted -->
+                    <field name="incident_ids" nolabel="1"
+                           invisible="state == 'submitted'"
+                           domain="[('lfpse_state', 'in', ['pending', 'exported'])]">
+                        <list>
+                            <field name="name"/>
+                            <field name="incident_kind"/>
+                            <field name="occurred_at"/>
+                            <field name="harm_grade"/>
+                            <field name="lfpse_state"/>
+                        </list>
+                    </field>
+                    <field name="incident_ids" nolabel="1"
+                           invisible="state != 'submitted'"
+                           readonly="1">
+                        <list>
+                            <field name="name"/>
+                            <field name="incident_kind"/>
+                            <field name="occurred_at"/>
+                            <field name="harm_grade"/>
+                            <field name="lfpse_state"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_lfpse" model="ir.actions.act_window">
+        <field name="name">LFPSE Batches</field>
+        <field name="res_model">nhs.lfpse.submission</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

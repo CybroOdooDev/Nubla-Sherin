@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- form VIEW - Device Bulk Schedule Wizard -->
+    <record id="view_nhs_device_bulk_schedule_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.device.bulk.schedule.wizard.form</field>
+        <field name="model">nhs.device.bulk.schedule.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bulk Schedule Creation">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Create Schedules in Bulk</h1>
+                        <p class="text-muted">
+                            Add the same maintenance/calibration schedule to multiple devices at once.
+                        </p>
+                    </div>
+                    <group>
+                        <field name="device_ids" widget="many2many_tags"/>
+                        <field name="schedule_type_id"/>
+                        <field name="interval_months"/>
+                        <field name="last_done_date"/>
+                        <field name="delivery"/>
+                    </group>
+                    <footer>
+                        <button name="action_create_schedules"
+                                string="Create Schedules"
+                                type="object"
+                                class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Device Bulk Schedule Wizard - Action -->
+    <record id="action_nhs_device_bulk_schedule_wizard" model="ir.actions.act_window">
+        <field name="name">Bulk Schedule</field>
+        <field name="res_model">nhs.device.bulk.schedule.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_nhs_device"/>
+        <field name="binding_view_types">list</field>
+    </record>
+</odoo>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Compliance Type List View -->
+    <record id="view_nhs_compliance_type_tree" model="ir.ui.view">
+        <field name="name">nhs.compliance.type.tree</field>
+        <field name="model">nhs.compliance.type</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="discipline_id"/>
+                <field name="htm_reference"/>
+                <field name="default_frequency_value"/>
+                <field name="default_frequency_unit"/>
+                <field name="is_statutory"/>
+                <field name="criticality"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Compliance Type Form View -->
+    <record id="view_nhs_compliance_type_form" model="ir.ui.view">
+        <field name="name">nhs.compliance.type.form</field>
+        <field name="model">nhs.compliance.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="discipline_id"/>
+                            <field name="htm_reference"/>
+                            <field name="is_statutory"/>
+                            <field name="criticality"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="default_frequency_value"/>
+                            <field name="default_frequency_unit"/>
+                            <field name="default_lead_days"/>
+                            <field name="requires_certificate"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Compliance Type Search View -->
+    <record id="view_nhs_compliance_type_search" model="ir.ui.view">
+        <field name="name">nhs.compliance.type.search</field>
+        <field name="model">nhs.compliance.type</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="discipline_id"/>
+                <filter name="statutory" string="Statutory" domain="[('is_statutory', '=', True)]"/>
+                <filter name="advisory" string="Advisory" domain="[('is_statutory', '=', False)]"/>
+                <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Compliance Type Action -->
+    <record id="action_nhs_compliance_type" model="ir.actions.act_window">
+        <field name="name">Compliance Types</field>
+        <field name="res_model">nhs.compliance.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

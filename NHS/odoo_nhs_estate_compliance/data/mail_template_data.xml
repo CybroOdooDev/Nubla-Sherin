@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Due Soon Item Reminder - Mail Template  -->
+        <record id="mail_template_compliance_due_soon" model="mail.template">
+            <field name="name">Compliance: Due Soon Reminder</field>
+            <field name="model_id" ref="model_nhs_compliance_item"/>
+            <field name="email_from">{{ (object.responsible_person_id.email_formatted or user.email_formatted or '')
+                }}
+            </field>
+            <field name="email_to">{{ object.responsible_person_id.email or '' }}</field>
+            <field name="subject">Compliance Item Due Soon: {{ object.reference }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p>Dear <t t-out="object.responsible_person_id.name or ''">Responsible Person</t>,
+                    </p>
+                    <p>The following compliance item is due soon:</p>
+                    <ul>
+                        <li>
+                            <strong>Reference:</strong>
+                            <t t-out="object.reference or ''">REF</t>
+                        </li>
+                        <li>
+                            <strong>Type:</strong>
+                            <t t-out="object.compliance_type_id.name or ''">Type</t>
+                        </li>
+                        <li>
+                            <strong>Discipline:</strong>
+                            <t t-out="object.discipline_id.name or ''">Discipline</t>
+                        </li>
+                        <li>
+                            <strong>Location:</strong>
+                            <t t-out="object.building_id.name or object.site_id.name or ''">Location</t>
+                        </li>
+                        <li>
+                            <strong>Next Due Date:</strong>
+                            <t t-out="object.next_due_date or ''">Date</t>
+                        </li>
+                    </ul>
+                    <p>Please ensure this test is completed before the due date.</p>
+                    <p>Kind regards,<br/>Estates Compliance Team
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <!-- Overdue Item Alert - Mail Template  -->
+        <record id="mail_template_compliance_overdue" model="mail.template">
+            <field name="name">Compliance: Overdue Alert</field>
+            <field name="model_id" ref="model_nhs_compliance_item"/>
+            <field name="email_from">{{ (object.responsible_person_id.email_formatted or user.email_formatted or '')
+                }}
+            </field>
+            <field name="email_to">{{ object.responsible_person_id.email or '' }}</field>
+            <field name="subject">COMPLIANCE OVERDUE: {{ object.reference }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p style="color: red;">
+                        <strong>URGENT: Compliance Item Overdue</strong>
+                    </p>
+                    <p>Dear <t t-out="object.responsible_person_id.name or ''">Responsible Person</t>,
+                    </p>
+                    <p>The following compliance item is now overdue:</p>
+                    <ul>
+                        <li>
+                            <strong>Reference:</strong>
+                            <t t-out="object.reference or ''">REF</t>
+                        </li>
+                        <li>
+                            <strong>Type:</strong>
+                            <t t-out="object.compliance_type_id.name or ''">Type</t>
+                        </li>
+                        <li>
+                            <strong>Discipline:</strong>
+                            <t t-out="object.discipline_id.name or ''">Discipline</t>
+                        </li>
+                        <li>
+                            <strong>Location:</strong>
+                            <t t-out="object.building_id.name or object.site_id.name or ''">Location</t>
+                        </li>
+                        <li>
+                            <strong>Next Due Date:</strong>
+                            <t t-out="object.next_due_date or ''">Date</t>
+                        </li>
+                    </ul>
+                    <p>
+                        <strong>This requires immediate attention.</strong>
+                    </p>
+                    <p>Kind regards,<br/>Estates Compliance Team
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <!-- Item Escalation Alert - Mail Template  -->
+        <record id="mail_template_compliance_escalation" model="mail.template">
+            <field name="name">Compliance: Escalation Alert</field>
+            <field name="model_id" ref="model_nhs_compliance_item"/>
+            <field name="email_from">{{ (object.responsible_person_id.email_formatted or user.email_formatted or '')
+                }}
+            </field>
+            <field name="email_to">{{ object.responsible_person_id.email or '' }}</field>
+            <field name="subject">CRITICAL COMPLIANCE ESCALATION: {{ object.reference }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p style="color: red; font-size: 16px;">
+                        <strong>CRITICAL: Compliance Escalation Notice</strong>
+                    </p>
+                    <p>The following compliance item remains unresolved and has exceeded the escalation threshold:</p>
+                    <ul>
+                        <li>
+                            <strong>Reference:</strong>
+                            <t t-out="object.reference or ''">REF</t>
+                        </li>
+                        <li>
+                            <strong>Type:</strong>
+                            <t t-out="object.compliance_type_id.name or ''">Type</t>
+                        </li>
+                        <li>
+                            <strong>Discipline:</strong>
+                            <t t-out="object.discipline_id.name or ''">Discipline</t>
+                        </li>
+                        <li>
+                            <strong>Location:</strong>
+                            <t t-out="object.building_id.name or object.site_id.name or ''">Location</t>
+                        </li>
+                        <li>
+                            <strong>Next Due Date:</strong>
+                            <t t-out="object.next_due_date or ''">Date</t>
+                        </li>
+                    </ul>
+                    <p>Please take immediate corrective action.</p>
+                    <p>Kind regards,<br/>Estates Compliance Team
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <!-- Duty Role Authorisation Expiring Remainder - Mail Template  -->
+        <record id="mail_template_authorisation_expiry" model="mail.template">
+            <field name="name">Compliance: Duty Role Authorisation Expiring</field>
+            <field name="model_id" ref="model_nhs_duty_assignment"/>
+            <field name="email_from">{{ (object.person_id.email_formatted or user.email_formatted or '') }}</field>
+            <field name="email_to">{{ object.person_id.email or '' }}</field>
+            <field name="subject">Duty Role Authorisation Expiring: {{ object.duty_role_id.name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p>Dear <t t-out="object.person_id.name or ''">User</t>,
+                    </p>
+                    <p>This is a reminder that your duty role authorisation for
+                        <strong>
+                            <t t-out="object.duty_role_id.name or ''">Duty Role</t>
+                        </strong>
+                        is expiring soon:
+                    </p>
+                    <ul>
+                        <li>
+                            <strong>Discipline:</strong>
+                            <t t-out="object.discipline_id.name or 'Organisation-wide'">Discipline</t>
+                        </li>
+                        <li>
+                            <strong>Expiry Date:</strong>
+                            <t t-out="object.authorised_to or ''">Date</t>
+                        </li>
+                        <li>
+                            <strong>Reference:</strong>
+                            <t t-out="object.authorisation_ref or 'N/A'">Ref</t>
+                        </li>
+                    </ul>
+                    <p>Please renew your competency/authorisation credentials to maintain compliance.</p>
+                    <p>Kind regards,<br/>Estates Compliance Team
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <!-- Duty Role Authorisation Expired - Mail Template  -->
+        <record id="mail_template_authorisation_expired" model="mail.template">
+            <field name="name">Compliance: Duty Role Authorisation Expired</field>
+            <field name="model_id" ref="model_nhs_duty_assignment"/>
+            <field name="email_from">{{ (object.person_id.email_formatted or user.email_formatted or '') }}</field>
+            <field name="email_to">{{ object.person_id.email or '' }}</field>
+            <field name="subject">Duty Role Authorisation EXPIRED: {{ object.duty_role_id.name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p style="color: red;">
+                        <strong>URGENT: Duty Role Authorisation Expired</strong>
+                    </p>
+                    <p>Dear <t t-out="object.person_id.name or ''">User</t>,
+                    </p>
+                    <p>This is to notify you that your duty role authorisation for
+                        <strong>
+                            <t t-out="object.duty_role_id.name or ''">Duty Role</t>
+                        </strong>
+                        has expired:
+                    </p>
+                    <ul>
+                        <li>
+                            <strong>Discipline:</strong>
+                            <t t-out="object.discipline_id.name or 'Organisation-wide'">Discipline</t>
+                        </li>
+                        <li>
+                            <strong>Expiry Date:</strong>
+                            <t t-out="object.authorised_to or ''">Date</t>
+                        </li>
+                        <li>
+                            <strong>Reference:</strong>
+                            <t t-out="object.authorisation_ref or 'N/A'">Ref</t>
+                        </li>
+                    </ul>
+                    <p>Please renew your competency/authorisation credentials immediately to restore compliance.</p>
+                    <p>Kind regards,<br/>Estates Compliance Team
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <!-- Overdue Remedial Escalation Alert - Mail Template  -->
+        <record id="mail_template_remedial_escalation" model="mail.template">
+            <field name="name">Remedial: Overdue Escalation Alert</field>
+            <field name="model_id" ref="model_nhs_compliance_remedial"/>
+            <field name="email_from">{{ (object.owner_id.email_formatted or user.email_formatted or '') }}</field>
+            <field name="email_to">{{ object.owner_id.email or '' }}</field>
+            <field name="subject">REMEDIAL ACTION OVERDUE ESCALATION: {{ object.name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p style="color: red;">
+                        <strong>URGENT: Remedial Action Overdue Escalation</strong>
+                    </p>
+                    <p>Dear <t t-out="object.owner_id.name or ''">Owner</t>,
+                    </p>
+                    <p>The following remedial action is overdue and has been escalated:</p>
+                    <ul>
+                        <li>
+                            <strong>Remedial Action:</strong>
+                            <t t-out="object.name or ''">Name</t>
+                        </li>
+                        <li>
+                            <strong>Compliance Item:</strong>
+                            <t t-out="object.item_id.name or ''">Item</t>
+                        </li>
+                        <li>
+                            <strong>Priority:</strong>
+                            <t t-out="object.priority or ''">Medium</t>
+                        </li>
+                        <li>
+                            <strong>Due Date:</strong>
+                            <t t-out="object.due_date or ''">Date</t>
+                        </li>
+                    </ul>
+                    <p>Please take immediate action to resolve this compliance issue.</p>
+                    <p>Kind regards,<br/>Estates Compliance Team
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <!-- Contractor Accreditation Expiring Reminder - Mail Template -->
+        <record id="mail_template_contractor_accreditation_expiry" model="mail.template">
+            <field name="name">Contractor: Accreditation Expiring</field>
+            <field name="model_id" ref="model_nhs_compliance_contractor"/>
+            <field name="email_from">{{ (user.email_formatted or '') }}</field>
+            <field name="email_to">{{ object.partner_id.email or '' }}</field>
+            <field name="subject">Contractor Accreditation Expiring: {{ object.name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p>Dear <t t-out="object.name or ''">Contractor</t>,
+                    </p>
+                    <p>This is a reminder that the following accreditation(s) are expiring soon:</p>
+                    <ul>
+                        <t t-foreach="object.accreditation_ids" t-as="line">
+                            <t t-if="line.days_remaining &gt;= 0 and line.days_remaining &lt;= 30">
+                                <li>
+                                    <strong>
+                                        <t t-esc="line.accreditation_id.code or ''"/>
+                                    </strong>
+                                    -
+                                    <t t-esc="line.accreditation_id.name or ''"/>
+                                    <br/>
+                                    <strong>Expiry Date:</strong>
+                                    <t t-esc="line.expiry_date or ''"/>
+                                    <span style="color: orange;">
+                                        (
+                                        <t t-esc="line.days_remaining or 0"/>
+                                        days remaining)
+                                    </span>
+                                </li>
+                            </t>
+                        </t>
+                    </ul>
+                    <p>Please provide updated accreditation details to ensure uninterrupted compliance status.</p>
+                    <p>Kind regards,<br/>Estates Compliance Team
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <!-- Contractor Accreditation Expired - Mail Template -->
+        <record id="mail_template_contractor_accreditation_expired" model="mail.template">
+            <field name="name">Contractor: Accreditation Expired</field>
+            <field name="model_id" ref="model_nhs_compliance_contractor"/>
+            <field name="email_from">{{ (user.email_formatted or '') }}</field>
+            <field name="email_to">{{ object.partner_id.email or '' }}</field>
+            <field name="subject">Contractor Accreditation EXPIRED: {{ object.name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p style="color: red;">
+                        <strong>URGENT: Contractor Accreditation Expired</strong>
+                    </p>
+                    <p>Dear <t t-out="object.name or ''">Contractor</t>,
+                    </p>
+                    <p>This is to notify you that the following accreditation(s) have expired:</p>
+                    <ul>
+                        <t t-foreach="object.accreditation_ids" t-as="line">
+                            <t t-if="line.is_expired">
+                                <li>
+                                    <strong>
+                                        <t t-esc="line.accreditation_id.code or ''"/>
+                                    </strong>
+                                    -
+                                    <t t-esc="line.accreditation_id.name or ''"/>
+                                    <br/>
+                                    <strong>Expiry Date:</strong>
+                                    <t t-esc="line.expiry_date or ''"/>
+                                    <span style="color: red; font-weight: bold;">
+                                        (EXPIRED -
+                                        <t t-esc="abs(line.days_remaining or 0)"/>
+                                        days overdue)
+                                    </span>
+                                </li>
+                            </t>
+                        </t>
+                    </ul>
+                    <p style="color: red;">
+                        <strong>IMPORTANT:</strong>
+                        Please provide updated accreditation details immediately to restore your compliance status.
+                    </p>
+                    <p>Kind regards,<br/>Estates Compliance Team
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <!-- Contractor Insurance Expiring Reminder - Mail Template -->
+        <record id="mail_template_contractor_insurance_expiry" model="mail.template">
+            <field name="name">Contractor: Insurance Expiring</field>
+            <field name="model_id" ref="model_nhs_compliance_contractor"/>
+            <field name="email_from">{{ (user.email_formatted or '') }}</field>
+            <field name="email_to">{{ object.partner_id.email or '' }}</field>
+            <field name="subject">Contractor Insurance Expiring: {{ object.name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p>Dear <t t-out="object.name or ''">Contractor</t>,
+                    </p>
+                    <p>This is a reminder that your insurance cover is expiring soon:</p>
+                    <ul>
+                        <li>
+                            <strong>Insurance Expiry Date:</strong>
+                            <t t-esc="object.insurance_expiry or ''"/>
+                            <t t-set="days"
+                               t-value="(object.insurance_expiry - datetime.date.today()).days if object.insurance_expiry else 0"/>
+                            <span style="color: orange;">(
+                                <t t-esc="days"/>
+                                days remaining)
+                            </span>
+                        </li>
+                    </ul>
+                    <p>Please provide a copy of your renewed insurance certificate to maintain compliance.</p>
+                    <p>Kind regards,<br/>Estates Compliance Team
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <!-- Contractor Insurance Expired - Mail Template -->
+        <record id="mail_template_contractor_insurance_expired" model="mail.template">
+            <field name="name">Contractor: Insurance Expired</field>
+            <field name="model_id" ref="model_nhs_compliance_contractor"/>
+            <field name="email_from">{{ (user.email_formatted or '') }}</field>
+            <field name="email_to">{{ object.partner_id.email or '' }}</field>
+            <field name="subject">Contractor Insurance EXPIRED: {{ object.name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p style="color: red;">
+                        <strong>URGENT: Contractor Insurance Expired</strong>
+                    </p>
+                    <p>Dear <t t-out="object.name or ''">Contractor</t>,
+                    </p>
+                    <p>This is to notify you that your insurance cover has expired:</p>
+                    <ul>
+                        <li>
+                            <strong>Insurance Expiry Date:</strong>
+                            <t t-esc="object.insurance_expiry or ''"/>
+                            <t t-set="days"
+                               t-value="(object.insurance_expiry - datetime.date.today()).days if object.insurance_expiry else 0"/>
+                            <span style="color: red; font-weight: bold;">
+                                (EXPIRED -
+                                <t t-esc="abs(days)"/>
+                                days overdue)
+                            </span>
+                        </li>
+                    </ul>
+                    <p style="color: red;">
+                        <strong>IMPORTANT:</strong>
+                        Please provide a copy of your renewed insurance certificate immediately to restore your
+                        compliance status.
+                    </p>
+                    <p>Kind regards,<br/>Estates Compliance Team
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <!-- Test Certificate Expiring Remainder - Mail Template  -->
+        <record id="mail_template_test_certificate_expiry" model="mail.template">
+            <field name="name">Test: Certificate Expiring</field>
+            <field name="model_id" ref="model_nhs_compliance_test"/>
+            <field name="email_from">{{ (object.item_id.responsible_person_id.email_formatted or user.email_formatted or
+                '') }}
+            </field>
+            <field name="email_to">{{ object.item_id.responsible_person_id.email or '' }}</field>
+            <field name="subject">Compliance Test Certificate Expiring: {{ object.name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p>Dear <t t-out="object.item_id.responsible_person_id.name or ''">Responsible Person</t>,
+                    </p>
+                    <p>The statutory certificate for compliance item
+                        <strong>
+                            <t t-out="object.item_id.name or ''">Item</t>
+                        </strong>
+                        is expiring soon:
+                    </p>
+                    <ul>
+                        <li>
+                            <strong>Test Reference:</strong>
+                            <t t-out="object.name or ''">Ref</t>
+                        </li>
+                        <li>
+                            <strong>Certificate Expiry Date:</strong>
+                            <t t-out="object.certificate_expiry or ''">Date</t>
+                        </li>
+                    </ul>
+                    <p>Please schedule a new compliance test before the expiry date.</p>
+                    <p>Kind regards,<br/>Estates Compliance Team
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+    </data>
+</odoo>

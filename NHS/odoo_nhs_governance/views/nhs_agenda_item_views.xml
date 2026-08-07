@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List view of agenda items across meetings, highlighting confidential items -->
+    <record id="view_nhs_agenda_item_list" model="ir.ui.view">
+        <field name="name">nhs.agenda.item.list</field>
+        <field name="model">nhs.agenda.item</field>
+        <field name="arch" type="xml">
+            <list string="Agenda Items" decoration-info="is_confidential">
+                <field name="meeting_id"/>
+                <field name="committee_id"/>
+                <field name="item_number"/>
+                <field name="title"/>
+                <field name="purpose"/>
+                <field name="presenter_id"/>
+                <field name="is_confidential"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'completed'" decoration-warning="state == 'deferred'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view for a single agenda item: purpose, presenter, papers, minute and decision -->
+    <record id="view_nhs_agenda_item_form" model="ir.ui.view">
+        <field name="name">nhs.agenda.item.form</field>
+        <field name="model">nhs.agenda.item</field>
+        <field name="arch" type="xml">
+            <form string="Agenda Item">
+                <header>
+                    <field name="id" invisible="1"/>
+                    <button name="action_mark_complete" string="Mark Complete" type="object"
+                            class="btn-primary" invisible="state in ('completed', 'deferred') or not id"/>
+                    <button name="action_defer_to_next" string="Defer" type="object"
+                            invisible="state in ('completed', 'deferred') or not id"/>
+                    <button name="action_reset_draft" string="Reset to Draft" type="object"
+                            invisible="state == 'draft' or not id"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,completed,deferred" options="{'clickable': '1'}" readonly="not id"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="title"/>
+                        <h1>
+                            <field name="title" placeholder="e.g. Q3 Financial Update"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="presenter_director_ids" invisible="1"/>
+                            <field name="meeting_id"/>
+                            <field name="item_number"/>
+                            <field name="purpose"/>
+                            <field name="state" widget="radio" options="{'horizontal': true}" invisible="id" string="Initial Status"/>
+                            <field name="presenter_id"/>
+                            <field name="time_allocation"/>
+                            <field name="is_confidential"/>
+                            <field name="cycle_item_id"/>
+                        </group>
+                        <group>
+                            <field name="paper_ids" widget="many2many_binary"/>
+                            <field name="deferred_to_id" required="state == 'deferred'"/>
+                        </group>
+                    </group>
+                    <group string="Minute &amp; Decision">
+                        <field name="minute_text"/>
+                        <field name="decision_text"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view with confidential/decision/status filters and group-bys for agenda items -->
+    <record id="view_nhs_agenda_item_search" model="ir.ui.view">
+        <field name="name">nhs.agenda.item.search</field>
+        <field name="model">nhs.agenda.item</field>
+        <field name="arch" type="xml">
+            <search string="Search Agenda Items">
+                <field name="title"/>
+                <field name="meeting_id"/>
+                <field name="committee_id"/>
+                <filter name="confidential" string="Confidential" domain="[('is_confidential', '=', True)]"/>
+                <filter name="decisions" string="Decisions" domain="[('purpose', '=', 'decision')]"/>
+                <separator/>
+                <filter name="status_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="status_completed" string="Completed" domain="[('state', '=', 'completed')]"/>
+                <filter name="status_deferred" string="Deferred" domain="[('state', '=', 'deferred')]"/>
+                <group name="group_by">
+                    <filter name="group_committee" string="Committee" context="{'group_by': 'committee_id'}"/>
+                    <filter name="group_purpose" string="Purpose" context="{'group_by': 'purpose'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window action opening the Agendas & Packs list/form for agenda items -->
+    <record id="action_nhs_agenda_item" model="ir.actions.act_window">
+        <field name="name">Agendas &amp; Packs</field>
+        <field name="res_model">nhs.agenda.item</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

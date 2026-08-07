@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Standard NHS staff groups used in national workforce data returns -->
+    <!-- Registered nurses and midwives -->
+    <record id="staff_group_nursing_midwifery" model="nhs.staff.group">
+        <field name="name">Nursing &amp; Midwifery</field>
+        <field name="code">N&amp;M</field>
+        <field name="sequence">10</field>
+        <field name="is_clinical">True</field>
+    </record>
+    <!-- Doctors and dentists, paid off the Medical & Dental contract rather than AfC -->
+    <record id="staff_group_medical_dental" model="nhs.staff.group">
+        <field name="name">Medical &amp; Dental</field>
+        <field name="code">MED</field>
+        <field name="sequence">20</field>
+        <field name="is_clinical">True</field>
+    </record>
+    <!-- Physiotherapists, radiographers, occupational therapists and similar AHP roles -->
+    <record id="staff_group_ahp" model="nhs.staff.group">
+        <field name="name">Allied Health Professionals (AHPs)</field>
+        <field name="code">AHP</field>
+        <field name="sequence">30</field>
+        <field name="is_clinical">True</field>
+    </record>
+    <!-- Biomedical, clinical and other healthcare science specialists -->
+    <record id="staff_group_healthcare_scientists" model="nhs.staff.group">
+        <field name="name">Healthcare Scientists</field>
+        <field name="code">HCS</field>
+        <field name="sequence">40</field>
+        <field name="is_clinical">True</field>
+    </record>
+    <!-- Support workers assisting registered clinical staff (e.g. therapy/nursing assistants) -->
+    <record id="staff_group_additional_clinical_services" model="nhs.staff.group">
+        <field name="name">Additional Clinical Services</field>
+        <field name="code">ACS</field>
+        <field name="sequence">50</field>
+        <field name="is_clinical">True</field>
+    </record>
+    <!-- Non-clinical office, clerical and management support roles -->
+    <record id="staff_group_admin_clerical" model="nhs.staff.group">
+        <field name="name">Administrative &amp; Clerical</field>
+        <field name="code">A&amp;C</field>
+        <field name="sequence">60</field>
+        <field name="is_clinical">False</field>
+    </record>
+    <!-- Estates, facilities and ancillary support staff (e.g. maintenance, catering, cleaning) -->
+    <record id="staff_group_estates_ancillary" model="nhs.staff.group">
+        <field name="name">Estates &amp; Ancillary</field>
+        <field name="code">E&amp;A</field>
+        <field name="sequence">70</field>
+        <field name="is_clinical">False</field>
+    </record>
+    <!-- Non-clinical professional, scientific and technical specialists (e.g. IT, informatics, engineering) -->
+    <record id="staff_group_additional_pst" model="nhs.staff.group">
+        <field name="name">Additional Professional, Scientific &amp; Technical</field>
+        <field name="code">APST</field>
+        <field name="sequence">80</field>
+        <field name="is_clinical">False</field>
+    </record>
+</odoo>

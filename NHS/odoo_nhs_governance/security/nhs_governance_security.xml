@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- MODULE CATEGORY / PRIVILEGE-->
+        <record id="module_category_nhs_governance" model="ir.module.category">
+            <field name="name">Governance</field>
+            <field name="description">NHS Governance Management access levels.</field>
+            <field name="sequence">55</field>
+        </record>
+
+        <!-- Privilege grouping the three governance access-level groups -->
+        <record id="privilege_nhs_gov_access_level" model="res.groups.privilege">
+            <field name="name">Governance Access Level</field>
+            <field name="category_id" ref="module_category_nhs_governance"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- GROUPS-->
+        <record id="group_nhs_gov_viewer" model="res.groups">
+            <field name="name">Governance Viewer</field>
+            <field name="privilege_id" ref="privilege_nhs_gov_access_level"/>
+            <field name="comment">Read board/committee content they are entitled to. Members see their own
+                committees, their own actions and their own declarations of interest.</field>
+        </record>
+
+        <!-- Security group: Committee Secretary / Governance Officer -->
+        <record id="group_nhs_gov_officer" model="res.groups">
+            <field name="name">Committee Secretary / Governance Officer</field>
+            <field name="privilege_id" ref="privilege_nhs_gov_access_level"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_gov_viewer'))]"/>
+            <field name="comment">Manage meetings, agendas, papers, minutes, actions, declarations and the
+                BAF. Cannot change configuration.</field>
+        </record>
+
+        <!-- Security group: Governance Manager / Company Secretary -->
+        <record id="group_nhs_gov_manager" model="res.groups">
+            <field name="name">Governance Manager / Company Secretary</field>
+            <field name="privilege_id" ref="privilege_nhs_gov_access_level"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_gov_officer'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+            <field name="comment">Full control including configuration and disbanding committees.</field>
+        </record>
+
+        <!-- RECORD RULES — nhs.committee-->
+        <record id="rule_gov_committee_manager" model="ir.rule">
+            <field name="name">Committee: manager full access</field>
+            <field name="model_id" ref="model_nhs_committee"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <!-- Record rule: officers/managers see committees within their company scope -->
+        <record id="rule_gov_committee_officer" model="ir.rule">
+            <field name="name">Committee: officer company scope</field>
+            <field name="model_id" ref="model_nhs_committee"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_officer'))]"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+        <!-- Record rule: viewers only see committees they are a member of -->
+        <record id="rule_gov_committee_viewer" model="ir.rule">
+            <field name="name">Committee: viewer sees own committees only</field>
+            <field name="model_id" ref="model_nhs_committee"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_viewer'))]"/>
+            <field name="domain_force">['&amp;', ('company_id', 'in', company_ids),
+                ('member_ids.user_id', '=', user.id)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- RECORD RULES — nhs.committee.member / nhs.cycle.of.business
+             (scoped through the parent committee's company + membership)-->
+        <record id="rule_gov_committee_member_officer" model="ir.rule">
+            <field name="name">Committee Member: officer/manager company scope</field>
+            <field name="model_id" ref="model_nhs_committee_member"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_officer'))]"/>
+            <field name="domain_force">[('committee_id.company_id', 'in', company_ids)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <!-- Record rule: viewers only see membership of their own committees -->
+        <record id="rule_gov_committee_member_viewer" model="ir.rule">
+            <field name="name">Committee Member: viewer sees own committees' membership only</field>
+            <field name="model_id" ref="model_nhs_committee_member"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_viewer'))]"/>
+            <field name="domain_force">['&amp;', ('committee_id.company_id', 'in', company_ids),
+                ('committee_id.member_ids.user_id', '=', user.id)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Record rule: officers/managers see cycle-of-business items within their company scope -->
+        <record id="rule_gov_cob_officer" model="ir.rule">
+            <field name="name">Cycle of Business: officer/manager company scope</field>
+            <field name="model_id" ref="model_nhs_cycle_of_business"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_officer'))]"/>
+            <field name="domain_force">[('committee_id.company_id', 'in', company_ids)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <!-- Record rule: viewers only see cycle-of-business items for their own committees -->
+        <record id="rule_gov_cob_viewer" model="ir.rule">
+            <field name="name">Cycle of Business: viewer sees own committees' cycle only</field>
+            <field name="model_id" ref="model_nhs_cycle_of_business"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_viewer'))]"/>
+            <field name="domain_force">['&amp;', ('committee_id.company_id', 'in', company_ids),
+                ('committee_id.member_ids.user_id', '=', user.id)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- RECORD RULES — nhs.meeting / nhs.meeting.attendee / nhs.agenda.item -->
+        <record id="rule_gov_meeting_officer" model="ir.rule">
+            <field name="name">Meeting: officer/manager company scope</field>
+            <field name="model_id" ref="model_nhs_meeting"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_officer'))]"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <!-- Record rule: viewers only see meetings of their own committees -->
+        <record id="rule_gov_meeting_viewer" model="ir.rule">
+            <field name="name">Meeting: viewer sees own committees' meetings only</field>
+            <field name="model_id" ref="model_nhs_meeting"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_viewer'))]"/>
+            <field name="domain_force">['&amp;', ('company_id', 'in', company_ids),
+                ('committee_id.member_ids.user_id', '=', user.id)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Record rule: officers/managers see attendance within their company scope -->
+        <record id="rule_gov_attendee_officer" model="ir.rule">
+            <field name="name">Attendance: officer/manager company scope</field>
+            <field name="model_id" ref="model_nhs_meeting_attendee"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_officer'))]"/>
+            <field name="domain_force">[('meeting_id.company_id', 'in', company_ids)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <!-- Record rule: viewers only see attendance for their own committees -->
+        <record id="rule_gov_attendee_viewer" model="ir.rule">
+            <field name="name">Attendance: viewer sees own committees only</field>
+            <field name="model_id" ref="model_nhs_meeting_attendee"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_viewer'))]"/>
+            <field name="domain_force">['&amp;', ('meeting_id.company_id', 'in', company_ids),
+                ('meeting_id.committee_id.member_ids.user_id', '=', user.id)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Record rule: officers/managers see agenda items, including confidential ones, within their company scope -->
+        <record id="rule_gov_agenda_item_officer" model="ir.rule">
+            <field name="name">Agenda Item: officer/manager company scope (incl. confidential)</field>
+            <field name="model_id" ref="model_nhs_agenda_item"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_officer'))]"/>
+            <field name="domain_force">[('meeting_id.company_id', 'in', company_ids)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <!-- Record rule: viewers see non-confidential agenda items, chairs also see confidential ones -->
+        <record id="rule_gov_agenda_item_viewer" model="ir.rule">
+            <field name="name">Agenda Item: viewer sees own committees, confidential restricted to the committee chair</field>
+            <field name="model_id" ref="model_nhs_agenda_item"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_viewer'))]"/>
+            <field name="domain_force">['&amp;', ('meeting_id.company_id', 'in', company_ids),
+                '&amp;', ('meeting_id.committee_id.member_ids.user_id', '=', user.id),
+                '|', ('is_confidential', '=', False),
+                ('meeting_id.committee_id.chair_id.user_id', '=', user.id)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- RECORD RULES — nhs.meeting.action (own actions for viewer) -->
+        <record id="rule_gov_action_officer" model="ir.rule">
+            <field name="name">Action: officer/manager company scope</field>
+            <field name="model_id" ref="model_nhs_meeting_action"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_officer'))]"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <!-- Record rule: viewers only see/update actions they own -->
+        <record id="rule_gov_action_viewer" model="ir.rule">
+            <field name="name">Action: viewer sees/updates own assigned actions only</field>
+            <field name="model_id" ref="model_nhs_meeting_action"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_viewer'))]"/>
+            <field name="domain_force">['&amp;', ('company_id', 'in', company_ids), ('owner_id', '=', user.id)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- RECORD RULES — nhs.declaration (own declarations for viewer;
+             sensitive personal data — access controlled) -->
+        <record id="rule_gov_declaration_officer" model="ir.rule">
+            <field name="name">Declaration: officer/manager company scope</field>
+            <field name="model_id" ref="model_nhs_declaration"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_officer'))]"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <!-- Record rule: viewers only see/declare their own interests -->
+        <record id="rule_gov_declaration_viewer" model="ir.rule">
+            <field name="name">Declaration: viewer sees/declares own interests only</field>
+            <field name="model_id" ref="model_nhs_declaration"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_viewer'))]"/>
+            <field name="domain_force">['&amp;', ('company_id', 'in', company_ids), ('director_id.user_id', '=', user.id)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- RECORD RULES — nhs.director (its own model; company-scoped like the
+             rest of the register, plus a director can always see/edit their own record)-->
+        <record id="rule_gov_director_officer" model="ir.rule">
+            <field name="name">Director: officer/manager company scope</field>
+            <field name="model_id" ref="model_nhs_director"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_officer'))]"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <!-- Record rule: viewers get read-only access to directors in their company -->
+        <record id="rule_gov_director_viewer_read" model="ir.rule">
+            <field name="name">Director: viewer read-only company scope</field>
+            <field name="model_id" ref="model_nhs_director"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_viewer'))]"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+        <!-- Record rule: a viewer can additionally edit their own director record
+             (e.g. to update their own FPPR/contact link) -->
+        <record id="rule_gov_director_viewer_own_write" model="ir.rule">
+            <field name="name">Director: viewer can edit their own record</field>
+            <field name="model_id" ref="model_nhs_director"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_viewer'))]"/>
+            <field name="domain_force">['&amp;', ('company_id', 'in', company_ids), ('user_id', '=', user.id)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- RECORD RULES — BAF (company-wide read for viewer; BAF is board-level,
+             less restrictive)-->
+        <record id="rule_gov_baf_objective_officer" model="ir.rule">
+            <field name="name">BAF Objective: officer/manager company scope</field>
+            <field name="model_id" ref="model_nhs_baf_objective"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_officer'))]"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <!-- Record rule: viewers get read-only access to BAF objectives in their company -->
+        <record id="rule_gov_baf_objective_viewer" model="ir.rule">
+            <field name="name">BAF Objective: viewer read-only company scope</field>
+            <field name="model_id" ref="model_nhs_baf_objective"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_viewer'))]"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Record rule: officers/managers see BAF risks within their company scope -->
+        <record id="rule_gov_baf_risk_officer" model="ir.rule">
+            <field name="name">BAF Risk: officer/manager company scope</field>
+            <field name="model_id" ref="model_nhs_baf_risk"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_officer'))]"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <!-- Record rule: viewers get read-only access to BAF risks in their company -->
+        <record id="rule_gov_baf_risk_viewer" model="ir.rule">
+            <field name="name">BAF Risk: viewer read-only company scope</field>
+            <field name="model_id" ref="model_nhs_baf_risk"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_viewer'))]"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Record rule: officers/managers see BAF assurances within their company scope -->
+        <record id="rule_gov_baf_assurance_officer" model="ir.rule">
+            <field name="name">BAF Assurance: officer/manager company scope</field>
+            <field name="model_id" ref="model_nhs_baf_assurance"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_officer'))]"/>
+            <field name="domain_force">[('risk_id.company_id', 'in', company_ids)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <!-- Record rule: viewers get read-only access to BAF assurances in their company -->
+        <record id="rule_gov_baf_assurance_viewer" model="ir.rule">
+            <field name="name">BAF Assurance: viewer read-only company scope</field>
+            <field name="model_id" ref="model_nhs_baf_assurance"/>
+            <field name="groups" eval="[(4, ref('group_nhs_gov_viewer'))]"/>
+            <field name="domain_force">[('risk_id.company_id', 'in', company_ids)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+    </data>
+</odoo>

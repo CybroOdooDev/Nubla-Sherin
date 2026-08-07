@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Response-timescale presets for the four complexity levels used by the complaint form -->
+    <record id="timescale_simple_25" model="nhs.complaint.timescale">
+        <field name="name">Simple (25 working days)</field>
+        <field name="working_days">25</field>
+        <field name="complexity">low</field>
+        <field name="description">For straightforward, single-point complaints that are simple to investigate.</field>
+    </record>
+
+    <record id="timescale_standard_40" model="nhs.complaint.timescale">
+        <field name="name">Standard (40 working days)</field>
+        <field name="working_days">40</field>
+        <field name="complexity">medium</field>
+        <field name="description">Default timescale for most formal complaints. Approximately 8 weeks.</field>
+    </record>
+
+    <record id="timescale_complex_60" model="nhs.complaint.timescale">
+        <field name="name">Complex (60 working days)</field>
+        <field name="working_days">60</field>
+        <field name="complexity">high</field>
+        <field name="description">For complex, multi-issue complaints requiring extensive investigation.</field>
+    </record>
+
+    <record id="timescale_major_negotiated" model="nhs.complaint.timescale">
+        <field name="name">Major / Multi-Organisation (negotiated)</field>
+        <field name="working_days">80</field>
+        <field name="complexity">major</field>
+        <field name="description">For major or multi-organisation complaints where the timescale must be agreed with all parties. Working days figure is a guide only — edit per case.</field>
+    </record>
+</odoo>

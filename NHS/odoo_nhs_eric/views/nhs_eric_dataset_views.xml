@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View for Data Sets -->
+    <record id="view_nhs_eric_dataset_list" model="ir.ui.view">
+        <field name="name">nhs.eric.dataset.list</field>
+        <field name="model">nhs.eric.dataset</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="year"/>
+                <field name="state"/>
+                <field name="item_count"/>
+                <field name="notes"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View for Data Sets -->
+    <record id="view_nhs_eric_dataset_form" model="ir.ui.view">
+        <field name="name">nhs.eric.dataset.form</field>
+        <field name="model">nhs.eric.dataset</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_draft" string="Set to Draft" type="object" invisible="state in ['draft']" class="oe_highlight" />
+                    <button name="action_activate" string="Activate" type="object" invisible="state in ['active']" class="oe_highlight" />
+                    <button name="action_archive" string="Archive" type="object" invisible="state in ['archived','draft']" class="oe_highlight" />
+                    <button name="action_clone_year" string="Clone to New Year" type="object" invisible="state in ['archived','draft']" class="oe_highlight" />
+                    <button name="action_compare_with_prior" string="Recalculate Changes" type="object" invisible="not prior_dataset_id" class="oe_highlight" />
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,archived"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_items" type="object" class="oe_stat_button" icon="fa-list">
+                            <field name="item_count" string="Items" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="e.g. ERIC 2025/26"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="year" placeholder="e.g. 2025/26"/>
+                            <field name="prior_dataset_id" readonly="1" invisible="not prior_dataset_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Sections" invisible="id == 0">
+                            <field name="section_ids"/>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Data set Search View -->
+    <record id="view_nhs_eric_dataset_search" model="ir.ui.view">
+        <field name="name">nhs.eric.dataset.search</field>
+        <field name="model">nhs.eric.dataset</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="year"/>
+                <filter name="active" string="Active" domain="[('state', '=', 'active')]"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="archived" string="Archived" domain="[('state', '=', 'archived')]"/>
+                <filter name="group_state" string="Status" domain="[]" context="{'group_by': 'state'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- List View for Sections -->
+    <record id="view_nhs_eric_section_list" model="ir.ui.view">
+        <field name="name">nhs.eric.section.list</field>
+        <field name="model">nhs.eric.section</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="item_count"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View for Sections -->
+    <record id="view_nhs_eric_section_form" model="ir.ui.view">
+        <field name="name">nhs.eric.section.form</field>
+        <field name="model">nhs.eric.section</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_items" type="object" class="oe_stat_button" icon="fa-list">
+                            <field name="item_count" string="Items" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="dataset_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Items" invisible="id == 0">
+                            <field name="item_def_ids">
+                                <list>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="data_type"/>
+                                    <field name="unit"/>
+                                    <field name="source_type"/>
+                                    <field name="required"/>
+                                    <field name="min_value" optional="hide"/>
+                                    <field name="max_value" optional="hide"/>
+                                    <field name="change_flag" decoration-success="change_flag == 'new'" decoration-warning="change_flag == 'changed'" decoration-danger="change_flag == 'removed'" decoration-info="change_flag == 'unchanged'" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View for Section -->
+    <record id="view_nhs_eric_section_search" model="ir.ui.view">
+        <field name="name">nhs.eric.section.search</field>
+        <field name="model">nhs.eric.section</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="dataset_id"/>
+                <filter name="group_by_dataset" string="Dataset" context="{'group_by': 'dataset_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- List view for Item Definitions -->
+    <record id="view_nhs_eric_item_def_list" model="ir.ui.view">
+        <field name="name">nhs.eric.item.def.list</field>
+        <field name="model">nhs.eric.item.def</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="section_id"/>
+                <field name="data_type"/>
+                <field name="reporting_level"/>
+                <field name="unit"/>
+                <field name="source_type"/>
+                <field name="required"/>
+                <field name="min_value" optional="hide"/>
+                <field name="max_value" optional="hide"/>
+                <field name="change_flag" decoration-success="change_flag == 'new'" decoration-warning="change_flag == 'changed'" decoration-danger="change_flag == 'removed'" decoration-info="change_flag == 'unchanged'" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view for Item Definitions -->
+    <record id="view_nhs_eric_item_def_form" model="ir.ui.view">
+        <field name="name">nhs.eric.item.def.form</field>
+        <field name="model">nhs.eric.item.def</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="Item Label"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Basic Info">
+                            <field name="code"/>
+                            <field name="section_id"/>
+                            <field name="sequence"/>
+                            <field name="change_flag" decoration-success="change_flag == 'new'" decoration-warning="change_flag == 'changed'" decoration-danger="change_flag == 'removed'" decoration-info="change_flag == 'unchanged'" widget="badge"/>
+                        </group>
+                        <group string="Data Configuration">
+                            <field name="data_type"/>
+                            <field name="reporting_level"/>
+                            <field name="site_id" invisible="reporting_level != 'site'"/>
+                            <field name="unit"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Source Mapping">
+                            <field name="source_type"/>
+                            <field name="selection_source_key" invisible="source_type != 'auto'"/>
+                            <field name="computation_operator" invisible="source_type != 'computed'" required="source_type == 'computed'"/>
+                            <field name="computed_input_ids" widget="many2many_tags" invisible="source_type != 'computed'" required="source_type == 'computed'"/>
+                        </group>
+                        <group string="Validation Rules">
+                            <field name="required"/>
+                            <field name="min_value" invisible="data_type not in ['integer', 'float', 'currency', 'percent']"/>
+                            <field name="max_value" invisible="data_type not in ['integer', 'float', 'currency', 'percent']"/>
+                            <field name="allowed_values" placeholder="e.g. Yes, No, Partial" invisible="data_type == 'boolean'"/>
+                        </group>
+                    </group>
+                    <group string="Guidance">
+                        <field name="help_text" placeholder="ERIC guidance and instructions..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View for Item Defs -->
+    <record id="view_nhs_eric_item_def_search" model="ir.ui.view">
+        <field name="name">nhs.eric.item.def.search</field>
+        <field name="model">nhs.eric.item.def</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="section_id"/>
+                <filter name="group_by_section" string="Section" context="{'group_by': 'section_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Data set Action -->
+    <record id="action_nhs_eric_dataset" model="ir.actions.act_window">
+        <field name="name">ERIC Data Sets</field>
+        <field name="res_model">nhs.eric.dataset</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Section Action -->
+    <record id="action_nhs_eric_section" model="ir.actions.act_window">
+        <field name="name">ERIC Sections</field>
+        <field name="res_model">nhs.eric.section</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_by_dataset': 1}</field>
+    </record>
+
+    <!-- Item Defs Action -->
+    <record id="action_nhs_eric_item_def" model="ir.actions.act_window">
+        <field name="name">Items</field>
+        <field name="res_model">nhs.eric.item.def</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_nhs_eric_item_def_search"/>
+        <field name="context">{'search_default_group_by_section': 1}</field>
+    </record>
+</odoo>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Certificate Pack Report - Action -->
+    <record id="report_nhs_certificate_pack" model="ir.actions.report">
+        <field name="name">Certificate Pack</field>
+        <field name="model">nhs.compliance.test</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_estate_compliance.report_nhs_cert_pack_view</field>
+        <field name="report_file">odoo_nhs_estate_compliance.report_nhs_cert_pack_view</field>
+        <field name="binding_model_id" ref="model_nhs_compliance_test"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Certificate Pack Report - Template -->
+    <template id="report_nhs_cert_pack_view">
+        <t t-call="web.html_container">
+            <t t-set="docs_list" t-value="docs"/>
+            <t t-set="total_count" t-value="len(docs_list)"/>
+            <t t-set="today" t-value="datetime.date.today()"/>
+            <t t-set="page_counter" t-value="2"/>
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page"
+                         style="font-family: 'Segoe UI', Arial, sans-serif; color: #334155; line-height: 1.5;">
+                        <!-- Title Banner -->
+                        <div class="row mb-4" style="border-bottom: 3px solid #005EB8; padding-bottom: 12px;">
+                            <div class="col-8">
+                                <h2 style="color: #005EB8; font-weight: 700; margin: 0;">Certificate of Compliance</h2>
+                                <div style="font-size: 1.1rem; font-weight: 500; margin-top: 4px;">
+                                    Test Record:
+                                    <span style="color: #0F172A; font-weight: 600;">
+                                        <t t-out="doc.name"/>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <img t-if="doc.item_id.company_id.logo"
+                                     t-att-src="image_data_uri(doc.item_id.company_id.logo)" style="max-height: 50px;"
+                                     alt="Company Logo"/>
+                            </div>
+                        </div>
+                        <div style="padding: 4px 0;">
+                                <strong>Compliance Item:</strong>
+                                <span style="color: #0F172A; font-weight: 500;" t-field="doc.item_id.name"/>
+                            </div>
+                        <div class="row mb-4"
+                             style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-left: 0; margin-right: 0;">
+                            <div class="col-6">
+                                <div style="padding: 4px 0;">
+                                    <strong>Discipline:</strong>
+                                    <span style="color: #0F172A; font-weight: 500;" t-field="doc.discipline_id.name"/>
+                                </div>
+                                <div style="padding: 4px 0;">
+                                    <strong>Location:</strong>
+                                    <span style="color: #0F172A; font-weight: 500;"
+                                          t-out="doc.item_building_id.name or doc.item_site_id.name or 'N/A'"/>
+                                </div>
+                                <div style="padding: 4px 0;">
+                                    <strong>Test Date:</strong>
+                                    <span style="color: #0F172A; font-weight: 500;" t-field="doc.test_date"/>
+                                </div>
+                                <div style="padding: 4px 0;">
+                                    <strong>Outcome:</strong>
+                                    <t t-if="doc.outcome == 'pass'">
+                                        <span style="background-color: #198754; color: white; padding: 2px 12px; border-radius: 4px; font-weight: 600; text-transform: uppercase;">
+                                            Pass
+                                        </span>
+                                    </t>
+                                    <t t-elif="doc.outcome == 'pass_with_observations'">
+                                        <span style="background-color: #FFC107; color: black; padding: 2px 12px; border-radius: 4px; font-weight: 600; text-transform: uppercase;">
+                                            Pass (Obs)
+                                        </span>
+                                    </t>
+                                    <t t-elif="doc.outcome == 'fail'">
+                                        <span style="background-color: #DC3545; color: white; padding: 2px 12px; border-radius: 4px; font-weight: 600; text-transform: uppercase;">
+                                            Fail
+                                        </span>
+                                    </t>
+                                    <t t-else="">
+                                        <span style="background-color: #DC3545; color: white; padding: 2px 12px; border-radius: 4px; font-weight: 600; text-transform: uppercase;"
+                                              t-out="doc.outcome.replace('_', ' ').title()"/>
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div style="padding: 4px 0;">
+                                    <strong>Certificate Reference:</strong>
+                                    <span style="color: #0F172A; font-weight: 600;" t-field="doc.certificate_ref"/>
+                                </div>
+                                <div style="padding: 4px 0;">
+                                    <strong>Issuing Body:</strong>
+                                    <span style="color: #0F172A; font-weight: 500;" t-field="doc.issuing_body"/>
+                                </div>
+                                <div style="padding: 4px 0;">
+                                    <strong>Certificate Date:</strong>
+                                    <span style="color: #0F172A; font-weight: 500;" t-field="doc.certificate_date"/>
+                                </div>
+                                <div style="padding: 4px 0;">
+                                    <strong>Certificate Expiry:</strong>
+                                    <t t-if="doc.certificate_expiry and doc.certificate_expiry &lt; today">
+                                        <span style="color: #DC3545; font-weight: 700;"
+                                              t-field="doc.certificate_expiry"/>
+                                    </t>
+                                    <t t-elif="doc.certificate_expiry and (doc.certificate_expiry - today).days &lt;= 30">
+                                        <span style="color: #FF8C00; font-weight: 700;"
+                                              t-field="doc.certificate_expiry"/>
+                                    </t>
+                                    <t t-else="">
+                                        <span style="color: #0F172A; font-weight: 500;"
+                                              t-field="doc.certificate_expiry"/>
+                                    </t>
+                                </div>
+                                <div style="padding: 4px 0;">
+                                    <strong>Performed By:</strong>
+                                    <span style="color: #0F172A; font-weight: 500;" t-field="doc.performed_by_id.name"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <h6 style="color: #005EB8; font-weight: 700; margin-bottom: 8px;">Readings &amp; Telemetry
+                            </h6>
+                            <div style="border: 1px solid #E2E8F0; border-radius: 6px; padding: 12px 16px; background-color: #F8FAFC; min-height: 60px; font-family: monospace; font-size: 0.9rem; color: #334155; white-space: pre-line;">
+                                <t t-if="doc.readings">
+                                    <span t-field="doc.readings"/>
+                                </t>
+                                <t t-else="">
+                                    <span style="color: #94A3B8; font-style: italic;">No readings recorded</span>
+                                </t>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <h6 style="color: #005EB8; font-weight: 700; margin-bottom: 8px;">Notes &amp; Observations
+                            </h6>
+                            <div style="border-left: 4px solid #D97706; border: 1px solid #FDE68A; border-radius: 6px; padding: 12px 16px; background-color: #FFFDF5; min-height: 60px; font-size: 0.95rem; color: #4B5563;">
+                                <t t-if="doc.notes">
+                                    <span t-field="doc.notes"/>
+                                </t>
+                                <t t-else="">
+                                    <span style="color: #94A3B8; font-style: italic;">No notes recorded</span>
+                                </t>
+                            </div>
+                        </div>
+                        <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid #E2E8F0; font-size: 0.7rem; color: #94A3B8; text-align: center;">
+                            <p>This certificate is auto-generated from the NHS Compliance Management System.</p>
+                            <p>Certificate
+                                <t t-esc="page_counter - 1"/>
+                                of
+                                <t t-esc="total_count"/>
+                                | Generated:
+                                <t t-esc="datetime.datetime.now().strftime('%d/%m/%Y %H:%M')"/>
+                            </p>
+                            <p>For verification, contact the Estates Compliance Team.</p>
+                        </div>
+                    </div>
+                </t>
+                <t t-set="page_counter" t-value="page_counter + 1"/>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_eric_new_year_wizard" model="ir.ui.view">
+        <field name="name">nhs.eric.new.year.wizard</field>
+        <field name="model">nhs.eric.new.year.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="dataset_id"/>
+                            <field name="new_name" placeholder="e.g. ERIC 2026/27"/>
+                            <field name="new_year" placeholder="e.g. 2026/27"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_clone" string="Clone" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_eric_new_year_wizard" model="ir.actions.act_window">
+        <field name="name">Clone Data Set to New Year</field>
+        <field name="res_model">nhs.eric.new.year.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

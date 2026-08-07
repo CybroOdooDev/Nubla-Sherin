@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Delete old window action first to allow recreating with model ir.actions.client -->
+    <delete model="ir.actions.act_window" id="action_nhs_eric_dashboard"/>
+
+    <!-- Dashboard Action pointing to OWL Client Action -->
+    <record id="action_nhs_eric_dashboard" model="ir.actions.client">
+        <field name="name">Return Dashboard</field>
+        <field name="tag">nhs_eric_dashboard</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Welcome to your ERIC Dashboard
+            </p>
+            <p>
+                Track the progress of all your ERIC returns at a glance.
+            </p>
+        </field>
+    </record>
+</odoo>

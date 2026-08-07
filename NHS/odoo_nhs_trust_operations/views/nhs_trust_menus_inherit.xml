@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Adds Operations and Compliance sub-menus under the root NHS Trusts menu.
+        The root menu (menu_nhs_trust_root) is defined in odoo_nhs_trust_management.
+    -->
+
+    <!-- ── Operations Parent Submenu -->
+    <menuitem id="nhs_trust_menu_operations"
+              name="Operations"
+              parent="odoo_nhs_trust_management.menu_nhs_trust_root"
+              sequence="10"
+              groups="odoo_nhs_trust_management.group_nhs_trust_user"/>
+
+    <!-- Sites — opens nhs_trust_site_action. -->
+    <menuitem id="nhs_trust_site_menu"
+              name="Sites"
+              parent="nhs_trust_menu_operations"
+              action="nhs_trust_site_action"
+              sequence="10"
+              groups="odoo_nhs_trust_management.group_nhs_trust_user"/>
+
+    <!-- Departments — opens nhs_trust_department_action. -->
+    <menuitem id="nhs_trust_department_menu"
+              name="Departments"
+              parent="nhs_trust_menu_operations"
+              action="nhs_trust_department_action"
+              sequence="20"
+              groups="odoo_nhs_trust_management.group_nhs_trust_user"/>
+
+    <!-- ── Compliance Parent Submenu -->
+    <menuitem id="nhs_trust_menu_compliance"
+              name="Compliance"
+              parent="odoo_nhs_trust_management.menu_nhs_trust_root"
+              sequence="20"
+              groups="odoo_nhs_trust_management.group_nhs_trust_user"/>
+
+    <!-- CQC Inspections — opens nhs_trust_cqc_inspection_action. -->
+    <menuitem id="nhs_trust_cqc_inspection_menu"
+              name="CQC Inspections"
+              parent="nhs_trust_menu_compliance"
+              action="nhs_trust_cqc_inspection_action"
+              sequence="10"
+              groups="odoo_nhs_trust_management.group_nhs_trust_user"/>
+
+    <!-- State Change Audit — opens the state log action defined in odoo_nhs_trust_management. -->
+    <menuitem id="nhs_trust_state_log_menu"
+              name="State Change Audit"
+              parent="nhs_trust_menu_compliance"
+              action="odoo_nhs_trust_management.action_nhs_trust_state_log"
+              sequence="20"
+              groups="odoo_nhs_trust_management.group_nhs_trust_user"/>
+
+    <!-- Clinical Specialties — opens nhs_trust_specialty_action, restricted to admins. -->
+    <menuitem id="nhs_trust_specialty_menu"
+              name="Clinical Specialties"
+              parent="odoo_nhs_trust_management.menu_nhs_trust_config"
+              action="nhs_trust_specialty_action"
+              sequence="60"
+              groups="odoo_nhs_trust_management.group_nhs_trust_admin"/>
+</odoo>

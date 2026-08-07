@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View  -->
+    <record id="view_nhs_dspt_assessment_list" model="ir.ui.view">
+        <field name="name">nhs.dspt.assessment.list</field>
+        <field name="model">nhs.dspt.assessment</field>
+        <field name="arch" type="xml">
+            <list decoration-success="achieved_status=='standards_met'"
+                  decoration-info="achieved_status=='plan_in_place'"
+                  decoration-warning="achieved_status=='approaching'"
+                  decoration-danger="achieved_status=='not_met'">
+                <field name="name"/>
+                <field name="year"/>
+                <field name="org_profile_id"/>
+                <field name="company_id" optional="show"/>
+                <field name="readiness_pct" string="Readiness %"/>
+                <field name="gap_count"/>
+                <field name="deadline"/>
+                <field name="achieved_status" widget="badge"/>
+                <field name="state" widget="badge"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!--  Kanban View -->
+    <record id="view_nhs_dspt_assessment_kanban" model="ir.ui.view">
+        <field name="name">nhs.dspt.assessment.kanban</field>
+        <field name="model">nhs.dspt.assessment</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" records_draggable="false">
+                <field name="name"/>
+                <field name="readiness_pct"/>
+                <field name="gap_count"/>
+                <field name="achieved_status"/>
+                <field name="deadline"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click p-3">
+                            <strong><field name="name"/></strong>
+                            <div t-attf-class="fw-bold #{
+                                record.achieved_status.raw_value == 'standards_met' ? 'text-success' :
+                                record.achieved_status.raw_value == 'not_met' ? 'text-danger' : 'text-warning'
+                            }">
+                                <field name="readiness_pct"/>% ready
+                            </div>
+                            <div class="text-muted small">
+                                <field name="gap_count"/> gap(s) — deadline <field name="deadline"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!--  Form View  -->
+    <record id="view_nhs_dspt_assessment_form" model="ir.ui.view">
+        <field name="name">nhs.dspt.assessment.form</field>
+        <field name="model">nhs.dspt.assessment</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="%(action_nhs_dspt_generate_wizard)d" type="action" string="Generate"
+                            context="{'default_assessment_id': id}"
+                            invisible="state in ('published', 'submitted') or evidence_ids"/>
+                    <button name="%(action_nhs_dspt_carry_forward_wizard)d" type="action" string="Carry Forward"
+                            context="{'default_assessment_id': id}"
+                            invisible="state in ('published', 'submitted') or not evidence_ids"/>
+                    <button name="action_recompute" type="object" string="Recompute"
+                            invisible="state not in ('in_progress', 'ready')"
+                            context="{'client_readiness_pct': readiness_pct, 'client_gap_count': gap_count,
+                                      'client_stale_evidence_count': stale_evidence_count,
+                                      'client_achieved_status': achieved_status}"/>
+                    <button name="action_mark_ready" type="object" string="Mark Ready"
+                            class="oe_highlight" invisible="state != 'in_progress'"/>
+                    <button name="action_publish" type="object" string="Publish"
+                            class="oe_highlight" invisible="state != 'ready'"
+                            groups="odoo_nhs_dspt.group_nhs_dspt_manager"/>
+                    <button name="action_submit" type="object" string="Submit"
+                            class="oe_highlight" invisible="state != 'published'"
+                            groups="odoo_nhs_dspt.group_nhs_dspt_manager"/>
+                    <button name="action_reopen" type="object" string="Re-open"
+                            invisible="state not in ('published', 'submitted')"
+                            groups="odoo_nhs_dspt.group_nhs_dspt_manager"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,ready,published,submitted"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_evidence" type="object"
+                                class="oe_stat_button" icon="fa-list-check">
+                            <field name="evidence_count" widget="statinfo" string="Evidence"/>
+                        </button>
+                        <button name="action_view_actions" type="object"
+                                class="oe_stat_button" icon="fa-wrench">
+                            <field name="action_count" widget="statinfo" string="Actions"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Locked" bg_color="text-bg-danger"
+                            invisible="state not in ('published', 'submitted')"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="edition_id" options="{'no_create': True}"
+                                   readonly="evidence_ids"/>
+                            <field name="company_id" options="{'no_create': True}"
+                                   readonly="evidence_ids"/>
+                            <field name="org_profile_id" options="{'no_create': True}"
+                                   readonly="evidence_ids"/>
+                            <field name="manager_id"
+                                   domain="[('all_group_ids', 'in', [%(odoo_nhs_dspt.group_nhs_dspt_manager)d]),
+                                            ('company_ids', 'in', company_id)]"
+                                   options="{'no_create': True}"/>
+                            <field name="ods_code"/>
+                            <field name="prior_assessment_id" options="{'no_create': True}"
+                                   domain="[('id', '!=', id), ('company_id', '=', company_id),
+                                            ('org_profile_id', '=', org_profile_id), ('ods_code', '=', ods_code)]"/>
+                        </group>
+                        <group>
+                            <field name="readiness_pct" widget="progressbar"/>
+                            <field name="achieved_status" widget="badge"/>
+                            <field name="gap_count"/>
+                            <field name="stale_evidence_count"/>
+                            <field name="deadline"/>
+                        </group>
+                    </group>
+                    <group invisible="state not in ('published', 'submitted')">
+                        <group>
+                            <field name="submission_reference"/>
+                            <field name="submission_date"/>
+                        </group>
+                        <group>
+                            <field name="published_by_id" readonly="1"/>
+                            <field name="published_at" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="assertions" string="Assertions">
+                            <field name="assertion_ids" context="{'default_assessment_id': id}">
+                                <list create="0" delete="0" decoration-success="status=='met'"
+                                      decoration-warning="status=='in_progress'"
+                                      decoration-danger="status=='not_met'"
+                                      decoration-muted="status in ('not_started', 'not_applicable')">
+                                    <field name="reference"/>
+                                    <field name="name"/>
+                                    <field name="standard_id"/>
+                                    <field name="owner_id" widget="many2one_avatar_user"/>
+                                    <field name="mandatory_met_count"/>
+                                    <field name="mandatory_total_count"/>
+                                    <field name="status" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="evidence" string="Evidence">
+                            <field name="evidence_ids">
+                                <list create="0" delete="0"
+                                      decoration-success="status=='met'"
+                                      decoration-warning="status=='in_progress'"
+                                      decoration-danger="status=='not_met'"
+                                      decoration-info="status=='not_applicable'">
+                                    <field name="reference"/>
+                                    <field name="name"/>
+                                    <field name="standard_id" column_invisible="1"/>
+                                    <field name="is_mandatory"/>
+                                    <field name="owner_id" widget="many2one_avatar_user"/>
+                                    <field name="status" widget="badge"/>
+                                    <field name="evidence_review_date"/>
+                                    <field name="is_stale"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="gaps" string="Gaps">
+                            <field name="gap_evidence_ids" create="0" delete="0">
+                                <list>
+                                    <field name="reference"/>
+                                    <field name="name"/>
+                                    <field name="standard_id"/>
+                                    <field name="owner_id" widget="many2one_avatar_user"/>
+                                    <field name="action_count" string="Actions Raised"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="actions" string="Actions">
+                            <field name="action_ids" context="{'default_assessment_id': id}">
+                                <list decoration-danger="is_overdue" decoration-success="state in ('completed', 'verified')">
+                                    <field name="reference"/>
+                                    <field name="name"/>
+                                    <field name="owner_id" widget="many2one_avatar_user"/>
+                                    <field name="priority" widget="priority"/>
+                                    <field name="target_date"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="notes" string="Notes">
+                            <field name="notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!--  Search View  -->
+    <record id="view_nhs_dspt_assessment_search" model="ir.ui.view">
+        <field name="name">nhs.dspt.assessment.search</field>
+        <field name="model">nhs.dspt.assessment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="year"/>
+                <field name="edition_id"/>
+                <field name="org_profile_id"/>
+                <filter name="current" string="Not Yet Submitted" domain="[('state', '!=', 'submitted')]"/>
+                <group>
+                    <filter name="group_edition" string="Edition" context="{'group_by': 'edition_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_achieved" string="Achieved Status" context="{'group_by': 'achieved_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--  Window Actions  -->
+    <record id="action_nhs_dspt_assessment" model="ir.actions.act_window">
+        <field name="name">DSPT Assessments</field>
+        <field name="res_model">nhs.dspt.assessment</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your organisation's DSPT assessment for the active edition to
+                get started.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_nhs_dspt_assessment_current" model="ir.actions.act_window">
+        <field name="name">Current Assessment</field>
+        <field name="res_model">nhs.dspt.assessment</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('edition_id.state', '=', 'active')]</field>
+        <field name="context">{'search_default_current': 1}</field>
+    </record>
+</odoo>

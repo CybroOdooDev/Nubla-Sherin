@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- list VIEW - Schedules -->
+    <record id="view_nhs_device_schedule_list" model="ir.ui.view">
+        <field name="name">nhs.device.schedule.list</field>
+        <field name="model">nhs.device.schedule</field>
+        <field name="arch" type="xml">
+            <list string="Maintenance Schedules" multi_edit="1"
+                  decoration-danger="status=='overdue'"
+                  decoration-warning="status=='due_soon'"
+                  decoration-success="status=='ok'">
+                <field name="device_id"/>
+                <field name="schedule_type_id"/>
+                <field name="interval_months"/>
+                <field name="last_done_date"/>
+                <field name="next_due_date"/>
+                <field name="status" widget="badge"
+                       decoration-danger="status=='overdue'"
+                       decoration-warning="status=='due_soon'"
+                       decoration-success="status=='ok'"/>
+                <field name="delivery"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- FORM VIEW - Schedules -->
+    <record id="view_nhs_device_schedule_form" model="ir.ui.view">
+        <field name="name">nhs.device.schedule.form</field>
+        <field name="model">nhs.device.schedule</field>
+        <field name="arch" type="xml">
+            <form string="Maintenance Schedule">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="device_id"/>
+                            <field name="schedule_type_id"/>
+                            <field name="interval_months"/>
+                        </group>
+                        <group>
+                            <field name="last_done_date"/>
+                            <field name="next_due_date"/>
+                            <field name="status" widget="badge"
+                                   decoration-danger="status == 'overdue'"
+                                   decoration-warning="status == 'due_soon'"
+                                   decoration-success="status == 'ok'"/>
+                            <field name="delivery"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- search VIEW - Schedules -->
+    <record id="view_nhs_device_schedule_search" model="ir.ui.view">
+        <field name="name">nhs.device.schedule.search</field>
+        <field name="model">nhs.device.schedule</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="device_id"/>
+                <field name="schedule_type_id"/>
+                <filter name="due_soon" string="Due Soon" domain="[('status','=','due_soon')]"/>
+                <filter name="overdue" string="Overdue" domain="[('status','=','overdue')]"/>
+                <filter name="archived" string="Archived" domain="[('active','=',False)]"/>
+                <filter name="active" string="Active" domain="[('active','=',True)]"/>
+                <filter name="group_status" string="Status" context="{'group_by':'status'}"/>
+                <filter name="group_delivery" string="Delivery Methods" context="{'group_by':'delivery'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ACTION - Schedules -->
+    <record id="action_nhs_device_schedule" model="ir.actions.act_window">
+        <field name="name">Schedules</field>
+        <field name="res_model">nhs.device.schedule</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                View all maintenance and calibration schedules.
+                Each schedule defines recurring activities for a device.
+            </p>
+        </field>
+    </record>
+</odoo>

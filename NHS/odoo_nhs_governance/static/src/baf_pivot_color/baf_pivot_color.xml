@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="web.PivotRenderer" t-inherit-mode="extension">
+        <xpath expr="//td[hasclass('o_pivot_cell_value')]" position="attributes">
+            <attribute name="t-attf-style">{{ getBafCellStyle(cell) }}</attribute>
+        </xpath>
+    </t>
+</templates>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Clinical Categories -->
+        <record id="function_inpatient" model="nhs.estate.function">
+            <field name="name">Inpatient</field>
+            <field name="is_clinical" eval="True"/>
+            <field name="eric_category">Inpatient</field>
+        </record>
+
+        <record id="function_inpatient_ward" model="nhs.estate.function">
+            <field name="name">General Ward</field>
+            <field name="parent_id" ref="function_inpatient"/>
+            <field name="is_clinical" eval="True"/>
+            <field name="eric_category">Inpatient</field>
+        </record>
+
+        <record id="function_inpatient_icu" model="nhs.estate.function">
+            <field name="name">ICU/HDU</field>
+            <field name="parent_id" ref="function_inpatient"/>
+            <field name="is_clinical" eval="True"/>
+            <field name="eric_category">Inpatient</field>
+        </record>
+
+        <record id="function_outpatient" model="nhs.estate.function">
+            <field name="name">Outpatient</field>
+            <field name="is_clinical" eval="True"/>
+            <field name="eric_category">Outpatient</field>
+        </record>
+
+        <record id="function_outpatient_clinic" model="nhs.estate.function">
+            <field name="name">Clinic Room</field>
+            <field name="parent_id" ref="function_outpatient"/>
+            <field name="is_clinical" eval="True"/>
+            <field name="eric_category">Outpatient</field>
+        </record>
+
+        <record id="function_diagnostic" model="nhs.estate.function">
+            <field name="name">Diagnostic &amp; Treatment</field>
+            <field name="is_clinical" eval="True"/>
+            <field name="eric_category">Diagnostic</field>
+        </record>
+
+        <record id="function_diagnostic_radiology" model="nhs.estate.function">
+            <field name="name">Radiology</field>
+            <field name="parent_id" ref="function_diagnostic"/>
+            <field name="is_clinical" eval="True"/>
+            <field name="eric_category">Diagnostic</field>
+        </record>
+
+        <record id="function_diagnostic_theatre" model="nhs.estate.function">
+            <field name="name">Theatre</field>
+            <field name="parent_id" ref="function_diagnostic"/>
+            <field name="is_clinical" eval="True"/>
+            <field name="eric_category">Diagnostic</field>
+        </record>
+
+        <record id="function_emergency" model="nhs.estate.function">
+            <field name="name">Emergency Department</field>
+            <field name="is_clinical" eval="True"/>
+            <field name="eric_category">Emergency</field>
+        </record>
+
+        <record id="function_maternity" model="nhs.estate.function">
+            <field name="name">Maternity</field>
+            <field name="is_clinical" eval="True"/>
+            <field name="eric_category">Maternity</field>
+        </record>
+
+        <record id="function_mental_health" model="nhs.estate.function">
+            <field name="name">Mental Health</field>
+            <field name="is_clinical" eval="True"/>
+            <field name="eric_category">Mental Health</field>
+        </record>
+
+        <!-- Non Clinical Categories -->
+        <record id="function_admin" model="nhs.estate.function">
+            <field name="name">Administrative/Office</field>
+            <field name="is_clinical" eval="False"/>
+            <field name="eric_category">Administrative</field>
+        </record>
+
+        <record id="function_residential" model="nhs.estate.function">
+            <field name="name">Residential/Accommodation</field>
+            <field name="is_clinical" eval="False"/>
+            <field name="eric_category">Residential</field>
+        </record>
+
+        <record id="function_support" model="nhs.estate.function">
+            <field name="name">Support/FM</field>
+            <field name="is_clinical" eval="False"/>
+            <field name="eric_category">Support</field>
+        </record>
+
+        <record id="function_support_catering" model="nhs.estate.function">
+            <field name="name">Catering</field>
+            <field name="parent_id" ref="function_support"/>
+            <field name="is_clinical" eval="False"/>
+            <field name="eric_category">Support</field>
+        </record>
+
+        <record id="function_support_laundry" model="nhs.estate.function">
+            <field name="name">Laundry</field>
+            <field name="parent_id" ref="function_support"/>
+            <field name="is_clinical" eval="False"/>
+            <field name="eric_category">Support</field>
+        </record>
+
+        <record id="function_support_store" model="nhs.estate.function">
+            <field name="name">Stores</field>
+            <field name="parent_id" ref="function_support"/>
+            <field name="is_clinical" eval="False"/>
+            <field name="eric_category">Support</field>
+        </record>
+
+        <record id="function_plant" model="nhs.estate.function">
+            <field name="name">Plant/Engineering</field>
+            <field name="is_clinical" eval="False"/>
+            <field name="eric_category">Plant</field>
+        </record>
+
+        <record id="function_circulation" model="nhs.estate.function">
+            <field name="name">Circulation</field>
+            <field name="is_clinical" eval="False"/>
+            <field name="eric_category">Circulation</field>
+        </record>
+
+        <record id="function_external" model="nhs.estate.function">
+            <field name="name">External/Grounds</field>
+            <field name="is_clinical" eval="False"/>
+            <field name="eric_category">External</field>
+        </record>
+    </data>
+</odoo>

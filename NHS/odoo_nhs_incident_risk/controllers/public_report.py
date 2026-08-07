@@ -1,0 +1,202 @@
+# -*- coding: utf-8 -*-
+#############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#
+#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
+#    (LGPL v3) along with this program.
+#    If not, see <http://www.gnu.org/licenses/>.
+#
+#############################################################################
+import logging
+from collections import defaultdict
+from datetime import datetime, timedelta
+
+from odoo import http, fields
+from odoo.http import request
+
+_logger = logging.getLogger(__name__)
+
+# IP rate-limit: max 10 submissions per window
+_RATE_LIMIT_WINDOW = 3600   # 1 hour in seconds
+_RATE_LIMIT_MAX = 10
+_ip_submissions: dict = defaultdict(list)
+
+
+def _check_rate_limit(ip):
+    """Return False and reject if ip has already made _RATE_LIMIT_MAX submissions
+    within the current _RATE_LIMIT_WINDOW; otherwise record this submission and
+    return True. State is kept in-memory per process, not persisted."""
+    now = datetime.now()
+    window_start = now - timedelta(seconds=_RATE_LIMIT_WINDOW)
+    _ip_submissions[ip] = [t for t in _ip_submissions[ip] if t > window_start]
+    if len(_ip_submissions[ip]) >= _RATE_LIMIT_MAX:
+        return False
+    _ip_submissions[ip].append(now)
+    return True
+
+
+class NhsPublicReport(http.Controller):
+    """Public-facing controller serving the anonymous/token-based incident report form."""
+
+    def _company_from_token(self, token):
+        """Return the company matching token if the public form is enabled for it,
+        otherwise None."""
+        Company = request.env['res.company'].sudo()
+        company = Company.search([('public_form_token', '=', token)], limit=1)
+        if not company or not company.public_form_enabled:
+            return None
+        return company
+
+    @http.route('/incident/report/<string:token>',
+                type='http', auth='public', website=False, sitemap=False)
+    def report_form(self, token, **kw):
+        """Render the public incident report form for the company matching token,
+        filtered to its active categories and locations, or 404 if the token
+        is invalid or the public form is disabled."""
+        company = self._company_from_token(token)
+        if not company:
+            return request.not_found()
+
+        Terminology = request.env['nhs.terminology'].sudo()
+        provider_type = company.provider_type or 'nhs_trust'
+
+        person_label = Terminology.t('person_affected', provider_type)
+        provider_name = dict(company._fields['provider_type']._description_selection(company.env)).get(provider_type, '')
+
+        # Build category list (only active, leaf-level for this provider)
+        categories = request.env['nhs.incident.category'].sudo().search([
+            ('active', '=', True),
+        ])
+        cat_list = []
+        for c in categories:
+            types = c.provider_types or ''
+            if not types or provider_type in types.split(','):
+                cat_list.append({'id': c.id, 'complete_name': c.complete_name})
+
+        # Build location list
+        locations = request.env['nhs.location'].sudo().search([
+            ('company_id', '=', company.id),
+            ('active', '=', True),
+        ])
+        loc_list = [{'id': l.id, 'complete_name': l.complete_name} for l in locations]
+
+        values = {
+            'token': token,
+            'company': company,
+            'provider_name': provider_name,
+            'person_label': person_label,
+            'categories': cat_list,
+            'locations': loc_list,
+            'anonymous_allowed': company.anonymous_reporting_allowed,
+        }
+        return request.render(
+            'odoo_nhs_incident_risk.public_report_form', values)
+
+    @http.route('/incident/report/<string:token>/submit',
+                type='http', auth='public', methods=['POST'], csrf=True)
+    def report_submit(self, token, **post):
+        """Handle submission of the public report form: validate the token, apply
+        IP rate-limiting, silently drop bot submissions caught by the hidden
+        honeypot field, create the incident (and any reported persons) as sudo,
+        and send an acknowledgement email unless the report is anonymous."""
+        company = self._company_from_token(token)
+        if not company:
+            return request.not_found()
+
+        # Rate limiting
+        ip = request.httprequest.remote_addr
+        if not _check_rate_limit(ip):
+            return request.render(
+                'odoo_nhs_incident_risk.public_report_thank_you',
+                {'reference': 'RATE_LIMITED', 'email_sent': False})
+
+        # Honeypot check (hidden field; bots fill it, humans don't)
+        if post.get('website_url'):
+            return request.not_found()
+
+        # Parse form values
+        is_anonymous = bool(post.get('is_anonymous'))
+        occurred_at_str = post.get('occurred_at', '').replace('T', ' ')
+        try:
+            occurred_at = datetime.strptime(occurred_at_str, '%Y-%m-%d %H:%M')
+            # The datetime-local input submits the reporter's local wall-clock
+            # time with no timezone info; convert it to UTC using the
+            # browser-reported offset (minutes to add to local time to get UTC)
+            # so it compares correctly against fields.Datetime.now().
+            try:
+                tz_offset = int(post.get('tz_offset') or 0)
+            except ValueError:
+                tz_offset = 0
+            occurred_at += timedelta(minutes=tz_offset)
+        except ValueError:
+            occurred_at = fields.Datetime.now()
+
+        vals = {
+            'company_id': company.id,
+            'incident_kind': post.get('incident_kind', 'incident'),
+            'occurred_at': occurred_at,
+            'reported_at': fields.Datetime.now(),
+            'location_id': int(post.get('location_id') or 0) or False,
+            'category_id': int(post.get('category_id') or 0) or False,
+            'description': post.get('description', ''),
+            'immediate_action': post.get('immediate_action', ''),
+            'is_anonymous': is_anonymous,
+            'reporter_name': '' if is_anonymous else post.get('reporter_name', ''),
+            'reporter_email': '' if is_anonymous else post.get('reporter_email', ''),
+            'reporter_role': post.get('reporter_role', ''),
+            'reported_via': 'public_form',
+        }
+
+        # Validate required fields
+        if not vals['location_id'] or not vals['category_id'] or not vals['description']:
+            return request.render(
+                'odoo_nhs_incident_risk.public_report_form',
+                {'error': 'Please fill in all required fields.',
+                 'token': token, 'company': company})
+
+        incident = request.env['nhs.incident'].sudo().create(vals)
+
+        # Parse persons
+        idx = 0
+        while f'person_type_{idx}' in post:
+            ptype = post.get(f'person_type_{idx}')
+            pname = post.get(f'person_name_{idx}', '')
+            pharm = post.get(f'person_harm_{idx}', 'none')
+            if ptype:
+                request.env['nhs.incident.person'].sudo().create({
+                    'incident_id': incident.id,
+                    'person_type': ptype,
+                    'name': pname,
+                    'harm_observed': pharm,
+                    'sequence': idx * 10,
+                })
+            idx += 1
+
+        # Send acknowledgement email
+        email_sent = False
+        if not is_anonymous and vals['reporter_email']:
+            template = request.env.ref(
+                'odoo_nhs_incident_risk.mail_template_reporter_ack',
+                raise_if_not_found=False)
+            if template:
+                try:
+                    template.sudo().send_mail(incident.id, force_send=True)
+                    email_sent = True
+                except Exception:
+                    _logger.warning('Failed to send acknowledgement email for %s', incident.name)
+
+        return request.render(
+            'odoo_nhs_incident_risk.public_report_thank_you',
+            {'reference': incident.name, 'email_sent': email_sent})

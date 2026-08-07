@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menu tree for the NHS Safety app: Incidents, Statutory, Risk Register, Actions, Reporting and
+         Configuration; the root is open to any reporter and each branch/item below is further restricted
+         to the more senior group actually responsible for that function -->
+    <!-- ══ ROOT APP MENU ════════════════════════════════════════════ -->
+    <!-- Root menu uses the most permissive group (reporter) so all app users can see it; visible children vary by role -->
+    <menuitem id="menu_nhs_root"
+              name ="Incident &amp; Risk Management"
+              sequence="50"
+              web_icon="odoo_nhs_incident_risk,static/description/icon.png"
+              groups="odoo_nhs_incident_risk.group_hc_reporter"/>
+
+    <!-- ══ INCIDENTS ════════════════════════════════════════════════ -->
+    <menuitem id="menu_nhs_incidents"
+              name="Incidents"
+              parent="menu_nhs_root"
+              sequence="10"
+              groups="odoo_nhs_incident_risk.group_hc_reporter"/>
+
+    <!-- Triage queue is restricted to handlers, who screen and categorise newly submitted reports -->
+    <menuitem id="menu_nhs_triage_queue"
+              name="Triage Queue"
+              parent="menu_nhs_incidents"
+              action="action_nhs_incident_triage_queue"
+              sequence="10"
+              groups="odoo_nhs_incident_risk.group_hc_handler"/>
+
+    <!-- Full incident list restricted to handlers; ordinary reporters only get "My Reports" below -->
+    <menuitem id="menu_nhs_all_incidents"
+              name="All Incidents"
+              parent="menu_nhs_incidents"
+              action="action_nhs_incident_all"
+              sequence="20"
+              groups="odoo_nhs_incident_risk.group_hc_handler"/>
+
+    <menuitem id="menu_nhs_my_reports"
+              name="My Reports"
+              parent="menu_nhs_incidents"
+              action="action_nhs_incident_my"
+              sequence="30"/>
+
+    <!-- Investigations restricted to the investigator group, who run the formal AAR/PSII review process -->
+    <menuitem id="menu_nhs_investigations"
+              name="Investigations"
+              parent="menu_nhs_incidents"
+              action="action_nhs_investigation"
+              sequence="40"
+              groups="odoo_nhs_incident_risk.group_hc_investigator"/>
+
+    <!-- ══ STATUTORY ════════════════════════════════════════════════ -->
+    <!-- Statutory/regulatory registers (Duty of Candour, RIDDOR, CQC, LFPSE), restricted to handlers -->
+    <menuitem id="menu_nhs_statutory"
+              name="Statutory"
+              parent="menu_nhs_root"
+              sequence="20"
+              groups="odoo_nhs_incident_risk.group_hc_handler"/>
+
+    <menuitem id="menu_nhs_doc"
+              name="Duty of Candour"
+              parent="menu_nhs_statutory"
+              action="action_nhs_duty_of_candour"
+              sequence="10"/>
+
+    <menuitem id="menu_nhs_riddor"
+              name="RIDDOR Log"
+              parent="menu_nhs_statutory"
+              action="action_nhs_riddor"
+              sequence="20"/>
+
+    <menuitem id="menu_nhs_cqc"
+              name="CQC Notifications"
+              parent="menu_nhs_statutory"
+              action="action_nhs_cqc_notification_menu"
+              sequence="30"/>
+
+    <!-- LFPSE (national patient safety event) batch submissions restricted to quality leads -->
+    <menuitem id="menu_nhs_lfpse"
+              name="LFPSE Batches"
+              parent="menu_nhs_statutory"
+              action="action_nhs_lfpse"
+              sequence="40"
+              groups="odoo_nhs_incident_risk.group_hc_quality_lead"/>
+
+    <!-- ══ RISK REGISTER ════════════════════════════════════════════ -->
+    <!-- Risk register branch restricted to risk managers, who own the organisation's risk log -->
+    <menuitem id="menu_nhs_risk_register"
+              name="Risk Register"
+              parent="menu_nhs_root"
+              sequence="30"
+              groups="odoo_nhs_incident_risk.group_hc_risk_manager"/>
+
+    <menuitem id="menu_nhs_risks"
+              name="Risks"
+              parent="menu_nhs_risk_register"
+              action="action_nhs_risk_all"
+              sequence="10"/>
+
+    <menuitem id="menu_nhs_registers"
+              name="Registers"
+              parent="menu_nhs_risk_register"
+              action="action_nhs_risk_register_admin"
+              sequence="20"/>
+
+    <menuitem id="menu_nhs_heatmap"
+              name="Heatmap"
+              parent="menu_nhs_risk_register"
+              action="action_nhs_risk_heatmap"
+              sequence="30"/>
+
+    <menuitem id="menu_nhs_reviews_due"
+              name="Reviews Due"
+              parent="menu_nhs_risk_register"
+              action="action_nhs_risk_reviews_due"
+              sequence="40"/>
+
+    <!-- ══ ACTIONS ══════════════════════════════════════════════════ -->
+    <menuitem id="menu_nhs_actions"
+              name="Actions"
+              parent="menu_nhs_root"
+              sequence="40"
+              groups="odoo_nhs_incident_risk.group_hc_reporter"/>
+
+    <menuitem id="menu_nhs_my_actions"
+              name="My Actions"
+              parent="menu_nhs_actions"
+              action="action_nhs_action_my"
+              sequence="10"/>
+
+    <!-- Full actions list restricted to handlers; other users only see their own via "My Actions" -->
+    <menuitem id="menu_nhs_all_actions"
+              name="All Actions"
+              parent="menu_nhs_actions"
+              action="action_nhs_action_all"
+              sequence="20"
+              groups="odoo_nhs_incident_risk.group_hc_handler"/>
+
+    <!-- ══ REPORTING ════════════════════════════════════════════════ -->
+    <!-- Analytics/reporting dashboards restricted to handlers -->
+    <menuitem id="menu_nhs_reporting"
+              name="Reporting"
+              parent="menu_nhs_root"
+              sequence="50"
+              groups="odoo_nhs_incident_risk.group_hc_handler"/>
+
+    <menuitem id="menu_nhs_incident_analysis"
+              name="Incident Analysis"
+              parent="menu_nhs_reporting"
+              action="action_nhs_incident_analysis"
+              sequence="10"/>
+
+    <menuitem id="menu_nhs_risk_analysis"
+              name="Risk Analysis"
+              parent="menu_nhs_reporting"
+              action="action_nhs_risk_analysis"
+              sequence="20"/>
+
+    <!-- Board-level PDF summary report, restricted to quality leads who compile it for governance meetings -->
+    <menuitem id="menu_nhs_board_pack"
+              name="Board Pack (PDF)"
+              parent="menu_nhs_reporting"
+              action="action_report_board_pack"
+              sequence="30"
+              groups="odoo_nhs_incident_risk.group_hc_quality_lead"/>
+
+    <!-- ══ CONFIGURATION ════════════════════════════════════════════ -->
+    <!-- All setup/config items (categories, notification rules, settings, etc.) restricted to quality leads -->
+    <menuitem id="menu_nhs_config"
+              name="Configuration"
+              parent="menu_nhs_root"
+              sequence="99"
+              groups="odoo_nhs_incident_risk.group_hc_quality_lead"/>
+
+    <menuitem id="menu_nhs_config_categories"
+              name="Incident Categories"
+              parent="menu_nhs_config"
+              action="action_nhs_incident_category"
+              sequence="10"/>
+
+    <menuitem id="menu_nhs_config_locations"
+              name="Locations"
+              parent="menu_nhs_config"
+              action="action_nhs_location"
+              sequence="20"/>
+
+    <menuitem id="menu_nhs_config_risk_categories"
+              name="Risk Categories"
+              parent="menu_nhs_config"
+              action="action_nhs_risk_category"
+              sequence="30"/>
+
+    <menuitem id="menu_nhs_config_notification_rules"
+              name="Notification Rules"
+              parent="menu_nhs_config"
+              action="action_nhs_notification_rule"
+              sequence="40"/>
+
+    <menuitem id="menu_nhs_config_terminology"
+              name="Terminology"
+              parent="menu_nhs_config"
+              action="action_nhs_terminology"
+              sequence="50"/>
+
+    <menuitem id="menu_nhs_config_holidays"
+              name="Bank Holidays"
+              parent="menu_nhs_config"
+              action="action_nhs_holiday"
+              sequence="60"/>
+
+    <menuitem id="menu_nhs_config_cqc_types"
+              name="CQC Notification Types"
+              parent="menu_nhs_config"
+              action="action_nhs_cqc_type"
+              sequence="70"/>
+
+    <menuitem id="menu_nhs_config_setup_wizard"
+              name="Provider Setup Wizard"
+              parent="menu_nhs_config"
+              action="action_nhs_provider_setup_wizard"
+              sequence="80"/>
+
+    <menuitem id="menu_nhs_config_settings"
+              name="Settings"
+              parent="menu_nhs_config"
+              action="action_nhs_config_settings"
+              sequence="99"/>
+</odoo>

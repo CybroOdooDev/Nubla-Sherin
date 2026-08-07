@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- nhs.terminology records: per-provider-type label overrides (e.g. "Patient" vs
+         "Resident" vs "Service User") so UI wording matches the selected provider_type. -->
+
+    <!-- NHS Trust terminology -->
+    <record id="term_trust_person_affected" model="nhs.terminology">
+        <field name="provider_type">nhs_trust</field>
+        <field name="logical_key">person_affected</field>
+        <field name="label">Patient</field>
+    </record>
+    <record id="term_trust_location_unit" model="nhs.terminology">
+        <field name="provider_type">nhs_trust</field>
+        <field name="logical_key">location_unit</field>
+        <field name="label">Ward</field>
+    </record>
+    <record id="term_trust_incident_word" model="nhs.terminology">
+        <field name="provider_type">nhs_trust</field>
+        <field name="logical_key">incident_word</field>
+        <field name="label">Patient Safety Incident</field>
+    </record>
+    <record id="term_trust_provider_name" model="nhs.terminology">
+        <field name="provider_type">nhs_trust</field>
+        <field name="logical_key">provider_name</field>
+        <field name="label">NHS Trust</field>
+    </record>
+
+    <!-- Care Home terminology -->
+    <record id="term_care_home_person_affected" model="nhs.terminology">
+        <field name="provider_type">care_home</field>
+        <field name="logical_key">person_affected</field>
+        <field name="label">Resident</field>
+    </record>
+    <record id="term_care_home_location_unit" model="nhs.terminology">
+        <field name="provider_type">care_home</field>
+        <field name="logical_key">location_unit</field>
+        <field name="label">Unit</field>
+    </record>
+    <record id="term_care_home_incident_word" model="nhs.terminology">
+        <field name="provider_type">care_home</field>
+        <field name="logical_key">incident_word</field>
+        <field name="label">Incident</field>
+    </record>
+    <record id="term_care_home_provider_name" model="nhs.terminology">
+        <field name="provider_type">care_home</field>
+        <field name="logical_key">provider_name</field>
+        <field name="label">Care Home</field>
+    </record>
+
+    <!-- GP Practice terminology -->
+    <record id="term_gp_person_affected" model="nhs.terminology">
+        <field name="provider_type">gp_practice</field>
+        <field name="logical_key">person_affected</field>
+        <field name="label">Patient</field>
+    </record>
+    <record id="term_gp_location_unit" model="nhs.terminology">
+        <field name="provider_type">gp_practice</field>
+        <field name="logical_key">location_unit</field>
+        <field name="label">Surgery</field>
+    </record>
+    <record id="term_gp_incident_word" model="nhs.terminology">
+        <field name="provider_type">gp_practice</field>
+        <field name="logical_key">incident_word</field>
+        <field name="label">Significant Event</field>
+    </record>
+    <record id="term_gp_provider_name" model="nhs.terminology">
+        <field name="provider_type">gp_practice</field>
+        <field name="logical_key">provider_name</field>
+        <field name="label">GP Practice</field>
+    </record>
+
+    <!-- Domiciliary Care terminology -->
+    <record id="term_dom_person_affected" model="nhs.terminology">
+        <field name="provider_type">domiciliary_care</field>
+        <field name="logical_key">person_affected</field>
+        <field name="label">Service User</field>
+    </record>
+    <record id="term_dom_location_unit" model="nhs.terminology">
+        <field name="provider_type">domiciliary_care</field>
+        <field name="logical_key">location_unit</field>
+        <field name="label">Area</field>
+    </record>
+    <record id="term_dom_incident_word" model="nhs.terminology">
+        <field name="provider_type">domiciliary_care</field>
+        <field name="logical_key">incident_word</field>
+        <field name="label">Incident</field>
+    </record>
+
+    <!-- Hospice terminology -->
+    <record id="term_hospice_person_affected" model="nhs.terminology">
+        <field name="provider_type">hospice</field>
+        <field name="logical_key">person_affected</field>
+        <field name="label">Patient</field>
+    </record>
+    <record id="term_hospice_incident_word" model="nhs.terminology">
+        <field name="provider_type">hospice</field>
+        <field name="logical_key">incident_word</field>
+        <field name="label">Incident</field>
+    </record>
+
+    <!-- Independent Hospital terminology -->
+    <record id="term_indep_person_affected" model="nhs.terminology">
+        <field name="provider_type">independent_hospital</field>
+        <field name="logical_key">person_affected</field>
+        <field name="label">Patient</field>
+    </record>
+    <record id="term_indep_incident_word" model="nhs.terminology">
+        <field name="provider_type">independent_hospital</field>
+        <field name="logical_key">incident_word</field>
+        <field name="label">Clinical Incident</field>
+    </record>
+
+    <!-- Pharmacy terminology -->
+    <record id="term_pharmacy_person_affected" model="nhs.terminology">
+        <field name="provider_type">pharmacy</field>
+        <field name="logical_key">person_affected</field>
+        <field name="label">Patient</field>
+    </record>
+    <record id="term_pharmacy_incident_word" model="nhs.terminology">
+        <field name="provider_type">pharmacy</field>
+        <field name="logical_key">incident_word</field>
+        <field name="label">Dispensing Incident</field>
+    </record>
+
+    <!-- Dental terminology -->
+    <record id="term_dental_person_affected" model="nhs.terminology">
+        <field name="provider_type">dental</field>
+        <field name="logical_key">person_affected</field>
+        <field name="label">Patient</field>
+    </record>
+    <record id="term_dental_incident_word" model="nhs.terminology">
+        <field name="provider_type">dental</field>
+        <field name="logical_key">incident_word</field>
+        <field name="label">Clinical Incident</field>
+    </record>
+</odoo>

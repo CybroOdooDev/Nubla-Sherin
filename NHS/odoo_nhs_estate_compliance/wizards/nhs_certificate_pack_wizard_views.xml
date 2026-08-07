@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Certificate Pack Wizard Form View -->
+    <record id="view_nhs_certificate_pack_wizard" model="ir.ui.view">
+        <field name="name">nhs.certificate.pack.wizard.form</field>
+        <field name="model">nhs.certificate.pack.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Certificate Pack">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="site_id" placeholder="All Sites"/>
+                            <field name="building_id" placeholder="All Buildings"/>
+                            <field name="discipline_id" placeholder="All Disciplines"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_generate_pack" string="Generate Pack (PDF)" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Certificate Pack Wizard - Action -->
+    <record id="action_nhs_certificate_pack_wizard" model="ir.actions.act_window">
+        <field name="name">Generate Certificate Pack</field>
+        <field name="res_model">nhs.certificate.pack.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

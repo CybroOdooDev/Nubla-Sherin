@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- list VIEW - Device Categories Default Schedules-->
+    <record id="view_nhs_device_category_schedule_list" model="ir.ui.view">
+        <field name="name">nhs.device.category.schedule.list</field>
+        <field name="model">nhs.device.category.schedule</field>
+        <field name="arch" type="xml">
+            <list string="Default Schedules">
+                <field name="category_id" widget="many2one"/>
+                <field name="schedule_type_id" widget="many2one"/>
+                <field name="interval_months"/>
+                <field name="delivery"/>
+                <field name="last_done_date"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- list VIEW - Device Categories -->
+    <record id="view_nhs_device_category_list" model="ir.ui.view">
+        <field name="name">nhs.device.category.list</field>
+        <field name="model">nhs.device.category</field>
+        <field name="arch" type="xml">
+            <list string="Device Categories">
+                <field name="name"/>
+                <field name="complete_name"/>
+                <field name="parent_id"/>
+                <field name="default_life_years"/>
+                <field name="is_clinical"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- form VIEW - Device Categories -->
+    <record id="view_nhs_device_category_form" model="ir.ui.view">
+        <field name="name">nhs.device.category.form</field>
+        <field name="model">nhs.device.category</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_devices" type="object"
+                                class="oe_stat_button" icon="fa-file">
+                            <span class="o_stat_text">Devices</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Category Name..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="parent_id" widget="selection"/>
+                            <field name="complete_name" readonly="1"/>
+                            <field name="default_life_years"/>
+                            <field name="is_clinical"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Default Schedules">
+                            <field name="default_schedule_ids"/>
+                        </page>
+                        <page string="Sub-Categories">
+                            <field name="child_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- search VIEW - Device Categories -->
+    <record id="view_nhs_device_category_search" model="ir.ui.view">
+        <field name="name">nhs.device.category.search</field>
+        <field name="model">nhs.device.category</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="parent_id"/>
+                <filter name="is_clinical" string="Clinical" domain="[('is_clinical','=',True)]"/>
+                <filter name="archived" string="Archived" domain="[('active','=',False)]"/>
+                <filter name="active" string="Active" domain="[('active','=',True)]"/>
+                <filter name="group_parent_id" string="Parent Category" context="{'group_by':'parent_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action - Device Categories -->
+    <record id="action_nhs_device_category" model="ir.actions.act_window">
+        <field name="name">Device Categories</field>
+        <field name="res_model">nhs.device.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create device categories to group similar devices.
+                Categories define default expected life and maintenance schedules.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="module_category_nhs_estate_assets" model="ir.module.category">
+            <field name="name">NHS Medical Devices and Equipment Management</field>
+            <field name="description">Access levels for NHS Medical Devices and Equipment Management.</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="privilege_nhs_estate_assets_level" model="res.groups.privilege">
+            <field name="name">NHS Medical Devices and Equipment Management Access Level</field>
+            <field name="category_id" ref="module_category_nhs_estate_assets"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- Security Groups -->
+        <record id="group_nhs_equipment_user" model="res.groups">
+            <field name="name">Equipment User</field>
+            <field name="privilege_id" ref="privilege_nhs_estate_assets_level"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="group_nhs_ebme_officer" model="res.groups">
+            <field name="name">EBME Officer</field>
+            <field name="privilege_id" ref="privilege_nhs_estate_assets_level"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_equipment_user'))]"/>
+        </record>
+
+        <record id="group_nhs_equipment_manager" model="res.groups">
+            <field name="name">Equipment Manager</field>
+            <field name="privilege_id" ref="privilege_nhs_estate_assets_level"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_ebme_officer'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- Record Rules -->
+        <record id="rule_nhs_device_company" model="ir.rule">
+            <field name="name">NHS Device: Company Access</field>
+            <field name="model_id" ref="model_nhs_device"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="rule_nhs_device_alert_company" model="ir.rule">
+            <field name="name">NHS Device Alert: Company Access</field>
+            <field name="model_id" ref="model_nhs_device_alert"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="rule_nhs_device_schedule_company" model="ir.rule">
+            <field name="name">NHS Device Schedule: Company Access</field>
+            <field name="model_id" ref="model_nhs_device_schedule"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="rule_nhs_device_service_company" model="ir.rule">
+            <field name="name">NHS Device Service: Company Access</field>
+            <field name="model_id" ref="model_nhs_device_service"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="rule_nhs_device_warranty_company" model="ir.rule">
+            <field name="name">NHS Device Warranty: Company Access</field>
+            <field name="model_id" ref="model_nhs_device_warranty"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="rule_nhs_device_alert_line_company" model="ir.rule">
+            <field name="name">NHS Device Alert Line: Company Access</field>
+            <field name="model_id" ref="model_nhs_device_alert_line"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+    </data>
+</odoo>

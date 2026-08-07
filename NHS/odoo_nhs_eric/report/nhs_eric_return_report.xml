@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report Definition -->
+    <record id="report_nhs_eric_return_pdf" model="ir.actions.report">
+        <field name="name">ERIC Return Report</field>
+        <field name="model">nhs.eric.return</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_eric.report_nhs_eric_return_template</field>
+        <field name="print_report_name">'ERIC_Return_%s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_nhs_eric_return"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Report Template -->
+    <template id="report_nhs_eric_return_template">
+        <t t-foreach="docs" t-as="doc">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <!-- Custom styles for better PDF formatting -->
+                            <style type="text/css">
+                                .report-header {
+                                border-bottom: 3px solid #005EB8;
+                                padding-bottom: 15px;
+                                margin-bottom: 20px;
+                                }
+                                .report-title {
+                                color: #005EB8;
+                                font-size: 34px;
+                                font-weight: 700;
+                                margin-bottom: 5px;
+                                }
+                                .report-subtitle {
+                                color: #212B32;
+                                font-size: 18px;
+                                font-weight: 600;
+                                }
+                                .info-table {
+                                width: 100%;
+                                margin-bottom: 25px;
+                                border-collapse: collapse;
+                                }
+                                .info-table th {
+                                background-color: #F0F4F5;
+                                font-weight: 700;
+                                padding: 10px 14px;
+                                text-align: left;
+                                width: 25%;
+                                border: 1px solid #D8DDE0;
+                                font-size: 15px;
+                                }
+                                .info-table td {
+                                padding: 10px 14px;
+                                text-align: left;
+                                border: 1px solid #D8DDE0;
+                                font-size: 15px;
+                                }
+                                .section-title {
+                                color: #005EB8;
+                                font-size: 16px;
+                                font-weight: 700;
+                                margin-top: 25px;
+                                margin-bottom: 15px;
+                                padding-bottom: 8px;
+                                border-bottom: 2px solid #E8EDEE;
+                                }
+                                .subsection-title {
+                                color: #212B32;
+                                font-size: 20px;
+                                font-weight: 700;
+                                margin-top: 20px;
+                                margin-bottom: 10px;
+                                padding: 8px 12px;
+                                background-color: #F0F4F5;
+                                border-left: 4px solid #005EB8;
+                                }
+                                .values-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-bottom: 20px;
+                                font-size: 14px;
+                                }
+                                .values-table th {
+                                background-color: #005EB8;
+                                color: #FFFFFF;
+                                font-weight: 700;
+                                padding: 10px 12px;
+                                text-align: center;
+                                border: 1px solid #005EB8;
+                                }
+                                .values-table td {
+                                padding: 10px 12px;
+                                text-align: center;
+                                border: 1px solid #D8DDE0;
+                                vertical-align: middle;
+                                }
+                                .values-table tbody tr:nth-child(even) {
+                                background-color: #F8FAFA;
+                                }
+                                .values-table tbody tr:hover {
+                                background-color: #F0F4F5;
+                                }
+                                .status-badge {
+                                display: inline-block;
+                                padding: 3px 12px;
+                                border-radius: 12px;
+                                font-weight: 600;
+                                font-size: 9px;
+                                text-transform: uppercase;
+                                }
+                                .status-populated {
+                                background-color: #009639;
+                                color: #FFFFFF;
+                                }
+                                .status-gap {
+                                background-color: #CE7B11;
+                                color: #FFFFFF;
+                                }
+                                .status-invalid {
+                                background-color: #DA291C;
+                                color: #FFFFFF;
+                                }
+                                .status-overridden {
+                                background-color: #00A3E0;
+                                color: #FFFFFF;
+                                }
+                                .text-success {
+                                color: #009639;
+                                }
+                                .text-warning {
+                                color: #CE7B11;
+                                }
+                                .text-danger {
+                                color: #DA291C;
+                                }
+                                .text-muted {
+                                color: #768692;
+                                }
+                                .table-footer {
+                                margin-top: 30px;
+                                padding-top: 15px;
+                                border-top: 1px solid #E8EDEE;
+                                font-size: 10px;
+                                color: #768692;
+                                text-align: center;
+                                }
+                                .summary-stats {
+                                background-color: #F0F4F5;
+                                padding: 12px 15px;
+                                border-radius: 4px;
+                                margin-bottom: 20px;
+                                display: flex;
+                                flex-wrap: wrap;
+                                justify-content: space-around;
+                                align-items: center;
+                                }
+                                .summary-stat-item {
+                                text-align: center;
+                                padding: 5px 10px;
+                                flex: 1;
+                                min-width: 80px;
+                                border-right: 1px solid #D8DDE0;
+                                }
+                                .summary-stat-item:last-child {
+                                border-right: none;
+                                }
+                                .summary-stat-item .label {
+                                font-size: 10px;
+                                color: #768692;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                display: block;
+                                }
+                                .summary-stat-item .value {
+                                font-size: 18px;
+                                font-weight: 700;
+                                color: #212B32;
+                                display: block;
+                                margin-top: 2px;
+                                }
+                                .summary-stat-item .value.success {
+                                color: #009639;
+                                }
+                                .summary-stat-item .value.warning {
+                                color: #CE7B11;
+                                }
+                                .summary-stat-item .value.danger {
+                                color: #DA291C;
+                                }
+                                .badge-state {
+                                display: inline-block;
+                                padding: 4px 14px;
+                                border-radius: 4px;
+                                font-weight: 600;
+                                font-size: 11px;
+                                text-transform: capitalize;
+                                }
+                                .state-draft {
+                                background-color: #F0F4F5;
+                                color: #768692;
+                                }
+                                .state-in_progress {
+                                background-color: #FFF2E6;
+                                color: #CE7B11;
+                                }
+                                .state-ready_for_review {
+                                background-color: #E6F8FF;
+                                color: #00A3E0;
+                                }
+                                .state-signed_off {
+                                background-color: #E6F3E6;
+                                color: #009639;
+                                }
+                                .source-auto {
+                                color: #005EB8;
+                                font-weight: 600;
+                                }
+                                .source-manual {
+                                color: #CE7B11;
+                                font-weight: 600;
+                                }
+                                .source-computed {
+                                color: #009639;
+                                font-weight: 600;
+                                }
+                                .required-star {
+                                color: #DA291C;
+                                font-weight: 700;
+                                margin-left: 2px;
+                                }
+                            </style>
+
+                            <!-- Report Header -->
+                            <div class="report-header">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <div class="report-title">NHS ERIC Return Report</div>
+                                        <div class="report-subtitle">
+                                            <t t-esc="doc.name"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-4 text-right">
+                                        <span style="font-size: 12px; color: #768692;">
+                                            Generated:
+                                            <t t-esc="time.strftime('%d/%m/%Y %H:%M')"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Organisation Information -->
+                            <table class="info-table">
+                                <tr>
+                                    <th class="p-3">Organisation</th>
+                                    <td>
+                                        <t t-esc="doc.company_id.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="p-3">Financial Year</th>
+                                    <td>
+                                        <t t-esc="doc.year"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="p-3">Status</th>
+                                    <td>
+                                        <span t-attf-class="badge-state state-#{doc.state}">
+                                            <t t-esc="doc.state.replace('_', ' ').title()"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="p-3">Completeness</th>
+                                    <td>
+                                        <strong><t t-esc="doc.completeness_pct"/>%
+                                        </strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="p-3">Gaps</th>
+                                    <td>
+                                        <span t-attf-class="#{'text-danger' if doc.gap_count > 0 else 'text-success'}">
+                                            <t t-esc="doc.gap_count"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="p-3">Validation Errors</th>
+                                    <td>
+                                        <span t-attf-class="#{'text-danger' if doc.validation_error_count > 0 else 'text-success'}">
+                                            <t t-esc="doc.validation_error_count"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Summary Statistics - SIDE BY SIDE -->
+                            <t t-set="total_values" t-value="len(doc.value_ids)"/>
+                            <t t-set="populated_values"
+                               t-value="len(doc.value_ids.filtered(lambda v: v.status == 'populated'))"/>
+                            <t t-set="gap_values" t-value="len(doc.value_ids.filtered(lambda v: v.status == 'gap'))"/>
+                            <t t-set="invalid_values"
+                               t-value="len(doc.value_ids.filtered(lambda v: v.status == 'invalid'))"/>
+                            <t t-set="auto_values"
+                               t-value="len(doc.value_ids.filtered(lambda v: v.item_def_id.source_type == 'auto'))"/>
+                            <t t-set="manual_values"
+                               t-value="len(doc.value_ids.filtered(lambda v: v.item_def_id.source_type == 'manual'))"/>
+
+                            <div class="row summary-stats">
+                                <div class="col summary-stat-item">
+                                    <div class="label">Total Items</div>
+                                    <div class="value">
+                                        <t t-esc="total_values"/>
+                                    </div>
+                                </div>
+                                <div class="col summary-stat-item">
+                                    <div class="label">Populated</div>
+                                    <div class="value success">
+                                        <t t-esc="populated_values"/>
+                                    </div>
+                                </div>
+                                <div class="col summary-stat-item">
+                                    <div class="label">Gaps</div>
+                                    <div class="value warning">
+                                        <t t-esc="gap_values"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row summary-stats">
+                                <div class="col summary-stat-item">
+                                    <div class="label">Invalid</div>
+                                    <div class="value danger">
+                                        <t t-esc="invalid_values"/>
+                                    </div>
+                                </div>
+                                <div class="col summary-stat-item">
+                                    <div class="label">Auto-sourced</div>
+                                    <div class="value">
+                                        <t t-esc="auto_values"/>
+                                    </div>
+                                </div>
+                                <div class="col summary-stat-item">
+                                    <div class="label">Manual Entry</div>
+                                    <div class="value">
+                                        <t t-esc="manual_values"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Values by Section -->
+                            <div class="section-title">Values by Section</div>
+
+                            <t t-set="sections" t-value="doc.dataset_id.section_ids.sorted('sequence')"/>
+                            <t t-foreach="sections" t-as="section">
+                                <t t-set="section_values"
+                                   t-value="doc.value_ids.filtered(lambda v: v.section_id.id == section.id)"/>
+                                <t t-if="section_values">
+                                    <div class="subsection-title">
+                                        <t t-esc="section.name"/>
+                                        <span style="float: right; font-weight: 400; font-size: 12px; color: #768692;">
+                                            <t t-esc="len(section_values.filtered(lambda v: v.status == 'populated'))"/>
+                                            /
+                                            <t t-esc="len(section_values)"/>
+                                            populated
+                                        </span>
+                                    </div>
+                                    <table class="values-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 25%;">Item</th>
+                                                <th style="width: 20%;">Value</th>
+                                                <th style="width: 15%;">Auto Value</th>
+                                                <th style="width: 20%;">Source</th>
+                                                <th style="width: 20%;">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="section_values" t-as="value">
+                                                <tr>
+                                                    <td>
+                                                        <strong>
+                                                            <t t-esc="value.item_def_id.name"/>
+                                                        </strong>
+                                                        <t t-if="value.item_def_id.required">
+                                                            <span class="required-star">*</span>
+                                                        </t>
+                                                    </td>
+                                                    <td>
+                                                        <t t-esc="value._get_value_display() or '-'"/>
+                                                    </td>
+                                                    <td>
+                                                        <t t-if="value.auto_value">
+                                                            <t t-esc="value.auto_value"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span class="text-muted">-</span>
+                                                        </t>
+                                                    </td>
+                                                    <td>
+                                                        <t t-if="value.item_def_id.source_type == 'auto'">
+                                                            <span class="source-auto">Auto-sourced</span>
+                                                            <t t-if="value.source_note">
+                                                                <br/>
+                                                                <span style="font-size: 9px; color: #768692;">
+                                                                    <t t-esc="value.source_note"/>
+                                                                </span>
+                                                            </t>
+                                                        </t>
+                                                        <t t-elif="value.item_def_id.source_type == 'manual'">
+                                                            <span class="source-manual">Manual Entry</span>
+                                                        </t>
+                                                        <t t-elif="value.item_def_id.source_type == 'computed'">
+                                                            <span class="source-computed">Computed</span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span class="text-muted">Unknown</span>
+                                                        </t>
+                                                    </td>
+                                                    <td>
+                                                        <span t-attf-class="status-badge status-#{value.status}">
+                                                            <t t-if="value.status == 'populated'">Populated</t>
+                                                            <t t-elif="value.status == 'gap'">Gap</t>
+                                                            <t t-elif="value.status == 'invalid'">Invalid</t>
+                                                            <t t-elif="value.status == 'overridden'">Overridden</t>
+                                                            <t t-else="">
+                                                                <t t-esc="value.status"/>
+                                                            </t>
+                                                        </span>
+                                                        <t t-if="value.status == 'overridden'">
+                                                            <span style="display: block; font-size: 9px; color: #00A3E0;">
+                                                                (Manual Override)
+                                                            </span>
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </t>
+                            </t>
+
+                            <!-- Footer -->
+                            <div class="table-footer">
+                                <p>
+                                    <strong>NHS ERIC Return Report</strong>
+                                    —
+                                    Generated on
+                                    <t t-esc="time.strftime('%d %B %Y at %H:%M')"/>
+                                </p>
+                                <p style="margin-top: 5px; font-size: 9px; color: #A9B3B9;">
+                                    This report is auto-generated from the NHS ERIC Return Management System.
+                                    <t t-if="doc.state != 'signed_off'">
+                                        <br/>
+                                        <span style="color: #CE7B11;">⚠ This return is not yet signed off.</span>
+                                    </t>
+                                    <t t-if="doc.gap_count > 0">
+                                        <br/>
+                                        <span style="color: #DA291C;">⚠ This return has
+                                            <t t-esc="doc.gap_count"/>
+                                            gap(s) that need attention.
+                                        </span>
+                                    </t>
+                                </p>
+                                <p style="margin-top: 5px;">
+                                    <span style="font-size: 8px; color: #A9B3B9;">
+                                        <span class="page-number"/>
+                                        of
+                                        <span class="topage"/>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

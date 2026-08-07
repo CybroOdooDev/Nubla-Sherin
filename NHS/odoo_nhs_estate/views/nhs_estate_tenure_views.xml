@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tenure List View -->
+    <record id="view_nhs_estate_tenure_list" model="ir.ui.view">
+        <field name="name">nhs.estate.tenure.list</field>
+        <field name="model">nhs.estate.tenure</field>
+        <field name="arch" type="xml">
+            <list string="Tenure Records" decoration-danger="expiring_soon==True"
+                  decoration-warning="expiring_soon==False and lease_end and lease_end">
+                <field name="name"/>
+                <field name="building_id"/>
+                <field name="tenure_type" widget="badge"/>
+                <field name="landlord"/>
+                <field name="lease_start"/>
+                <field name="lease_end"/>
+                <field name="break_date"/>
+                <field name="rent_amount"/>
+                <field name="contract_ref"/>
+                <field name="contract_end"/>
+                <field name="expiring_soon" widget="boolean"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Tenure Form View -->
+    <record id="view_nhs_estate_tenure_form" model="ir.ui.view">
+        <field name="name">nhs.estate.tenure.form</field>
+        <field name="model">nhs.estate.tenure</field>
+        <field name="arch" type="xml">
+            <form string="Tenure">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_building" type="object"
+                                class="oe_stat_button" icon="fa-building">
+                            <span class="o_stat_text">Building</span>
+                        </button>
+                        <button name="action_view_documents" type="object"
+                                class="oe_stat_button" icon="fa-file">
+                            <span class="o_stat_text">Documents</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Tenure Name..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="building_id" placeholder="Building..."/>
+                            <field name="tenure_type" required="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Details" invisible="tenure_type in ['freehold','licence']">
+                            <group>
+                                <group>
+                                    <field name="landlord" invisible="tenure_type in ['freehold','licence']"/>
+                                    <field name="lease_start"
+                                           invisible="tenure_type in ['freehold','licence','pfi','lift','nhsps','chp','licence']"/>
+                                    <field name="lease_end"
+                                           invisible="tenure_type in ['freehold','licence','pfi','lift','nhsps','chp','licence']"/>
+                                    <field name="lease_term_years" readonly="1"
+                                           invisible="tenure_type in ['freehold','licence','pfi','lift','nhsps','chp','licence']"/>
+                                    <field name="rent_amount"
+                                           invisible="tenure_type in ['freehold','licence','leasehold']"/>
+                                    <field name="contract_ref"
+                                           invisible="tenure_type in ['freehold','licence','leasehold']"/>
+                                    <field name="contract_start"
+                                           invisible="tenure_type in ['freehold','licence','leasehold']"/>
+                                    <field name="contract_end"
+                                           invisible="tenure_type in ['freehold','licence','leasehold']"/>
+                                    <field name="expiring_soon" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="break_date"/>
+                                    <field name="rent_review_date"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Documents" invisible="tenure_type in ['freehold','licence']">
+                            <group>
+                                <field name="document_ids" widget="many2many_binary" help="Lease/Contract Documents"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tenure Search View -->
+    <record id="view_nhs_estate_tenure_search" model="ir.ui.view">
+        <field name="name">nhs.estate.tenure.search</field>
+        <field name="model">nhs.estate.tenure</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="building_id"/>
+                <field name="tenure_type"/>
+                <field name="landlord"/>
+                <filter name="group_by_tenure_type"
+                        string="Tenure Type"
+                        context="{'group_by': 'tenure_type'}"/>
+                <filter name="group_by_building"
+                        string="Building"
+                        context="{'group_by': 'building_id'}"/>
+                <filter name="expiring_soon"
+                        string="Expiring in 12 Months"
+                        domain="[('expiring_soon', '=', True)]"/>
+                <filter name="leasehold"
+                        string="Leasehold"
+                        domain="[('tenure_type', '=', 'leasehold')]"/>
+                <filter name="pfi"
+                        string="PFI/LIFT"
+                        domain="[('tenure_type', 'in', ['pfi','lift'])]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Tenure Graph View -->
+    <record id="view_nhs_estate_tenure_graph" model="ir.ui.view">
+        <field name="name">nhs.estate.tenure.graph</field>
+        <field name="model">nhs.estate.tenure</field>
+        <field name="arch" type="xml">
+            <graph string="Tenure Breakdown" type="pie">
+                <field name="tenure_type" type="row"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Tenure Pivot View -->
+    <record id="view_nhs_estate_tenure_pivot" model="ir.ui.view">
+        <field name="name">nhs.estate.tenure.pivot</field>
+        <field name="model">nhs.estate.tenure</field>
+        <field name="arch" type="xml">
+            <pivot string="Tenure Analysis">
+                <field name="tenure_type" type="row"/>
+                <field name="building_id" type="col"/>
+                <field name="rent_amount" type="measure" operator="sum"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Tenure Action -->
+    <record id="action_nhs_estate_tenure" model="ir.actions.act_window">
+        <field name="name">Tenure Records</field>
+        <field name="res_model">nhs.estate.tenure</field>
+        <field name="view_mode">list,form,pivot,graph</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first tenure record
+            </p>
+            <p>
+                Record tenure and lease details for buildings.
+                Track lease dates, break clauses, rent reviews, and expiries.
+            </p>
+        </field>
+    </record>
+
+</odoo>

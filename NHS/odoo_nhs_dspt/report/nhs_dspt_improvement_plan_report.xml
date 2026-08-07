@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="report_nhs_dspt_improvement_plan" model="ir.actions.report">
+        <field name="name">DSPT Improvement Plan</field>
+        <field name="model">nhs.dspt.assessment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_dspt.report_nhs_dspt_improvement_plan_view</field>
+        <field name="report_file">odoo_nhs_dspt.report_nhs_dspt_improvement_plan_view</field>
+        <field name="binding_model_id" ref="model_nhs_dspt_assessment"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_nhs_dspt_improvement_plan_view">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="assessment">
+                    <div class="page">
+                        <h2 style="color:#005EB8;">Improvement Plan — <t t-out="assessment.name"/></h2>
+                        <p class="text-muted">Generated <t t-out="generated_on"/></p>
+
+                        <t t-set="assessment_actions" t-value="[r for r in action_rows if r['assessment'].id == assessment.id]"/>
+                        <t t-if="assessment_actions">
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Ref</th><th>Action</th><th>Gap</th><th>Owner</th>
+                                        <th>Priority</th><th>Target Date</th><th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="assessment_actions" t-as="row">
+                                        <tr t-attf-style="#{row['is_overdue'] and 'background-color:#f8d7da;' or ''}">
+                                            <td><t t-out="row['reference']"/></td>
+                                            <td><t t-out="row['name']"/></td>
+                                            <td><t t-out="row['evidence']"/></td>
+                                            <td><t t-out="row['owner']"/></td>
+                                            <td><t t-out="row['priority']"/></td>
+                                            <td><t t-out="row['target_date'] or '-'"/></td>
+                                            <td><t t-out="row['state']"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+                        <t t-else="">
+                            <p class="text-success">No improvement actions raised — no outstanding gaps.</p>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

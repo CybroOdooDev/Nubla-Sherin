@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ir.sequence definitions numbering the reference codes for incidents,
+         investigations, risks, actions and LFPSE export batches (per-year prefix,
+         not company-specific). -->
+    <record id="seq_nhs_incident" model="ir.sequence">
+        <field name="name">NHS Incident Reference</field>
+        <field name="code">nhs.incident</field>
+        <field name="prefix">INC/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_nhs_investigation" model="ir.sequence">
+        <field name="name">NHS Investigation Reference</field>
+        <field name="code">nhs.investigation</field>
+        <field name="prefix">INV/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_nhs_risk" model="ir.sequence">
+        <field name="name">NHS Risk Reference</field>
+        <field name="code">nhs.risk</field>
+        <field name="prefix">RSK/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_nhs_action" model="ir.sequence">
+        <field name="name">NHS Action Reference</field>
+        <field name="code">nhs.action</field>
+        <field name="prefix">ACT/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_nhs_lfpse" model="ir.sequence">
+        <field name="name">NHS LFPSE Batch Reference</field>
+        <field name="code">nhs.lfpse.submission</field>
+        <field name="prefix">LFPSE/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

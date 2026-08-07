@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- list View for Values -->
+    <record id="view_nhs_eric_value_list" model="ir.ui.view">
+        <field name="name">nhs.eric.value.list</field>
+        <field name="model">nhs.eric.value</field>
+        <field name="arch" type="xml">
+            <list decoration-success="status == 'populated'" decoration-warning="status == 'gap'"
+                  decoration-danger="status == 'invalid'">
+                <field name="return_id"/>
+                <field name="section_id"/>
+                <field name="site_id"/>
+                <field name="item_def_id"/>
+                <field name="source_type" readonly="1"/>
+                <field name="data_type"/>
+                <field name="value_number"/>
+                <field name="auto_value"/>
+                <field name="is_overridden"/>
+                <field name="override_reason" optional="hide"/>
+                <field name="is_anomaly" optional="show"/>
+                <field name="anomaly_reason" optional="hide"/>
+                <field name="status" widget="badge" decoration-success="status == 'populated'"
+                       decoration-warning="status == 'gap'" decoration-danger="status == 'invalid'"/>
+                <field name="signed_off"/>
+                <field name="owner_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View for Values -->
+    <record id="view_nhs_eric_value_form" model="ir.ui.view">
+        <field name="name">nhs.eric.value.form</field>
+        <field name="model">nhs.eric.value</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="return_id"/>
+                            <field name="item_def_id"/>
+                            <field name="site_id"/>
+                            <field name="section_id"/>
+                            <field name="item_code"/>
+                        </group>
+                        <group>
+                            <field name="status"/>
+                            <field name="signed_off"/>
+                            <field name="owner_id"/>
+                            <field name="is_anomaly" readonly="1"/>
+                            <field name="anomaly_reason" readonly="1" invisible="not is_anomaly"/>
+                        </group>
+                    </group>
+                    <group string="Value">
+                        <field name="source_type" invisible="1"/>
+                        <field name="data_type"/>
+                        <field name="value_number"
+                               invisible="item_def_id.data_type not in ['integer', 'float', 'currency', 'percent']"
+                               readonly="source_type == 'computed' or data_type not in ['integer', 'float', 'currency', 'percent']"/>
+                        <field name="value_text" invisible="item_def_id.data_type != 'text'"
+                               readonly="source_type == 'computed' or data_type != 'text'"/>
+                        <field name="value_bool" invisible="item_def_id.data_type != 'boolean'"
+                               readonly="source_type == 'computed' or data_type != 'boolean'"/>
+                        <field name="attachment_ids" widget="many2many_binary"/>
+                    </group>
+                    <group string="Auto Value" groups="odoo_nhs_eric.group_nhs_eric_officer">
+                        <field name="auto_value"/>
+                        <field name="is_overridden"/>
+                        <field name="override_reason" invisible="not is_overridden"/>
+                        <field name="source_note"/>
+                    </group>
+                    <group string="Sign Off">
+                        <field name="signed_off_by_id"/>
+                        <field name="signed_off_at"/>
+                    </group>
+                    <footer>
+                        <button name="action_sign_off" string="Sign Off" type="object"
+                                groups="odoo_nhs_eric.group_nhs_eric_officer" invisible="status != 'populated'"/>
+                        <button name="action_unsign" string="Unsign" type="object"
+                                groups="odoo_nhs_eric.group_nhs_eric_officer" invisible="status != 'populated'"/>
+                        <button name="action_override" string="Override" type="object"
+                                groups="odoo_nhs_eric.group_nhs_eric_officer" invisible="status != 'populated'"/>
+                        <button name="action_clear_override" string="Clear Override" type="object"
+                                groups="odoo_nhs_eric.group_nhs_eric_officer" invisible="not is_overridden"/>
+                    </footer>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View for Values -->
+    <record id="view_nhs_eric_value_search" model="ir.ui.view">
+        <field name="name">nhs.eric.value.search</field>
+        <field name="model">nhs.eric.value</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="return_id"/>
+                <field name="section_id"/>
+                <field name="site_id"/>
+                <field name="item_def_id"/>
+                <filter string="Manual Only" name="manual_only" domain="[('item_def_id.source_type', '=', 'manual')]"/>
+                <filter string="Gaps Only" name="gaps_only" domain="[('status', '=', 'gap')]"/>
+                <filter string="Anomalies Only" name="anomalies_only" domain="[('is_anomaly', '=', True)]"/>
+                <filter string="Section" name="group_section" domain="[]" context="{'group_by': 'section_id'}"/>
+                <filter string="Site" name="group_site" domain="[]" context="{'group_by': 'site_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Gaps and validation List View -->
+    <record id="view_nhs_eric_value_gaps_validation_list" model="ir.ui.view">
+        <field name="name">nhs.eric.value.gaps.validation</field>
+        <field name="model">nhs.eric.value</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" create="false" delete="false" decoration-success="status == 'populated'"
+                  decoration-warning="status == 'gap'" decoration-danger="status == 'invalid'">
+                <field name="section_id" readonly="1"/>
+                <field name="site_id" readonly="1"/>
+                <field name="item_code" readonly="1"/>
+                <field name="item_def_id" readonly="1"/>
+                <field name="source_type" readonly="1"/>
+                <field name="data_type"/>
+                <field name="value_number" placeholder="Enter number..."
+                       invisible="data_type not in ['integer', 'float', 'currency', 'percent']"
+                       readonly="source_type == 'computed' or data_type not in ['integer', 'float', 'currency', 'percent']"/>
+                <field name="value_text" placeholder="Enter text..." invisible="data_type != 'text'"
+                       readonly="source_type == 'computed' or data_type != 'text'"/>
+                <field name="value_bool" invisible="data_type != 'boolean'"
+                       readonly="source_type == 'computed' or data_type != 'boolean'"/>
+                <field name="auto_value" readonly="1"/>
+                <field name="is_overridden"/>
+                <field name="override_reason" required="is_overridden" invisible="not is_overridden"/>
+                <field name="is_anomaly" readonly="1"/>
+                <field name="anomaly_reason" readonly="1"/>
+                <field name="attachment_ids" widget="many2many_binary"/>
+                <field name="status" readonly="1" widget="badge" decoration-success="status == 'populated'"
+                       decoration-warning="status == 'gap'" decoration-danger="status == 'invalid'"/>
+                <field name="signed_off"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Values Action -->
+    <record id="action_nhs_eric_values" model="ir.actions.act_window">
+        <field name="name">Values</field>
+        <field name="res_model">nhs.eric.value</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Action for Gaps and Validation -->
+    <record id="action_nhs_eric_value_gaps_validation" model="ir.actions.act_window">
+        <field name="name">Gaps and Invalid Values</field>
+        <field name="res_model">nhs.eric.value</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_nhs_eric_value_gaps_validation_list"/>
+        <field name="search_view_id" ref="view_nhs_eric_value_search"/>
+        <field name="domain">[('status', 'in', ['gap', 'invalid'])]</field>
+        <field name="context">{'search_default_manual_only': 1, 'search_default_group_section': 1}</field>
+    </record>
+
+
+
+</odoo>

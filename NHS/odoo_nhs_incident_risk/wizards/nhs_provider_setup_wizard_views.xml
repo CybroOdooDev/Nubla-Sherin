@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Onboarding wizard: selecting a provider_type activates the matching incident
+         categories, terminology pack and notification rules; safe to re-run later. -->
+    <record id="view_nhs_provider_setup_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.provider.setup.wizard.form</field>
+        <field name="model">nhs.provider.setup.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Provider Setup Wizard">
+                <div class="alert alert-info" role="alert">
+                    Choose your provider type to activate the correct incident categories,
+                    terminology pack and notification rules.
+                    This wizard can be re-run at any time without data loss.
+                </div>
+                <group>
+                    <field name="provider_type"/>
+                </group>
+                <group string="Categories to Activate">
+                    <field name="category_preview" nolabel="1" readonly="1"/>
+                </group>
+                <footer>
+                    <button name="action_apply" string="Apply Configuration"
+                            type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_provider_setup_wizard" model="ir.actions.act_window">
+        <field name="name">Provider Setup Wizard</field>
+        <field name="res_model">nhs.provider.setup.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- DEVICE PASSPORT REPORT ACTION -->
+    <record id="action_report_nhs_device_passport" model="ir.actions.report">
+        <field name="name">Device Passport</field>
+        <field name="model">nhs.device</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_estate_assets.nhs_device_passport</field>
+        <field name="report_file">odoo_nhs_estate_assets.nhs_device_passport</field>
+        <field name="print_report_name">'Device Passport - %s' % (object.display_name)</field>
+        <field name="binding_model_id" ref="model_nhs_device"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- DEVICE PASSPORT REPORT TEMPLATE -->
+    <template id="nhs_device_passport">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="device">
+                <t t-call="web.basic_layout">
+                    <div class="page" t-att-style="'page-break-after: always;' if not device_last else ''">
+                        <t t-call="odoo_nhs_estate_assets.nhs_device_passport_body"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="nhs_device_passport_body">
+        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #212529; line-height: 1.4;">
+            <t t-set="company" t-value="device.company_id or res_company or env.company"/>
+            <div style="border-bottom: 2px solid #003087; padding-bottom: 6px; margin-bottom: 10px;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 30%; vertical-align: middle; text-align: left;">
+                            <t t-if="company and company.logo">
+                                <img t-att-src="image_data_uri(company.logo)"
+                                     style="max-height: 50px; max-width: 160px; object-fit: contain;" alt="Logo"/>
+                            </t>
+                            <t t-else="">
+                                <span style="font-weight: bold; font-size: 16px; color: #003087;">
+                                    <t t-esc="company.name if company else 'NHS Trust'"/>
+                                </span>
+                            </t>
+                        </td>
+                        <td style="width: 40%; vertical-align: middle; text-align: center;">
+                            <h2 style="color: #003087; font-size: 20px; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">
+                                NHS Device Passport
+                            </h2>
+                            <p style="color: #495057; font-size: 12px; margin: 3px 0 0 0;">Medical Device &amp;
+                                Equipment Summary
+                            </p>
+                        </td>
+                        <td style="width: 30%; vertical-align: middle; text-align: right;">
+                            <span style="background: #003087; color: white; padding: 5px 12px; border-radius: 3px; font-weight: bold; font-size: 13px; display: inline-block;">
+                                Asset Tag:
+                                <t t-esc="device.asset_tag"/>
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 8px 10px; margin-bottom: 8px;">
+                <h4 style="color: #003087; font-size: 14px; margin: 0 0 5px 0; font-weight: bold; border-bottom: 1px solid #003087; padding-bottom: 3px;">
+                    Device Details
+                </h4>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 78%; vertical-align: top;">
+                            <h3 style="color: #003087; font-size: 16px; margin: 0 0 5px 0; font-weight: bold;">
+                                <t t-esc="device.display_name"/>
+                            </h3>
+                            <table style="width: 100%; font-size: 12.5px; border-collapse: collapse;">
+                                <tr>
+                                    <td style="width: 50%; padding: 2px 0;">
+                                        <strong>Category:</strong>
+                                        <t t-esc="device.category_id.display_name or 'N/A'"/>
+                                    </td>
+                                    <td style="width: 50%; padding: 2px 0;">
+                                        <strong>Site:</strong>
+                                        <t t-esc="device.site_id.display_name or 'N/A'"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 2px 0;">
+                                        <strong>Manufacturer:</strong>
+                                        <t t-esc="device.manufacturer or 'N/A'"/>
+                                    </td>
+                                    <td style="padding: 2px 0;">
+                                        <strong>Building / Space:</strong>
+                                        <t t-esc="(device.building_id.name or '') + (' / ' + device.space_id.name if device.space_id else '') or 'N/A'"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 2px 0;">
+                                        <strong>Model:</strong>
+                                        <t t-esc="device.model or 'N/A'"/>
+                                    </td>
+                                    <td style="padding: 2px 0;">
+                                        <strong>Department:</strong>
+                                        <t t-esc="device.department or 'N/A'"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 2px 0;">
+                                        <strong>Serial Number:</strong>
+                                        <t t-esc="device.serial_number or 'N/A'"/>
+                                    </td>
+                                    <td style="padding: 2px 0;">
+                                        <strong>Responsible User:</strong>
+                                        <t t-esc="device.responsible_user_id.name or 'N/A'"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 2px 0;">
+                                        <strong>Status:</strong>
+                                        <span t-att-class="'badge badge-success' if device.status == 'in_service' else 'badge badge-danger' if device.status == 'awaiting_repair' else 'badge badge-warning' if device.status == 'out_of_service' else 'badge badge-secondary'">
+                                            <t t-esc="dict(device._fields['status'].selection).get(device.status, device.status)"/>
+                                        </span>
+                                    </td>
+                                    <td style="padding: 2px 0;">
+                                        <strong>Condition:</strong>
+                                        <t t-esc="dict(device._fields['condition'].selection).get(device.condition, device.condition) or 'N/A'"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 2px 0;">
+                                        <strong>Acquisition Date:</strong>
+                                        <t t-esc="device.acquisition_date or 'N/A'"/>
+                                    </td>
+                                    <td style="padding: 2px 0;">
+                                        <strong>Expected Life / Replacement:</strong>
+                                        <t t-esc="device.expected_life_years or 'N/A'"/>
+                                        yrs /
+                                        <t t-esc="device.replacement_year or 'N/A'"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 22%; text-align: center; vertical-align: top; padding-left: 8px;">
+                            <div style="background: #ffffff; border: 1px solid #dee2e6; border-radius: 4px; padding: 4px; height: 90px; display: flex; align-items: center; justify-content: center;">
+                                <span t-if="device.image">
+                                    <img t-att-src="'data:image/png;base64,' + device.image.decode('utf-8')"
+                                         style="max-width: 90px; max-height: 80px; object-fit: contain;"/>
+                                </span>
+                                <span t-else="" style="color: #999; font-size: 11px;">No Photo</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <t t-set="maint_services"
+               t-value="device.service_ids.filtered(lambda s: s.service_type in ['ppm', 'repair', 'inspection'])"/>
+            <div style="margin-bottom: 8px;">
+                <h4 style="color: #003087; font-size: 14px; margin: 0 0 4px 0; font-weight: bold; border-bottom: 1px solid #003087; padding-bottom: 3px;">
+                    Maintenance History
+                </h4>
+                <t t-if="maint_services">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11.5px; border: 1px solid #dee2e6;">
+                        <thead style="background: #e9ecef; font-weight: bold;">
+                            <tr>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 15%;">
+                                    Date
+                                </th>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 22%;">
+                                    Type
+                                </th>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 25%;">
+                                    Performed By
+                                </th>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 18%;">
+                                    Outcome
+                                </th>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 20%;">
+                                    Notes
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="maint_services[:3]" t-as="service">
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <t t-esc="service.service_date or 'N/A'"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <t t-esc="dict(service._fields['service_type'].selection).get(service.service_type, service.service_type)"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <t t-esc="service.performed_by_id.name or service.contractor or 'N/A'"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <span t-att-class="'text-success' if service.outcome in ['pass','pass_with_note'] else 'text-danger'">
+                                        <t t-esc="dict(service._fields['outcome'].selection).get(service.outcome, service.outcome)"/>
+                                    </span>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <t t-esc="(service.notes or service.parts_used or 'N/A')[:40]"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+                <t t-else="">
+                    <p style="color: #6c757d; font-size: 12px; margin: 2px 0 0 0;">No maintenance history recorded.</p>
+                </t>
+            </div>
+            <t t-set="calib_services"
+               t-value="device.service_ids.filtered(lambda s: s.service_type in ['calibration', 'electrical_safety'])"/>
+            <div style="margin-bottom: 8px;">
+                <h4 style="color: #003087; font-size: 14px; margin: 0 0 4px 0; font-weight: bold; border-bottom: 1px solid #003087; padding-bottom: 3px;">
+                    Calibration History
+                </h4>
+                <t t-if="calib_services">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11.5px; border: 1px solid #dee2e6;">
+                        <thead style="background: #e9ecef; font-weight: bold;">
+                            <tr>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 15%;">
+                                    Date
+                                </th>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 25%;">
+                                    Service Type
+                                </th>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 22%;">
+                                    Cert Ref
+                                </th>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 23%;">
+                                    Performed By
+                                </th>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 15%;">
+                                    Outcome
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="calib_services[:3]" t-as="calib">
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <t t-esc="calib.service_date or 'N/A'"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <t t-esc="dict(calib._fields['service_type'].selection).get(calib.service_type, calib.service_type)"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <t t-esc="calib.certificate_ref or 'N/A'"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <t t-esc="calib.performed_by_id.name or calib.contractor or 'N/A'"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <span t-att-class="'text-success' if calib.outcome in ['pass','pass_with_note'] else 'text-danger'">
+                                        <t t-esc="dict(calib._fields['outcome'].selection).get(calib.outcome, calib.outcome)"/>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+                <t t-else="">
+                    <p style="color: #6c757d; font-size: 12px; margin: 2px 0 0 0;">No calibration history recorded.</p>
+                </t>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <h4 style="color: #003087; font-size: 14px; margin: 0 0 4px 0; font-weight: bold; border-bottom: 1px solid #003087; padding-bottom: 3px;">
+                    Alerts
+                </h4>
+                <t t-if="device.alert_line_ids">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11.5px; border: 1px solid #dee2e6;">
+                        <thead style="background: #e9ecef; font-weight: bold;">
+                            <tr>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 35%;">
+                                    Alert Title
+                                </th>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 25%;">
+                                    Reference
+                                </th>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 20%;">
+                                    Action Status
+                                </th>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 20%;">
+                                    Actioned Date
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="device.alert_line_ids[:3]" t-as="alert_line">
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <t t-esc="alert_line.alert_id.name or 'N/A'"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <t t-esc="alert_line.alert_id.reference or 'N/A'"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <span t-att-class="'badge badge-danger' if alert_line.action_status == 'pending' else 'badge badge-warning' if alert_line.action_status == 'quarantined' else 'badge badge-success' if alert_line.action_status == 'actioned' else 'badge badge-secondary'">
+                                        <t t-esc="dict(alert_line._fields['action_status'].selection).get(alert_line.action_status, alert_line.action_status)"/>
+                                    </span>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <t t-esc="alert_line.actioned_date or 'N/A'"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+                <t t-else="">
+                    <p style="color: #6c757d; font-size: 12px; margin: 2px 0 0 0;">No safety alerts affecting this
+                        device.
+                    </p>
+                </t>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <h4 style="color: #003087; font-size: 14px; margin: 0 0 4px 0; font-weight: bold; border-bottom: 1px solid #003087; padding-bottom: 3px;">
+                    Warranty Information
+                </h4>
+                <t t-if="device.warranty_ids">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11.5px; border: 1px solid #dee2e6;">
+                        <thead style="background: #e9ecef; font-weight: bold;">
+                            <tr>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 25%;">
+                                    Cover Type
+                                </th>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 30%;">
+                                    Provider
+                                </th>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 15%;">
+                                    Start Date
+                                </th>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 15%;">
+                                    Expiry Date
+                                </th>
+                                <th style="border: 1px solid #dee2e6; padding: 4px 6px; text-align: left; width: 15%;">
+                                    Status
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="device.warranty_ids[:3]" t-as="warranty">
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <t t-esc="dict(warranty._fields['cover_type'].selection).get(warranty.cover_type, warranty.cover_type)"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <t t-esc="warranty.provider or 'N/A'"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <t t-esc="warranty.start_date or 'N/A'"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <t t-esc="warranty.expiry_date or 'N/A'"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 4px 6px;">
+                                    <span t-att-class="'badge badge-danger' if warranty.is_expiring else 'badge badge-success'">
+                                        <t t-if="warranty.is_expiring">Expiring Soon</t>
+                                        <t t-else="">Active</t>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+                <t t-else="">
+                    <p style="color: #6c757d; font-size: 12px; margin: 2px 0 0 0;">No warranty or service contract
+                        recorded.
+                    </p>
+                </t>
+            </div>
+            <div style="border-top: 1px solid #dee2e6; padding-top: 4px; margin-top: 6px; font-size: 11px; color: #6c757d; text-align: center;">
+                <span>Generated on
+                    <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d')"/>
+                    | NHS Estate Assets Management | Device Passport:
+                    <t t-esc="device.asset_tag"/>
+                </span>
+            </div>
+        </div>
+    </template>
+</odoo>

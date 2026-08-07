@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ACTION - Device Register Dashboard -->
+    <record id="action_nhs_device_dashboard" model="ir.actions.client">
+        <field name="name">Device Register Dashboard</field>
+        <field name="tag">nhs_device_dashboard</field>
+    </record>
+
+    <!-- REPLACEMENT FORECAST - GRAPH VIEW -->
+    <record id="view_nhs_device_replacement_forecast_graph" model="ir.ui.view">
+        <field name="name">nhs.device.replacement.forecast.graph</field>
+        <field name="model">nhs.device</field>
+        <field name="arch" type="xml">
+            <graph string="Replacement Forecast" type="bar" sample="1">
+                <field name="replacement_year" type="row"/>
+                <field name="estimated_replacement_cost" type="measure"/>
+                <field name="acquisition_cost" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- REPLACEMENT FORECAST - PIVOT VIEW -->
+    <record id="view_nhs_device_replacement_forecast_pivot" model="ir.ui.view">
+        <field name="name">nhs.device.replacement.forecast.pivot</field>
+        <field name="model">nhs.device</field>
+        <field name="arch" type="xml">
+            <pivot string="Replacement Forecast Analysis" sample="1">
+                <field name="replacement_year" type="row"/>
+                <field name="category_id" type="row"/>
+                <field name="device_class" type="col"/>
+                <field name="acquisition_cost" type="measure"/>
+                <field name="estimated_replacement_cost" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- REPLACEMENT FORECAST - LIST VIEW -->
+    <record id="view_nhs_device_replacement_forecast_list" model="ir.ui.view">
+        <field name="name">nhs.device.replacement.forecast.list</field>
+        <field name="model">nhs.device</field>
+        <field name="arch" type="xml">
+            <list string="Replacement Forecast" create="false" delete="false">
+                <field name="display_name" string="Device"/>
+                <field name="asset_tag"/>
+                <field name="category_id" string="Category"/>
+                <field name="device_class"/>
+                <field name="manufacturer" string="Manufacturer"/>
+                <field name="site_id" string="Site"/>
+                <field name="department" string="Department"/>
+                <field name="acquisition_date" string="Acquisition Date"/>
+                <field name="expected_replacement_date" string="Expected Replacement Date"/>
+                <field name="replacement_year" string="Replacement Year"/>
+                <field name="acquisition_cost" string="Purchase Cost" sum="Total Purchase Cost"/>
+                <field name="estimated_replacement_cost" string="Estimated Replacement Cost"
+                       sum="Total Replacement Cost"/>
+                <field name="status" string="Current Status"/>
+                <field name="company_id" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- REPLACEMENT FORECAST - SEARCH VIEW -->
+    <record id="view_nhs_device_replacement_forecast_search" model="ir.ui.view">
+        <field name="name">nhs.device.replacement.forecast.search</field>
+        <field name="model">nhs.device</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="asset_tag"/>
+                <field name="category_id"/>
+                <field name="manufacturer"/>
+                <field name="department"/>
+                <field name="site_id"/>
+                <field name="company_id"/>
+                <filter string="End of Life Devices" name="filter_end_of_life"
+                        domain="[('is_end_of_life', '=', True)]"/>
+                <filter string="With Replacement Year" name="filter_has_year" domain="[('replacement_year', '>', 0)]"/>
+                <filter string="In Service" name="filter_in_service" domain="[('status', '=', 'in_service')]"/>
+                <filter string="Awaiting Repair" name="filter_repair" domain="[('status', '=', 'awaiting_repair')]"/>
+                <filter string="Out of Service" name="filter_out_of_service"
+                        domain="[('status', '=', 'out_of_service')]"/>
+                <filter string="Replacement Year" name="group_by_replacement_year"
+                        context="{'group_by': 'replacement_year'}"/>
+                <filter string="Device Category" name="group_by_category" context="{'group_by': 'category_id'}"/>
+                <filter string="Device Class" name="group_by_device_class" context="{'group_by': 'device_class'}"/>
+                <filter string="Manufacturer" name="group_by_manufacturer" context="{'group_by': 'manufacturer'}"/>
+                <filter string="Department" name="group_by_department" context="{'group_by': 'department'}"/>
+                <filter string="Site" name="group_by_site" context="{'group_by': 'site_id'}"/>
+                <filter string="Device Status" name="group_by_status" context="{'group_by': 'status'}"/>
+                <filter string="Company" name="group_by_company" context="{'group_by': 'company_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- REPLACEMENT FORECAST - ACTION-->
+    <record id="action_nhs_device_replacement_forecast" model="ir.actions.act_window">
+        <field name="name">Replacement Forecast</field>
+        <field name="res_model">nhs.device</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="search_view_id" ref="view_nhs_device_replacement_forecast_search"/>
+        <field name="context">{'search_default_group_by_replacement_year': 1, 'search_default_filter_has_year': 1}
+        </field>
+        <field name="domain">[('replacement_year', '>', 0)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Capital Planning Replacement Forecast
+            </p>
+            <p>
+                Analyze devices due for replacement by year, category, site, department, and estimated replacement cost.
+            </p>
+        </field>
+    </record>
+
+    <!-- REPLACEMENT FORECAST - GRAPH ACTION -->
+    <record id="action_nhs_device_replacement_forecast_graph" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_nhs_device_replacement_forecast_graph"/>
+        <field name="act_window_id" ref="action_nhs_device_replacement_forecast"/>
+    </record>
+
+    <!-- REPLACEMENT FORECAST - PIVOT ACTION -->
+    <record id="action_nhs_device_replacement_forecast_pivot" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_nhs_device_replacement_forecast_pivot"/>
+        <field name="act_window_id" ref="action_nhs_device_replacement_forecast"/>
+    </record>
+
+    <!-- REPLACEMENT FORECAST - LIST ACTION -->
+    <record id="action_nhs_device_replacement_forecast_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_nhs_device_replacement_forecast_list"/>
+        <field name="act_window_id" ref="action_nhs_device_replacement_forecast"/>
+    </record>
+
+    <!-- ACTION - Device Passport PDF -->
+    <record id="action_nhs_device_passport" model="ir.actions.act_window">
+        <field name="name">Device Passport (PDF)</field>
+        <field name="res_model">nhs.device.passport.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- ACTION - Alert Response PDF -->
+    <record id="action_nhs_device_alert_response" model="ir.actions.act_window">
+        <field name="name">Alert Response (PDF)</field>
+        <field name="res_model">nhs.alert.response.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

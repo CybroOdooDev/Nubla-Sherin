@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List-->
+    <record id="view_nhs_establishment_change_list" model="ir.ui.view">
+        <field name="name">nhs.establishment.change.list</field>
+        <field name="model">nhs.establishment.change</field>
+        <field name="arch" type="xml">
+            <list string="Establishment Change Requests"
+                  decoration-muted="state == 'rejected'"
+                  decoration-success="state == 'applied'"
+                  decoration-info="state == 'draft'">
+                <field name="name"/>
+                <field name="change_type"/>
+                <field name="post_id"/>
+                <field name="org_unit_id"/>
+                <field name="effective_date"/>
+                <field name="cost_impact"/>
+                <field name="requested_by_id"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state in ('submitted','workforce_approved')"
+                       decoration-success="state in ('finance_approved','applied')"
+                       decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form  -->
+    <record id="view_nhs_establishment_change_form" model="ir.ui.view">
+        <field name="name">nhs.establishment.change.form</field>
+        <field name="model">nhs.establishment.change</field>
+        <field name="arch" type="xml">
+            <form string="Establishment Change Request">
+                <header>
+                    <button name="action_submit" type="object" string="Submit"
+                            invisible="state != 'draft'" class="btn-primary"
+                            groups="odoo_nhs_establishment.group_nhs_workforce_officer"/>
+                    <button name="action_workforce_approve" type="object" string="Workforce Approve"
+                            invisible="state != 'submitted'" class="btn-primary"
+                            groups="odoo_nhs_establishment.group_nhs_workforce_manager"/>
+                    <button name="action_finance_approve" type="object" string="Finance Approve"
+                            invisible="state != 'workforce_approved'" class="btn-primary"
+                            groups="odoo_nhs_establishment.group_nhs_workforce_manager"/>
+                    <button name="action_apply" type="object" string="Apply"
+                            invisible="state != 'finance_approved'" class="btn-primary"
+                            groups="odoo_nhs_establishment.group_nhs_workforce_manager"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            invisible="state in ('applied', 'rejected')"
+                            groups="odoo_nhs_establishment.group_nhs_workforce_manager"/>
+                    <field name="state" widget="statusbar" invisible="state == 'rejected'"
+                           statusbar_visible="draft,submitted,workforce_approved,finance_approved,applied"/>
+                    <field name="state" widget="statusbar" invisible="state != 'rejected'"
+                           statusbar_visible="draft,submitted,workforce_approved,finance_approved"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Rejected" bg_color="text-bg-danger"
+                            invisible="state != 'rejected'"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="change_type"/>
+                            <field name="post_id" invisible="change_type == 'create_post'"
+                                   required="change_type != 'create_post'"/>
+                            <field name="org_unit_id" invisible="change_type not in ('create_post', 'transfer')"
+                                   required="change_type in ('create_post', 'transfer')"/>
+                            <field name="effective_date"/>
+                        </group>
+                        <group>
+                            <field name="requested_by_id"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="cost_impact"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="Proposed Values"
+                           invisible="change_type not in ('create_post', 'increase_fte', 'decrease_fte', 'reband')">
+                        <group invisible="change_type not in ('create_post', 'reband')">
+                            <field name="proposed_job_title" invisible="change_type != 'create_post'"/>
+                            <field name="proposed_staff_group_id" invisible="change_type != 'create_post'"/>
+                            <field name="proposed_is_medical" invisible="change_type not in ('create_post', 'reband')"/>
+                            <field name="proposed_band_id"
+                                   invisible="proposed_is_medical or change_type not in ('create_post', 'reband')"/>
+                            <field name="proposed_manual_indicative_salary"
+                                   invisible="not proposed_is_medical or change_type not in ('create_post', 'reband')"/>
+                        </group>
+                        <group invisible="change_type not in ('create_post', 'increase_fte', 'decrease_fte')">
+                            <field name="proposed_contracted_hours" invisible="change_type != 'create_post'"/>
+                            <field name="proposed_headcount" invisible="change_type not in ('create_post', 'increase_fte', 'decrease_fte')"/>
+                            <field name="proposed_fte" invisible="change_type not in ('create_post', 'increase_fte', 'decrease_fte')"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="reason"/>
+                    </group>
+                    <group string="Approval" groups="odoo_nhs_establishment.group_nhs_workforce_manager">
+                        <group>
+                            <field name="workforce_approver_id" readonly="1"/>
+                            <field name="workforce_approved_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="finance_approver_id" readonly="1"/>
+                            <field name="finance_approved_date" readonly="1"/>
+                            <field name="applied_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Rejection" invisible="state not in ('submitted', 'workforce_approved', 'finance_approved', 'rejected')">
+                        <field name="rejection_reason" nolabel="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!--  Search -->
+    <record id="view_nhs_establishment_change_search" model="ir.ui.view">
+        <field name="name">nhs.establishment.change.search</field>
+        <field name="model">nhs.establishment.change</field>
+        <field name="arch" type="xml">
+            <search string="Search Change Requests">
+                <field name="name"/>
+                <field name="post_id"/>
+                <field name="org_unit_id"/>
+                <field name="requested_by_id"/>
+                <filter string="Draft" name="filter_draft" domain="[('state','=','draft')]"/>
+                <filter string="Awaiting Approval" name="filter_awaiting"
+                        domain="[('state','in',('submitted','workforce_approved'))]"/>
+                <filter string="Applied" name="filter_applied" domain="[('state','=','applied')]"/>
+                <filter string="Rejected" name="filter_rejected" domain="[('state','=','rejected')]"/>
+                <separator/>
+                <filter string="My Requests" name="filter_my_requests"
+                        domain="[('requested_by_id','=',uid)]"/>
+                <group name="group_by">
+                    <filter string="Status" name="groupby_state" context="{'group_by': 'state'}"/>
+                    <filter string="Change Type" name="groupby_change_type" context="{'group_by': 'change_type'}"/>
+                    <filter string="Requested By" name="groupby_requested_by" context="{'group_by': 'requested_by_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--Actions -->
+    <!-- All change requests -->
+    <record id="action_nhs_establishment_change" model="ir.actions.act_window">
+        <field name="name">Change Requests</field>
+        <field name="res_model">nhs.establishment.change</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_nhs_establishment_change_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Raise an establishment change request from a post, or start one here.
+            </p>
+        </field>
+    </record>
+
+    <!-- Change requests filtered to the current user -->
+    <record id="action_nhs_establishment_change_my" model="ir.actions.act_window">
+        <field name="name">My Requests</field>
+        <field name="res_model">nhs.establishment.change</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_nhs_establishment_change_search"/>
+        <field name="domain">[('requested_by_id','=',uid)]</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>

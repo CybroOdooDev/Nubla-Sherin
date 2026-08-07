@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="view_nhs_dspt_action_list" model="ir.ui.view">
+        <field name="name">nhs.dspt.action.list</field>
+        <field name="model">nhs.dspt.action</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="is_overdue" decoration-success="state in ('completed', 'verified')">
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="assessment_id"/>
+                <field name="owner_id" widget="many2one_avatar_user"/>
+                <field name="priority" widget="priority"/>
+                <field name="target_date"/>
+                <field name="is_overdue" column_invisible="1"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_nhs_dspt_action_kanban" model="ir.ui.view">
+        <field name="name">nhs.dspt.action.kanban</field>
+        <field name="model">nhs.dspt.action</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" records_draggable="false">
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="owner_id"/>
+                <field name="target_date"/>
+                <field name="priority"/>
+                <field name="is_overdue"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_global_click p-2 border-start border-4 #{record.is_overdue.raw_value and 'border-danger' or 'border-transparent'}">
+                            <div class="d-flex justify-content-between">
+                                <strong><field name="reference"/></strong>
+                                <field name="priority" widget="priority"/>
+                            </div>
+                            <div><field name="name"/></div>
+                            <div class="text-muted small">
+                                <field name="owner_id"/> — due <field name="target_date"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!--  Form View -->
+    <record id="view_nhs_dspt_action_form" model="ir.ui.view">
+        <field name="name">nhs.dspt.action.form</field>
+        <field name="model">nhs.dspt.action</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_mark_in_progress" type="object" string="Start"
+                            invisible="state != 'open'"/>
+                    <button name="action_mark_completed" type="object" string="Complete"
+                            class="oe_highlight" invisible="state != 'in_progress'"/>
+                    <button name="action_mark_verified" type="object" string="Verify"
+                            class="oe_highlight" invisible="state != 'completed'"/>
+                    <button name="action_reopen" type="object" string="Re-open"
+                            invisible="state not in ('completed', 'verified')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="open,in_progress,completed,verified"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Overdue" bg_color="text-bg-danger" invisible="not is_overdue"/>
+                    <div class="oe_title">
+                        <span class="o_form_label">Reference</span>
+                        <h2><field name="reference" readonly="1"/></h2>
+                        <h1><field name="name" placeholder="What needs to happen to close this gap?"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="assessment_id" options="{'no_create': True}"/>
+                            <field name="evidence_id" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="owner_id"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="target_date"/>
+                        </group>
+                    </group>
+                    <field name="completion_note" nolabel="1" placeholder="Describe the resolution details and how this improvement action was completed..." style="min-height: 120px;"/>
+                    <field name="attachment_ids" widget="many2many_binary" nolabel="1"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_nhs_dspt_action_search" model="ir.ui.view">
+        <field name="name">nhs.dspt.action.search</field>
+        <field name="model">nhs.dspt.action</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="owner_id"/>
+                <field name="assessment_id"/>
+                <filter name="my_actions" string="My Actions" domain="[('owner_id', '=', uid)]"/>
+                <filter name="overdue" string="Overdue" domain="[('is_overdue', '=', True)]"/>
+                <filter name="open" string="Open" domain="[('state', 'in', ('open', 'in_progress'))]"/>
+                <group>
+                    <filter name="group_owner" string="Owner" context="{'group_by': 'owner_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_assessment" string="Assessment" context="{'group_by': 'assessment_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--  Window Action -->
+    <record id="action_nhs_dspt_action" model="ir.actions.act_window">
+        <field name="name">Gaps &amp; Actions</field>
+        <field name="res_model">nhs.dspt.action</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="context">{'search_default_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Raise an improvement action from any 'Not Met' evidence item to build
+                the improvement plan.
+            </p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_dspt_carry_forward_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.dspt.carry.forward.wizard.form</field>
+        <field name="model">nhs.dspt.carry.forward.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Carry Forward">
+                <field name="assessment_id" invisible="1"/>
+                <field name="company_id" invisible="1"/>
+                <group>
+                    <field name="prior_assessment_id" options="{'no_create': True}"/>
+                </group>
+                <group string="What to carry forward">
+                    <field name="carry_answers"/>
+                    <field name="carry_attachments"/>
+                    <field name="carry_owners"/>
+                </group>
+                <p class="text-muted">
+                    Matches by evidence reference, so it still works even after the
+                    edition has changed year to year.
+                </p>
+                <footer>
+                    <button name="action_confirm" type="object" string="Carry Forward" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_dspt_carry_forward_wizard" model="ir.actions.act_window">
+        <field name="name">Carry Forward</field>
+        <field name="res_model">nhs.dspt.carry.forward.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

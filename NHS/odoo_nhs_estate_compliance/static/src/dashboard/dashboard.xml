@@ -1,0 +1,717 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="odoo_nhs_estate_compliance.NhsComplianceDashboard">
+        <div class="o_nhs_dashboard_container">
+
+            <!-- Embedded Styles for Dashboard Redesign -->
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap');
+
+                .o_nhs_dashboard_container,
+                .o_nhs_dashboard_container * {
+                    box-sizing: border-box;
+                }
+
+                .o_nhs_dashboard_container {
+                    background-color: #F0F4F5;
+                    padding: 24px;
+                    overflow-y: auto !important;
+                    overflow-x: hidden !important;
+                    position: relative;
+                    height: 100% !important;
+                    font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+                    color: #212B32;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 24px;
+                    width: 100%;
+                }
+
+                /* Primary KPI Card */
+                .o_nhs_primary_kpi_card {
+                    background-color: #ffffff;
+                    border: 1px solid #D8DDE0;
+                    border-radius: 8px;
+                    padding: 24px 32px;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                    border-left: 8px solid #005EB8;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                    transition: transform 0.15s ease, box-shadow 0.15s ease;
+                    width: 100%;
+                    min-height: 120px;
+                }
+                .o_nhs_primary_kpi_card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+                }
+                .o_nhs_primary_kpi_left {
+                    display: flex;
+                    flex-direction: column;
+                    flex: 1;
+                }
+                .o_nhs_primary_kpi_label {
+                    font-size: 0.95rem;
+                    font-weight: 800;
+                    color: #505A5F;
+                    text-transform: uppercase;
+                    letter-spacing: 0.8px;
+                }
+                .o_nhs_primary_kpi_sub {
+                    font-size: 0.85rem;
+                    color: #768692;
+                    margin-top: 4px;
+                }
+                .o_nhs_primary_kpi_progress_container {
+                    background-color: #E8EDEE;
+                    border-radius: 4px;
+                    height: 8px;
+                    width: 70%;
+                    margin-top: 12px;
+                    overflow: hidden;
+                }
+                .o_nhs_primary_kpi_progress_bar {
+                    background-color: #005EB8;
+                    height: 100%;
+                    border-radius: 4px;
+                    transition: width 0.4s ease;
+                }
+                .o_nhs_primary_kpi_text {
+                    font-size: 0.85rem;
+                    color: #505A5F;
+                    margin-top: 8px;
+                    font-weight: 500;
+                }
+                .o_nhs_primary_kpi_right {
+                    padding-left: 24px;
+                }
+                .o_nhs_primary_kpi_value {
+                    font-size: 3.2rem;
+                    font-weight: 800;
+                    color: #005EB8;
+                    line-height: 1;
+                }
+
+                /* Grid of 8 KPI Cards */
+                .o_nhs_kpi_grid_8 {
+                    display: grid;
+                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                    gap: 20px;
+                }
+                @media (max-width: 1200px) {
+                    .o_nhs_kpi_grid_8 {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
+                }
+                @media (max-width: 576px) {
+                    .o_nhs_kpi_grid_8 {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
+                .o_nhs_kpi_card_8 {
+                    background-color: #ffffff;
+                    border: 1px solid #D8DDE0;
+                    border-radius: 8px;
+                    padding: 16px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+                    border-left: 5px solid #005EB8;
+                    transition: transform 0.15s ease, box-shadow 0.15s ease;
+                    cursor: pointer;
+                    height: 80px;
+                }
+                .o_nhs_kpi_card_8:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 12px rgba(0,0,0,0.06);
+                }
+                .o_nhs_kpi_card_8.kpi-red { border-left-color: #DA291C; }
+                .o_nhs_kpi_card_8.kpi-orange { border-left-color: #CE7B11; }
+                .o_nhs_kpi_card_8.kpi-green { border-left-color: #009639; }
+
+                .o_nhs_kpi_content_8 {
+                    display: flex;
+                    flex-direction: column;
+                }
+                .o_nhs_kpi_title_8 {
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    color: #505A5F;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+                .o_nhs_kpi_value_8 {
+                    font-size: 1.5rem;
+                    font-weight: 800;
+                    color: #212B32;
+                    margin-top: 2px;
+                    line-height: 1.2;
+                }
+                .o_nhs_kpi_icon_wrapper_8 {
+                    background-color: #F0F4F5;
+                    color: #005EB8;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.1rem;
+                }
+                .o_nhs_kpi_card_8.kpi-red .o_nhs_kpi_icon_wrapper_8 { color: #DA291C; background-color: #FFE6E6; }
+                .o_nhs_kpi_card_8.kpi-orange .o_nhs_kpi_icon_wrapper_8 { color: #CE7B11; background-color: #FFF2E6; }
+                .o_nhs_kpi_card_8.kpi-green .o_nhs_kpi_icon_wrapper_8 { color: #009639; background-color: #E6F3E6; }
+
+                /* Charts Layout */
+                .o_nhs_charts_grid_redesign {
+                    display: grid;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    gap: 24px;
+                }
+                @media (max-width: 992px) {
+                    .o_nhs_charts_grid_redesign {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
+                .o_nhs_card_redesign {
+                    background-color: #ffffff;
+                    border: 1px solid #D8DDE0;
+                    border-radius: 8px;
+                    padding: 20px;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                    display: flex;
+                    flex-direction: column;
+                    height: 380px;
+                }
+                .o_nhs_card_redesign.full-width {
+                    grid-column: span 2;
+                    height: auto;
+                    min-height: 380px;
+                }
+                @media (max-width: 992px) {
+                    .o_nhs_card_redesign.full-width {
+                        grid-column: span 1;
+                    }
+                }
+
+                .o_nhs_card_header_redesign {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-bottom: 2px solid #F0F4F5;
+                    padding-bottom: 10px;
+                    margin-bottom: 15px;
+                }
+                .o_nhs_card_title_redesign {
+                    font-size: 1.05rem;
+                    font-weight: 700;
+                    color: #005EB8;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+                .o_nhs_chart_canvas_wrapper_redesign {
+                    flex: 1;
+                    min-height: 0;
+                    position: relative;
+                }
+
+                /* RAG Matrix Table */
+                .rag-table-wrapper {
+                    overflow-x: auto;
+                    width: 100%;
+                }
+                .rag-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 10px;
+                    font-size: 0.85rem;
+                }
+                .rag-table th {
+                    background-color: #F8F9FA;
+                    color: #505A5F;
+                    font-weight: 700;
+                    padding: 8px 12px;
+                    border: 1px solid #E8EDEE;
+                    text-align: center;
+                    white-space: nowrap;
+                }
+                .rag-table th:first-child {
+                    text-align: left;
+                }
+                .rag-table td {
+                    padding: 8px 12px;
+                    border: 1px solid #E8EDEE;
+                    vertical-align: middle;
+                    white-space: nowrap;
+                }
+                .rag-cell-na {
+                    background-color: #F8F9FA;
+                    color: #768692;
+                    text-align: center;
+                }
+                .rag-cell-compliant {
+                    background-color: #E6F3E6;
+                    color: #009639;
+                    font-weight: 600;
+                    text-align: center;
+                }
+                .rag-cell-warning {
+                    background-color: #FFF2E6;
+                    color: #CE7B11;
+                    font-weight: 600;
+                    text-align: center;
+                }
+                .rag-cell-critical {
+                    background-color: #FFE6E6;
+                    color: #DA291C;
+                    font-weight: 600;
+                    text-align: center;
+                }
+
+                /* Operational Registers Layout */
+                .o_nhs_ops_grid_redesign {
+                    display: grid;
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                    gap: 24px;
+                }
+                @media (max-width: 1200px) {
+                    .o_nhs_ops_grid_redesign {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
+                }
+                @media (max-width: 768px) {
+                    .o_nhs_ops_grid_redesign {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
+                .o_nhs_ops_card_redesign {
+                    background-color: #ffffff;
+                    border: 1px solid #D8DDE0;
+                    border-radius: 8px;
+                    padding: 20px;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                    display: flex;
+                    flex-direction: column;
+                    min-height: 300px;
+                }
+                .o_nhs_list_table_redesign {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 0.85rem;
+                }
+                .o_nhs_list_table_redesign th {
+                    text-align: left;
+                    color: #505A5F;
+                    font-weight: 700;
+                    padding: 8px;
+                    border-bottom: 2px solid #E8EDEE;
+                }
+                .o_nhs_list_table_redesign td {
+                    padding: 8px;
+                    border-bottom: 1px solid #F0F4F5;
+                    color: #212B32;
+                    vertical-align: middle;
+                }
+                .o_nhs_list_table_redesign tr:last-child td {
+                    border-bottom: none;
+                }
+                .o_nhs_list_table_redesign tr:hover td {
+                    background-color: rgba(0, 94, 184, 0.03);
+                    cursor: pointer;
+                }
+
+                /* Tab buttons */
+                .o_nhs_tab_header {
+                    display: flex;
+                    gap: 4px;
+                }
+                .o_nhs_tab_btn {
+                    border: 1px solid #D8DDE0;
+                    background-color: #ffffff;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                    color: #505A5F;
+                    padding: 4px 10px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    transition: all 0.15s ease;
+                }
+                .o_nhs_tab_btn:hover {
+                    background-color: #F0F4F5;
+                }
+                .o_nhs_tab_btn.active {
+                    background-color: #005EB8;
+                    color: #ffffff;
+                    border-color: #005EB8;
+                }
+
+                /* Badge styles */
+                .nhs-badge {
+                    display: inline-block;
+                    padding: 2px 6px;
+                    font-size: 0.7rem;
+                    font-weight: 700;
+                    border-radius: 4px;
+                    text-transform: uppercase;
+                }
+                .badge-red { background-color: #FFE6E6; color: #DA291C; }
+                .badge-orange { background-color: #FFF2E6; color: #CE7B11; }
+                .badge-green { background-color: #E6F3E6; color: #009639; }
+                .badge-grey { background-color: #F0F4F5; color: #768692; }
+            </style>
+
+            <t t-if="state.loading">
+                <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </t>
+            <t t-else="">
+                <!-- Primary KPI Highlight Card -->
+                <div class="o_nhs_primary_kpi_card" t-on-click="openComplianceRate">
+                    <div class="o_nhs_primary_kpi_left">
+                        <div class="o_nhs_primary_kpi_label">Overall Compliance Rate</div>
+                        <div class="o_nhs_primary_kpi_sub">Percentage of compliant statutory obligations across all estate locations</div>
+                        <div class="o_nhs_primary_kpi_progress_container">
+                            <div class="o_nhs_primary_kpi_progress_bar" t-attf-style="width: {{state.metrics.overall_compliance_rate}}%;"/>
+                        </div>
+                        <div class="o_nhs_primary_kpi_text">
+                            <span t-esc="state.metrics.status_overview.compliant"/> compliant / <span t-esc="state.metrics.active_schedules"/> total active obligations
+                        </div>
+                    </div>
+                    <div class="o_nhs_primary_kpi_right">
+                        <div class="o_nhs_primary_kpi_value"><t t-esc="state.metrics.overall_compliance_rate"/>%</div>
+                    </div>
+                </div>
+
+                <!-- 7 Clickable KPI Cards (Grid) -->
+                <div class="o_nhs_kpi_grid_8 mb-4">
+                    <!-- Active Compliance Schedules -->
+                    <div class="o_nhs_kpi_card_8" t-on-click="openActiveSchedules">
+                        <div class="o_nhs_kpi_content_8">
+                            <span class="o_nhs_kpi_title_8">Active Requirements</span>
+                            <span class="o_nhs_kpi_value_8" t-esc="state.metrics.active_schedules"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper_8">
+                            <i class="fa fa-calendar-check-o"/>
+                        </div>
+                    </div>
+
+                    <!-- Compliance Tasks Completed This Month -->
+                    <div class="o_nhs_kpi_card_8 kpi-green" t-on-click="openCompletedThisMonth">
+                        <div class="o_nhs_kpi_content_8">
+                            <span class="o_nhs_kpi_title_8">Completed Tests (Month)</span>
+                            <span class="o_nhs_kpi_value_8" t-esc="state.metrics.completed_this_month"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper_8">
+                            <i class="fa fa-check-circle"/>
+                        </div>
+                    </div>
+
+                    <!-- Expiring Certificates -->
+                    <div class="o_nhs_kpi_card_8 kpi-orange" t-on-click="openExpiringCertificates">
+                        <div class="o_nhs_kpi_content_8">
+                            <span class="o_nhs_kpi_title_8">Expiring Certificates</span>
+                            <span class="o_nhs_kpi_value_8" t-esc="state.metrics.expiring_certificates"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper_8">
+                            <i class="fa fa-file-text-o"/>
+                        </div>
+                    </div>
+
+                    <!-- Overdue Items -->
+                    <div class="o_nhs_kpi_card_8 kpi-red" t-on-click="openOverdueTests">
+                        <div class="o_nhs_kpi_content_8">
+                            <span class="o_nhs_kpi_title_8">Overdue Items</span>
+                            <span class="o_nhs_kpi_value_8" t-esc="state.metrics.overdue_tests"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper_8">
+                            <i class="fa fa-exclamation-triangle"/>
+                        </div>
+                    </div>
+
+                    <!-- Due Soon Items -->
+                    <div class="o_nhs_kpi_card_8 kpi-orange" t-on-click="openDueSoonItems">
+                        <div class="o_nhs_kpi_content_8">
+                            <span class="o_nhs_kpi_title_8">Due Soon Items</span>
+                            <span class="o_nhs_kpi_value_8" t-esc="state.metrics.status_overview.due_soon"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper_8">
+                            <i class="fa fa-clock-o"/>
+                        </div>
+                    </div>
+
+                    <!-- Failed Items -->
+                    <div class="o_nhs_kpi_card_8 kpi-red" t-on-click="openFailedItems">
+                        <div class="o_nhs_kpi_content_8">
+                            <span class="o_nhs_kpi_title_8">Failed Items</span>
+                            <span class="o_nhs_kpi_value_8" t-esc="state.metrics.status_overview.failed"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper_8">
+                            <i class="fa fa-times-circle"/>
+                        </div>
+                    </div>
+
+                    <!-- Failed Tests -->
+                    <div class="o_nhs_kpi_card_8 kpi-red" t-on-click="openFailedTests">
+                        <div class="o_nhs_kpi_content_8">
+                            <span class="o_nhs_kpi_title_8">Failed Tests</span>
+                            <span class="o_nhs_kpi_value_8" t-esc="state.failedTestsCount"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper_8">
+                            <i class="fa fa-times"/>
+                        </div>
+                    </div>
+
+                    <!-- Open Remedials -->
+                    <div class="o_nhs_kpi_card_8 kpi-red" t-on-click="openOpenNonCompliance">
+                        <div class="o_nhs_kpi_content_8">
+                            <span class="o_nhs_kpi_title_8">Pending Repairs</span>
+                            <span class="o_nhs_kpi_value_8" t-esc="state.metrics.open_remedials_count"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper_8">
+                            <i class="fa fa-wrench"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2-Column Analytics Charts & Full-width Heatmap -->
+                <div class="o_nhs_charts_grid_redesign mb-4">
+                    <!-- Chart 1: Compliance by Discipline -->
+                    <div class="o_nhs_card_redesign">
+                        <div class="o_nhs_card_header_redesign">
+                            <div class="o_nhs_card_title_redesign">
+                                <i class="fa fa-shield"/> Compliance by Discipline (%)
+                            </div>
+                        </div>
+                        <div class="o_nhs_chart_canvas_wrapper_redesign">
+                            <canvas t-ref="disciplineChart"/>
+                        </div>
+                    </div>
+
+                    <!-- Chart 2: Compliance by Site -->
+                    <div class="o_nhs_card_redesign">
+                        <div class="o_nhs_card_header_redesign">
+                            <div class="o_nhs_card_title_redesign">
+                                <i class="fa fa-map-marker"/> Compliance by Site (%)
+                            </div>
+                        </div>
+                        <div class="o_nhs_chart_canvas_wrapper_redesign">
+                            <canvas t-ref="siteChart"/>
+                        </div>
+                    </div>
+
+                    <!-- Chart 3: Compliance by Building -->
+                    <div class="o_nhs_card_redesign">
+                        <div class="o_nhs_card_header_redesign">
+                            <div class="o_nhs_card_title_redesign">
+                                <i class="fa fa-building"/> Compliance by Building (%)
+                            </div>
+                        </div>
+                        <div class="o_nhs_chart_canvas_wrapper_redesign">
+                            <canvas t-ref="buildingChart"/>
+                        </div>
+                    </div>
+
+                    <!-- Chart 4: Month-on-Month Compliance Trend -->
+                    <div class="o_nhs_card_redesign">
+                        <div class="o_nhs_card_header_redesign">
+                            <div class="o_nhs_card_title_redesign">
+                                <i class="fa fa-line-chart"/> Completed vs Overdue Trend
+                            </div>
+                        </div>
+                        <div class="o_nhs_chart_canvas_wrapper_redesign">
+                            <canvas t-ref="trendChart"/>
+                        </div>
+                    </div>
+
+                    <!-- Card 5 (Full Width): RAG Building x Discipline Matrix -->
+                    <div class="o_nhs_card_redesign full-width">
+                        <div class="o_nhs_card_header_redesign">
+                            <div class="o_nhs_card_title_redesign">
+                                <i class="fa fa-th"/> Building × Discipline Compliance Heatmap
+                            </div>
+                        </div>
+                        <div class="rag-table-wrapper">
+                            <table class="rag-table">
+                                <thead>
+                                    <tr>
+                                        <th>Building</th>
+                                        <t t-foreach="state.metrics.discipline_headers" t-as="dh" t-key="dh.id">
+                                            <th><t t-esc="dh.name"/></th>
+                                        </t>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.metrics.rag_matrix" t-as="row" t-key="row.building_id">
+                                        <tr>
+                                            <td style="font-weight: 600;" t-esc="row.building_name"/>
+                                            <t t-foreach="row.cells" t-as="cell" t-key="cell.discipline_id">
+                                                <td t-attf-class="{{cell.total == 0 ? 'rag-cell-na' : (cell.rate &lt; 70 ? 'rag-cell-critical' : (cell.rate &lt; 90 ? 'rag-cell-warning' : 'rag-cell-compliant'))}}">
+                                                    <t t-esc="cell.value"/>
+                                                </td>
+                                            </t>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3-Column Operational Registers -->
+                <div class="o_nhs_ops_grid_redesign mb-4">
+                    <!-- Overdue Register -->
+                    <div class="o_nhs_ops_card_redesign">
+                        <div class="o_nhs_card_header_redesign">
+                            <div class="o_nhs_card_title_redesign">
+                                <i class="fa fa-exclamation-triangle" style="color: #DA291C;"/> Overdue Register
+                            </div>
+                            <button class="btn btn-sm btn-link p-0 text-decoration-none" style="color: #005EB8; font-weight: 600;" t-on-click="openOverdueTests">View All</button>
+                        </div>
+                        <div style="flex: 1; overflow-y: auto;">
+                            <table class="o_nhs_list_table_redesign">
+                                <thead>
+                                    <tr>
+                                        <th>Ref</th>
+                                        <th>Compliance Obligation</th>
+                                        <th>Due Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.overdueItems" t-as="item" t-key="item.id">
+                                        <tr t-on-click="() => this.openItem(item.id)">
+                                            <td style="font-weight: 700; color: #DA291C;" t-esc="item.reference"/>
+                                            <td t-esc="item.name"/>
+                                            <td style="white-space: nowrap; font-weight: 600; color: #DA291C;" t-esc="item.next_due_date"/>
+                                        </tr>
+                                    </t>
+                                    <t t-if="!state.overdueItems.length">
+                                        <tr>
+                                            <td colspan="3" class="text-center text-muted" style="padding: 20px;">No overdue obligations.</td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Due-Soon Planner -->
+                    <div class="o_nhs_ops_card_redesign">
+                        <div class="o_nhs_card_header_redesign">
+                            <div class="o_nhs_card_title_redesign">
+                                <i class="fa fa-clock-o" style="color: #CE7B11;"/> Due-Soon Planner
+                            </div>
+                            <button class="btn btn-sm btn-link p-0 text-decoration-none" style="color: #005EB8; font-weight: 600;" t-on-click="openDueSoonItems">View All</button>
+                        </div>
+                        <div style="flex: 1; overflow-y: auto;">
+                            <table class="o_nhs_list_table_redesign">
+                                <thead>
+                                    <tr>
+                                        <th>Ref</th>
+                                        <th>Compliance Obligation</th>
+                                        <th>Due Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.dueSoonItems" t-as="item" t-key="item.id">
+                                        <tr t-on-click="() => this.openItem(item.id)">
+                                            <td style="font-weight: 700; color: #CE7B11;" t-esc="item.reference"/>
+                                            <td t-esc="item.name"/>
+                                            <td style="white-space: nowrap; font-weight: 600; color: #CE7B11;" t-esc="item.next_due_date"/>
+                                        </tr>
+                                    </t>
+                                    <t t-if="!state.dueSoonItems.length">
+                                        <tr>
+                                            <td colspan="3" class="text-center text-muted" style="padding: 20px;">No due soon obligations.</td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Failed Tests & Open Remedials (Tabbed Card) -->
+                    <div class="o_nhs_ops_card_redesign">
+                        <div class="o_nhs_card_header_redesign">
+                            <div class="o_nhs_tab_header">
+                                <button t-attf-class="o_nhs_tab_btn {{state.activeRemedialTab == 'failed' ? 'active' : ''}}" t-on-click="() => this.setOpsTab('failed')">Failed Tests</button>
+                                <button t-attf-class="o_nhs_tab_btn {{state.activeRemedialTab == 'remedial' ? 'active' : ''}}" t-on-click="() => this.setOpsTab('remedial')">Open Remedials</button>
+                            </div>
+                            <t t-if="state.activeRemedialTab == 'failed'">
+                                <button class="btn btn-sm btn-link p-0 text-decoration-none" style="color: #005EB8; font-weight: 600;" t-on-click="openFailedTests">View All</button>
+                            </t>
+                            <t t-else="">
+                                <button class="btn btn-sm btn-link p-0 text-decoration-none" style="color: #005EB8; font-weight: 600;" t-on-click="openOpenNonCompliance">View All</button>
+                            </t>
+                        </div>
+                        <div style="flex: 1; overflow-y: auto;">
+                            <!-- Failed Tests Tab -->
+                            <t t-if="state.activeRemedialTab == 'failed'">
+                                <table class="o_nhs_list_table_redesign">
+                                    <thead>
+                                        <tr>
+                                            <th>Ref</th>
+                                            <th>Compliance Obligation</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="state.failedTests" t-as="test" t-key="test.id">
+                                            <tr t-on-click="() => this.openTest(test.id)">
+                                                <td style="font-weight: 700; color: #DA291C;" t-esc="test.name"/>
+                                                <td t-esc="test.item_id[1]"/>
+                                                <td style="white-space: nowrap;" t-esc="test.test_date"/>
+                                            </tr>
+                                        </t>
+                                        <t t-if="!state.failedTests.length">
+                                            <tr>
+                                                <td colspan="3" class="text-center text-muted" style="padding: 20px;">No failed tests recorded.</td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </t>
+                            <!-- Open Remedials Tab -->
+                            <t t-else="">
+                                <table class="o_nhs_list_table_redesign">
+                                    <thead>
+                                        <tr>
+                                            <th>Action</th>
+                                            <th>Priority</th>
+                                            <th>Due Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="state.openRemedials" t-as="remedial" t-key="remedial.id">
+                                            <tr t-on-click="() => this.openRemedial(remedial.id)">
+                                                <td style="font-weight: 700;" t-esc="remedial.name"/>
+                                                <td>
+                                                    <span t-attf-class="nhs-badge {{remedial.priority == 'urgent' ? 'badge-red' : (remedial.priority == 'high' ? 'badge-orange' : (remedial.priority == 'medium' ? 'badge-green' : 'badge-grey'))}}" t-esc="remedial.priority"/>
+                                                </td>
+                                                <td style="white-space: nowrap;" t-esc="remedial.due_date"/>
+                                            </tr>
+                                        </t>
+                                        <t t-if="!state.openRemedials.length">
+                                            <tr>
+                                                <td colspan="3" class="text-center text-muted" style="padding: 20px;">No open remedials.</td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,67 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nhs_incident_reporter,nhs.incident reporter,model_nhs_incident,group_hc_reporter,1,0,1,0
+access_nhs_incident_handler,nhs.incident handler,model_nhs_incident,group_hc_handler,1,1,1,0
+access_nhs_incident_quality,nhs.incident quality lead,model_nhs_incident,group_hc_quality_lead,1,1,1,0
+access_nhs_incident_person_reporter,nhs.incident.person reporter,model_nhs_incident_person,group_hc_reporter,1,0,1,0
+access_nhs_incident_person_handler,nhs.incident.person handler,model_nhs_incident_person,group_hc_handler,1,1,1,1
+access_nhs_incident_category_reporter,nhs.incident.category reporter,model_nhs_incident_category,group_hc_reporter,1,0,0,0
+access_nhs_incident_category_handler,nhs.incident.category handler,model_nhs_incident_category,group_hc_handler,1,0,0,0
+access_nhs_incident_category_quality,nhs.incident.category quality,model_nhs_incident_category,group_hc_quality_lead,1,1,1,1
+access_nhs_location_reporter,nhs.location reporter,model_nhs_location,group_hc_reporter,1,0,0,0
+access_nhs_location_handler,nhs.location handler,model_nhs_location,group_hc_handler,1,0,0,0
+access_nhs_location_quality,nhs.location quality,model_nhs_location,group_hc_quality_lead,1,1,1,1
+access_nhs_investigation_reporter,nhs.investigation reporter,model_nhs_investigation,group_hc_reporter,1,0,0,0
+access_nhs_investigation_handler,nhs.investigation handler,model_nhs_investigation,group_hc_handler,1,1,1,0
+access_nhs_investigation_investigator,nhs.investigation investigator,model_nhs_investigation,group_hc_investigator,1,1,1,0
+access_nhs_investigation_quality,nhs.investigation quality,model_nhs_investigation,group_hc_quality_lead,1,1,1,0
+access_nhs_investigation_timeline_investigator,nhs.investigation.timeline investigator,model_nhs_investigation_timeline,group_hc_investigator,1,1,1,1
+access_nhs_investigation_timeline_handler,nhs.investigation.timeline handler,model_nhs_investigation_timeline,group_hc_handler,1,1,1,1
+access_nhs_investigation_timeline_quality,nhs.investigation.timeline quality,model_nhs_investigation_timeline,group_hc_quality_lead,1,1,1,1
+access_nhs_contributing_factor_handler,nhs.contributing.factor handler,model_nhs_contributing_factor,group_hc_handler,1,0,0,0
+access_nhs_contributing_factor_quality,nhs.contributing.factor quality,model_nhs_contributing_factor,group_hc_quality_lead,1,1,1,1
+access_nhs_duty_of_candour_reporter,nhs.duty.of.candour reporter,model_nhs_duty_of_candour,group_hc_reporter,1,0,0,0
+access_nhs_duty_of_candour_handler,nhs.duty.of.candour handler,model_nhs_duty_of_candour,group_hc_handler,1,1,1,0
+access_nhs_duty_of_candour_quality,nhs.duty.of.candour quality,model_nhs_duty_of_candour,group_hc_quality_lead,1,1,1,0
+access_nhs_riddor_reporter,nhs.riddor reporter,model_nhs_riddor,group_hc_reporter,1,0,0,0
+access_nhs_riddor_handler,nhs.riddor handler,model_nhs_riddor,group_hc_handler,1,1,1,0
+access_nhs_riddor_quality,nhs.riddor quality,model_nhs_riddor,group_hc_quality_lead,1,1,1,0
+access_nhs_cqc_notification_type_reporter,nhs.cqc.notification.type reporter,model_nhs_cqc_notification_type,group_hc_reporter,1,0,0,0
+access_nhs_cqc_notification_type_handler,nhs.cqc.notification.type handler,model_nhs_cqc_notification_type,group_hc_handler,1,0,0,0
+access_nhs_cqc_notification_type_quality,nhs.cqc.notification.type quality,model_nhs_cqc_notification_type,group_hc_quality_lead,1,1,1,1
+access_nhs_cqc_notification_reporter,nhs.cqc.notification reporter,model_nhs_cqc_notification,group_hc_reporter,1,0,0,0
+access_nhs_cqc_notification_handler,nhs.cqc.notification handler,model_nhs_cqc_notification,group_hc_handler,1,1,1,0
+access_nhs_cqc_notification_quality,nhs.cqc.notification quality,model_nhs_cqc_notification,group_hc_quality_lead,1,1,1,0
+access_nhs_lfpse_submission_quality,nhs.lfpse.submission quality,model_nhs_lfpse_submission,group_hc_quality_lead,1,1,1,0
+access_nhs_action_reporter,nhs.action reporter,model_nhs_action,group_hc_reporter,1,0,0,0
+access_nhs_action_handler,nhs.action handler,model_nhs_action,group_hc_handler,1,1,1,0
+access_nhs_action_quality,nhs.action quality,model_nhs_action,group_hc_quality_lead,1,1,1,1
+access_nhs_risk_reporter,nhs.risk reporter,model_nhs_risk,group_hc_reporter,1,0,0,0
+access_nhs_risk_risk_manager,nhs.risk risk manager,model_nhs_risk,group_hc_risk_manager,1,1,1,0
+access_nhs_risk_quality,nhs.risk quality,model_nhs_risk,group_hc_quality_lead,1,1,1,0
+access_nhs_risk_handler,nhs.risk handler,model_nhs_risk,group_hc_handler,1,0,0,0
+access_nhs_risk_register_risk_manager,nhs.risk.register risk manager,model_nhs_risk_register,group_hc_risk_manager,1,1,1,0
+access_nhs_risk_register_quality,nhs.risk.register quality,model_nhs_risk_register,group_hc_quality_lead,1,1,1,1
+access_nhs_risk_register_handler,nhs.risk.register handler,model_nhs_risk_register,group_hc_handler,1,0,0,0
+access_nhs_risk_category_risk_manager,nhs.risk.category risk manager,model_nhs_risk_category,group_hc_risk_manager,1,0,0,0
+access_nhs_risk_category_quality,nhs.risk.category quality,model_nhs_risk_category,group_hc_quality_lead,1,1,1,1
+access_nhs_risk_control_risk_manager,nhs.risk.control risk manager,model_nhs_risk_control,group_hc_risk_manager,1,1,1,1
+access_nhs_risk_assurance_risk_manager,nhs.risk.assurance risk manager,model_nhs_risk_assurance,group_hc_risk_manager,1,1,1,1
+access_nhs_risk_review_risk_manager,nhs.risk.review risk manager,model_nhs_risk_review,group_hc_risk_manager,1,1,1,0
+access_nhs_risk_review_quality,nhs.risk.review quality,model_nhs_risk_review,group_hc_quality_lead,1,1,1,0
+access_nhs_holiday_handler,nhs.holiday handler,model_nhs_holiday,group_hc_handler,1,0,0,0
+access_nhs_holiday_quality,nhs.holiday quality,model_nhs_holiday,group_hc_quality_lead,1,1,1,1
+access_nhs_terminology_handler,nhs.terminology handler,model_nhs_terminology,group_hc_handler,1,0,0,0
+access_nhs_terminology_quality,nhs.terminology quality,model_nhs_terminology,group_hc_quality_lead,1,1,1,1
+access_nhs_notification_rule_handler,nhs.notification.rule handler,model_nhs_notification_rule,group_hc_handler,1,0,0,0
+access_nhs_notification_rule_quality,nhs.notification.rule quality,model_nhs_notification_rule,group_hc_quality_lead,1,1,1,1
+access_nhs_triage_wizard_handler,nhs.triage.wizard handler,model_nhs_triage_wizard,group_hc_handler,1,1,1,1
+access_nhs_triage_wizard_quality,nhs.triage.wizard quality,model_nhs_triage_wizard,group_hc_quality_lead,1,1,1,1
+access_nhs_riddor_wizard_handler,nhs.riddor.wizard handler,model_nhs_riddor_wizard,group_hc_handler,1,1,1,1
+access_nhs_riddor_wizard_quality,nhs.riddor.wizard quality,model_nhs_riddor_wizard,group_hc_quality_lead,1,1,1,1
+access_nhs_lfpse_export_wizard_quality,nhs.lfpse.export.wizard quality,model_nhs_lfpse_export_wizard,group_hc_quality_lead,1,1,1,1
+access_nhs_risk_escalate_wizard_risk_manager,nhs.risk.escalate.wizard risk manager,model_nhs_risk_escalate_wizard,group_hc_risk_manager,1,1,1,1
+access_nhs_risk_escalate_wizard_quality,nhs.risk.escalate.wizard quality,model_nhs_risk_escalate_wizard,group_hc_quality_lead,1,1,1,1
+access_nhs_risk_review_wizard_risk_manager,nhs.risk.review.wizard risk manager,model_nhs_risk_review_wizard,group_hc_risk_manager,1,1,1,1
+access_nhs_risk_review_wizard_quality,nhs.risk.review.wizard quality,model_nhs_risk_review_wizard,group_hc_quality_lead,1,1,1,1
+access_nhs_provider_setup_wizard_quality,nhs.provider.setup.wizard quality,model_nhs_provider_setup_wizard,group_hc_quality_lead,1,1,1,1
+access_nhs_risk_close_wizard_quality,nhs.risk.close.wizard quality,model_nhs_risk_close_wizard,group_hc_quality_lead,1,1,1,1

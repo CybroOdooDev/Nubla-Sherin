@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!--SECURITY CATEGORY-->
+        <!-- Dedicated application category grouping the NHS Trust Management access level groups -->
+        <record id="module_category_nhs_trust" model="ir.module.category">
+            <field name="name">NHS Trust Management</field>
+            <field name="description">Access levels for NHS Trust Management System.</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- SECURITY PRIVILEGE-->
+        <!-- Privilege grouping the User/Manager/Administrator access levels so they display as a single exclusive selector -->
+        <record id="privilege_nhs_trust_level" model="res.groups.privilege">
+            <field name="name">NHS Trust Access Level</field>
+            <field name="category_id" ref="module_category_nhs_trust"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- SECURITY GROUPS -->
+        <!-- Base access level: internal users who can only see NHS Trusts within their geographically allowed ICBs/Health Boards -->
+        <record id="group_nhs_trust_user" model="res.groups">
+            <field name="name">User</field>
+            <field name="privilege_id" ref="privilege_nhs_trust_level"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- Elevated access level: implies User and grants unrestricted (global) access to all NHS Trusts and their state logs -->
+        <record id="group_nhs_trust_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="privilege_id" ref="privilege_nhs_trust_level"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_trust_user'))]"/>
+        </record>
+
+        <!-- Top access level: implies Manager and grants visibility of the NHS Trust Allowed Scope configuration on user forms; auto-assigned to the root/admin users -->
+        <record id="group_nhs_trust_admin" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="privilege_id" ref="privilege_nhs_trust_level"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_trust_manager'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- RECORD RULES (GEOGRAPHIC ACCESS SCOPING)-->
+        <!-- Restricts NHS Trust User group to only Trusts under their allowed ICBs (England) or Health Boards (Scotland) -->
+        <record id="nhs_trust_rule_user" model="ir.rule">
+            <field name="name">NHS Trust User Allowed Scope Only</field>
+            <field name="model_id" ref="model_nhs_trust"/>
+            <field name="groups" eval="[(4, ref('group_nhs_trust_user'))]"/>
+            <field name="domain_force">['|',
+                '&amp;', ('health_system', '=', 'nhs_england'), ('icb_id', 'in', user.nhs_allowed_icb_ids.ids),
+                '&amp;', ('health_system', '=', 'nhs_scotland'), ('health_board_id', 'in', user.nhs_allowed_health_board_ids.ids)
+            ]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Grants NHS Trust Manager group unrestricted (always-true domain) access to all Trusts, overriding the geographic scoping -->
+        <record id="nhs_trust_rule_manager" model="ir.rule">
+            <field name="name">NHS Trust Manager Global Access</field>
+            <field name="model_id" ref="model_nhs_trust"/>
+            <field name="groups" eval="[(4, ref('group_nhs_trust_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!--  NHS TRUST STATE LOG GEOGRAPHIC SCOPING-->
+        <!-- Restricts NHS Trust User group to state log entries whose related Trust falls within their allowed ICBs/Health Boards -->
+        <record id="nhs_trust_state_log_rule_user" model="ir.rule">
+            <field name="name">NHS Trust State Log User Allowed Scope Only</field>
+            <field name="model_id" ref="model_nhs_trust_state_log"/>
+            <field name="groups" eval="[(4, ref('group_nhs_trust_user'))]"/>
+            <field name="domain_force">['|',
+                '&amp;', ('trust_id.health_system', '=', 'nhs_england'),
+                ('trust_id.icb_id', 'in', user.nhs_allowed_icb_ids.ids),
+                '&amp;', ('trust_id.health_system', '=', 'nhs_scotland'),
+                ('trust_id.health_board_id', 'in', user.nhs_allowed_health_board_ids.ids)
+            ]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Grants NHS Trust Manager group unrestricted (always-true domain) access to all state log entries, overriding the geographic scoping -->
+        <record id="nhs_trust_state_log_rule_manager" model="ir.rule">
+            <field name="name">NHS Trust State Log Manager Global Access</field>
+            <field name="model_id" ref="model_nhs_trust_state_log"/>
+            <field name="groups" eval="[(4, ref('group_nhs_trust_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+    </data>
+</odoo>
+

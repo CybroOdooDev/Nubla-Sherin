@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>NHS ERIC Returns – Odoo Module</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+
+    <style>
+        body {
+            font-family: "Montserrat", sans-serif;
+            background-color: #71639e08;
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: #005EB8 !important;
+            color: white !important;
+            border-color: #005EB8 !important;
+        }
+
+        .nav-pills .nav-link:not(.active):hover {
+            background-color: #e9ecef !important;
+            color: #005EB8 !important;
+        }
+
+        .feature-card {
+            background-color: #8d76d51f;
+            backdrop-filter: blur(20px);
+            border-radius: 10px;
+            padding: 32px;
+            border: 2px solid #71639e1a;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            background-color: #005EB8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-card .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: black;
+            margin-bottom: 12px;
+            letter-spacing: -0.025em;
+        }
+
+        .feature-card .card-description {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 0;
+            line-height: 1.6;
+        }
+
+        .tabs-design1 .nav-pills .nav-link {
+            width: max-content;
+            border-radius: 50px;
+            margin: 0 5px;
+            padding: 12px 24px;
+            font-weight: 500;
+            border: 2px solid #e9ecef;
+            position: relative;
+            text-decoration: none;
+            color: #005EB8;
+            background: white;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tabs-design1 .nav-pills .nav-link.active {
+            background-color: #005EB8 !important;
+            color: white !important;
+            border-color: #005EB8 !important;
+        }
+
+        .tabs-design1 .nav-pills .nav-link:not(.active):hover {
+            background-color: #e9ecef !important;
+            color: #005EB8 !important;
+        }
+
+        details summary::-webkit-details-marker {
+            display: none !important;
+        }
+
+        details summary {
+            list-style: none !important;
+            outline: none !important;
+        }
+
+        details summary:focus {
+            outline: none !important;
+        }
+
+        details[open] summary.accordion-button::after {
+            transform: rotate(-180deg) !important;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ═══ HEADER WITH SUPPORTS BADGE (exactly as reference) ═══ -->
+<div class="container-fluid cmpad">
+    <div class="supports my-3 py-3"
+         style="border: 2px solid #e9ecef;padding: 0 35px;border-radius: 10px;background-color: white;">
+        <div class="row justify-content-between align-items-center">
+            <div class="col-lg-3">
+                <div class="my-3 mx-auto mx-sm-0" style="width: 250px;">
+                    <img src="//apps.odoocdn.com/apps/assets/17.0/theme_boec/images/Cybrosys.png?fcdde35"
+                         style="width: 100%;" alt="Cybrosys">
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="row">
+                    <div class="my-3 d-flex align-items-center justify-content-center justify-content-sm-end">
+                        <span class="me-3"><b>Supports: </b></span>
+                        <div class="text-center"
+                             style="background-color: #005EB8 !important;font-size: 1rem !important;color: #fff !important;font-weight: 500 !important;padding: 8px !important;margin: 0 3px !important;border-radius: 50px !important;min-width: 130px !important;">
+                            Community
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 10px;display: flex;justify-content: end;float: right;">
+                    <div class="d-flex align-items-center justify-content-end flex-wrap gap-2">
+                        <span class="me-3"><b>Availability: </b></span>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-center col"
+                             style="border: 2px solid #ebebeb;font-size: 1rem !important;color: #333 !important;font-weight: 500 !important;padding: 8px !important;margin: 0 3px !important;border-radius: 20px !important;min-width: 150px !important;">
+                            <img src="./assets/icons/close.png" alt="" width="18" height="18">
+                            Odoo Online
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-center col"
+                             style="border: 2px solid #ebebeb;font-size: 1rem !important;color: #333 !important;font-weight: 500 !important;padding: 8px !important;margin: 0 3px !important;border-radius: 20px !important;min-width: 150px !important;">
+                            <img src="./assets/icons/close.png" alt="" width="18" height="18">
+                            Odoo.sh
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-center col"
+                             style="border: 2px solid #ebebeb;font-size: 1rem !important;color: #333 !important;font-weight: 500 !important;padding: 8px !important;margin: 0 3px !important;border-radius: 20px !important;min-width: 150px !important;">
+                            <img src="./assets/icons/tick.png" alt="" width="18" height="18">
+                            On Premise
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ HERO SECTION ═══ -->
+<div class="container-fluid cmpad text-center py-5 py-md-3">
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="mainhead" style="font-size: 2.3rem;padding-top: 1rem;font-weight: 700;color: black;">NHS ERIC
+                Returns</h3>
+            <p class="para mb-4" style="font-size: 20px;color: #6b7280;">
+                Generate the mandatory annual Estates Returns Information Collection (ERIC) automatically from the NHS
+                Estate Register and Estates Compliance — versioned, validated and export-ready.
+            </p>
+
+            <div class="d-flex justify-content-center gap-1 flex-wrap">
+                <a href="mailto:info@cybrosys.com"
+                   class="contact-btn email-btn d-flex align-items-center gap-2 justify-content-center"
+                   style="position: relative;padding: 15px 25px;border: none;border-radius: 50px;font-size: 16px;font-weight: 600;text-decoration: none;color: white;cursor: pointer;min-width: 200px;justify-content: center;background-color: #4facfe">
+                    <img src="./assets/icons/mail.png" alt="" width="25" height="25">
+                    <span class="btn-text" style="font-size: 15px;letter-spacing: 0.5px;">Email Us</span>
+                </a>
+                <a href="https://wa.me/918606827707"
+                   class="contact-btn whatsapp-btn d-flex align-items-center gap-2 justify-content-center"
+                   style="position: relative;padding: 15px 25px;border: none;border-radius: 50px;font-size: 16px;font-weight: 600;text-decoration: none;color: white;cursor: pointer;min-width: 200px;justify-content: center;background-color: #25d366;">
+                    <img src="./assets/icons/whatsapp.png" alt="" width="25" height="25">
+                    <span class="btn-text" style="font-size: 15px;letter-spacing: 0.5px;">+91 86068 27707</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ KEY HIGHLIGHTS (ERIC specific) ═══ -->
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="highlights-section">
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Key
+            <span>Highlights</span></h2>
+        <div class="row" style="margin-top: 20px;">
+            <div class="col-md-4 mb-4">
+                <div class="feature-card h-100">
+                    <div class="card-icon d-flex align-items-center justify-content-center">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title">Versioned ERIC Data-set</h3>
+                    <p class="card-description">Holds sections, items, validation rules and source mappings per
+                        collection year — clone and adjust annually without code changes.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card h-100">
+                    <div class="card-icon d-flex align-items-center justify-content-center">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title">Auto-population Engine</h3>
+                    <p class="card-description">Automatically assembles GIA, backlog, compliance, age profile and tenure
+                        from Estate Register & Compliance — traceable to source.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card h-100">
+                    <div class="card-icon d-flex align-items-center justify-content-center">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title">Validation & Gap Report</h3>
+                    <p class="card-description">Completeness checks, cross‑field rules, anomaly detection vs prior year,
+                        and a clear gap report showing exactly what’s missing.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card h-100">
+                    <div class="card-icon d-flex align-items-center justify-content-center">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title">Year‑on‑Year Comparison</h3>
+                    <p class="card-description">Side‑by‑side return comparison, trend tiles and percentage‑change
+                        highlighting to spot movements and errors.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card h-100">
+                    <div class="card-icon d-flex align-items-center justify-content-center">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title">Submission Export</h3>
+                    <p class="card-description">Export in the format required for submission (workbook/CSV aligned to
+                        the collection template) plus a readable internal report.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card h-100">
+                    <div class="card-icon d-flex align-items-center justify-content-center">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title">Review & Sign‑off</h3>
+                    <p class="card-description">Section owners, reviewer sign‑off per section, finalisation workflow,
+                        and full audit trail (chatter) for governance.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ TABS: SCREENSHOTS, FEATURES, FAQ, LATEST RELEASE ═══ -->
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="tabs-design1">
+        <ul class="nav nav-pills justify-content-start justify-content-md-center pb-4"
+            style="flex-flow: nowrap;overflow: hidden;overflow-x: auto;" id="pills1" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="screenshot-tab" data-bs-toggle="pill" data-bs-target="#screenshot"
+                   role="tab" aria-controls="screenshot" aria-selected="true" href="#screenshot">
+                    Screenshot
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="features-tab" data-bs-toggle="pill" data-bs-target="#features"
+                   role="tab" aria-controls="features" aria-selected="false" href="#features">
+                    Features
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="faq-tab" data-bs-toggle="pill" data-bs-target="#faq"
+                   role="tab" aria-controls="faq" aria-selected="false" href="#faq">
+                    Frequent Questions
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="latest-release-tab" data-bs-toggle="pill" data-bs-target="#latest-release"
+                   role="tab" aria-controls="latest-release" aria-selected="false" href="#latest-release">
+                    Latest Release
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content bg-white rounded-4" style="border: 2px solid #e9ecef;border-radius: 10px;"
+             id="pills1Content">
+
+            <!-- ═══ SCREENSHOT TAB  ═══ -->
+            <div class="tab-pane fade show active" id="screenshot" role="tabpanel" aria-labelledby="screenshot-tab">
+                <div class="p-3 py-md-5">
+
+                    <h2 class="mainhead text-center mb-2" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Manage <span>User Access</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Configure user roles - ERIC User , ERIC Officer and ERIC Manager , from the Users settings
+                        page.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/user_access.png" alt="User Access"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <h2 class="mainhead text-center mb-2" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Configuration <span> Settings </span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Configure the default options like auto-populate,carry forward,anomaly threshold and validation policy.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/settings.png" alt="Configuration Settings"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <h2 class="mainhead text-center mb-2" style="font-size: 2rem;font-weight: 700;color: black;">
+                        ERIC Return <span>Dashboard</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Overview of completeness, gaps, validation errors and headline metrics for the current ERIC
+                        return.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/dashboard1.png" alt="ERIC Dashboard"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/dashboard2.png" alt="ERIC Dashboard"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <h2 class="mainhead text-center mb-2" style="font-size: 2rem;font-weight: 700;color: black;">
+                        ERIC Data‑set <span>Configuration</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Versioned definition with sections, items, source mappings and validation rules.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/dataset.png" alt="ERIC Data-set"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/sections.png" alt="ERIC Sections"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/item.png" alt="ERIC Items"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <h2 class="mainhead text-center mb-2" style="font-size: 2rem;font-weight: 700;color: black;">
+                        ERIC Return <span>Form</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Complete return with status, completeness gauge, and values grouped by section.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/return.png" alt="ERIC Return Form"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ FEATURES TAB (exact same card style as reference) ═══ -->
+            <div class="tab-pane fade" id="features" role="tabpanel" aria-labelledby="features-tab">
+                <div class="p-3 py-md-5">
+                    <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">Our
+                        <span>Features</span></h2>
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center"><img
+                                        src="./assets/icons/chart.png" alt="" width="30" height="30"></div>
+                                <h3 class="card-title">Versioned Data-set</h3>
+                                <p class="card-description">Clone and adjust ERIC year definitions without code changes.
+                                    Mark items added/changed/removed vs prior year.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center"><img
+                                        src="./assets/icons/chart.png" alt="" width="30" height="30"></div>
+                                <h3 class="card-title">Auto-populate from Estate</h3>
+                                <p class="card-description">Site count, GIA, backlog, compliance %, tenure split – all
+                                    pulled from Estate Register & Compliance.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center"><img
+                                        src="./assets/icons/chart.png" alt="" width="30" height="30"></div>
+                                <h3 class="card-title">Manual Entry & Overrides</h3>
+                                <p class="card-description">Enter cost, soft‑FM, energy items; override auto values with
+                                    reason; carry‑forward from prior year.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center"><img
+                                        src="./assets/icons/chart.png" alt="" width="30" height="30"></div>
+                                <h3 class="card-title">Validation & Gap Analysis</h3>
+                                <p class="card-description">Required/range/type checks; cross‑field rules; anomaly
+                                    flags; gap report with completeness %.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center"><img
+                                        src="./assets/icons/chart.png" alt="" width="30" height="30"></div>
+                                <h3 class="card-title">Export & Reports</h3>
+                                <p class="card-description">Submission‑aligned workbook/CSV, internal PDF report, gap
+                                    report, board summary and full data export.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center"><img
+                                        src="./assets/icons/chart.png" alt="" width="30" height="30"></div>
+                                <h3 class="card-title">Review & Sign‑off</h3>
+                                <p class="card-description">Section owners, reviewer sign‑off, finalisation workflow,
+                                    audit trail (chatter) and locked snapshots.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ FAQ TAB (exact same style as reference) ═══ -->
+            <div class="tab-pane fade" id="faq" role="tabpanel" aria-labelledby="faq-tab">
+                <div class="p-3 py-md-5">
+                    <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Frequently Asked <span>Questions</span></h2>
+                    <div class="modern-accordion">
+                        <div class="accordion accordion-flush" id="accordionFlushExample">
+                            <details class="accordion-item loading-animation"
+                                     style="margin-bottom: 1rem;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                <summary class="accordion-button collapsed"
+                                         style="box-shadow: unset; border: none !important; padding: 1.5rem 2rem !important; font-weight: 600 !important; font-size: 1.1rem; color: #71639e !important; background-color: #e3e3f3a9 !important; position: relative; overflow: hidden; border-radius: 10px !important; cursor: pointer;"
+                                         aria-expanded="false">
+                                    How does the module handle annual ERIC changes?
+                                </summary>
+                                <div style="border-top: 1px solid #e2e8f0;">
+                                    <div class="accordion-body"
+                                         style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                        <p style="color: #374151; font-size: 0.95rem; margin-top: 10px;">
+                                            The module uses a <strong>versioned data-set definition</strong> (sections,
+                                            items, validation rules, source mappings) keyed by collection year.
+                                            When NHS England revises the return, you clone the previous year’s
+                                            definition, adjust the items that changed, and mark them as
+                                            new/changed/removed.
+                                            No code changes are required — the module stays current year after year.
+                                        </p>
+                                    </div>
+                                </div>
+                            </details>
+
+                            <details class="accordion-item loading-animation"
+                                     style="margin-bottom: 1rem;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                <summary class="accordion-button collapsed"
+                                         style="box-shadow: unset; border: none !important; padding: 1.5rem 2rem !important; font-weight: 600 !important; font-size: 1.1rem; color: #71639e !important; background-color: #e3e3f3a9 !important; position: relative; overflow: hidden; border-radius: 10px !important; cursor: pointer;"
+                                         aria-expanded="false">
+                                    Which data sources are used for auto‑population?
+                                </summary>
+                                <div style="border-top: 1px solid #e2e8f0;">
+                                    <div class="accordion-body"
+                                         style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                        <p style="color: #374151; font-size: 0.95rem; margin-top: 10px;">
+                                            The module reads from the <strong>Estate Register</strong> (sites,
+                                            buildings, GIA, age, tenure, backlog, condition) and <strong>Estates
+                                            Compliance</strong> (statutory‑compliance status by discipline).
+                                            A source resolver maps each ERIC item to the correct figure. Manual items
+                                            (cost, soft‑FM, energy) are entered separately.
+                                        </p>
+                                    </div>
+                                </div>
+                            </details>
+
+                            <details class="accordion-item loading-animation"
+                                     style="margin-bottom: 0;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                <summary class="accordion-button collapsed"
+                                         style="box-shadow: unset; border: none !important; padding: 1.5rem 2rem !important; font-weight: 600 !important; font-size: 1.1rem; color: #71639e !important; background-color: #e3e3f3a9 !important; position: relative; overflow: hidden; border-radius: 10px !important; cursor: pointer;"
+                                         aria-expanded="false">
+                                    What happens when I finalise a return?
+                                </summary>
+                                <div style="border-top: 1px solid #e2e8f0;">
+                                    <div class="accordion-body"
+                                         style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                        <p style="color: #374151; font-size: 0.95rem; margin-top: 10px;">
+                                            Finalisation <strong>snapshots</strong> all values, stamps the return with
+                                            the finaliser and timestamp, and locks the return so no further edits are
+                                            allowed.
+                                            The snapshot preserves the exact values submitted, even if underlying estate
+                                            data changes later.
+                                            You can still export the return in the submission format.
+                                        </p>
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ LATEST RELEASE TAB (exact same style as reference) ═══ -->
+            <div class="tab-pane fade" id="latest-release" role="tabpanel" aria-labelledby="latest-release-tab">
+                <div class="p-3 py-md-5 text-center">
+                    <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">Latest
+                        <span>Releases</span></h2>
+                    <div class="text-center py-5" style="color: #6b7280;">
+                        <div class="col-md-6 offset-md-3 mb-4">
+                            <div class="release-item h-100"
+                                 style="position: relative;padding: 30px;border: 2px solid #71639e24;border-radius: 15px;">
+                                <div class="release-header d-flex align-items-center flex-wrap gap-3"
+                                     style="margin-bottom: 0.75rem;">
+                                    <div class="version"
+                                         style="font-size: 1.25rem;font-weight: 700;color: #1a202c;">Latest Release
+                                        19.0.1.0.0
+                                    </div>
+                                    <div style="padding: 0.25rem 0.75rem;border-radius: 20px;font-size: 0.75rem;font-weight: 600;text-transform: uppercase;letter-spacing: 0.5px;background-color: #9ae6b4;color: #2d7d32;border: 2px solid #68d391;"
+                                         class="add">Add
+                                    </div>
+                                    <div class="date"
+                                         style="color: #64748b;font-size: 0.875rem;font-weight: 500;gap: 0.5rem;">
+                                        <img src="./assets/icons/calendar.png" alt="" width="16" height="16"
+                                             style="margin-right: 5px;">
+                                        06th July, 2026
+                                    </div>
+                                </div>
+                                <div class="feature-list">
+                                    <div class="feature-item p-3"
+                                         style="border-radius: 5px;display: flex;align-items: center;padding: 25px;background-color: #f5f5f5e7;border-radius: 10px;text-align: left;">
+                                        <div class="feature-text"
+                                             style="color: #6b7280;line-height: 1.6;font-size: 0.95rem;">
+                                            <strong>Initial Commit</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ═══ RELATED MODULES (exact same paths as reference) ═══ -->
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="highlights-section">
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Related
+            <span>Modules</span></h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/base_accounting_kit" style="text-decoration: none;">
+                    <div class="feature-card h-100 p-4" style="background-color: white; border: 2px solid #71639e1a;">
+                        <div class="card-image"
+                             style="border: 2px solid #71639e1c; margin-bottom: 1rem; border-radius: 10px; overflow: hidden;">
+                            <img src="./assets/modules/module1.gif" alt="NHS Estate Register"
+                                 style="width: 100%; border-radius: 10px;">
+                        </div>
+                        <h3 class="card-title" style="font-size: 20px;font-weight: 600;color: black;">Odoo 19 Full
+                            Accounting Kit for Community</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/hide_menu_user" style="text-decoration: none;">
+                    <div class="feature-card h-100 p-4" style="background-color: white; border: 2px solid #71639e1a;">
+                        <div class="card-image"
+                             style="border: 2px solid #71639e1c; margin-bottom: 1rem; border-radius: 10px; overflow: hidden;">
+                            <img src="./assets/modules/module2.jpg" alt="Estates Compliance"
+                                 style="width: 100%; border-radius: 10px;">
+                        </div>
+                        <h3 class="card-title" style="font-size: 20px;font-weight: 600;color: black;">Hide Any Menu User
+                            Wise</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/base_account_budget" style="text-decoration: none;">
+                    <div class="feature-card h-100 p-4" style="background-color: white; border: 2px solid #71639e1a;">
+                        <div class="card-image"
+                             style="border: 2px solid #71639e1c; margin-bottom: 1rem; border-radius: 10px; overflow: hidden;">
+                            <img src="./assets/modules/module3.jpg" alt="Energy & Net Zero"
+                                 style="width: 100%; border-radius: 10px;">
+                        </div>
+                        <h3 class="card-title" style="font-size: 20px;font-weight: 600;color: black;">Odoo 19 Budget
+                            Management</h3>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ OUR SERVICES ═══ -->
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="highlights-section">
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Our
+            <span>Services</span></h2>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/setting.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Customization</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/imple.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Implementation</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/support.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Support</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/transfer.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Migration</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/idea.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Integration</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chat.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Consultancy</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Licensing</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/people.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Hire Odoo
+                        Developer</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var tabLinks = document.querySelectorAll('#pills1 .nav-link');
+        tabLinks.forEach(function (link) {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                tabLinks.forEach(function (l) {
+                    l.classList.remove('active');
+                    l.setAttribute('aria-selected', 'false');
+                });
+                this.classList.add('active');
+                this.setAttribute('aria-selected', 'true');
+                var targetId = this.getAttribute('data-bs-target');
+                var targetPane = document.querySelector(targetId);
+                var allPanes = document.querySelectorAll('#pills1Content .tab-pane');
+                allPanes.forEach(function (pane) {
+                    pane.classList.remove('show', 'active');
+                });
+                if (targetPane) {
+                    targetPane.classList.add('show', 'active');
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+
+</html>

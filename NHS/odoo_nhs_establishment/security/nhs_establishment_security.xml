@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- ══════════════════════════════════════════════════════════════
+             Module Category
+        ══════════════════════════════════════════════════════════════════ -->
+        <record id="module_category_nhs_establishment" model="ir.module.category">
+            <field name="name">NHS Establishment Register</field>
+            <field name="description">NHS Establishment Register access levels.</field>
+            <field name="sequence">52</field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             Privilege (Odoo 19 — replaces category_id on res.groups)
+        ══════════════════════════════════════════════════════════════════ -->
+        <record id="privilege_establishment_access_level" model="res.groups.privilege">
+            <field name="name">Establishment Access Level</field>
+            <field name="category_id" ref="module_category_nhs_establishment"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             Groups
+        ══════════════════════════════════════════════════════════════════ -->
+        <record id="group_nhs_workforce_user" model="res.groups">
+            <field name="name">Workforce User</field>
+            <field name="privilege_id" ref="privilege_establishment_access_level"/>
+            <field name="comment">Read-only across establishment — for finance, governance and
+                managers who need the funded/vacancy picture but don't edit it.</field>
+        </record>
+
+        <record id="group_nhs_workforce_officer" model="res.groups">
+            <field name="name">Workforce Officer</field>
+            <field name="privilege_id" ref="privilege_establishment_access_level"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_workforce_user'))]"/>
+            <field name="comment">Maintain posts and in-post figures, manage the org hierarchy,
+                raise establishment change requests. Cannot approve changes or edit configuration.</field>
+        </record>
+
+        <record id="group_nhs_workforce_manager" model="res.groups">
+            <field name="name">Workforce Manager</field>
+            <field name="privilege_id" ref="privilege_establishment_access_level"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_workforce_officer'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+            <field name="comment">Full control: approve establishment changes, configure AfC
+                bands / staff groups / settings, and manage everything above.</field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             Record Rules — Company scoping (multi-organisation isolation)
+        ══════════════════════════════════════════════════════════════════ -->
+        <record id="rule_nhs_org_unit_company" model="ir.rule">
+            <field name="name">nhs.org.unit: company scope</field>
+            <field name="model_id" ref="model_nhs_org_unit"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_workforce_user'))]"/>
+        </record>
+
+        <record id="rule_nhs_establishment_post_company" model="ir.rule">
+            <field name="name">nhs.establishment.post: company scope</field>
+            <field name="model_id" ref="model_nhs_establishment_post"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_workforce_user'))]"/>
+        </record>
+
+        <record id="rule_nhs_establishment_change_company" model="ir.rule">
+            <field name="name">nhs.establishment.change: company scope</field>
+            <field name="model_id" ref="model_nhs_establishment_change"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_workforce_user'))]"/>
+        </record>
+
+        <record id="rule_nhs_afc_band_company" model="ir.rule">
+            <field name="name">nhs.afc.band: company scope</field>
+            <field name="model_id" ref="model_nhs_afc_band"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_workforce_user'))]"/>
+        </record>
+
+        <record id="rule_nhs_cost_centre_company" model="ir.rule">
+            <field name="name">nhs.cost.centre: company scope</field>
+            <field name="model_id" ref="model_nhs_cost_centre"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_workforce_user'))]"/>
+        </record>
+
+        <!-- No-delete is enforced via perm_unlink=0 in ir.model.access.csv for
+             user/officer groups, and via the archive-not-delete convention on
+             nhs.org.unit / nhs.establishment.post (active=False + status='deleted'). -->
+    </data>
+</odoo>

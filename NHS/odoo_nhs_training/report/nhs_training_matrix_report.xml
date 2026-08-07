@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report action: Team Training Matrix PDF -->
+    <record id="report_nhs_training_matrix" model="ir.actions.report">
+        <field name="name">Team Training Matrix</field>
+        <field name="model">nhs.workforce.member</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_training.report_nhs_training_matrix_view</field>
+        <field name="report_file">odoo_nhs_training.report_nhs_training_matrix_view</field>
+        <field name="binding_model_id" ref="model_nhs_workforce_member"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_nhs_training_matrix"/>
+    </record>
+
+    <template id="report_nhs_training_matrix_view">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="pages" t-as="matrix_page">
+                    <div class="page" t-attf-style="#{not matrix_page_last and 'page-break-after: always;' or ''}">
+                        <h2 style="color:#005EB8;">Team Training Matrix</h2>
+                        <p class="text-muted">
+                            Generated <t t-out="generated_on"/>
+                            <t t-if="len(pages) &gt; 1">
+                                — Subjects page <t t-out="matrix_page_index + 1"/> of <t t-out="len(pages)"/>
+                            </t>
+                        </p>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Member</th>
+                                    <th>Team</th>
+                                    <t t-foreach="matrix_page['subjects']" t-as="subject">
+                                        <th style="font-size: 0.7rem;"><t t-out="subject.complete_name"/></th>
+                                    </t>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="matrix_page['rows']" t-as="row">
+                                    <tr>
+                                        <td><t t-out="row['member'].name"/></td>
+                                        <td><t t-out="row['member'].org_unit_id.name"/></td>
+                                        <t t-foreach="row['cells']" t-as="cell">
+                                            <td t-attf-style="text-align:center; #{cell['status'] == 'compliant' and 'background-color:#d4edda;' or cell['status'] == 'due_soon' and 'background-color:#fff3cd;' or cell['status'] == 'expired' and 'background-color:#f8d7da;' or cell['status'] == 'failed' and 'background-color:#f1aeb5;' or cell['status'] == 'exempt' and 'background-color:#d1ecf1;' or ''}">
+                                                <t t-out="cell['label']"/>
+                                            </td>
+                                        </t>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

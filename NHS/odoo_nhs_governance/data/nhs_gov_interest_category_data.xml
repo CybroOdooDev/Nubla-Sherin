@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Financial interest category -->
+    <record id="interest_category_financial" model="nhs.gov.interest.category">
+        <field name="name">Financial</field>
+        <field name="code">financial</field>
+        <field name="sequence">10</field>
+        <field name="description">A financial interest — e.g. shareholdings, directorships,
+            consultancy income from an organisation that could conflict with NHS duties.</field>
+    </record>
+    <!-- Non-financial professional interest category -->
+    <record id="interest_category_non_financial_professional" model="nhs.gov.interest.category">
+        <field name="name">Non-Financial Professional</field>
+        <field name="code">non_financial_professional</field>
+        <field name="sequence">20</field>
+        <field name="description">A professional interest with no direct financial benefit — e.g.
+            an unpaid advisory role, academic position or professional body role.</field>
+    </record>
+    <!-- Non-financial personal interest category -->
+    <record id="interest_category_non_financial_personal" model="nhs.gov.interest.category">
+        <field name="name">Non-Financial Personal</field>
+        <field name="code">non_financial_personal</field>
+        <field name="sequence">30</field>
+        <field name="description">A personal interest — e.g. a close family member employed by or
+            contracting with the organisation.</field>
+    </record>
+    <!-- Loyalty interest category -->
+    <record id="interest_category_loyalty" model="nhs.gov.interest.category">
+        <field name="name">Loyalty</field>
+        <field name="code">loyalty</field>
+        <field name="sequence">40</field>
+        <field name="description">A loyalty interest arising from membership of, or loyalty to,
+            another organisation or person.</field>
+    </record>
+    <!-- Indirect interest category -->
+    <record id="interest_category_indirect" model="nhs.gov.interest.category">
+        <field name="name">Indirect</field>
+        <field name="code">indirect</field>
+        <field name="sequence">50</field>
+        <field name="description">An interest held indirectly, e.g. through a close associate or
+            connected organisation.</field>
+    </record>
+    <!-- Nil return interest category -->
+    <record id="interest_category_nil" model="nhs.gov.interest.category">
+        <field name="name">Nil Return</field>
+        <field name="code">nil</field>
+        <field name="sequence">60</field>
+        <field name="description">Used to record that a member has no interests to declare at this review point.</field>
+    </record>
+</odoo>

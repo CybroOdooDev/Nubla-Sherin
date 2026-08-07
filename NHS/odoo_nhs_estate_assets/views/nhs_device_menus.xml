@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ROOT MENU -->
+    <menuitem id="menu_nhs_device_root"
+              name="Medical Devices"
+              sequence="10"
+              web_icon="odoo_nhs_estate_assets,static/description/icon.png"/>
+
+    <!-- DASHBOARD SECTION -->
+    <menuitem id="menu_nhs_device_dashboard"
+              name="Dashboard"
+              parent="menu_nhs_device_root"
+              action="action_nhs_device_dashboard"
+              sequence="1"/>
+
+    <!-- DEVICES SECTION -->
+    <menuitem id="menu_nhs_device_devices"
+              name="Devices"
+              parent="menu_nhs_device_root"
+              sequence="10"/>
+    <menuitem id="menu_nhs_device_register"
+              name="Device Register"
+              parent="menu_nhs_device_devices"
+              action="action_nhs_device"
+              sequence="10"/>
+    <menuitem id="menu_nhs_device_due_soon"
+              name="Due Soon"
+              parent="menu_nhs_device_devices"
+              action="action_nhs_device_due_soon"
+              sequence="20"/>
+    <menuitem id="menu_nhs_device_overdue"
+              name="Overdue"
+              parent="menu_nhs_device_devices"
+              action="action_nhs_device_overdue"
+              sequence="30"/>
+    <menuitem id="menu_nhs_device_end_of_life"
+              name="End of Life"
+              parent="menu_nhs_device_devices"
+              action="action_nhs_device_end_of_life"
+              sequence="40"/>
+
+    <!-- MAINTENANCE SECTION -->
+    <menuitem id="menu_nhs_device_maintenance"
+              name="Maintenance"
+              parent="menu_nhs_device_root"
+              sequence="20"/>
+    <menuitem id="menu_nhs_device_service_records"
+              name="Service Records"
+              parent="menu_nhs_device_maintenance"
+              action="action_nhs_device_service"
+              sequence="10"/>
+    <menuitem id="menu_nhs_device_schedules"
+              name="Schedules"
+              parent="menu_nhs_device_maintenance"
+              action="action_nhs_device_schedule"
+              sequence="20"/>
+
+    <!-- SAFETY ALERTS SECTION -->
+    <menuitem id="menu_nhs_device_alerts"
+              name="Safety Alerts"
+              parent="menu_nhs_device_root"
+              sequence="30"/>
+    <menuitem id="menu_nhs_device_alert"
+              name="Alerts (MHRA/CAS)"
+              parent="menu_nhs_device_alerts"
+              action="action_nhs_device_alert"
+              sequence="10"/>
+    <menuitem id="menu_nhs_device_alert_affected"
+              name="Affected Devices"
+              parent="menu_nhs_device_alerts"
+              action="action_nhs_device_alert_line"
+              sequence="20"/>
+
+    <!-- CONTRACTS SECTION -->
+
+    <menuitem id="menu_nhs_device_contracts"
+              name="Contracts"
+              parent="menu_nhs_device_root"
+              sequence="40"/>
+    <menuitem id="menu_nhs_device_warranties"
+              name="Warranties &amp; Service Contracts"
+              parent="menu_nhs_device_contracts"
+              action="action_nhs_device_warranty"
+              sequence="10"/>
+
+    <!-- REPORTING SECTION -->
+
+    <menuitem id="menu_nhs_device_reports"
+              name="Reporting"
+              parent="menu_nhs_device_root"
+              sequence="50"/>
+    <menuitem id="menu_nhs_device_replacement_forecast"
+              name="Replacement Forecast"
+              parent="menu_nhs_device_reports"
+              action="action_nhs_device_replacement_forecast"
+              sequence="15"/>
+    <menuitem id="menu_nhs_device_replacement_forecast_pdf"
+              name="Replacement Forecast Report (PDF)"
+              parent="menu_nhs_device_reports"
+              action="action_report_nhs_replacement_forecast"
+              sequence="20"/>
+    <menuitem id="menu_nhs_device_passport"
+              name="Device Passport (PDF)"
+              parent="menu_nhs_device_reports"
+              action="action_nhs_device_passport"
+              sequence="25"/>
+    <menuitem id="menu_nhs_device_alert_response"
+              name="Alert Response (PDF)"
+              parent="menu_nhs_device_reports"
+              action="action_nhs_device_alert_response"
+              sequence="30"/>
+    <menuitem id="menu_nhs_device_export_excel"
+              name="Device Register (Excel)"
+              parent="menu_nhs_device_reports"
+              action="action_server_export_all_device_excel"
+              sequence="35"/>
+
+
+    <!-- CONFIGURATION SECTION (Manager Only) -->
+
+    <menuitem id="menu_nhs_device_configuration"
+              name="Configuration"
+              parent="menu_nhs_device_root"
+              sequence="100"
+              groups="group_nhs_equipment_manager"/>
+    <menuitem id="menu_nhs_device_category"
+              name="Device Categories"
+              parent="menu_nhs_device_configuration"
+              action="action_nhs_device_category"
+              sequence="10"/>
+    <menuitem id="menu_nhs_device_schedule_types"
+              name="Schedule Types"
+              parent="menu_nhs_device_configuration"
+              action="action_nhs_device_schedule_type"
+              sequence="20"/>
+    <menuitem id="menu_nhs_device_settings"
+              name="Settings"
+              parent="menu_nhs_device_configuration"
+              action="action_nhs_estate_assets_settings"
+              sequence="30"/>
+</odoo>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Compliance PAM Wizard Form View -->
+    <record id="view_nhs_compliance_pam_wizard" model="ir.ui.view">
+        <field name="name">nhs.compliance.pam.wizard.form</field>
+        <field name="model">nhs.compliance.pam.wizard</field>
+        <field name="arch" type="xml">
+            <form string="PAM Safety Domain Extract">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="discipline_id" placeholder="All Disciplines"/>
+                            <field name="statutory_filter" widget="radio"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_export_excel" string="Extract Excel" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Compliance PAM Wizard - Action -->
+    <record id="action_nhs_compliance_pam_wizard" model="ir.actions.act_window">
+        <field name="name">PAM Safety-Domain Extract</field>
+        <field name="res_model">nhs.compliance.pam.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

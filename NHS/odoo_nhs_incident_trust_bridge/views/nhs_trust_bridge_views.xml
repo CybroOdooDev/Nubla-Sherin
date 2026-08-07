@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Extends the NHS Trust form (from odoo_nhs_trust_management) with:
+        1. A Locations stat button showing how many incident locations are linked
+        2. A "Sites & Locations" notebook page for setting up the location hierarchy
+    -->
+    <record id="view_nhs_trust_form_bridge" model="ir.ui.view">
+        <field name="name">nhs.trust.form.bridge</field>
+        <field name="model">nhs.trust</field>
+        <field name="inherit_id" ref="odoo_nhs_trust_management.view_nhs_trust_form"/>
+        <field name="arch" type="xml">
+
+            <!-- ── Locations stat button ──────────────────────────────── -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_locations"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-map-marker">
+                    <field name="location_count" widget="statinfo" string="Locations"/>
+                </button>
+            </xpath>
+
+            <!-- ── Sites &amp; Locations notebook page ───────────────── -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Sites &amp; Locations" name="sites_locations">
+                    <group col="1">
+                        <div class="mb-2">
+                            <button name="action_open_location_setup_wizard"
+                                    string="Setup Location Hierarchy"
+                                    type="object"
+                                    class="btn-primary"
+                                    help="Create a site and standard ward/department locations for this trust."/>
+                            <button name="action_view_locations"
+                                    string="View All Locations"
+                                    type="object"
+                                    class="btn-secondary ms-2"
+                                    invisible="location_count == 0"/>
+                        </div>
+                        <field name="location_ids" nolabel="1" readonly="1">
+                            <list string="Locations">
+                                <field name="complete_name"/>
+                                <field name="location_type"/>
+                                <field name="parent_id"/>
+                                <field name="ods_site_code"/>
+                            </list>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

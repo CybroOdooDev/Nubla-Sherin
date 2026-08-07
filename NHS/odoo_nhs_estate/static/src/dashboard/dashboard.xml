@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="odoo_nhs_estate.NhsEstateDashboard">
+        <div class="o_nhs_dashboard_container" style="background-color: #F0F4F5; padding: 24px; box-sizing: border-box; overflow-y: auto; overflow-x: hidden; position: relative; height: 100%;">
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap');
+
+                .o_nhs_dashboard_container,
+                .o_nhs_dashboard_container * {
+                    box-sizing: border-box;
+                }
+                .o_nhs_dashboard_container {
+                    font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+                    color: #212B32;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 24px;
+                    overflow-y: auto !important;
+                    overflow-x: hidden !important;
+                    height: 100% !important;
+                    position: relative !important;
+                    width: 100%;
+                }
+                /* KPI Card Section (Exactly 3 cards per row on desktop, taller and clearer) */
+                .o_nhs_kpi_grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                    gap: 24px;
+                }
+                @media (max-width: 992px) {
+                    .o_nhs_kpi_grid {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
+                }
+                @media (max-width: 576px) {
+                    .o_nhs_kpi_grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                .o_nhs_kpi_card {
+                    background-color: #ffffff;
+                    border: 1px solid #D8DDE0;
+                    border-radius: 8px;
+                    padding: 20px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                    border-left: 6px solid #005EB8;
+                    transition: transform 0.15s ease, box-shadow 0.15s ease;
+                    cursor: pointer;
+                    height: 100px;
+                }
+                .o_nhs_kpi_card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+                }
+                .o_nhs_kpi_card.kpi-red { border-left-color: #DA291C; }
+                .o_nhs_kpi_card.kpi-orange { border-left-color: #CE7B11; }
+                .o_nhs_kpi_card.kpi-green { border-left-color: #009639; }
+                .o_nhs_kpi_content {
+                    display: flex;
+                    flex-direction: column;
+                }
+                .o_nhs_kpi_title {
+                    font-size: 0.85rem;
+                    text-transform: uppercase;
+                    font-weight: 700;
+                    color: #505A5F;
+                    letter-spacing: 0.6px;
+                }
+                .o_nhs_kpi_value {
+                    font-size: 1.85rem;
+                    font-weight: 800;
+                    color: #212B32;
+                    margin-top: 4px;
+                    line-height: 1.2;
+                }
+                .o_nhs_kpi_icon_wrapper {
+                    background-color: #F0F4F5;
+                    color: #005EB8;
+                    width: 52px;
+                    height: 52px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.35rem;
+                }
+                .o_nhs_kpi_card.kpi-red .o_nhs_kpi_icon_wrapper { color: #DA291C; background-color: #FFE6E6; }
+                .o_nhs_kpi_card.kpi-orange .o_nhs_kpi_icon_wrapper { color: #CE7B11; background-color: #FFF2E6; }
+                .o_nhs_kpi_card.kpi-green .o_nhs_kpi_icon_wrapper { color: #009639; background-color: #E6F3E6; }
+                /* Analytics Grid (Exactly 2 charts per row on desktop for spacious display) */
+                .o_nhs_charts_grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    gap: 24px;
+                }
+                @media (max-width: 992px) {
+                    .o_nhs_charts_grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                /* Standard spacious white panel card */
+                .o_nhs_card {
+                    background-color: #ffffff;
+                    border: 1px solid #D8DDE0;
+                    border-radius: 8px;
+                    padding: 24px;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                    display: flex;
+                    flex-direction: column;
+                    height: 420px;
+                }
+                .o_nhs_card_header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-bottom: 2px solid #F0F4F5;
+                    padding-bottom: 12px;
+                    margin-bottom: 20px;
+                }
+                .o_nhs_card_title {
+                    font-size: 1.15rem;
+                    font-weight: 700;
+                    color: #005EB8;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+                .o_nhs_chart_canvas_wrapper {
+                    flex: 1;
+                    min-height: 0;
+                    position: relative;
+                }
+                /* Operational Section Grid (3 columns on desktop, stacking on tablet/mobile) */
+                .o_nhs_ops_grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                    gap: 24px;
+                }
+                @media (max-width: 1200px) {
+                    .o_nhs_ops_grid {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
+                }
+                @media (max-width: 768px) {
+                    .o_nhs_ops_grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                .o_nhs_ops_card {
+                    background-color: #ffffff;
+                    border: 1px solid #D8DDE0;
+                    border-radius: 8px;
+                    padding: 24px;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                    display: flex;
+                    flex-direction: column;
+                    min-height: 280px;
+                    box-sizing: border-box;
+                }
+                /* Table list styling (Enlarged for readability/scanning) */
+                .o_nhs_list_table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 0.95rem;
+                }
+                .o_nhs_list_table th {
+                    text-align: left;
+                    color: #505A5F;
+                    font-weight: 700;
+                    padding: 10px 12px;
+                    border-bottom: 2px solid #E8EDEE;
+                }
+                .o_nhs_list_table td {
+                    padding: 12px 12px;
+                    border-bottom: 1px solid #F0F4F5;
+                    color: #212B32;
+                    vertical-align: middle;
+                }
+                .o_nhs_list_table tr:last-child td {
+                    border-bottom: none;
+                }
+                .o_nhs_list_table tr:hover td {
+                    background-color: rgba(0, 94, 184, 0.03);
+                    cursor: pointer;
+                }
+                /* Badges (Enlarged) */
+                .badge-compact {
+                    font-size: 0.75rem;
+                    padding: 0.25rem 0.60rem;
+                    border-radius: 4px;
+                    font-weight: 700;
+                    text-align: center;
+                    white-space: nowrap;
+                    display: inline-block;
+                }
+                .status-operational { background-color: #E6F3E6; color: #009639; }
+                .status-partial { background-color: #FFF2E6; color: #CE7B11; }
+                .status-closed { background-color: #FFE6E6; color: #DA291C; }
+                .status-disposed { background-color: #F0F4F5; color: #768692; }
+                .status-grade-A { background-color: #E6F3E6; color: #009639; }
+                .status-grade-B { background-color: #E6F8FF; color: #00A3E0; }
+                .status-grade-C { background-color: #FFF2E6; color: #CE7B11; }
+                .status-grade-D { background-color: #FFE6E6; color: #DA291C; }
+                .status-grade-unassessed { background-color: #F0F4F5; color: #768692; }
+                .badge-high-risk { background-color: #FFE6E6; color: #DA291C; }
+                .badge-sig-risk { background-color: #FFF2E6; color: #CE7B11; }
+                .badge-mod-risk { background-color: #E6F8FF; color: #005EB8; }
+                .badge-low-risk { background-color: #E6F3E6; color: #009639; }
+            </style>
+            <t t-if="state.loading">
+                <div class="d-flex justify-content-center align-items-center" style="height: 350px;">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem; color: #005EB8 !important;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </t>
+            <t t-else="">
+                <div class="o_nhs_kpi_grid">
+                    <!-- Row 1 / Card 1: Sites -->
+                    <div class="o_nhs_kpi_card" t-on-click="openSites">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">Total Sites</span>
+                            <span class="o_nhs_kpi_value" t-esc="state.metrics.site_count"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-hospital-o"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_kpi_card" t-on-click="openBuildings">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">Total Buildings</span>
+                            <span class="o_nhs_kpi_value" t-esc="state.metrics.building_count"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-building-o"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_kpi_card" t-on-click="openFloors">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">Total Floors</span>
+                            <span class="o_nhs_kpi_value" t-esc="state.metrics.floor_count"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-navicon"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_kpi_card" t-on-click="openSpaces">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">Functional Spaces</span>
+                            <span class="o_nhs_kpi_value" t-esc="state.metrics.space_count"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-th"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_kpi_card kpi-green" t-on-click="openBuildings">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">Total GIA (m²)</span>
+                            <span class="o_nhs_kpi_value">
+                                <t t-esc="Math.round(state.metrics.total_gia).toLocaleString()"/> m²
+                            </span>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-arrows-alt"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_kpi_card kpi-red" t-on-click="openBacklogs">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">Total Backlog</span>
+                            <span class="o_nhs_kpi_value">
+                                £<t t-esc="Math.round(state.metrics.total_backlog).toLocaleString()"/>
+                            </span>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-wrench fa-2x opacity-50"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_kpi_card kpi-red" t-on-click="openHighRiskBacklogs">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">High-Risk Backlog</span>
+                            <span class="o_nhs_kpi_value" t-esc="state.metrics.high_risk_backlog_count"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-exclamation-triangle"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_kpi_card kpi-orange" t-on-click="openExpiringTenures">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">Expiring Leases</span>
+                            <span class="o_nhs_kpi_value" t-esc="state.metrics.expiring_tenure_count"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-clock-o"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_kpi_card kpi-red" t-on-click="openConditionDBuildings">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">Grade D Buildings</span>
+                            <span class="o_nhs_kpi_value" t-esc="state.metrics.poor_condition_buildings_count"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-meh-o"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="o_nhs_charts_grid">
+                    <div class="o_nhs_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title">
+                                <i class="fa fa-pie-chart"/>Condition Profile
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.estate.building', 'graph')" title="Open Native Graph"><i class="fa fa-bar-chart text-primary"/></button>
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.estate.building', 'pivot')" title="Open Native Pivot"><i class="fa fa-table text-primary"/></button>
+                                <span class="badge rounded-pill bg-light text-dark border">A/B/C/D</span>
+                            </div>
+                        </div>
+                        <div class="o_nhs_chart_canvas_wrapper">
+                            <canvas t-ref="conditionChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="o_nhs_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title">
+                                <i class="fa fa-bar-chart"/>Backlog Maintenance Costs
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.estate.backlog', 'graph')" title="Open Native Graph"><i class="fa fa-bar-chart text-primary"/></button>
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.estate.backlog', 'pivot')" title="Open Native Pivot"><i class="fa fa-table text-primary"/></button>
+                                <span class="badge rounded-pill bg-light text-dark border">By Risk (£)</span>
+                            </div>
+                        </div>
+                        <div class="o_nhs_chart_canvas_wrapper">
+                            <canvas t-ref="backlogRiskChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="o_nhs_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title">
+                                <i class="fa fa-key"/>Tenure Breakdown
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.estate.tenure', 'graph')" title="Open Native Graph"><i class="fa fa-bar-chart text-primary"/></button>
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.estate.tenure', 'pivot')" title="Open Native Pivot"><i class="fa fa-table text-primary"/></button>
+                                <span class="badge rounded-pill bg-light text-dark border">Breakdown</span>
+                            </div>
+                        </div>
+                        <div class="o_nhs_chart_canvas_wrapper">
+                            <canvas t-ref="display_name"></canvas>
+                        </div>
+                    </div>
+                    <div class="o_nhs_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title">
+                                <i class="fa fa-hospital-o"/>GIA by Function (Building)
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.estate.building', 'graph')" title="Open Native Graph"><i class="fa fa-bar-chart text-primary"/></button>
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.estate.building', 'pivot')" title="Open Native Pivot"><i class="fa fa-table text-primary"/></button>
+                                <span class="badge rounded-pill bg-light text-dark border">GIA (m²)</span>
+                            </div>
+                        </div>
+                        <div class="o_nhs_chart_canvas_wrapper">
+                            <canvas t-ref="giaFunctionChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="o_nhs_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title">
+                                <i class="fa fa-check-square-o"/>Operational Status (Building)
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.estate.building', 'graph')" title="Open Native Graph"><i class="fa fa-bar-chart text-primary"/></button>
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.estate.building', 'pivot')" title="Open Native Pivot"><i class="fa fa-table text-primary"/></button>
+                                <span class="badge rounded-pill bg-light text-dark border">Status</span>
+                            </div>
+                        </div>
+                        <div class="o_nhs_chart_canvas_wrapper">
+                            <canvas t-ref="operationalStatusChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="o_nhs_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title">
+                                <i class="fa fa-clock-o"/>Lease Expiry Analysis
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.estate.tenure', 'graph')" title="Open Native Graph"><i class="fa fa-bar-chart text-primary"/></button>
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.estate.tenure', 'pivot')" title="Open Native Pivot"><i class="fa fa-table text-primary"/></button>
+                                <span class="badge rounded-pill bg-light text-dark border">12 Months Expiries</span>
+                            </div>
+                        </div>
+                        <div class="o_nhs_chart_canvas_wrapper">
+                            <canvas t-ref="leaseExpiryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="o_nhs_ops_grid">
+                    <div class="o_nhs_ops_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title" style="color: #DA291C;">
+                                <i class="fa fa-exclamation-triangle text-danger"/>High-Risk Alerts
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-danger rounded-pill text-white" t-esc="state.metrics.high_risk_backlog_count"/>
+                                <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.8rem; border-color: #005EB8; color: #005EB8; font-weight: bold;" t-on-click="openHighRiskBacklogs">View All</button>
+                            </div>
+                        </div>
+                        <t t-if="state.metrics.high_risk_backlogs.length == 0">
+                            <div class="text-muted text-center py-4 my-auto">No high-risk backlog alerts.</div>
+                        </t>
+                        <t t-else="">
+                            <table class="o_nhs_list_table">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Building</th>
+                                        <th>Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.metrics.high_risk_backlogs.slice(0, 3)" t-as="item" t-key="item.id">
+                                        <tr t-on-click="() => this.openRecord('nhs.estate.backlog', item.id)">
+                                            <td class="fw-bold" t-esc="item.name"/>
+                                            <td t-esc="item.building_name"/>
+                                            <td class="text-danger fw-bold">£<t t-esc="Math.round(item.cost_estimate).toLocaleString()"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+                    </div>
+                    <div class="o_nhs_ops_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title" style="color: #CE7B11;">
+                                <i class="fa fa-clock-o text-warning"/>Upcoming Lease Expiries
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-warning text-dark rounded-pill" t-esc="state.metrics.upcoming_leases.length"/>
+                                <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.8rem; border-color: #005EB8; color: #005EB8; font-weight: bold;" t-on-click="openExpiringTenures">View All</button>
+                            </div>
+                        </div>
+                        <t t-if="state.metrics.upcoming_leases.length == 0">
+                            <div class="text-muted text-center py-4 my-auto">No upcoming lease expiries.</div>
+                        </t>
+                        <t t-else="">
+                            <table class="o_nhs_list_table">
+                                <thead>
+                                    <tr>
+                                        <th>Lease</th>
+                                        <th>Building</th>
+                                        <th>Days Left</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.metrics.upcoming_leases.slice(0, 3)" t-as="l" t-key="l.id">
+                                        <tr t-on-click="() => this.openRecord('nhs.estate.tenure', l.id)">
+                                            <td class="fw-bold" t-esc="l.name"/>
+                                            <td t-esc="l.building_name"/>
+                                            <td>
+                                                <span t-attf-class="badge-compact badge #{l.days_remaining &lt; 90 ? 'bg-danger text-white' : (l.days_remaining &lt; 180 ? 'bg-warning text-dark' : 'bg-success text-white')}">
+                                                    <t t-esc="l.days_remaining"/> days
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+                    </div>
+                    <div class="o_nhs_ops_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title" style="color: #DA291C;">
+                                <i class="fa fa-meh-o text-danger"/>Grade D Conditions
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-danger text-white rounded-pill" t-esc="state.metrics.poor_condition_buildings_count"/>
+                                <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.8rem; border-color: #005EB8; color: #005EB8; font-weight: bold;" t-on-click="openConditionDBuildings">View All</button>
+                            </div>
+                        </div>
+                        <t t-if="state.metrics.poor_condition_buildings_count == 0">
+                            <div class="text-muted text-center py-4 my-auto">No Grade D buildings.</div>
+                        </t>
+                        <t t-else="">
+                            <table class="o_nhs_list_table">
+                                <thead>
+                                    <tr>
+                                        <th>Building</th>
+                                        <th>Site</th>
+                                        <th>GIA</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="gradeD_count" t-value="0"/>
+                                    <t t-foreach="state.metrics.buildings" t-as="b" t-key="b.id">
+                                        <t t-if="b.latest_condition_grade == 'D' and gradeD_count &lt; 3">
+                                            <tr t-on-click="() => this.openRecord('nhs.estate.building', b.id)">
+                                                <td class="fw-bold" t-esc="b.name"/>
+                                                <td t-esc="b.site_name"/>
+                                                <td t-esc="b.gia"/> m²
+                                            </tr>
+                                            <t t-set="gradeD_count" t-value="gradeD_count + 1"/>
+                                        </t>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+                    </div>
+                    <div class="o_nhs_ops_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title">
+                                <i class="fa fa-file-text-o text-primary"/>Recent Surveys
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary rounded-pill text-white" t-esc="state.metrics.recent_surveys.length"/>
+                                <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.8rem; border-color: #005EB8; color: #005EB8; font-weight: bold;" t-on-click="openRecentSurveys">View All</button>
+                            </div>
+                        </div>
+                        <t t-if="state.metrics.recent_surveys.length == 0">
+                            <div class="text-muted text-center py-4 my-auto">No recent surveys.</div>
+                        </t>
+                        <t t-else="">
+                            <table class="o_nhs_list_table">
+                                <thead>
+                                    <tr>
+                                        <th>Survey</th>
+                                        <th>Building</th>
+                                        <th>Grade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.metrics.recent_surveys.slice(0, 3)" t-as="rs" t-key="rs.id">
+                                        <tr t-on-click="() => this.openRecord('nhs.estate.condition', rs.id)">
+                                            <td class="fw-bold" t-esc="rs.name"/>
+                                            <td t-esc="rs.building_name"/>
+                                            <td>
+                                                <span t-attf-class="badge-compact status-grade-#{rs.overall_grade}" t-esc="rs.overall_grade"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+                    </div>
+                    <div class="o_nhs_ops_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title">
+                                <i class="fa fa-wrench text-primary"/>Recent Backlog Items
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary rounded-pill text-white" t-esc="state.metrics.total_backlog_count"/>
+                                <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.8rem; border-color: #005EB8; color: #005EB8; font-weight: bold;" t-on-click="openRecentBacklogs">View All</button>
+                            </div>
+                        </div>
+                        <t t-if="state.metrics.total_backlog_count == 0">
+                            <div class="text-muted text-center py-4 my-auto">No recent backlog items.</div>
+                        </t>
+                        <t t-else="">
+                            <table class="o_nhs_list_table">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Building</th>
+                                        <th>Risk</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.metrics.recent_backlogs.slice(0, 3)" t-as="rb" t-key="rb.id">
+                                        <tr t-on-click="() => this.openRecord('nhs.estate.backlog', rb.id)">
+                                            <td class="fw-bold" t-esc="rb.name"/>
+                                            <td t-esc="rb.building_name"/>
+                                            <td>
+                                                <span t-attf-class="badge-compact badge #{rb.risk_category == 'high' ? 'badge-high-risk' : (rb.risk_category == 'significant' ? 'badge-sig-risk' : (rb.risk_category == 'moderate' ? 'badge-mod-risk' : 'badge-low-risk'))}">
+                                                    <t t-esc="rb.risk_category"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

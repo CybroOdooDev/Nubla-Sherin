@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Estate Root Menu -->
+    <menuitem id="menu_nhs_estate_root"
+              name="Estate Register"
+              sequence="10"
+              web_icon="odoo_nhs_estate/static/description/icon.png"/>
+
+    <!-- Estate Dashboard Menu -->
+    <menuitem id="menu_estate_dashboard"
+              name="Dashboard"
+              parent="menu_nhs_estate_root"
+              action="action_estate_dashboard"
+              sequence="5"/>
+
+    <!-- Main Estate Menu -->
+    <menuitem id="menu_nhs_estate_main"
+              name="Estate"
+              parent="menu_nhs_estate_root"
+              sequence="10"/>
+    <menuitem id="menu_nhs_estate_site"
+              name="Sites"
+              parent="menu_nhs_estate_main"
+              action="action_nhs_estate_site"
+              sequence="10"/>
+    <menuitem id="menu_nhs_estate_building"
+              name="Buildings"
+              parent="menu_nhs_estate_main"
+              action="action_nhs_estate_building"
+              sequence="20"/>
+    <menuitem id="menu_nhs_estate_floor"
+              name="Floors"
+              parent="menu_nhs_estate_main"
+              action="action_nhs_estate_floor"
+              sequence="30"/>
+    <menuitem id="menu_nhs_estate_space"
+              name="Spaces"
+              parent="menu_nhs_estate_main"
+              action="action_nhs_estate_space"
+              sequence="40"/>
+
+    <!-- Condition Menu -->
+    <menuitem id="menu_nhs_estate_condition"
+              name="Condition"
+              parent="menu_nhs_estate_root"
+              sequence="20"/>
+    <menuitem id="menu_nhs_estate_condition_survey"
+              name="Condition Surveys"
+              parent="menu_nhs_estate_condition"
+              action="action_nhs_estate_condition"
+              sequence="10"/>
+    <menuitem id="menu_nhs_estate_backlog"
+              name="Backlog Maintenance"
+              parent="menu_nhs_estate_condition"
+              action="action_nhs_estate_backlog"
+              sequence="20"/>
+
+    <!-- Tenure Menu -->
+    <menuitem id="menu_nhs_estate_tenure"
+              name="Tenure &amp; Leases"
+              parent="menu_nhs_estate_root"
+              sequence="30"/>
+    <menuitem id="menu_nhs_estate_tenure_record"
+              name="Tenure Records"
+              parent="menu_nhs_estate_tenure"
+              action="action_nhs_estate_tenure"
+              sequence="10"/>
+
+    <!-- Reporting Menu -->
+    <menuitem id="menu_nhs_estate_reporting"
+              name="Reporting"
+              parent="menu_nhs_estate_root"
+              sequence="40"/>
+    <menuitem id="menu_nhs_estate_summary"
+              name="Estate Summary"
+              parent="menu_nhs_estate_reporting"
+              action="action_nhs_estate_summary"
+              sequence="10"/>
+    <menuitem id="menu_nhs_estate_condition_profile"
+              name="Condition Profile"
+              parent="menu_nhs_estate_reporting"
+              action="action_nhs_estate_condition_profile"
+              sequence="20"/>
+    <menuitem id="menu_nhs_estate_backlog_tenure"
+              name="Backlog by Risk"
+              parent="menu_nhs_estate_reporting"
+              action="action_nhs_estate_backlog_tenure"
+              sequence="30"/>
+    <menuitem id="menu_nhs_estate_lease_expiries"
+              name="Lease Expiries"
+              parent="menu_nhs_estate_reporting"
+              action="action_nhs_estate_lease_expiries"
+              sequence="40"/>
+    <menuitem id="menu_nhs_estate_register_report"
+              name="Estate Register Report"
+              parent="menu_nhs_estate_reporting"
+              action="action_report_estate_register"
+              sequence="50"/>
+
+    <!-- Configuration Menu (Manager Only) -->
+    <menuitem id="menu_nhs_estate_config"
+              name="Configuration"
+              parent="menu_nhs_estate_root"
+              sequence="50"
+              groups="group_nhs_estate_manager"/>
+    <menuitem id="menu_nhs_estate_function"
+              name="Functions"
+              parent="menu_nhs_estate_config"
+              action="action_nhs_estate_function"
+              sequence="10"/>
+    <menuitem id="menu_nhs_estate_settings"
+              name="Settings"
+              parent="menu_nhs_estate_config"
+              action="action_nhs_estate_settings"
+              sequence="50"/>
+</odoo>

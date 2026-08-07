@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Estate Summary - Pivot View -->
+    <record id="view_nhs_estate_summary_pivot" model="ir.ui.view">
+        <field name="name">nhs.estate.summary.pivot</field>
+        <field name="model">nhs.estate.site</field>
+        <field name="arch" type="xml">
+            <pivot string="Estate Summary Dashboard">
+                <field name="name" type="row"/>
+                <field name="site_type" type="row"/>
+                <field name="operational_status" type="col"/>
+                <field name="total_gia" type="measure" operator="sum"/>
+                <field name="total_backlog" type="measure" operator="sum"/>
+                <field name="building_count" type="measure" operator="sum"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Estate Summary - Bar Chart -->
+    <record id="view_nhs_estate_summary_bar" model="ir.ui.view">
+        <field name="name">nhs.estate.summary.bar</field>
+        <field name="model">nhs.estate.site</field>
+        <field name="arch" type="xml">
+            <graph string="Estate Summary" type="bar">
+                <field name="site_type" type="row"/>
+                <field name="total_gia" type="measure" operator="sum"/>
+                <field name="total_backlog" type="measure" operator="sum"/>
+                <field name="building_count" type="measure" operator="sum"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action for Estate Summary Dashboard -->
+    <record id="action_nhs_estate_summary" model="ir.actions.act_window">
+        <field name="name">Estate Summary Dashboard</field>
+        <field name="res_model">nhs.estate.site</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="help" type="html">
+            <p><strong>Estate Summary Dashboard</strong></p>
+        </field>
+    </record>
+
+    <!-- Condition Profile - By Site -->
+    <record id="view_nhs_estate_condition_graph" model="ir.ui.view">
+        <field name="name">nhs.estate.condition.graph</field>
+        <field name="model">nhs.estate.condition</field>
+        <field name="arch" type="xml">
+            <graph string="Condition Surveys Analysis">
+                <field name="overall_grade" type="col"/>
+                <field name="building_id" type="row"/>
+                <field name="survey_date" type="row"/>
+                <field name="facet_physical" type="col"/>
+                <field name="facet_statutory" type="col"/>
+                <field name="facet_functional" type="col"/>
+                <field name="facet_utilisation" type="col"/>
+                <field name="facet_quality" type="col"/>
+                <field name="facet_energy" type="col"/>
+            </graph>
+        </field>
+    </record>
+
+         <!-- Condition Profile Action -->
+    <record id="action_nhs_estate_condition_profile" model="ir.actions.act_window">
+        <field name="name">Condition Surveys</field>
+        <field name="res_model">nhs.estate.condition</field>
+        <field name="view_mode">graph</field>
+        <field name="help" type="html">
+            <p><strong>Condition Profile</strong></p>
+            <p>Shows the distribution of buildings by their latest condition grade.</p>
+            <p>Percentage of estate at A/B/C/D grades.</p>
+        </field>
+    </record>
+
+    <!-- Backlog by Risk - Pie -->
+    <record id="view_nhs_estate_backlog_risk_pie" model="ir.ui.view">
+        <field name="name">nhs.estate.backlog.risk.pie</field>
+        <field name="model">nhs.estate.backlog</field>
+        <field name="arch" type="xml">
+            <graph string="Backlog by Risk" type="pie">
+                <field name="risk_category" type="row"/>
+                <field name="cost_estimate" type="measure" operator="sum"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Backlog by Risk - Bar -->
+    <record id="view_nhs_estate_backlog_risk_bar" model="ir.ui.view">
+        <field name="name">nhs.estate.backlog.risk.bar</field>
+        <field name="model">nhs.estate.backlog</field>
+        <field name="arch" type="xml">
+            <graph string="Backlog by Risk" type="bar" stacked="True">
+                <field name="risk_category" type="row"/>
+                <field name="element" type="col"/>
+                <field name="cost_estimate" type="measure" operator="sum"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action for Backlog  Analysis -->
+    <record id="action_nhs_estate_backlog_tenure" model="ir.actions.act_window">
+        <field name="name">Backlog Analysis</field>
+        <field name="res_model">nhs.estate.backlog</field>
+        <field name="view_mode">graph</field>
+        <field name="help" type="html">
+            <p><strong>Backlog Analysis</strong></p>
+        </field>
+    </record>
+
+    <!-- Lease Expiries - Tree View -->
+    <record id="view_nhs_estate_lease_expiries_tree" model="ir.ui.view">
+        <field name="name">nhs.estate.lease.expiries.tree</field>
+        <field name="model">nhs.estate.tenure</field>
+        <field name="arch" type="xml">
+            <list string="Lease/Contract Expiries (Next 12 Months)"
+                  decoration-danger="expiring_soon == True">
+                <field name="name"/>
+                <field name="building_id"/>
+                <field name="tenure_type" widget="badge"/>
+                <field name="landlord"/>
+                <field name="lease_end"/>
+                <field name="break_date"/>
+                <field name="contract_end"/>
+                <field name="rent_amount"/>
+                <field name="expiring_soon" widget="boolean"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Lease Expiries - Search View  -->
+    <record id="view_nhs_estate_lease_expiries_search" model="ir.ui.view">
+        <field name="name">nhs.estate.lease.expiries.search</field>
+        <field name="model">nhs.estate.tenure</field>
+        <field name="arch" type="xml">
+            <search string="Search Lease Expiries">
+                <field name="name"/>
+                <field name="building_id"/>
+                <field name="landlord"/>
+                <field name="tenure_type"/>
+                <field name="lease_end"/>
+                <filter name="expiring_soon" string="Expiring Soon" domain="[('expiring_soon', '=', True)]"/>
+                <filter name="leasehold" string="Leasehold" domain="[('tenure_type', '=', 'leasehold')]"/>
+                <filter name="pfi_lift" string="PFI/LIFT" domain="[('tenure_type', 'in', ['pfi','lift'])]"/>
+                <filter name="group_by_tenure" string="Tenure Type" context="{'group_by': 'tenure_type'}"/>
+                <filter name="group_by_building" string="Building" context="{'group_by': 'building_id'}"/>
+                <filter name="group_by_landlord" string="Landlord" context="{'group_by': 'landlord'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action for Lease Expiries & Reports -->
+    <record id="action_nhs_estate_lease_expiries" model="ir.actions.act_window">
+        <field name="name">Lease Expiries &amp; Reports</field>
+        <field name="res_model">nhs.estate.tenure</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_nhs_estate_lease_expiries_tree"/>
+        <field name="search_view_id" ref="view_nhs_estate_lease_expiries_search"/>
+        <field name="domain">[('expiring_soon', '=', True)]</field>
+        <field name="context">{'create': False}</field>
+        <field name="help" type="html">
+            <p><strong>Lease Expiries &amp; Reports</strong></p>
+        </field>
+    </record>
+
+</odoo>

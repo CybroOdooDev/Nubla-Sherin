@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report action generating the Board Assurance Framework PDF -->
+    <record id="action_report_baf" model="ir.actions.report">
+        <field name="name">BAF Report</field>
+        <field name="model">res.company</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_governance.report_baf</field>
+        <field name="print_report_name">'Board Assurance Framework - ' + object.name</field>
+    </record>
+
+    <!-- QWeb template rendering objectives, risks and assurances for the BAF report -->
+    <template id="report_baf">
+        <t t-call="web.html_container">
+            <t t-set="companies" t-value="docs or env.company"/>
+            <t t-foreach="companies" t-as="company">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: Arial, sans-serif; color: #000000; font-size: 11px;">
+                        
+                        <style>
+                            .table-bordered td:empty::after {
+                                content: "\00a0";
+                            }
+                            .table-bordered th, .table-bordered td {
+                                border: 1px solid #dee2e6 !important;
+                            }
+                        </style>
+                        <div class="text-center mb-4">
+                            <h2 style="font-weight: bold;">Board Assurance Framework</h2>
+                            <h4 style="color: #555555; font-weight: normal;" t-out="company.name"/>
+                            <hr style="border-top: 1px solid #000000;"/>
+                        </div>
+                        <t t-set="objectives" t-value="company.env['nhs.baf.objective'].search([('company_id', '=', company.id)])"/>
+                        <t t-foreach="objectives" t-as="objective">
+                            <h4 style="font-weight: bold; margin-top: 20px; font-size: 14px;" t-out="(objective.code or '') + ' ' + objective.name"/>
+                            <div style="padding-right: 1px; padding-left: 1px;"><table class="table table-sm table-bordered" style="table-layout: fixed; width: 99.9%; word-wrap: break-word; vertical-align: top;">
+                                <thead>
+                                    <tr style="background-color: #f5f5f5;">
+                                        <th style="width: 12%;">Ref</th>
+                                        <th style="width: 25%;">Principal Risk</th>
+                                        <th style="width: 14%;">Committee</th>
+                                        <th style="width: 4%; text-align: center;">C</th>
+                                        <th style="width: 4%; text-align: center;">L</th>
+                                        <th style="width: 5%; text-align: center;">Score</th>
+                                        <th style="width: 6%;">Band</th>
+                                        <th style="width: 5%; text-align: center;">Target</th>
+                                        <th style="width: 13%;">Assurance Rating</th>
+                                        <th style="width: 12%; white-space: nowrap;">Last Reviewed</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="objective.risk_ids" t-as="risk" style="vertical-align: top;">
+                                        <td>
+                                            <t t-out="risk.reference"/>
+                                            <t t-if="not risk.reference">&#160;</t>
+                                        </td>
+                                        <td>
+                                            <t t-out="risk.name"/>
+                                            <t t-if="not risk.name">&#160;</t>
+                                        </td>
+                                        <td>
+                                            <t t-out="risk.owning_committee_id.name"/>
+                                            <t t-if="not risk.owning_committee_id.name">&#160;</t>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <t t-out="risk.consequence"/>
+                                            <t t-if="risk.consequence == False">&#160;</t>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <t t-out="risk.likelihood"/>
+                                            <t t-if="risk.likelihood == False">&#160;</t>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <t t-out="risk.current_score"/>
+                                            <t t-if="risk.current_score == False">&#160;</t>
+                                        </td>
+                                        <td>
+                                            <t t-out="risk.current_band"/>
+                                            <t t-if="not risk.current_band">&#160;</t>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <t t-out="risk.target_score"/>
+                                            <t t-if="risk.target_score == False">&#160;</t>
+                                        </td>
+                                        <td>
+                                            <t t-out="risk.assurance_rating"/>
+                                            <t t-if="not risk.assurance_rating">&#160;</t>
+                                        </td>
+                                        <td style="white-space: nowrap;">
+                                            <t t-out="risk.last_reviewed"/>
+                                            <t t-if="not risk.last_reviewed">&#160;</t>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table></div>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Backlog List View -->
+    <record id="view_nhs_estate_backlog_list" model="ir.ui.view">
+        <field name="name">nhs.estate.backlog.list</field>
+        <field name="model">nhs.estate.backlog</field>
+        <field name="arch" type="xml">
+            <list string="Backlog Items" decoration-danger="risk_category=='high'"
+                  decoration-warning="risk_category=='significant'"
+                  decoration-success="risk_category=='low'">
+                <field name="name"/>
+                <field name="building_id"/>
+                <field name="space_id" optional="hide"/>
+                <field name="risk_category"/>
+                <field name="cost_estimate"/>
+                <field name="element"/>
+                <field name="status"/>
+                <field name="target_year"/>
+                <field name="works_ref"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Backlog Form View -->
+    <record id="view_nhs_estate_backlog_form" model="ir.ui.view">
+        <field name="name">nhs.estate.backlog.form</field>
+        <field name="model">nhs.estate.backlog</field>
+        <field name="arch" type="xml">
+            <form string="Backlog Item">
+                <header>
+                    <button name="action_mark_planned" string="Plan" type="object" class="oe_highlight"
+                            invisible="status in ['planned','in_progress','resolved']"/>
+                    <button name="action_mark_start" string="Start" type="object" class="oe_highlight"
+                            invisible="status in ['identified','in_progress','resolved']"/>
+                    <button name="action_mark_resolved" string="Done" type="object" class="oe_highlight"
+                            invisible="status in ['identified','planned','resolved']"/>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="identified,planned,in_progress,resolved"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_documents" type="object"
+                                class="oe_stat_button" icon="fa-file">
+                            <span class="o_stat_text">Documents</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Description..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="building_id" placeholder="Building..."/>
+                        <field name="space_id" placeholder="Space..."/>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="risk_category"/>
+                            <field name="element"/>
+                            <field name="cost_estimate"/>
+                        </group>
+                        <group>
+                            <field name="target_year" readonly="status in ['planned','in_progress','resolved']"/>
+                            <field name="works_ref"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Backlog Search View -->
+    <record id="view_nhs_estate_backlog_search" model="ir.ui.view">
+        <field name="name">nhs.estate.backlog.search</field>
+        <field name="model">nhs.estate.backlog</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="building_id"/>
+                <field name="risk_category"/>
+                <field name="status"/>
+
+                <filter name="group_by_risk_category"
+                        string="Risk Category"
+                        context="{'group_by': 'risk_category'}"/>
+                <filter name="group_by_building"
+                        string="Building"
+                        context="{'group_by': 'building_id'}"/>
+                <filter name="group_by_element"
+                        string="Element"
+                        context="{'group_by': 'element'}"/>
+
+                <filter name="not_resolved"
+                        string="Not Resolved"
+                        domain="[('status', '!=', 'resolved')]"/>
+                <filter name="high_risk"
+                        string="High Risk"
+                        domain="[('risk_category', '=', 'high')]"/>
+
+                <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Backlog Graph View -->
+    <record id="view_nhs_estate_backlog_graph" model="ir.ui.view">
+        <field name="name">nhs.estate.backlog.graph</field>
+        <field name="model">nhs.estate.backlog</field>
+        <field name="arch" type="xml">
+            <graph string="Backlog by Risk" type="bar">
+                <field name="risk_category" type="row"/>
+                <field name="cost_estimate" type="measure" operator="sum"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Backlog Pivot View -->
+    <record id="view_nhs_estate_backlog_pivot" model="ir.ui.view">
+        <field name="name">nhs.estate.backlog.pivot</field>
+        <field name="model">nhs.estate.backlog</field>
+        <field name="arch" type="xml">
+            <pivot string="Backlog Analysis">
+                <field name="building_id" type="row"/>
+                <field name="risk_category" type="col"/>
+                <field name="element" type="col"/>
+                <field name="cost_estimate" type="measure" operator="sum"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Backlog Action -->
+    <record id="action_nhs_estate_backlog" model="ir.actions.act_window">
+        <field name="name">Backlog Maintenance</field>
+        <field name="res_model">nhs.estate.backlog</field>
+        <field name="view_mode">list,form,pivot,graph</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first backlog item
+            </p>
+            <p>
+                Record maintenance backlog items against buildings and spaces.
+                Track costs, risks, and rectification status.
+            </p>
+        </field>
+    </record>
+</odoo>

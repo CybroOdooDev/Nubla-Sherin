@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report action for the complaint acknowledgement letter PDF -->
+    <record id="action_report_nhs_complaint_ack" model="ir.actions.report">
+        <field name="name">NHS Complaint Acknowledgement Letter</field>
+        <field name="model">nhs.complaint</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_complaints.report_nhs_complaint_ack</field>
+        <field name="report_file">odoo_nhs_complaints.report_nhs_complaint_ack</field>
+        <field name="print_report_name">'Acknowledgement_' + object.name</field>
+    </record>
+
+    <!-- QWeb template rendering the acknowledgement letter body, including the reference, statutory deadline and PHSO referral note -->
+    <template id="report_nhs_complaint_ack">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Acknowledgement of Complaint</h2>
+                        <p>Date: <span t-out="context_timestamp(datetime.datetime.now()).strftime('%d %B %Y')"/></p>
+                        <p>Reference: <strong><span t-out="o.name"/></strong></p>
+                        <br/>
+                        <p>Dear <span t-out="o.complainant_id.name or 'Complainant'"/>,</p>
+                        <p>Thank you for contacting us. We write to acknowledge receipt of your complaint, reference <strong><span t-out="o.name"/></strong>, received on <span t-out="o.received_at.strftime('%d %B %Y') if o.received_at else ''"/>.</p>
+                        <p>We take all complaints seriously. We will investigate the matters you have raised and aim to provide you with a full written response within the agreed timescale.</p>
+                        <t t-if="o.ack_deadline">
+                            <p>Our statutory acknowledgement deadline was: <strong><span t-out="o.ack_deadline.strftime('%d %B %Y')"/></strong>.</p>
+                        </t>
+                        <p>If you have any questions in the meantime, please do not hesitate to contact our Complaints Team.</p>
+                        <br/>
+                        <p>Yours sincerely,</p>
+                        <br/><br/>
+                        <p><strong>Complaints Manager</strong><br/>
+                        <span t-out="o.company_id.name"/></p>
+                        <br/>
+                        <p class="text-muted" style="font-size:10px;">
+                            If you remain dissatisfied with our response, you may refer your complaint to the Parliamentary and Health Service Ombudsman (PHSO) at www.ombudsman.org.uk.
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- REPLACEMENT FORECAST REPORT ACTION -->
+    <record id="action_report_nhs_replacement_forecast" model="ir.actions.report">
+        <field name="name">Replacement Forecast Report</field>
+        <field name="model">nhs.device</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_estate_assets.nhs_replacement_forecast</field>
+        <field name="report_file">odoo_nhs_estate_assets.nhs_replacement_forecast</field>
+        <field name="print_report_name">'Replacement Forecast Report - %s' % (time.strftime('%Y-%m-%d'))</field>
+        <field name="binding_model_id" ref="model_nhs_device"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- REPLACEMENT FORECAST REPORT TEMPLATE -->
+    <template id="nhs_replacement_forecast">
+        <t t-call="web.html_container">
+            <t t-set="all_devices" t-value="docs if len(docs) > 0 else env['nhs.device'].search([('replacement_year', '&gt;', 0)])"/>
+            <t t-foreach="[all_devices]" t-as="doc_set">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: Arial, sans-serif; font-size: 13px; color: #212529; padding: 10px;">
+                        <div style="border-bottom: 2.5px solid #003087; padding-bottom: 6px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h2 style="color: #003087; font-size: 24px; margin: 0; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Replacement Forecast Report</h2>
+                                <span style="color: #555; font-size: 13px; font-weight: 500;">Capital Budgeting &amp; Asset Replacement Planning</span>
+                            </div>
+                            <div style="text-align: right;">
+                                <span style="background: #003087; color: #ffffff; padding: 4px 12px; border-radius: 4px; font-weight: bold; font-size: 13px; display: inline-block;">
+                                    Date: <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/>
+                                </span>
+                            </div>
+                        </div>
+                        <t t-set="devices" t-value="doc_set.filtered(lambda d: d.replacement_year) if doc_set.filtered(lambda d: d.replacement_year) else doc_set"/>
+                        <t t-set="total_count" t-value="len(devices)"/>
+                        <t t-set="total_purchase_cost" t-value="sum(devices.mapped('acquisition_cost'))"/>
+                        <t t-set="total_replacement_cost" t-value="sum(d.estimated_replacement_cost or d.acquisition_cost or 0.0 for d in devices)"/>
+                        <t t-set="eol_count" t-value="len(devices.filtered(lambda d: d.is_end_of_life))"/>
+                        <div style="margin-bottom: 16px;">
+                            <h4 style="color: #003087; margin: 0 0 8px 0; font-size: 16px; text-transform: uppercase; font-weight: bold; border-left: 3px solid #003087; padding-left: 6px;">Executive Summary</h4>
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="width: 25%; padding: 3px;">
+                                        <div style="background: #f8f9fa; border: 1px solid #003087; border-radius: 4px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 20px; font-weight: bold; color: #003087;"><t t-esc="total_count"/></div>
+                                            <div style="font-size: 12px; color: #555; font-weight: bold; text-transform: uppercase; margin-top: 2px;">Total Devices Due</div>
+                                        </div>
+                                    </td>
+                                    <td style="width: 25%; padding: 3px;">
+                                        <div style="background: #f8f9fa; border: 1px solid #dc3545; border-radius: 4px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 20px; font-weight: bold; color: #dc3545;"><t t-esc="eol_count"/></div>
+                                            <div style="font-size: 12px; color: #555; font-weight: bold; text-transform: uppercase; margin-top: 2px;">End of Life Devices</div>
+                                        </div>
+                                    </td>
+                                    <td style="width: 25%; padding: 3px;">
+                                        <div style="background: #f8f9fa; border: 1px solid #003087; border-radius: 4px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 20px; font-weight: bold; color: #003087;">£<t t-esc="'{:,.2f}'.format(total_purchase_cost)"/></div>
+                                            <div style="font-size: 12px; color: #555; font-weight: bold; text-transform: uppercase; margin-top: 2px;">Total Purchase Cost</div>
+                                        </div>
+                                    </td>
+                                    <td style="width: 25%; padding: 3px;">
+                                        <div style="background: #003087; color: white; border-radius: 4px; padding: 8px; text-align: center;">
+                                            <div style="font-size: 20px; font-weight: bold; color: #ffffff;">£<t t-esc="'{:,.2f}'.format(total_replacement_cost)"/></div>
+                                            <div style="font-size: 12px; color: #ffffff; font-weight: bold; text-transform: uppercase; margin-top: 2px;">Est. Replacement Cost</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <t t-set="all_years" t-value="sorted(list(set(d.replacement_year or 0 for d in devices)))"/>
+                        <div style="margin-bottom: 18px;">
+                            <h4 style="color: #003087; margin: 0 0 8px 0; font-size: 16px; text-transform: uppercase; font-weight: bold; border-left: 3px solid #003087; padding-left: 6px;">Breakdown by Replacement Year</h4>
+                            <table class="table table-sm table-bordered" style="width: 100%; font-size: 12px; border: 1px solid #dee2e6; margin-bottom: 0; border-collapse: collapse;">
+                                <thead style="background: #003087;">
+                                    <tr>
+                                        <th style="padding: 5px 8px; text-align: left; color: #ffffff; font-size: 12px;">Replacement Year</th>
+                                        <th style="padding: 5px 8px; text-align: center; color: #ffffff; font-size: 12px;">Device Count</th>
+                                        <th style="padding: 5px 8px; text-align: right; color: #ffffff; font-size: 12px;">Total Purchase Cost</th>
+                                        <th style="padding: 5px 8px; text-align: right; color: #ffffff; font-size: 12px;">Total Est. Replacement Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="all_years" t-as="yr">
+                                        <t t-set="yr_devices" t-value="devices.filtered(lambda d: (d.replacement_year or 0) == yr)"/>
+                                        <t t-set="yr_purchase" t-value="sum(d.acquisition_cost for d in yr_devices)"/>
+                                        <t t-set="yr_replacement" t-value="sum(d.estimated_replacement_cost or d.acquisition_cost or 0.0 for d in yr_devices)"/>
+                                        <tr>
+                                            <td style="padding: 4px 8px; font-weight: bold; font-size: 12px;">
+                                                <t t-if="yr != 0">Year <t t-esc="yr"/></t>
+                                                <t t-else="">Unspecified Year</t>
+                                            </td>
+                                            <td style="padding: 4px 8px; text-align: center; font-size: 12px;"><t t-esc="len(yr_devices)"/></td>
+                                            <td style="padding: 4px 8px; text-align: right; font-size: 12px;">£<t t-esc="'{:,.2f}'.format(yr_purchase)"/></td>
+                                            <td style="padding: 4px 8px; text-align: right; font-weight: bold; color: #003087; font-size: 12px;">£<t t-esc="'{:,.2f}'.format(yr_replacement)"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                                <tfoot style="background-color: #f8f9fa; font-weight: bold;">
+                                    <tr>
+                                        <td style="padding: 5px 8px; font-size: 12px;">Total</td>
+                                        <td style="padding: 5px 8px; text-align: center; font-size: 12px;"><t t-esc="total_count"/></td>
+                                        <td style="padding: 5px 8px; text-align: right; font-size: 12px;">£<t t-esc="'{:,.2f}'.format(total_purchase_cost)"/></td>
+                                        <td style="padding: 5px 8px; text-align: right; color: #003087; font-size: 12px;">£<t t-esc="'{:,.2f}'.format(total_replacement_cost)"/></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div>
+                            <h4 style="color: #003087; margin: 0 0 8px 0; font-size: 16px; text-transform: uppercase; font-weight: bold; border-left: 3px solid #003087; padding-left: 6px;">Detailed Replacement Schedule</h4>
+                            <t t-foreach="all_years" t-as="yr">
+                                <t t-set="yr_devices" t-value="devices.filtered(lambda d: (d.replacement_year or 0) == yr)"/>
+                                <t t-set="yr_total_budget" t-value="sum(d.estimated_replacement_cost or d.acquisition_cost or 0.0 for d in yr_devices)"/>
+                                <div style="margin-bottom: 14px; page-break-inside: avoid;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #003087; padding-bottom: 3px; margin-top: 10px; margin-bottom: 6px;">
+                                        <h5 style="color: #003087; font-size: 14px; margin: 0; font-weight: bold;">
+                                            <t t-if="yr != 0">Replacement Year: <t t-esc="yr"/></t>
+                                            <t t-else="">Unspecified Replacement Year</t>
+                                        </h5>
+                                        <span style="font-size: 12px; font-weight: normal; color: #555;">
+                                            <t t-esc="len(yr_devices)"/> devices | Total Budget: £<t t-esc="'{:,.2f}'.format(yr_total_budget)"/>
+                                        </span>
+                                    </div>
+                                    <table class="table table-sm table-striped table-bordered" style="width: 100%; font-size: 11px; margin-bottom: 0; border-collapse: collapse;">
+                                        <thead style="background-color: #f1f3f5; color: #212529;">
+                                            <tr>
+                                                <th style="padding: 4px 5px; font-size: 11px; text-align: left;">Device Name</th>
+                                                <th style="padding: 4px 5px; font-size: 11px; text-align: left;">Category</th>
+                                                <th style="padding: 4px 5px; font-size: 11px; text-align: left;">Class</th>
+                                                <th style="padding: 4px 5px; font-size: 11px; text-align: left;">Manufacturer</th>
+                                                <th style="padding: 4px 5px; font-size: 11px; text-align: left;">Department</th>
+                                                <th style="padding: 4px 5px; font-size: 11px; text-align: left;">Site</th>
+                                                <th style="padding: 4px 5px; font-size: 11px; text-align: left;">Acq. Date</th>
+                                                <th style="padding: 4px 5px; font-size: 11px; text-align: left;">Exp. Replacement</th>
+                                                <th style="padding: 4px 5px; font-size: 11px; text-align: center;">Year</th>
+                                                <th style="padding: 4px 5px; font-size: 11px; text-align: right;">Purchase Cost</th>
+                                                <th style="padding: 4px 5px; font-size: 11px; text-align: center;">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr t-foreach="yr_devices" t-as="device">
+                                                <td style="padding: 4px 5px; font-weight: bold; font-size: 11px; text-align: left;"><t t-esc="device.display_name or ''"/></td>
+                                                <td style="padding: 4px 5px; font-size: 11px; text-align: left;"><t t-esc="device.category_id.display_name or ''"/></td>
+                                                <td style="padding: 4px 5px; font-size: 11px; text-align: left;">
+                                                    <t t-if="device.device_class">
+                                                        <t t-esc="dict(device._fields.get('device_class', {}).selection or []).get(device.device_class, device.device_class)"/>
+                                                    </t>
+                                                    <t t-else="">-</t>
+                                                </td>
+                                                <td style="padding: 4px 5px; font-size: 11px; text-align: left;"><t t-esc="device.manufacturer or 'N/A'"/></td>
+                                                <td style="padding: 4px 5px; font-size: 11px; text-align: left;"><t t-esc="device.department or 'N/A'"/></td>
+                                                <td style="padding: 4px 5px; font-size: 11px; text-align: left;"><t t-esc="device.site_id.display_name or 'N/A'"/></td>
+                                                <td style="padding: 4px 5px; font-size: 11px; text-align: left;"><t t-esc="device.acquisition_date.strftime('%d/%m/%Y') if device.acquisition_date else 'N/A'"/></td>
+                                                <td style="padding: 4px 5px; font-weight: bold; font-size: 11px; text-align: left;"><t t-esc="device.expected_replacement_date.strftime('%d/%m/%Y') if device.expected_replacement_date else 'N/A'"/></td>
+                                                <td style="padding: 4px 5px; font-size: 11px; text-align: center; font-weight: bold;"><t t-esc="device.replacement_year or '-'"/></td>
+                                                <td style="padding: 4px 5px; font-size: 11px; text-align: right;">
+                                                    <t t-if="device.acquisition_cost">£<t t-esc="'{:,.2f}'.format(device.acquisition_cost)"/></t>
+                                                    <t t-else="">-</t>
+                                                </td>
+                                                <td style="padding: 4px 5px; font-size: 11px; text-align: center;">
+                                                    <t t-esc="dict(device._fields.get('status', {}).selection or []).get(device.status, device.status or '')"/>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

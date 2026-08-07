@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ALERT RESPONSE REPORT ACTION -->
+    <record id="action_report_nhs_alert_response" model="ir.actions.report">
+        <field name="name">Alert Response Report</field>
+        <field name="model">nhs.device.alert</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_estate_assets.nhs_alert_response</field>
+        <field name="report_file">odoo_nhs_estate_assets.nhs_alert_response</field>
+        <field name="print_report_name">'Alert Response - %s' % (object.reference)</field>
+        <field name="binding_model_id" ref="model_nhs_device_alert"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- ALERT RESPONSE REPORT TEMPLATE -->
+    <template id="nhs_alert_response">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="alert">
+                <t t-call="web.basic_layout">
+                    <div class="page" t-att-style="'page-break-after: always;' if not alert_last else ''">
+                        <t t-call="odoo_nhs_estate_assets.nhs_alert_response_body"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="nhs_alert_response_body">
+        <div style="font-family: Arial, sans-serif; font-size: 13.5px; color: #212529;">
+            <t t-set="company" t-value="alert.company_id or res_company or env.company"/>
+            <div style="border-bottom: 3px solid #dc3545; padding-bottom: 8px; margin-bottom: 15px;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 30%; vertical-align: middle; text-align: left;">
+                            <t t-if="company and company.logo">
+                                <img t-att-src="image_data_uri(company.logo)" style="max-height: 50px; max-width: 160px; object-fit: contain;" alt="Logo"/>
+                            </t>
+                            <t t-else="">
+                                <span style="font-weight: bold; font-size: 16px; color: #dc3545;"><t t-esc="company.name if company else 'NHS Trust'"/></span>
+                            </t>
+                        </td>
+                        <td style="width: 40%; vertical-align: middle; text-align: center;">
+                            <h1 style="color: #dc3545; font-size: 20px; margin: 0; font-weight: bold; text-transform: uppercase;">Safety Alert Response Report</h1>
+                            <p style="color: #666; margin: 3px 0 0 0; font-size: 12px;">MHRA / CAS Safety Alert Action Record</p>
+                        </td>
+                        <td style="width: 30%; vertical-align: middle; text-align: right;">
+                            <span style="background: #dc3545; color: white; padding: 5px 12px; border-radius: 3px; font-weight: bold; font-size: 14px; display: inline-block;">
+                                Ref: <t t-esc="alert.reference"/>
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 12px; margin-bottom: 15px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                    <tr>
+                        <td style="width: 50%; padding: 4px;">
+                            <strong>Alert Title:</strong> <t t-esc="alert.name"/>
+                        </td>
+                        <td style="width: 50%; padding: 4px;">
+                            <strong>Reference:</strong> <t t-esc="alert.reference"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50%; padding: 4px;">
+                            <strong>Source:</strong>
+                            <t t-esc="dict(alert._fields['source'].selection).get(alert.source, alert.source)"/>
+                        </td>
+                        <td style="width: 50%; padding: 4px;">
+                            <strong>State:</strong>
+                            <span t-att-class="'badge badge-success' if alert.state == 'closed' else 'badge badge-warning' if alert.state == 'in_progress' else 'badge badge-danger'">
+                                <t t-esc="alert.state.upper()"/>
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50%; padding: 4px;">
+                            <strong>Issued Date:</strong> <t t-esc="alert.issued_date"/>
+                        </td>
+                        <td style="width: 50%; padding: 4px;">
+                            <strong>Action Deadline:</strong> <t t-esc="alert.action_deadline or 'Not Set'"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50%; padding: 4px;">
+                            <strong>Affected Make:</strong> <t t-esc="alert.affected_make or 'All'"/>
+                        </td>
+                        <td style="width: 50%; padding: 4px;">
+                            <strong>Affected Model:</strong> <t t-esc="alert.affected_model or 'All'"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50%; padding: 4px;">
+                            <strong>Affected Category:</strong> <t t-esc="alert.affected_category_id.display_name or 'All'"/>
+                        </td>
+                        <td style="width: 50%; padding: 4px;">
+                            <strong>Is Overdue:</strong> <t t-esc="alert.is_overdue and 'Yes' or 'No'"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50%; padding: 4px;">
+                            <strong>Affected Count:</strong> <t t-esc="alert.affected_count"/>
+                        </td>
+                        <td style="width: 50%; padding: 4px;">
+                            <strong>Actioned Count:</strong> <t t-esc="alert.actioned_count"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <h3 style="color: #dc3545; border-bottom: 2px solid #dc3545; padding-bottom: 4px; font-size: 16px; margin-bottom: 6px;">Alert Description</h3>
+                <p style="background: #fff; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px; font-size: 13px; margin: 0;">
+                    <t t-esc="alert.description or 'No description provided.'"/>
+                </p>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <h3 style="color: #dc3545; border-bottom: 2px solid #dc3545; padding-bottom: 4px; font-size: 16px; margin-bottom: 6px;">Required Action</h3>
+                <p style="background: #fff; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px; font-size: 13px; margin: 0;">
+                    <t t-esc="alert.required_action or 'No action specified.'"/>
+                </p>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <h3 style="color: #dc3545; border-bottom: 2px solid #dc3545; padding-bottom: 4px; font-size: 16px; margin-bottom: 6px;">Affected Devices &amp; Actions Taken</h3>
+                <t t-if="alert.line_ids">
+                    <table style="width: 100%; border-collapse: collapse; border: 1px solid #dee2e6; font-size: 12.5px;">
+                        <thead style="background: #f8f9fa;">
+                            <tr>
+                                <th style="border: 1px solid #dee2e6; padding: 6px; text-align: left;">Device</th>
+                                <th style="border: 1px solid #dee2e6; padding: 6px; text-align: left;">Asset Tag</th>
+                                <th style="border: 1px solid #dee2e6; padding: 6px; text-align: left;">Status</th>
+                                <th style="border: 1px solid #dee2e6; padding: 6px; text-align: left;">Action Required</th>
+                                <th style="border: 1px solid #dee2e6; padding: 6px; text-align: left;">Action Status</th>
+                                <th style="border: 1px solid #dee2e6; padding: 6px; text-align: left;">Actioned By</th>
+                                <th style="border: 1px solid #dee2e6; padding: 6px; text-align: left;">Actioned Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="alert.line_ids" t-as="line">
+                                <td style="border: 1px solid #dee2e6; padding: 6px;">
+                                    <t t-esc="line.device_id.display_name or ''"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 6px;">
+                                    <t t-esc="line.device_id.asset_tag or ''"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 6px;">
+                                    <t t-esc="dict(line.device_id._fields['status'].selection).get(line.device_id.status, line.device_id.status)"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 6px;">
+                                    <t t-esc="line.action_required or 'N/A'"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 6px;">
+                                    <span t-att-class="'badge badge-danger' if line.action_status == 'pending' else 'badge badge-warning' if line.action_status == 'quarantined' else 'badge badge-success' if line.action_status == 'actioned' else 'badge badge-secondary'">
+                                        <t t-esc="dict(line._fields['action_status'].selection).get(line.action_status, line.action_status)"/>
+                                    </span>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 6px;">
+                                    <t t-esc="line.actioned_by_id.name or ''"/>
+                                </td>
+                                <td style="border: 1px solid #dee2e6; padding: 6px;">
+                                    <t t-esc="line.actioned_date or 'N/A'"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+                <t t-else="">
+                    <p style="color: #6c757d; font-size: 13px;">No devices have been matched to this alert yet.</p>
+                </t>
+            </div>
+            <t t-if="alert.line_ids.filtered('note')">
+                <div style="margin-bottom: 15px;">
+                    <h3 style="color: #dc3545; border-bottom: 2px solid #dc3545; padding-bottom: 4px; font-size: 16px; margin-bottom: 6px;">Evidence &amp; Notes</h3>
+                    <t t-foreach="alert.line_ids.filtered('note')" t-as="line">
+                        <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px; margin-bottom: 8px; font-size: 13px;">
+                            <p style="margin: 0;">
+                                <strong><t t-esc="line.device_id.display_name or ''"/></strong>
+                                <span style="float: right; color: #666; font-size: 12px;">
+                                    <t t-esc="line.actioned_date or ''"/> by <t t-esc="line.actioned_by_id.name or ''"/>
+                                </span>
+                            </p>
+                            <p style="margin: 4px 0 0 0;"><t t-esc="line.note"/></p>
+                        </div>
+                    </t>
+                </div>
+            </t>
+            <div style="border-top: 1px solid #dee2e6; padding-top: 8px; margin-top: 15px; font-size: 11px; color: #6c757d; text-align: center;">
+                <p style="margin: 0 0 2px 0;">
+                    Generated on <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d')"/> |
+                    NHS Medical Devices &amp; Equipment Management |
+                    Alert Response Report
+                </p>
+                <p style="font-size: 10px; margin: 0;">
+                    This document provides an auditable record of actions taken in response to a safety alert.
+                    It should be retained for CQC and MHRA compliance purposes.
+                </p>
+            </div>
+        </div>
+    </template>
+</odoo>

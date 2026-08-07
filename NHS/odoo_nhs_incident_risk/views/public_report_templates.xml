@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Public-facing QWeb templates (no login required) for the token-based anonymous incident
+         reporting form and its post-submission thank-you page -->
+    <!-- Renders the public incident report form; the provider is identified by the token in the URL -->
+    <template id="public_report_form" name="Public Incident Report Form">
+        <t t-call="web.layout">
+            <t t-set="head">
+                <t t-call-assets="web.assets_frontend" t-js="false"/>
+                <t t-call-assets="web.assets_frontend" t-css="false"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <title>Report an Incident</title>
+            </t>
+            <div id="nhs_public_form_wrap" class="d-flex align-items-center justify-content-center py-5">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-md-10 col-lg-8">
+                            <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
+                                <div class="card-header bg-primary text-white p-4">
+                                    <h2 class="mb-1 fw-bold text-center">
+                                        <t t-out="provider_name"/> — Report an Incident
+                                    </h2>
+                                    <p class="mb-0 text-center opacity-75">
+                                        This form is for reporting safety incidents and near misses. It should take less than 5 minutes.
+                                    </p>
+                                </div>
+                                <div class="card-body p-4 p-md-5">
+                                    <form method="POST"
+                                          t-attf-action="/incident/report/#{token}/submit"
+                                          enctype="multipart/form-data"
+                                          id="nhs_public_report_form">
+                                        <input type="hidden" name="csrf_token"
+                                               t-att-value="request.csrf_token()"/>
+                                        <!-- Hidden field filled by the script below with the browser's UTC offset, so
+                                             occurred_at is interpreted in the reporter's local time, not server time -->
+                                        <input type="hidden" name="tz_offset" id="nhs_tz_offset"/>
+
+                                        <!-- What happened -->
+                                        <div class="mb-4">
+                                            <label class="form-label fw-semibold">
+                                                Type of Incident <span class="text-danger">*</span>
+                                            </label>
+                                            <select name="incident_kind" class="form-select form-select-lg" required="required">
+                                                <option value="incident">Patient Safety Incident</option>
+                                                <option value="risk_event">Near Miss / Hazard</option>
+                                                <option value="outcome">Harm Observed (no known incident)</option>
+                                                <option value="good_care">Good Care / Excellence</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label fw-semibold">
+                                                Date &amp; Time of Incident <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="datetime-local" name="occurred_at"
+                                                   class="form-control form-control-lg" required="required"/>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label fw-semibold">
+                                                Location <span class="text-danger">*</span>
+                                            </label>
+                                            <select name="location_id" class="form-select form-select-lg" required="required">
+                                                <option value="">— Select location —</option>
+                                                <t t-foreach="locations" t-as="loc">
+                                                    <option t-att-value="loc['id']"
+                                                            t-out="loc['complete_name']"/>
+                                                </t>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label fw-semibold">
+                                                Category <span class="text-danger">*</span>
+                                            </label>
+                                            <select name="category_id" class="form-select form-select-lg" required="required">
+                                                <option value="">— Select category —</option>
+                                                <t t-foreach="categories" t-as="cat">
+                                                    <option t-att-value="cat['id']"
+                                                            t-out="cat['complete_name']"/>
+                                                </t>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label fw-semibold">
+                                                What Happened <span class="text-danger">*</span>
+                                            </label>
+                                            <small class="form-text text-muted d-block mb-2">
+                                                Please describe the event. Do NOT include full names — use initials or role only.
+                                            </small>
+                                            <textarea name="description" class="form-control"
+                                                      rows="5" required="required"
+                                                      placeholder="Describe what happened…"/>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label fw-semibold">Immediate Action Taken</label>
+                                            <textarea name="immediate_action" class="form-control"
+                                                      rows="3" placeholder="What was done at the time…"/>
+                                        </div>
+
+                                        <!-- Persons affected -->
+                                        <div class="border rounded-3 p-4 mb-4" id="persons_section">
+                                            <h5 class="fw-bold mb-3">Person(s) Affected</h5>
+                                            <div id="person_list">
+                                                <div class="person-row row g-3 mb-3" data-index="0">
+                                                    <div class="col-md-4">
+                                                        <select name="person_type_0" class="form-select">
+                                                            <option value="patient">
+                                                                <t t-out="person_label"/>
+                                                            </option>
+                                                            <option value="staff">Staff</option>
+                                                            <option value="visitor">Visitor</option>
+                                                            <option value="other">Other</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <input type="text" name="person_name_0"
+                                                               class="form-control"
+                                                               placeholder="Name / initials (optional)"/>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <select name="person_harm_0" class="form-select">
+                                                            <option value="none">No apparent harm</option>
+                                                            <option value="low">Low harm</option>
+                                                            <option value="moderate">Moderate harm</option>
+                                                            <option value="severe">Severe harm</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm fw-semibold"
+                                                    id="add_person_btn">+ Add another person</button>
+                                        </div>
+
+                                        <!-- Anonymous toggle -->
+                                        <div class="mb-4" t-if="anonymous_allowed">
+                                            <div class="form-check">
+                                                <input type="checkbox" name="is_anonymous"
+                                                       class="form-check-input" id="anonymous_check"
+                                                       value="1"/>
+                                                <label class="form-check-label fw-semibold text-secondary" for="anonymous_check">
+                                                    Submit anonymously (your contact details will not be recorded)
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Reporter details -->
+                                        <div id="reporter_section" class="border rounded-3 p-4 mb-4">
+                                            <h5 class="fw-bold mb-3">Your Details (optional)</h5>
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <input type="text" name="reporter_name"
+                                                           class="form-control" placeholder="Your name"/>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <input type="email" name="reporter_email"
+                                                           class="form-control"
+                                                           placeholder="Email for acknowledgement"/>
+                                                </div>
+                                                <div class="col-12">
+                                                    <input type="text" name="reporter_role"
+                                                           class="form-control" placeholder="Your role"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Attachment -->
+                                        <div class="mb-4">
+                                            <label class="form-label fw-semibold">Attachment (optional)</label>
+                                            <input type="file" name="attachment"
+                                                   class="form-control" accept="image/*,.pdf"/>
+                                        </div>
+
+                                        <div class="d-grid mt-5">
+                                            <button type="submit" class="btn btn-primary btn-lg fw-bold py-3 shadow-sm">
+                                                Submit Incident Report
+                                            </button>
+                                        </div>
+                                    </form>
+                                    <!-- Populates tz_offset with the browser's timezone offset just before submit,
+                                         so the server can convert the submitted occurred_at to UTC correctly -->
+                                    <script type="text/javascript">
+                                        document.getElementById('nhs_public_report_form').addEventListener('submit', function () {
+                                            document.getElementById('nhs_tz_offset').value = new Date().getTimezoneOffset();
+                                        });
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Confirmation page shown after successful submission, displaying the generated incident reference -->
+    <template id="public_report_thank_you" name="Public Report — Thank You">
+        <t t-call="web.layout">
+            <t t-set="head">
+                <t t-call-assets="web.assets_frontend" t-js="false"/>
+                <t t-call-assets="web.assets_frontend" t-css="false"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <title>Report Submitted</title>
+            </t>
+            <div id="nhs_public_form_wrap" class="d-flex align-items-center justify-content-center py-5">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-md-8 col-lg-6 text-center">
+                            <div class="card shadow-lg border-0 rounded-3 overflow-hidden p-5">
+                                <div class="card-body">
+                                    <div class="mb-4">
+                                        <div class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded-circle" style="width: 80px; height: 80px; font-size: 40px; box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);">
+                                            ✓
+                                        </div>
+                                    </div>
+                                    <h2 class="text-success fw-bold mb-3">Report Submitted Successfully</h2>
+                                    <p class="lead text-muted mb-4">Your incident reference number is:</p>
+                                    <div class="bg-light border rounded-3 p-3 mb-4">
+                                        <h3 class="text-primary fw-bold mb-0 letter-spacing-1">
+                                            <t t-out="reference"/>
+                                        </h3>
+                                    </div>
+                                    <p class="mb-4 text-secondary">
+                                        Thank you for reporting this incident. A trained handler will review your report within 3 working days.
+                                    </p>
+                                    <t t-if="email_sent">
+                                        <p class="text-muted small border-top pt-3">
+                                            A confirmation email has been sent to the address you provided.
+                                        </p>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

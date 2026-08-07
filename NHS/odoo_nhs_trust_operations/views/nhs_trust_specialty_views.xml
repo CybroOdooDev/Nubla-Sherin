@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view: clinical specialties, editable inline. -->
+    <record id="nhs_trust_specialty_view_list" model="ir.ui.view">
+        <field name="name">nhs.trust.specialty.list</field>
+        <field name="model">nhs.trust.specialty</field>
+        <field name="arch" type="xml">
+            <list string="Clinical Specialties" editable="bottom">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="description"/>
+                <field name="active" widget="boolean_toggle" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view: specialty identity, active flag, and description. -->
+    <record id="nhs_trust_specialty_view_form" model="ir.ui.view">
+        <field name="name">nhs.trust.specialty.form</field>
+        <field name="model">nhs.trust.specialty</field>
+        <field name="arch" type="xml">
+            <form string="Clinical Specialty">
+                <sheet>
+                    <group>
+                        <group string="Identity">
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group string="Status">
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1" placeholder="Short description of what this specialty covers..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Window action: entry point for the Clinical Specialties config menu (list/form). -->
+    <record id="nhs_trust_specialty_action" model="ir.actions.act_window">
+        <field name="name">Clinical Specialties</field>
+        <field name="res_model">nhs.trust.specialty</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add a clinical specialty.</p>
+            <p>Seed this list with NHS Data Dictionary specialty codes (e.g. 320 Cardiology, 110 T&amp;O).</p>
+        </field>
+    </record>
+
+</odoo>

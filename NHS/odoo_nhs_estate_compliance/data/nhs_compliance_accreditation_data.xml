@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Electrical -->
+        <record id="accreditation_niceic" model="nhs.compliance.contractor.accreditation">
+            <field name="name">National Inspection Council for Electrical Installation Contracting</field>
+            <field name="code">NICEIC</field>
+            <field name="description">UK's largest certification body for electrical businesses, assessing competence against BS 7671.</field>
+        </record>
+
+        <record id="accreditation_gas_safe" model="nhs.compliance.contractor.accreditation">
+            <field name="name">Gas Safe Register</field>
+            <field name="code">Gas Safe</field>
+            <field name="description">Official gas registration body for the UK, legally required for any gas work.</field>
+        </record>
+
+        <record id="accreditation_leea" model="nhs.compliance.contractor.accreditation">
+            <field name="name">Lifting Equipment Engineers Association</field>
+            <field name="code">LEEA</field>
+            <field name="description">Professional body for lifting equipment engineers, ensuring safety and competence in lifting operations.</field>
+        </record>
+
+        <!-- Electrical -->
+        <record id="accreditation_napit" model="nhs.compliance.contractor.accreditation">
+            <field name="name">National Association of Professional Inspectors and Testers</field>
+            <field name="code">NAPIT</field>
+            <field name="description">Certification body for electrical, heating, and plumbing trades.</field>
+        </record>
+
+        <!-- Gas & Heating -->
+        <record id="accreditation_oftec" model="nhs.compliance.contractor.accreditation">
+            <field name="name">Oil Firing Technical Association</field>
+            <field name="code">OFTEC</field>
+            <field name="description">Certification body for oil heating and cooking equipment installers.</field>
+        </record>
+
+        <!-- Renewables -->
+        <record id="accreditation_mcs" model="nhs.compliance.contractor.accreditation">
+            <field name="name">Microgeneration Certification Scheme</field>
+            <field name="code">MCS</field>
+            <field name="description">Quality assurance scheme for renewable energy technologies.</field>
+        </record>
+
+        <!-- Building & General -->
+        <record id="accreditation_chas" model="nhs.compliance.contractor.accreditation">
+            <field name="name">Contractors Health and Safety Assessment Scheme</field>
+            <field name="code">CHAS</field>
+            <field name="description">Health and safety pre-qualification scheme widely used in UK construction.</field>
+        </record>
+    </data>
+</odoo>

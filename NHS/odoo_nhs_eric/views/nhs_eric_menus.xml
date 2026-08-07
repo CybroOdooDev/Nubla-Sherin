@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Menu -->
+    <menuitem id="menu_nhs_eric_root"
+              name="ERIC Returns"
+              sequence="10"
+              groups="odoo_nhs_eric.group_nhs_eric_user"/>
+
+    <menuitem id="menu_nhs_eric_dashboard"
+              name="Dashboard"
+              parent="menu_nhs_eric_root"
+              action="action_nhs_eric_dashboard"
+              sequence="20"/>
+
+    <!-- Returns Menu -->
+    <menuitem id="menu_nhs_eric_returns"
+              name="Returns"
+              parent="menu_nhs_eric_root"
+              sequence="30"/>
+
+    <menuitem id="menu_nhs_eric_return"
+              name="ERIC Returns"
+              parent="menu_nhs_eric_returns"
+              action="action_nhs_eric_return"
+              sequence="10"/>
+
+    <menuitem id="menu_nhs_eric_current_return"
+              name="Current Return"
+              parent="menu_nhs_eric_returns"
+              action="action_nhs_eric_current_return"
+              sequence="20"/>
+
+    <menuitem id="menu_nhs_eric_gaps"
+              name="Gaps &amp; Validation"
+              parent="menu_nhs_eric_returns"
+              action="action_nhs_eric_value_gaps_validation"
+              sequence="30"/>
+
+    <!-- Reporting Menu -->
+    <menuitem id="menu_nhs_eric_reporting"
+              name="Reporting"
+              parent="menu_nhs_eric_root"
+              sequence="40"/>
+
+    <menuitem id="menu_nhs_eric_year_on_year"
+              name="Year-on-Year"
+              parent="menu_nhs_eric_reporting"
+              action="action_nhs_eric_year_on_year"
+              sequence="20"/>
+
+<!--    <menuitem id="menu_nhs_eric_return_pdf"-->
+<!--              name="ERIC Return Report"-->
+<!--              parent="menu_nhs_eric_reporting"-->
+<!--              action="report_nhs_eric_return_pdf"-->
+<!--              sequence="30"/>-->
+
+<!--    <menuitem id="menu_nhs_eric_gap_report"-->
+<!--              name="Gap Report"-->
+<!--              parent="menu_nhs_eric_reporting"-->
+<!--              action="report_nhs_eric_gap_pdf"-->
+<!--              sequence="40"/>-->
+
+    <!-- Configuration Menu (Manager Only) -->
+    <menuitem id="menu_nhs_eric_config"
+              name="Configuration"
+              parent="menu_nhs_eric_root"
+              sequence="50"
+              groups="odoo_nhs_eric.group_nhs_eric_manager"/>
+
+    <menuitem id="menu_nhs_eric_dataset"
+              name="ERIC Data Sets"
+              parent="menu_nhs_eric_config"
+              action="action_nhs_eric_dataset"
+              sequence="10"/>
+
+    <menuitem id="menu_nhs_eric_sections"
+              name="Sections"
+              parent="menu_nhs_eric_config"
+              action="action_nhs_eric_section"
+              sequence="10"/>
+
+    <menuitem id="menu_nhs_eric_items"
+              name="Items"
+              parent="menu_nhs_eric_config"
+              action="action_nhs_eric_item_def"
+              sequence="20"/>
+
+    <menuitem id="menu_nhs_eric_config_settings"
+              name="Settings"
+              parent="menu_nhs_eric_config"
+              action="action_nhs_eric_config_settings"
+              sequence="50"/>
+
+</odoo>

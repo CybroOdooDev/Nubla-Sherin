@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Space List View -->
+    <record id="view_nhs_estate_space_list" model="ir.ui.view">
+        <field name="name">nhs.estate.space.list</field>
+        <field name="model">nhs.estate.space</field>
+        <field name="arch" type="xml">
+            <list string="Spaces">
+                <field name="name"/>
+                <field name="complete_name"/>
+                <field name="code"/>
+                <field name="floor_id"/>
+                <field name="building_id" optional="hide"/>
+                <field name="site_id" optional="hide"/>
+                <field name="function_id"/>
+                <field name="is_clinical" widget="boolean"/>
+                <field name="area" sum="Total Area"/>
+                <field name="capacity" sum="Total Capacity"/>
+                <field name="space_type"/>
+                <field name="utilisation" widget="badge"/>
+                <field name="department"/>
+                <field name="company_id" optional="hide" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Space Form View -->
+    <record id="view_nhs_estate_space_form" model="ir.ui.view">
+        <field name="name">nhs.estate.space.form</field>
+        <field name="model">nhs.estate.space</field>
+        <field name="arch" type="xml">
+            <form string="Space" multi_edit="1" >
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_documents" type="object"
+                                class="oe_stat_button" icon="fa-file">
+                            <span class="o_stat_text">Documents</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Space Name..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="code" placeholder="Space Reference..."/>
+                        <field name="floor_id" placeholder="Floor..."/>
+                        <field name="complete_name"/>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="function_id"/>
+                            <field name="is_clinical" widget="boolean"/>
+                            <field name="space_type"/>
+                            <field name="area"/>
+                            <field name="capacity"/>
+                        </group>
+                        <group>
+                            <field name="department"/>
+                            <field name="utilisation"/>
+                            <field name="cost_centre"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes ">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Space Kanban View -->
+    <record id="view_nhs_estate_space_kanban" model="ir.ui.view">
+        <field name="name">nhs.estate.space.kanban</field>
+        <field name="model">nhs.estate.space</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="floor_id" class="o_kanban_small_column">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="complete_name"/>
+                <field name="floor_id"/>
+                <field name="building_id"/>
+                <field name="site_id"/>
+                <field name="function_id"/>
+                <field name="is_clinical"/>
+                <field name="area"/>
+                <field name="capacity"/>
+                <field name="space_type"/>
+                <field name="utilisation"/>
+                <field name="department"/>
+                <field name="cost_centre"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click o_kanban_record">
+                            <div class="oe_kanban_details d-flex flex-column justify-content-between h-100">
+                                <div>
+                                    <div class="o_kanban_record_top">
+                                        <div class="o_kanban_record_headings">
+                                            <strong class="o_kanban_record_title">
+                                                <field name="name"/>
+                                            </strong>
+                                            <div class="text-muted">
+                                                <field name="complete_name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_body mt-2">
+                                        <div class="d-flex justify-content-between mb-2 flex-wrap gap-1">
+                                            <span t-if="record.is_clinical.raw_value" class="badge text-bg-success">
+                                                <i class="fa fa-plus-circle mr-1"/>
+                                                Clinical
+                                            </span>
+                                            <span t-else="" class="badge text-bg-secondary">
+                                                <i class="fa fa-minus-circle mr-1"/>
+                                                Non-Clinical
+                                            </span>
+                                            <span class="badge text-bg-info">
+                                                <i class="fa fa-tag mr-1"/>
+                                                <field name="space_type"/>
+                                            </span>
+                                            <span class="badge"
+                                                  t-attf-class="badge #{record.utilisation.raw_value == 'full' ? 'text-bg-success' : record.utilisation.raw_value == 'over' ? 'text-bg-danger' : record.utilisation.raw_value == 'under' ? 'text-bg-warning' : record.utilisation.raw_value == 'empty' ? 'text-bg-secondary' : 'text-bg-light'}">
+                                                <field name="utilisation"/>
+                                            </span>
+                                        </div>
+                                        <div class="mt-2 text-muted">
+                                            <i class="fa fa-arrows-alt mr-1"/>
+                                            <field name="area"/>
+                                            m²
+                                        </div>
+                                        <div class="mt-1 text-muted">
+                                            <i class="fa fa-users mr-1"/>
+                                            <field name="capacity"/>
+                                            Capacity
+                                        </div>
+                                        <div class="mt-1 text-muted">
+                                            <i class="fa fa-tag mr-1"/>
+                                            <field name="function_id"/>
+                                        </div>
+                                        <div t-if="record.department.raw_value" class="mt-1 text-muted">
+                                            <i class="fa fa-building mr-1"/>
+                                            <field name="department"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom mt-3 d-flex justify-content-between align-items-center"
+                                     style="border-top: 1px solid #f3f4f6; padding-top: 8px;">
+                                    <span class="badge" style="background-color: #f3f4f6; color: #6b7280;">
+                                        <i class="fa fa-building mr-1"/>
+                                        <field name="building_id"/>
+                                    </span>
+                                    <span class="badge" style="background-color: #f3f4f6; color: #6b7280;">
+                                        <i class="fa fa-layer-group mr-1"/>
+                                        <field name="floor_id"/>
+                                    </span>
+                                    <field name="activity_ids" widget="kanban_activity"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Space Search View -->
+    <record id="view_nhs_estate_space_search" model="ir.ui.view">
+        <field name="name">nhs.estate.space.search</field>
+        <field name="model">nhs.estate.space</field>
+        <field name="arch" type="xml">
+            <search string="Search Spaces">
+                <field name="name" string="Space Name"/>
+                <field name="code" string="Space Reference"/>
+                <field name="floor_id" string="Floor"/>
+                <field name="building_id" string="Building"/>
+                <field name="site_id" string="Site"/>
+                <field name="function_id" string="Function"/>
+                <field name="department" string="Department"/>
+                <field name="space_type"/>
+                <field name="utilisation"/>
+                <filter name="clinical" string="Clinical"
+                        domain="[('is_clinical', '=', True)]"/>
+                <filter name="non_clinical" string="Non-Clinical"
+                        domain="[('is_clinical', '=', False)]"/>
+                <filter name="empty" string="Empty"
+                        domain="[('utilisation', '=', 'empty')]"/>
+                <filter name="under_utilised" string="Under-utilised"
+                        domain="[('utilisation', '=', 'under')]"/>
+                <filter name="group_floor" string=" Floor"
+                        context="{'group_by': 'floor_id'}"/>
+                <filter name="group_building" string=" Building"
+                        context="{'group_by': 'building_id'}"/>
+                <filter name="group_site" string=" Site"
+                        context="{'group_by': 'site_id'}"/>
+                <filter name="group_function" string=" Function"
+                        context="{'group_by': 'function_id'}"/>
+                <filter name="group_space_type" string=" Space Type"
+                        context="{'group_by': 'space_type'}"/>
+                <filter name="group_utilisation" string=" Utilisation"
+                        context="{'group_by': 'utilisation'}"/>
+                <filter name="group_clinical" string=" Clinical"
+                        context="{'group_by': 'is_clinical'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Space Pivot View -->
+    <record id="view_nhs_estate_space_pivot" model="ir.ui.view">
+        <field name="name">nhs.estate.space.pivot</field>
+        <field name="model">nhs.estate.space</field>
+        <field name="arch" type="xml">
+            <pivot string="Space Analysis">
+                <field name="site_id" type="row"/>
+                <field name="building_id" type="row"/>
+                <field name="function_id" type="col"/>
+                <field name="space_type" type="col"/>
+                <field name="area" type="measure" operator="sum"/>
+                <field name="capacity" type="measure" operator="sum"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Space Action -->
+    <record id="action_nhs_estate_space" model="ir.actions.act_window">
+        <field name="name">Spaces</field>
+        <field name="res_model">nhs.estate.space</field>
+        <field name="view_mode">list,form,kanban,pivot</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first space
+            </p>
+            <p>
+                Spaces are the lowest level of the estate hierarchy.
+                Each space belongs to a floor.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Settings Action -->
+    <record id="view_res_config_settings_nhs_estate" model="ir.ui.view">
+        <field name="name">res.config.settings.nhs</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Estate Register" name="odoo_nhs_estate"
+                     groups="odoo_nhs_estate.group_nhs_estate_manager">
+                    <block title="Condition Survey">
+                        <setting string="Condition Roll-up Rule"
+                                 help="Determines how the overall condition grade is calculated from six facet ratings. Worst Grade (Default): Selects the poorest grade. Weighted Average: Calculates an equal-weighted average.">
+                            <field name="condition_rollup"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Setting Action -->
+    <record id="action_nhs_estate_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_res_config_settings_nhs_estate"/>
+        <field name="target">current</field>
+        <field name="context">{'module': 'odoo_nhs_estate'}</field>
+    </record>
+
+    <!-- Function List View -->
+    <record id="view_nhs_estate_function_list" model="ir.ui.view">
+        <field name="name">nhs.estate.function.list</field>
+        <field name="model">nhs.estate.function</field>
+        <field name="arch" type="xml">
+            <list string="Functions">
+                <field name="complete_name"/>
+                <field name="parent_id" optional="hide"/>
+                <field name="is_clinical" widget="boolean"/>
+                <field name="eric_category"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Function Form View -->
+    <record id="view_nhs_estate_function_form" model="ir.ui.view">
+        <field name="name">nhs.estate.function.form</field>
+        <field name="model">nhs.estate.function</field>
+        <field name="arch" type="xml">
+            <form string="Function">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Function Name..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="parent_id" placeholder="Parent Function..."/>
+                            <field name="complete_name" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="is_clinical"/>
+                            <field name="eric_category"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Function Search View -->
+    <record id="view_nhs_estate_function_search" model="ir.ui.view">
+        <field name="name">nhs.estate.function.search</field>
+        <field name="model">nhs.estate.function</field>
+        <field name="arch" type="xml">
+            <search string="Search Functions">
+                <field name="name" string="Function Name"/>
+                <field name="eric_category"/>
+                <filter name="clinical" string="Clinical"
+                        domain="[('is_clinical', '=', True)]"/>
+                <filter name="non_clinical" string="Non-Clinical"
+                        domain="[('is_clinical', '=', False)]"/>
+                <filter name="group_parent" string="Group by Parent"
+                        context="{'group_by': 'parent_id'}"/>
+                <filter name="group_eric" string="Group by ERIC Category"
+                        context="{'group_by': 'eric_category'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Function Action -->
+    <record id="action_nhs_estate_function" model="ir.actions.act_window">
+        <field name="name">Functions</field>
+        <field name="res_model">nhs.estate.function</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p>
+                Manage the function/use taxonomy for the estate.
+                Functions are used to classify buildings, floors, and spaces.
+            </p>
+        </field>
+    </record>
+</odoo>

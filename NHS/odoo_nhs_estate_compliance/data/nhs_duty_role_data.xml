@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Duty Roles Records -->
+        <record id="duty_role_duty_holder" model="nhs.duty.role">
+            <field name="name">Duty Holder</field>
+            <field name="code">DH</field>
+            <field name="description">Ultimate accountability for compliance within the organisation</field>
+            <field name="requires_authorisation" eval="False"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="duty_role_designated_person" model="nhs.duty.role">
+            <field name="name">Designated Person</field>
+            <field name="code">DP</field>
+            <field name="description">Designated accountability for compliance oversight</field>
+            <field name="requires_authorisation" eval="False"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="duty_role_responsible_person" model="nhs.duty.role">
+            <field name="name">Responsible Person</field>
+            <field name="code">RP</field>
+            <field name="description">Day-to-day responsibility for compliance in a discipline</field>
+            <field name="requires_authorisation" eval="False"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="duty_role_authorised_person" model="nhs.duty.role">
+            <field name="name">Authorised Person</field>
+            <field name="code">AP</field>
+            <field name="description">Formally authorised to oversee work in a discipline</field>
+            <field name="requires_authorisation" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="duty_role_competent_person" model="nhs.duty.role">
+            <field name="name">Competent Person</field>
+            <field name="code">CP</field>
+            <field name="description">Competent to carry out work in a discipline</field>
+            <field name="requires_authorisation" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="duty_role_authorising_engineer" model="nhs.duty.role">
+            <field name="name">Authorising Engineer</field>
+            <field name="code">AE</field>
+            <field name="description">External authorising engineer for medical gas and other critical systems</field>
+            <field name="requires_authorisation" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

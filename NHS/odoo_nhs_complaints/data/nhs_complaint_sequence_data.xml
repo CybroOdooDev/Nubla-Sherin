@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Reference sequence for formal complaints (COMP/year/#####) -->
+        <record id="seq_nhs_complaint_formal" model="ir.sequence">
+            <field name="name">NHS Formal Complaint Reference</field>
+            <field name="code">nhs.complaint.formal</field>
+            <field name="prefix">COMP/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="implementation">no_gap</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Reference sequence for PALS concerns (PALS/year/#####) -->
+        <record id="seq_nhs_complaint_pals" model="ir.sequence">
+            <field name="name">NHS PALS Concern Reference</field>
+            <field name="code">nhs.complaint.pals</field>
+            <field name="prefix">PALS/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="implementation">no_gap</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Reference sequence for complaint investigation records (CINV/year/#####) -->
+        <record id="seq_nhs_complaint_investigation" model="ir.sequence">
+            <field name="name">NHS Complaint Investigation Reference</field>
+            <field name="code">nhs.complaint.investigation</field>
+            <field name="prefix">CINV/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="implementation">no_gap</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

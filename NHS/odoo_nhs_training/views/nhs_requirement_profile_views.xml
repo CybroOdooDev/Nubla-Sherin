@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List view for nhs.requirement.profile -->
+    <record id="view_nhs_requirement_profile_list" model="ir.ui.view">
+        <field name="name">nhs.requirement.profile.list</field>
+        <field name="model">nhs.requirement.profile</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="requirement_count"/>
+                <field name="post_count"/>
+                <field name="member_count"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view for nhs.requirement.profile -->
+    <record id="view_nhs_requirement_profile_form" model="ir.ui.view">
+        <field name="name">nhs.requirement.profile.form</field>
+        <field name="model">nhs.requirement.profile</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <!-- <button name="action_assign_posts" type="object" string="Assign Posts"
+                            class="oe_highlight" invisible="not id"/> -->
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_posts" type="object"
+                                class="oe_stat_button" icon="fa-briefcase">
+                            <field name="post_count" widget="statinfo" string="Posts"/>
+                        </button>
+                        <button name="action_view_members" type="object"
+                                class="oe_stat_button" icon="fa-users">
+                            <field name="member_count" widget="statinfo" string="Members"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="e.g. Ward Nurse"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="description" placeholder="What roles this profile suits..."/>
+                    </group>
+                    <notebook>
+                        <page name="requirements" string="Requirements">
+                            <field name="requirement_ids">
+                                <list editable="bottom">
+                                    <field name="subject_id" options="{'no_create': True}"/>
+                                    <field name="frequency_months_override"/>
+                                    <field name="is_mandatory"/>
+                                    <field name="effective_from"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="posts" string="Posts">
+                            <field name="post_ids" widget="many2many" options="{'no_create': True}" domain="[('status', '=', 'active')]">
+                                <list>
+                                    <field name="reference"/>
+                                    <field name="job_title"/>
+                                    <field name="org_unit_id"/>
+                                    <field name="staff_group_id"/>
+                                    <field name="status" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                    <field name="active" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Window action for Requirement Profiles (nhs.requirement.profile) -->
+    <record id="action_nhs_requirement_profile" model="ir.actions.act_window">
+        <field name="name">Requirement Profiles</field>
+        <field name="res_model">nhs.requirement.profile</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Build a requirement profile — a reusable bundle of subjects a role needs.
+            </p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Site List View -->
+    <record id="view_nhs_estate_site_list" model="ir.ui.view">
+        <field name="name">nhs.estate.site.list</field>
+        <field name="model">nhs.estate.site</field>
+        <field name="arch" type="xml">
+            <list string="Sites" multi_edit="1" decoration-info="operational_status == 'partial'"
+                  decoration-danger="operational_status in ('closed','disposed')"
+                  decoration-success="operational_status == 'operational'">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="site_type" widget="badge"/>
+                <field name="operational_status" widget="badge"/>
+                <field name="city"/>
+                <field name="parent_id" optional="hide"/>
+                <field name="building_count" sum="Total"/>
+                <field name="total_gia" sum="Total Gross Internal Area"/>
+                <field name="total_backlog" sum="Total Backlog"/>
+                <field name="company_id" optional="hide" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Site Kanban View -->
+    <record id="view_nhs_estate_site_kanban" model="ir.ui.view">
+        <field name="name">nhs.estate.site.kanban</field>
+        <field name="model">nhs.estate.site</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="operational_status" class="o_kanban_small_column">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="site_type"/>
+                <field name="operational_status"/>
+                <field name="city"/>
+                <field name="building_count"/>
+                <field name="total_gia"/>
+                <field name="total_backlog"/>
+                <field name="image"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click o_kanban_record">
+                            <div class="oe_kanban_details d-flex flex-column justify-content-between h-100">
+                                <div>
+                                    <div class="o_kanban_record_top">
+                                        <div class="o_kanban_record_headings">
+                                            <strong class="o_kanban_record_title">
+                                                <field name="name"/>
+                                            </strong>
+                                            <div class="text-muted">
+                                                <field name="code"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_body mt-2">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span class="badge text-bg-primary">
+                                                <field name="site_type"/>
+                                            </span>
+                                            <span t-attf-class="badge #{record.operational_status.raw_value == 'operational' ? 'text-bg-success' : record.operational_status.raw_value == 'partial' ? 'text-bg-warning' : 'text-bg-danger'}">
+                                                <field name="operational_status"/>
+                                            </span>
+                                        </div>
+                                        <div class="mt-2 text-muted">
+                                            <i class="fa fa-map-marker mr-1"/>
+                                            <field name="city"/>
+                                        </div>
+                                        <div class="mt-1 text-muted">
+                                            <i class="fa fa-building mr-1"/>
+                                            <field name="building_count"/>
+                                            Buildings
+                                        </div>
+                                        <div class="mt-1 text-muted">
+                                            <i class="fa fa-area-chart mr-1"/>
+                                            <field name="total_gia"/>
+                                            m²
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom mt-3 d-flex justify-content-between align-items-center"
+                                     style="border-top: 1px solid #f3f4f6; padding-top: 8px;">
+                                    <span class="badge" style="background-color: #f3f4f6; color: #6b7280;">
+                                        <i class="fa fa-exclamation-triangle mr-1"/>
+                                        <field name="total_backlog"/>
+                                    </span>
+                                    <field name="activity_ids" widget="kanban_activity"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Site Pivot View -->
+    <record id="view_nhs_estate_site_pivot" model="ir.ui.view">
+        <field name="name">nhs.estate.site.pivot</field>
+        <field name="model">nhs.estate.site</field>
+        <field name="arch" type="xml">
+            <pivot string="Site Area &amp; Backlog Analysis">
+                <field name="site_type" type="row"/>
+                <field name="operational_status" type="row"/>
+                <field name="name" type="col"/>
+                <field name="total_gia" type="measure" operator="sum"/>
+                <field name="total_backlog" type="measure" operator="sum"/>
+                <field name="building_count" type="measure" operator="sum"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Site Form View -->
+    <record id="view_nhs_estate_site_form" model="ir.ui.view">
+        <field name="name">nhs.estate.site.form</field>
+        <field name="model">nhs.estate.site</field>
+        <field name="arch" type="xml">
+            <form string="NHS Estate Site">
+                <field name="is_virtual" invisible="1"/>
+                <field name="virtual_type_str" invisible="1"/>
+                <div class="alert alert-info text-center" role="alert" invisible="not is_virtual"
+                     style="margin-bottom: 20px;">
+                    This is a virtual record representing a<field name="virtual_type_str" readonly="1"/>:
+                    <strong>
+                        <field name="name" readonly="1"/>
+                    </strong>
+                    <button name="action_open_record" type="object" string="Open Details" class="btn btn-primary ms-3"/>
+                </div>
+                <header>
+                    <button name="action_operational" type="object" string="Operational" class="oe_highlight"
+                            invisible="operational_status in ['operational','closed','disposed']"/>
+                    <button name="action_partial_operational" type="object" string="Partially Operational"
+                            class="oe_highlight"
+                            invisible="operational_status in ['partial','closed','disposed']"/>
+                    <button name="action_closed" type="object" string="Closed" class="oe_highlight"
+                            invisible="operational_status in ['closed','disposed']"/>
+                    <button name="action_disposed" type="object" string="Disposed" class="oe_highlight"
+                            invisible="operational_status in ['disposed']"/>
+                    <field name="operational_status" widget="statusbar"
+                           statusbar_visible="operational,partial,closed,disposed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_buildings" type="object"
+                                class="oe_stat_button" icon="fa-building">
+                            <field name="building_count" widget="statinfo" string="Buildings"/>
+                        </button>
+                        <button name="action_view_hierarchy" type="object"
+                                class="oe_stat_button" icon="fa-sitemap">
+                            <span class="o_stat_text">Hierarchy</span>
+                        </button>
+                        <button name="action_view_documents" type="object"
+                                class="oe_stat_button" icon="fa-file">
+                            <span class="o_stat_text">Documents</span>
+                        </button>
+                        <button name="" type="object"
+                                class="oe_stat_button" icon="fa-wrench">
+                            <field name="total_backlog" widget="statinfo" string="Backlogs"/>
+                        </button>
+                        <button name="" type="object"
+                                class="oe_stat_button" icon="fa-building">
+                            <field name="total_gia" widget="statinfo" string="Total GIA (m²)"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Site Name..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="code" placeholder="Site Code..."
+                               style="width: 150px; text-transform: uppercase;"/>
+                        <field name="site_type" placeholder="Site Type" style="width: 200px;"/>
+                    </group>
+                    <group>
+                        <group string="Core Details">
+                            <field name="parent_id" placeholder="Parent Site..."/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   options="{'no_open': True, 'no_create': True}"/>
+                            <field name="owner_org"/>
+                            <field name="manager_id" options="{'no_open': True, 'no_create': True}"/>
+                            <field name="acquired_date"/>
+                        </group>
+                        <group string="Location">
+                            <field name="latitude"/>
+                            <field name="longitude"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="General">
+                            <group string="Postal Address">
+                                <group>
+                                    <div class="o_address_format">
+                                        <field name="street" placeholder="Street..." class="o_address_street"/>
+                                        <field name="street2" placeholder="Street 2..." class="o_address_street"/>
+                                        <field name="city" placeholder="City" class="o_address_city"/>
+                                        <field name="zip" placeholder="Postcode" class="o_address_zip"/>
+                                        <div name="site_address_country" class="d-flex justify-content-between">
+                                            <field name="country_id" placeholder="Country" class="o_address_country"
+                                                   options="{'no_open': True, 'no_create': True}"/>
+                                        </div>
+                                    </div>
+                                </group>
+                            </group>
+                            <group string="Space Details">
+                                <group>
+                                    <field name="site_clinical_area"/>
+                                    <field name="site_non_clinical_area"/>
+                                    <field name="site_occupied_area"/>
+                                    <field name="site_vacant_area"/>
+                                </group>
+                                <group>
+                                    <field name="total_gia"/>
+                                    <field name="land_area_ha"/>
+                                    <field name="car_parking_spaces"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Buildings" name="buildings_tab" invisible="id == 0">
+                            <field name="building_ids" context="{'default_site_id': id}" readonly="operational_status in ['closed', 'disposed']" />
+                        </page>
+                        <page string="Site Photo" name="photo_tab">
+                            <field name="image" widget="many2many_binary" help="Site Photo"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Site HIERARCHY VIEW -->
+    <record id="view_nhs_estate_site_hierarchy" model="ir.ui.view">
+        <field name="name">nhs.estate.site.hierarchy</field>
+        <field name="model">nhs.estate.site</field>
+        <field name="arch" type="xml">
+            <hierarchy child_field="child_ids" draggable="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="site_type"/>
+                <field name="operational_status"/>
+                <field name="city"/>
+                <field name="building_count"/>
+                <field name="space_count"/>
+                <field name="total_gia"/>
+                <field name="total_backlog"/>
+                <field name="image"/>
+                <field name="company_id"/>
+                <field name="parent_id"/>
+                <field name="parent_path"/>
+                <field name="child_ids"/>
+                <field name="is_virtual"/>
+                <field name="virtual_type_str"/>
+                <field name="virtual_space_type"/>
+                <field name="virtual_operational_status"/>
+                <templates>
+                    <t t-name="sidebar">
+                        <div class="o_hierarchy_sidebar">
+                            <div class="o_search_panel">
+                                <div class="o_search_panel_section">
+                                    <div class="o_search_panel_section_title">
+                                        SITES
+                                    </div>
+                                    <div class="o_search_panel_section_content">
+                                        <div class="o_search_panel_list_view">
+                                            <t t-foreach="widget.get('records')" t-as="site">
+                                                <div class="o_search_panel_record"
+                                                     t-attf-class="{'o_selected': #{site.id} == active_id}">
+                                                    <span t-esc="site.name"/>
+                                                    <span class="badge float-end text-bg-secondary">
+                                                        <t t-esc="site.child_count or 0"/>
+                                                    </span>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-name="hierarchy-box">
+                        <div class="o_hierarchy_node_card">
+                            <div class="o_hierarchy_node_header d-flex align-items-center justify-content-between px-2 pt-2">
+                                <span class="fw-bold text-truncate" style="max-width: 120px;">
+                                    <field name="name"/>
+                                </span>
+                                <span class="badge text-bg-secondary ms-1" t-if="record.code.raw_value">
+                                    <field name="code"/>
+                                </span>
+                                <span class="badge text-bg-info ms-1" t-if="record.is_virtual.raw_value">
+                                    <field name="virtual_type_str"/>
+                                </span>
+                            </div>
+                            <div class="o_hierarchy_node_body p-2">
+                                <div class="d-flex gap-1 flex-wrap mb-1">
+                                    <span class="badge text-bg-primary"
+                                          t-if="record.site_type.raw_value or (record.is_virtual.raw_value and record.virtual_space_type.raw_value)">
+                                        <t t-if="record.is_virtual.raw_value and record.virtual_type_str.raw_value == 'Space'">
+                                            <t t-esc="record.virtual_space_type.raw_value"/>
+                                        </t>
+                                        <t t-else="">
+                                            <field name="site_type"/>
+                                        </t>
+                                    </span>
+                                    <span class="badge"
+                                          t-if="record.operational_status.raw_value or (record.is_virtual.raw_value and record.virtual_operational_status.raw_value)"
+                                          t-attf-class="badge #{record.operational_status.raw_value == 'operational' ? 'text-bg-success' : record.operational_status.raw_value == 'partial' ? 'text-bg-warning' : (record.is_virtual.raw_value and record.virtual_type_str.raw_value == 'Space') ? 'text-bg-info' : 'text-bg-danger'}">
+                                        <t t-if="record.is_virtual.raw_value and record.virtual_type_str.raw_value == 'Space'">
+                                            <t t-esc="record.virtual_operational_status.raw_value"/>
+                                        </t>
+                                        <t t-else="">
+                                            <field name="operational_status"/>
+                                        </t>
+                                    </span>
+                                </div>
+                                <div class="text-muted small" t-if="record.city.raw_value">
+                                    <i class="fa fa-map-marker me-1"/>
+                                    <field name="city"/>
+                                </div>
+                                <div class="d-flex gap-3 mt-1 pt-1 border-top small text-muted">
+                                    <span t-if="record.building_count.raw_value > 0 ">
+                                        <i class="fa fa-building me-1"/>
+                                        <field name="building_count"/>
+                                    </span>
+                                    <span t-if="record.space_count.raw_value > 0 ">
+                                        <i class="fa fa-cubes me-1"/>
+                                        <field name="space_count"/>
+                                        <t t-if="record.space_count.raw_value != 1">spaces</t>
+                                        <t t-else="">space</t>
+                                    </span>
+                                    <span t-if="record.total_gia.raw_value > 0">
+                                        <i class="fa fa-arrows-h me-1"/>
+                                        <field name="total_gia"/>
+                                        m²
+                                    </span>
+                                </div>
+                                <div class="mt-1 small" t-if="record.total_backlog.raw_value > 0">
+                                    <span class="text-danger">
+                                        <i class="fa fa-exclamation-triangle me-1"/>
+                                        <field name="total_backlog"/>
+                                    </span>
+                                </div>
+                            </div>
+                            <br/>
+                            <br/>
+                        </div>
+                    </t>
+                </templates>
+            </hierarchy>
+        </field>
+    </record>
+
+    <!-- Site SEARCH VIEW -->
+    <record id="view_nhs_estate_site_search" model="ir.ui.view">
+        <field name="name">nhs.estate.site.search</field>
+        <field name="model">nhs.estate.site</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="city"/>
+                <field name="site_type"/>
+                <field name="operational_status"/>
+                <filter name="group_by_status"
+                        string="Status"
+                        context="{'group_by': 'operational_status'}"/>
+                <filter name="group_by_site_type"
+                        string="Site Type"
+                        context="{'group_by': 'site_type'}"/>
+                <filter name="group_by_building_count"
+                        string="Building Count"
+                        context="{'group_by': 'building_count'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Site Action -->
+    <record id="action_nhs_estate_site" model="ir.actions.act_window">
+        <field name="name">Sites</field>
+        <field name="res_model">nhs.estate.site</field>
+        <field name="view_mode">kanban,list,form,pivot</field>
+        <field name="search_view_id" ref="view_nhs_estate_site_search"/>
+        <field name="context">{'search_default_all_sites': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first NHS site
+            </p>
+            <p>
+                Sites are the top level of the estate hierarchy.
+                Each site can contain multiple buildings.
+            </p>
+        </field>
+    </record>
+</odoo>

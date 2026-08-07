@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Email template: notify member that their training record is due to expire soon -->
+        <record id="mail_template_training_due_soon" model="mail.template">
+            <field name="name">Training: Due Soon</field>
+            <field name="model_id" ref="model_nhs_training_record"/>
+            <field name="subject">Training due soon: {{ object.subject_id.complete_name }}</field>
+            <field name="email_to">{{ object.member_id.email or object.member_id.user_id.email }}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p>Hello <t t-out="object.member_id.name"/>,</p>
+                    <p>Your <strong t-out="object.subject_id.complete_name"/> training expires on
+                        <strong t-out="object.expiry_date"/>. Please arrange your renewal before then.</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Email template: notify member that their training record has expired -->
+        <record id="mail_template_training_expired" model="mail.template">
+            <field name="name">Training: Expired</field>
+            <field name="model_id" ref="model_nhs_training_record"/>
+            <field name="subject">ACTION NEEDED — Training expired: {{ object.subject_id.complete_name }}</field>
+            <field name="email_to">{{ object.member_id.email or object.member_id.user_id.email }}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p>Hello <t t-out="object.member_id.name"/>,</p>
+                    <p>Your <strong t-out="object.subject_id.complete_name"/> training expired on
+                        <strong t-out="object.expiry_date"/>. Please arrange your renewal as soon as possible.</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Email template: notify member that their professional registration is expiring soon -->
+        <record id="mail_template_registration_expiring" model="mail.template">
+            <field name="name">Registration: Expiring Soon</field>
+            <field name="model_id" ref="model_nhs_registration"/>
+            <field name="subject">Professional registration expiring soon: {{ object.regulator_id.name }}</field>
+            <field name="email_to">{{ object.member_id.email or object.member_id.user_id.email }}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p>Hello <t t-out="object.member_id.name"/>,</p>
+                    <p>Your <strong t-out="object.regulator_id.name"/> registration expires on
+                        <strong t-out="object.expiry_date"/>. Please arrange your renewal/revalidation before then.</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Email template: alert manager that team training compliance dropped below target -->
+        <record id="mail_template_compliance_escalation" model="mail.template">
+            <field name="name">Compliance: Team Below Target (Escalation)</field>
+            <field name="model_id" ref="model_nhs_org_unit"/>
+            <field name="subject">Training compliance below target: {{ object.complete_name }}</field>
+            <field name="email_to">{{ object.manager_id.email }}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p>Hello <t t-out="object.manager_id.name"/>,</p>
+                    <p>Training compliance for <strong t-out="object.complete_name"/> has dropped to
+                        <strong t-out="'%.1f' % object.team_compliance_pct"/>%, below the organisation target.</p>
+                    <p>Please review the Training Matrix for your team.</p>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

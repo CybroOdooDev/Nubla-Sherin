@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="odoo_nhs_eric.NhsEricDashboard">
+        <div class="o_nhs_dashboard_container" style="background-color: #F0F4F5; padding: 24px; box-sizing: border-box; overflow-y: auto; overflow-x: hidden; position: relative; height: 100%;">
+
+            <!-- Custom CSS block for optimized typography and larger charts -->
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap');
+
+                .o_nhs_dashboard_container,
+                .o_nhs_dashboard_container * {
+                    box-sizing: border-box;
+                }
+
+                .o_nhs_dashboard_container {
+                    font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+                    color: #212B32;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 24px;
+                    overflow-y: auto !important;
+                    overflow-x: hidden !important;
+                    height: 100% !important;
+                    position: relative !important;
+                    width: 100%;
+                }
+
+                /* Header Controls */
+                .o_nhs_dashboard_header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    background-color: #ffffff;
+                    border: 1px solid #D8DDE0;
+                    border-radius: 8px;
+                    padding: 16px 24px;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                }
+                .o_nhs_header_title {
+                    font-size: 1.45rem;
+                    font-weight: 800;
+                    color: #005EB8;
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                }
+                .o_nhs_header_select {
+                    font-family: 'Outfit', sans-serif;
+                    font-size: 0.95rem;
+                    font-weight: 600;
+                    color: #212B32;
+                    padding: 8px 16px;
+                    border-radius: 6px;
+                    border: 1px solid #D8DDE0;
+                    background-color: #F0F4F5;
+                    outline: none;
+                    cursor: pointer;
+                    transition: border-color 0.15s ease;
+                }
+                .o_nhs_header_select:focus {
+                    border-color: #005EB8;
+                }
+
+                /* KPI Card Section */
+                .o_nhs_kpi_grid {
+                    display: grid;
+                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                    gap: 24px;
+                }
+                @media (max-width: 1200px) {
+                    .o_nhs_kpi_grid {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
+                }
+                @media (max-width: 576px) {
+                    .o_nhs_kpi_grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
+                .o_nhs_kpi_card {
+                    background-color: #ffffff;
+                    border: 1px solid #D8DDE0;
+                    border-radius: 8px;
+                    padding: 20px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                    border-left: 6px solid #005EB8;
+                    transition: transform 0.15s ease, box-shadow 0.15s ease;
+                    cursor: pointer;
+                    height: 100px;
+                }
+                .o_nhs_kpi_card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+                }
+                .o_nhs_kpi_card.kpi-red { border-left-color: #DA291C; }
+                .o_nhs_kpi_card.kpi-orange { border-left-color: #CE7B11; }
+                .o_nhs_kpi_card.kpi-green { border-left-color: #009639; }
+                .o_nhs_kpi_card.kpi-blue { border-left-color: #00A3E0; }
+
+                .o_nhs_kpi_content {
+                    display: flex;
+                    flex-direction: column;
+                }
+                .o_nhs_kpi_title {
+                    font-size: 0.82rem;
+                    text-transform: uppercase;
+                    font-weight: 700;
+                    color: #505A5F;
+                    letter-spacing: 0.6px;
+                }
+                .o_nhs_kpi_value {
+                    font-size: 1.75rem;
+                    font-weight: 800;
+                    color: #212B32;
+                    margin-top: 4px;
+                    line-height: 1.2;
+                }
+                .o_nhs_kpi_icon_wrapper {
+                    background-color: #F0F4F5;
+                    color: #005EB8;
+                    width: 52px;
+                    height: 52px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.35rem;
+                }
+                .o_nhs_kpi_card.kpi-red .o_nhs_kpi_icon_wrapper { color: #DA291C; background-color: #FFE6E6; }
+                .o_nhs_kpi_card.kpi-orange .o_nhs_kpi_icon_wrapper { color: #CE7B11; background-color: #FFF2E6; }
+                .o_nhs_kpi_card.kpi-green .o_nhs_kpi_icon_wrapper { color: #009639; background-color: #E6F3E6; }
+                .o_nhs_kpi_card.kpi-blue .o_nhs_kpi_icon_wrapper { color: #00A3E0; background-color: #E6F8FF; }
+
+                /* Headline Estate Metrics Ribbon */
+                .o_nhs_headline_ribbon {
+                    display: grid;
+                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                    gap: 16px;
+                    background-color: #ffffff;
+                    border: 1px solid #D8DDE0;
+                    border-radius: 8px;
+                    padding: 16px 24px;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                }
+                @media (max-width: 768px) {
+                    .o_nhs_headline_ribbon {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
+                }
+                .o_nhs_ribbon_item {
+                    display: flex;
+                    flex-direction: column;
+                    border-right: 1px solid #E8EDEE;
+                    padding-right: 16px;
+                }
+                .o_nhs_ribbon_item:last-child {
+                    border-right: none;
+                }
+                .o_nhs_ribbon_label {
+                    font-size: 0.8rem;
+                    font-weight: 700;
+                    color: #768692;
+                }
+                .o_nhs_ribbon_value {
+                    font-size: 1.25rem;
+                    font-weight: 800;
+                    color: #212B32;
+                    margin-top: 2px;
+                }
+
+                /* Analytics Grid */
+                .o_nhs_charts_grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    gap: 24px;
+                }
+                @media (max-width: 992px) {
+                    .o_nhs_charts_grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
+                .o_nhs_card {
+                    background-color: #ffffff;
+                    border: 1px solid #D8DDE0;
+                    border-radius: 8px;
+                    padding: 24px;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                    display: flex;
+                    flex-direction: column;
+                    height: 380px;
+                }
+                .o_nhs_card_header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-bottom: 2px solid #F0F4F5;
+                    padding-bottom: 12px;
+                    margin-bottom: 20px;
+                }
+                .o_nhs_card_title {
+                    font-size: 1.1rem;
+                    font-weight: 700;
+                    color: #005EB8;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+                .o_nhs_chart_canvas_wrapper {
+                    flex: 1;
+                    min-height: 0;
+                    position: relative;
+                }
+
+                /* Operational Progress Table */
+                .o_nhs_table_card {
+                    background-color: #ffffff;
+                    border: 1px solid #D8DDE0;
+                    border-radius: 8px;
+                    padding: 24px;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                    display: flex;
+                    flex-direction: column;
+                }
+                .o_nhs_list_table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 0.95rem;
+                }
+                .o_nhs_list_table th {
+                    text-align: left;
+                    color: #505A5F;
+                    font-weight: 700;
+                    padding: 12px;
+                    border-bottom: 2px solid #E8EDEE;
+                }
+                .o_nhs_list_table td {
+                    padding: 12px;
+                    border-bottom: 1px solid #F0F4F5;
+                    color: #212B32;
+                    vertical-align: middle;
+                }
+                .o_nhs_list_table tr:last-child td {
+                    border-bottom: none;
+                }
+                .o_nhs_list_table tr:hover td {
+                    background-color: rgba(0, 94, 184, 0.03);
+                    cursor: pointer;
+                }
+
+                /* Badges */
+                .badge-compact {
+                    font-size: 0.75rem;
+                    padding: 0.25rem 0.60rem;
+                    border-radius: 4px;
+                    font-weight: 700;
+                    text-align: center;
+                    white-space: nowrap;
+                    display: inline-block;
+                }
+                .state-draft { background-color: #F0F4F5; color: #768692; }
+                .state-in_progress { background-color: #FFF2E6; color: #CE7B11; }
+                .state-ready_for_review { background-color: #E6F8FF; color: #00A3E0; }
+                .state-signed_off { background-color: #E6F3E6; color: #009639; }
+
+                /* Progress bar */
+                .o_nhs_progress_container {
+                    background-color: #E8EDEE;
+                    border-radius: 4px;
+                    height: 8px;
+                    width: 100%;
+                    overflow: hidden;
+                }
+                .o_nhs_progress_fill {
+                    background-color: #005EB8;
+                    height: 100%;
+                    border-radius: 4px;
+                }
+            </style>
+
+            <!-- Loading Spinner -->
+            <t t-if="state.loading">
+                <div class="d-flex justify-content-center align-items-center" style="height: 350px;">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem; color: #005EB8 !important;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </t>
+
+            <!-- Main Dashboard Content -->
+            <t t-else="">
+                
+                <!-- Header Control Box -->
+                <div class="o_nhs_dashboard_header">
+                    <span class="o_nhs_header_title">
+                        <i class="fa fa-tachometer"/>
+                        NHS ERIC Return Dashboard
+                    </span>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="fw-bold text-muted">Active Return:</span>
+                        <select class="o_nhs_header_select" t-on-change="onReturnChange">
+                            <t t-foreach="state.metrics.returns" t-as="ret" t-key="ret.id">
+                                <option t-att-value="ret.id" t-att-selected="ret.id == state.metrics.selected_return_id">
+                                    <t t-esc="ret.name"/>
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+
+                <t t-if="!state.metrics.has_data">
+                    <div class="text-center py-5 bg-white border rounded-3">
+                        <i class="fa fa-info-circle fa-3x text-muted mb-3"/>
+                        <h3>No ERIC Returns Found</h3>
+                        <p class="text-muted">Please create an ERIC Return first to view progress metrics.</p>
+                    </div>
+                </t>
+                <t t-else="">
+                    
+                    <!-- 1. KPI Cards Grid (4 progress stats) -->
+                    <div class="o_nhs_kpi_grid">
+                        
+                        <!-- Completeness -->
+                        <div class="o_nhs_kpi_card kpi-green" t-on-click="openReturn">
+                            <div class="o_nhs_kpi_content">
+                                <span class="o_nhs_kpi_title">Completeness %</span>
+                                <span class="o_nhs_kpi_value">
+                                    <t t-esc="state.metrics.completeness_pct.toFixed(1)"/>%
+                                </span>
+                            </div>
+                            <div class="o_nhs_kpi_icon_wrapper">
+                                <i class="fa fa-check-circle-o"/>
+                            </div>
+                        </div>
+
+                        <!-- Sections Outstanding -->
+                        <div class="o_nhs_kpi_card kpi-orange" t-on-click="openReturn">
+                            <div class="o_nhs_kpi_content">
+                                <span class="o_nhs_kpi_title">Sections Outstanding</span>
+                                <span class="o_nhs_kpi_value">
+                                    <t t-esc="state.metrics.sections_outstanding"/>
+                                </span>
+                            </div>
+                            <div class="o_nhs_kpi_icon_wrapper">
+                                <i class="fa fa-list-ol"/>
+                            </div>
+                        </div>
+
+                        <!-- Validation Errors -->
+                        <div class="o_nhs_kpi_card kpi-red" t-on-click="openReturn">
+                            <div class="o_nhs_kpi_content">
+                                <span class="o_nhs_kpi_title">Validation Errors</span>
+                                <span class="o_nhs_kpi_value">
+                                    <t t-esc="state.metrics.validation_error_count"/>
+                                </span>
+                            </div>
+                            <div class="o_nhs_kpi_icon_wrapper">
+                                <i class="fa fa-exclamation-circle"/>
+                            </div>
+                        </div>
+
+                        <!-- Gaps -->
+                        <div class="o_nhs_kpi_card kpi-blue" t-on-click="() => this.openAction('nhs.eric.value', 'list,form', [['return_id', '=', state.metrics.selected_return_id], ['status', '=', 'gap']])">
+                            <div class="o_nhs_kpi_content">
+                                <span class="o_nhs_kpi_title">Required Gaps</span>
+                                <span class="o_nhs_kpi_value">
+                                    <t t-esc="state.metrics.gap_count"/>
+                                </span>
+                            </div>
+                            <div class="o_nhs_kpi_icon_wrapper">
+                                <i class="fa fa-folder-open-o"/>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- 2. Headline Estate Metrics Ribbon -->
+                    <div class="o_nhs_headline_ribbon">
+                        <div class="o_nhs_ribbon_item">
+                            <span class="o_nhs_ribbon_label">Total GIA (m²)</span>
+                            <span class="o_nhs_ribbon_value">
+                                <t t-esc="Math.round(state.metrics.headline.gia).toLocaleString()"/> m²
+                            </span>
+                        </div>
+                        <div class="o_nhs_ribbon_item">
+                            <span class="o_nhs_ribbon_label">Total Backlog Maintenance</span>
+                            <span class="o_nhs_ribbon_value">
+                                £<t t-esc="Math.round(state.metrics.headline.backlog).toLocaleString()"/>
+                            </span>
+                        </div>
+                        <div class="o_nhs_ribbon_item">
+                            <span class="o_nhs_ribbon_label">Overall Compliance %</span>
+                            <span class="o_nhs_ribbon_value">
+                                <t t-esc="state.metrics.headline.compliance.toFixed(1)"/>%
+                            </span>
+                        </div>
+                        <div class="o_nhs_ribbon_item">
+                            <span class="o_nhs_ribbon_label">Cost per m²</span>
+                            <span class="o_nhs_ribbon_value">
+                                £<t t-esc="state.metrics.headline.cost_per_m2.toFixed(2)"/> / m²
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- 3. Charts Section -->
+                    <div class="o_nhs_charts_grid">
+                        
+                        <!-- Chart 1: Data-Source Coverage -->
+                        <div class="o_nhs_card">
+                            <div class="o_nhs_card_header">
+                                <span class="o_nhs_card_title">
+                                    <i class="fa fa-pie-chart"/>
+                                    Data-Source Coverage (Suite Value)
+                                </span>
+                                <span class="badge rounded-pill bg-light text-dark border">
+                                    Auto: <t t-esc="state.metrics.coverage.auto_pct.toFixed(1)"/>%
+                                </span>
+                            </div>
+                            <div class="o_nhs_chart_canvas_wrapper">
+                                <canvas t-ref="coverageChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 2: Section Completeness -->
+                        <div class="o_nhs_card">
+                            <div class="o_nhs_card_header">
+                                <span class="o_nhs_card_title">
+                                    <i class="fa fa-bar-chart"/>
+                                    Completeness by Section
+                                </span>
+                            </div>
+                            <div class="o_nhs_chart_canvas_wrapper">
+                                <canvas t-ref="sectionProgressChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 3: YoY GIA & Backlog Trend -->
+                        <div class="o_nhs_card">
+                            <div class="o_nhs_card_header">
+                                <span class="o_nhs_card_title">
+                                    <i class="fa fa-line-chart"/>
+                                    YoY GIA &amp; Backlog Trends
+                                </span>
+                            </div>
+                            <div class="o_nhs_chart_canvas_wrapper">
+                                <canvas t-ref="trendGiaBacklogChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 4: YoY Cost & Compliance Trend -->
+                        <div class="o_nhs_card">
+                            <div class="o_nhs_card_header">
+                                <span class="o_nhs_card_title">
+                                    <i class="fa fa-line-chart"/>
+                                    YoY Cost per m² &amp; Compliance
+                                </span>
+                            </div>
+                            <div class="o_nhs_chart_canvas_wrapper">
+                                <canvas t-ref="trendCostComplianceChart"></canvas>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- 4. Operational Progress Table -->
+                    <div class="o_nhs_table_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title">
+                                <i class="fa fa-list-ul"/>
+                                Section Review &amp; Sign-off Progress
+                            </span>
+                        </div>
+                        <table class="o_nhs_list_table">
+                            <thead>
+                                <tr>
+                                    <th>Section Name</th>
+                                    <th>Section Owner</th>
+                                    <th>Section Reviewer</th>
+                                    <th style="width: 250px;">Completeness</th>
+                                    <th style="text-align: center;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.metrics.section_lines" t-as="sec" t-key="sec.id">
+                                    <tr t-on-click="() => this.openReturnSection(sec.id)">
+                                        <td class="fw-bold" t-esc="sec.name"/>
+                                        <td t-esc="sec.owner"/>
+                                        <td t-esc="sec.reviewer"/>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="fw-bold" style="font-size: 0.85rem; min-width: 45px;"><t t-esc="sec.completeness_pct.toFixed(0)"/>%</span>
+                                                <div class="o_nhs_progress_container">
+                                                    <div class="o_nhs_progress_fill" t-attf-style="width: #{sec.completeness_pct}%;"/>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <span t-attf-class="badge-compact state-#{sec.state}">
+                                                <t t-if="sec.state == 'draft'">Draft</t>
+                                                <t t-elif="sec.state == 'in_progress'">In Progress</t>
+                                                <t t-elif="sec.state == 'ready_for_review'">Ready for Review</t>
+                                                <t t-elif="sec.state == 'signed_off'">Signed Off</t>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </t>
+
+            </t>
+        </div>
+    </t>
+</templates>

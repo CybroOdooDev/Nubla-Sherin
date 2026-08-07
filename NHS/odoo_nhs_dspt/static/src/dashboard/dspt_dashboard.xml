@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- Dashboard template for displaying DSPT readiness metrics and summaries. -->
+    <t t-name="odoo_nhs_dspt.NhsDsptDashboard" owl="1">
+        <div class="o_nhs_dspt_dashboard o_content p-4" style="height: 100%; overflow-y: auto;">
+            <t t-if="state.loading">
+                <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+                    <div class="spinner-border text-primary" role="status"/>
+                </div>
+            </t>
+            <t t-elif="!state.metrics.has_assessment">
+                <div class="d-flex flex-column align-items-center justify-content-center text-center" style="height: 50vh;">
+                    <i class="fa fa-shield fa-3x text-muted mb-3"/>
+                    <h4>No DSPT assessment yet</h4>
+                    <p class="text-muted">Create an assessment for the active edition to see your readiness here.</p>
+                </div>
+            </t>
+            <t t-else="">
+                <div class="d-flex justify-content-between align-items-center mb-4 nhs-dspt-dashboard-header">
+                    <div>
+                        <h2 class="mb-0"><i class="fa fa-shield me-2"/> DSPT Readiness Dashboard</h2>
+                        <div class="text-muted" t-esc="state.metrics.assessment_name"/>
+                    </div>
+                    <button class="btn btn-nhs btn-sm" t-on-click="openAssessment">
+                        <i class="fa fa-clipboard-check me-1"/> Open Assessment
+                    </button>
+                </div>
+
+                <div t-attf-class="nhs-dspt-rag-banner nhs-dspt-rag-{{ state.metrics.rag }} mb-4">
+                    <i t-attf-class="fa me-2 {{
+                        state.metrics.rag == 'on_track' ? 'fa-check-circle' :
+                        state.metrics.rag == 'at_risk' ? 'fa-exclamation-circle' :
+                        state.metrics.rag == 'behind' ? 'fa-times-circle' : 'fa-info-circle'
+                    }}"/>
+                    <span t-if="state.metrics.deadline">
+                        Deadline <strong t-esc="state.metrics.deadline"/>
+                        <t t-if="state.metrics.days_left >= 0"> — <t t-esc="state.metrics.days_left"/> days left</t>
+                        <t t-else=""> — <t t-esc="-state.metrics.days_left"/> days overdue</t>
+                    </span>
+                    <span t-else="">No deadline set for this edition.</span>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="card h-100 shadow-sm nhs-stat-card nhs-stat-blue" t-on-click="openAssessment">
+                            <div class="card-body">
+                                <div class="nhs-stat-icon"><i class="fa fa-pie-chart"/></div>
+                                <h6 class="text-uppercase opacity-75 mb-1">Readiness</h6>
+                                <h2 class="fw-bold mb-0" t-esc="state.metrics.readiness_pct + '%'"/>
+                                <small class="opacity-75" t-esc="state.metrics.achieved_status"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100 shadow-sm nhs-stat-card nhs-stat-red" t-on-click="openGaps">
+                            <div class="card-body">
+                                <div class="nhs-stat-icon"><i class="fa fa-exclamation-triangle"/></div>
+                                <h6 class="text-uppercase opacity-75 mb-1">Gaps</h6>
+                                <h2 class="fw-bold mb-0" t-esc="state.metrics.gap_count"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100 shadow-sm nhs-stat-card nhs-stat-yellow" t-on-click="openOverdueActions">
+                            <div class="card-body">
+                                <div class="nhs-stat-icon"><i class="fa fa-wrench"/></div>
+                                <h6 class="text-uppercase opacity-75 mb-1">Overdue Actions</h6>
+                                <h2 class="fw-bold mb-0" t-esc="state.metrics.overdue_action_count"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100 shadow-sm nhs-stat-card nhs-stat-dark" t-on-click="openStaleEvidence">
+                            <div class="card-body">
+                                <div class="nhs-stat-icon"><i class="fa fa-clock-o"/></div>
+                                <h6 class="text-uppercase opacity-75 mb-1">Stale Evidence</h6>
+                                <h2 class="fw-bold mb-0" t-esc="state.metrics.stale_evidence_count"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <t t-set="show_standards" t-value="state.metrics.standard_stats &amp;&amp; state.metrics.standard_stats.length &gt; 0"/>
+                <t t-set="show_owners" t-value="state.metrics.owner_stats &amp;&amp; state.metrics.owner_stats.length &gt; 0"/>
+                <t t-if="show_standards || show_owners">
+                    <div class="row g-3 mb-4">
+                        <div t-attf-class="col-md-{{ show_standards &amp;&amp; show_owners ? '6' : '12' }}" t-if="show_standards">
+                            <div class="card h-100 shadow-sm nhs-panel">
+                                <div class="card-header"><i class="fa fa-book me-2"/>Readiness by Standard</div>
+                                <ul class="list-group list-group-flush">
+                                    <t t-foreach="state.metrics.standard_stats" t-as="s" t-key="s.id">
+                                        <li class="list-group-item" style="cursor: pointer;"
+                                            t-on-click="() => this.openStandard(s.id)">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span t-esc="s.name"/>
+                                                <span t-attf-class="badge nhs-badge-{{ getRateLevel(s.rate) }}" t-esc="s.rate + '%'"/>
+                                            </div>
+                                            <div class="nhs-progress">
+                                                <div t-attf-class="nhs-progress-bar nhs-progress-{{ getRateLevel(s.rate) }}"
+                                                     t-attf-style="width: {{ s.rate }}%;"/>
+                                            </div>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </div>
+                        </div>
+                        <div t-attf-class="col-md-{{ show_standards &amp;&amp; show_owners ? '6' : '12' }}" t-if="show_owners">
+                            <div class="card h-100 shadow-sm nhs-panel">
+                                <div class="card-header"><i class="fa fa-users me-2"/>Owner Completion</div>
+                                <table class="table table-sm mb-0">
+                                    <t t-foreach="state.metrics.owner_stats" t-as="o" t-key="o.id">
+                                        <tr style="cursor: pointer;" t-on-click="() => this.openOwner(o.id)">
+                                            <td t-esc="o.name"/>
+                                            <td><span class="badge text-bg-secondary" t-esc="o.total"/> assigned</td>
+                                            <td>
+                                                <span t-attf-class="badge {{ o.outstanding > 0 ? 'text-bg-warning' : 'text-bg-success' }}"
+                                                      t-esc="o.outstanding + ' outstanding'"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Compliance Item  List View -->
+    <record id="view_nhs_compliance_item_tree" model="ir.ui.view">
+        <field name="name">nhs.compliance.item.tree</field>
+        <field name="model">nhs.compliance.item</field>
+        <field name="arch" type="xml">
+            <list decoration-success="status=='compliant'"
+                  decoration-warning="status=='due_soon'"
+                  decoration-danger="status in ['overdue','failed']">
+                <field name="reference"/>
+                <field name="discipline_id"/>
+                <field name="compliance_type_id"/>
+                <field name="site_id"/>
+                <field name="building_id"/>
+                <field name="responsible_person_id"/>
+                <field name="last_completed_date"/>
+                <field name="next_due_date"/>
+                <field name="status" widget="badge"/>
+                <field name="open_remedial_count" string="Remedials" sum="Total"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Compliance Item  Form View -->
+    <record id="view_nhs_compliance_item_form" model="ir.ui.view">
+        <field name="name">nhs.compliance.item.form</field>
+        <field name="model">nhs.compliance.item</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="compliant,due_soon,overdue,failed"/>
+                    <button name="action_log_test" type="object" string="Log Test" class="oe_highlight"
+                            invisible="id == 0"/>
+                    <button name="action_log_remedial" type="object" string="Log Remedial" class="oe_highlight"
+                            invisible="id == 0"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_maintenance" type="object"
+                                class="oe_stat_button" icon="fa-wrench">
+                            <span class="o_stat_text">Maintenance</span>
+                        </button>
+                        <button name="action_view_history" type="object"
+                                class="oe_stat_button" icon="fa-history">
+                            <field name="test_count" widget="statinfo" string="Tests"/>
+                        </button>
+                        <button name="action_view_compliance_remedial" type="object"
+                                class="oe_stat_button" icon="fa-wrench">
+                            <field name="open_remedial_count" widget="statinfo" string="Open Remedials"/>
+                        </button>
+                    </div>
+                    <div class="oe_title" decoration-bf="1">
+                        <h1>
+                            <field name="reference"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="compliance_type_id" options="{'no_create': True}"/>
+                            <field name="discipline_id" options="{'no_create': True}"/>
+                            <field name="criticality" widget="badge"/>
+                        </group>
+                        <group>
+                            <field name="site_id" options="{'no_create': True}"/>
+                            <field name="building_id" options="{'no_create': True}"/>
+                            <field name="space_id" options="{'no_create': True}"/>
+                            <field name="equipment_id" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="frequency_value"/>
+                            <field name="frequency_unit"/>
+                            <field name="lead_days"/>
+                            <field name="calendar_id" options="{'no_create': True}"/>
+                            <field name="grace_days"/>
+                            <field name="responsible_person_id" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="last_completed_date"/>
+                            <field name="next_due_date"/>
+                            <field name="delivery_method"/>
+                            <field name="contractor_id" invisible="delivery_method != 'contractor'"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook invisible="id == 0">
+                        <page name="tests" string="Tests">
+                            <field name="test_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="test_date"/>
+                                    <field name="outcome" widget="badge"/>
+                                    <field name="performed_by_id"/>
+                                    <field name="contractor_id"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="remedials" string="Remedials">
+                            <field name="remedial_ids" readonly="1" >
+                                <list decoration-danger="state in ['open']"
+                                      decoration-warning="state in ['in_progress','awaiting_parts']">
+                                    <field name="name"/>
+                                    <field name="priority" widget="badge"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="owner_id"/>
+                                    <field name="due_date"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Compliance Item  Kanban View -->
+    <record id="view_nhs_compliance_item_kanban" model="ir.ui.view">
+        <field name="name">nhs.compliance.item.kanban</field>
+        <field name="model">nhs.compliance.item</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="status"/>
+                <field name="discipline_id"/>
+                <field name="compliance_type_id"/>
+                <field name="next_due_date"/>
+                <field name="responsible_person_id"/>
+                <field name="activity_ids"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <div class="oe_kanban_details d-flex flex-column justify-content-between h-100 ps-2">
+                                <div>
+                                    <div class="o_kanban_record_top mb-1">
+                                        <div class="o_kanban_record_headings">
+                                            <strong class="o_kanban_record_title fs-6">
+                                                <field name="reference"/>
+                                            </strong>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-1 mb-2">
+                                        <span class="badge text-bg-primary">
+                                            <field name="compliance_type_id"/>
+                                        </span>
+                                    </div>
+                                    <div class="d-flex gap-3 mt-2">
+                                        <span class="text-muted small" title="Discipline">
+                                            <field name="discipline_id"/>
+                                        </span>
+                                    </div>
+                                    <div class="d-flex gap-3 mt-2">
+                                        <span class="text-muted small">
+                                            <i class="fa fa-building me-1" title="Building"/>
+                                        </span>
+                                        <span class="text-muted small" title="Site">
+                                            <field name="site_id"/>
+                                        </span>
+                                        <span class="text-muted small" title="Building">
+                                            <field name="building_id"/>
+                                        </span>
+                                        <span class="text-muted small" title="Space">
+                                            <field name="space_id"/>
+                                        </span>
+                                    </div>
+                                    <div class="d-flex gap-3 mt-2">
+                                        <span class="text-muted small">
+                                            Due :
+                                            <field name="next_due_date"/>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom mt-2 pt-2 d-flex justify-content-between align-items-center"
+                                     style="border-top:1px solid #e9ecef;">
+                                    <span class="badge text-bg-secondary" title="Status">
+                                        <field name="status"/>
+                                    </span>
+                                    <field name="activity_ids" widget="kanban_activity"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Compliance Item  Calendar View -->
+    <record id="view_nhs_compliance_item_calendar" model="ir.ui.view">
+        <field name="name">nhs.compliance.item.calendar</field>
+        <field name="model">nhs.compliance.item</field>
+        <field name="arch" type="xml">
+            <calendar color="discipline_id" date_start="next_due_date" string="Next Due" quick_create="false">
+                <field name="name"/>
+                <field name="discipline_id"/>
+                <field name="building_id"/>
+                <field name="responsible_person_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Compliance Item  Search View -->
+    <record id="view_nhs_compliance_item_search" model="ir.ui.view">
+        <field name="name">nhs.compliance.item.search</field>
+        <field name="model">nhs.compliance.item</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="compliance_type_id"/>
+                <field name="discipline_id"/>
+                <field name="building_id"/>
+                <field name="responsible_person_id"/>
+                <filter name="compliant" string="Compliant" domain="[('status', '=', 'compliant')]"/>
+                <filter name="due_soon" string="Due Soon" domain="[('status', '=', 'due_soon')]"/>
+                <filter name="overdue" string="Overdue" domain="[('status', '=', 'overdue')]"/>
+                <filter name="failed" string="Failed" domain="[('status', '=', 'failed')]"/>
+                <separator/>
+                <filter name="due_this_week" string="Due This Week"
+                        domain="[('next_due_date', '&gt;=', context_today()), ('next_due_date', '&lt;=', context_today() + relativedelta(weeks=1))]"/>
+                <filter name="due_this_month" string="Due This Month"
+                        domain="[('next_due_date', '&gt;=', context_today()), ('next_due_date', '&lt;=', context_today() + relativedelta(months=1))]"/>
+                <filter name="due_this_quarter" string="Due This Quarter"
+                        domain="[('next_due_date', '&gt;=', context_today()), ('next_due_date', '&lt;=', context_today() + relativedelta(months=3))]"/>
+                <filter name="due_this_year" string="Due This Year"
+                        domain="[('next_due_date', '&gt;=', context_today()), ('next_due_date', '&lt;=', context_today() + relativedelta(years=1))]"/>
+                <group>
+                    <filter name="group_discipline" string="Discipline" context="{'group_by': 'discipline_id'}"/>
+                    <filter name="group_building" string="Building" context="{'group_by': 'building_id'}"/>
+                    <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
+                    <filter name="group_criticality" string="Criticality" context="{'group_by': 'criticality'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Compliance Item  Action -->
+    <record id="action_nhs_compliance_item" model="ir.actions.act_window">
+        <field name="name">Compliance Items</field>
+        <field name="res_model">nhs.compliance.item</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create compliance items to track your statutory obligations.
+            </p>
+        </field>
+    </record>
+
+    <!-- Compliance Item Due Soon Action -->
+    <record id="action_nhs_compliance_item_due_soon" model="ir.actions.act_window">
+        <field name="name">Due Soon</field>
+        <field name="res_model">nhs.compliance.item</field>
+        <field name="view_mode">calendar,list,form</field>
+        <field name="domain">[('status', '=', 'due_soon')]</field>
+    </record>
+
+    <!-- Compliance Item Overdue Action -->
+    <record id="action_nhs_compliance_item_overdue" model="ir.actions.act_window">
+        <field name="name">Overdue</field>
+        <field name="res_model">nhs.compliance.item</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('status', '=', 'overdue')]</field>
+        <field name="context">{'search_default_group_criticality': 1}</field>
+    </record>
+
+    <!-- Compliance Item  Failed Action -->
+    <record id="action_nhs_compliance_item_failed" model="ir.actions.act_window">
+        <field name="name">Failed &amp; Remedials</field>
+        <field name="res_model">nhs.compliance.item</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('status', '=', 'failed')]</field>
+    </record>
+
+    <!-- Compliance Item  Pivot View -->
+    <record id="view_nhs_compliance_item_pivot" model="ir.ui.view">
+        <field name="name">nhs.compliance.item.pivot</field>
+        <field name="model">nhs.compliance.item</field>
+        <field name="arch" type="xml">
+            <pivot string="Compliance Planner Analysis">
+                <field name="discipline_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="next_due_date" interval="month" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Compliance Item  Graph View -->
+    <record id="view_nhs_compliance_item_graph" model="ir.ui.view">
+        <field name="name">nhs.compliance.item.graph</field>
+        <field name="model">nhs.compliance.item</field>
+        <field name="arch" type="xml">
+            <graph string="Compliance Planner Analysis" type="bar">
+                <field name="next_due_date" interval="month"/>
+                <field name="discipline_id"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Compliance Planner Action -->
+    <record id="action_nhs_compliance_planner" model="ir.actions.act_window">
+        <field name="name">Forward Schedule / Planner</field>
+        <field name="res_model">nhs.compliance.item</field>
+        <field name="view_mode">calendar,list,pivot,graph,form</field>
+        <field name="context">{'search_default_group_discipline': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Forward schedule of compliance items.
+            </p>
+        </field>
+    </record>
+</odoo>

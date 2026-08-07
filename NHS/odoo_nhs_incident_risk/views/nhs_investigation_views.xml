@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form/list views and window action for the Investigation workflow (draft → in_progress → submitted →
+         approved), linked back to the source incident and to the corrective/preventive actions it raises -->
+    <record id="view_nhs_investigation_form" model="ir.ui.view">
+        <field name="name">nhs.investigation.form</field>
+        <field name="model">nhs.investigation</field>
+        <field name="arch" type="xml">
+            <form string="Investigation">
+                <!-- Workflow buttons: any investigator can start/submit; only quality leads may approve or send the
+                     submission back for rework, enforcing independent sign-off of the investigation -->
+                <header>
+                    <button name="action_start" string="Start Investigation"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_submit" string="Submit for Approval"
+                            type="object" class="btn-primary"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_approve" string="Approve"
+                            type="object" class="btn-success"
+                            groups="odoo_nhs_incident_risk.group_hc_quality_lead"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_rework" string="Return for Rework"
+                            type="object"
+                            groups="odoo_nhs_incident_risk.group_hc_quality_lead"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_print_report" string="Print Report"
+                            type="object" icon="fa-print"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,submitted,approved"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="incident_id" readonly="1"/>
+                            <field name="response_level"/>
+                        </group>
+                        <group>
+                            <field name="lead_investigator_id"/>
+                            <field name="team_member_ids" widget="many2many_tags"/>
+                            <field name="approved_by_id" readonly="1"/>
+                            <field name="approved_at" readonly="1"/>
+                        </group>
+                    </group>
+                    <!-- Detail tabs (chronology, factors, findings, actions) are hidden until the investigation
+                         has actually started, since there is nothing to show for a draft -->
+                    <notebook invisible="state == 'draft'">
+                        <page string="Terms of Reference">
+                            <field name="terms_of_reference"
+                                   placeholder="Required for PSII investigations."/>
+                        </page>
+                        <page string="Chronology">
+                            <field name="timeline_ids">
+                                <list editable="bottom">
+                                    <field name="happened_at"/>
+                                    <field name="entry"/>
+                                    <field name="source"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Contributing Factors">
+                            <field name="contributing_factor_ids" widget="many2many_checkboxes"/>
+                        </page>
+                        <page string="Findings &amp; Learning">
+                            <group string="Investigation Findings">
+                                <field name="findings" nolabel="1" colspan="2"
+                                       placeholder="Provide a detailed summary of what the investigation discovered regarding the timeline, root causes, and immediate circumstances..."/>
+                            </group>
+                            <group string="Lessons Learned">
+                                <field name="lessons_learned" nolabel="1" colspan="2"
+                                       placeholder="Identify key learning points to prevent similar incidents (e.g., training needs, process adjustments)..."/>
+                            </group>
+                            <group string="Areas of Good Practice">
+                                <field name="good_practice" nolabel="1" colspan="2"
+                                       placeholder="Highlight what went well, positive care examples, or rapid clinical responses to share with other teams..."/>
+                            </group>
+                        </page>
+                        <page string="Actions">
+                            <field name="action_ids"
+                                   context="{'default_incident_id': incident_id, 'default_investigation_id': id}">
+                                <list>
+                                    <field name="reference"/>
+                                    <field name="name"/>
+                                    <field name="owner_id"/>
+                                    <field name="due_date"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_investigation_list" model="ir.ui.view">
+        <field name="name">nhs.investigation.list</field>
+        <field name="model">nhs.investigation</field>
+        <field name="arch" type="xml">
+            <list string="Investigations">
+                <field name="name"/>
+                <field name="incident_id"/>
+                <field name="response_level"/>
+                <field name="lead_investigator_id"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'approved'"
+                       decoration-warning="state == 'submitted'"
+                       decoration-info="state in ('draft','in_progress')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_nhs_investigation" model="ir.actions.act_window">
+        <field name="name">Investigations</field>
+        <field name="res_model">nhs.investigation</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

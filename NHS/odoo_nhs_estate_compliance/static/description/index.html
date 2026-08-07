@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>NHS Estates Compliance · Odoo Module</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+
+    <style>
+        /* Active tab styling */
+        .nav-pills .nav-link.active {
+            background-color: #005EB8 !important;
+            color: white !important;
+            border-color: #005EB8 !important;
+        }
+
+        /* Tab hover effect */
+        .nav-pills .nav-link:not(.active):hover {
+            background-color: #e9ecef !important;
+            color: #005EB8 !important;
+        }
+
+        /* Feature cards like key highlights */
+        .feature-card {
+            background-color: #8d76d51f;
+            backdrop-filter: blur(20px);
+            border-radius: 10px;
+            padding: 32px;
+            border: 2px solid #71639e1a;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            background-color: #005EB8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-card .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: black;
+            margin-bottom: 12px;
+            letter-spacing: -0.025em;
+        }
+
+        .feature-card .card-description {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 0;
+            line-height: 1.6;
+        }
+
+        /* Tab link styles */
+        .tabs-design1 .nav-pills .nav-link {
+            width: max-content;
+            border-radius: 50px;
+            margin: 0 5px;
+            padding: 12px 24px;
+            font-weight: 500;
+            border: 2px solid #e9ecef;
+            position: relative;
+            text-decoration: none;
+            color: #005EB8;
+            background: white;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tabs-design1 .nav-pills .nav-link.active {
+            background-color: #005EB8 !important;
+            color: white !important;
+            border-color: #005EB8 !important;
+        }
+
+        .tabs-design1 .nav-pills .nav-link:not(.active):hover {
+            background-color: #e9ecef !important;
+            color: #005EB8 !important;
+        }
+
+        /* FAQ details styling */
+        details summary::-webkit-details-marker {
+            display: none !important;
+        }
+        details summary {
+            list-style: none !important;
+            outline: none !important;
+        }
+        details summary:focus {
+            outline: none !important;
+        }
+        details[open] summary.accordion-button::after {
+            transform: rotate(-180deg) !important;
+        }
+    </style>
+</head>
+
+<body style="font-family: &quot;Montserrat&quot;, sans-serif;background-color: #71639e08;">
+
+<!-- ═══ HEADER WITH SUPPORTS BADGE ═══ -->
+<div class="container-fluid cmpad">
+    <div class="supports my-3 py-3"
+         style="border: 2px solid #e9ecef;padding: 0 35px;border-radius: 10px;background-color: white;">
+        <div class="row justify-content-between align-items-center">
+            <div class="col-lg-3">
+                <div class="my-3 mx-auto mx-sm-0" style="width: 250px;">
+                    <img src="//apps.odoocdn.com/apps/assets/17.0/theme_boec/images/Cybrosys.png?fcdde35"
+                         style="width: 100%;">
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="row">
+                    <div class="my-3 d-flex align-items-center justify-content-center justify-content-sm-end">
+                        <span class="me-3"><b>Supports: </b></span>
+                        <div class="text-center"
+                             style="background-color: #005EB8 !important;font-size: 1rem !important;color: #fff !important;font-weight: 500 !important;padding: 8px !important;margin: 0 3px !important;border-radius: 50px !important;min-width: 130px !important;">
+                            Community
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 10px;display: flex;justify-content: end;float: right;">
+                    <div class="d-flex align-items-center justify-content-end flex-wrap gap-2">
+                        <span class="me-3"><b>Availability: </b></span>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-center col"
+                             style="border: 2px solid #ebebeb;font-size: 1rem !important;color: #333 !important;font-weight: 500 !important;padding: 8px !important;margin: 0 3px !important;border-radius: 20px !important;min-width: 150px !important;">
+                            <img src="./assets/icons/close.png" alt="" width="18" height="18">
+                            Odoo Online
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-center col"
+                             style="border: 2px solid #ebebeb;font-size: 1rem !important;color: #333 !important;font-weight: 500 !important;padding: 8px !important;margin: 0 3px !important;border-radius: 20px !important;min-width: 150px !important;">
+                            <img src="./assets/icons/close.png" alt="" width="18" height="18">
+                            Odoo.sh
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-center col"
+                             style="border: 2px solid #ebebeb;font-size: 1rem !important;color: #333 !important;font-weight: 500 !important;padding: 8px !important;margin: 0 3px !important;border-radius: 20px !important;min-width: 150px !important;">
+                            <img src="./assets/icons/tick.png" alt="" width="18" height="18">
+                            On Premise
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ HERO SECTION ═══ -->
+<div class="container-fluid cmpad text-center py-5 py-md-3">
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="mainhead" style="font-size: 2.3rem;padding-top: 1rem;font-weight: 700;color: black;">NHS Estates
+                Compliance</h3>
+            <p class="para mb-4" style="font-size: 20px;color: #6b7280;">Statutory estates compliance scheduling — water, fire, electrical, ventilation, asbestos, lifting and medical gas — for the NHS and CQC-registered providers.</p>
+
+            <div class="d-flex justify-content-center gap-1 flex-wrap">
+                <a href="mailto:"
+                   class="contact-btn email-btn d-flex align-items-center gap-2 justify-content-center"
+                   style="position: relative;padding: 15px 25px;border: none;border-radius: 50px;font-size: 16px;font-weight: 600;text-decoration: none;color: white;cursor: pointer;min-width: 200px;justify-content: center;background-color: #4facfe">
+                    <img src="./assets/icons/mail.png" alt="" width="25" height="25">
+                    <span class="btn-text" style="font-size: 15px;letter-spacing: 0.5px;">Email Us</span>
+                </a>
+                <a href="https://wa.me/918606827707"
+                   class="contact-btn whatsapp-btn d-flex align-items-center gap-2 justify-content-center"
+                   style="position: relative;padding: 15px 25px;border: none;border-radius: 50px;font-size: 16px;font-weight: 600;text-decoration: none;color: white;cursor: pointer;min-width: 200px;justify-content: center;background-color: #25d366;">
+                    <img src="./assets/icons/whatsapp.png" alt="" width="25" height="25">
+                    <span class="btn-text" style="font-size: 15px;letter-spacing: 0.5px;">+91 86068 27707</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ KEY HIGHLIGHTS ═══ -->
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="highlights-section">
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Key
+            <span>Highlights</span></h2>
+        <div class="row" style="margin-top: 20px;">
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Statutory Framework</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Pre-loaded compliance disciplines (water, fire, electrical, ventilation, asbestos, LOLER, medical gas) with HTM references.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Accountable Persons</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Duty Holder, Responsible Person, Authorised Person, Competent Person — with authorisation expiry tracking.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Scheduling & Recurrence</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Auto-computed next-due dates, due-soon/overdue status, working calendar awareness, and bulk reschedule.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Test & Certificate Records</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Pass/fail/remedial outcomes, certificate ref, expiry, readings, attachments — full audit trail.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Remedial Actions</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Raise remedials from failures, track priority, owner, due date, verification — with escalation.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Dashboards & ERIC Export</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Compliance % by discipline/building, RAG heat grid, overdue register, and ERIC-ready data export.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ TABS: SCREENSHOTS, FEATURES, FAQ, LATEST RELEASE ═══ -->
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="tabs-design1">
+        <ul class="nav nav-pills justify-content-start justify-content-md-center pb-4"
+            style="flex-flow: nowrap;overflow: hidden;overflow-x: auto;" id="pills1" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="screenshot-tab" data-bs-toggle="pill" data-bs-target="#screenshot"
+                   role="tab" aria-controls="screenshot" aria-selected="true" href="#screenshot">
+                    Screenshot
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="features-tab" data-bs-toggle="pill" data-bs-target="#features"
+                   role="tab" aria-controls="features" aria-selected="false" href="#features">
+                    Features
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="faq-tab" data-bs-toggle="pill" data-bs-target="#faq"
+                   role="tab" aria-controls="faq" aria-selected="false" href="#faq">
+                    Frequent Questions
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="latest-release-tab" data-bs-toggle="pill" data-bs-target="#latest-release"
+                   role="tab" aria-controls="latest-release" aria-selected="false" href="#latest-release">
+                    Latest Release
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content bg-white rounded-4" style="border: 2px solid #e9ecef;border-radius: 10px;"
+             id="pills1Content">
+
+            <!-- ═══ SCREENSHOT TAB (ACTIVE BY DEFAULT) ═══ -->
+            <div class="tab-pane fade show active" id="screenshot" role="tabpanel" aria-labelledby="screenshot-tab">
+                <div class="p-3 py-md-5">
+
+                    <h2 class="mainhead text-center mb-2" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Manage <span>User Access</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Configure user roles - User , Officer and Manager , from the Users settings
+                        page.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/access_user.png" alt="User Access"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <h2 class="mainhead text-center mb-2" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Configuration <span>Settings</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Configure the due soon threshold,escalation threshold and the weekly digest recipients mail.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/setting.png" alt="Configuration Settings"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <h2 class="mainhead text-center mb-2" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Compliance <span>Dashboard</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Overall compliance %, by-discipline bars, overdue count, failed tests, and authorisation lapses.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/dashboard1.png" alt="Compliance Dashboard"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/dashboard2.png" alt="Compliance Dashboard"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/dashboard3.png" alt="Compliance Dashboard"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <h2 class="mainhead text-center mb-2" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Compliance <span>Item Form</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Status ribbon (green/amber/red), location breadcrumb, responsible person, next-due countdown.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/item_1.png" alt="Compliance Item"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/item_2.png" alt="Compliance Item"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <h2 class="mainhead text-center mb-2" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Test <span>Record</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Outcome selector, certificate fields, readings, attachments — raise remedial inline on fail.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/test.png" alt="Test Record"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Accountable <span>Persons</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Duty assignments: person, role, discipline, scope, authorised-to with expiry highlighting.
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/duty_assignment.png" alt="Duty Assignments"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/duty_roles.png" alt="Duty Roles"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Contractor <span>Visit</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Log multiple tests from one visit, permit-to-work reference, contractor accreditation expiry.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/contractor1.png" alt="Contractor"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/Contractor2.png" alt="Contractor"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/contractor_performance.png" alt="Contractor Performance"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/visit.png" alt="Contractor Visit"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Remedial <span>Actions</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Track failures → remedials with priority, owner, due date, verification and completion evidence.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/remedial.png" alt="Remedial Actions"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Disciplines <span>And their Types</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Pre-loaded disciplines and associated compliance types with frequency,lead times,etc.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/disciplines.png" alt="Disciplines"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/discipline2.png" alt="Disciplines"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Compliance <span> Reports</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        PDF reports: per site, per discipline, whole estate — board assurance, certificate pack.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/compliance_position.png" alt="Compliance Report"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/board_assurance.png" alt="Board Assurance Report"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+                    <br/>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/certificate.png" alt="Certificate Pack"
+                             style="max-width: 100%;height: auto;">
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ═══ FEATURES TAB (Styled like Key Highlights) ═══ -->
+            <div class="tab-pane fade" id="features" role="tabpanel" aria-labelledby="features-tab">
+                <div class="p-3 py-md-5">
+                    <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">Our
+                        <span>Features</span></h2>
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">Pre-loaded Disciplines & Types</h3>
+                                <p class="card-description">Water, fire, electrical, ventilation, asbestos, LOLER, MGPS, pressure, gas, lightning — with HTM refs and default frequencies.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">Statutory vs Advisory Flag</h3>
+                                <p class="card-description">Each compliance type marked as statutory duty or advisory/good-practice — drives reporting emphasis.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">Bulk-Apply Discipline Schedule</h3>
+                                <p class="card-description">Apply a discipline schedule to many buildings at once — e.g. fire schedule to all 12 buildings.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">Due-Soon / Overdue Alerts</h3>
+                                <p class="card-description">Configurable amber window, automatic reminders, escalation to estates manager / Duty Holder.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">Certificate & Evidence Management</h3>
+                                <p class="card-description">Attach certificates, reports, photos; track certificate ref, issue date, expiry.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">Contractor Accreditation Expiry</h3>
+                                <p class="card-description">Track contractor insurance and accreditation expiry with automatic reminders.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">RAG Heat Grid Dashboard</h3>
+                                <p class="card-description">Building × discipline heat view — instantly see where risk concentrates.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">Board Assurance Report</h3>
+                                <p class="card-description">Compliance %, key risks, overdue items — ready for the estates board paper.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card h-100">
+                                <div class="card-icon d-flex align-items-center justify-content-center">
+                                    <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                                </div>
+                                <h3 class="card-title">XLSX Import Templates</h3>
+                                <p class="card-description">Bulk import compliance items, last-completed dates, and accountable persons.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ FAQ TAB ═══ -->
+            <div class="tab-pane fade" id="faq" role="tabpanel" aria-labelledby="faq-tab">
+                <div class="p-3 py-md-5">
+
+                    <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Frequently Asked <span>Questions</span></h2>
+
+                    <div class="modern-accordion">
+                        <div class="accordion accordion-flush" id="accordionFlushExample">
+                            <details class="accordion-item loading-animation"
+                                     style="margin-bottom: 1rem;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                <summary class="accordion-button collapsed"
+                                         style="box-shadow: unset; border: none !important; padding: 1.5rem 2rem !important; font-weight: 600 !important; font-size: 1.1rem; color: #71639e !important; background-color: #e3e3f3a9 !important; position: relative; overflow: hidden; border-radius: 10px !important; cursor: pointer;"
+                                         aria-expanded="false">
+                                    ❓ What compliance disciplines are covered?
+                                </summary>
+                                <div style="border-top: 1px solid #e2e8f0;">
+                                    <div class="accordion-body"
+                                         style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                        <p style="color: #374151; font-size: 0.95rem; margin-top: 10px;">
+                                            The module pre-loads: Water safety (HTM 04-01), Fire (RRO/HTM 05), Electrical (HTM 06), Ventilation (HTM 03-01), Asbestos, Lifting/LOLER, Medical gas (HTM 02-01), Pressure systems, Gas, Lightning, Drainage, and Working at height.
+                                        </p>
+                                        <p style="color: #374151; font-size: 0.95rem;">
+                                            Each discipline comes with its specific compliance types, default frequencies, and HTM/regulation references. You can enable/disable disciplines per organisation.
+                                        </p>
+                                    </div>
+                                </div>
+                            </details>
+
+                            <details class="accordion-item loading-animation"
+                                     style="margin-bottom: 0;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                <summary class="accordion-button collapsed"
+                                         style="box-shadow: unset; border: none !important; padding: 1.5rem 2rem !important; font-weight: 600 !important; font-size: 1.1rem; color: #71639e !important; background-color: #e3e3f3a9 !important; position: relative; overflow: hidden; border-radius: 10px !important; cursor: pointer;"
+                                         aria-expanded="false">
+                                    ❓ What is the accountable-person model?
+                                </summary>
+                                <div style="border-top: 1px solid #e2e8f0;">
+                                    <div class="accordion-body"
+                                         style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                        <p style="color: #374151; font-size: 0.95rem; margin-top: 10px;">
+                                            The HTM regime requires specific named individuals to be accountable for each discipline. The module models:
+                                        </p>
+                                        <ul style="color: #374151; font-size: 0.95rem; padding-left: 20px;">
+                                            <li><strong>Duty Holder</strong> – ultimate legal duty (often Chief Executive)</li>
+                                            <li><strong>Designated Person</strong> – board-level 'informed person'</li>
+                                            <li><strong>Responsible Person (RP)</strong> – day-to-day management</li>
+                                            <li><strong>Authorised Person (AP)</strong> – authorised to carry out/supervise work</li>
+                                            <li><strong>Competent Person (CP)</strong> – carries out the actual work</li>
+                                            <li><strong>Authorising Engineer (AE)</strong> – advises and audits</li>
+                                        </ul>
+                                        <p style="color: #374151; font-size: 0.95rem;">
+                                            Assignments include authorisation expiry dates; lapses are flagged as compliance gaps.
+                                        </p>
+                                    </div>
+                                </div>
+                            </details>
+                            <details class="accordion-item loading-animation"
+                                     style="margin-bottom: 0;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;margin-top:1rem;">
+                                <summary class="accordion-button collapsed"
+                                         style="box-shadow: unset; border: none !important; padding: 1.5rem 2rem !important; font-weight: 600 !important; font-size: 1.1rem; color: #71639e !important; background-color: #e3e3f3a9 !important; position: relative; overflow: hidden; border-radius: 10px !important; cursor: pointer;"
+                                         aria-expanded="false">
+                                    ❓ Can I generate compliance items in bulk?
+                                </summary>
+                                <div style="border-top: 1px solid #e2e8f0;">
+                                    <div class="accordion-body"
+                                         style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                        <p style="color: #374151; font-size: 0.95rem; margin-top: 10px;">
+                                            Yes. The <strong>Bulk-Apply</strong> wizard lets you:
+                                        </p>
+                                        <ul style="color: #374151; font-size: 0.95rem; padding-left: 20px;">
+                                            <li>Pick a discipline (or set of compliance types)</li>
+                                            <li>Select a set of buildings/sites</li>
+                                            <li>Set a starting last-completed date (or leave blank to start as due now)</li>
+                                            <li>Preview the items before committing</li>
+                                        </ul>
+                                        <p style="color: #374151; font-size: 0.95rem;">
+                                            This is perfect for onboarding an existing estate — e.g. apply the full fire schedule to all 12 buildings in one action.
+                                        </p>
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ LATEST RELEASE TAB  ═══ -->
+            <div class="tab-pane fade" id="latest-release" role="tabpanel" aria-labelledby="latest-release-tab">
+                <div class="p-3 py-md-5 text-center">
+                    <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">Latest
+                        <span>Releases</span></h2>
+                    <div class="text-center py-5" style="color: #6b7280;">
+                        <div class="col-md-4 mb-4" style="margin:0 auto;">
+                            <div class="release-item h-100"
+                                 style="position: relative;padding: 30px;border: 2px solid #71639e24;border-radius: 15px;background:white;">
+                                <div class="release-header d-flex align-items-center flex-wrap gap-3"
+                                     style="margin-bottom: 0.75rem;">
+                                    <div class="version"
+                                         style="font-size: 1.25rem;font-weight: 700;color: #1a202c;">Latest Release
+                                        19.0.1.0.0
+                                    </div>
+                                    <div style="padding: 0.25rem 0.75rem;border-radius: 20px;font-size: 0.75rem;font-weight: 600;text-transform: uppercase;letter-spacing: 0.5px;background-color: #9ae6b4;color: #2d7d32;border: 2px solid #68d391;"
+                                         class="add">Add
+                                    </div>
+                                    <div class="date"
+                                         style="color: #64748b;font-size: 0.875rem;font-weight: 500;gap: 0.5rem;">
+                                        <img src="./assets/icons/calendar.png" alt="" width="16" height="16"
+                                             style="margin-right: 5px;">
+                                        06th July, 2026
+                                    </div>
+                                </div>
+                                <div class="feature-list">
+                                    <div class="feature-item p-3"
+                                         style="border-radius: 5px;display: flex;align-items: center;padding: 25px;background-color: #f5f5f5e7;border-radius: 10px;text-align: left;">
+                                        <div class="feature-text"
+                                             style="color: #6b7280;line-height: 1.6;font-size: 0.95rem;">
+                                            <strong>Initial Commit</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ═══ RELATED MODULES & SERVICES ═══ -->
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="highlights-section">
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Related
+            <span>Modules</span>
+        </h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/base_accounting_kit"
+                   style="text-decoration: none;">
+                    <div class="highlight-card h-100 p-4" style="background-color: white;
+                       backdrop-filter: blur(20px);
+                       border-radius: 10px;
+                       padding: 32px;
+                       border: 2px solid #71639e1a;
+                       position: relative;
+                       overflow: hidden;">
+                        <div class="card-image" style="border: 2px solid #71639e1c;
+                       margin-bottom: 1rem;
+                       border-radius: 10px;
+                       overflow: hidden;">
+                            <img src="./assets/modules/module1.gif" alt=""
+                                 style="width: 100%;border-radius: 10px;">
+                        </div>
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo 19 Full Accounting Kit for Community</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/hide_menu_user"
+                   style="text-decoration: none;">
+                    <div class="highlight-card h-100 p-4" style="background-color: white;
+                       backdrop-filter: blur(20px);
+                       border-radius: 10px;
+                       padding: 32px;
+                       border: 2px solid #71639e1a;
+                       position: relative;
+                       overflow: hidden;">
+                        <div class="card-image" style="border: 2px solid #71639e1c;
+                       margin-bottom: 1rem;
+                       border-radius: 10px;
+                       overflow: hidden;">
+                            <img src="./assets/modules/module2.jpg" alt=""
+                                 style="width: 100%;border-radius: 10px;">
+                        </div>
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Hide Any Menu User Wise</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/base_account_budget"
+                   style="text-decoration: none;">
+                    <div class="highlight-card h-100 p-4" style="background-color: white;
+                       backdrop-filter: blur(20px);
+                       border-radius: 10px;
+                       padding: 32px;
+                       border: 2px solid #71639e1a;
+                       position: relative;
+                       overflow: hidden;">
+                        <div class="card-image" style="border: 2px solid #71639e1c;
+                           margin-bottom: 1rem;
+                           border-radius: 10px;
+                           overflow: hidden;">
+                            <img src="./assets/modules/module3.jpg" alt=""
+                                 style="width: 100%;border-radius: 10px;">
+                        </div>
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo 19 Budget Management</h3>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ OUR SERVICES ═══ -->
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="highlights-section">
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Our
+            <span>Services</span></h2>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/setting.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Customization</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/imple.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Implementation</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/support.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Support</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/transfer.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Migration</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/idea.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Integration</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chat.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Consultancy</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo
+                        Licensing</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #005EB8;">
+                        <img src="./assets/icons/people.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Hire Odoo
+                        Developer</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Manual tab initialization for Bootstrap 5
+    document.addEventListener('DOMContentLoaded', function () {
+        var tabLinks = document.querySelectorAll('#pills1 .nav-link');
+
+        tabLinks.forEach(function (link) {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                // Remove active class from all tabs
+                tabLinks.forEach(function (l) {
+                    l.classList.remove('active');
+                    l.setAttribute('aria-selected', 'false');
+                });
+
+                // Add active class to clicked tab
+                this.classList.add('active');
+                this.setAttribute('aria-selected', 'true');
+
+                // Get target pane ID
+                var targetId = this.getAttribute('data-bs-target');
+                var targetPane = document.querySelector(targetId);
+
+                // Hide all tab panes
+                var allPanes = document.querySelectorAll('#pills1Content .tab-pane');
+                allPanes.forEach(function (pane) {
+                    pane.classList.remove('show', 'active');
+                });
+
+                // Show the target pane
+                if (targetPane) {
+                    targetPane.classList.add('show', 'active');
+                }
+            });
+        });
+    });
+</script>
+
+</html>

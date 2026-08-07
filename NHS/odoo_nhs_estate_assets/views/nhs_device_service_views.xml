@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- list VIEW - Service Records -->
+    <record id="view_nhs_device_service_list" model="ir.ui.view">
+        <field name="name">nhs.device.service.list</field>
+        <field name="model">nhs.device.service</field>
+        <field name="arch" type="xml">
+            <list string="Service History" multi_edit="1"
+                  decoration-success="outcome in ['pass','pass_with_note']"
+                  decoration-danger="outcome in ['fail','removed_from_use']">
+                <field name="name"/>
+                <field name="device_id"/>
+                <field name="service_date"/>
+                <field name="service_type"/>
+                <field name="performed_by_id"/>
+                <field name="contractor"/>
+                <field name="outcome" widget="badge"
+                       decoration-success="outcome in ['pass','pass_with_note']"
+                       decoration-danger="outcome in ['fail','removed_from_use']"/>
+                <field name="cost"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- FORM VIEW - Service Record -->
+    <record id="view_nhs_device_service_form" model="ir.ui.view">
+        <field name="name">nhs.device.service.form</field>
+        <field name="model">nhs.device.service</field>
+        <field name="arch" type="xml">
+            <form string="Service Record">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_documents" type="object"
+                                class="oe_stat_button" icon="fa-file">
+                            <span class="o_stat_text">Documents</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="General Information">
+                            <field name="device_id"/>
+                            <field name="service_type"/>
+                            <field name="service_date"/>
+                            <field name="schedule_id"/>
+                            <field name="maintenance_request_id" readonly="1" invisible="not maintenance_request_id"/>
+                            <field name="warranty_id"/>
+                            <field name="outcome" widget="radio"/>
+                        </group>
+                        <group string="Personnel &amp; Costs">
+                            <field name="performed_by_id"/>
+                            <field name="contractor"/>
+                            <field name="downtime_hours"/>
+                            <field name="cost"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Parts &amp; Details">
+                            <group>
+                                <field name="parts_used"
+                                       placeholder="List spare parts, replacement components, or materials consumed..."/>
+                                <field name="notes" placeholder="Service notes, findings, observations..."/>
+                            </group>
+                        </page>
+                        <page string="Certificate &amp; Attachments">
+                            <group>
+                                <field name="certificate_ref"/>
+                                <field name="attachment_ids" widget="many2many_binary"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- SEARCH VIEW - Service Records -->
+    <record id="view_nhs_device_service_search" model="ir.ui.view">
+        <field name="name">nhs.device.service.search</field>
+        <field name="model">nhs.device.service</field>
+        <field name="arch" type="xml">
+            <search string="Search Service Records">
+                <field name="name"/>
+                <field name="device_id"/>
+                <field name="service_type"/>
+                <field name="outcome"/>
+                <field name="performed_by_id"/>
+                <field name="contractor"/>
+                <field name="certificate_ref"/>
+                <filter name="pass" string="Pass" domain="[('outcome','in',['pass','pass_with_note'])]"/>
+                <filter name="fail" string="Fail" domain="[('outcome','in',['fail','removed_from_use'])]"/>
+                <filter name="ppm" string="PPM" domain="[('service_type','=','ppm')]"/>
+                <filter name="repair" string="Repair" domain="[('service_type','=','repair')]"/>
+                <filter name="calibration" string="Calibration" domain="[('service_type','=','calibration')]"/>
+                <filter name="inspection" string="Inspection" domain="[('service_type','=','inspection')]"/>
+                <filter name="electrical_safety" string="Electrical Safety"
+                        domain="[('service_type','=','electrical_safety')]"/>
+                <filter name="my_services" string="My Services" domain="[('performed_by_id','=',uid)]"/>
+                <filter name="active" string="Archived" domain="[('active','=',False)]"/>
+                <filter name="group_device" string="Device" context="{'group_by':'device_id'}"/>
+                <filter name="group_type" string="Service Type" context="{'group_by':'service_type'}"/>
+                <filter name="group_outcome" string="Outcome" context="{'group_by':'outcome'}"/>
+                <filter name="group_performed_by" string="Performed By" context="{'group_by':'performed_by_id'}"/>
+                <filter name="group_contractor" string="Contractor" context="{'group_by':'contractor'}"/>
+                <filter name="group_date" string="Service Date" context="{'group_by':'service_date'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ACTION - Service Records -->
+    <record id="action_nhs_device_service" model="ir.actions.act_window">
+        <field name="name">Service Records</field>
+        <field name="res_model">nhs.device.service</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_nhs_device_service_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Complete history of all maintenance, repairs, calibrations,
+                and inspections performed on devices.
+            </p>
+        </field>
+    </record>
+</odoo>

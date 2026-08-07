@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Compliance Test List View -->
+    <record id="view_nhs_compliance_test_tree" model="ir.ui.view">
+        <field name="name">nhs.compliance.test.tree</field>
+        <field name="model">nhs.compliance.test</field>
+        <field name="arch" type="xml">
+            <list decoration-success="outcome in ['pass','pass_with_observations']"
+                  decoration-danger="outcome in ['fail','remedial_required']">
+                <field name="name"/>
+                <field name="item_id"/>
+                <field name="test_date"/>
+                <field name="outcome" widget="badge"/>
+                <field name="performed_by_id"/>
+                <field name="contractor_id"/>
+                <field name="certificate_ref"/>
+                <field name="certificate_expiry"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Compliance Test Form View -->
+    <record id="view_nhs_compliance_test_form" model="ir.ui.view">
+        <field name="name">nhs.compliance.test.form</field>
+        <field name="model">nhs.compliance.test</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_raise_remedial" type="object" string="Raise Remedial"
+                            class="oe_highlight"
+                            invisible="outcome not in ['fail','remedial_required']"/>
+                    <field name="outcome" widget="statusbar"
+                           statusbar_visible="pass,pass_with_observations,fail,remedial_required"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_compliance_remedial" type="object"
+                                class="oe_stat_button" icon="fa-wrench">
+                            <field name="remedial_count" widget="statinfo" string="Remedials"/>
+                        </button>
+                        <button name="action_view_documents" type="object"
+                                class="oe_stat_button" icon="fa-file">
+                            <span class="o_stat_text">Documents</span>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="item_id" readonly="id"/>
+                            <field name="item_delivery_method" invisible="1"/>
+                            <field name="item_site_id" invisible="1"/>
+                            <field name="item_building_id" invisible="1"/>
+                            <field name="test_date"/>
+                            <field name="performed_by_id"/>
+                            <field name="discipline_id" invisible="1"/>
+                            <field name="contractor_id" invisible="item_delivery_method != 'contractor'" readonly="1"/>
+                            <field name="visit_id" invisible="item_delivery_method != 'contractor'"
+                                   context="{'default_contractor_id': contractor_id, 'default_site_id': item_site_id, 'default_building_id': item_building_id}"/>
+                        </group>
+                        <group>
+                            <field name="outcome" widget="radio"/>
+                            <field name="certificate_ref"/>
+                            <field name="issuing_body" required="certificate_ref != False"/>
+                            <field name="certificate_date" required="certificate_ref != False"/>
+                            <field name="certificate_expiry" required="certificate_ref != False"/>
+                            <field name="due_date"/>
+                            <field name="completion_status"
+                                   widget="badge"
+                                   decoration-success="completion_status == 'on_time'"
+                                   decoration-danger="completion_status == 'late'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="readings" placeholder="Enter readings (e.g. water temperatures, EICR codes)"/>
+                        <field name="notes" placeholder="Observations / findings"/>
+                    </group>
+                    <notebook>
+                        <page name="remedials" string="Remedials" invisible="not remedial_ids">
+                            <field name="remedial_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="priority" widget="badge"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="owner_id"/>
+                                    <field name="due_date"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="attachments" string="Attachments">
+                            <field name="attachment_ids" widget="many2many_binary" help="Certificate, report, photos"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Compliance Test Pivot View -->
+    <record id="view_nhs_compliance_test_pivot" model="ir.ui.view">
+        <field name="name">nhs.compliance.test.pivot</field>
+        <field name="model">nhs.compliance.test</field>
+        <field name="arch" type="xml">
+            <pivot string="Contractor Performance" sample="1">
+                <field name="contractor_id" type="row"/>
+                <field name="completion_status" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Compliance Test Graph View -->
+    <record id="view_nhs_compliance_test_graph" model="ir.ui.view">
+        <field name="name">nhs.compliance.test.graph</field>
+        <field name="model">nhs.compliance.test</field>
+        <field name="arch" type="xml">
+            <graph string="Contractor Performance" type="bar" sample="1">
+                <field name="contractor_id"/>
+                <field name="completion_status"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Compliance Test Search View -->
+    <record id="view_nhs_compliance_test_search" model="ir.ui.view">
+        <field name="name">nhs.compliance.test.search</field>
+        <field name="model">nhs.compliance.test</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="item_id"/>
+                <field name="certificate_ref"/>
+                <field name="issuing_body"/>
+                <filter name="pass" string="Pass" domain="[('outcome', '=', 'pass')]"/>
+                <filter name="pass_observations" string="Pass with Observations"
+                        domain="[('outcome', '=', 'pass_with_observations')]"/>
+                <filter name="fail" string="Fail" domain="[('outcome', '=', 'fail')]"/>
+                <filter name="remedial_required" string="Remedial Required"
+                        domain="[('outcome', '=', 'remedial_required')]"/>
+                <separator/>
+                <filter name="on_time" string="On Time" domain="[('completion_status', '=', 'on_time')]"/>
+                <filter name="late" string="Late" domain="[('completion_status', '=', 'late')]"/>
+                <separator/>
+                <filter name="has_certificate" string="Has Certificate" domain="[('certificate_ref', '!=', False)]"/>
+                <filter name="cert_expiring_soon" string="Certificates Expiring Soon"
+                        domain="[('certificate_expiry', '!=', False), ('certificate_expiry', '&gt;=', context_today()), ('certificate_expiry', '&lt;=', context_today() + relativedelta(days=30))]"/>
+                <filter name="cert_expired" string="Certificates Expired"
+                        domain="[('certificate_expiry', '!=', False), ('certificate_expiry', '&lt;', context_today())]"/>
+                <group>
+                    <filter name="group_contractor" string="Contractor" context="{'group_by': 'contractor_id'}"/>
+                    <filter name="group_completion_status" string="Completion Status"
+                            context="{'group_by': 'completion_status'}"/>
+                    <filter name="group_outcome" string="Outcome" context="{'group_by': 'outcome'}"/>
+                    <filter name="group_item" string="Item" context="{'group_by': 'item_id'}"/>
+                    <filter name="group_test_date" string="Test Date" context="{'group_by': 'test_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Compliance Test Action -->
+    <record id="action_nhs_compliance_test" model="ir.actions.act_window">
+        <field name="name">Test Records</field>
+        <field name="res_model">nhs.compliance.test</field>
+        <field name="view_mode">list,form,pivot,graph</field>
+    </record>
+
+    <!-- Compliance Test Certificate Action -->
+    <record id="action_nhs_certificate_register" model="ir.actions.act_window">
+        <field name="name">Certificate Register</field>
+        <field name="res_model">nhs.compliance.test</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('certificate_ref', '!=', False),('attachment_ids','!=',False)]</field>
+        <field name="context">{'create': False}</field>
+    </record>
+</odoo>

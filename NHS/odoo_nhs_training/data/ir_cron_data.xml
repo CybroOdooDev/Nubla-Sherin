@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Scheduled action: recompute training status & compliance daily for workforce members -->
+        <record id="cron_nhs_training_recompute_compliance" model="ir.cron">
+            <field name="name">NHS Training: Recompute Status &amp; Compliance</field>
+            <field name="model_id" ref="model_nhs_workforce_member"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_recompute_compliance()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Scheduled action: send due-soon / expired training record reminders daily -->
+        <record id="cron_nhs_training_reminders" model="ir.cron">
+            <field name="name">NHS Training: Send Due-Soon / Expired Reminders</field>
+            <field name="model_id" ref="model_nhs_training_record"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_send_reminders()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Scheduled action: send professional registration expiry reminders daily -->
+        <record id="cron_nhs_registration_reminders" model="ir.cron">
+            <field name="name">NHS Training: Registration Expiry Reminders</field>
+            <field name="model_id" ref="model_nhs_registration"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_send_expiry_reminders()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Scheduled action: escalate org units whose training compliance is below target daily -->
+        <record id="cron_nhs_training_escalation" model="ir.cron">
+            <field name="name">NHS Training: Escalate Teams Below Target</field>
+            <field name="model_id" ref="model_nhs_org_unit"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_escalate_low_compliance()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Scheduled action: send weekly compliance digest email to org units -->
+        <record id="cron_nhs_training_weekly_digest" model="ir.cron">
+            <field name="name">NHS Training: Weekly Compliance Digest</field>
+            <field name="model_id" ref="model_nhs_org_unit"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_send_weekly_digest()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

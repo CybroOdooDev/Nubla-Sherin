@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report Definition -->
+    <record id="report_nhs_eric_gap_pdf" model="ir.actions.report">
+        <field name="name">ERIC Gap Report</field>
+        <field name="model">nhs.eric.return</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_eric.report_nhs_eric_gap_template</field>
+        <field name="print_report_name">'ERIC_Gap_Report_%s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_nhs_eric_return"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Report Template -->
+    <template id="report_nhs_eric_gap_template">
+        <t t-foreach="docs" t-as="doc">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <!-- Custom styles for better PDF formatting -->
+                            <style>
+                                .report-header {
+                                border-bottom: 3px solid #005EB8;
+                                padding-bottom: 15px;
+                                margin-bottom: 20px;
+                                }
+                                .report-title {
+                                color: #005EB8;
+                                font-size: 34px;
+                                font-weight: 700;
+                                margin-bottom: 5px;
+                                }
+                                .report-subtitle {
+                                color: #212B32;
+                                font-size: 18px;
+                                font-weight: 600;
+                                }
+                                .info-table {
+                                width: 100%;
+                                margin-bottom: 20px;
+                                border-collapse: collapse;
+                                }
+                                .info-table th {
+                                background-color: #F0F4F5;
+                                font-weight: 700;
+                                padding: 10px 12px;
+                                text-align: left;
+                                width: 30%;
+                                border: 1px solid #D8DDE0;
+                                }
+                                .info-table td {
+                                padding: 10px 12px;
+                                text-align: left;
+                                border: 1px solid #D8DDE0;
+                                }
+                                .section-title {
+                                color: #005EB8;
+                                font-size: 16px;
+                                font-weight: 700;
+                                margin-top: 25px;
+                                margin-bottom: 15px;
+                                padding-bottom: 8px;
+                                border-bottom: 2px solid #E8EDEE;
+                                }
+                                .gap-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-top: 10px;
+                                font-size: 11px;
+                                }
+                                .gap-table th {
+                                background-color: #005EB8;
+                                color: #FFFFFF;
+                                font-weight: 700;
+                                padding: 10px 12px;
+                                text-align: center;
+                                border: 1px solid #005EB8;
+                                }
+                                .gap-table td {
+                                padding: 10px 12px;
+                                text-align: center;
+                                border: 1px solid #D8DDE0;
+                                vertical-align: middle;
+                                }
+                                .gap-table tbody tr:hover {
+                                background-color: #F0F4F5;
+                                }
+                                .gap-table tbody tr:nth-child(even) {
+                                background-color: #F8FAFA;
+                                }
+                                .status-badge {
+                                display: inline-block;
+                                padding: 3px 12px;
+                                border-radius: 12px;
+                                font-weight: 600;
+                                font-size: 10px;
+                                text-transform: uppercase;
+                                }
+                                .status-gap {
+                                background-color: #CE7B11;
+                                color: #FFFFFF;
+                                }
+                                .status-invalid {
+                                background-color: #DA291C;
+                                color: #FFFFFF;
+                                }
+                                .no-gaps {
+                                background-color: #E6F3E6;
+                                border: 2px solid #009639;
+                                border-radius: 8px;
+                                padding: 20px;
+                                text-align: center;
+                                color: #009639;
+                                font-weight: 600;
+                                font-size: 16px;
+                                }
+                                .action-required {
+                                font-weight: 600;
+                                color: #DA291C;
+                                }
+                                .table-footer {
+                                margin-top: 20px;
+                                padding-top: 15px;
+                                border-top: 1px solid #E8EDEE;
+                                font-size: 10px;
+                                color: #768692;
+                                text-align: center;
+                                }
+                                .gap-summary {
+                                background-color: #F0F4F5;
+                                padding: 12px 15px;
+                                border-radius: 4px;
+                                margin-bottom: 15px;
+                                display: flex;
+                                justify-content: space-between;
+                                }
+                                .gap-summary-item {
+                                text-align: center;
+                                }
+                                .gap-summary-item .label {
+                                font-size: 10px;
+                                color: #768692;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                }
+                                .gap-summary-item .value {
+                                font-size: 18px;
+                                font-weight: 700;
+                                color: #212B32;
+                                }
+                                .gap-summary-item .value.danger {
+                                color: #DA291C;
+                                }
+                                .gap-summary-item .value.warning {
+                                color: #CE7B11;
+                                }
+                                .gap-summary-item .value.success {
+                                color: #009639;
+                                }
+                            </style>
+
+                            <div class="report-header">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <div class="report-title">NHS ERIC Gap Report</div>
+                                        <div class="report-subtitle">
+                                            <t t-esc="doc.name"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-4 text-right">
+                                        <span style="font-size: 12px; color: #768692;">
+                                            Generated:
+                                            <t t-esc="time.strftime('%d/%m/%Y %H:%M')"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Organisation Information -->
+                            <table class="info-table">
+                                <tr>
+                                    <th class="p-3">Organisation</th>
+                                    <td>
+                                        <t t-esc="doc.company_id.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="p-3">Financial Year</th>
+                                    <td>
+                                        <t t-esc="doc.year"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="p-3">Return Status</th>
+                                    <td>
+                                        <span t-attf-class="badge #{'badge-success' if doc.state == 'signed_off' else 'badge-warning' if doc.state == 'in_progress' else 'badge-secondary'}">
+                                            <t t-esc="doc.state.replace('_', ' ').title()"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="p-3">Completeness</th>
+                                    <td>
+                                        <strong><t t-esc="doc.completeness_pct"/>%
+                                        </strong>
+                                        <span style="color: #768692; font-size: 12px; margin-left: 10px;">
+                                            (
+                                            <t t-esc="doc.gap_count"/>
+                                            gaps)
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Gaps and Invalid Items Table -->
+                            <t t-set="gaps" t-value="doc.value_ids.filtered(lambda v: v.status in ['gap', 'invalid'])"/>
+                            <div class="section-title">Gaps and Invalid Items</div>
+
+                            <t t-if="gaps">
+                                <table class="gap-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 20%;">Section</th>
+                                            <th style="width: 25%;">Item</th>
+                                            <th style="width: 15%;">Status</th>
+                                            <th style="width: 20%;">Owner</th>
+                                            <th style="width: 20%;">Action Required</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="gaps" t-as="value">
+                                            <tr>
+                                                <td>
+                                                    <strong>
+                                                        <t t-esc="value.section_id.name"/>
+                                                    </strong>
+                                                </td>
+                                                <td>
+                                                    <t t-esc="value.item_def_id.name"/>
+                                                </td>
+                                                <td>
+                                                    <span t-attf-class="status-badge status-#{value.status}">
+                                                        <t t-if="value.status == 'gap'">Missing</t>
+                                                        <t t-if="value.status == 'invalid'">Invalid</t>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <t t-esc="value.owner_id.name or 'Unassigned'"/>
+                                                </td>
+                                                <td>
+                                                    <span class="action-required">
+                                                        <t t-if="value.status == 'gap'">
+                                                            Enter required value
+                                                        </t>
+                                                        <t t-if="value.status == 'invalid'">
+                                                            Fix validation error
+                                                        </t>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+
+                                <!-- Pagination/Grouping by Section -->
+                                <t t-set="sections" t-value="set(gaps.mapped('section_id'))"/>
+                                <t t-if="len(sections) > 1">
+                                    <div style="margin-top: 20px; padding: 10px; background-color: #F0F4F5; border-radius: 4px; font-size: 11px;">
+                                        <strong>Summary by Section:</strong>
+                                        <ul style="margin: 5px 0; padding-left: 20px;">
+                                            <t t-foreach="sections" t-as="section">
+                                                <li>
+                                                    <t t-esc="section.name"/>:
+                                                    <t t-esc="len(gaps.filtered(lambda v: v.section_id == section))"/>
+                                                    issues
+                                                    (
+                                                    <t t-esc="len(gaps.filtered(lambda v: v.section_id == section and v.status == 'gap'))"/>
+                                                    gaps,
+                                                    <t t-esc="len(gaps.filtered(lambda v: v.section_id == section and v.status == 'invalid'))"/>
+                                                    invalid)
+                                                </li>
+                                            </t>
+                                        </ul>
+                                    </div>
+                                </t>
+                            </t>
+                            <t t-if="not gaps">
+                                <div class="no-gaps">
+                                    <i class="fa fa-check-circle"
+                                       style="font-size: 24px; display: block; margin-bottom: 10px;"/>
+                                    No gaps or invalid items found. The return is complete!
+                                </div>
+                            </t>
+
+                            <!-- Footer -->
+                            <div class="table-footer">
+                                <p>
+                                    <strong>NHS ERIC Gap Report</strong>
+                                    —
+                                    Generated on
+                                    <t t-esc="time.strftime('%d %B %Y at %H:%M')"/>
+                                    |
+                                    Page
+                                    <span class="page-number"/>
+                                    of
+                                    <span class="topage"/>
+                                </p>
+                                <p style="margin-top: 5px; font-size: 9px; color: #A9B3B9;">
+                                    This report is auto-generated from the NHS ERIC Return Management System.
+                                    For any discrepancies, please contact your ERIC administrator.
+                                </p>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

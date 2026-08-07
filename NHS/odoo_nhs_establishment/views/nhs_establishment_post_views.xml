@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List -->
+    <record id="view_nhs_establishment_post_list" model="ir.ui.view">
+        <field name="name">nhs.establishment.post.list</field>
+        <field name="model">nhs.establishment.post</field>
+        <field name="arch" type="xml">
+            <list string="Establishment Posts" editable="bottom" open_form_view="1"
+                  decoration-danger="vacancy_status == 'fully_vacant'"
+                  decoration-warning="vacancy_status == 'part_vacant'"
+                  decoration-info="vacancy_status == 'over_established'"
+                  decoration-muted="status == 'deleted' or not active">
+                <field name="reference"/>
+                <field name="job_title"/>
+                <field name="org_unit_id"/>
+                <field name="staff_group_id"/>
+                <field name="band_id"/>
+                <field name="is_medical" optional="hide"/>
+                <field name="cost_centre" optional="hide"/>
+                <field name="funded_fte" sum="Funded FTE"/>
+                <field name="in_post_fte" sum="In-Post FTE"/>
+                <field name="vacant_fte" sum="Vacant FTE"/>
+                <field name="vacancy_status" widget="badge"
+                       decoration-success="vacancy_status == 'fully_staffed'"
+                       decoration-warning="vacancy_status == 'part_vacant'"
+                       decoration-danger="vacancy_status == 'fully_vacant'"
+                       decoration-info="vacancy_status == 'over_established'"/>
+                <field name="is_frozen" optional="show"/>
+                <field name="days_vacant" optional="hide" sum="Total Days Vacant"/>
+                <field name="indicative_pay" optional="hide" sum="Indicative Pay"/>
+                <field name="status"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!--  Kanban (by status) -->
+    <record id="view_nhs_establishment_post_kanban" model="ir.ui.view">
+        <field name="name">nhs.establishment.post.kanban</field>
+        <field name="model">nhs.establishment.post</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status" records_draggable="false" class="o_kanban_dashboard">
+                <field name="reference"/>
+                <field name="job_title"/>
+                <field name="org_unit_id"/>
+                <field name="staff_group_id"/>
+                <field name="band_id"/>
+                <field name="funded_fte"/>
+                <field name="in_post_fte"/>
+                <field name="vacant_fte"/>
+                <field name="is_frozen"/>
+                <field name="vacancy_status"/>
+                <field name="status"/>
+                <field name="manager_id"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_global_click p-3 rounded shadow-sm border-start border-4 #{
+                            record.vacancy_status.raw_value == 'fully_staffed' ? 'border-success' :
+                            record.vacancy_status.raw_value == 'part_vacant' ? 'border-warning' :
+                            record.vacancy_status.raw_value == 'fully_vacant' ? 'border-danger' :
+                            'border-info'
+                        }">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge text-bg-light border fw-semibold">
+                                    <field name="reference"/>
+                                </span>
+                                <span t-attf-class="badge #{
+                                    record.vacancy_status.raw_value == 'fully_staffed' ? 'text-bg-success text-success-light' :
+                                    record.vacancy_status.raw_value == 'part_vacant' ? 'text-bg-warning text-warning-light' :
+                                    record.vacancy_status.raw_value == 'fully_vacant' ? 'text-bg-danger text-danger-light' :
+                                    'text-bg-info text-info-light'
+                                } px-2 py-1 small fw-bold">
+                                    <field name="vacancy_status"/>
+                                </span>
+                            </div>
+                            
+                            <h4 class="text-primary fw-bold mb-1 fs-5">
+                                <field name="job_title"/>
+                            </h4>
+                            
+                            <div class="text-muted small mb-2 d-flex align-items-center">
+                                <i class="fa fa-sitemap me-1 text-secondary" title="Organisation Unit" aria-label="Organisation Unit"/>
+                                <field name="org_unit_id"/>
+                            </div>
+                            
+                            <hr class="my-2 opacity-25"/>
+                            
+                            <div class="row text-center g-0">
+                                <div class="col-4 border-end">
+                                    <div class="text-muted small" style="font-size: 0.75rem;">Funded</div>
+                                    <div class="fw-bold text-dark"><field name="funded_fte"/></div>
+                                </div>
+                                <div class="col-4 border-end">
+                                    <div class="text-muted small" style="font-size: 0.75rem;">In-Post</div>
+                                    <div class="fw-bold text-success"><field name="in_post_fte"/></div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="text-muted small" style="font-size: 0.75rem;">Vacant</div>
+                                    <div t-attf-class="fw-bold #{
+                                        record.vacant_fte.raw_value > 0 ? 'text-danger' : 'text-muted'
+                                    }"><field name="vacant_fte"/></div>
+                                </div>
+                            </div>
+                            
+                            <div class="o_kanban_record_bottom d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                                <div class="oe_kanban_bottom_left">
+                                    <div t-if="record.is_frozen &amp;&amp; record.is_frozen.raw_value">
+                                        <span class="badge text-bg-secondary"><i class="fa fa-snowflake-o me-1" title="Frozen" aria-label="Frozen"/>Frozen</span>
+                                    </div>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="manager_id" widget="many2one_avatar_user" readonly="1"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!--  Form -->
+    <record id="view_nhs_establishment_post_form" model="ir.ui.view">
+        <field name="name">nhs.establishment.post.form</field>
+        <field name="model">nhs.establishment.post</field>
+        <field name="arch" type="xml">
+            <form string="Establishment Post">
+                 <header>
+                     <button name="action_raise_change_request" type="object"
+                             string="Raise Change Request" class="btn-primary"
+                             groups="odoo_nhs_establishment.group_nhs_workforce_officer"/>
+                     <button name="action_freeze_post" type="object"
+                             string="Freeze Post" class="btn-secondary"
+                             invisible="status != 'active'"
+                             groups="odoo_nhs_establishment.group_nhs_workforce_officer"/>
+                     <button name="action_activate_post" type="object"
+                             string="Activate Post" class="btn-secondary"
+                             invisible="status == 'active'"
+                             groups="odoo_nhs_establishment.group_nhs_workforce_officer"/>
+                     <button name="action_delete_post" type="object"
+                             string="Archive Post" class="btn-secondary"
+                             invisible="status == 'deleted'"
+                             groups="odoo_nhs_establishment.group_nhs_workforce_officer"/>
+                     <field name="status" widget="statusbar" statusbar_visible="draft,active,frozen"/>
+                 </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Fully Staffed" bg_color="text-bg-success"
+                            invisible="vacancy_status != 'fully_staffed'"/>
+                    <widget name="web_ribbon" title="Part Vacant" bg_color="text-bg-warning"
+                            invisible="vacancy_status != 'part_vacant'"/>
+                    <widget name="web_ribbon" title="Fully Vacant" bg_color="text-bg-danger"
+                            invisible="vacancy_status != 'fully_vacant'"/>
+                    <widget name="web_ribbon" title="Over-Established" bg_color="text-bg-dark"
+                            invisible="vacancy_status != 'over_established'"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_changes" type="object" class="oe_stat_button" icon="fa-history">
+                            <field name="change_count" widget="statinfo" string="Changes"/>
+                        </button>
+                    </div>
+                    <field name="active" invisible="1"/>
+                    <div class="oe_title">
+                        <h1><field name="job_title" placeholder="Job Title"/></h1>
+                        <h3><field name="reference" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="org_unit_id"/>
+                            <field name="staff_group_id"/>
+                            <field name="is_medical"/>
+                            <field name="band_id" invisible="is_medical" required="not is_medical"/>
+                            <field name="manual_indicative_salary" invisible="not is_medical" required="is_medical"/>
+                            <field name="cost_centre"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="contract_type"/>
+                            <field name="effective_from"/>
+                            <field name="effective_to"/>
+                        </group>
+                    </group>
+                    <group string="Funded, In-Post &amp; Vacant FTE">
+                        <group>
+                            <field name="contracted_hours"/>
+                            <field name="funded_headcount"/>
+                            <field name="funded_fte"/>
+                        </group>
+                        <group>
+                            <field name="in_post_headcount"/>
+                            <field name="in_post_fte"/>
+                            <field name="vacant_fte"/>
+                        </group>
+                    </group>
+                    <group string="Vacancy">
+                        <group>
+                            <field name="vacancy_status"/>
+                            <field name="vacancy_start_date"/>
+                            <field name="days_vacant"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="indicative_pay"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Job Description" name="job_description">
+                            <field name="job_description" filename="job_description_filename"/>
+                            <field name="job_description_filename" invisible="1"/>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Search ───────────────────────────────────────────────── -->
+    <record id="view_nhs_establishment_post_search" model="ir.ui.view">
+        <field name="name">nhs.establishment.post.search</field>
+        <field name="model">nhs.establishment.post</field>
+        <field name="arch" type="xml">
+            <search string="Search Establishment Posts">
+                <field name="job_title"/>
+                <field name="reference"/>
+                <field name="org_unit_id"/>
+                <field name="staff_group_id"/>
+                <field name="band_id"/>
+                <field name="cost_centre"/>
+                <filter string="Vacant" name="filter_vacant"
+                        domain="[('vacancy_status','in',('part_vacant','fully_vacant'))]"/>
+                <filter string="Fully Staffed" name="filter_fully_staffed"
+                        domain="[('vacancy_status','=','fully_staffed')]"/>
+                <filter string="Over-Established" name="filter_over_established"
+                        domain="[('vacancy_status','=','over_established')]"/>
+                <filter string="Frozen" name="filter_frozen" domain="[('is_frozen','=',True)]"/>
+                <filter string="Medical / Non-AfC" name="filter_medical" domain="[('is_medical','=',True)]"/>
+                <separator/>
+                <filter string="Archived" name="filter_archived" domain="[('active','=',False)]"/>
+                <group name="group_by">
+                    <filter string="Org Unit" name="groupby_org_unit" context="{'group_by': 'org_unit_id'}"/>
+                    <filter string="Staff Group" name="groupby_staff_group" context="{'group_by': 'staff_group_id'}"/>
+                    <filter string="Band" name="groupby_band" context="{'group_by': 'band_id'}"/>
+                    <filter string="Cost Centre" name="groupby_cost_centre" context="{'group_by': 'cost_centre'}"/>
+                    <filter string="Vacancy Status" name="groupby_vacancy_status" context="{'group_by': 'vacancy_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--  Action: Posts -->
+    <record id="action_nhs_establishment_post" model="ir.actions.act_window">
+        <field name="name">Posts</field>
+        <field name="res_model">nhs.establishment.post</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_nhs_establishment_post_search"/>
+        <field name="context">{'search_default_groupby_org_unit': 0}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first funded post.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action: Vacancy Register -->
+    <record id="action_nhs_vacancy_register" model="ir.actions.act_window">
+        <field name="name">Vacancy Register</field>
+        <field name="res_model">nhs.establishment.post</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('status','=','active'),('vacancy_status','in',('part_vacant','fully_vacant')),('is_frozen','=',False)]</field>
+        <field name="search_view_id" ref="view_nhs_establishment_post_search"/>
+        <field name="context">{'search_default_groupby_org_unit': 0}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No unfilled funded posts — the establishment is fully staffed.
+            </p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Mail template: notifies members that a meeting pack has been issued -->
+    <record id="mail_template_meeting_pack_issued" model="mail.template">
+        <field name="name">NHS Governance: Board Pack Issued</field>
+        <field name="model_id" ref="model_nhs_meeting"/>
+        <field name="subject">Meeting Pack — {{ object.name }}</field>
+        <field name="use_default_to">False</field>
+        <field name="email_from">{{ object.company_id.partner_id.email_formatted or user.email_formatted }}</field>
+        <field name="email_to">{{ object.committee_id.chair_id.email or '' }}</field>
+        <field name="body_html"><![CDATA[
+                <p>Dear Member,</p>
+                <p>The pack for <strong><t t-out="object.name"/></strong> has been assembled and issued.</p>
+                <p>Venue: <t t-out="object.location or 'See calendar invite'"/></p>
+                <p>Please review the agenda and papers ahead of the meeting.</p>
+        ]]></field>
+        <field name="auto_delete">True</field>
+    </record>
+
+    <!-- Mail template: notifies an owner that a governance action was assigned to them -->
+    <record id="mail_template_action_assigned" model="mail.template">
+        <field name="name">NHS Governance: Action Assigned</field>
+        <field name="model_id" ref="model_nhs_meeting_action"/>
+        <field name="subject">Governance Action Assigned — {{ object.reference }}</field>
+        <field name="use_default_to">False</field>
+        <field name="email_from">{{ object.company_id.partner_id.email_formatted or user.email_formatted }}</field>
+        <field name="email_to">{{ object.owner_id.email }}</field>
+        <field name="body_html"><![CDATA[
+                <p>Dear <t t-out="object.owner_id.name"/>,</p>
+                <p>A governance action has been assigned to you: <strong><t t-out="object.name"/></strong>.</p>
+                <p>Due date: <t t-out="object.due_date"/></p>
+        ]]></field>
+        <field name="auto_delete">True</field>
+    </record>
+
+    <!-- Mail template: reminds a contact their annual declaration of interest refresh is due -->
+    <record id="mail_template_doi_refresh_due" model="mail.template">
+        <field name="name">NHS Governance: Annual Declaration of Interest Refresh Due</field>
+        <field name="model_id" ref="model_nhs_director"/>
+        <field name="subject">Annual Declaration of Interest Refresh Due — {{ object.name }}</field>
+        <field name="use_default_to">False</field>
+        <field name="email_from">{{ user.email_formatted }}</field>
+        <field name="email_to">{{ object.email }}</field>
+        <field name="body_html"><![CDATA[
+                <p>Dear <t t-out="object.name"/>,</p>
+                <p>Your annual declaration of interest refresh is due. Please review and update your declarations,
+                   or confirm a nil return if you have no interests to declare.</p>
+        ]]></field>
+        <field name="auto_delete">True</field>
+    </record>
+
+    <!-- Mail template: confirms an Annual Refresh declaration of interest was recorded -->
+    <record id="mail_template_doi_annual_confirmed" model="mail.template">
+        <field name="name">NHS Governance: Annual Declaration of Interest Confirmed</field>
+        <field name="model_id" ref="model_nhs_declaration"/>
+        <field name="subject">Annual Declaration of Interest Recorded — {{ object.director_id.name }}</field>
+        <field name="use_default_to">False</field>
+        <field name="email_from">{{ object.company_id.partner_id.email_formatted or user.email_formatted }}</field>
+        <field name="email_to">{{ object.director_id.email }}</field>
+        <field name="body_html"><![CDATA[
+<p>Dear <t t-out="object.director_id.name"/>,</p>
+<p>Your annual declaration of interest refresh has been recorded:
+   <strong><t t-out="object.category_id.name"/></strong>,
+   effective <t t-out="object.date_from"/>.</p>
+<p>Thank you for keeping the register up to date.</p>
+        ]]></field>
+        <field name="auto_delete">True</field>
+    </record>
+
+    <!-- Mail template: reminds a committee's chair that its Terms of Reference review is due -->
+    <record id="mail_template_tor_review_due" model="mail.template">
+        <field name="name">NHS Governance: Terms of Reference Review Due</field>
+        <field name="model_id" ref="model_nhs_committee"/>
+        <field name="subject">Terms of Reference Review Due — {{ object.name }}</field>
+        <field name="use_default_to">False</field>
+        <field name="email_from">{{ object.company_id.partner_id.email_formatted or user.email_formatted }}</field>
+        <field name="email_to">{{ object.tor_reminder_email or '' }}</field>
+        <field name="body_html"><![CDATA[
+                <p>The Terms of Reference for <strong><t t-out="object.name"/></strong> are due for review
+                   on <t t-out="object.tor_review_date"/>.</p>
+                        ]]></field>
+        <field name="auto_delete">True</field>
+    </record>
+</odoo>

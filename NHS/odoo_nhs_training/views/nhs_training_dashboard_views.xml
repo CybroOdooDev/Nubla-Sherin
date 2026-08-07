@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Client action: JS Training Matrix widget -->
+    <record id="action_nhs_training_matrix_client" model="ir.actions.client">
+        <field name="name">Training Matrix</field>
+        <field name="tag">nhs_training_matrix</field>
+    </record>
+
+    <!-- Client action: JS Compliance Dashboard widget -->
+    <record id="action_nhs_training_dashboard_client" model="ir.actions.client">
+        <field name="name">Compliance Dashboard</field>
+        <field name="tag">nhs_training_dashboard</field>
+    </record>
+</odoo>

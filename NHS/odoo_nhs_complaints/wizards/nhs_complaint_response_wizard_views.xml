@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form for the wizard to draft, preview, sign off and send a complaint response -->
+    <record id="view_nhs_complaint_response_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.complaint.response.wizard.form</field>
+        <field name="model">nhs.complaint.response.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Draft and Sign Off Response">
+                <group>
+                    <field name="complaint_id" readonly="1"/>
+                </group>
+
+                <separator string="Investigation Context"/>
+                <group col="1">
+                    <field name="points_of_complaint" readonly="1"
+                           placeholder="No points of complaint recorded yet."/>
+                </group>
+                <group col="1">
+                    <field name="findings" readonly="1"
+                           placeholder="No investigation findings recorded yet."/>
+                </group>
+
+                <separator string="Response Letter"/>
+                <field name="response_text" nolabel="1" widget="html"
+                       style="min-height:200px;"
+                       placeholder="Draft the full written response here…"/>
+
+                <separator string="Sign-off Options"/>
+                <group>
+                    <group>
+                        <field name="sign_off_now"
+                               groups="odoo_nhs_complaints.group_nhs_complaint_quality_lead"/>
+                        <field name="send_immediately" invisible="not sign_off_now"/>
+                        <field name="response_method" invisible="not send_immediately"/>
+                    </group>
+                </group>
+
+                <footer>
+                    <button name="action_save_draft" string="Save Draft"
+                            type="object" class="btn-primary"/>
+                    <button name="action_submit_for_signoff" string="Submit for Sign-off"
+                            type="object" class="btn-secondary"/>
+                    <button name="action_preview" string="Preview Response"
+                            type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action opening the response wizard in a new dialog -->
+    <record id="action_nhs_complaint_response_wizard" model="ir.actions.act_window">
+        <field name="name">Generate Response</field>
+        <field name="res_model">nhs.complaint.response.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Response Details View Wizard -->
+    <record id="view_nhs_complaint_response_view_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.complaint.response.view.wizard.form</field>
+        <field name="model">nhs.complaint.response.view.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Response Details">
+                <field name="complaint_id" invisible="1"/>
+                <group>
+                    <group string="Sign-off Details">
+                        <field name="signed_off_by_id" readonly="1"/>
+                        <field name="signed_off_at" readonly="1"/>
+                    </group>
+                    <group string="Transmission Details">
+                        <field name="response_sent_at" readonly="1"/>
+                        <field name="response_method" readonly="1"/>
+                    </group>
+                </group>
+                <separator string="Response Letter"/>
+                <field name="response_text" readonly="1" widget="html" style="min-height:300px;"/>
+                <footer>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action opening the read-only response details wizard in a new dialog -->
+    <record id="action_nhs_complaint_response_view_wizard" model="ir.actions.act_window">
+        <field name="name">Response Details</field>
+        <field name="res_model">nhs.complaint.response.view.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

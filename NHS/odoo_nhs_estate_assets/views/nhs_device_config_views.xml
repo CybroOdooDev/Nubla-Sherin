@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Settings  -->
+    <record id="view_res_config_settings_nhs_estate_assets" model="ir.ui.view">
+        <field name="name">res.config.settings.nhs</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Medical Devices &amp; Equipment Management" name="odoo_nhs_estate_assets"
+                     groups="odoo_nhs_estate_assets.group_nhs_equipment_manager">
+                    <block title="General Settings">
+                        <setting string="Due Soon Window (Days)"
+                                 help="Number of days before a maintenance/calibration due date when the status changes to 'Due Soon'">
+                            <field name="due_soon_window"/>
+                        </setting>
+                        <setting string="Overdue Escalation Threshold (Days)"
+                                 help="Number of days past due before triggering escalation activities to EBME Managers.">
+                            <field name="overdue_escalation_days"/>
+                        </setting>
+                        <setting string="Expiry Reminder Window (Days)"
+                                 help="Number of days before warranty/service contract expiry when the 'Expiring' flag is triggered.">
+                            <field name="expiry_reminder_window"/>
+                        </setting>
+                        <setting string="Indicative Value Method"
+                                 help="Method used for non-accounting indicative value calculations across the estate.">
+                            <field name="indicative_depreciation_method"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Setting Action -->
+    <record id="action_nhs_estate_assets_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_res_config_settings_nhs_estate_assets"/>
+        <field name="target">current</field>
+        <field name="context">{'module': 'odoo_nhs_estate_assets'}</field>
+    </record>
+
+    <!-- SCHEDULE TYPES - list view -->
+    <record id="view_nhs_device_schedule_type_list" model="ir.ui.view">
+        <field name="name">nhs.device.schedule.type.list</field>
+        <field name="model">nhs.device.schedule.type</field>
+        <field name="arch" type="xml">
+            <list string="Schedule Types" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="description"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- SCHEDULE TYPES - Action-->
+    <record id="action_nhs_device_schedule_type" model="ir.actions.act_window">
+        <field name="name">Schedule Types</field>
+        <field name="res_model">nhs.device.schedule.type</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Schedule types define the types of recurring activities
+                that can be scheduled for devices (e.g., PPM, Calibration, Electrical Safety).
+            </p>
+        </field>
+    </record>
+</odoo>

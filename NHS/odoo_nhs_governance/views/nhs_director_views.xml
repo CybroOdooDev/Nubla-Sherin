@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Directors register: a standalone nhs.director model (not res.partner / Trust
+         Management's NHS Board Member) — light appointment & FPPR tracking per the
+         build spec, with only an optional contact/user link for portal access. -->
+
+    <!-- Director form -->
+    <record id="view_nhs_director_form" model="ir.ui.view">
+        <field name="name">nhs.director.form</field>
+        <field name="model">nhs.director</field>
+        <field name="arch" type="xml">
+            <form string="Director / Officer">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object" name="action_view_committees"
+                                class="oe_stat_button" icon="fa-users"
+                                invisible="not committee_count">
+                            <field name="committee_count" widget="statinfo" string="Committees"/>
+                        </button>
+                        <button type="object" name="action_view_declarations"
+                                class="oe_stat_button" icon="fa-balance-scale">
+                            <field name="declaration_count" widget="statinfo" string="Declarations"/>
+                        </button>
+                    </div>
+                    <field name="fppr_status" widget="badge" class="float-end fs-6"
+                           decoration-success="fppr_status == 'passed'"
+                           decoration-danger="fppr_status == 'concern'"
+                           decoration-warning="fppr_status == 'in_progress'"
+                           decoration-info="fppr_status == 'not_checked'"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Jane Smith"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="role_title"/>
+                            <field name="is_executive"/>
+                            <field name="email" widget="email"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="appointment_date"/>
+                            <field name="term_end"/>
+                            <field name="user_id"/>
+                        </group>
+                    </group>
+                    <group string="Fit and Proper Person (FPPR)">
+                        <field name="fppr_status"/>
+                        <field name="fppr_check_date"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List view of directors, focused on FPPR and term status -->
+    <record id="view_nhs_director_list" model="ir.ui.view">
+        <field name="name">nhs.director.list</field>
+        <field name="model">nhs.director</field>
+        <field name="arch" type="xml">
+            <list string="Directors">
+                <field name="name"/>
+                <field name="email" widget="email"/>
+                <field name="role_title" string="Role"/>
+                <field name="is_executive" string="Executive"/>
+                <field name="appointment_date"/>
+                <field name="term_end"/>
+                <field name="fppr_status" string="FPPR Status"/>
+                <field name="fppr_check_date" string="FPPR Check Date"/>
+                <field name="committee_count" string="Committees"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kanban view of directors, cards led by FPPR status -->
+    <record id="view_nhs_director_kanban" model="ir.ui.view">
+        <field name="name">nhs.director.kanban</field>
+        <field name="model">nhs.director</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" record_draggable="false" quick_create="false">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="role_title"/>
+                <field name="is_executive"/>
+                <field name="appointment_date"/>
+                <field name="term_end"/>
+                <field name="fppr_status"/>
+                <field name="fppr_check_date"/>
+                <field name="committee_count"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <field name="name" class="mb-0 fw-bold fs-5"/>
+                            <span t-attf-class="badge #{record.is_executive.raw_value ? 'text-bg-primary' : 'text-bg-secondary'}"
+                                  style="font-size: 0.72em; padding: 2px 6px;">
+                                <t t-if="record.is_executive.raw_value">Executive</t>
+                                <t t-else="">Non-Executive</t>
+                            </span>
+                        </div>
+
+                        <div style="font-size: 0.88em; color: #4b5563;">
+                            <!-- Role -->
+                            <div t-if="record.role_title.raw_value" class="d-flex align-items-center mb-1 text-truncate">
+                                <i class="fa fa-briefcase me-2 text-secondary" style="width: 14px;" title="Role"/>
+                                <span><field name="role_title"/></span>
+                            </div>
+                            <!-- Term Dates -->
+                            <div class="d-flex align-items-center text-muted mb-1" style="font-size: 0.85em;">
+                                <i class="fa fa-calendar me-2" style="width: 14px;" title="Term Dates"/>
+                                <span>
+                                    <t t-if="record.appointment_date.raw_value"><field name="appointment_date"/></t>
+                                    <t t-else="">...</t>
+                                    to
+                                    <t t-if="record.term_end.raw_value"><field name="term_end"/></t>
+                                    <t t-else="">Present</t>
+                                </span>
+                            </div>
+                            <!-- FPPR check date -->
+                            <div t-if="record.fppr_check_date.raw_value" class="d-flex align-items-center mb-1 text-truncate">
+                                <i class="fa fa-shield me-2 text-secondary" style="width: 14px;" title="FPPR Check Date"/>
+                                <span>FPPR checked <field name="fppr_check_date"/></span>
+                            </div>
+                        </div>
+
+                        <footer class="mt-2">
+                            <span t-attf-class="badge #{
+                                    record.fppr_status.raw_value === 'passed' ? 'text-bg-success' :
+                                    record.fppr_status.raw_value === 'concern' ? 'text-bg-danger' :
+                                    record.fppr_status.raw_value === 'in_progress' ? 'text-bg-warning' : 'text-bg-light'}"
+                                  style="font-size: 0.78em; padding: 4px 8px;">
+                                <field name="fppr_status"/>
+                            </span>
+                            <span t-if="record.committee_count.raw_value" class="badge text-bg-info ms-1"
+                                  style="font-size: 0.78em; padding: 4px 8px;">
+                                <t t-esc="record.committee_count.raw_value"/> committee(s)
+                            </span>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search view: filter/group directors by FPPR status and executive/non-executive -->
+    <record id="view_nhs_director_search" model="ir.ui.view">
+        <field name="name">nhs.director.search</field>
+        <field name="model">nhs.director</field>
+        <field name="arch" type="xml">
+            <search string="Search Directors">
+                <field name="name"/>
+                <field name="role_title"/>
+                <filter string="Executive" name="filter_executive" domain="[('is_executive', '=', True)]"/>
+                <filter string="Non-Executive" name="filter_non_executive" domain="[('is_executive', '=', False)]"/>
+                <separator/>
+                <filter string="FPPR Not Checked" name="filter_fppr_not_checked" domain="[('fppr_status', '=', 'not_checked')]"/>
+                <filter string="FPPR In Progress" name="filter_fppr_in_progress" domain="[('fppr_status', '=', 'in_progress')]"/>
+                <filter string="FPPR Passed" name="filter_fppr_passed" domain="[('fppr_status', '=', 'passed')]"/>
+                <filter string="FPPR Concern Raised" name="filter_fppr_concern" domain="[('fppr_status', '=', 'concern')]"/>
+                <group name="group_by">
+                    <filter string="Role" name="groupby_role" context="{'group_by': 'role_title'}"/>
+                    <filter string="FPPR Status" name="groupby_fppr_status" context="{'group_by': 'fppr_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window action: the Directors register -->
+    <record id="action_nhs_gov_director" model="ir.actions.act_window">
+        <field name="name">Directors</field>
+        <field name="res_model">nhs.director</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="search_view_id" ref="view_nhs_director_search"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_nhs_director_kanban')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_nhs_director_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_nhs_director_form')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first director/officer</p>
+            <p>Track appointment/term dates, executive status and Fit and Proper Person (FPPR)
+               checks — then add them to committees from the committee's Membership tab.</p>
+        </field>
+    </record>
+</odoo>

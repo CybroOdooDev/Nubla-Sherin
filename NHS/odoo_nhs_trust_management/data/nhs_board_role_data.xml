@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="board_role_chair" model="nhs.board.role">
+        <field name="name">Chair</field>
+        <field name="code">chair</field>
+        <field name="sequence">10</field>
+        <field name="is_ned">True</field>
+    </record>
+    <record id="board_role_ceo" model="nhs.board.role">
+        <field name="name">Chief Executive Officer (CEO)</field>
+        <field name="code">ceo</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="board_role_medical_director" model="nhs.board.role">
+        <field name="name">Medical Director</field>
+        <field name="code">medical_director</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="board_role_nursing_director" model="nhs.board.role">
+        <field name="name">Director of Nursing</field>
+        <field name="code">nursing_director</field>
+        <field name="sequence">40</field>
+    </record>
+    <record id="board_role_finance_director" model="nhs.board.role">
+        <field name="name">Director of Finance</field>
+        <field name="code">finance_director</field>
+        <field name="sequence">50</field>
+    </record>
+    <record id="board_role_exec" model="nhs.board.role">
+        <field name="name">Executive Director</field>
+        <field name="code">exec</field>
+        <field name="sequence">60</field>
+    </record>
+    <record id="board_role_non_exec" model="nhs.board.role">
+        <field name="name">Non-Executive Director</field>
+        <field name="code">non_exec</field>
+        <field name="sequence">70</field>
+        <field name="is_ned">True</field>
+    </record>
+    <record id="board_role_other" model="nhs.board.role">
+        <field name="name">Other Board Member</field>
+        <field name="code">other</field>
+        <field name="sequence">80</field>
+    </record>
+</odoo>

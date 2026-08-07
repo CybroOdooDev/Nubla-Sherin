@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Board Members list view (create/delete restriction injected server-side per user group) -->
+    <record id="view_nhs_board_member_list" model="ir.ui.view">
+        <field name="name">res.partner.nhs.board.member.list</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <list string="Board Members">
+                <field name="name"/>
+                <field name="nhs_trust_id" string="NHS Trust"/>
+                <field name="nhs_board_role" string="Role"/>
+                <field name="is_voting_member" string="Voting"/>
+                <field name="term_start_date" string="Term Start"/>
+                <field name="term_end_date" string="Term End"/>
+                <field name="is_term_active" string="Term Active" widget="boolean"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Board Members Kanban View -->
+    <record id="view_nhs_board_member_kanban" model="ir.ui.view">
+        <field name="name">res.partner.nhs.board.member.kanban</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <kanban class="o_res_partner_kanban" record_draggable="false" quick_create="false">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="nhs_trust_id"/>
+                <field name="nhs_board_role"/>
+                <field name="is_voting_member"/>
+                <field name="term_start_date"/>
+                <field name="term_end_date"/>
+                <field name="is_term_active"/>
+                <field name="avatar_128"/>
+                <templates>
+                    <t t-name="card" class="flex-row">
+                        <aside class="o_kanban_aside_full">
+                            <field name="avatar_128" alt="Board Member" class="w-100 h-100 m-0" widget="image" options="{'img_class': 'object-fit-cover w-100 h-100'}"/>
+                        </aside>
+                        
+                        <main class="ps-2 flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <field name="name" class="mb-0 fw-bold fs-5"/>
+                                <span t-attf-class="badge #{record.is_term_active.raw_value ? 'text-bg-success' : 'text-bg-danger'}"
+                                      style="font-size: 0.72em; padding: 2px 6px;">
+                                    <t t-if="record.is_term_active.raw_value">Active</t>
+                                    <t t-else="">Inactive</t>
+                                </span>
+                            </div>
+                            
+                            <div style="font-size: 0.88em; color: #4b5563;">
+                                <!-- NHS Trust -->
+                                <div t-if="record.nhs_trust_id.raw_value" class="d-flex align-items-center mb-1 text-truncate">
+                                    <i class="fa fa-hospital-o me-2 text-primary" style="width: 14px;" title="NHS Trust"/>
+                                    <span style="font-weight: 500;"><field name="nhs_trust_id"/></span>
+                                </div>
+                                <!-- Role -->
+                                <div t-if="record.nhs_board_role.raw_value" class="d-flex align-items-center mb-1 text-truncate">
+                                    <i class="fa fa-briefcase me-2 text-secondary" style="width: 14px;" title="Role"/>
+                                    <span><field name="nhs_board_role"/></span>
+                                </div>
+                                <!-- Term Dates -->
+                                <div class="d-flex align-items-center text-muted mb-1" style="font-size: 0.85em;">
+                                    <i class="fa fa-calendar me-2" style="width: 14px;" title="Term Dates"/>
+                                    <span>
+                                        <t t-if="record.term_start_date.raw_value"><field name="term_start_date"/></t>
+                                        <t t-else="">...</t>
+                                        to
+                                        <t t-if="record.term_end_date.raw_value"><field name="term_end_date"/></t>
+                                        <t t-else="">Present</t>
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <!-- Footer -->
+                            <footer class="mt-2">
+                                <span t-attf-class="badge #{record.is_voting_member.raw_value ? 'text-bg-info' : 'text-bg-light'}"
+                                      style="font-size: 0.78em; padding: 4px 8px;">
+                                    <t t-if="record.is_voting_member.raw_value">Voting Member</t>
+                                    <t t-else="">Non-Voting Member</t>
+                                </span>
+                            </footer>
+                        </main>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Standalone Board Members list action (all trusts, not scoped to active_id) -->
+    <record id="action_nhs_board_members" model="ir.actions.act_window">
+        <field name="name">Board Members</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('is_nhs_board_member', '=', True)]</field>
+        <field name="context">{'default_is_nhs_board_member': True, 'default_is_company': False}</field>
+        <field name="view_ids" eval="[(5, 0, 0), 
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_nhs_board_member_kanban')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_nhs_board_member_list')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No board members found.</p>
+            <p>Board members are created from within a Trust record.</p>
+        </field>
+    </record>
+
+    <!-- Inherited res.partner form: adds NHS Board Member toggle, Trust smart button, and governance tab -->
+    <record id="view_partner_form" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.nhs_trust</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="is_nhs_board_member" widget="boolean_toggle" readonly="not can_edit_board_member"/>
+                <field name="can_edit_board_member" invisible="1"/>
+            </xpath>
+            <!-- Add NHS Trust smart button for board members -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button type="object" name="action_open_nhs_trust"
+                        class="oe_stat_button" icon="fa-hospital-o"
+                        invisible="not is_nhs_board_member or not nhs_trust_id">
+                    <div class="o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="nhs_trust_id" readonly="1" options="{'no_open': True}"/>
+                        </span>
+                        <span class="o_stat_text">NHS Trust</span>
+                    </div>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="NHS Governance" name="nhs_governance" invisible="not is_nhs_board_member">
+                    <group string="Trust Board Membership Profile">
+                        <group>
+                            <field name="nhs_trust_id"
+                                   required="is_nhs_board_member and can_edit_board_member"
+                                   readonly="not can_edit_board_member"
+                                   domain="[('state', 'not in', ['dissolved', 'suspended'])]"/>
+                            <field name="nhs_board_role"
+                                   required="is_nhs_board_member and can_edit_board_member"
+                                   readonly="not can_edit_board_member"/>
+                            <field name="is_voting_member" readonly="not can_edit_board_member"/>
+                        </group>
+                        <group>
+                            <field name="term_start_date" readonly="not can_edit_board_member"/>
+                            <field name="term_end_date" readonly="not can_edit_board_member"/>
+                            <field name="is_term_active" readonly="1"/>
+                            <field name="appointment_authority" readonly="not can_edit_board_member"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

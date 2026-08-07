@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="odoo_nhs_training.NhsTrainingMatrix" owl="1">
+        <div class="o_nhs_training_matrix o_content p-4" style="height: 100%; overflow: auto;">
+            <!-- Header Section Card -->
+            <div class="card border-0 shadow-sm mb-4 p-4 bg-white rounded-3">
+                <div class="row align-items-center g-3">
+                    <div class="col-12 col-md-6 d-flex align-items-center">
+                        <div class="nhs-matrix-icon-wrapper d-flex align-items-center justify-content-center me-3 rounded-3 shadow-sm">
+                            <i class="fa fa-th text-primary fs-4"/>
+                        </div>
+                        <div>
+                            <h3 class="mb-1 fw-bold text-dark fs-4">Training Matrix</h3>
+                            <p class="mb-0 text-muted small">Monitor workforce training status, requirements, and compliance levels.</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 d-flex justify-content-md-end align-items-center">
+                        <div class="d-flex align-items-center gap-2 bg-light px-3 py-2 rounded-3 border border-light-subtle shadow-sm">
+                            <i class="fa fa-filter text-muted small"/>
+                            <label class="mb-0 text-muted small fw-bold me-1">Team Filter</label>
+                            <select class="form-select form-select-sm border-0 bg-transparent py-0 px-1 fw-semibold text-dark focus-none" style="width: auto; min-width: 150px; outline: none; box-shadow: none;" t-on-change="onTeamChange">
+                                <option value="">All Teams</option>
+                                <t t-foreach="state.orgUnits" t-as="unit" t-key="unit.id">
+                                    <option t-att-value="unit.id" t-esc="unit.complete_name"/>
+                                </t>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Legend Banner nested within the header card for clean organization -->
+                <div class="mt-4 pt-3 border-top border-light-subtle d-flex flex-wrap align-items-center justify-content-between gap-3">
+
+                    <div class="text-muted small italic">
+                       <span class="text-muted small fw-bold me-2"><i class="fa fa-info-circle me-1"/> Status Legend:</span>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge nhs-legend-badge bg-compliant-light text-compliant px-3 py-2 rounded-pill"><i class="fa fa-check-circle me-1"/> Compliant</span>
+                            <span class="badge nhs-legend-badge bg-due-soon-light text-due-soon px-3 py-2 rounded-pill"><i class="fa fa-clock-o me-1"/> Due Soon</span>
+                            <span class="badge nhs-legend-badge bg-expired-light text-expired px-3 py-2 rounded-pill"><i class="fa fa-exclamation-circle me-1"/> Expired</span>
+                            <span class="badge nhs-legend-badge bg-failed-light text-failed px-3 py-2 rounded-pill"><i class="fa fa-times-circle me-1"/> Failed</span>
+                            <span class="badge nhs-legend-badge bg-not-done-light text-not-done px-3 py-2 rounded-pill"><i class="fa fa-circle-o me-1"/> Not Done</span>
+                            <span class="badge nhs-legend-badge bg-exempt-light text-exempt px-3 py-2 rounded-pill"><i class="fa fa-ban me-1"/> Exempt</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <t t-if="state.loading">
+                <div class="d-flex justify-content-center align-items-center" style="height: 40vh;">
+                    <div class="spinner-border text-primary" role="status"/>
+                </div>
+            </t>
+            <t t-else="">
+                <!-- Table Card wrapper -->
+                <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle o_nhs_matrix_table mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="o_nhs_matrix_member_col text-start ps-4">Member</th>
+                                    <th class="text-start">Team</th>
+                                    <t t-foreach="state.data.subjects" t-as="subject" t-key="subject.id">
+                                        <th class="o_nhs_matrix_subject_col text-center" t-esc="subject.name"/>
+                                    </t>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.data.members" t-as="member" t-key="member.id">
+                                    <tr>
+                                        <td class="ps-4 o_nhs_matrix_member_col">
+                                            <a href="#" class="text-decoration-none fw-bold" t-on-click.prevent="() => this.openMember(member.id)" t-esc="member.name"/>
+                                        </td>
+                                        <td class="text-muted small" t-esc="member.org_unit"/>
+                                        <t t-foreach="state.data.subjects" t-as="subject" t-key="subject.id">
+                                            <t t-set="cell" t-value="member.cells[subject.id]"/>
+                                            <td t-if="cell"
+                                                class="text-center nhs-matrix-cell"
+                                                style="cursor: pointer;"
+                                                t-att-title="cell.expiry_date"
+                                                t-on-click="() => this.onCellClick(member.id, subject.id, cell)">
+                                                <span t-attf-class="badge nhs-badge nhs-status-{{ cell.status }}"
+                                                      t-esc="cell.label"/>
+                                            </td>
+                                            <td t-else="" class="text-center text-muted small bg-light-subtle">-</td>
+                                        </t>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>
+

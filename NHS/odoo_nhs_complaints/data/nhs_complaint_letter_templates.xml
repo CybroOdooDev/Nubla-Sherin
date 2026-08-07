@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Acknowledgement Letter Template -->
+    <record id="letter_template_acknowledgement" model="mail.template">
+        <field name="name">NHS Complaint – Acknowledgement Letter</field>
+        <field name="model_id" ref="model_nhs_complaint"/>
+        <field name="subject">Acknowledgement of your complaint – {{ object.name }}</field>
+        <field name="body_html"><![CDATA[
+<p>Dear <t t-out="object.complainant_id.name or 'Complainant'"/>,</p>
+<p>Thank you for contacting us. We are writing to acknowledge receipt of your complaint/concern, reference <strong><t t-out="object.name"/></strong>, received on <t t-out="object.received_at.strftime('%d %B %Y') if object.received_at else ''"/>.</p>
+<p>We take all complaints seriously and will investigate the matters you have raised. We aim to provide you with a full written response within an agreed timescale, which we will confirm with you shortly.</p>
+<p>If you have any questions in the meantime, please do not hesitate to contact our Complaints Team.</p>
+<p>Yours sincerely,</p>
+<p>[Complaints Manager]<br/>[Organisation Name]</p>
+<p><em>If you are not satisfied with the outcome of our investigation, you have the right to refer your complaint to the Parliamentary and Health Service Ombudsman (PHSO).</em></p>
+        ]]></field>
+        <field name="auto_delete">False</field>
+    </record>
+
+    <!-- Holding Letter Template -->
+    <record id="letter_template_holding" model="mail.template">
+        <field name="name">NHS Complaint – Holding Letter</field>
+        <field name="model_id" ref="model_nhs_complaint"/>
+        <field name="subject">Update on your complaint – {{ object.name }}</field>
+        <field name="body_html"><![CDATA[
+<p>Dear <t t-out="object.complainant_id.name or 'Complainant'"/>,</p>
+<p>We are writing regarding your complaint, reference <strong><t t-out="object.name"/></strong>.</p>
+<p>We are currently investigating the matters you have raised and wish to assure you that this is being taken seriously. Our investigation is ongoing and we expect to provide you with a full written response by <t t-out="object.response_deadline.strftime('%d %B %Y') if object.response_deadline else 'the agreed date'"/>.</p>
+<p>We apologise for any delay and thank you for your patience.</p>
+<p>Yours sincerely,</p>
+<p>[Complaints Manager]<br/>[Organisation Name]</p>
+        ]]></field>
+        <field name="auto_delete">False</field>
+    </record>
+
+    <!-- Closure Letter Template -->
+    <record id="letter_template_closure" model="mail.template">
+        <field name="name">NHS Complaint – Closure Letter</field>
+        <field name="model_id" ref="model_nhs_complaint"/>
+        <field name="subject">Closure of your complaint – {{ object.name }}</field>
+        <field name="body_html"><![CDATA[
+<p>Dear <t t-out="object.complainant_id.name or 'Complainant'"/>,</p>
+<p>We are writing to confirm that your complaint, reference <strong><t t-out="object.name"/></strong>, has now been closed following our formal response.</p>
+<p>If you remain dissatisfied with our response, you have the right to refer your complaint to the <strong>Parliamentary and Health Service Ombudsman (PHSO)</strong>. The PHSO can be contacted at:</p>
+<ul>
+    <li>Website: <a href="https://www.ombudsman.org.uk">www.ombudsman.org.uk</a></li>
+    <li>Phone: 0345 015 4033</li>
+</ul>
+<p>Thank you for bringing this matter to our attention.</p>
+<p>Yours sincerely,</p>
+<p>[Chief Executive / Delegate]<br/>[Organisation Name]</p>
+        ]]></field>
+        <field name="auto_delete">False</field>
+    </record>
+
+    <!-- Consent Request Letter Template -->
+    <record id="letter_template_consent_request" model="mail.template">
+        <field name="name">NHS Complaint – Consent Request</field>
+        <field name="model_id" ref="model_nhs_complaint"/>
+        <field name="subject">Consent required – complaint reference {{ object.name }}</field>
+        <field name="body_html"><![CDATA[
+<p>Dear <t t-out="object.complainant_id.name or 'Complainant'"/>,</p>
+<p>We have received your complaint, reference <strong><t t-out="object.name"/></strong>, on behalf of <t t-out="object.patient_name or 'the patient'"/>.</p>
+<p>In order to investigate and respond to this complaint, we require written consent from the patient (or evidence of your authority to act on their behalf, such as lasting power of attorney or executor status).</p>
+<p>Please provide this consent at your earliest convenience. We will be unable to proceed with our investigation until consent has been obtained.</p>
+<p>Yours sincerely,</p>
+<p>[Complaints Manager]<br/>[Organisation Name]</p>
+        ]]></field>
+        <field name="auto_delete">False</field>
+    </record>
+</odoo>

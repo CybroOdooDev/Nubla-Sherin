@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Estate Dashboard Action -->
+    <record id="action_estate_dashboard" model="ir.actions.client">
+        <field name="name">Estate Dashboard</field>
+        <field name="tag">nhs_estate_dashboard</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Estate Summary Dashboard
+            </p>
+            <p>
+                Overview of your estate portfolio including sites, buildings,
+                total GIA, total backlog, and condition profile.
+            </p>
+        </field>
+    </record>
+</odoo>
