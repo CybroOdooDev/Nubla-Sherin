@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Check Types -->
+    <record id="view_nhs_check_type_list" model="ir.ui.view">
+        <field name="name">nhs.check.type.list</field>
+        <field name="model">nhs.check.type</field>
+        <field name="arch" type="xml">
+            <list string="Check Types" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="is_sensitive"/>
+                <field name="has_level"/>
+                <field name="default_required"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Window action: Check Types configuration list -->
+    <record id="action_nhs_check_type" model="ir.actions.act_window">
+        <field name="name">Check Types</field>
+        <field name="res_model">nhs.check.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Check Profiles -->
+    <record id="view_nhs_check_profile_list" model="ir.ui.view">
+        <field name="name">nhs.check.profile.list</field>
+        <field name="model">nhs.check.profile</field>
+        <field name="arch" type="xml">
+            <list string="Check Profiles">
+                <field name="name"/>
+                <field name="staff_group_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view: check profile with required check-type lines per staff group -->
+    <record id="view_nhs_check_profile_form" model="ir.ui.view">
+        <field name="name">nhs.check.profile.form</field>
+        <field name="model">nhs.check.profile</field>
+        <field name="arch" type="xml">
+            <form string="Check Profile">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="staff_group_id"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                    <field name="line_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="check_type_id"/>
+                            <field name="level"/>
+                            <field name="is_required"/>
+                        </list>
+                    </field>
+                    <field name="notes"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Window action: Check Profiles configuration list -->
+    <record id="action_nhs_check_profile" model="ir.actions.act_window">
+        <field name="name">Check Profiles</field>
+        <field name="res_model">nhs.check.profile</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Person Specification Templates -->
+    <record id="view_nhs_person_spec_list" model="ir.ui.view">
+        <field name="name">nhs.person.spec.list</field>
+        <field name="model">nhs.person.spec</field>
+        <field name="arch" type="xml">
+            <list string="Person Specifications">
+                <field name="name"/>
+                <field name="vacancy_count"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view: person specification with job description file and scoring criteria -->
+    <record id="view_nhs_person_spec_form" model="ir.ui.view">
+        <field name="name">nhs.person.spec.form</field>
+        <field name="model">nhs.person.spec</field>
+        <field name="arch" type="xml">
+            <form string="Person Specification">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="job_description" filename="job_description_filename"/>
+                        <field name="job_description_filename" invisible="1"/>
+                    </group>
+                    <field name="criterion_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                            <field name="category"/>
+                            <field name="essential"/>
+                            <field name="assessment_method"/>
+                            <field name="weight"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Window action: Person-Spec Templates configuration list -->
+    <record id="action_nhs_person_spec" model="ir.actions.act_window">
+        <field name="name">Person-Spec Templates</field>
+        <field name="res_model">nhs.person.spec</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Advertising Channels -->
+    <record id="view_nhs_recruitment_channel_list" model="ir.ui.view">
+        <field name="name">nhs.recruitment.channel.list</field>
+        <field name="model">nhs.recruitment.channel</field>
+        <field name="arch" type="xml">
+            <list string="Advertising Channels" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="is_external"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Window action: Advertising Channels configuration list -->
+    <record id="action_nhs_recruitment_channel" model="ir.actions.act_window">
+        <field name="name">Advertising Channels</field>
+        <field name="res_model">nhs.recruitment.channel</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Settings -->
+    <record id="view_nhs_recruitment_res_config_settings_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.nhs.recruitment</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="NHS Recruitment" data-string="NHS Recruitment"
+                     name="nhs_recruitment"
+                     groups="odoo_nhs_recruitment.group_nhs_recruit_manager">
+                    <block title="Vacancy Approval" name="nhs_recruitment_approval_block">
+                        <setting id="nhs_recruit_workforce_approval"
+                                 help="Require workforce sign-off before finance approval.">
+                            <field name="nhs_recruit_workforce_approval_required"/>
+                        </setting>
+                        <setting id="nhs_recruit_finance_approval"
+                                 help="Require finance sign-off before a vacancy can be opened.">
+                            <field name="nhs_recruit_finance_approval_required"/>
+                        </setting>
+                    </block>
+                    <block title="Pre-Employment Checks" name="nhs_recruitment_checks_block">
+                        <setting id="nhs_recruit_check_gate"
+                                 help="Block unconditional offers/starts until all required checks are cleared (disable for a soft/advisory gate only).">
+                            <field name="nhs_recruit_check_gate_hard"/>
+                        </setting>
+                    </block>
+                    <block title="Data Protection &amp; Retention" name="nhs_recruitment_retention_block">
+                        <setting id="nhs_recruit_retention"
+                                 help="Months after which an unsuccessful applicant's data is anonymised, unless they consented to the talent pool.">
+                            <field name="nhs_recruit_retention_months"/>
+                        </setting>
+                    </block>
+                    <block title="Public Application Form" name="nhs_recruitment_portal_block">
+                        <setting id="nhs_recruit_public_form" help="Share this token with candidates for job applications.">
+                            <field name="nhs_recruit_public_form_enabled"/>
+                            <div invisible="not nhs_recruit_public_form_enabled" class="mt-3">
+                                <field name="nhs_recruit_public_form_token" widget="CopyClipboardChar" readonly="1" nolabel="1"/>
+                                <div class="mt-2">
+                                    <button name="action_nhs_recruit_generate_token" string="Regenerate Token"
+                                            type="object" class="btn-primary btn-sm me-2"/>
+                                    <button name="action_nhs_recruit_open_form" string="Open Public Form"
+                                            type="object" class="btn-secondary btn-sm"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Window action: NHS Recruitment settings page -->
+    <record id="action_nhs_recruitment_config_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'module': 'nhs_recruitment', 'bin_size': False}</field>
+    </record>
+</odoo>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Module Category-->
+        <record id="module_category_nhs_recruitment" model="ir.module.category">
+            <field name="name">NHS Recruitment Pipeline</field>
+            <field name="description">NHS Recruitment Pipeline access levels.</field>
+            <field name="sequence">54</field>
+        </record>
+
+        <!-- Privilege (Odoo 19 — replaces category_id on res.groups)-->
+        <record id="privilege_recruitment_access_level" model="res.groups.privilege">
+            <field name="name">Recruitment Access Level</field>
+            <field name="category_id" ref="module_category_nhs_recruitment"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- Groups — self-contained, no governance/estates dependency.
+             Escalating access via implied_ids: Viewer < Officer < Manager;
+             Checks is a deliberate lateral separation (sensitive data) that
+             does NOT imply, or get implied by, Officer.-->
+        <record id="group_nhs_recruit_viewer" model="res.groups">
+            <field name="name">Recruitment Viewer</field>
+            <field name="privilege_id" ref="privilege_recruitment_access_level"/>
+            <field name="comment">Hiring managers: view their own vacancies and candidates,
+                score shortlisting/interviews for their vacancy. No sensitive check data,
+                no equality-monitoring data.</field>
+        </record>
+
+        <!-- Security group: Recruitment Officer - manage vacancies/apps/interviews/offers, no check data -->
+        <record id="group_nhs_recruit_officer" model="res.groups">
+            <field name="name">Recruitment Officer</field>
+            <field name="privilege_id" ref="privilege_recruitment_access_level"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_recruit_viewer'))]"/>
+            <field name="comment">Recruitment/resourcing team: manage vacancies,
+                applications, interviews, offers, communications. Not sensitive check
+                data or configuration.</field>
+        </record>
+
+        <!-- Security group: Pre-Employment Checks role, access to sensitive DBS/OH check data -->
+        <record id="group_nhs_recruit_checks" model="res.groups">
+            <field name="name">Pre-Employment Checks</field>
+            <field name="privilege_id" ref="privilege_recruitment_access_level"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_recruit_viewer'))]"/>
+            <field name="comment">Authorised recruitment/HR staff who may view and manage
+                the sensitive pre-employment check records (DBS, occupational health,
+                etc). Granted separately from Officer — keep this role tight.</field>
+        </record>
+
+        <!-- Security group: Recruitment Manager - full access incl. checks, equality data, config -->
+        <record id="group_nhs_recruit_manager" model="res.groups">
+            <field name="name">Recruitment Manager</field>
+            <field name="privilege_id" ref="privilege_recruitment_access_level"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_recruit_officer')), (4, ref('group_nhs_recruit_checks'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+            <field name="comment">Full control: configuration, approvals, retention policy,
+                all data including checks and equality monitoring.</field>
+        </record>
+
+        <!-- Record Rules — nhs.vacancy-->
+        <record id="rule_nhs_vacancy_viewer_own" model="ir.rule">
+            <field name="name">nhs.vacancy: hiring-manager scope (viewer)</field>
+            <field name="model_id" ref="model_nhs_vacancy"/>
+            <field name="domain_force">['&amp;', ('company_id', 'in', company_ids), ('hiring_manager_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_recruit_viewer'))]"/>
+        </record>
+
+        <!-- Record rule: officers see all vacancies within their company/companies -->
+        <record id="rule_nhs_vacancy_officer_company" model="ir.rule">
+            <field name="name">nhs.vacancy: company scope (officer)</field>
+            <field name="model_id" ref="model_nhs_vacancy"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_recruit_officer'))]"/>
+        </record>
+
+        <!-- Record Rules — nhs.application-->
+        <record id="rule_nhs_application_viewer_own" model="ir.rule">
+            <field name="name">nhs.application: hiring-manager/panel scope (viewer)</field>
+            <field name="model_id" ref="model_nhs_application"/>
+            <field name="domain_force">['&amp;', ('company_id', 'in', company_ids), '|', ('vacancy_id.hiring_manager_id', '=', user.id), ('interview_ids.panel_ids', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_recruit_viewer'))]"/>
+        </record>
+
+        <!-- Record rule: officers see all applications within their company/companies -->
+        <record id="rule_nhs_application_officer_company" model="ir.rule">
+            <field name="name">nhs.application: company scope (officer)</field>
+            <field name="model_id" ref="model_nhs_application"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_recruit_officer'))]"/>
+        </record>
+
+        <!-- Record Rules — nhs.interview-->
+        <record id="rule_nhs_interview_viewer_own" model="ir.rule">
+            <field name="name">nhs.interview: hiring-manager/panel scope (viewer)</field>
+            <field name="model_id" ref="model_nhs_interview"/>
+            <field name="domain_force">['&amp;', ('company_id', 'in', company_ids), '|', ('vacancy_id.hiring_manager_id', '=', user.id), ('panel_ids', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_recruit_viewer'))]"/>
+        </record>
+
+        <!-- Record rule: officers see all interviews within their company/companies -->
+        <record id="rule_nhs_interview_officer_company" model="ir.rule">
+            <field name="name">nhs.interview: company scope (officer)</field>
+            <field name="model_id" ref="model_nhs_interview"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_recruit_officer'))]"/>
+        </record>
+
+        <!-- Record Rules — nhs.offer-->
+        <record id="rule_nhs_offer_viewer_own" model="ir.rule">
+            <field name="name">nhs.offer: hiring-manager scope (viewer)</field>
+            <field name="model_id" ref="model_nhs_offer"/>
+            <field name="domain_force">['&amp;', ('company_id', 'in', company_ids), ('vacancy_id.hiring_manager_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_recruit_viewer'))]"/>
+        </record>
+
+        <!-- Record rule: officers see all offers within their company/companies -->
+        <record id="rule_nhs_offer_officer_company" model="ir.rule">
+            <field name="name">nhs.offer: company scope (officer)</field>
+            <field name="model_id" ref="model_nhs_offer"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_recruit_officer'))]"/>
+        </record>
+
+        <!-- Record Rules — nhs.candidate (company scope only; no hiring-manager
+             narrowing since a candidate may apply to several vacancies)-->
+        <record id="rule_nhs_candidate_company" model="ir.rule">
+            <field name="name">nhs.candidate: company scope</field>
+            <field name="model_id" ref="model_nhs_candidate"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_recruit_viewer'))]"/>
+        </record>
+
+        <!--Record Rules — sensitive check data (checks role / manager only,
+             enforced primarily via ir.model.access.csv having no rows at all
+             for viewer/officer on nhs.check and nhs.equality.monitoring)-->
+        <record id="rule_nhs_check_company" model="ir.rule">
+            <field name="name">nhs.check: company scope</field>
+            <field name="model_id" ref="model_nhs_check"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_recruit_checks'))]"/>
+        </record>
+
+        <!-- Record rule: equality monitoring data restricted to Recruitment Manager, company scope -->
+        <record id="rule_nhs_equality_monitoring_company" model="ir.rule">
+            <field name="name">nhs.equality.monitoring: company scope</field>
+            <field name="model_id" ref="model_nhs_equality_monitoring"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_recruit_manager'))]"/>
+        </record>
+
+        <!-- Record Rules — reference/config models (company scope, nullable
+             for shared/global reference data)-->
+        <record id="rule_nhs_person_spec_company" model="ir.rule">
+            <field name="name">nhs.person.spec: company scope</field>
+            <field name="model_id" ref="model_nhs_person_spec"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_recruit_viewer'))]"/>
+        </record>
+
+        <!-- Record rule: check profiles visible company-wide or global (company_id false) -->
+        <record id="rule_nhs_check_profile_company" model="ir.rule">
+            <field name="name">nhs.check.profile: company scope</field>
+            <field name="model_id" ref="model_nhs_check_profile"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_recruit_viewer'))]"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List view: offers, colored by all-checks-cleared or concern flag -->
+    <record id="view_nhs_offer_list" model="ir.ui.view">
+        <field name="name">nhs.offer.list</field>
+        <field name="model">nhs.offer</field>
+        <field name="arch" type="xml">
+            <list string="Offers" decoration-success="all_checks_cleared"
+                  decoration-danger="has_concern">
+                <field name="name"/>
+                <field name="candidate_id"/>
+                <field name="vacancy_id"/>
+                <field name="offer_type" widget="badge"/>
+                <field name="state" widget="badge"/>
+                <field name="start_date"/>
+                <field name="checks_cleared_count"/>
+                <field name="check_count"/>
+                <field name="all_checks_cleared" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view: offer record with accept/unconditional/onboard workflow and checks stat button -->
+    <record id="view_nhs_offer_form" model="ir.ui.view">
+        <field name="name">nhs.offer.form</field>
+        <field name="model">nhs.offer</field>
+        <field name="arch" type="xml">
+            <form string="Offer">
+                <header>
+                    <button name="action_accept" type="object" string="Mark Accepted"
+                            class="btn-primary" invisible="state != 'made'"/>
+                    <button name="action_convert_unconditional" type="object" string="Make Unconditional"
+                            class="btn-primary" invisible="offer_type == 'unconditional' or state != 'accepted'"/>
+                    <button name="action_open_onboard_wizard" type="object" string="Confirm Hire"
+                            class="btn-primary" invisible="state != 'accepted' or offer_type != 'unconditional'"/>
+                    <button name="action_decline" type="object" string="Mark Declined"
+                            invisible="state in ('hired', 'declined', 'withdrawn')"/>
+                    <button name="action_withdraw" type="object" string="Withdraw"
+                            invisible="state in ('hired', 'declined', 'withdrawn')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="made,accepted,hired"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_checks" type="object"
+                                class="oe_stat_button" icon="fa-shield">
+                            <field name="check_count" widget="statinfo" string="Checks"/>
+                        </button>
+                    </div>
+                    <div class="alert alert-danger" role="alert" invisible="not has_concern">
+                        A pre-employment check has been flagged with a concern — progression is paused for review.
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="application_id" readonly="1"/>
+                            <field name="candidate_id" readonly="1"/>
+                            <field name="vacancy_id" readonly="1"/>
+                            <field name="band_id" readonly="1"/>
+                            <field name="pay_point"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="salary" widget="monetary"/>
+                            <field name="fte"/>
+                            <field name="hours"/>
+                            <field name="start_date"/>
+                            <field name="offer_type"/>
+                        </group>
+                    </group>
+                    <group string="Pre-Employment Checks">
+                        <field name="checks_cleared_count" readonly="1"/>
+                        <field name="check_count" readonly="1"/>
+                        <field name="all_checks_cleared" widget="boolean_toggle" readonly="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view: filter offers awaiting checks or ready to onboard -->
+    <record id="view_nhs_offer_search" model="ir.ui.view">
+        <field name="name">nhs.offer.search</field>
+        <field name="model">nhs.offer</field>
+        <field name="arch" type="xml">
+            <search string="Offers">
+                <field name="name"/>
+                <field name="candidate_id"/>
+                <field name="vacancy_id"/>
+                <filter string="Awaiting Checks" name="awaiting_checks"
+                        domain="[('all_checks_cleared', '=', False), ('state', '=', 'accepted')]"/>
+                <filter string="Ready to Onboard" name="ready" domain="[('all_checks_cleared', '=', True), ('state', '=', 'accepted')]"/>
+                <group>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window action: Offers menu entry -->
+    <record id="action_nhs_offer" model="ir.actions.act_window">
+        <field name="name">Offers</field>
+        <field name="res_model">nhs.offer</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_nhs_offer_search"/>
+    </record>
+</odoo>

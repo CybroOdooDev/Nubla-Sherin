@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Clinical staff groups: all six standards, DBS enhanced with barred-list check -->
+    <record id="check_profile_clinical" model="nhs.check.profile">
+        <field name="name">Clinical (Enhanced DBS + Barred List)</field>
+        <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_nursing_midwifery"/>
+        <field name="line_ids" eval="[
+            (0, 0, {'check_type_id': ref('check_type_identity'), 'sequence': 10, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_rtw'), 'sequence': 20, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_registration'), 'sequence': 30, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_references'), 'sequence': 40, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_dbs'), 'sequence': 50, 'level': 'enhanced_barred', 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_oh'), 'sequence': 60, 'is_required': True}),
+        ]"/>
+    </record>
+
+    <!-- Check profile: Medical & Dental staff, enhanced DBS + barred list -->
+    <record id="check_profile_medical" model="nhs.check.profile">
+        <field name="name">Medical &amp; Dental (Enhanced DBS + Barred List)</field>
+        <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_medical_dental"/>
+        <field name="line_ids" eval="[
+            (0, 0, {'check_type_id': ref('check_type_identity'), 'sequence': 10, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_rtw'), 'sequence': 20, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_registration'), 'sequence': 30, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_references'), 'sequence': 40, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_dbs'), 'sequence': 50, 'level': 'enhanced_barred', 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_oh'), 'sequence': 60, 'is_required': True}),
+        ]"/>
+    </record>
+
+    <!-- Check profile: Allied Health Professions, enhanced DBS (no barred list) -->
+    <record id="check_profile_ahp" model="nhs.check.profile">
+        <field name="name">Allied Health Professions (Enhanced DBS)</field>
+        <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_ahp"/>
+        <field name="line_ids" eval="[
+            (0, 0, {'check_type_id': ref('check_type_identity'), 'sequence': 10, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_rtw'), 'sequence': 20, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_registration'), 'sequence': 30, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_references'), 'sequence': 40, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_dbs'), 'sequence': 50, 'level': 'enhanced', 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_oh'), 'sequence': 60, 'is_required': True}),
+        ]"/>
+    </record>
+
+    <!-- Check profile: Additional Clinical Services, enhanced DBS, registration optional -->
+    <record id="check_profile_clinical_support" model="nhs.check.profile">
+        <field name="name">Additional Clinical Services (Enhanced DBS)</field>
+        <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_additional_clinical_services"/>
+        <field name="line_ids" eval="[
+            (0, 0, {'check_type_id': ref('check_type_identity'), 'sequence': 10, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_rtw'), 'sequence': 20, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_registration'), 'sequence': 30, 'is_required': False}),
+            (0, 0, {'check_type_id': ref('check_type_references'), 'sequence': 40, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_dbs'), 'sequence': 50, 'level': 'enhanced', 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_oh'), 'sequence': 60, 'is_required': True}),
+        ]"/>
+    </record>
+
+    <!-- Non-clinical staff groups: all six standards, DBS standard level (no barred list) -->
+    <record id="check_profile_admin" model="nhs.check.profile">
+        <field name="name">Admin &amp; Clerical (Standard DBS)</field>
+        <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_admin_clerical"/>
+        <field name="line_ids" eval="[
+            (0, 0, {'check_type_id': ref('check_type_identity'), 'sequence': 10, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_rtw'), 'sequence': 20, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_registration'), 'sequence': 30, 'is_required': False}),
+            (0, 0, {'check_type_id': ref('check_type_references'), 'sequence': 40, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_dbs'), 'sequence': 50, 'level': 'standard', 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_oh'), 'sequence': 60, 'is_required': True}),
+        ]"/>
+    </record>
+
+    <!-- Check profile: Estates & Ancillary staff, standard DBS level -->
+    <record id="check_profile_estates" model="nhs.check.profile">
+        <field name="name">Estates &amp; Ancillary (Standard DBS)</field>
+        <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_estates_ancillary"/>
+        <field name="line_ids" eval="[
+            (0, 0, {'check_type_id': ref('check_type_identity'), 'sequence': 10, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_rtw'), 'sequence': 20, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_registration'), 'sequence': 30, 'is_required': False}),
+            (0, 0, {'check_type_id': ref('check_type_references'), 'sequence': 40, 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_dbs'), 'sequence': 50, 'level': 'standard', 'is_required': True}),
+            (0, 0, {'check_type_id': ref('check_type_oh'), 'sequence': 60, 'is_required': True}),
+        ]"/>
+    </record>
+</odoo>

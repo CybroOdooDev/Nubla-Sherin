@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard view: form to select mail template and send outcome to applicants -->
+    <record id="view_nhs_bulk_communicate_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.bulk.communicate.wizard.form</field>
+        <field name="model">nhs.bulk.communicate.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Communicate Outcome to Applicants">
+                <group>
+                    <field name="application_ids" widget="many2many_tags" readonly="1"/>
+                    <field name="template_id"/>
+                </group>
+                <footer>
+                    <button name="action_send" type="object" string="Send" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Wizard action: bulk-communicate outcome, bound to application list view -->
+    <record id="action_nhs_bulk_communicate_wizard" model="ir.actions.act_window">
+        <field name="name">Communicate Outcome</field>
+        <field name="res_model">nhs.bulk.communicate.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_nhs_application"/>
+        <field name="binding_view_types">list</field>
+    </record>
+</odoo>
