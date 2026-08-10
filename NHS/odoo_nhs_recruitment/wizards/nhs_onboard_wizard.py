@@ -75,11 +75,16 @@ class NhsOnboardWizard(models.TransientModel):
         })
         offer.application_id.write({'stage': 'hired'})
 
+        # Closing the loop with Establishment/Training is a system action of
+        # this module's onboarding flow, not a direct user edit of those
+        # other modules' models — sudo() so recruitment officers/managers
+        # (who hold no odoo_nhs_establishment/odoo_nhs_training group) can
+        # still confirm a hire.
         post = offer.vacancy_id.post_id
-        post.write({'in_post_fte': post.in_post_fte + offer.fte})
+        post.sudo().write({'in_post_fte': post.in_post_fte + offer.fte})
 
         if self.create_training_member and 'nhs.workforce.member' in self.env:
-            self.env['nhs.workforce.member'].create({
+            self.env['nhs.workforce.member'].sudo().create({
                 'name': offer.candidate_id.name,
                 'email': offer.candidate_id.email,
                 'post_id': post.id,

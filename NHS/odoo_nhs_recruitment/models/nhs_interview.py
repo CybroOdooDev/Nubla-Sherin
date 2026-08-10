@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import  _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -46,11 +46,11 @@ class NhsInterviewScoreLine(models.Model):
             vacancy = line.interview_id.vacancy_id
             spec = vacancy.person_spec_id
             if not spec:
-                raise ValidationError(_(
+                raise ValidationError((
                     "Set a Person Specification on vacancy '%s' before scoring "
                     "interviews against it.") % vacancy.name)
             if line.criterion_id.spec_id != spec:
-                raise ValidationError(_(
+                raise ValidationError((
                     "'%s' is not a criterion of this vacancy's Person Specification "
                     "('%s').") % (line.criterion_id.name, spec.name))
 
@@ -141,7 +141,7 @@ class NhsInterview(models.Model):
         slot is never left in place by mistake."""
         self.ensure_one()
         return {
-            'name': _('Reschedule Interview'),
+            'name': ('Reschedule Interview'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.interview.reschedule.wizard',
             'view_mode': 'form',

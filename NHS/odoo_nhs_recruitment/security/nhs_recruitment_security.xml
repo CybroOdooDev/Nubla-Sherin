@@ -41,7 +41,7 @@
         <record id="group_nhs_recruit_checks" model="res.groups">
             <field name="name">Pre-Employment Checks</field>
             <field name="privilege_id" ref="privilege_recruitment_access_level"/>
-            <field name="implied_ids" eval="[(4, ref('group_nhs_recruit_viewer'))]"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_recruit_officer'))]"/>
             <field name="comment">Authorised recruitment/HR staff who may view and manage
                 the sensitive pre-employment check records (DBS, occupational health,
                 etc). Granted separately from Officer — keep this role tight.</field>

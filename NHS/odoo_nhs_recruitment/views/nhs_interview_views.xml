@@ -24,23 +24,34 @@
         <field name="model">nhs.interview</field>
         <field name="arch" type="xml">
             <form string="Interview">
+                <!-- Viewer's role on interviews is to view and score (per spec) —
+                     invite/outcome logistics are officer-managed, so every
+                     header action below is officer+ only; a Viewer gets no
+                     clickable buttons on this form. -->
                 <header>
                     <button name="action_mark_accepted" type="object" string="Mark Accepted"
-                            class="btn-primary" invisible="invite_status not in ('invited', 'rescheduled')"/>
+                            class="btn-primary" invisible="invite_status not in ('invited', 'rescheduled')"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_mark_declined" type="object" string="Mark Declined"
-                            invisible="invite_status not in ('invited', 'rescheduled', 'accepted')"/>
+                            invisible="invite_status not in ('invited', 'rescheduled', 'accepted')"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_mark_rescheduled" type="object" string="Mark Rescheduled"
-                            invisible="invite_status in ('rescheduled', 'attended')"/>
+                            invisible="invite_status in ('rescheduled', 'attended')"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_mark_attended" type="object" string="Mark Attended"
-                            class="btn-primary" invisible="invite_status != 'accepted'"/>
+                            class="btn-primary" invisible="invite_status != 'accepted'"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_mark_no_show" type="object" string="Mark No Show"
-                            invisible="invite_status not in ('accepted', 'attended')"/>
+                            invisible="invite_status not in ('accepted', 'attended')"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_mark_appointable" type="object" string="Mark Appointable"
                             class="btn-primary"
-                            invisible="outcome == 'appointable' or invite_status != 'attended'"/>
+                            invisible="outcome == 'appointable' or invite_status != 'attended'"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_mark_not_appointable" type="object" string="Mark Not Appointable"
-                            invisible="outcome == 'not_appointable' or invite_status != 'attended'"/>
-                    <field name="invite_status" widget="statusbar"/>
+                            invisible="outcome == 'not_appointable' or invite_status != 'attended'"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
+                    <field name="invite_status" widget="statusbar" statusbar_visible="invited,accepted,attended"/>
                 </header>
                 <sheet>
                     <div class="oe_title">

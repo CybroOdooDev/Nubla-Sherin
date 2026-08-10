@@ -205,15 +205,17 @@ class NhsVacancy(models.Model):
             vacancy.interview_count = interview_counts.get(vacancy.id, 0)
             vacancy.offer_count = offer_counts.get(vacancy.id, 0)
 
+    @api.depends('state', 'open_date')
     def _compute_days_open(self):
         """Days since opening, for vacancies still open or in progress;
-        zero once filled, closed, withdrawn, or never opened."""
+        zero once filled, closed, withdrawn, never opened, or not yet due
+        to open (a future Opening Date)."""
         today = fields.Date.context_today(self)
         for vacancy in self:
             if vacancy.state in ('filled', 'closed', 'withdrawn') or not vacancy.open_date:
                 vacancy.days_open = 0
             else:
-                vacancy.days_open = (today - vacancy.open_date).days
+                vacancy.days_open = max(0, (today - vacancy.open_date).days)
 
     @api.depends('filled_date', 'open_date')
     def _compute_time_to_hire(self):
@@ -231,6 +233,16 @@ class NhsVacancy(models.Model):
         for vacancy in self:
             if vacancy.fte <= 0:
                 raise ValidationError(('Vacancy FTE must be greater than zero.'))
+
+    @api.constrains('open_date', 'close_date')
+    def _check_advert_dates(self):
+        """Rejects an Opening or Closing Date set in the past."""
+        today = fields.Date.context_today(self)
+        for vacancy in self:
+            if vacancy.open_date and vacancy.open_date < today:
+                raise ValidationError(('Opening Date cannot be in the past.'))
+            if vacancy.close_date and vacancy.close_date < today:
+                raise ValidationError(('Closing Date cannot be in the past.'))
 
     @api.onchange('post_id')
     def _onchange_post_id(self):

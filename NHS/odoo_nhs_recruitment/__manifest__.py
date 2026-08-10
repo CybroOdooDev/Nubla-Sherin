@@ -39,8 +39,7 @@ Establishment Register as an updated in-post position.
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'depends': [
-        'odoo_nhs_establishment','mail','portal'],
+    'depends': ['base','odoo_nhs_establishment','mail','portal'],
     'data': [
         'security/nhs_recruitment_security.xml',
         'security/ir.model.access.csv',

@@ -89,5 +89,6 @@
               parent="menu_nhs_recruitment_config" action="action_nhs_recruitment_channel" sequence="40"/>
     <!-- Menu: recruitment settings page, under Configuration -->
     <menuitem id="menu_nhs_recruitment_settings" name="Settings"
-              parent="menu_nhs_recruitment_config" action="action_nhs_recruitment_config_settings" sequence="50"/>
+              parent="menu_nhs_recruitment_config" action="action_nhs_recruitment_config_settings" sequence="50"
+              groups="base.group_system"/>
 </odoo>

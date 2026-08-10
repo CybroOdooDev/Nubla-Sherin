@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import  api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -42,7 +42,7 @@ class NhsInterviewRescheduleWizard(models.TransientModel):
     def _check_new_datetime_changed(self):
         for wizard in self:
             if wizard.new_datetime == wizard.old_datetime:
-                raise UserError(_(
+                raise UserError((
                     "Set a new date/time for the interview — it's still the same as the"
                     " current one."))
 
@@ -57,5 +57,5 @@ class NhsInterviewRescheduleWizard(models.TransientModel):
         })
         if self.reason:
             self.interview_id.message_post(
-                body=_("Interview rescheduled: %s") % self.reason)
+                body=("Interview rescheduled: %s") % self.reason)
         return {'type': 'ir.actions.act_window_close'}

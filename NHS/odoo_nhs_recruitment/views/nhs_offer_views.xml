@@ -26,23 +26,34 @@
         <field name="model">nhs.offer</field>
         <field name="arch" type="xml">
             <form string="Offer">
+                <!-- Viewer has read-only ACL on nhs.offer (hiring managers view only) —
+                     every state-changing action below is officer+ so the button is
+                     hidden rather than surfacing an Access Error. -->
                 <header>
                     <button name="action_accept" type="object" string="Mark Accepted"
-                            class="btn-primary" invisible="state != 'made'"/>
+                            class="btn-primary" invisible="state != 'made'"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_convert_unconditional" type="object" string="Make Unconditional"
-                            class="btn-primary" invisible="offer_type == 'unconditional' or state != 'accepted'"/>
+                            class="btn-primary" invisible="offer_type == 'unconditional' or state != 'accepted'"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_open_onboard_wizard" type="object" string="Confirm Hire"
-                            class="btn-primary" invisible="state != 'accepted' or offer_type != 'unconditional'"/>
+                            class="btn-primary" invisible="state != 'accepted' or offer_type != 'unconditional'"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_decline" type="object" string="Mark Declined"
-                            invisible="state in ('hired', 'declined', 'withdrawn')"/>
+                            invisible="state in ('hired', 'declined', 'withdrawn')"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_withdraw" type="object" string="Withdraw"
-                            invisible="state in ('hired', 'declined', 'withdrawn')"/>
+                            invisible="state in ('hired', 'declined', 'withdrawn')"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <field name="state" widget="statusbar" statusbar_visible="made,accepted,hired"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
+                        <!-- nhs.check ACL grants viewer/officer no access at all — only
+                             the checks role and manager (who implies checks). -->
                         <button name="action_view_checks" type="object"
-                                class="oe_stat_button" icon="fa-shield">
+                                class="oe_stat_button" icon="fa-shield"
+                                groups="odoo_nhs_recruitment.group_nhs_recruit_checks">
                             <field name="check_count" widget="statinfo" string="Checks"/>
                         </button>
                     </div>

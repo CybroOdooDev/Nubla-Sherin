@@ -4,83 +4,233 @@
     <record id="check_profile_clinical" model="nhs.check.profile">
         <field name="name">Clinical (Enhanced DBS + Barred List)</field>
         <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_nursing_midwifery"/>
-        <field name="line_ids" eval="[
-            (0, 0, {'check_type_id': ref('check_type_identity'), 'sequence': 10, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_rtw'), 'sequence': 20, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_registration'), 'sequence': 30, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_references'), 'sequence': 40, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_dbs'), 'sequence': 50, 'level': 'enhanced_barred', 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_oh'), 'sequence': 60, 'is_required': True}),
-        ]"/>
+        <field name="line_ids">
+            <record>
+                <field name="check_type_id" ref="check_type_identity"/>
+                <field name="sequence">10</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_rtw"/>
+                <field name="sequence">20</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_registration"/>
+                <field name="sequence">30</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_references"/>
+                <field name="sequence">40</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_dbs"/>
+                <field name="sequence">50</field>
+                <field name="level">enhanced_barred</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_oh"/>
+                <field name="sequence">60</field>
+                <field name="is_required">True</field>
+            </record>
+        </field>
     </record>
 
     <!-- Check profile: Medical & Dental staff, enhanced DBS + barred list -->
     <record id="check_profile_medical" model="nhs.check.profile">
         <field name="name">Medical &amp; Dental (Enhanced DBS + Barred List)</field>
         <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_medical_dental"/>
-        <field name="line_ids" eval="[
-            (0, 0, {'check_type_id': ref('check_type_identity'), 'sequence': 10, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_rtw'), 'sequence': 20, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_registration'), 'sequence': 30, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_references'), 'sequence': 40, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_dbs'), 'sequence': 50, 'level': 'enhanced_barred', 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_oh'), 'sequence': 60, 'is_required': True}),
-        ]"/>
+        <field name="line_ids">
+            <record>
+                <field name="check_type_id" ref="check_type_identity"/>
+                <field name="sequence">10</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_rtw"/>
+                <field name="sequence">20</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_registration"/>
+                <field name="sequence">30</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_references"/>
+                <field name="sequence">40</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_dbs"/>
+                <field name="sequence">50</field>
+                <field name="level">enhanced_barred</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_oh"/>
+                <field name="sequence">60</field>
+                <field name="is_required">True</field>
+            </record>
+        </field>
     </record>
 
     <!-- Check profile: Allied Health Professions, enhanced DBS (no barred list) -->
     <record id="check_profile_ahp" model="nhs.check.profile">
         <field name="name">Allied Health Professions (Enhanced DBS)</field>
         <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_ahp"/>
-        <field name="line_ids" eval="[
-            (0, 0, {'check_type_id': ref('check_type_identity'), 'sequence': 10, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_rtw'), 'sequence': 20, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_registration'), 'sequence': 30, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_references'), 'sequence': 40, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_dbs'), 'sequence': 50, 'level': 'enhanced', 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_oh'), 'sequence': 60, 'is_required': True}),
-        ]"/>
+        <field name="line_ids">
+            <record>
+                <field name="check_type_id" ref="check_type_identity"/>
+                <field name="sequence">10</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_rtw"/>
+                <field name="sequence">20</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_registration"/>
+                <field name="sequence">30</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_references"/>
+                <field name="sequence">40</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_dbs"/>
+                <field name="sequence">50</field>
+                <field name="level">enhanced</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_oh"/>
+                <field name="sequence">60</field>
+                <field name="is_required">True</field>
+            </record>
+        </field>
     </record>
 
     <!-- Check profile: Additional Clinical Services, enhanced DBS, registration optional -->
     <record id="check_profile_clinical_support" model="nhs.check.profile">
         <field name="name">Additional Clinical Services (Enhanced DBS)</field>
         <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_additional_clinical_services"/>
-        <field name="line_ids" eval="[
-            (0, 0, {'check_type_id': ref('check_type_identity'), 'sequence': 10, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_rtw'), 'sequence': 20, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_registration'), 'sequence': 30, 'is_required': False}),
-            (0, 0, {'check_type_id': ref('check_type_references'), 'sequence': 40, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_dbs'), 'sequence': 50, 'level': 'enhanced', 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_oh'), 'sequence': 60, 'is_required': True}),
-        ]"/>
+        <field name="line_ids">
+            <record>
+                <field name="check_type_id" ref="check_type_identity"/>
+                <field name="sequence">10</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_rtw"/>
+                <field name="sequence">20</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_registration"/>
+                <field name="sequence">30</field>
+                <field name="is_required">False</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_references"/>
+                <field name="sequence">40</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_dbs"/>
+                <field name="sequence">50</field>
+                <field name="level">enhanced</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_oh"/>
+                <field name="sequence">60</field>
+                <field name="is_required">True</field>
+            </record>
+        </field>
     </record>
 
     <!-- Non-clinical staff groups: all six standards, DBS standard level (no barred list) -->
     <record id="check_profile_admin" model="nhs.check.profile">
         <field name="name">Admin &amp; Clerical (Standard DBS)</field>
         <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_admin_clerical"/>
-        <field name="line_ids" eval="[
-            (0, 0, {'check_type_id': ref('check_type_identity'), 'sequence': 10, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_rtw'), 'sequence': 20, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_registration'), 'sequence': 30, 'is_required': False}),
-            (0, 0, {'check_type_id': ref('check_type_references'), 'sequence': 40, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_dbs'), 'sequence': 50, 'level': 'standard', 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_oh'), 'sequence': 60, 'is_required': True}),
-        ]"/>
+        <field name="line_ids">
+            <record>
+                <field name="check_type_id" ref="check_type_identity"/>
+                <field name="sequence">10</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_rtw"/>
+                <field name="sequence">20</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_registration"/>
+                <field name="sequence">30</field>
+                <field name="is_required">False</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_references"/>
+                <field name="sequence">40</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_dbs"/>
+                <field name="sequence">50</field>
+                <field name="level">standard</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_oh"/>
+                <field name="sequence">60</field>
+                <field name="is_required">True</field>
+            </record>
+        </field>
     </record>
 
     <!-- Check profile: Estates & Ancillary staff, standard DBS level -->
     <record id="check_profile_estates" model="nhs.check.profile">
         <field name="name">Estates &amp; Ancillary (Standard DBS)</field>
         <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_estates_ancillary"/>
-        <field name="line_ids" eval="[
-            (0, 0, {'check_type_id': ref('check_type_identity'), 'sequence': 10, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_rtw'), 'sequence': 20, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_registration'), 'sequence': 30, 'is_required': False}),
-            (0, 0, {'check_type_id': ref('check_type_references'), 'sequence': 40, 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_dbs'), 'sequence': 50, 'level': 'standard', 'is_required': True}),
-            (0, 0, {'check_type_id': ref('check_type_oh'), 'sequence': 60, 'is_required': True}),
-        ]"/>
+        <field name="line_ids">
+            <record>
+                <field name="check_type_id" ref="check_type_identity"/>
+                <field name="sequence">10</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_rtw"/>
+                <field name="sequence">20</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_registration"/>
+                <field name="sequence">30</field>
+                <field name="is_required">False</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_references"/>
+                <field name="sequence">40</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_dbs"/>
+                <field name="sequence">50</field>
+                <field name="level">standard</field>
+                <field name="is_required">True</field>
+            </record>
+            <record>
+                <field name="check_type_id" ref="check_type_oh"/>
+                <field name="sequence">60</field>
+                <field name="is_required">True</field>
+            </record>
+        </field>
     </record>
 </odoo>

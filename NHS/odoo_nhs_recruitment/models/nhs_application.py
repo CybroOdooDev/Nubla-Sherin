@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import  _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 APPLICATION_STAGES = [
@@ -56,11 +56,11 @@ class NhsApplicationScoreLine(models.Model):
             vacancy = line.application_id.vacancy_id
             spec = vacancy.person_spec_id
             if not spec:
-                raise ValidationError(_(
+                raise ValidationError((
                     "Set a Person Specification on vacancy '%s' before scoring "
                     "applications against it.") % vacancy.name)
             if line.criterion_id.spec_id != spec:
-                raise ValidationError(_(
+                raise ValidationError((
                     "'%s' is not a criterion of this vacancy's Person Specification "
                     "('%s').") % (line.criterion_id.name, spec.name))
 
@@ -153,7 +153,11 @@ class NhsApplication(models.Model):
         applications = super().create(vals_list)
         for application in applications:
             if not application.equality_id:
-                application.equality_id = self.env['nhs.equality.monitoring'].create({
+                # Auto-created as a transparent system action, regardless of
+                # the creating user's group — sudo() so viewer/officer/checks
+                # users (who have no rights on the segregated equality model)
+                # can still create an application.
+                application.equality_id = self.env['nhs.equality.monitoring'].sudo().create({
                     'application_id': application.id,
                 })
         return applications

@@ -76,20 +76,30 @@
         <field name="model">nhs.application</field>
         <field name="arch" type="xml">
             <form string="Application">
+                <!-- Viewer's role on applications is to view and score against the
+                     person spec (per spec) — pipeline-stage management is
+                     officer-managed, so every header action below is officer+
+                     only; a Viewer gets no clickable buttons on this form. -->
                 <header>
                     <button name="action_start_shortlisting" type="object" string="Start Shortlisting"
-                            class="btn-primary" invisible="stage != 'received'"/>
+                            class="btn-primary" invisible="stage != 'received'"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_shortlist_decide" type="object" string="Apply Shortlist Decision"
-                            class="btn-primary" invisible="stage != 'shortlisting'"/>
+                            class="btn-primary" invisible="stage != 'shortlisting'"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_make_offer" type="object" string="Make Offer"
-                            class="btn-primary" invisible="stage != 'interview'"/>
+                            class="btn-primary" invisible="stage != 'interview'"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_send_acknowledgement" type="object" string="Send Acknowledgement"
-                            class="btn-primary" invisible="acknowledged or stage == 'received'"/>
+                            class="btn-primary" invisible="acknowledged or stage == 'received'"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_reject" type="object" string="Reject"
                             class="btn-primary" invisible="stage in ('hired', 'rejected', 'withdrawn')"
-                            confirm="Reject this application?"/>
+                            confirm="Reject this application?"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_withdraw" type="object" string="Withdraw"
-                            class="btn-primary" invisible="stage in ('hired', 'rejected', 'withdrawn')"/>
+                            class="btn-primary" invisible="stage in ('hired', 'rejected', 'withdrawn')"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <field name="stage" widget="statusbar"
                            statusbar_visible="received,shortlisting,shortlisted,interview,offered,hired"/>
                 </header>
@@ -140,7 +150,7 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Interviews" invisible="stage == 'received'">
+                        <page string="Interviews" invisible="stage in ('received', 'shortlisting')">
                             <field name="interview_ids">
                                 <list>
                                     <field name="interview_datetime"/>

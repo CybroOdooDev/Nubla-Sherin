@@ -63,15 +63,19 @@ class NhsRecruitmentPublic(http.Controller):
 
     @http.route('/jobs/apply/<string:token>', type='http', auth='public', website=False, sitemap=False)
     def vacancy_list(self, token, **kw):
-        """List currently open vacancies for the company matching token."""
+        """List currently open vacancies for the company matching token,
+        excluding internal-only vacancies for anyone who isn't logged in
+        as an internal user (matches the gate on the apply route itself)."""
         company = self._company_from_token(token)
         if not company:
             return request.not_found()
 
-        vacancies = request.env['nhs.vacancy'].sudo().search([
+        domain = [
             ('company_id', '=', company.id),
             ('state', 'in', ('open', 'in_progress')),
-        ])
+            ('internal_only', '=', False),
+        ]
+        vacancies = request.env['nhs.vacancy'].sudo().search(domain)
         return request.render('odoo_nhs_recruitment.public_vacancy_list', {
             'token': token,
             'company': company,
@@ -89,7 +93,7 @@ class NhsRecruitmentPublic(http.Controller):
         vacancy = request.env['nhs.vacancy'].sudo().browse(vacancy_id)
         if not vacancy.exists() or vacancy.company_id.id != company.id \
                 or vacancy.state not in ('open', 'in_progress') \
-                or (vacancy.internal_only and not request.env.user._is_internal()):
+                or vacancy.internal_only:
             return request.not_found()
 
         return request.render('odoo_nhs_recruitment.public_application_form', {
@@ -108,7 +112,7 @@ class NhsRecruitmentPublic(http.Controller):
             return request.not_found()
 
         vacancy = request.env['nhs.vacancy'].sudo().browse(vacancy_id)
-        if not vacancy.exists() or vacancy.company_id.id != company.id:
+        if not vacancy.exists() or vacancy.company_id.id != company.id or vacancy.internal_only:
             return request.not_found()
 
         ip = request.httprequest.remote_addr

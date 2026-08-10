@@ -1,4 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nhs_establishment_post_recruit_viewer,nhs.establishment.post recruit viewer,odoo_nhs_establishment.model_nhs_establishment_post,group_nhs_recruit_viewer,1,0,0,0
+access_nhs_afc_band_recruit_viewer,nhs.afc.band recruit viewer,odoo_nhs_establishment.model_nhs_afc_band,group_nhs_recruit_viewer,1,0,0,0
+access_nhs_staff_group_recruit_viewer,nhs.staff.group recruit viewer,odoo_nhs_establishment.model_nhs_staff_group,group_nhs_recruit_viewer,1,0,0,0
+access_nhs_org_unit_recruit_viewer,nhs.org.unit recruit viewer,odoo_nhs_establishment.model_nhs_org_unit,group_nhs_recruit_viewer,1,0,0,0
 access_nhs_vacancy_viewer,nhs.vacancy viewer,model_nhs_vacancy,group_nhs_recruit_viewer,1,0,0,0
 access_nhs_vacancy_officer,nhs.vacancy officer,model_nhs_vacancy,group_nhs_recruit_officer,1,1,1,0
 access_nhs_vacancy_manager,nhs.vacancy manager,model_nhs_vacancy,group_nhs_recruit_manager,1,1,1,1
