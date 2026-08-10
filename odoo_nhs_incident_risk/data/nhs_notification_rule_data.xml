@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Duty of Candour auto-arm: moderate+ harm on any provider type -->
+    <record id="rule_doc_moderate" model="nhs.notification.rule">
+        <field name="name">DoC — Moderate harm or worse</field>
+        <field name="provider_type">all</field>
+        <field name="min_harm_grade">moderate</field>
+        <field name="require_lfpse">True</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <!-- LFPSE — NHS-funded providers -->
+    <record id="rule_lfpse_trust" model="nhs.notification.rule">
+        <field name="name">LFPSE — NHS Trust any incident</field>
+        <field name="provider_type">nhs_trust</field>
+        <field name="require_lfpse">True</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="rule_lfpse_gp" model="nhs.notification.rule">
+        <field name="name">LFPSE — GP Practice any incident</field>
+        <field name="provider_type">gp_practice</field>
+        <field name="require_lfpse">True</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <!-- CQC — Death of service user (all CQC providers) -->
+    <record id="rule_cqc_death" model="nhs.notification.rule">
+        <field name="name">CQC — Death of service user</field>
+        <field name="provider_type">all</field>
+        <field name="category_id" ref="cat_death"/>
+        <field name="min_harm_grade">death</field>
+        <field name="require_cqc">True</field>
+        <field name="cqc_notification_type_id" ref="cqc_type_death"/>
+        <field name="deadline_days">3</field>
+        <field name="sequence">5</field>
+    </record>
+
+    <!-- CQC — Safeguarding -->
+    <record id="rule_cqc_safeguarding" model="nhs.notification.rule">
+        <field name="name">CQC — Safeguarding allegation</field>
+        <field name="provider_type">all</field>
+        <field name="category_id" ref="cat_safeguarding"/>
+        <field name="require_cqc">True</field>
+        <field name="cqc_notification_type_id" ref="cqc_type_abuse"/>
+        <field name="require_safeguarding">True</field>
+        <field name="sequence">5</field>
+    </record>
+
+    <!-- RIDDOR suggestion — staff injury category -->
+    <record id="rule_riddor_staff" model="nhs.notification.rule">
+        <field name="name">RIDDOR check — staff injury</field>
+        <field name="provider_type">all</field>
+        <field name="category_id" ref="cat_staff_injury"/>
+        <field name="suggest_riddor">True</field>
+        <field name="sequence">15</field>
+    </record>
+    <record id="rule_riddor_violence" model="nhs.notification.rule">
+        <field name="name">RIDDOR check — violence to staff</field>
+        <field name="provider_type">all</field>
+        <field name="category_id" ref="cat_violence"/>
+        <field name="suggest_riddor">True</field>
+        <field name="sequence">15</field>
+    </record>
+</odoo>

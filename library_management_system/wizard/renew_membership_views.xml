@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--    Form view for renew membership model.-->
+    <record id="renew_membership_view_form" model="ir.ui.view">
+        <field name="name">renew.membership.view.form</field>
+        <field name="model">renew.membership</field>
+        <field name="arch" type="xml">
+            <form string="Renew Membership">
+                <p class="oe_grey">
+                    Invoices will be created and validated for membership
+                    renewal
+                </p>
+                <group>
+                    <group>
+                        <field name="member_id" readonly="1" force_save="1"/>
+                        <field name="membership_id" readonly="1"
+                               force_save="1"/>
+                        <field name="membership_type_id" readonly="0"/>
+                    </group>
+                    <group>
+                        <field name="renewal_amount" readonly="1"
+                               force_save="1"/>
+                        <field name="expiry_date" readonly="1" force_save="1"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="renew_membership" string="Renew and Invoice"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-default"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <!--    Window action for renew membership model.-->
+    <record id="renew_membership_action" model="ir.actions.act_window">
+        <field name="name">Renew Membership</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">renew.membership</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

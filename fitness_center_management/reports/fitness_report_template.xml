@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_fitness_report" model="ir.actions.report">
+        <field name="name">Fitness Report</field>
+        <field name="model">fitness.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">fitness_center_management.report_fitness_report_template</field>
+        <field name="report_file">fitness_center_management.report_fitness_report_template</field>
+        <field name="print_report_name">'Fitness Report - %s' % (object.member_id.name)</field>
+        <field name="binding_model_id" ref="model_fitness_report"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_fitness_report_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="row mt32 mb32">
+                            <div class="col-12 text-center">
+                                <h2>Fitness Report</h2>
+                                <h4><span t-field="o.member_id.name"/></h4>
+                                <p class="text-muted">Report Date: <span t-field="o.date"/></p>
+                            </div>
+                        </div>
+
+                        <div class="row mb16">
+                            <div class="col-6">
+                                <strong>Member: </strong><span t-field="o.member_id.name"/><br/>
+                                <strong>Age: </strong><span t-field="o.age"/> years<br/>
+                                <strong>Gender: </strong><span t-field="o.gender"/><br/>
+                            </div>
+                            <div class="col-6 text-end">
+                                <strong>Reference: </strong><span t-field="o.name"/><br/>
+                                <strong>Date: </strong><span t-field="o.date"/><br/>
+                            </div>
+                        </div>
+
+                        <h4 class="mt32">Body Measurements</h4>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Height</strong></td>
+                                    <td><span t-field="o.height"/> cm</td>
+                                    <td><strong>Weight</strong></td>
+                                    <td><span t-field="o.weight"/> kg</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Waist</strong></td>
+                                    <td><span t-field="o.waist"/> cm</td>
+                                    <td><strong>Hip</strong></td>
+                                    <td><span t-field="o.hip"/> cm</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Neck</strong></td>
+                                    <td><span t-field="o.neck"/> cm</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4 class="mt32">Health Indices</h4>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Value</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>BMI (Body Mass Index)</strong></td>
+                                    <td><span t-field="o.bmi"/></td>
+                                    <td><span t-field="o.bmi_category"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>BMR (Basal Metabolic Rate)</strong></td>
+                                    <td><span t-field="o.bmr"/> kcal/day</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>BFP (Body Fat Percentage)</strong></td>
+                                    <td><span t-field="o.bfp"/> %</td>
+                                    <td>-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <t t-if="o.notes">
+                            <h4 class="mt32">Notes</h4>
+                            <p t-field="o.notes"/>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

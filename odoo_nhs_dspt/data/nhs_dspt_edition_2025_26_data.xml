@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Organisation-type profiles-->
+        <record id="org_profile_trust" model="nhs.dspt.org.profile">
+            <field name="name">NHS Trust</field>
+            <field name="code">TRUST</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="org_profile_gp" model="nhs.dspt.org.profile">
+            <field name="name">GP Practice</field>
+            <field name="code">GP</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="org_profile_care" model="nhs.dspt.org.profile">
+            <field name="name">Care Provider</field>
+            <field name="code">CARE</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="org_profile_supplier" model="nhs.dspt.org.profile">
+            <field name="name">Supplier / Partner</field>
+            <field name="code">SUPPLIER</field>
+            <field name="sequence">40</field>
+        </record>
+        <record id="org_profile_other" model="nhs.dspt.org.profile">
+            <field name="name">Other</field>
+            <field name="code">OTHER</field>
+            <field name="sequence">50</field>
+        </record>
+
+        <!-- DSPT Edition — seed year. NOTE: this is a representative
+             starting framework aligned to the National Data Guardian's ten
+             data-security standards, NOT a verbatim copy of the full NHS
+             England DSPT question set. Verify/adjust against the current
+             published toolkit before relying on it for a real submission.-->
+        <record id="edition_2025_26" model="nhs.dspt.edition">
+            <field name="name">DSPT 2025/26</field>
+            <field name="year">2025/26</field>
+            <field name="state">active</field>
+            <field name="deadline" eval="(DateTime.now() + timedelta(days=270)).strftime('%Y-%m-%d')"/>
+            <field name="notes">Seed edition aligned to the ten National Data Guardian data-security
+standards. Review and adjust against the current published NHS England DSPT for the year you are
+submitting — the toolkit is revised annually.</field>
+        </record>
+
+        <!-- 1. Personal Confidential Data -->
+        <record id="std_1_personal_data" model="nhs.dspt.standard">
+            <field name="name">Personal Confidential Data</field>
+            <field name="edition_id" ref="edition_2025_26"/>
+            <field name="code">1</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="assertion_1_1" model="nhs.dspt.assertion.def">
+            <field name="name">Personal confidential data is only shared for lawful and appropriate purposes</field>
+            <field name="reference">1.1</field>
+            <field name="standard_id" ref="std_1_personal_data"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_1_1_1" model="nhs.dspt.evidence.def">
+            <field name="name">A current Data Protection Officer (or equivalent) is in place</field>
+            <field name="reference">1.1.1</field>
+            <field name="assertion_def_id" ref="assertion_1_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="evidence_type_hint">Named role / appointment letter</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_1_1_2" model="nhs.dspt.evidence.def">
+            <field name="name">Records of Processing Activities (ROPA) are maintained and current</field>
+            <field name="reference">1.1.2</field>
+            <field name="assertion_def_id" ref="assertion_1_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="evidence_type_hint">ROPA register</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="evidence_1_1_3" model="nhs.dspt.evidence.def">
+            <field name="name">Data Protection Impact Assessments (DPIAs) are completed for high-risk processing</field>
+            <field name="reference">1.1.3</field>
+            <field name="assertion_def_id" ref="assertion_1_1"/>
+            <field name="is_mandatory" eval="False"/>
+            <field name="evidence_type_hint">DPIA documents</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <!-- 2. Staff Responsibilities -->
+        <record id="std_2_staff_responsibilities" model="nhs.dspt.standard">
+            <field name="name">Staff Responsibilities</field>
+            <field name="edition_id" ref="edition_2025_26"/>
+            <field name="code">2</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="assertion_2_1" model="nhs.dspt.assertion.def">
+            <field name="name">All staff understand their data-security responsibilities</field>
+            <field name="reference">2.1</field>
+            <field name="standard_id" ref="std_2_staff_responsibilities"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_2_1_1" model="nhs.dspt.evidence.def">
+            <field name="name">Contracts of employment include data-security responsibilities</field>
+            <field name="reference">2.1.1</field>
+            <field name="assertion_def_id" ref="assertion_2_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="evidence_type_hint">Contract clause / policy reference</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_2_1_2" model="nhs.dspt.evidence.def">
+            <field name="name">A published acceptable-use / data-security policy is in place</field>
+            <field name="reference">2.1.2</field>
+            <field name="assertion_def_id" ref="assertion_2_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="evidence_type_hint">Policy document</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- 3. Training -->
+        <record id="std_3_training" model="nhs.dspt.standard">
+            <field name="name">Training</field>
+            <field name="edition_id" ref="edition_2025_26"/>
+            <field name="code">3</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="assertion_3_1" model="nhs.dspt.assertion.def">
+            <field name="name">Staff complete annual data-security awareness training</field>
+            <field name="reference">3.1</field>
+            <field name="standard_id" ref="std_3_training"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_3_1_1" model="nhs.dspt.evidence.def">
+            <field name="name">Data-security training completion rate meets the organisation's target</field>
+            <field name="reference">3.1.1</field>
+            <field name="assertion_def_id" ref="assertion_3_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="evidence_type_hint">Training compliance % (see odoo_nhs_training, if installed)</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_3_1_2" model="nhs.dspt.evidence.def">
+            <field name="name">New starters complete data-security induction before system access is granted</field>
+            <field name="reference">3.1.2</field>
+            <field name="assertion_def_id" ref="assertion_3_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="evidence_type_hint">Induction record</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- 4. Managing Data Access -->
+        <record id="std_4_managing_access" model="nhs.dspt.standard">
+            <field name="name">Managing Data Access</field>
+            <field name="edition_id" ref="edition_2025_26"/>
+            <field name="code">4</field>
+            <field name="sequence">40</field>
+        </record>
+        <record id="assertion_4_1" model="nhs.dspt.assertion.def">
+            <field name="name">Access to personal confidential data is limited to those who need it</field>
+            <field name="reference">4.1</field>
+            <field name="standard_id" ref="std_4_managing_access"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_4_1_1" model="nhs.dspt.evidence.def">
+            <field name="name">Role-based access control is implemented on clinical/data systems</field>
+            <field name="reference">4.1.1</field>
+            <field name="assertion_def_id" ref="assertion_4_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="evidence_type_hint">Access control policy / system config</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_4_1_2" model="nhs.dspt.evidence.def">
+            <field name="name">User access rights are reviewed at least annually and on leaving</field>
+            <field name="reference">4.1.2</field>
+            <field name="assertion_def_id" ref="assertion_4_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="evidence_type_hint">Access review log</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- 5. Process Reviews -->
+        <record id="std_5_process_reviews" model="nhs.dspt.standard">
+            <field name="name">Process Reviews</field>
+            <field name="edition_id" ref="edition_2025_26"/>
+            <field name="code">5</field>
+            <field name="sequence">50</field>
+        </record>
+        <record id="assertion_5_1" model="nhs.dspt.assertion.def">
+            <field name="name">Data-handling processes are regularly reviewed and improved</field>
+            <field name="reference">5.1</field>
+            <field name="standard_id" ref="std_5_process_reviews"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_5_1_1" model="nhs.dspt.evidence.def">
+            <field name="name">An annual internal audit / self-assessment of data-handling processes is completed</field>
+            <field name="reference">5.1.1</field>
+            <field name="assertion_def_id" ref="assertion_5_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="evidence_type_hint">Audit report</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- 6. Responding to Incidents -->
+        <record id="std_6_incidents" model="nhs.dspt.standard">
+            <field name="name">Responding to Incidents</field>
+            <field name="edition_id" ref="edition_2025_26"/>
+            <field name="code">6</field>
+            <field name="sequence">60</field>
+        </record>
+        <record id="assertion_6_1" model="nhs.dspt.assertion.def">
+            <field name="name">There is an effective incident-reporting and response process</field>
+            <field name="reference">6.1</field>
+            <field name="standard_id" ref="std_6_incidents"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_6_1_1" model="nhs.dspt.evidence.def">
+            <field name="name">A data-security incident-response plan is documented and tested</field>
+            <field name="reference">6.1.1</field>
+            <field name="assertion_def_id" ref="assertion_6_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="evidence_type_hint">Incident response plan (see odoo_nhs_incident_risk, if installed)</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_6_1_2" model="nhs.dspt.evidence.def">
+            <field name="name">Reportable incidents are notified to the ICO/NHS England within required timescales</field>
+            <field name="reference">6.1.2</field>
+            <field name="assertion_def_id" ref="assertion_6_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="evidence_type_hint">Incident log with notification dates</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- 7. Continuity Planning -->
+        <record id="std_7_continuity" model="nhs.dspt.standard">
+            <field name="name">Continuity Planning</field>
+            <field name="edition_id" ref="edition_2025_26"/>
+            <field name="code">7</field>
+            <field name="sequence">70</field>
+        </record>
+        <record id="assertion_7_1" model="nhs.dspt.assertion.def">
+            <field name="name">The organisation can continue to operate in the event of a data-security incident</field>
+            <field name="reference">7.1</field>
+            <field name="standard_id" ref="std_7_continuity"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_7_1_1" model="nhs.dspt.evidence.def">
+            <field name="name">A business-continuity / disaster-recovery plan covering critical data systems exists and is tested</field>
+            <field name="reference">7.1.1</field>
+            <field name="assertion_def_id" ref="assertion_7_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="evidence_type_hint">BC/DR plan and test log</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_7_1_2" model="nhs.dspt.evidence.def">
+            <field name="name">Backups of critical data are taken and periodically restore-tested</field>
+            <field name="reference">7.1.2</field>
+            <field name="assertion_def_id" ref="assertion_7_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="evidence_type_hint">Backup/restore test evidence</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- 8. Unsupported Systems -->
+        <record id="std_8_unsupported_systems" model="nhs.dspt.standard">
+            <field name="name">Unsupported Systems</field>
+            <field name="edition_id" ref="edition_2025_26"/>
+            <field name="code">8</field>
+            <field name="sequence">80</field>
+        </record>
+        <record id="assertion_8_1" model="nhs.dspt.assertion.def">
+            <field name="name">No unsupported operating systems, software or internet browsers are in use</field>
+            <field name="reference">8.1</field>
+            <field name="standard_id" ref="std_8_unsupported_systems"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_8_1_1" model="nhs.dspt.evidence.def">
+            <field name="name">An asset register of operating systems/software is maintained, with a plan to remove unsupported items</field>
+            <field name="reference">8.1.1</field>
+            <field name="assertion_def_id" ref="assertion_8_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="evidence_type_hint">IT asset register</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- 9. IT Protection -->
+        <record id="std_9_it_protection" model="nhs.dspt.standard">
+            <field name="name">IT Protection</field>
+            <field name="edition_id" ref="edition_2025_26"/>
+            <field name="code">9</field>
+            <field name="sequence">90</field>
+        </record>
+        <record id="assertion_9_1" model="nhs.dspt.assertion.def">
+            <field name="name">IT systems are protected against cyber threats</field>
+            <field name="reference">9.1</field>
+            <field name="standard_id" ref="std_9_it_protection"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_9_1_1" model="nhs.dspt.evidence.def">
+            <field name="name">A current Cyber Essentials (or Cyber Essentials Plus) certificate is held</field>
+            <field name="reference">9.1.1</field>
+            <field name="assertion_def_id" ref="assertion_9_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="evidence_type_hint">Certificate</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_9_1_2" model="nhs.dspt.evidence.def">
+            <field name="name">Endpoint protection (anti-malware) is deployed and kept up to date across all devices</field>
+            <field name="reference">9.1.2</field>
+            <field name="assertion_def_id" ref="assertion_9_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="evidence_type_hint">Endpoint protection report</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="evidence_9_1_3" model="nhs.dspt.evidence.def">
+            <field name="name">Multi-factor authentication is enforced for remote and privileged access</field>
+            <field name="reference">9.1.3</field>
+            <field name="assertion_def_id" ref="assertion_9_1"/>
+            <field name="is_mandatory" eval="False"/>
+            <field name="evidence_type_hint">MFA configuration evidence</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <!-- 10. Accountable Suppliers -->
+        <record id="std_10_accountable_suppliers" model="nhs.dspt.standard">
+            <field name="name">Accountable Suppliers</field>
+            <field name="edition_id" ref="edition_2025_26"/>
+            <field name="code">10</field>
+            <field name="sequence">100</field>
+        </record>
+        <record id="assertion_10_1" model="nhs.dspt.assertion.def">
+            <field name="name">Suppliers and partners that handle data are held to the same standard</field>
+            <field name="reference">10.1</field>
+            <field name="standard_id" ref="std_10_accountable_suppliers"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_10_1_1" model="nhs.dspt.evidence.def">
+            <field name="name">Data-processing contracts with suppliers include data-security clauses</field>
+            <field name="reference">10.1.1</field>
+            <field name="assertion_def_id" ref="assertion_10_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="applies_to_profile_ids" eval="[(6, 0, [ref('org_profile_trust'), ref('org_profile_gp'), ref('org_profile_care')])]"/>
+            <field name="evidence_type_hint">Contract clause</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="evidence_10_1_2" model="nhs.dspt.evidence.def">
+            <field name="name">A current DSPT status of 'Standards Met' or better is confirmed for key suppliers</field>
+            <field name="reference">10.1.2</field>
+            <field name="assertion_def_id" ref="assertion_10_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="applies_to_profile_ids" eval="[(6, 0, [ref('org_profile_trust'), ref('org_profile_gp'), ref('org_profile_care')])]"/>
+            <field name="evidence_type_hint">Supplier DSPT assurance summary</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="evidence_10_1_3" model="nhs.dspt.evidence.def">
+            <field name="name">Sub-processors and data flows to third parties are mapped and documented</field>
+            <field name="reference">10.1.3</field>
+            <field name="assertion_def_id" ref="assertion_10_1"/>
+            <field name="is_mandatory" eval="True"/>
+            <field name="applies_to_profile_ids" eval="[(6, 0, [ref('org_profile_supplier')])]"/>
+            <field name="evidence_type_hint">Data flow map</field>
+            <field name="sequence">30</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <!--DASHBOARD VIEW WITH NAVIGATION-BAR, INTERACTJS TEMPLATE-->
+    <t t-name="owl.DashboardSidebar" owl="1">
+        <div class="p-2 border-top dashboard-tiles-wrapper dash-sidebar d-flex flex-column h-100">
+            <div t-if="props.favoriteDashboards &amp;&amp; props.favoriteDashboards.length > 0" class="sidebar-card mb-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h3 class="fw-bold text-dark mb-0 small text-uppercase opacity-75">Favorites</h3>
+                </div>
+                <div class="favorite-dashboards-list d-flex flex-column gap-1">
+                    <t t-foreach="props.favoriteDashboards" t-as="fav" t-key="fav.id">
+                        <div class="favorite-dashboard-item p-2 rounded cursor-pointer d-flex align-items-center bg-light-hover"
+                             t-on-click="() => props.onFavoriteClick(fav)">
+                            <i class="fa fa-star text-warning me-2 small"/>
+                            <span class="small text-truncate"><t t-esc="fav.name"/></span>
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+            <div class="sidebar-card mb-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h3 class="fw-bold text-dark mb-0 small text-uppercase opacity-75">Layouts</h3>
+                </div>
+                <div class="d-flex gap-2">
+                    <div class="layout-btn p-2 border rounded cursor-pointer flex-fill text-center"
+                         t-att-class="props.currentLayout === 'layout_1' ? 'bg-primary text-white border-primary' : ''"
+                         t-on-click="() => props.onChangeLayout('layout_1')">
+                        <i class="fa fa-th-large d-block mb-1"></i>
+                        <span class="small">Centered</span>
+                    </div>
+                    <div class="layout-btn p-2 border rounded cursor-pointer flex-fill text-center"
+                         t-att-class="props.currentLayout === 'layout_2' ? 'bg-primary text-white border-primary' : ''"
+                         t-on-click="() => props.onChangeLayout('layout_2')">
+                        <i class="fa fa-columns d-block mb-1"></i>
+                        <span class="small">Side</span>
+                    </div>
+                    <div class="layout-btn p-2 border rounded cursor-pointer flex-fill text-center"
+                         t-att-class="props.currentLayout === 'layout_3' ? 'bg-primary text-white border-primary' : ''"
+                         t-on-click="() => props.onChangeLayout('layout_3')">
+                        <i class="fa fa-th d-block mb-1"></i>
+                        <span class="small">Grid</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-card flex-grow-1 overflow-hidden d-flex flex-column mb-0">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <h3 class="fw-bold text-dark mb-0 small text-uppercase opacity-75">Widgets</h3>
+                </div>
+                <p class="text-muted extra-small mb-2">Drag to dashboard</p>
+                <div class="flex-grow-1 overflow-auto sidebar-scrollbar">
+                    <div t-attf-class="row {{ props.sidebarWidth &lt; 270 ? 'row-cols-1' : 'row-cols-2' }} g-1 pb-3">
+                        <t t-foreach="items" t-as="item" t-key="item.id">
+                            <div class="col">
+                                <div class="dashboard-tile dashboard-item-tile d-flex flex-column grid-stack-item cursor-pointer"
+                                     t-att-data-type="item.type"
+                                     t-att-gs-w="item.w"
+                                     t-att-gs-h="item.h"
+                                     t-on-click="() => props.onItemClick(item)">
+                                    <div class="grid-stack-item-content w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                                        <div class="dashboard-tile-icon mb-1">
+                                            <img t-attf-src="/multi_dashboard/static/src/icons/{{item.img}}"
+                                                 widget="35" height="35"
+                                                 class="drag-icon" alt="Icon"/>
+                                        </div>
+                                        <div class="first-content text-center">
+                                            <span class="extra-small"><t t-esc="item.name"/></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--    Form view of settings view.-->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">
+            res.config.settings.view.form.inherit.library.management.system
+        </field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="30"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <div class="app_settings_block" data-string="Library"
+                     string="Library"
+                     data-key="library_management_system">
+                    <h2>Configuration</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-xs-12 col-md-6 o_setting_box"
+                             title="Configuration">
+                            <div class="o_setting_left_pane">
+                                <field name="is_auto_calc_return"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label string="Calculate return date"
+                                       for="return_in_days"/>
+                                <div class="text-muted">
+                                    Calculate expected return date from issued
+                                    date.
+                                </div>
+                                <p invisible="is_auto_calc_return != True">
+                                    <h6>Return in</h6>
+                                    <field name="return_in_days"
+                                           style="width:100px;"
+                                           required="'is_auto_calc_return' == True"/>
+                                    <label style="font-weight: bold;" string="Days"
+                                           for="return_in_days"
+                                           class="col-md-3 o_light_label"/>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-6 o_setting_box"
+                             title="Configuration">
+                            <div class="o_setting_right_pane">
+                                <label string="Daily Due"
+                                       for="daily_due_amount"/>
+                                <div class="text-muted">
+                                    Due amount added each day after issued book
+                                    expired.
+                                </div>
+                                <field name="daily_due_amount"
+                                       widget="monetary"/>
+                            </div>
+                        </div>
+                    </div>
+                    <h2>Journal Configuration</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-xs-12 col-md-6 o_setting_box"
+                             title="Journal">
+                            <div class="o_setting_right_pane">
+                                <label string="Due Journal"
+                                       for="due_journal_type_id"/>
+                                <div class="text-muted">
+                                    Journal for register due amount invoicing.
+                                </div>
+                                <field name="due_journal_type_id"/>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-6 o_setting_box"
+                             title="Journal">
+                            <div class="o_setting_right_pane">
+                                <label string="Membership Journal"
+                                       for="membership_journal_type_id"/>
+                                <div class="text-muted">
+                                    Journal for invoicing membership renewal.
+                                </div>
+                                <field name="membership_journal_type_id"/>
+                            </div>
+                        </div>
+                    </div>
+                    <h2>Member Id Generation</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-xs-12 col-md-6 o_setting_box">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <h6>Member Id Prefix</h6>
+                                <div class="text-muted">
+                                    Prefix for generating member id.
+                                </div>
+                                <div class="content-group">
+                                    <div class="row mt16">
+                                        <label string="Prefix"
+                                               style="font-weight: bold;"
+                                               for="member_id_prefix"
+                                               class="col-md-3 o_light_label"/>
+                                        <field style="width:150px;"
+                                               name="member_id_prefix"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-6 o_setting_box">
+                            <div class="o_setting_right_pane">
+                                <h6>Member Id Suffix</h6>
+                                <div class="text-muted">
+                                    suffix for generating member id.
+                                </div>
+                                <div class="content-group">
+                                    <div class="row mt16">
+                                        <label string="Suffix"
+                                               style="font-weight: bold;"
+                                               for="member_id_suffix"
+                                               class="col-md-3 o_light_label"/>
+                                        <field style="width:150px;"
+                                               name="member_id_suffix"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    <!--  Window action for settings view. -->
+    <record id="res_config_settings_action" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'module' : 'library_management_system'}</field>
+        <field name="binding_view_types">kanban</field>
+    </record>
+
+</odoo>

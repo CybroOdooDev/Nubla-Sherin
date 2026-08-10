@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="multi_dashboard.DashboardChat">
+        <div class="o_dashboard_chat_widget" t-att-class="{ 'o_chat_open': state.isOpen }">
+            <!-- Floating Bubble Toggle -->
+            <div class="o_chat_bubble d-flex align-items-center justify-content-center shadow-lg" 
+                 t-on-click="toggleChat"
+                 title="AI Assistant">
+                <i t-att-class="state.isOpen ? 'fa fa-times' : 'fa fa-commenting-o'"/>
+                <span t-if="!state.isOpen" class="o_chat_badge">AI</span>
+            </div>
+
+            <!-- Chat Window -->
+            <div t-if="state.isOpen" class="o_chat_window d-flex flex-column shadow-lg border rounded overflow-hidden">
+                <!-- Header -->
+                <div class="o_chat_header d-flex align-items-center p-3 text-white">
+                    <div class="o_chat_avatar me-2 d-flex align-items-center justify-content-center">
+                        <i class="fa fa-magic"/>
+                    </div>
+                    <div>
+                        <div class="fw-bold lh-1">Multi Dashboard AI</div>
+                        <small class="opacity-75">Assistant</small>
+                    </div>
+                    <button class="btn btn-sm text-white ms-auto shadow-none border-0" t-on-click="toggleChat">
+                        <i class="fa fa-minus"/>
+                    </button>
+                </div>
+
+                <!-- Messages Area -->
+                <div class="o_chat_messages flex-grow-1 p-3 overflow-auto d-flex flex-column gap-3" t-ref="chatScroll">
+                    <t t-foreach="state.messages" t-as="msg" t-key="msg_index">
+                        <div t-attf-class="o_chat_message d-flex flex-column {{ msg.role === 'user' ? 'align-items-end' : 'align-items-start' }}">
+                            <div class="o_message_content p-2 rounded shadow-sm">
+                                <t t-out="msg.content"/>
+                            </div>
+                            <small class="text-muted mt-1" style="font-size: 0.7rem;">
+                                <t t-esc="msg.timestamp"/>
+                            </small>
+                        </div>
+                    </t>
+                    <div t-if="state.isLoading" class="o_chat_message align-items-start d-flex flex-column">
+                        <div class="o_message_content p-3 rounded shadow-sm">
+                            <div class="typing-dots d-flex gap-1">
+                                <span class="dot"/>
+                                <span class="dot"/>
+                                <span class="dot"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer / Input -->
+                <div class="o_chat_footer p-2 border-top bg-white">
+                    <div class="input-group">
+                        <input type="text" 
+                               class="form-control border-0 shadow-none px-3" 
+                               placeholder="Ask me anything..."
+                               t-model="state.inputValue"
+                               t-on-keydown="onInputKeydown"
+                               t-att-disabled="state.isLoading"/>
+                        <button class="btn btn-link text-primary shadow-none border-0" 
+                                t-on-click="sendMessage"
+                                t-att-disabled="state.isLoading">
+                            <i t-att-class="state.isLoading ? 'fa fa-spinner fa-spin' : 'fa fa-paper-plane'"/>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

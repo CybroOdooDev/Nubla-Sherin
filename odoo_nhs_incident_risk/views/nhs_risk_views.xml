@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_risk_form" model="ir.ui.view">
+        <field name="name">nhs.risk.form</field>
+        <field name="model">nhs.risk</field>
+        <field name="arch" type="xml">
+            <form string="Risk">
+                <header>
+                    <button name="action_activate" string="Activate"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_escalate" string="Escalate / Move Register"
+                            type="object"
+                            groups="odoo_nhs_incident_risk.group_hc_risk_manager"
+                            invisible="state != 'active'"/>
+                    <button name="action_review_now" string="Record Review"
+                            type="object"
+                            groups="odoo_nhs_incident_risk.group_hc_risk_manager"
+                            invisible="state != 'active'"/>
+                    <button name="action_open_close_wizard" string="Close Risk"
+                            type="object"
+                            groups="odoo_nhs_incident_risk.group_hc_quality_lead"
+                            invisible="state != 'active'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active,closed"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-danger" role="alert"
+                         invisible="not outside_appetite">
+                        ⚠ This risk is rated OUTSIDE appetite
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="title" readonly="state == 'closed'"/>
+                            <field name="category_id" readonly="state == 'closed'"/>
+                            <field name="register_id" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="risk_owner_id" readonly="state == 'closed'"/>
+                            <field name="executive_lead_id" readonly="state == 'closed'"/>
+                            <field name="next_review_date" readonly="1"/>
+                            <field name="outside_appetite" readonly="1"/>
+                            <field name="review_frequency_days" readonly="1"/>
+                            <field name="manual_frequency_override" readonly="state == 'closed'"/>
+                            <field name="manual_frequency_days"
+                                   invisible="not manual_frequency_override"
+                                   required="manual_frequency_override"
+                                   readonly="state == 'closed'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Risk Description">
+                            <group>
+                                <field name="cause" placeholder="IF [cause]…"
+                                       readonly="state == 'closed'"/>
+                                <field name="event" placeholder="THEN [event]…"
+                                       readonly="state == 'closed'"/>
+                                <field name="effect" placeholder="RESULTING IN [effect]…"
+                                       readonly="state == 'closed'"/>
+                            </group>
+                        </page>
+                        <page string="Scoring">
+                            <group string="Inherent Score (before controls)">
+                                <field name="inherent_consequence"
+                                       readonly="state == 'closed'"/>
+                                <field name="inherent_likelihood"
+                                       readonly="state == 'closed'"/>
+                                <field name="inherent_rating" readonly="1"/>
+                                <field name="inherent_band" readonly="1"/>
+                            </group>
+                            <group string="Current Score (with existing controls)">
+                                <field name="current_consequence"
+                                       readonly="state == 'closed'"/>
+                                <field name="current_likelihood"
+                                       readonly="state == 'closed'"/>
+                                <field name="current_rating" readonly="1"/>
+                                <field name="current_band" readonly="1"/>
+                            </group>
+                            <group string="Target Score (post-mitigation)">
+                                <field name="target_consequence"
+                                       readonly="state == 'closed'"/>
+                                <field name="target_likelihood"
+                                       readonly="state == 'closed'"/>
+                                <field name="target_rating" readonly="1"/>
+                                <field name="target_band" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Controls" invisible="state == 'draft'">
+                            <field name="control_ids" readonly="state == 'closed'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="control_gap" widget="toggle_button"/>
+                                    <field name="owner_id"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Assurances" invisible="state == 'draft'">
+                            <field name="assurance_ids" readonly="state == 'closed'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="control_id" domain="[('risk_id', '=', parent.id)]"/>
+                                    <field name="line"/>
+                                    <field name="assurance_gap" widget="toggle_button"/>
+                                    <field name="source"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Actions" invisible="state == 'draft'">
+                            <field name="action_ids" readonly="state == 'closed'">
+                                <list open_form_view="True">
+                                    <field name="reference"/>
+                                    <field name="name"/>
+                                    <field name="owner_id"/>
+                                    <field name="due_date"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'done'"
+                                           decoration-warning="state == 'evidence_review'"
+                                           decoration-muted="state == 'cancelled'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Evidence Incidents" invisible="state == 'draft'">
+                            <field name="incident_ids" readonly="state == 'closed'">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="occurred_at"/>
+                                    <field name="category_id"/>
+                                    <field name="harm_grade"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Review Log" invisible="state == 'draft'">
+                            <field name="review_ids" readonly="1">
+                                <list>
+                                    <field name="reviewed_at"/>
+                                    <field name="reviewer_id"/>
+                                    <field name="prev_current_consequence"/>
+                                    <field name="prev_current_likelihood"/>
+                                    <field name="new_current_consequence"/>
+                                    <field name="new_current_likelihood"/>
+                                    <field name="decision"/>
+                                    <field name="commentary"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Closure" invisible="state != 'closed'">
+                            <field name="closure_reason" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_risk_list" model="ir.ui.view">
+        <field name="name">nhs.risk.list</field>
+        <field name="model">nhs.risk</field>
+        <field name="arch" type="xml">
+            <list string="Risk Register"
+                  decoration-danger="current_band in ('high','extreme')"
+                  decoration-warning="current_band == 'moderate'"
+                  decoration-success="current_band == 'low'"
+                  decoration-muted="state == 'closed'">
+                <field name="name"/>
+                <field name="title"/>
+                <field name="risk_owner_id"/>
+                <field name="current_consequence"/>
+                <field name="current_likelihood"/>
+                <field name="current_rating"/>
+                <field name="current_band" widget="badge"
+                       decoration-success="current_band == 'low'"
+                       decoration-warning="current_band == 'moderate'"
+                       decoration-danger="current_band in ('high','extreme')"/>
+                <field name="target_rating" optional="show"/>
+                <field name="next_review_date"
+                       decoration-danger="next_review_date and next_review_date &lt; context_today()"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_risk_pivot" model="ir.ui.view">
+        <field name="name">nhs.risk.pivot</field>
+        <field name="model">nhs.risk</field>
+        <field name="arch" type="xml">
+            <pivot string="Risk Heatmap" js_class="nhs_risk_heatmap_pivot">
+                <field name="current_consequence" type="row"/>
+                <field name="current_likelihood" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_nhs_risk_search" model="ir.ui.view">
+        <field name="name">nhs.risk.search</field>
+        <field name="model">nhs.risk</field>
+        <field name="arch" type="xml">
+            <search string="Search Risks">
+                <field name="title"/>
+                <field name="risk_owner_id"/>
+                <field name="register_id"/>
+                <field name="category_id"/>
+                <filter name="active" string="Active" domain="[('state','=','active')]"/>
+                <filter name="outside_appetite" string="Outside Appetite"
+                        domain="[('outside_appetite','=',True)]"/>
+                <filter name="extreme" string="Extreme" domain="[('current_band','=','extreme')]"/>
+                <filter name="reviews_due" string="Reviews Due"
+                        domain="[('next_review_date','&lt;=',context_today())]"/>
+                <group name="group_by">
+                    <filter name="group_register" string="Register"
+                            context="{'group_by':'register_id'}"/>
+                    <filter name="group_band" string="RAG Band"
+                            context="{'group_by':'current_band'}"/>
+                    <filter name="group_category" string="Category"
+                            context="{'group_by':'category_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_risk_all" model="ir.actions.act_window">
+        <field name="name">Risks</field>
+        <field name="res_model">nhs.risk</field>
+        <field name="view_mode">list,form,pivot</field>
+        <field name="domain">[('state','in',['draft','active'])]</field>
+    </record>
+
+    <record id="action_nhs_risk_heatmap" model="ir.actions.act_window">
+        <field name="name">Risk Heatmap</field>
+        <field name="res_model">nhs.risk</field>
+        <field name="view_mode">pivot,list</field>
+        <field name="domain">[('state','in',['draft','active'])]</field>
+        <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'pivot','view_id':ref('view_nhs_risk_pivot')}),
+            (0,0,{'view_mode':'list','view_id':ref('view_nhs_risk_list')})]"/>
+    </record>
+
+    <record id="action_nhs_risk_heatmap_client" model="ir.actions.client">
+        <field name="name">Risk Heatmap (Matrix)</field>
+        <field name="tag">nhs_risk_heatmap</field>
+    </record>
+
+    <record id="action_nhs_risk_reviews_due" model="ir.actions.act_window">
+        <field name="name">Reviews Due</field>
+        <field name="res_model">nhs.risk</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state','=','active'),('next_review_date','&lt;=',context_today())]</field>
+    </record>
+
+    <record id="view_nhs_risk_register_list" model="ir.ui.view">
+        <field name="name">nhs.risk.register.list</field>
+        <field name="model">nhs.risk.register</field>
+        <field name="arch" type="xml">
+            <list string="Risk Registers">
+                <field name="name"/>
+                <field name="tier"/>
+                <field name="owner_group_id"/>
+                <field name="risk_count"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_risk_register_form" model="ir.ui.view">
+        <field name="name">nhs.risk.register.form</field>
+        <field name="model">nhs.risk.register</field>
+        <field name="arch" type="xml">
+            <form string="Risk Register">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_risks" type="object" class="oe_stat_button" icon="oi-list">
+                            <field name="risk_count" string="Risks" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="tier"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="owner_group_id"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1" colspan="2" placeholder="Optional notes about the purpose, scope, or governance arrangements for this register…"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_risk_register_admin" model="ir.actions.act_window">
+        <field name="name">Registers</field>
+        <field name="res_model">nhs.risk.register</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

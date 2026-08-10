@@ -1,0 +1,239 @@
+/** --- Modern Professional Table Styling --- **/
+
+.o_custom_list_view {
+    /* Always render list widgets on a light surface so they remain readable even on dark dashboards. */
+    background: var(--widget-accent, var(--widget-bg, #fff));
+    border-radius: 12px;
+    overflow: hidden;
+    --list-text-color: #111827;
+    --list-header-color: #111827;
+    --list-border-color: rgba(17, 24, 39, 0.14);
+    --list-header-bg: color-mix(in srgb, var(--widget-accent, #fff), black 6%);
+    --list-hover-bg: rgba(17, 24, 39, 0.04);
+    border: 1px solid var(--list-border-color);
+    position: relative;
+    /* anchor absolutely-positioned tool buttons */
+}
+
+/* Header */
+.o_custom_list_view .list-name h1 {
+    /* Heading text follows the selected dashboard theme (green/blue/purple/etc). */
+    color: var(--widget-header-color, var(--list-header-color));
+}
+
+.o_custom_list_view .table thead th {
+    background: var(--list-header-bg) !important;
+    color: var(--list-header-color);
+    font-weight: 600;
+    border-bottom: 1px solid var(--list-border-color);
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.6px;
+}
+
+.o_custom_list_view .table {
+    /* Prevent Odoo/Bootstrap dark-mode table variables from forcing a dark table surface. */
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--list-text-color);
+    --bs-table-border-color: var(--list-border-color);
+    background-color: transparent;
+}
+
+/* Hover effect for rows */
+.o_custom_list_view .table tbody tr:hover {
+    background-color: var(--list-hover-bg);
+    cursor: pointer;
+    transition: background 0.15s ease-in-out;
+}
+
+/* Row height + spacing */
+.o_custom_list_view .table tbody td {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    vertical-align: middle;
+}
+
+/* Text styling */
+.o_custom_list_view .table tbody td {
+    color: var(--list-text-color) !important;
+    font-size: 0.85rem;
+    border-color: var(--list-border-color) !important;
+}
+
+/* Truncate tooltip */
+.o_custom_list_view .table tbody td span {
+    max-width: 180px;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(17, 24, 39, 0.06);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(17, 24, 39, 0.22);
+    border-radius: 10px;
+}
+
+/* Top bar */
+.o_custom_list_view .border-bottom {
+    border-color: var(--list-border-color) !important;
+}
+
+/* Badge (record count) */
+.o_custom_list_view .badge {
+    font-size: 0.75rem;
+    color: var(--list-text-color);
+    background: var(--list-header-bg) !important;
+    border: 1px solid var(--list-border-color);
+}
+
+
+
+
+.list-tools {
+    position: absolute;
+    top: 6px;
+    /* Leave space for the JSON download button so click targets don't overlap */
+    right: 50px;
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-5px);
+    transition: all 0.25s ease;
+    z-index: 5;
+}
+
+/* Show AI insight on hover (view mode) */
+.o_custom_list_view:hover .list-tools {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Buttons */
+.list-tools button {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.list-tools button:hover {
+    background: rgba(0, 0, 0, 0.65);
+    transform: scale(1.1);
+}
+
+.btn-del-list:hover {
+    background: #dc3545;
+    /* danger red */
+}
+
+.btn-edit-list:hover {
+    background: #0d6efd;
+    /* bootstrap primary */
+}
+
+/* In view mode, only show AI insight (hide edit/delete) */
+.o_custom_list_view .list-tools .btn-edit-list,
+.o_custom_list_view .list-tools .btn-del-list,
+.o_custom_list_view .list-tools .btn-duplicate-list {
+    display: none;
+}
+
+/* Show edit/delete when sidebar is active (edit mode) */
+.o_sidebar_active .o_custom_list_view .list-tools .btn-edit-list,
+.o_sidebar_active .o_custom_list_view .list-tools .btn-del-list,
+.o_sidebar_active .o_custom_list_view .list-tools .btn-duplicate-list {
+    display: flex;
+}
+
+/* Show tools when sidebar is active */
+.o_sidebar_active .o_custom_list_view .list-tools {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    right: 10px;
+    /* download button is hidden in edit mode */
+}
+
+.dashboard-badge-list {
+    /* "Total" pill: follow selected dashboard theme header color (black for dark theme). */
+    color: var(--widget-header-color, var(--list-text-color)) !important;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.o_sidebar_active .o_custom_list_view .download-options {
+    display: none;
+}
+
+.o_custom_list_view .btn-download-json {
+    display: flex;
+    /* override other widget CSS that hides this class by default */
+}
+
+.o_custom_list_view .download-options {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.o_custom_list_view:hover .download-options {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* List widget body layout: table + AI insight side panel */
+.o_custom_list_view .o_list_body {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem 1rem 1rem;
+    min-height: 0;
+    /* allows inner scroll */
+}
+
+.o_custom_list_view .o_list_main {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    /* allows inner scroll */
+}
+
+/* Reuse the global side-panel styling but tighten spacing for list widget */
+.o_custom_list_view .o_list_insight_panel {
+    width: 280px;
+    max-width: 40%;
+    margin: 0;
+    padding: 10px;
+    overflow: hidden;
+}
+
+/* On smaller screens, stack the insight below the table */
+@media (max-width: 991.98px) {
+    .o_custom_list_view .o_list_body {
+        flex-direction: column;
+    }
+
+    .o_custom_list_view .o_list_insight_panel {
+        width: 100%;
+        max-width: 100%;
+    }
+}

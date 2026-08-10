@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_nhs_trust_location_setup_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.trust.location.setup.wizard.form</field>
+        <field name="model">nhs.trust.location.setup.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Setup Location Hierarchy">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        This wizard creates a <b>site</b> location for the trust and
+                        optionally populates it with standard NHS ward and department
+                        locations. You can add custom locations below.
+                        The site and all children are automatically linked to the trust.
+                    </div>
+                    <group>
+                        <group string="Trust &amp; Site">
+                            <field name="trust_id" readonly="1"/>
+                            <field name="site_name"/>
+                            <field name="ods_site_code"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Options">
+                            <field name="create_standard_wards"/>
+                        </group>
+                    </group>
+                    <group string="Custom Locations (optional)">
+                        <field name="custom_ward_ids" nolabel="1">
+                            <list editable="bottom">
+                                <field name="name"/>
+                                <field name="location_type"/>
+                            </list>
+                        </field>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_create_locations"
+                            string="Create Locations"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_trust_location_setup_wizard" model="ir.actions.act_window">
+        <field name="name">Setup Location Hierarchy</field>
+        <field name="res_model">nhs.trust.location.setup.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

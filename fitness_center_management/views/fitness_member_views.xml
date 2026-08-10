@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ═══════════════ LIST VIEW ═══════════════ -->
+    <record id="view_fitness_member_tree" model="ir.ui.view">
+        <field name="name">fitness.member.tree</field>
+        <field name="model">fitness.member</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <list string="Members">
+                <field name="member_id"/>
+                <field name="name"/>
+                <field name="gender"/>
+                <field name="age"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="blood_group" optional="hide"/>
+                <field name="join_date" optional="hide"/>
+                <field name="fitness_goal" optional="hide"/>
+                <field name="trainer_id" optional="hide"/>
+                <field name="membership_status" widget="badge"
+                       decoration-success="membership_status == 'active'"
+                       decoration-warning="membership_status == 'frozen'"
+                       decoration-danger="membership_status == 'expired'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ═══════════════ FORM VIEW ═══════════════ -->
+    <record id="view_fitness_member_form_new" model="ir.ui.view">
+        <field name="name">fitness.member.form.new</field>
+        <field name="model">fitness.member</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="is_checked_in" invisible="1"/>
+                    <button name="action_check_in" type="object" string="Check In" class="btn-primary"
+                            invisible="is_checked_in"/>
+                    <button name="action_check_out" type="object" string="Check Out" class="btn-secondary"
+                            invisible="not is_checked_in"/>
+                    <field name="membership_status" widget="statusbar"
+                           statusbar_visible="active,frozen,expired,cancelled"/>
+                </header>
+                <sheet>
+                    <!-- ─── Smart Buttons ─── -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_attendance" type="object" class="oe_stat_button"
+                                icon="fa-calendar-check-o">
+                            <field name="attendance_count" widget="statinfo" string="Attendances"/>
+                        </button>
+                        <button name="action_view_subscriptions" type="object" class="oe_stat_button"
+                                icon="fa-id-card-o">
+                            <field name="subscription_count" widget="statinfo" string="Subscriptions"/>
+                        </button>
+                        <button name="action_view_bookings" type="object" class="oe_stat_button"
+                                icon="fa-book">
+                            <field name="booking_count" widget="statinfo" string="Bookings"/>
+                        </button>
+                        <button name="action_view_payments" type="object" class="oe_stat_button"
+                                icon="fa-money">
+                            <field name="payment_count" widget="statinfo" string="Payments"/>
+                        </button>
+                        <button name="action_view_fitness_reports" type="object" class="oe_stat_button"
+                                icon="fa-heartbeat">
+                            <field name="fitness_report_count" widget="statinfo" string="Diet Reports"/>
+                        </button>
+                        <button name="action_view_diet_plans" type="object" class="oe_stat_button"
+                                icon="fa-cutlery">
+                            <field name="diet_plan_count" widget="statinfo" string="Diet Plans"/>
+                        </button>
+                    </div>
+
+                    <!-- ─── Avatar + Title ─── -->
+                    <field name="image_1920" widget="image" class="oe_avatar"
+                           options="{'preview_image': 'image_1920'}"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Member Name" required="1"/>
+                        </h1>
+                        <field name="member_id" readonly="1"/>
+                    </div>
+
+                    <!-- ─── Main Info Groups ─── -->
+                    <group>
+                        <group string="Personal Info">
+                            <field name="partner_id"/>
+                            <field name="gender"/>
+                            <field name="dob"/>
+                            <field name="age"/>
+                            <field name="blood_group"/>
+                            <field name="nationality"/>
+                            <field name="branch_id"/>
+                            <field name="id_number"/>
+                        </group>
+                        <group string="Contact Info">
+                            <field name="phone" widget="phone"/>
+                            <field name="email" widget="email"/>
+                            <field name="join_date"/>
+                            <field name="is_diet_member"/>
+                            <field name="fitness_goal"/>
+                            <field name="preferred_time"/>
+                            <field name="trainer_id"/>
+                        </group>
+                    </group>
+
+                    <!-- ─── Notebook Tabs ─── -->
+                    <notebook>
+                        <!-- Tab 1: Address -->
+                        <page string="Address" name="address">
+                            <group>
+                                <group>
+                                    <field name="street" placeholder="Street..."/>
+                                    <field name="street2" placeholder="Street 2..."/>
+                                    <field name="city" placeholder="City"/>
+                                    <field name="zip" placeholder="ZIP"/>
+                                </group>
+                                <group>
+                                    <field name="country_id" placeholder="Country"/>
+                                    <field name="state_id" placeholder="State"
+                                           domain="[('country_id', '=', country_id)]"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Tab 2: Physical Metrics -->
+                        <page string="Physical Metrics" name="metrics">
+                            <group>
+                                <group>
+                                    <field name="height"/>
+                                    <field name="weight"/>
+                                </group>
+                                <group>
+                                    <field name="bmi"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Tab 3: Fitness &amp; Goals -->
+                        <page string="Fitness &amp; Goals" name="goals">
+                            <group>
+                                <field name="notes" placeholder="General notes about this member..."/>
+                            </group>
+                        </page>
+
+                        <!-- Tab 4: Emergency Contact -->
+                        <page string="Emergency Contact" name="emergency">
+                            <group>
+                                <group>
+                                    <field name="emergency_contact_name" placeholder="Full Name"/>
+                                    <field name="emergency_contact_phone" widget="phone" placeholder="Phone"/>
+                                    <field name="emergency_contact_relation" placeholder="e.g. Spouse, Parent"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Tab 5: Medical Info -->
+                        <page string="Medical" name="medical">
+                            <group>
+                                <group string="Health">
+                                    <field name="health_notes" placeholder="Health info..."/>
+                                    <field name="medical_conditions" placeholder="E.g. asthma, diabetes..."/>
+                                    <field name="allergies" placeholder="E.g. peanuts, dust..."/>
+                                </group>
+                                <group string="Doctor">
+                                    <field name="doctor_name" placeholder="Doctor name"/>
+                                    <field name="doctor_phone" widget="phone" placeholder="Doctor phone"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Tab 6: Subscriptions -->
+                        <page string="Subscriptions" name="subscriptions">
+                            <field name="subscription_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="plan_id"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'active'"
+                                           decoration-info="state == 'draft'"
+                                           decoration-warning="state == 'frozen'"
+                                           decoration-danger="state == 'expired'"/>
+                                    <field name="payment_status" widget="badge"
+                                           decoration-success="payment_status == 'paid'"
+                                           decoration-warning="payment_status == 'partial'"
+                                           decoration-danger="payment_status == 'unpaid'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- Tab 7: Class Bookings -->
+                        <page string="Bookings" name="bookings">
+                            <field name="booking_ids" readonly="1">
+                                <list>
+                                    <field name="schedule_id"/>
+                                    <field name="booking_date"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'attended'"
+                                           decoration-info="state == 'booked'"
+                                           decoration-danger="state == 'cancelled'"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ═══════════════ ACTIONS & MENUS ═══════════════ -->
+    <record id="action_fitness_member" model="ir.actions.act_window">
+        <field name="name">Members</field>
+        <field name="res_model">fitness.member</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_fitness_member_tree"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first member!
+            </p>
+        </field>
+    </record>
+
+    <record id="action_fitness_member_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_fitness_member_tree"/>
+        <field name="act_window_id" ref="action_fitness_member"/>
+    </record>
+
+    <record id="action_fitness_member_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_fitness_member_form_new"/>
+        <field name="act_window_id" ref="action_fitness_member"/>
+    </record>
+
+    <menuitem id="menu_fitness_member"
+              name="Members"
+              parent="menu_fitness_members_root"
+              action="action_fitness_member"
+              sequence="10"/>
+</odoo>

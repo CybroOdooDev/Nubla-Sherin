@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Search View -->
+    <record id="view_epic_allergy_search" model="ir.ui.view">
+        <field name="name">epic.allergy.search</field>
+        <field name="model">epic.allergy</field>
+        <field name="arch" type="xml">
+            <search string="Search Allergies">
+                <field name="substance" string="Substance / Allergen"/>
+                <field name="patient_id" string="Patient"/>
+                <filter name="filter_active" string="Active"
+                        domain="[('clinical_status','=','active')]"/>
+                <filter name="filter_resolved" string="Resolved"
+                        domain="[('clinical_status','=','resolved')]"/>
+                <filter name="filter_high_criticality" string="High Criticality"
+                        domain="[('criticality','=','high')]"/>
+                <separator/>
+                <filter name="filter_food" string="Food"
+                        domain="[('category','=','food')]"/>
+                <filter name="filter_medication" string="Medication"
+                        domain="[('category','=','medication')]"/>
+                <filter name="filter_environment" string="Environment"
+                        domain="[('category','=','environment')]"/>
+                <filter name="filter_biologic" string="Biologic"
+                        domain="[('category','=','biologic')]"/>
+                <separator/>
+                <filter name="filter_allergy_type" string="Allergy"
+                        domain="[('allergy_type','=','allergy')]"/>
+                <filter name="filter_intolerance" string="Intolerance"
+                        domain="[('allergy_type','=','intolerance')]"/>
+                <group>
+                    <filter name="group_clinical_status" string="Clinical Status"
+                            context="{'group_by': 'clinical_status'}"/>
+                    <filter name="group_criticality" string="Criticality"
+                            context="{'group_by': 'criticality'}"/>
+                    <filter name="group_category" string="Category"
+                            context="{'group_by': 'category'}"/>
+                    <filter name="group_type" string="Type"
+                            context="{'group_by': 'allergy_type'}"/>
+                    <filter name="group_severity" string="Reaction Severity"
+                            context="{'group_by': 'reaction_severity'}"/>
+                    <filter name="group_patient" string="Patient"
+                            context="{'group_by': 'patient_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="view_epic_allergy_graph" model="ir.ui.view">
+        <field name="name">epic.allergy.graph</field>
+        <field name="model">epic.allergy</field>
+        <field name="arch" type="xml">
+            <graph string="Allergy Analysis" type="pie">
+                <field name="clinical_status" type="row"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="view_epic_allergy_pivot" model="ir.ui.view">
+        <field name="name">epic.allergy.pivot</field>
+        <field name="model">epic.allergy</field>
+        <field name="arch" type="xml">
+            <pivot string="Allergy Analysis">
+                <field name="clinical_status" type="row"/>
+                <field name="criticality" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Dashboard Action -->
+    <record id="action_epic_allergy_dashboard" model="ir.actions.act_window">
+        <field name="name">Allergy Analytics</field>
+        <field name="res_model">epic.allergy</field>
+        <field name="view_mode">graph,pivot,list,form</field>
+        <field name="search_view_id" ref="view_epic_allergy_search"/>
+        <field name="context">{'search_default_filter_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No allergy data to analyse</p>
+            <p>Sync allergies from Epic to view analytics and charts.</p>
+        </field>
+    </record>
+
+    <!-- Menu Item: Allergy Analytics under Clinical Records -->
+    <menuitem id="menu_epic_allergy_dashboard"
+              name="Allergy Analytics"
+              parent="menu_epic_clinical"
+              action="action_epic_allergy_dashboard"
+              sequence="15"
+              groups="epic_integration.group_nhs_clinician"/>
+</odoo>

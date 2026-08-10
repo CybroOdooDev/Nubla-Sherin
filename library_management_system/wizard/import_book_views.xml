@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--    Form view of import book model.-->
+    <record id="import_book_view_form" model="ir.ui.view">
+        <field name="name">import.book.view.form</field>
+        <field name="model">import.book</field>
+        <field name="arch" type="xml">
+            <form string="Import Book">
+                <p class="oe_grey">
+                    Import and create book details by using isbn of the book
+                    from external api.
+                </p>
+                <group>
+                    <group>
+                        <field name="isbn_value"/>
+                        <field name="book_found" invisible="1"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="get_book_details" string="Get Book Details"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-default"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <!--    Server action of import book model.-->
+    <record id="import_book_action" model="ir.actions.server">
+        <field name="name">Approvals</field>
+        <field name="model_id" ref="model_import_book"/>
+        <field name="binding_model_id" ref="model_import_book"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = model.import_book_wizard()
+        </field>
+    </record>
+</odoo>

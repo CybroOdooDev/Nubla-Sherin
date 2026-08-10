@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sage_dashboard" model="ir.ui.view">
+        <field name="name">sage.dashboard.form</field>
+        <field name="model">sage.sync.log</field>
+        <field name="arch" type="xml">
+            <form string="Sage Dashboard" create="0" edit="0" delete="0">
+                <header>
+                    <button name="action_execute_sync" type="object" string="Execute" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="o_horizontal_separator mt32 mb32" style="font-size: 24px; font-weight: bold; color: #714B67;">Sage Dashboard</div>
+                    
+                    <div class="alert alert-info" role="alert">
+                        Check each sync option individually to ensure the information is correct. 
+                        Uncheck the sync option once you've verified the details.
+                        To sync data from Odoo to Sage, the server actions option is available to maintain data integrity.
+                    </div>
+
+                    <group>
+                        <group string="Modules">
+                            <field name="sync_contacts" string="Contacts"/>
+                            <field name="sync_products" string="Products"/>
+                            <field name="sync_sales_invoices" string="Sales Invoices"/>
+                            <field name="sync_purchase_invoices" string="Purchase Invoices"/>
+                        </group>
+                        <group string="Sync Status">
+                            <field name="last_sync_date" readonly="1"/>
+                            <field name="connection_status" widget="badge" decoration-success="connection_status == 'connected'" decoration-danger="connection_status == 'disconnected'"/>
+                        </group>
+                    </group>
+
+                    <div class="mt32">
+                        <h5>Sync Options</h5>
+                        <p class="text-muted">You have one synchronization option available:</p>
+                        <ul>
+                            <li><strong>Manual Sync</strong>: Choose any option like Contacts, Products, Sales Invoices and Purchase Invoices then press the <strong>Execute</strong> button.</li>
+                        </ul>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sage_dashboard_main" model="ir.actions.act_window">
+        <field name="name">Sage Dashboard</field>
+        <field name="res_model">sage.sync.log</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <record id="action_sage_sync_dashboard" model="ir.actions.act_window">
+        <field name="name">Sync Dashboard</field>
+        <field name="res_model">sage.sync.log</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_sage_sync_log_tree" model="ir.ui.view">
+        <field name="name">sage.sync.log.list</field>
+        <field name="model">sage.sync.log</field>
+        <field name="arch" type="xml">
+            <list string="Sync Logs" decoration-success="status == 'success'" decoration-danger="status == 'error'">
+                <field name="sync_date"/>
+                <field name="name"/>
+                <field name="status" widget="badge" decoration-success="status == 'success'" decoration-danger="status == 'error'"/>
+                <field name="message"/>
+            </list>
+        </field>
+    </record>
+
+    <menuitem id="menu_sage_root" name="Sage Connector" web_icon="sage_evolution_integration,static/description/icon.png"/>
+    <menuitem id="menu_sage_dashboard_main" name="Dashboard" parent="menu_sage_root" action="action_sage_dashboard_main" sequence="5"/>
+    <menuitem id="menu_sage_logs" name="Sync Logs" parent="menu_sage_root" action="action_sage_sync_dashboard" sequence="10"/>
+</odoo>

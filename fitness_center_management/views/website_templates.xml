@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Website Header Menu Injection -->
+    <template id="fitness_header_menu" inherit_id="website.navbar_nav" name="Fitness Header Menu">
+        <xpath expr="//t[@t-out='0']" position="after">
+            <li class="nav-item dropdown o_no_autohide_item">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Fitness</a>
+                <div class="dropdown-menu" role="menu">
+                    <a href="/fitness/router" class="dropdown-item" role="menuitem">Dashboard</a>
+                    <a href="/fitness/membership" class="dropdown-item" role="menuitem">Plans</a>
+                    <a href="/fitness/classes" class="dropdown-item" role="menuitem">Classes</a>
+                    <a href="/fitness/trainers" class="dropdown-item" role="menuitem">Trainers</a>
+                    <a href="/diet-request" class="dropdown-item" role="menuitem">Diet Request</a>
+                </div>
+            </li>
+        </xpath>
+    </template>
+
+    <!-- Homepage Template -->
+    <template id="fitness_index" name="Fitness Home">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="fitness-hero animate-fade-in-up">
+                    <div class="container">
+                        <h1>Elevate Your Fitness</h1>
+                        <p class="lead">Join our community and transform your life with expert trainers and world-class facilities.</p>
+                        <a href="/fitness/membership" class="btn btn-lg btn-fitness mt-4">Get Started</a>
+                    </div>
+                </div>
+
+                <section class="py-5">
+                    <div class="container">
+                        <h2 class="fitness-section-title">Popular Classes</h2>
+                        <div class="row">
+                            <t t-foreach="classes" t-as="cls">
+                                <div class="col-md-4 mb-4">
+                                    <div class="card fitness-card">
+                                        <div class="card-body">
+                                            <span class="badge bg-danger mb-2" t-esc="cls.class_type.title()"/>
+                                            <h4 class="card-title text-uppercase font-weight-bold" t-esc="cls.name"/>
+                                            <p class="card-text text-muted" t-esc="cls.description"/>
+                                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                                <span class="text-primary"><i class="fa fa-clock-o mr-1"/> <t t-esc="cls.default_duration"/> Hrs</span>
+                                                <span class="text-info"><i class="fa fa-signal mr-1"/> <t t-esc="cls.difficulty.title()"/></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="py-5 bg-light">
+                    <div class="container">
+                        <h2 class="fitness-section-title">Expert Trainers</h2>
+                        <div class="row">
+                            <t t-foreach="trainers" t-as="trainer">
+                                <div class="col-md-3 mb-4">
+                                    <div class="card fitness-card text-center">
+                                        <t t-if="trainer.photo">
+                                            <img t-attf-src="data:image/png;base64,#{trainer.photo}" class="card-img-top" alt="Trainer"/>
+                                        </t>
+                                        <t t-else="">
+                                            <img src="/web/static/img/placeholder.png" class="card-img-top" alt="Trainer"/>
+                                        </t>
+                                        <div class="card-body">
+                                            <h5 class="card-title" t-esc="trainer.name"/>
+                                            <p class="small text-muted mb-2">
+                                                <t t-foreach="trainer.specialization_ids" t-as="spec">
+                                                    <span class="badge border text-dark mr-1" t-esc="spec.name"/>
+                                                </t>
+                                            </p>
+                                            <div class="text-warning">
+                                                <t t-foreach="range(int(trainer.rating))" t-as="star">
+                                                    <i class="fa fa-star"/>
+                                                </t>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="/fitness/trainers" class="btn btn-outline-dark">View All Trainers</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <!-- Membership Plans Template -->
+    <template id="fitness_membership_plans" name="Membership Plans">
+        <t t-call="website.layout">
+            <div id="wrap" class="py-5">
+                <div class="container">
+                    <h2 class="fitness-section-title">Choose Your Plan</h2>
+                    <div class="row justify-content-center">
+                        <t t-foreach="plans" t-as="plan">
+                            <div class="col-md-4 mb-4">
+                                <div class="card fitness-card text-center">
+                                    <div class="card-header bg-dark text-white py-4">
+                                        <h3 class="mb-0" t-esc="plan.name"/>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="fitness-price-tag mb-3">
+                                            $<span t-esc="plan.price"/>
+                                            <small class="text-muted">/ <t t-esc="plan.plan_type"/></small>
+                                        </div>
+                                        <ul class="list-unstyled mb-4">
+                                            <t t-if="plan.features">
+                                                <t t-foreach="plan.features.split('\n')" t-as="feature">
+                                                    <li class="mb-2"><i class="fa fa-check text-success mr-2"/> <t t-esc="feature"/></li>
+                                                </t>
+                                            </t>
+                                            <t t-else="">
+                                                <li class="mb-2 text-muted">Core Gym Access</li>
+                                            </t>
+                                        </ul>
+                                        <hr/>
+                                        <p class="small text-muted">Max Freeze: <t t-esc="plan.max_freeze_days"/> Days</p>
+                                        <a t-attf-href="/fitness/join/#{plan.id}" class="btn btn-fitness mt-3">Join Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Classes Schedule Template -->
+    <template id="fitness_classes_schedule" name="Classes Schedule">
+        <t t-call="website.layout">
+            <div id="wrap" class="py-5">
+                <div class="container">
+                    <h2 class="fitness-section-title">Class Schedule</h2>
+
+                    <!-- Booking feedback alerts -->
+                    <t t-if="request.params.get('success')">
+                        <div class="alert alert-success text-center shadow-sm" role="alert">
+                            <i class="fa fa-check-circle mr-2"/> <strong>Booked!</strong> Your class has been booked successfully.
+                        </div>
+                    </t>
+                    <t t-if="request.params.get('error') == 'no_member'">
+                        <div class="alert alert-warning text-center shadow-sm" role="alert">
+                            <i class="fa fa-exclamation-triangle mr-2"/> You need an active member profile to book a class.
+                            <a href="/fitness/membership" class="alert-link">Join a plan first</a>.
+                        </div>
+                    </t>
+                    <t t-if="request.params.get('error') == 'already_booked'">
+                        <div class="alert alert-info text-center shadow-sm" role="alert">
+                            <i class="fa fa-info-circle mr-2"/> You have already booked this class.
+                        </div>
+                    </t>
+                    <t t-if="request.params.get('error') == 'full'">
+                        <div class="alert alert-danger text-center shadow-sm" role="alert">
+                            <i class="fa fa-times-circle mr-2"/> Sorry, this class is full. No spots available.
+                        </div>
+                    </t>
+                    <div class="table-responsive">
+                        <table class="table table-hover shadow-sm rounded">
+                            <thead class="bg-dark text-white">
+                                <tr>
+                                    <th>Date &amp; Time</th>
+                                    <th>Class</th>
+                                    <th>Trainer</th>
+                                    <th>Room</th>
+                                    <th>Availability</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="schedules" t-as="schedule">
+                                    <tr>
+                                        <td>
+                                            <strong><span t-field="schedule.date_start" t-options='{"widget": "datetime", "format": "MMM d, HH:mm"}'/></strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-danger mr-2" t-esc="schedule.class_id.class_type.title()"/>
+                                            <strong t-esc="schedule.class_id.name"/>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <t t-if="schedule.trainer_id.photo">
+                                                    <img t-attf-src="data:image/png;base64,#{schedule.trainer_id.photo}" class="rounded-circle mr-2" style="width: 30px; height: 30px; object-fit: cover;"/>
+                                                </t>
+                                                <span t-esc="schedule.trainer_id.name"/>
+                                            </div>
+                                        </td>
+                                        <td t-esc="schedule.room or 'N/A'"/>
+                                        <td>
+                                            <t t-if="schedule.available_spots &gt; 0">
+                                                <span class="text-success" t-esc="schedule.available_spots"/> Spots Left
+                                            </t>
+                                            <t t-else="">
+                                                <span class="text-danger">Full</span>
+                                            </t>
+                                        </td>
+                                        <td>
+                                            <form action="/fitness/classes/book" method="post" class="d-inline">
+                                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                                <input type="hidden" name="schedule_id" t-att-value="schedule.id"/>
+                                                <button type="submit" class="btn btn-sm btn-fitness"
+                                                        t-att-disabled="schedule.available_spots &lt;= 0">Book Now</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Trainers Template -->
+    <template id="fitness_trainers" name="Our Trainers">
+        <t t-call="website.layout">
+            <div id="wrap" class="py-5">
+                <div class="container">
+                    <h2 class="fitness-section-title">Meet Our Professionals</h2>
+                    <div class="row">
+                        <t t-foreach="trainers" t-as="trainer">
+                            <div class="col-md-6 mb-4">
+                                <div class="card fitness-card">
+                                    <div class="row no-gutters">
+                                        <div class="col-md-4">
+                                            <t t-if="trainer.photo">
+                                                <img t-attf-src="data:image/png;base64,#{trainer.photo}" class="card-img h-100" alt="Trainer" style="object-fit: cover;"/>
+                                            </t>
+                                            <t t-else="">
+                                                <img src="/web/static/img/placeholder.png" class="card-img h-100" alt="Trainer" style="object-fit: cover;"/>
+                                            </t>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <h4 class="card-title mb-1" t-esc="trainer.name"/>
+                                                <div class="text-warning small mb-3">
+                                                    <t t-foreach="range(int(trainer.rating))" t-as="star">
+                                                        <i class="fa fa-star"/>
+                                                    </t>
+                                                </div>
+                                                <p class="card-text">
+                                                    <strong>Specializations:</strong><br/>
+                                                    <t t-foreach="trainer.specialization_ids" t-as="spec">
+                                                        <span class="badge badge-light border mr-1" t-esc="spec.name"/>
+                                                    </t>
+                                                </p>
+                                                <p class="card-text small text-muted" t-field="trainer.bio"/>
+                                                <div class="mt-3">
+                                                    <span class="text-primary font-weight-bold" t-esc="trainer.experience_years"/> Years of Experience
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Join Form Template -->
+    <template id="fitness_join_form" name="Join Plan">
+        <t t-call="website.layout">
+            <div id="wrap" class="py-5 bg-light">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="card fitness-card shadow">
+                                <div class="card-header bg-dark text-white text-center py-4">
+                                    <h3 class="mb-0">Join <t t-esc="plan.name"/> Plan</h3>
+                                </div>
+                                <div class="card-body p-4">
+                                    <form action="/fitness/join/submit" method="post">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="plan_id" t-att-value="plan.id"/>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label font-weight-bold">Full Name</label>
+                                            <input type="text" class="form-control" name="name" required="1"/>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label font-weight-bold">Email Address</label>
+                                            <input type="email" class="form-control" name="email" required="1"/>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="form-label font-weight-bold">Phone Number</label>
+                                            <input type="tel" class="form-control" name="phone"/>
+                                        </div>
+                                        <button type="submit" class="btn btn-fitness btn-lg w-100">Confirm Subscription</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Success Template -->
+    <template id="fitness_join_success" name="Registration Successful">
+        <t t-call="website.layout">
+            <div id="wrap" class="py-5 text-center">
+                <div class="container py-5">
+                    <i class="fa fa-check-circle text-success" style="font-size: 80px;"/>
+                    <h2 class="mt-4 font-weight-bold">Subscription Received!</h2>
+                    <p class="lead text-muted">Thank you for joining. Our team will contact you shortly regarding the payment and facility access.</p>
+                    <div class="mt-4">
+                        <a href="/fitness" class="btn btn-outline-dark me-2">Back to Home</a>
+                        <a href="/my/fitness" class="btn btn-fitness">Go to Dashboard</a>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+
+</odoo>

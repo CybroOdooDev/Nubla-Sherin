@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report action: shortlisting & interview summary PDF for a vacancy -->
+    <record id="action_report_nhs_shortlist_summary" model="ir.actions.report">
+        <field name="name">Shortlisting &amp; Interview Summary</field>
+        <field name="model">nhs.vacancy</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_recruitment.report_nhs_shortlist_summary</field>
+        <field name="report_file">odoo_nhs_recruitment.report_nhs_shortlist_summary</field>
+        <field name="print_report_name">'Shortlisting Summary - %s' % object.reference</field>
+        <field name="binding_model_id" ref="model_nhs_vacancy"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_nhs_shortlist_summary">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="vacancy">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Shortlisting &amp; Interview Summary</h2>
+                        <p><strong>Vacancy:</strong> <span t-esc="vacancy.name"/> (<span t-esc="vacancy.reference"/>)</p>
+
+                        <h4>Shortlisting</h4>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Candidate</th><th>Score</th><th>Outcome</th><th>Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="vacancy.application_ids" t-as="application">
+                                    <td><span t-esc="application.candidate_id.name"/></td>
+                                    <td><span t-esc="'%.2f' % application.shortlist_score"/></td>
+                                    <td><span t-esc="application.shortlist_outcome"/></td>
+                                    <td><span t-esc="application.shortlist_reason"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Interviews</h4>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Candidate</th><th>Date</th><th>Total Score</th><th>Outcome</th><th>Rank</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="vacancy.application_ids" t-as="application">
+                                    <tr t-foreach="application.interview_ids" t-as="interview">
+                                        <td><span t-esc="application.candidate_id.name"/></td>
+                                        <td><span t-esc="interview.interview_datetime"/></td>
+                                        <td><span t-esc="'%.2f' % interview.total_score"/></td>
+                                        <td><span t-esc="interview.outcome"/></td>
+                                        <td><span t-esc="interview.rank"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

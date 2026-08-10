@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--    This XML view defines the form for creating books in the Odoo application.
+    It includes fields for book details such as name, authors, publisher,
+    ISBN numbers, language, page count, categories, average rating, web reader
+    link, and preview link. Additionally, there is a description field for
+    providing a detailed description of the book.-->
+    <record id="create_book_view_form" model="ir.ui.view">
+        <field name="name">create.book.view.form</field>
+        <field name="model">create.book</field>
+        <field name="arch" type="xml">
+            <form string="Create Book">
+                <p class="oe_grey">
+                    Create book by using the details given below
+                </p>
+                <field name="image_medium" widget="image" class="oe_avatar"/>
+                <div class="oe_title">
+                    <label class="oe_edit_only" for="name" string="Book Name"/>
+                    <h1>
+                        <field name="name" placeholder="Book Name"
+                               readonly="1"/>
+                    </h1>
+                    <div name="options">
+                        <div>
+                            <label for="authors_ids"/>
+                            <span style="margin-left:8px;margin-right:3px;">
+                                :
+                            </span>
+                            <field name="authors_ids" widget="many2many_tags"
+                                   force_save="1" readonly="1"/>
+                        </div>
+                        <div>
+                            <label for="publisher_id"/>
+                            <span style="margin-left:8px;margin-right:3px;">
+                                :
+                            </span>
+                            <field name="publisher_id" force_save="1"
+                                   readonly="1"/>
+                        </div>
+                    </div>
+                </div>
+                <group>
+                    <group string="Book Details">
+                        <field name="title" force_save="1" readonly="1"/>
+                        <field name="isbn_13" force_save="1" readonly="1"/>
+                        <field name="isbn_10" force_save="1" readonly="1"/>
+                        <field name="book_language" force_save="1"
+                               readonly="1"/>
+                        <field name="pageCount" force_save="1" readonly="1"/>
+                    </group>
+                    <group colspan="2">
+                        <field name="categories" force_save="1" readonly="1"/>
+                        <field name="averageRating" force_save="1"
+                               readonly="1"/>
+                        <field name="webReaderLink" force_save="1"
+                               readonly="1"/>
+                        <field name="previewLink" force_save="1" readonly="1"/>
+                    </group>
+                </group>
+                <group string="Description">
+                    <field name="description" readonly="1"/>
+                </group>
+                <footer>
+                    <button name="create_book" string="Create Book"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-default"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <!--    Action Window Definition for Creating Books.-->
+    <record id="create_book_action" model="ir.actions.act_window">
+        <field name="name">Create Book</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">create.book</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,363 @@
+/* =============================================
+   GLOBAL DARK MODE FOR ENTIRE FITNESS MODULE
+   Applies when body has .fitness-dark-mode class
+   ============================================= */
+
+/* === Core Odoo Variables Override === */
+body.fitness-dark-mode {
+    --o-main-bg-color: #0f0f1a;
+    --o-view-background-color: #0f0f1a;
+    --View-background-color: #0f0f1a;
+}
+
+/* === Web Client === */
+body.fitness-dark-mode .o_web_client {
+    background-color: #0f0f1a;
+}
+
+body.fitness-dark-mode .o_action_manager {
+    background-color: #0f0f1a;
+}
+
+/* === Navbar === */
+body.fitness-dark-mode .o_main_navbar {
+    background: linear-gradient(135deg, #1a1a3e 0%, #2d1b69 100%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+
+    /* Make section entries blend into the dark navbar (avoid "button" look). */
+    --NavBar-brand-color: #e0d8f0;
+    --NavBar-entry-backgroundColor: transparent;
+    --NavBar-entry-backgroundColor--hover: rgba(255, 255, 255, 0.08);
+    --NavBar-entry-backgroundColor--focus: rgba(255, 255, 255, 0.08);
+    --NavBar-entry-backgroundColor--active: rgba(255, 255, 255, 0.12);
+    --NavBar-entry-borderColor-active: rgba(255, 255, 255, 0.12);
+    --NavBar-entry-color--active: #fff;
+}
+
+body.fitness-dark-mode .o_main_navbar .o_menu_brand,
+body.fitness-dark-mode .o_main_navbar .o_nav_entry,
+body.fitness-dark-mode .o_main_navbar .dropdown-toggle:not(.o-dropdown-toggle-custo) {
+    color: #e0d8f0 !important;
+}
+
+body.fitness-dark-mode .o_main_navbar .o_nav_entry:hover,
+body.fitness-dark-mode .o_main_navbar .dropdown-toggle:not(.o-dropdown-toggle-custo):hover {
+    color: #fff !important;
+}
+
+/* === Control Panel (Search bar, breadcrumbs) === */
+body.fitness-dark-mode .o_control_panel {
+    background: #16162a !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.fitness-dark-mode .o_control_panel .breadcrumb-item,
+body.fitness-dark-mode .o_control_panel .breadcrumb-item a,
+body.fitness-dark-mode .o_control_panel .breadcrumb-item.active {
+    color: #b0b0c8 !important;
+}
+
+body.fitness-dark-mode .o_control_panel .o_searchview {
+    background: #1e1e32 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #e0d8f0 !important;
+}
+
+body.fitness-dark-mode .o_control_panel .o_searchview input {
+    color: #e0d8f0 !important;
+}
+
+body.fitness-dark-mode .o_control_panel .o_searchview input::placeholder {
+    color: #6e6e8a !important;
+}
+
+body.fitness-dark-mode .o_control_panel .btn-secondary,
+body.fitness-dark-mode .o_control_panel .btn-light {
+    background: #1e1e32 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #b0b0c8 !important;
+}
+
+body.fitness-dark-mode .o_control_panel .btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    border-color: transparent !important;
+}
+
+/* === Content Area === */
+body.fitness-dark-mode .o_content {
+    background: #0f0f1a !important;
+}
+
+/* === List View === */
+body.fitness-dark-mode .o_list_view {
+    background: #0f0f1a !important;
+}
+
+body.fitness-dark-mode .o_list_view .o_list_table {
+    background: transparent;
+    color: #b0b0c8;
+}
+
+body.fitness-dark-mode .o_list_view .o_list_table thead th {
+    background: #16162a !important;
+    color: #8c8c9e !important;
+    border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+body.fitness-dark-mode .o_list_view .o_list_table tbody tr {
+    border-bottom-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+body.fitness-dark-mode .o_list_view .o_list_table tbody tr td {
+    color: #b0b0c8 !important;
+    border-bottom-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+body.fitness-dark-mode .o_list_view .o_list_table tbody tr:hover td {
+    background: rgba(102, 126, 234, 0.06) !important;
+}
+
+body.fitness-dark-mode .o_list_view .o_list_table tbody tr.o_data_row.o_list_no_open td {
+    color: #b0b0c8 !important;
+}
+
+body.fitness-dark-mode .o_list_view .o_list_table tfoot td {
+    background: #16162a !important;
+    color: #8c8c9e !important;
+}
+
+body.fitness-dark-mode .o_list_view .o_list_record_selector input {
+    background: #1e1e32;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* === Form View === */
+body.fitness-dark-mode .o_form_view {
+    background: #0f0f1a !important;
+}
+
+body.fitness-dark-mode .o_form_view .o_form_sheet_bg {
+    background: #0f0f1a !important;
+}
+
+body.fitness-dark-mode .o_form_view .o_form_sheet {
+    background: #1e1e32 !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.fitness-dark-mode .o_form_view .oe_title span,
+body.fitness-dark-mode .o_form_view .oe_title input,
+body.fitness-dark-mode .o_form_view .o_field_widget span,
+body.fitness-dark-mode .o_form_view .o_field_widget input,
+body.fitness-dark-mode .o_form_view .o_field_widget textarea {
+    color: #e0d8f0 !important;
+}
+
+body.fitness-dark-mode .o_form_view .o_group .o_inner_group .o_td_label label,
+body.fitness-dark-mode .o_form_view label.o_form_label {
+    color: #8c8c9e !important;
+}
+
+body.fitness-dark-mode .o_form_view .o_field_widget input,
+body.fitness-dark-mode .o_form_view .o_field_widget textarea,
+body.fitness-dark-mode .o_form_view .o_field_widget select {
+    background: #16162a !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.fitness-dark-mode .o_form_view .o_notebook>.nav .nav-link {
+    color: #b0b0c8 !important;
+    border-color: transparent !important;
+}
+
+body.fitness-dark-mode .o_form_view .o_notebook>.nav .nav-link.active {
+    color: #a78bfa !important;
+    border-bottom-color: #a78bfa !important;
+    background: transparent !important;
+}
+
+body.fitness-dark-mode .o_form_view .o_notebook .tab-content {
+    background: transparent !important;
+}
+
+body.fitness-dark-mode .o_form_view .o_horizontal_separator {
+    color: #8c8c9e !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* === Status Bar === */
+body.fitness-dark-mode .o_statusbar_status .o_arrow_button {
+    background: #1e1e32 !important;
+    color: #b0b0c8 !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+body.fitness-dark-mode .o_statusbar_status .o_arrow_button.disabled.o_arrow_button_current {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    color: #fff !important;
+}
+
+body.fitness-dark-mode .o_form_view .o_form_statusbar {
+    background: #16162a !important;
+    border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* === Chatter === */
+body.fitness-dark-mode .o-mail-Chatter {
+    background: #0f0f1a !important;
+}
+
+body.fitness-dark-mode .o-mail-Thread .o-mail-Message {
+    background: #1e1e32 !important;
+    border-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+body.fitness-dark-mode .o-mail-Thread .o-mail-Message-body {
+    color: #b0b0c8 !important;
+}
+
+body.fitness-dark-mode .o-mail-Chatter-topbar {
+    background: #16162a !important;
+}
+
+/* === Kanban View === */
+body.fitness-dark-mode .o_kanban_view {
+    background: #0f0f1a !important;
+}
+
+body.fitness-dark-mode .o_kanban_record {
+    background: #1e1e32 !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    color: #b0b0c8 !important;
+}
+
+body.fitness-dark-mode .o_kanban_record:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.fitness-dark-mode .o_kanban_group_header {
+    background: #16162a !important;
+    color: #e0d8f0 !important;
+}
+
+/* === Dropdown / Popover === */
+body.fitness-dark-mode .dropdown-menu {
+    background: #1e1e32 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.fitness-dark-mode .dropdown-menu .dropdown-item {
+    color: #b0b0c8 !important;
+}
+
+body.fitness-dark-mode .dropdown-menu .dropdown-item:hover {
+    background: rgba(102, 126, 234, 0.1) !important;
+    color: #e0d8f0 !important;
+}
+
+/* === Modal / Dialogs === */
+body.fitness-dark-mode .modal-content {
+    background: #1e1e32 !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+    color: #e0d8f0 !important;
+}
+
+body.fitness-dark-mode .modal-header {
+    border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+    color: #e0d8f0 !important;
+}
+
+body.fitness-dark-mode .modal-footer {
+    border-top-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* === Badges === */
+body.fitness-dark-mode .badge {
+    opacity: 0.9;
+}
+
+/* === Scrollbar Styling === */
+body.fitness-dark-mode ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+body.fitness-dark-mode ::-webkit-scrollbar-track {
+    background: #0f0f1a;
+}
+
+body.fitness-dark-mode ::-webkit-scrollbar-thumb {
+    background: #2d2d4a;
+    border-radius: 4px;
+}
+
+body.fitness-dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: #3d3d5a;
+}
+
+/* === Pager === */
+body.fitness-dark-mode .o_pager .o_pager_value,
+body.fitness-dark-mode .o_pager .o_pager_limit {
+    color: #8c8c9e !important;
+}
+
+/* === Checkbox === */
+body.fitness-dark-mode .o_list_record_selector .form-check-input {
+    background-color: #1e1e32 !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* === Selection Widget === */
+body.fitness-dark-mode .o_field_widget .o_field_many2one input,
+body.fitness-dark-mode .o_field_widget .o_input {
+    background: #16162a !important;
+    color: #e0d8f0 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* === Button Styling in Dark Mode === */
+body.fitness-dark-mode .o_form_view .btn-secondary {
+    background: #2d2d4a !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #b0b0c8 !important;
+}
+
+body.fitness-dark-mode .o_form_view .btn-secondary:hover {
+    background: #3d3d5a !important;
+    color: #e0d8f0 !important;
+}
+
+/* === Settings Page === */
+body.fitness-dark-mode .o_settings_container {
+    background: #0f0f1a !important;
+}
+
+body.fitness-dark-mode .o_setting_box {
+    background: #1e1e32 !important;
+}
+
+/* === General Links === */
+body.fitness-dark-mode .o_form_view a:not(.btn) {
+    color: #a78bfa !important;
+}
+
+/* === Studio Sidebar (if any) === */
+body.fitness-dark-mode .o_cp_action_menus .dropdown-toggle {
+    color: #b0b0c8 !important;
+}
+
+/* === Smooth Transition for All Elements === */
+body.fitness-dark-mode .o_main_navbar,
+body.fitness-dark-mode .o_control_panel,
+body.fitness-dark-mode .o_content,
+body.fitness-dark-mode .o_list_view,
+body.fitness-dark-mode .o_form_view,
+body.fitness-dark-mode .o_form_view .o_form_sheet_bg,
+body.fitness-dark-mode .o_form_view .o_form_sheet {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Create Library Privilege (acts like category in Odoo 18) -->
+    <record id="res_groups_privilege_library" model="res.groups.privilege">
+        <field name="name">Library</field>
+        <field name="category_id" ref="base.module_category_hidden"/> <!-- or base.module_category_hr if you want visible -->
+        <field name="sequence">10</field>
+    </record>
+
+    <!-- Librarian group -->
+    <record id="library_group_librarian" model="res.groups">
+        <field name="name">Librarian</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="privilege_id" ref="res_groups_privilege_library"/>
+    </record>
+
+    <!-- Manager group -->
+    <record id="library_group_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="implied_ids" eval="[(4, ref('library_group_librarian'))]"/>
+        <field name="privilege_id" ref="res_groups_privilege_library"/>
+    </record>
+</odoo>

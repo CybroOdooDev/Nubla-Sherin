@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_nhs_ko41a" model="ir.actions.report">
+        <field name="name">NHS KO41a Complaint Return (Board Pack)</field>
+        <field name="model">nhs.complaint</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_complaints.report_nhs_ko41a</field>
+        <field name="report_file">odoo_nhs_complaints.report_nhs_ko41a</field>
+        <field name="print_report_name">'KO41a_Complaints_Report'</field>
+    </record>
+
+    <template id="report_nhs_ko41a">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2>KO41a Complaints Summary — Board Pack</h2>
+                    <p><strong>Organisation:</strong> <span t-esc="docs[0].company_id.name if docs else ''"/></p>
+                    <p>Generated: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d %B %Y')"/></p>
+
+                    <h4>Complaints by Subject</h4>
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr class="table-dark">
+                                <th>KO41a Code</th>
+                                <th>Subject</th>
+                                <th>Count</th>
+                                <th>% of Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="total" t-value="len(docs)"/>
+                            <t t-set="by_subject" t-value="{}"/>
+                            <t t-foreach="docs" t-as="c">
+                                <t t-set="key" t-value="c.subject_id.complete_name if c.subject_id else 'Unknown'"/>
+                                <t t-set="code" t-value="c.subject_id.ko41a_code if c.subject_id else '—'"/>
+                            </t>
+                            <tr>
+                                <td colspan="4" class="text-muted text-center">
+                                    Use the KO41a Export wizard for a full breakdown (Reporting → KO41a Return).
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-secondary">
+                                <td colspan="2"><strong>Total</strong></td>
+                                <td><strong><span t-esc="len(docs)"/></strong></td>
+                                <td><strong>100%</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    <h4>Complaints by Severity</h4>
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr class="table-dark">
+                                <th>Severity</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="['low','medium','high','major']" t-as="sev">
+                                <tr>
+                                    <td><span t-esc="sev.title()"/></td>
+                                    <td><span t-esc="len(docs.filtered(lambda d: d.severity == sev))"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <h4>PHSO Escalations</h4>
+                    <t t-set="phso_complaints" t-value="docs.filtered(lambda d: d.state == 'phso')"/>
+                    <p><span t-esc="len(phso_complaints)"/> complaint(s) referred to the PHSO.</p>
+
+                    <h4>Average Days to Respond</h4>
+                    <t t-set="responded" t-value="docs.filtered(lambda d: d.days_to_respond)"/>
+                    <t t-set="avg" t-value="sum(responded.mapped('days_to_respond')) / len(responded) if responded else 0"/>
+                    <p><span t-esc="'%.1f' % avg"/> working days (across <span t-esc="len(responded)"/> closed complaints).</p>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

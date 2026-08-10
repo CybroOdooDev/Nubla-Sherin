@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── PHSO Kanban ─────────────────────────────────────────── -->
+    <record id="view_nhs_complaint_phso_kanban" model="ir.ui.view">
+        <field name="name">nhs.complaint.phso.kanban</field>
+        <field name="model">nhs.complaint.phso</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="state"/>
+                <field name="complaint_id"/>
+                <field name="phso_reference"/>
+                <field name="outcome"/>
+                <field name="referred_at"/>
+                <field name="complaint_subject_summary"/>
+                <field name="complaint_severity"/>
+                <field name="complaint_handler_id"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex flex-column justify-content-between p-2" style="min-height: 110px;">
+                            <!-- Header Row: Title (Complaint ID) and State Badge -->
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <span class="fw-bold text-primary" style="font-size:0.95rem;">
+                                    <field name="complaint_id"/>
+                                </span>
+                                <span t-attf-class="badge rounded-pill flex-shrink-0 #{
+                                    record.state.raw_value == 'referred'      ? 'text-bg-info' :
+                                    record.state.raw_value == 'under_review'  ? 'text-bg-warning' :
+                                    record.state.raw_value == 'decision_made' ? 'text-bg-success' : 'text-bg-secondary'
+                                }" style="font-size:0.68rem;">
+                                    <field name="state"/>
+                                </span>
+                            </div>
+
+                            <!-- Subject Summary -->
+                            <div class="mb-1" style="font-size:0.85rem; font-weight: 500; color:#333;">
+                                <field name="complaint_subject_summary"/>
+                            </div>
+
+                            <!-- Middle Section: PHSO Ref & Referred At -->
+                            <div class="d-flex flex-column gap-1 mb-2 text-muted" style="font-size:0.8rem;">
+                                <div t-if="record.phso_reference.raw_value" class="d-flex align-items-center gap-1">
+                                    <i class="fa fa-tag" style="width:13px; color:#777;"/>
+                                    <span>PHSO Ref: <field name="phso_reference"/></span>
+                                </div>
+                                <div class="d-flex align-items-center gap-1">
+                                    <i class="fa fa-calendar-o" style="width:13px; color:#777;"/>
+                                    <span>Referred: <field name="referred_at"/></span>
+                                </div>
+                            </div>
+
+                            <!-- Footer Row: Outcome/Severity on left, Assignee Avatar on right -->
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top" style="border-top-style: dashed !important; border-top-color: #ddd !important;">
+                                <!-- Left side: Severity and Outcome Badges -->
+                                <div class="d-flex gap-1 align-items-center">
+                                    <!-- Severity Badge -->
+                                    <span t-if="record.complaint_severity.raw_value" t-attf-class="badge #{
+                                        record.complaint_severity.raw_value == 'high' ? 'text-bg-danger' :
+                                        record.complaint_severity.raw_value == 'medium' ? 'text-bg-warning' : 'text-bg-light border'
+                                    }" style="font-size:0.7rem; text-transform: capitalize;">
+                                        <field name="complaint_severity"/>
+                                    </span>
+                                    
+                                    <!-- Outcome Badge -->
+                                    <span t-if="record.outcome.raw_value" t-attf-class="badge text-bg-#{
+                                        record.outcome.raw_value == 'not_upheld' ? 'success' :
+                                        record.outcome.raw_value == 'partly_upheld' ? 'warning' :
+                                        record.outcome.raw_value == 'upheld' ? 'danger' : 'secondary'
+                                    }" style="font-size:0.7rem;">
+                                        <field name="outcome"/>
+                                    </span>
+                                </div>
+
+                                <!-- Right side: Assignee Avatar/Name -->
+                                <div class="d-flex align-items-center gap-1" t-if="record.complaint_handler_id.raw_value">
+                                    <field name="complaint_handler_id" widget="many2one_avatar_user"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ── PHSO List ───────────────────────────────────────────── -->
+    <record id="view_nhs_complaint_phso_list" model="ir.ui.view">
+        <field name="name">nhs.complaint.phso.list</field>
+        <field name="model">nhs.complaint.phso</field>
+        <field name="arch" type="xml">
+            <list string="PHSO Casebook">
+                <field name="phso_reference"/>
+                <field name="complaint_id"/>
+                <field name="referred_at"/>
+                <field name="state" widget="badge"
+                       decoration-info="state=='referred'"
+                       decoration-warning="state=='under_review'"
+                       decoration-success="state=='decision_made'"
+                       decoration-muted="state=='closed'"/>
+                <field name="outcome"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── PHSO Form ───────────────────────────────────────────── -->
+    <record id="view_nhs_complaint_phso_form" model="ir.ui.view">
+        <field name="name">nhs.complaint.phso.form</field>
+        <field name="model">nhs.complaint.phso</field>
+        <field name="arch" type="xml">
+            <form string="PHSO Escalation Record">
+                <header>
+                    <button name="action_mark_under_review" string="Mark Under Review" type="object"
+                            class="btn-primary" invisible="state != 'referred'"/>
+                    <button name="action_record_decision" string="Record Decision" type="object"
+                            class="btn-primary" invisible="state != 'under_review'"/>
+                    <button name="action_close" string="Close" type="object"
+                            class="btn-primary" invisible="state != 'decision_made'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="referred,under_review,decision_made,closed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="complaint_id"/>
+                            <field name="phso_reference"/>
+                            <field name="referred_at"/>
+                        </group>
+                        <group>
+                            <field name="outcome" invisible="state in ('referred', 'under_review')" readonly="state == 'closed'"/>
+                            <field name="compensation_recommended" widget="monetary" invisible="state in ('referred', 'under_review')" readonly="state == 'closed'"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="PHSO Recommendations" invisible="state in ('referred', 'under_review')">
+                        <field name="recommendations" colspan="2" nolabel="1"
+                               placeholder="Recommendations issued by the PHSO…" readonly="state == 'closed'"/>
+                    </group>
+                    <separator string="Actions from Recommendations" invisible="state in ('referred', 'under_review')"/>
+                    <field name="action_ids" nolabel="1" readonly="state != 'decision_made'" context="{'default_complaint_id': complaint_id, 'default_phso_id': id}" invisible="state in ('referred', 'under_review')">
+                        <list>
+                            <field name="name" string="Action Title"/>
+                            <field name="owner_id" string="Owner"/>
+                            <field name="due_date" string="Due Date"/>
+                            <field name="state" string="Status" widget="badge"/>
+                        </list>
+                    </field>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_complaint_phso" model="ir.actions.act_window">
+        <field name="name">PHSO Casebook</field>
+        <field name="res_model">nhs.complaint.phso</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+    </record>
+</odoo>

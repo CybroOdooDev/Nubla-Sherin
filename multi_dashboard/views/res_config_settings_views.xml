@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.multi.dashboard</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="100"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='integration']" position="inside">
+                <setting id="multi_dashboard_ai" help="Configure Google Gemini AI for smart chart creation.">
+                    <field name="multi_dashboard_gemini_api_key" placeholder="AIZA..."/>
+                    <div class="text-muted mt-2">
+                        Enter your Google Gemini API Key to enable Natural Language Chart Creation on multi dashboards.
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

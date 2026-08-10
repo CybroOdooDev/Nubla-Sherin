@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="ir_cron_fitness_notifications" model="ir.cron">
+            <field name="name">Fitness Center: Send Automated Notifications</field>
+            <field name="model_id" ref="fitness_center_management.model_fitness_member"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_send_notifications()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

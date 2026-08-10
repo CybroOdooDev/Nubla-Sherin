@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+     <!--  Record rule for librarian  -->
+    <record id="library_rule_librarian_register" model="ir.rule">
+        <field name="name">Library Librarian rule</field>
+        <field name="model_id" ref="model_book_register"/>
+        <field name="domain_force">[('responsive_person_id.id','=',user.id), ('company_id','=',user.company_id.id)]
+        </field>
+        <field name="groups" eval="[(4,ref('library_group_librarian'))]"/>
+    </record>
+    <!--  Record rule for library manager -->
+    <record id="library_rule_manager_register" model="ir.rule">
+        <field name="name">Library Manager register</field>
+        <field name="model_id" ref="model_book_register"/>
+        <field name="domain_force">[('company_id','=',user.company_id.id)]</field>
+        <field name="groups" eval="[(4,ref('library_group_manager'))]"/>
+    </record>
+    <!--  Record rule for library manager and librarian -->
+    <record id="library_rule_authors" model="ir.rule">
+        <field name="name">Library Authors</field>
+        <field name="model_id" ref="model_book_author"/>
+        <field name="domain_force">[('company_id','=',user.company_id.id)]</field>
+        <field name="groups" eval="[(4,ref('library_group_manager')), (4,ref('library_group_librarian'))]"/>
+    </record>
+    <record id="library_rule_publisher" model="ir.rule">
+        <field name="name">Library Publisher</field>
+        <field name="model_id" ref="model_book_publisher"/>
+        <field name="domain_force">[('company_id','=',user.company_id.id)]</field>
+        <field name="groups" eval="[(4,ref('library_group_manager')), (4,ref('library_group_librarian'))]"/>
+    </record>
+    <record id="library_rule_res_partner" model="ir.rule">
+        <field name="name">Library Members</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4,ref('library_group_manager')), (4,ref('library_group_librarian'))]"/>
+    </record>
+    <record id="library_rule_product_template" model="ir.rule">
+        <field name="name">Library Books</field>
+        <field name="model_id" ref="model_product_template"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4,ref('library_group_manager')), (4,ref('library_group_librarian'))]"/>
+    </record>
+</odoo>

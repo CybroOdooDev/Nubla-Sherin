@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_org_unit_list_inherit_training" model="ir.ui.view">
+        <field name="name">nhs.org.unit.list.inherit.training</field>
+        <field name="model">nhs.org.unit</field>
+        <field name="inherit_id" ref="odoo_nhs_establishment.view_nhs_org_unit_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vacancy_rate']" position="after">
+                <field name="team_compliance_pct" string="Training Compliance %" avg="Avg Training Compliance"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_nhs_org_unit_form_inherit_training" model="ir.ui.view">
+        <field name="name">nhs.org.unit.form.inherit.training</field>
+        <field name="model">nhs.org.unit</field>
+        <field name="inherit_id" ref="odoo_nhs_establishment.view_nhs_org_unit_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_workforce_members" type="object"
+                        class="oe_stat_button" icon="fa-graduation-cap">
+                    <field name="member_count" widget="statinfo" string="Training Members"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='vacancy_rate'][1]" position="after">
+                <label for="team_compliance_pct"/>
+                <div class="o_row">
+                    <field name="team_compliance_pct" class="oe_inline"/>
+                    <span>%</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_nhs_org_unit_hierarchy_inherit_training" model="ir.ui.view">
+        <field name="name">nhs.org.unit.hierarchy.inherit.training</field>
+        <field name="model">nhs.org.unit</field>
+        <field name="inherit_id" ref="odoo_nhs_establishment.view_nhs_org_unit_hierarchy"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vacancy_rate'][1]" position="after">
+                <field name="team_compliance_pct"/>
+                <field name="team_required_count"/>
+            </xpath>
+            <xpath expr="//span[@t-if='record.vacancy_rate.raw_value or record.funded_fte.raw_value']" position="after">
+                <span t-if="record.team_required_count.raw_value"
+                      t-attf-class="badge #{record.team_compliance_pct.raw_value >= 85 ? 'text-bg-success' : (record.team_compliance_pct.raw_value >= 70 ? 'text-bg-warning' : 'text-bg-danger')}">
+                    <field name="team_compliance_pct"/>% trained
+                </span>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_nhs_training_org_unit" model="ir.actions.act_window">
+        <field name="name">Org Hierarchy — Training Compliance</field>
+        <field name="res_model">nhs.org.unit</field>
+        <field name="view_mode">hierarchy,list,form</field>
+    </record>
+</odoo>

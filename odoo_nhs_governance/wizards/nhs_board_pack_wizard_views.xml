@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view for the board pack assembly wizard -->
+    <record id="view_nhs_board_pack_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.board.pack.wizard.form</field>
+        <field name="model">nhs.board.pack.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Assemble Board Pack">
+                <group>
+                    <field name="meeting_id" readonly="1"/>
+                    <field name="include_confidential"/>
+                    <field name="distribute"/>
+                </group>
+                <footer>
+                    <button name="action_assemble" string="Assemble &amp; Print" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

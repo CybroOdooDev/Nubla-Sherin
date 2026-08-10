@@ -1,0 +1,32 @@
+/* Layout 1: Centered Stack */
+.tile-layout-center {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* Layout 2: Side-by-Side (Value Left) */
+.tile-layout-side {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    text-align: right;
+}
+
+/* Layout 3: Corner KPI (Label Top-Left, Value Bottom-Right) */
+.tile-layout-corner {
+    flex-direction: column;
+    justify-content: space-between; /* Spreads them out top-to-bottom */
+    align-items: flex-start;
+}
+
+/* Specific overrides for Corner Layout to push value to bottom */
+.tile-layout-corner .tile-label {
+    order: 1; /* Label on top */
+}
+.tile-layout-corner .tile-value {
+    order: 2; /* Value on bottom */
+    align-self: flex-start; /* Or flex-end if you want it bottom-right */
+    margin-top: auto; /* Pushes it to the bottom */
+}

@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--  COMMITTEE FORM -->
+    <record id="view_nhs_committee_form" model="ir.ui.view">
+        <field name="name">nhs.committee.form</field>
+        <field name="model">nhs.committee</field>
+        <field name="arch" type="xml">
+            <form string="Committee">
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"
+                            groups="odoo_nhs_governance.group_nhs_gov_officer"/>
+                    <button name="action_set_dormant" string="Set Dormant" type="object"
+                            class="btn-primary"
+                            invisible="state != 'active'"
+                            groups="odoo_nhs_governance.group_nhs_gov_officer"/>
+                    <button name="action_reactivate" string="Reactivate" type="object"
+                            class="btn-primary"
+                            invisible="state not in ('dormant', 'disbanded')"
+                            groups="odoo_nhs_governance.group_nhs_gov_officer"/>
+                    <button name="action_disband" string="Disband" type="object"
+                            class="btn-primary"
+                            invisible="state in ('disbanded', 'draft')"
+                            groups="odoo_nhs_governance.group_nhs_gov_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,dormant,disbanded"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not tor_review_date">
+                        Next Terms of Reference review: <field name="tor_review_date" readonly="1" class="oe_inline"/>
+                    </div>
+                    <div class="alert alert-danger" role="alert"
+                         invisible="quorum_min &lt;= voting_member_count and quorum_min_ned &lt;= voting_ned_count">
+                        Quorum cannot be met with the current Membership:
+                        <field name="quorum_min" readonly="1" class="oe_inline"/> minimum members required vs.
+                        <field name="voting_member_count" readonly="1" class="oe_inline"/> voting member(s) on the committee;
+                        <field name="quorum_min_ned" readonly="1" class="oe_inline"/> minimum NEDs required vs.
+                        <field name="voting_ned_count" readonly="1" class="oe_inline"/> voting NED(s) on the committee.
+                    </div>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_meetings" type="object"
+                                class="oe_stat_button" icon="fa-calendar">
+                            <field name="meeting_count" widget="statinfo" string="Meetings"/>
+                        </button>
+                        <button name="action_view_members" type="object"
+                                class="oe_stat_button" icon="fa-users">
+                            <field name="member_count" widget="statinfo" string="Members"/>
+                        </button>
+                        <button name="action_view_baf_risks" type="object"
+                                class="oe_stat_button" icon="fa-shield"
+                                invisible="baf_risk_count == 0">
+                            <field name="baf_risk_count" widget="statinfo" string="Principal Risks"/>
+                        </button>
+                        <button name="action_open_meeting_generate_wizard" type="object"
+                                class="oe_stat_button" icon="fa-repeat"
+                                invisible="state != 'active'"
+                                groups="odoo_nhs_governance.group_nhs_gov_officer">
+                            <span class="o_stat_text">Generate<br/>Meetings</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Audit Committee"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="committee_type_id"/>
+                            <field name="parent_id"/>
+                            <field name="trust_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="frequency"/>
+                            <field name="quorum_min"/>
+                            <field name="quorum_min_ned"/>
+                            <field name="chair_id" options="{'no_create': True}"/>
+                            <field name="tor_review_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Terms of Reference">
+                            <field name="terms_of_reference"/>
+                        </page>
+                        <page string="Membership">
+                            <field name="member_ids">
+                                <list>
+                                    <field name="director_id" options="{'no_create': True}"/>
+                                    <field name="email" widget="email" readonly="1"/>
+                                    <field name="role"/>
+                                    <field name="is_ned"/>
+                                    <field name="voting"/>
+                                    <field name="term_start"/>
+                                    <field name="term_end"/>
+                                </list>
+                                <form string="Committee Membership">
+                                    <group>
+                                        <group>
+                                            <field name="director_id" options="{'no_create': True}"/>
+                                            <field name="email" widget="email" readonly="1"/>
+                                            <field name="role"/>
+                                            <field name="is_ned"/>
+                                        </group>
+                                        <group>
+                                            <field name="voting"/>
+                                            <field name="term_start"/>
+                                            <field name="term_end"/>
+                                        </group>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Cycle Of Business">
+                            <field name="cycle_item_ids">
+                                <list>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="title"/>
+                                    <field name="frequency"/>
+                                    <field name="scheduled_months" widget="many2many_tags"
+                                           invisible="frequency == 'every_meeting'"/>
+                                    <field name="purpose"/>
+                                    <field name="owner_id"/>
+                                    <field name="is_statutory"/>
+                                </list>
+                                <form string="Cycle Of Business Item">
+                                    <group>
+                                        <group>
+                                            <field name="title"/>
+                                            <field name="frequency"/>
+                                            <field name="scheduled_months" widget="many2many_tags"
+                                                   invisible="frequency == 'every_meeting'"/>
+                                        </group>
+                                        <group>
+                                            <field name="purpose"/>
+                                            <field name="owner_id"/>
+                                            <field name="is_statutory"/>
+                                        </group>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ══ COMMITTEE LIST ═══════════════════════════════════════════ -->
+    <record id="view_nhs_committee_list" model="ir.ui.view">
+        <field name="name">nhs.committee.list</field>
+        <field name="model">nhs.committee</field>
+        <field name="arch" type="xml">
+            <list string="Committees" decoration-muted="state != 'active'">
+                <field name="complete_name"/>
+                <field name="committee_type_id"/>
+                <field name="frequency"/>
+                <field name="chair_id"/>
+                <field name="tor_review_date"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'active'"
+                       decoration-warning="state == 'dormant'"
+                       decoration-danger="state == 'disbanded'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ══ COMMITTEE SEARCH ═════════════════════════════════════════ -->
+    <record id="view_nhs_committee_search" model="ir.ui.view">
+        <field name="name">nhs.committee.search</field>
+        <field name="model">nhs.committee</field>
+        <field name="arch" type="xml">
+            <search string="Search Committees">
+                <field name="name"/>
+                <field name="committee_type_id"/>
+                <field name="chair_id"/>
+                <filter name="draft_committees" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="active_committees" string="Active" domain="[('state', '=', 'active')]"/>
+                <filter name="tor_due" string="ToR Review Due"
+                        domain="[('tor_review_date', '!=', False), ('tor_review_date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="my_committees" string="My Committees"
+                        domain="[('member_ids.user_id', '=', uid)]"/>
+                <group name="group_by">
+                    <filter name="group_type" string="Type" context="{'group_by': 'committee_type_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_parent" string="Reports To" context="{'group_by': 'parent_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ══ COMMITTEE MEMBER LIST/FORM (standalone, for the smart button) ═ -->
+    <record id="view_nhs_committee_member_list" model="ir.ui.view">
+        <field name="name">nhs.committee.member.list</field>
+        <field name="model">nhs.committee.member</field>
+        <field name="arch" type="xml">
+            <list string="Membership" editable="bottom">
+                <field name="committee_id"/>
+                <field name="director_id" options="{'no_create': True}"/>
+                <field name="role"/>
+                <field name="is_ned"/>
+                <field name="voting"/>
+                <field name="term_start"/>
+                <field name="term_end"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Standalone Membership form used when opening a single member record -->
+    <record id="view_nhs_committee_member_form" model="ir.ui.view">
+        <field name="name">nhs.committee.member.form</field>
+        <field name="model">nhs.committee.member</field>
+        <field name="arch" type="xml">
+            <form string="Committee Membership">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="committee_id"/>
+                            <field name="director_id" options="{'no_create': True}"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group>
+                            <field name="role"/>
+                            <field name="is_ned"/>
+                            <field name="voting"/>
+                            <field name="term_start"/>
+                            <field name="term_end"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ══ ACTIONS ══════════════════════════════════════════════════ -->
+    <record id="action_nhs_committee" model="ir.actions.act_window">
+        <field name="name">Committees &amp; Boards</field>
+        <field name="res_model">nhs.committee</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active_committees': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first board or committee</p>
+            <p>Set its Terms of Reference, membership, quorum rule and meeting frequency.</p>
+        </field>
+    </record>
+</odoo>

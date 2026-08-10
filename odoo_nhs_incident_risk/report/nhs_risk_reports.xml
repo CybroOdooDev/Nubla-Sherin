@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ══ RISK REGISTER EXTRACT PDF ═══════════════════════════════ -->
+    <record id="action_report_risk_register" model="ir.actions.report">
+        <field name="name">Risk Register Extract</field>
+        <field name="model">nhs.risk.register</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_incident_risk.report_risk_register</field>
+        <field name="print_report_name">'Risk Register - ' + object.name</field>
+    </record>
+
+    <template id="report_risk_register">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="reg">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 t-out="reg.name"/>
+                        <p>
+                            Tier: <strong t-out="reg.tier"/>
+                            — Generated: <t t-out="context_timestamp(datetime.datetime.now()).strftime('%d %B %Y')"/>
+                        </p>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Ref</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Owner</th>
+                                    <th>C</th>
+                                    <th>L</th>
+                                    <th>Rating</th>
+                                    <th>Band</th>
+                                    <th>Target</th>
+                                    <th>Next Review</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="risks" t-value="reg.env['nhs.risk'].search([('register_id','=',reg.id),('state','=','active')])"/>
+                                <t t-foreach="risks" t-as="risk">
+                                    <tr>
+                                        <td t-out="risk.name"/>
+                                        <td t-out="risk.title"/>
+                                        <td t-out="risk.category_id.name"/>
+                                        <td t-out="risk.risk_owner_id.name"/>
+                                        <td t-out="risk.current_consequence"/>
+                                        <td t-out="risk.current_likelihood"/>
+                                        <td t-out="risk.current_rating"/>
+                                        <td t-out="risk.current_band"/>
+                                        <td t-out="risk.target_rating"/>
+                                        <td t-out="risk.next_review_date"/>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

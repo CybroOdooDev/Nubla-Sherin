@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form_nhs_simple" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.nhs.simple</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="NHS Patient" string="NHS Patient"
+                     name="nhs_patient_simple">
+                    <block title="NHS Digital API Connection"
+                           name="nhs_simple_block">
+                        <setting string="Environment"
+                                 help="Sandbox is for testing only">
+                            <field name="nhs_simple_environment"/>
+                        </setting>
+                        <setting string="API Key"
+                                 help="From digital.nhs.uk/developer → Application → API keys">
+                            <field name="nhs_simple_apikey" password="True"/>
+                        </setting>
+                        <setting string="Test Connection"
+                                 help="Calls NHS Hello World API to verify the key">
+                            <button name="action_nhs_test_connection"
+                                    type="object"
+                                    string="Test NHS Connection"
+                                    class="btn-primary"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_nhs_simple_settings" model="ir.actions.act_window">
+        <field name="name">NHS Patient Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'module': 'nhs_patient_simple'}</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="odoo_nhs_establishment.EstablishmentDashboard">
+        <div class="nhs-dashboard">
+            <!-- Header -->
+            <div class="nhs-dashboard-header">
+                <div class="header-title-group">
+                    <div class="header-icon">
+                        <i class="fa fa-users" role="img" aria-label="Establishment"/>
+                    </div>
+                    <div>
+                        <h1>Establishment Dashboard</h1>
+                        <p>Real-time overview of funded, in-post, and vacant FTE across the NHS Organisation.</p>
+                    </div>
+                </div>
+                <button class="btn-refresh" t-att-disabled="state.loading" t-on-click="() => this.refresh()">
+                    <i t-attf-class="fa fa-refresh {{ state.loading ? 'fa-spin' : '' }}"/>
+                    Refresh
+                </button>
+            </div>
+
+            <!-- Loading Spinner -->
+            <t t-if="state.loading">
+                <div class="text-center py-5 text-muted">
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Loading establishment data...
+                </div>
+            </t>
+            <t t-else="">
+                <!-- KPI Cards Grid -->
+                <div class="kpi-cards-grid">
+                    <div class="kpi-card funded" t-on-click="() => this.openDetails('All Posts', 'nhs.establishment.post', [['status', '!=', 'deleted']])">
+                        <div class="kpi-title">Funded FTE</div>
+                        <div class="kpi-value"><t t-esc="formatFTE(state.summary.funded)"/></div>
+                        <div class="kpi-subtitle">Total budgeted establishment</div>
+                    </div>
+                    <div class="kpi-card in-post" t-on-click="() => this.openDetails('In-Post Posts', 'nhs.establishment.post', [['status', '!=', 'deleted'], ['in_post_fte', '>', 0]])">
+                        <div class="kpi-title">In-Post FTE</div>
+                        <div class="kpi-value"><t t-esc="formatFTE(state.summary.in_post)"/></div>
+                        <div class="kpi-subtitle">Active staff currently in post</div>
+                    </div>
+                    <div class="kpi-card vacant" t-on-click="() => this.openDetails('Vacant Register', 'nhs.establishment.post', [['status', '!=', 'deleted'], ['vacancy_status', 'in', ['part_vacant', 'fully_vacant']]])">
+                        <div class="kpi-title">Vacant FTE</div>
+                        <div class="kpi-value"><t t-esc="formatFTE(state.summary.vacant)"/></div>
+                        <div class="kpi-subtitle">FTE vacancy gap to recruit</div>
+                    </div>
+                    <div class="kpi-card rate" t-on-click="() => this.openDetails('Vacancy Hotspots', 'nhs.org.unit', [['funded_fte', '>', 0]])">
+                        <div class="kpi-title">Vacancy Rate</div>
+                        <div class="kpi-value"><t t-esc="formatPercent(state.summary.rate)"/></div>
+                        <div class="kpi-subtitle">Average unfilled ratio</div>
+                    </div>
+                </div>
+
+                <!-- Main Widgets Grid -->
+                <div class="dashboard-grid">
+                    <!-- Widget 1: Vacancy Hotspots (most actionable, full width) -->
+                    <div class="dashboard-widget widget-full">
+                        <div class="widget-header">
+                            <h3>Vacancy Hotspots (Highest Rates)</h3>
+                            <a class="btn-link" t-on-click="() => this.openDetails('Vacancy Hotspots', 'nhs.org.unit', [['funded_fte', '>', 0]])">
+                                View All
+                            </a>
+                        </div>
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Team / Department</th>
+                                    <th class="text-end">Funded</th>
+                                    <th class="text-end">Vacant</th>
+                                    <th class="text-center">Vacancy Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.hotspots" t-as="hotspot" t-key="hotspot.name">
+                                    <tr>
+                                        <td>
+                                            <a href="#" t-on-click.prevent="() => this.openHotspot(hotspot)" class="text-decoration-none text-dark fw-bold">
+                                                <t t-esc="hotspot.complete_name || hotspot.name"/>
+                                            </a>
+                                        </td>
+                                        <td class="text-end"><t t-esc="formatFTE(hotspot.funded_fte)"/></td>
+                                        <td class="text-end"><t t-esc="formatFTE(hotspot.vacant_fte)"/></td>
+                                        <td class="text-center">
+                                            <span t-attf-class="status-badge {{ hotspot.vacancy_rate >= 15 ? 'danger' : (hotspot.vacancy_rate >= 5 ? 'warning' : 'normal') }}">
+                                                <t t-esc="formatPercent(hotspot.vacancy_rate)"/>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Widget 2: Staff Group Breakdown -->
+                    <div class="dashboard-widget">
+                        <div class="widget-header">
+                            <h3>Establishment by Staff Group</h3>
+                            <a class="btn-link" t-on-click="() => this.openDetails('Staff Group Analysis', 'nhs.establishment.post', [['status', '!=', 'deleted']], {'pivot_row_groupby': ['staff_group_id']})">
+                                View Analysis
+                            </a>
+                        </div>
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Staff Group</th>
+                                    <th class="text-end">Funded</th>
+                                    <th class="text-end">In-Post</th>
+                                    <th class="text-end">Vacant</th>
+                                    <th class="text-center">Vacancy Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.staffGroups" t-as="grp" t-key="grp.name">
+                                    <tr>
+                                        <td><strong><t t-esc="grp.name"/></strong></td>
+                                        <td class="text-end"><t t-esc="formatFTE(grp.funded)"/></td>
+                                        <td class="text-end"><t t-esc="formatFTE(grp.in_post)"/></td>
+                                        <td class="text-end"><t t-esc="formatFTE(grp.vacant)"/></td>
+                                        <td class="text-center">
+                                            <div class="progress-bar-container">
+                                                <div t-attf-class="progress-bar-fill {{ grp.rate >= 15 ? 'danger' : (grp.rate >= 5 ? 'warning' : 'normal') }}"
+                                                     t-attf-style="width: {{ grp.rate }}%;"></div>
+                                            </div>
+                                            <span style="font-size: 0.8rem; font-weight: 600;">
+                                                <t t-esc="formatPercent(grp.rate)"/>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Widget 3: Agenda for Change Band Breakdown -->
+                    <div class="dashboard-widget">
+                        <div class="widget-header">
+                            <h3>Establishment by Agenda for Change Band</h3>
+                            <a class="btn-link" t-on-click="() => this.openDetails('Band Analysis', 'nhs.establishment.post', [['status', '!=', 'deleted']], {'pivot_row_groupby': ['band_id']})">
+                                View Analysis
+                            </a>
+                        </div>
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Band</th>
+                                    <th class="text-end">Funded</th>
+                                    <th class="text-end">In-Post</th>
+                                    <th class="text-end">Vacant</th>
+                                    <th class="text-center">Vacancy Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.bands" t-as="band" t-key="band.name">
+                                    <tr>
+                                        <td><strong><t t-esc="band.name"/></strong></td>
+                                        <td class="text-end"><t t-esc="formatFTE(band.funded)"/></td>
+                                        <td class="text-end"><t t-esc="formatFTE(band.in_post)"/></td>
+                                        <td class="text-end"><t t-esc="formatFTE(band.vacant)"/></td>
+                                        <td class="text-center">
+                                            <span t-attf-class="status-badge {{ band.rate >= 15 ? 'danger' : (band.rate >= 5 ? 'warning' : 'normal') }}">
+                                                <t t-esc="formatPercent(band.rate)"/>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Widget 4: Indicative Pay Budgets (full width) -->
+                    <div class="dashboard-widget widget-full">
+                        <div class="widget-header">
+                            <h3>Indicative Annual Pay Budget (Top 5 Areas)</h3>
+                            <a class="btn-link" t-on-click="() => this.openDetails('Pay Budget Analysis', 'nhs.establishment.post', [['status', '!=', 'deleted']], {'pivot_row_groupby': ['org_unit_id'], 'pivot_measures': ['indicative_pay']})">
+                                View Pay Analysis
+                            </a>
+                        </div>
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Team / Department</th>
+                                    <th class="text-end">Indicative Budget (Annual)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.payBudgets" t-as="area" t-key="area.name">
+                                    <tr>
+                                        <td><strong><t t-esc="area.name"/></strong></td>
+                                        <td class="text-end budget-amount text-success"><t t-esc="formatCurrency(area.budget)"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Widget 5: Cost Centre Budget (full width) -->
+                    <div class="dashboard-widget widget-full">
+                        <div class="widget-header">
+                            <h3>Cost Centre Budget (Highest Utilisation)</h3>
+                            <a class="btn-link" t-on-click="() => this.openDetails('Cost Centres', 'nhs.cost.centre', [])">
+                                View All
+                            </a>
+                        </div>
+                        <t t-if="!state.costCentres.length">
+                            <p class="text-muted mb-0">No cost centre has an annual budget set yet. Add one under Configuration &#8594; Cost Centres.</p>
+                        </t>
+                        <table t-else="" class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Cost Centre</th>
+                                    <th class="text-end">Budget</th>
+                                    <th class="text-end">Indicative Spend</th>
+                                    <th class="text-end">Variance</th>
+                                    <th class="text-center">Utilisation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.costCentres" t-as="cc" t-key="cc.id">
+                                    <tr>
+                                        <td>
+                                            <a href="#" t-on-click.prevent="() => this.openCostCentre(cc)" class="text-decoration-none text-dark fw-bold">
+                                                <t t-esc="cc.code"/> — <t t-esc="cc.name"/>
+                                            </a>
+                                        </td>
+                                        <td class="text-end budget-amount"><t t-esc="formatCurrency(cc.budget_amount)"/></td>
+                                        <td class="text-end budget-amount"><t t-esc="formatCurrency(cc.indicative_pay_total)"/></td>
+                                        <td t-attf-class="text-end budget-amount {{ cc.budget_variance &lt; 0 ? 'text-danger' : 'text-success' }}">
+                                            <t t-esc="formatCurrency(cc.budget_variance)"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-attf-class="status-badge {{ cc.budget_utilization > 100 ? 'danger' : (cc.budget_utilization >= 85 ? 'warning' : 'normal') }}">
+                                                <t t-esc="formatPercent(cc.budget_utilization)"/>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

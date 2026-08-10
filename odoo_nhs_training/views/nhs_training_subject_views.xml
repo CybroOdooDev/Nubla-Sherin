@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_training_subject_list" model="ir.ui.view">
+        <field name="name">nhs.training.subject.list</field>
+        <field name="model">nhs.training.subject</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="level"/>
+                <field name="code"/>
+                <field name="training_class" widget="badge"
+                       decoration-danger="training_class == 'statutory'"
+                       decoration-warning="training_class == 'mandatory'"
+                       decoration-info="training_class == 'role_specific'"/>
+                <field name="default_frequency_months"/>
+                <field name="is_one_off"/>
+                <field name="default_lead_days"/>
+                <field name="cstf_aligned"/>
+                <field name="requirement_count"/>
+                <field name="record_count"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_training_subject_form" model="ir.ui.view">
+        <field name="name">nhs.training.subject.form</field>
+        <field name="model">nhs.training.subject</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_requirements" type="object"
+                                class="oe_stat_button" icon="fa-list-alt">
+                            <field name="requirement_count" widget="statinfo" string="Requirements"/>
+                        </button>
+                        <button name="action_view_records" type="object"
+                                class="oe_stat_button" icon="fa-graduation-cap">
+                            <field name="record_count" widget="statinfo" string="Completions"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="e.g. Safeguarding Children"/>
+                        </h1>
+                        <field name="level" placeholder="Level (optional), e.g. Level 3"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="training_class"/>
+                            <field name="cstf_aligned"/>
+                        </group>
+                        <group>
+                            <field name="is_one_off"/>
+                            <field name="default_frequency_months" invisible="is_one_off"/>
+                            <field name="default_lead_days" invisible="is_one_off"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_training_subject_search" model="ir.ui.view">
+        <field name="name">nhs.training.subject.search</field>
+        <field name="model">nhs.training.subject</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <filter name="cstf_aligned" string="CSTF Aligned" domain="[('cstf_aligned', '=', True)]"/>
+                <filter name="one_off" string="One-Off" domain="[('is_one_off', '=', True)]"/>
+                <separator/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="group_class" string="Classification" context="{'group_by': 'training_class'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_training_subject" model="ir.actions.act_window">
+        <field name="name">Training Subjects</field>
+        <field name="res_model">nhs.training.subject</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a training subject beyond the seeded CSTF catalogue.
+            </p>
+        </field>
+    </record>
+</odoo>

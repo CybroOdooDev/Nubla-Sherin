@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend nhs.action form to show complaint_id and phso_id in Source section -->
+    <record id="view_nhs_action_form_complaint_inherit" model="ir.ui.view">
+        <field name="name">nhs.action.form.complaint.inherit</field>
+        <field name="model">nhs.action</field>
+        <field name="inherit_id" ref="odoo_nhs_incident_risk.view_nhs_action_form"/>
+        <field name="arch" type="xml">
+            <field name="risk_id" position="after">
+                <field name="complaint_id"
+                       invisible="incident_id or investigation_id or risk_id"/>
+                <field name="phso_id"
+                       invisible="not complaint_id"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Extend nhs.action list to optionally show complaint source -->
+    <record id="view_nhs_action_list_complaint_inherit" model="ir.ui.view">
+        <field name="name">nhs.action.list.complaint.inherit</field>
+        <field name="model">nhs.action</field>
+        <field name="inherit_id" ref="odoo_nhs_incident_risk.view_nhs_action_list"/>
+        <field name="arch" type="xml">
+            <field name="risk_id" position="after">
+                <field name="complaint_id" optional="show"/>
+                <field name="phso_id" optional="hide"/>
+            </field>
+        </field>
+    </record>
+</odoo>

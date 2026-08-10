@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_lfpse_export_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.lfpse.export.wizard.form</field>
+        <field name="model">nhs.lfpse.export.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Export LFPSE Data">
+                <group>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                    <field name="export_format"/>
+                </group>
+                <group string="Incidents to Export">
+                    <field name="incident_count" string="Matching Incidents" readonly="1"/>
+                    <field name="incident_ids" nolabel="1" readonly="1">
+                        <list>
+                            <field name="name"/>
+                            <field name="occurred_at"/>
+                            <field name="category_id"/>
+                            <field name="harm_grade"/>
+                        </list>
+                    </field>
+                </group>
+                <footer>
+                    <button name="action_export" string="Generate Export File"
+                            type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_lfpse_export_wizard" model="ir.actions.act_window">
+        <field name="name">Export LFPSE Data</field>
+        <field name="res_model">nhs.lfpse.export.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

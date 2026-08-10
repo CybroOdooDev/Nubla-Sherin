@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="view_epic_practitioner_tree" model="ir.ui.view">
+        <field name="name">epic.practitioner.list</field>
+        <field name="model">epic.practitioner</field>
+        <field name="arch" type="xml">
+            <list string="Clinical Staff">
+                <header>
+                    <button name="action_sync_practitioners" type="object"
+                            string="Sync Staff from Epic" class="btn-primary" display="always"/>
+                </header>
+                <field name="name"/>
+                <field name="role"/>
+                <field name="specialty"/>
+                <field name="department"/>
+                <field name="gmc_number"/>
+                <field name="nmc_pin"/>
+                <field name="telecom"/>
+                <field name="gender"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_epic_practitioner_form" model="ir.ui.view">
+        <field name="name">epic.practitioner.form</field>
+        <field name="model">epic.practitioner</field>
+        <field name="arch" type="xml">
+            <form string="Clinical Staff">
+                <header>
+                    <button name="action_sync_practitioners" type="object"
+                            string="Sync from Epic" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Full Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Role &amp; Specialty">
+                            <field name="role"/>
+                            <field name="specialty"/>
+                            <field name="department"/>
+                            <field name="gender"/>
+                        </group>
+                        <group string="Professional Registration">
+                            <field name="gmc_number"/>
+                            <field name="nmc_pin"/>
+                            <field name="npi" string="NPI (US)"/>
+                            <field name="epic_id" string="Epic FHIR ID"/>
+                        </group>
+                    </group>
+                    <group string="Contact">
+                        <field name="telecom"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_epic_practitioner" model="ir.actions.act_window">
+        <field name="name">Clinical Staff</field>
+        <field name="res_model">epic.practitioner</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No Clinical Staff Found</p>
+            <p>Click "Sync Staff from Epic" to import practitioner data from Epic.</p>
+        </field>
+    </record>
+
+    <!-- Root Menu -->
+    <menuitem id="menu_epic_integration_root"
+              name="NHS Trust | Epic"
+              sequence="50"
+              web_icon="epic_integration,static/description/icon.png"/>
+
+    <!-- Main Menus -->
+    <menuitem id="menu_epic_patients" name="Patients"
+              parent="menu_epic_integration_root"
+              action="action_epic_patient" sequence="10"/>
+    <menuitem id="menu_epic_appointments" name="Appointments"
+              parent="menu_epic_integration_root"
+              action="action_epic_appointment" sequence="20"/>
+
+    <!-- Clinical sub-menu -->
+    <menuitem id="menu_epic_clinical" name="Clinical Records"
+              parent="menu_epic_integration_root" sequence="30"
+              groups="epic_integration.group_nhs_clinician"/>
+    <menuitem id="menu_epic_allergies" name="Allergies"
+              parent="menu_epic_clinical"
+              action="action_epic_allergy" sequence="10"
+              groups="epic_integration.group_nhs_clinician"/>
+    <menuitem id="menu_epic_conditions" name="Conditions"
+              parent="menu_epic_clinical"
+              action="action_epic_condition" sequence="20"
+              groups="epic_integration.group_nhs_clinician"/>
+    <menuitem id="menu_epic_clinical_notes" name="Clinical Notes"
+              parent="menu_epic_clinical"
+              action="action_epic_clinical_note" sequence="30"
+              groups="epic_integration.group_nhs_clinician"/>
+
+    <!-- Staff -->
+    <menuitem id="menu_epic_practitioners" name="Clinical Staff"
+              parent="menu_epic_integration_root"
+              action="action_epic_practitioner" sequence="40"
+              groups="epic_integration.group_nhs_clinician"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_epic_configuration" name="Configuration"
+              parent="menu_epic_integration_root" sequence="100"
+              groups="epic_integration.group_nhs_trust_admin"/>
+    <menuitem id="menu_epic_settings" name="Epic API Settings"
+              parent="menu_epic_configuration"
+              action="epic_config_settings_action" sequence="10"
+              groups="epic_integration.group_nhs_trust_admin"/>
+</odoo>

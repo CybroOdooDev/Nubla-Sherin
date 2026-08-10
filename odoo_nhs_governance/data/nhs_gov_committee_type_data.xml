@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Committee type: Board (top decision-making body) -->
+    <record id="committee_type_board" model="nhs.committee.type">
+        <field name="name">Board</field>
+        <field name="code">board</field>
+        <field name="sequence">10</field>
+        <field name="description">The top decision-making body; a mix of executive and non-executive directors,
+            chaired by the Trust Chair.</field>
+    </record>
+    <!-- Committee type: Standing Committee (delegated business with formal ToR) -->
+    <record id="committee_type_committee" model="nhs.committee.type">
+        <field name="name">Standing Committee</field>
+        <field name="code">committee</field>
+        <field name="sequence">20</field>
+        <field name="description">A committee the board delegates defined business to, with formal
+            Terms of Reference (e.g. Audit, Finance &amp; Performance, Quality &amp; Safety).</field>
+    </record>
+    <!-- Committee type: Sub-Committee (reports into a standing committee) -->
+    <record id="committee_type_sub_committee" model="nhs.committee.type">
+        <field name="name">Sub-Committee</field>
+        <field name="code">sub_committee</field>
+        <field name="sequence">30</field>
+        <field name="description">A sub-committee reporting into a standing committee.</field>
+    </record>
+    <!-- Committee type: Group (operational group reporting into a committee) -->
+    <record id="committee_type_group" model="nhs.committee.type">
+        <field name="name">Group</field>
+        <field name="code">group</field>
+        <field name="sequence">40</field>
+        <field name="description">An operational group reporting into a committee
+            (e.g. a Water Safety Group reporting into an estates/H&amp;S committee).</field>
+    </record>
+    <!-- Committee type: Council of Governors (foundation-trust governor layer) -->
+    <record id="committee_type_council_of_governors" model="nhs.committee.type">
+        <field name="name">Council of Governors</field>
+        <field name="code">council_of_governors</field>
+        <field name="sequence">50</field>
+        <field name="description">Foundation-trust governor and member layer, with its own meetings.</field>
+    </record>
+</odoo>

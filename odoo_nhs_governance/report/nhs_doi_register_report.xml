@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report action for printing the declarations of interest register as PDF -->
+    <record id="action_report_doi_register" model="ir.actions.report">
+        <field name="name">Declarations Of Interest Register</field>
+        <field name="model">res.company</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_governance.report_doi_register</field>
+        <field name="print_report_name">'Declarations of Interest Register - ' + object.name</field>
+    </record>
+
+    <!-- QWeb template rendering the published declarations table per company -->
+    <template id="report_doi_register">
+        <t t-call="web.html_container">
+            <t t-set="companies" t-value="docs or env.company"/>
+            <t t-foreach="companies" t-as="company">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: Arial, sans-serif; color: #000000; font-size: 13px;">
+                        
+                        <style>
+                            .table-bordered td:empty::after {
+                                content: "\00a0";
+                            }
+                            .table-bordered th, .table-bordered td {
+                                border: 1px solid #dee2e6 !important;
+                            }
+                        </style>
+                        <div class="text-center mb-4">
+                            <h2 style="font-weight: bold;">Declarations Of Interest Register</h2>
+                            <h4 style="color: #555555; font-weight: normal;" t-out="company.name"/>
+                            <hr style="border-top: 1px solid #000000;"/>
+                        </div>
+                        <t t-set="declarations" t-value="company.env['nhs.declaration'].search([
+                            ('company_id', '=', company.id), ('is_published', '=', True)], order='director_id, date_from desc')"/>
+                        <div style="padding-right: 1px; padding-left: 1px;"><table class="table table-sm table-bordered" style="table-layout: fixed; width: 99.9%; word-wrap: break-word;">
+                            <thead>
+                                <tr style="background-color: #f5f5f5;">
+                                    <th style="width: 15%;">Director / Officer</th>
+                                    <th style="width: 15%;">Category</th>
+                                    <th style="width: 30%;">Nature</th>
+                                    <th style="width: 20%;">Related Organisation</th>
+                                    <th style="width: 10%; white-space: nowrap;">From</th>
+                                    <th style="width: 10%; white-space: nowrap;">To</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="declarations" t-as="decl">
+                                    <td>
+                                        <t t-out="decl.director_id.name"/>
+                                        <t t-if="not decl.director_id.name">&#160;</t>
+                                    </td>
+                                    <td>
+                                        <t t-out="decl.category_id.name"/>
+                                        <t t-if="not decl.category_id.name">&#160;</t>
+                                    </td>
+                                    <td>
+                                        <t t-if="decl.nature">
+                                            <t t-out="decl.nature"/>
+                                        </t>
+                                        <t t-elif="decl.category_code == 'nil'">
+                                            Nil return
+                                        </t>
+                                        <t t-else="">&#160;</t>
+                                    </td>
+                                    <td>
+                                        <t t-out="decl.related_org"/>
+                                        <t t-if="not decl.related_org">&#160;</t>
+                                    </td>
+                                    <td style="white-space: nowrap;">
+                                        <t t-out="decl.date_from"/>
+                                        <t t-if="not decl.date_from">&#160;</t>
+                                    </td>
+                                    <td style="white-space: nowrap;">
+                                        <t t-out="decl.date_to"/>
+                                        <t t-if="not decl.date_to">&#160;</t>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table></div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

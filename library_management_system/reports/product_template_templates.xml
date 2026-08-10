@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--    This record defines the configuration for generating a Book Barcode report in the Library Management System.-->
+    <record id="library_book_barcode" model="ir.actions.report">
+        <field name="name">Book Barcode</field>
+        <field name="model">product.template</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">library_management_system.print_book_barcode</field>
+        <field name="report_file">library_management_system.print_book_barcode</field>
+        <field name="print_report_name">('Book Barcode - %s' %
+            (object.name).replace('/', ''))
+        </field>
+        <field name="binding_model_id" ref="model_product_template"/>
+        <field name="binding_type">report</field>
+    </record>
+    <!--   Paper format for  Book Barcode    -->
+    <record id="book_barcode_paper" model="report.paperformat">
+        <field name="name">Book Barcode</field>
+        <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="page_height">30</field>
+        <field name="page_width">50</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">2</field>
+        <field name="margin_bottom">0</field>
+        <field name="margin_left">0</field>
+        <field name="margin_right">2</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">35</field>
+        <field name="dpi">90</field>
+    </record>
+    <!--    This record links a specific paper format to the Library Book Barcode report.-->
+    <record id="library_book_barcode" model="ir.actions.report">
+        <field name="paperformat_id"
+               ref="library_management_system.book_barcode_paper"/>
+    </record>
+    <!-- Template for Book Barcode Report -->
+    <template id="print_book_barcode">
+        <t t-name="library_management_system.print_book_barcode">
+            <t t-call="web.basic_layout">
+                <div class="page">
+                    <t t-foreach="docs" t-as="book">
+                        <div class="col-md-6">
+                            <table style="margin-top:10px; width:210pt; height:120pt; border: 1pt solid black;border-collapse:separate;border-radius:8pt; margin:5pt;padding: 16px 13px 13px 16px;">
+                                <tr>
+                                    <td colspan="2"
+                                        style="text-align:center;padding: 0;">
+                                        <t t-if="book">
+                                            <t t-set="barcodeb_size"
+                                               t-value="'width:265px;height:80px'"/>
+                                            <div t-field="book.name"
+                                                 t-options="{'widget': 'barcode', 'symbology': 'EAN13', 'img_style': barcodeb_size}"
+                                                 style="width:265px;height:80px"/>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;font-size: 10px;">
+                                        <t t-esc="book.isbn_number"/>
+                                    </td>
+                                    <td style="text-align:right;font-size: 10px;">
+                                        <t t-esc="book.isbn_13_number"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" style="text-align:left;">
+                                        <div style="height:25px; overflow: hidden;font-size: 9px;">
+                                            <t t-esc="book.name"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

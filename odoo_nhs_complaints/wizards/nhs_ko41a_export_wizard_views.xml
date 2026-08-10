@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_ko41a_export_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.ko41a.export.wizard.form</field>
+        <field name="model">nhs.ko41a.export.wizard</field>
+        <field name="arch" type="xml">
+            <form string="KO41a Annual Return Export">
+                <!-- Configuration state -->
+                <group invisible="state != 'draft'">
+                    <group string="Financial Year">
+                        <field name="financial_year"
+                               placeholder="Select to auto-fill dates…"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group string="Options">
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="include_pals"/>
+                    </group>
+                </group>
+                <!-- Results state -->
+                <div invisible="state != 'done'" class="o_ko41a_results">
+                    <field name="summary_html" nolabel="1" widget="html" readonly="1"/>
+                    <div invisible="not export_file" class="mt-3">
+                        <field name="export_file" filename="export_filename" readonly="1"/>
+                    </div>
+                    <div invisible="unmapped_count == 0" class="alert alert-warning mt-3">
+                        <strong><field name="unmapped_count"/> subject(s) lack a KO41a code.</strong>
+                        Go to Configuration → KO41a Subjects to add the missing codes before submitting to NHS Digital.
+                    </div>
+                </div>
+                <footer>
+                    <button name="action_generate" string="Generate Return" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_ko41a_export_wizard" model="ir.actions.act_window">
+        <field name="name">KO41a Annual Return</field>
+        <field name="res_model">nhs.ko41a.export.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

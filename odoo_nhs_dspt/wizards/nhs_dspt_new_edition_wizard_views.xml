@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_dspt_new_edition_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.dspt.new.edition.wizard.form</field>
+        <field name="model">nhs.dspt.new.edition.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Clone Edition">
+                <group>
+                    <field name="source_edition_id" options="{'no_create': True}"/>
+                    <field name="new_year" placeholder="e.g. 2026/27"/>
+                    <field name="new_name" placeholder="e.g. DSPT 2026/27"/>
+                    <field name="new_deadline"/>
+                </group>
+                <p class="text-muted">
+                    Deep-clones every standard, assertion and evidence item into the new
+                    edition, flagging each copied item 'New' so you can review and mark
+                    the ones that actually changed vs the prior year.
+                </p>
+                <footer>
+                    <button name="action_confirm" type="object" string="Clone" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_dspt_new_edition_wizard" model="ir.actions.act_window">
+        <field name="name">New DSPT Edition</field>
+        <field name="res_model">nhs.dspt.new.edition.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

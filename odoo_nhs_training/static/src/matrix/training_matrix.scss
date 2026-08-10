@@ -1,0 +1,203 @@
+.o_nhs_training_matrix {
+    background-color: #f8fafc;
+    min-height: 100%;
+    
+    .nhs-matrix-icon-wrapper {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, #e0e7ff 0%, #e0f2fe 100%);
+        border: 1px solid #cbd5e1;
+        color: #4f46e5;
+        font-size: 1.1rem;
+    }
+    
+    .focus-none:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+    
+    // Legend custom styling
+    .nhs-legend-badge {
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 0.4rem 0.8rem;
+        border: 1px solid transparent;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        text-transform: capitalize;
+    }
+    
+    .bg-compliant-light {
+        background-color: #e6f4ea;
+        color: #137333;
+        border-color: #ceead6;
+    }
+    
+    .bg-due-soon-light {
+        background-color: #fef7e0;
+        color: #b06000;
+        border-color: #feebc8;
+    }
+    
+    .bg-expired-light {
+        background-color: #fce8e6;
+        color: #c5221f;
+        border-color: #fad2cf;
+    }
+
+    .bg-failed-light {
+        background-color: #fbe4ea;
+        color: #8b1538;
+        border-color: #f3c2d1;
+    }
+
+    .bg-not-done-light {
+        background-color: #f1f3f4;
+        color: #5f6368;
+        border-color: #e8eaed;
+    }
+    
+    .bg-exempt-light {
+        background-color: #e8f0fe;
+        color: #1a73e8;
+        border-color: #d2e3fc;
+    }
+
+    // Modern Badge component for table cells
+    .nhs-badge {
+        display: inline-block;
+        padding: 0.45rem 0.75rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+        border-radius: 50rem;
+        min-width: 95px;
+        text-align: center;
+        border: 1px solid transparent;
+        transition: all 0.15s ease-in-out;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+        }
+        
+        &.nhs-status-compliant {
+            background-color: #e6f4ea;
+            color: #137333;
+            border-color: #ceead6;
+        }
+        
+        &.nhs-status-due_soon {
+            background-color: #fef7e0;
+            color: #b06000;
+            border-color: #feebc8;
+        }
+        
+        &.nhs-status-expired {
+            background-color: #fce8e6;
+            color: #c5221f;
+            border-color: #fad2cf;
+        }
+
+        &.nhs-status-failed {
+            background-color: #fbe4ea;
+            color: #8b1538;
+            border-color: #f3c2d1;
+        }
+
+        &.nhs-status-not_done {
+            background-color: #f1f3f4;
+            color: #5f6368;
+            border-color: #e8eaed;
+        }
+        
+        &.nhs-status-exempt {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+            border-color: #d2e3fc;
+        }
+    }
+    
+    // Table Styling
+    .o_nhs_matrix_table {
+        border-collapse: separate;
+        border-spacing: 0;
+        background-color: #ffffff;
+
+        thead {
+            tr {
+                border-bottom: 2px solid #e2e8f0;
+            }
+            th {
+                background-color: #f8fafc;
+                font-weight: 700;
+                color: #475569;
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                text-align: center;
+                vertical-align: middle;
+                white-space: normal !important;
+                word-break: break-word;
+                padding: 1rem 0.75rem;
+                border-bottom: 2px solid #cbd5e1;
+                border-right: 1px solid #f1f5f9;
+                
+                &:last-child {
+                    border-right: none;
+                }
+            }
+        }
+
+        tbody {
+            tr {
+                transition: background-color 0.1s ease;
+                
+                &:hover {
+                    background-color: #f8fafc !important;
+                }
+                
+                td {
+                    padding: 0.8rem 0.75rem;
+                    vertical-align: middle;
+                    border-bottom: 1px solid #e2e8f0;
+                    border-right: 1px solid #f1f5f9;
+                    
+                    &:last-child {
+                        border-right: none;
+                    }
+                }
+            }
+        }
+
+        .o_nhs_matrix_member_col {
+            min-width: 180px;
+            max-width: 250px;
+            font-weight: 600;
+            
+            a {
+                color: #2563eb;
+                transition: color 0.15s ease;
+                
+                &:hover {
+                    color: #1d4ed8;
+                    text-decoration: underline !important;
+                }
+            }
+        }
+
+        .o_nhs_matrix_subject_col {
+            min-width: 140px;
+            max-width: 200px;
+        }
+        
+        .nhs-matrix-cell {
+            transition: background-color 0.15s ease;
+            
+            &:hover {
+                background-color: #f1f5f9;
+            }
+        }
+    }
+}

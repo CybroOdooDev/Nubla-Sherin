@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_riddor_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.riddor.wizard.form</field>
+        <field name="model">nhs.riddor.wizard</field>
+        <field name="arch" type="xml">
+            <form string="RIDDOR Determination">
+                <group string="Incident">
+                    <field name="incident_id" readonly="1"/>
+                    <field name="person_id"
+                           domain="[('incident_id','=',incident_id)]"/>
+                </group>
+                <group string="Step 1 — Was anyone injured?">
+                    <field name="anyone_injured"/>
+                    <field name="worker_injured" invisible="not anyone_injured"/>
+                    <field name="fatal" invisible="not anyone_injured"/>
+                </group>
+                <group string="Step 2 — Specified Injury?" invisible="not anyone_injured or fatal">
+                    <field name="specified_fracture"/>
+                    <field name="specified_amputation"/>
+                    <field name="specified_sight"/>
+                    <field name="specified_crush"/>
+                    <field name="specified_burn"/>
+                    <field name="specified_scalp"/>
+                    <field name="specified_unconscious"/>
+                    <field name="specified_enclosed_space"/>
+                </group>
+                <group string="Step 3 — Over-7-Day Incapacitation?"
+                       invisible="not worker_injured or fatal">
+                    <field name="over_7_day"/>
+                </group>
+                <group string="Step 4 — Dangerous Occurrence?">
+                    <field name="dangerous_occurrence"/>
+                </group>
+                <group string="Step 5 — Occupational Disease?">
+                    <field name="occupational_disease"/>
+                </group>
+                <group string="Outcome">
+                    <field name="reportable" readonly="1"/>
+                    <field name="riddor_category" readonly="1"
+                           invisible="not reportable"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" string="Save Determination"
+                            type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

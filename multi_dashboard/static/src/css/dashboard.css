@@ -1,0 +1,1094 @@
+.dashboard-tiles-wrapper {
+    max-width: 1000px;
+}
+
+/* =========================================================================
+   DASHBOARD THEME VARIABLES
+   ========================================================================= */
+
+.o_multi_dashboard_container {
+    /* Default (Light) Theme Variables */
+    --bs-body-bg: #f8f9fb;
+    --bs-body-color: #374151;
+    --theme-gradient: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+    --widget-bg: #ffffff;
+    --widget-border: #e5e7eb;
+    --chat-bubble-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --chat-header-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --chat-header-color: #ffffff;
+    --widget-header-bg: #f8f9fb;
+    --widget-header-color: #000000;
+    /* Used only for the widget title row (e.g. "Sales by Salesperson"). */
+    --chart-header-color: var(--widget-header-color);
+    --widget-text-color: #374151;
+    --sidebar-bg: #f8f9fb;
+    --navbar-bg: #ffffff;
+    --navbar-border: #e5e7eb;
+    --hover-bg: #f3f4f6;
+    --theme-primary: #71639e;
+    /* Chart widget tool buttons (download/insight/edit/delete/duplicate) */
+    /* Keep these themed (not "black") so they match green/blue/purple dashboard themes. */
+    --chart-tool-bg: var(--theme-primary);
+    --chart-tool-bg-muted: color-mix(in srgb, var(--theme-primary), black 10%);
+    --chart-tool-border: color-mix(in srgb, var(--theme-primary), white 30%);
+    --chart-tool-fg: #ffffff;
+    --chart-tool-hover-bg: color-mix(in srgb, var(--theme-primary), white 25%);
+    /* Tile widget tool buttons (AI/Download/Edit/Delete/Duplicate) */
+    --tile-tool-bg: var(--theme-primary);
+    --tile-tool-hover-bg: color-mix(in srgb, var(--theme-primary), white 20%);
+    --tile-tool-border: color-mix(in srgb, var(--theme-primary), white 30%);
+    --tile-tool-fg: #ffffff;
+    background: var(--theme-gradient) !important;
+}
+
+.o-dashboard-theme-dark {
+    --bs-body-bg: #121212;
+    --bs-body-color: #e0e0e0;
+    --theme-gradient: linear-gradient(135deg, #1e1e1e 0%, #121212 100%);
+    --widget-bg: #1e1e1e;
+    --widget-border: #333333;
+    --chat-bubble-bg: linear-gradient(135deg, #444444 0%, #111111 100%);
+    --chat-header-bg: linear-gradient(135deg, #444444 0%, #111111 100%);
+    --chat-header-color: #e0e0e0;
+    --widget-header-bg: #2a2a2a;
+    --widget-header-color: #000000;
+    --widget-text-color: #e0e0e0;
+    --sidebar-bg: #1e1e1e;
+    --navbar-bg: #1e1e1e;
+    --navbar-border: #333333;
+    --hover-bg: #2a2a2a;
+    --theme-primary: #bb86fc;
+    --chart-tool-bg: var(--theme-primary);
+    --chart-tool-bg-muted: color-mix(in srgb, var(--theme-primary), black 25%);
+    --chart-tool-border: color-mix(in srgb, var(--theme-primary), white 15%);
+    --chart-tool-fg: #ffffff;
+    --chart-tool-hover-bg: color-mix(in srgb, var(--theme-primary), white 15%);
+    --tile-tool-bg: var(--theme-primary);
+    --tile-tool-hover-bg: color-mix(in srgb, var(--theme-primary), white 12%);
+    --tile-tool-border: color-mix(in srgb, var(--theme-primary), white 15%);
+    --tile-tool-fg: #ffffff;
+}
+
+.o-dashboard-theme-blue {
+    --bs-body-bg: #e1ecf7;
+    --bs-body-color: #1e3a5f;
+    --theme-gradient: linear-gradient(135deg, #f8fbff 0%, #e1ecf7 100%);
+    --widget-bg: #f8fbff;
+    --widget-border: #bcd4ef;
+    --chat-bubble-bg: linear-gradient(135deg, #0b5394 0%, #3e8ed0 100%);
+    --chat-header-bg: linear-gradient(135deg, #0b5394 0%, #3e8ed0 100%);
+    --chat-header-color: #ffffff;
+    --widget-header-bg: #cfe2f3;
+    --widget-header-color: #0b5394;
+    --widget-text-color: #1e3a5f;
+    --sidebar-bg: #cfe2f3;
+    --navbar-bg: #f8fbff;
+    --navbar-border: #bcd4ef;
+    --hover-bg: #c9daf8;
+    --theme-primary: #0b5394;
+}
+
+.o-dashboard-theme-green {
+    --bs-body-bg: #e4f2e7;
+    --bs-body-color: #1a3c26;
+    --theme-gradient: linear-gradient(135deg, #f5fcf7 0%, #e4f2e7 100%);
+    --widget-bg: #f5fcf7;
+    --widget-border: #b7d8be;
+    --chat-bubble-bg: linear-gradient(135deg, #274e13 0%, #6aa84f 100%);
+    --chat-header-bg: linear-gradient(135deg, #274e13 0%, #6aa84f 100%);
+    --chat-header-color: #ffffff;
+    --widget-header-bg: #d4ead9;
+    --widget-header-color: #274e13;
+    --widget-text-color: #1a3c26;
+    --sidebar-bg: #d4ead9;
+    --navbar-bg: #f5fcf7;
+    --navbar-border: #b7d8be;
+    --hover-bg: #c2e0c9;
+    --theme-primary: #274e13;
+}
+
+.o-dashboard-theme-purple {
+    --bs-body-bg: #ede7f6;
+    --bs-body-color: #311b92;
+    --theme-gradient: linear-gradient(135deg, #f3e5f5 0%, #ede7f6 100%);
+    --widget-bg: #fcfaff;
+    --widget-border: #d1c4e9;
+    --chat-bubble-bg: linear-gradient(135deg, #4a148c 0%, #9c27b0 100%);
+    --chat-header-bg: linear-gradient(135deg, #4a148c 0%, #9c27b0 100%);
+    --chat-header-color: #ffffff;
+    --widget-header-bg: #e1d5f2;
+    --widget-header-color: #4a148c;
+    --widget-text-color: #311b92;
+    --sidebar-bg: #e1d5f2;
+    --navbar-bg: #fcfaff;
+    --navbar-border: #d1c4e9;
+    --hover-bg: #d9ccf5;
+    --theme-primary: #4a148c;
+}
+
+.o-dashboard-theme-dark-gradient {
+    --bs-body-bg: #0f172a;
+    --bs-body-color: #f1f5f9;
+    --theme-gradient: linear-gradient(135deg, #1e1b4b 0%, #7e22ce 40%, #be185d 75%, #ef4444 100%);
+    --widget-bg: rgba(255, 255, 255, 0.1);
+    --widget-border: rgba(255, 255, 255, 0.15);
+    --chat-bubble-bg: linear-gradient(to top, #374151 0%, #111827 100%);
+    --chat-header-bg: linear-gradient(to top, #374151 0%, #111827 100%);
+    --chat-header-color: #f1f5f9;
+    --widget-header-bg: rgba(0, 0, 0, 0.2);
+    --widget-header-color: #f8fafc;
+    /* Keep the dashboard headings light, but make chart titles readable on light widget headers. */
+    --chart-header-color: #C2185B;
+    --widget-text-color: #f1f5f9;
+    --sidebar-bg: rgba(30, 41, 59, 0.6);
+    --navbar-bg: rgba(15, 23, 42, 0.7);
+    --navbar-border: rgba(255, 255, 255, 0.1);
+    --hover-bg: rgba(255, 255, 255, 0.05);
+    --theme-primary: #f472b6;
+    --chart-tool-bg: rgba(0, 0, 0, 0.35);
+    --chart-tool-bg-muted: rgba(0, 0, 0, 0.25);
+    --chart-tool-border: rgba(255, 255, 255, 0.25);
+    --chart-tool-fg: #ffffff;
+    --chart-tool-hover-bg: rgba(255, 255, 255, 0.12);
+    --tile-tool-bg: rgba(0, 0, 0, 0.35);
+    --tile-tool-hover-bg: rgba(255, 255, 255, 0.12);
+    --tile-tool-border: rgba(255, 255, 255, 0.25);
+    --tile-tool-fg: #ffffff;
+}
+
+/* =========================================================================
+   DASHBOARD GRID & LAYOUT
+   ========================================================================= */
+
+/* Apply Theme Variables to Layout Components */
+.o_multi_dashboard_container .bg-100,
+.o_multi_dashboard_container .bg-light,
+.o_multi_dashboard_container .o_dashboard_main {
+    background: transparent !important;
+    color: var(--bs-body-color);
+}
+
+.o_multi_dashboard_container .bg-white {
+    background-color: var(--navbar-bg) !important;
+    color: var(--bs-body-color);
+}
+
+.o_multi_dashboard_container .border-bottom,
+.o_multi_dashboard_container .border-top,
+.o_multi_dashboard_container .border-end {
+    border-color: var(--navbar-border) !important;
+}
+
+.o_dashboard_sidebar {
+    background-color: var(--sidebar-bg) !important;
+}
+
+.o_multi_dashboard_container .h4 {
+    color: var(--bs-body-color);
+}
+
+.o_multi_dashboard_container .empty-dashboard-card h3,
+.o_multi_dashboard_container .empty-dashboard-card p {
+    color: var(--bs-body-color);
+}
+
+.o_multi_dashboard_container .icon-loader-wrapper .loader-text {
+    color: var(--bs-body-color);
+}
+
+.o_multi_dashboard_container .btn-outline-secondary {
+    color: var(--bs-body-color);
+    border-color: var(--navbar-border);
+}
+
+.o_multi_dashboard_container .btn-outline-secondary:hover {
+    background-color: var(--hover-bg);
+}
+
+.o_multi_dashboard_container .btn-primary {
+    background-color: var(--theme-primary) !important;
+    border-color: var(--theme-primary) !important;
+    color: #ffffff !important;
+}
+
+.o_multi_dashboard_container .btn-primary:hover {
+    opacity: 0.9;
+    background-color: var(--theme-primary) !important;
+    border-color: var(--theme-primary) !important;
+}
+
+/* CHART WIDGET STYLES */
+.o_dashboard_chart_container,
+.o_custom_list_view,
+.o_dashboard_progress_card {
+    background: var(--widget-bg);
+    background: var(--widget-accent, var(--widget-bg));
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    border-radius: 5px;
+    box-sizing: border-box;
+    color: var(--widget-text-color);
+    border: 1px solid var(--widget-border);
+    position: relative;
+}
+
+.o_custom_list_view {
+    padding: 0;
+    /* Lists handle their own internal padding/spacing */
+}
+
+.o_dashboard_chart_container:hover .export-group {
+    display: flex;
+}
+
+.chart-header {
+    text-align: left;
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    background-color: color-mix(in srgb, var(--widget-accent, var(--widget-header-bg)), white 20%);
+    padding: 5px;
+    border-radius: 5px;
+    /* Heading text follows the selected dashboard theme (green/blue/purple/etc). */
+    color: var(--chart-header-color, var(--widget-header-color));
+}
+
+.chart-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    float: right;
+}
+
+.chart-tool {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 6px;
+    background: var(--chart-tool-bg);
+    transition: 0.2s ease, transform 0.2s ease;
+    border: 0.5px solid;
+    border-color: var(--chart-tool-border);
+}
+
+.export-group {
+    display: none;
+    flex-direction: row;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 6px;
+    transition: all 0.4s ease;
+    max-width: 32px;
+    /* Initial width (only shows one button) */
+}
+
+.export-group:hover {
+    max-width: 250px;
+    /* Adjust based on number of buttons */
+}
+
+.export-options {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+.export-group:hover .export-options {
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
+    gap: 3px;
+}
+
+.main-trigger {
+    background: var(--chart-tool-bg) !important;
+}
+
+.export-group:hover .main-trigger {
+    display: none;
+}
+
+.exp-print-tool {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 6px;
+    background: var(--chart-tool-bg-muted);
+    transition: 0.2s ease, transform 0.2s ease;
+}
+
+.exp-print-tool i {
+    font-size: 14px;
+    color: var(--chart-tool-fg);
+}
+
+.exp-print-tool:hover {
+    background: var(--chart-tool-hover-bg);
+    transform: scale(1.05);
+}
+
+.chart-tool i {
+    font-size: 14px;
+    color: var(--chart-tool-fg);
+}
+
+/* Hover effect */
+.chart-tool:hover {
+    background: var(--chart-tool-hover-bg);
+    transform: scale(1.05);
+}
+
+.chart-tool:active {
+    transform: scale(0.95);
+}
+
+.o-chart-edit,
+.o-chart-insight,
+.o-chart-duplicate,
+.o-progress-edit,
+.o-progress-delete,
+.o-progress-duplicate {
+    display: none !important;
+}
+
+.o_sidebar_active .o-chart-edit,
+.o_sidebar_active .o-chart-duplicate,
+.o_sidebar_active .o-progress-edit,
+.o_sidebar_active .o-progress-delete,
+.o_sidebar_active .o-progress-duplicate {
+    display: flex !important;
+}
+
+.o_dashboard_chart_container:hover .o-chart-insight,
+.o_dashboard_chart_container:hover .o-chart-duplicate,
+.o_dashboard_progress_card:hover .o-progress-insight,
+.o_dashboard_progress_card:hover .o-progress-duplicate {
+    display: flex !important;
+}
+
+.o_dashboard_preview_container {
+    height: 450px;
+}
+
+.o_sidebar_active .exp-print-tool {
+    display: none !important;
+}
+
+.empty-dashboard-card {
+    opacity: 0.95;
+}
+
+.empty-dashboard-image {
+    width: 50%;
+    height: auto;
+    opacity: 0.85;
+}
+
+.empty-dashboard-card h3 {
+    font-size: 1.5rem;
+}
+
+.empty-dashboard-card p {
+    font-size: 0.95rem;
+}
+
+.import-chart {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 6px;
+    background: var(--theme-primary, rgba(0, 0, 0, 0.5));
+    transition: all 0.2s ease;
+}
+
+.import-chart i {
+    font-size: 14px;
+    color: #fff;
+}
+
+.import-chart:hover {
+    opacity: 0.85;
+    transform: translateY(-1px);
+}
+
+.layout-btn {
+    transition: all 0.3s ease;
+    border: 1px solid var(--navbar-border) !important;
+}
+
+.layout-btn:hover {
+    background-color: var(--hover-bg) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.layout-btn.bg-primary {
+    background-color: var(--theme-primary) !important;
+    border-color: var(--theme-primary) !important;
+}
+
+/* Special class applied only during PDF generation */
+.is-exporting-pdf .grid-stack {
+    height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+}
+
+.is-exporting-pdf .grid-stack-item {
+    position: relative !important;
+    /* Helps html2canvas locate elements */
+    page-break-inside: avoid;
+}
+
+/* Ensure amCharts SVGs have a defined height */
+.is-exporting-pdf .grid-stack-item-content {
+    background-color: white !important;
+    min-height: 200px;
+}
+
+/* Target the actual container that overflows */
+.grid-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.grid-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--bs-body-color);
+    border-radius: 10px;
+}
+
+/* Optional: Add a hover effect so you know it's working */
+.grid-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+
+
+
+.nlp-search-container {
+    position: relative;
+    transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+}
+
+/* Expand on hover OR if the input is focused */
+.nlp-search-container:hover,
+.nlp-search-container:focus-within {
+    width: 350px;
+}
+
+.nlp-search-container .input-group {
+    flex-wrap: nowrap;
+}
+
+.nlp-input {
+    border-right: none;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    border: 1px solid #dee2e6;
+}
+
+/* Show text when expanded */
+.nlp-search-container:hover .nlp-input,
+.nlp-search-container:focus-within .nlp-input {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.nlp-btn {
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-radius 0.3s ease;
+}
+
+/* Optional: Subtle glow when active */
+.nlp-search-container:focus-within {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+
+/* Selected refresh option */
+.active-refresh {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+/* Hover effect */
+.multi-dashboard.dropdown-menu .dropdown-item:hover {
+    background-color: #f1f5f9;
+}
+
+/* Smooth UI */
+.multi-dashboard .dropdown-menu {
+    border-radius: 8px;
+    padding: 6px;
+}
+
+/* AI Summary Styling */
+.ai-summary-container {
+    background-color: #ffffff;
+    border-left: 5px solid #71639e;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin: 10px 10px 20px 10px;
+    padding: 40px !important;
+    border-radius: 12px;
+    animation: slideInDown 0.4s ease-out;
+    border: 1px solid #e2e8f0;
+    max-height: 6500px;
+    min-height: 350px;
+    overflow-y: auto;
+}
+
+.ai-summary-content {
+    font-size: 14px;
+    line-height: 2.0;
+    color: #1e293b;
+}
+
+.ai-summary-content strong {
+    color: #71639e;
+    font-weight: 700;
+}
+
+.ai-summary-content ul {
+    margin-top: 10px;
+}
+
+.ai-summary-content li {
+    margin-bottom: 10px;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Custom Date Filter styles */
+.multi-dashboard.dropdown-menu {
+    min-width: 350px !important;
+}
+
+.multi-dashboard-date-dropdown {
+    min-width: 460px !important;
+    max-width: min(460px, calc(100vw - 2rem));
+}
+
+.dropdown-header {
+    font-weight: bold;
+    color: var(--widget-header-color);
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.active-refresh {
+    background-color: var(--hover-bg) !important;
+    font-weight: bold;
+}
+
+.multi-dashboard-date-range-item {
+    cursor: default;
+}
+
+.multi-dashboard-date-range-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--widget-header-color);
+    margin-bottom: 0.75rem;
+}
+
+.multi-dashboard-date-range-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+}
+
+.multi-dashboard-date-range-label {
+    color: var(--bs-body-color);
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+
+.multi-dashboard-date-range-row .multi-dashboard-date-input {
+    flex: 0 0 116px;
+    width: 116px !important;
+    min-width: 116px;
+    margin: 0;
+    padding: 0.25rem 0.5rem;
+    text-align: center;
+}
+
+@media (max-width: 575.98px) {
+    .multi-dashboard-date-dropdown {
+        min-width: 320px !important;
+    }
+
+    .multi-dashboard-date-range-row {
+        flex-wrap: wrap;
+    }
+
+    .multi-dashboard-date-range-row .multi-dashboard-date-input {
+        flex: 1 1 100%;
+        width: 100% !important;
+        min-width: 0;
+    }
+}
+
+/* Chart Specific AI Insight Side-Panel (Non-overlapping) */
+.chart-ai-insight-side-panel {
+    width: 300px;
+    max-width: 45%;
+    height: fit-content;
+    align-self: flex-start;
+    margin: 10px;
+    background: var(--widget-bg);
+    border: 1px solid var(--widget-border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    overflow-y: auto;
+}
+
+.o-dashboard-theme-dark .chart-ai-insight-side-panel {
+    background: #2a2a2a;
+    color: #e0e0e0;
+}
+
+
+.insight-text {
+    line-height: 1.5;
+    color: var(--bs-body-color);
+}
+
+/* Tile Specific AI Insight Overlay */
+.tile-ai-insight-overlay {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    height: fit-content;
+    max-height: calc(100% - 10px);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(4px);
+    border-radius: 8px;
+    padding: 10px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* List Specific AI Insight Overlay */
+.chart-ai-insight-overlay {
+    background: var(--widget-bg);
+    border: 1px solid var(--widget-border);
+    border-radius: 8px;
+    padding: 0;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.extra-small {
+    font-size: 0.7rem;
+}
+
+.opacity-90 {
+    opacity: 0.9;
+}
+
+/* =========================================================================
+   RESPONSIVE TWEAKS (MOBILE/TABLET)
+   ========================================================================= */
+
+@media (max-width: 991.98px) {
+
+    /* Reduce large desktop padding and avoid horizontal scrolling on small screens */
+    .o_multi_dashboard_container .grid-scrollbar {
+        padding: 1rem !important;
+        overflow-x: hidden;
+    }
+}
+
+@media (max-width: 767.98px) {
+
+    /* Top action bar: allow wrapping instead of overflowing */
+    .o_multi_dashboard_container .o_dashboard_main>.p-2.border-bottom.border-top {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .o_multi_dashboard_container .o_dashboard_main>.p-2.border-bottom.border-top .ms-auto {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    /* Make NLP input usable on touch devices (no hover) */
+    .o_multi_dashboard_container .nlp-search-container,
+    .o_multi_dashboard_container .nlp-search-container:hover,
+    .o_multi_dashboard_container .nlp-search-container:focus-within {
+        width: 100% !important;
+    }
+
+    .o_multi_dashboard_container .nlp-input {
+        opacity: 1;
+        transform: none;
+    }
+
+    .o_multi_dashboard_container .h4 {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+
+    /* Off-canvas sidebar on mobile: keep main content full width */
+    .o_multi_dashboard_container .o_dashboard_sidebar {
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        height: 100%;
+        z-index: 1040;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    }
+
+    .o_multi_dashboard_container.o_sidebar_active .o_dashboard_sidebar {
+        width: min(75vw, 300px) !important;
+        min-width: min(75vw, 300px) !important;
+    }
+
+    .o_multi_dashboard_container .sidebar-resize-handle {
+        display: none !important;
+    }
+
+    .o_multi_dashboard_container .o_dashboard_main {
+        width: 100%;
+        /* Ensure main content is below backdrop */
+        z-index: 1000;
+    }
+
+    .o_multi_dashboard_container .o_dashboard_sidebar_backdrop {
+        position: absolute;
+        inset: 0;
+        z-index: 1030;
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(2px);
+        pointer-events: auto;
+        cursor: pointer;
+    }
+}
+
+/* AI Chat Widget */
+.o_dashboard_chat_widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1100;
+    transition: all 0.3s ease;
+}
+
+.o_chat_bubble {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--chat-bubble-bg, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+    color: white;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.o_chat_bubble:hover {
+    transform: scale(1.1);
+}
+
+.o_chat_badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff4757;
+    color: white;
+    font-size: 0.6rem;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 10px;
+    border: 2px solid white;
+}
+
+.o_chat_window {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 350px;
+    height: 500px;
+    background: var(--widget-bg, #ffffff);
+    border: 1px solid var(--widget-border, #dee2e6) !important;
+    display: flex;
+    flex-direction: column;
+    animation: slideInUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.o_chat_header {
+    background: var(--chat-header-bg, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+    color: var(--chat-header-color, #ffffff) !important;
+}
+
+.o_chat_header .o_chat_avatar {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--chat-header-color, #ffffff);
+}
+
+.o_chat_avatar {
+    width: 35px;
+    height: 35px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+}
+
+.o_chat_messages {
+    background: var(--bs-body-bg, #f8f9fa);
+    scrollbar-width: thin;
+}
+
+.o_chat_message.align-items-start .o_message_content {
+    background: var(--widget-bg, #ffffff) !important;
+    color: var(--bs-body-color, #212529) !important;
+    border: 1px solid var(--widget-border, #dee2e6) !important;
+}
+
+.o_chat_message.align-items-end .o_message_content {
+    background: var(--chat-bubble-bg, #007bff) !important;
+    color: #ffffff !important;
+}
+
+.o_message_content {
+    max-width: 85%;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.typing-dots .dot {
+    width: 6px;
+    height: 6px;
+    background: #90949c;
+    border-radius: 50%;
+    animation: typing 1s infinite alternate;
+}
+
+.typing-dots .dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dots .dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    from {
+        opacity: 0.3;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(-4px);
+    }
+}
+
+.o_chat_footer input::placeholder {
+    color: #cbd5e0;
+}
+
+/* Favorite Star */
+.favorite-star {
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s, color 0.2s;
+}
+
+.favorite-star:hover {
+    transform: scale(1.2);
+}
+
+.bg-light-hover {
+    transition: background-color 0.2s;
+}
+
+.bg-light-hover:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.favorite-dashboard-item {
+    transition: background-color 0.2s;
+    color: var(--bs-body-color);
+}
+
+.favorite-dashboard-item span {
+    color: inherit;
+}
+
+.layout-btn {
+    color: var(--bs-body-color);
+    transition: all 0.2s;
+}
+
+.layout-btn.bg-primary {
+    color: #ffffff !important;
+}
+
+/* Sidebar Boxed Sections */
+.sidebar-card {
+    background: var(--widget-bg);
+    border: 1px solid var(--widget-border);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.o_dashboard_sidebar {
+    background-color: var(--sidebar-bg);
+}
+
+.extra-small {
+    font-size: 0.75rem !important;
+}
+
+.opacity-75 {
+    opacity: 0.75;
+}
+
+.bg-light-hover {
+    transition: background-color 0.2s;
+}
+
+.bg-light-hover:hover {
+    background-color: var(--hover-bg) !important;
+}
+
+/* Notification Dropdown Theme Support */
+.dashboard-notification-dropdown {
+    background-color: var(--widget-bg) !important;
+    color: var(--bs-body-color);
+    border-color: var(--widget-border) !important;
+    right: 20px;
+    top: 60px;
+    z-index: 1050;
+    min-width: 250px;
+}
+
+.dashboard-notification-dropdown .notification-header {
+    background-color: var(--widget-header-bg) !important;
+    color: var(--bs-body-color);
+    border-bottom: 1px solid var(--widget-border);
+}
+
+.notification-item {
+    border-bottom: 1px solid var(--widget-border) !important;
+    color: var(--bs-body-color);
+    background-color: var(--widget-bg) !important;
+}
+
+.notification-item:hover {
+    background-color: var(--hover-bg) !important;
+}
+
+.notification-item .text-muted {
+    color: var(--bs-body-color) !important;
+    opacity: 0.7;
+}
+
+/* Notification Hover Refinement */
+.notification-item:hover {
+    background-color: var(--hover-bg) !important;
+    box-shadow: inset 0 0 0 1px var(--widget-border);
+}
+
+.notification-item:hover .text-primary,
+.notification-item .text-primary,
+.notification-item:hover .fw-bold,
+.notification-item .fw-bold {
+    color: var(--theme-primary) !important;
+}
+
+.o-dashboard-theme-dark-gradient .notification-item .text-muted,
+.o-dashboard-theme-dark .notification-item .text-muted {
+    color: #cbd5e1 !important;
+    opacity: 0.9;
+}
+
+.o-dashboard-theme-dark-gradient .dashboard-notification-dropdown,
+.o-dashboard-theme-dark .dashboard-notification-dropdown {
+    background: var(--navbar-bg) !important;
+    border-color: var(--navbar-border) !important;
+    backdrop-filter: blur(10px);
+}
+
+.o-dashboard-theme-dark-gradient .notification-header,
+.o-dashboard-theme-dark .notification-header {
+    background: var(--widget-header-bg) !important;
+    color: var(--widget-header-color) !important;
+}
+
+/* Ensure secondary labels maintain clear visibility */
+.notification-item:hover .text-muted {
+    color: var(--bs-body-color) !important;
+    opacity: 0.7;
+}
+
+/* Ensure badges/tags retain their original theme colors */
+.notification-item:hover .badge {
+    opacity: 1 !important;
+}
+
+/* Maintain specific alert colors on hover */
+.notification-item:hover .text-danger {
+    color: #dc3545 !important;
+}
+
+.notification-item:hover .text-success {
+    color: #28a745 !important;
+}

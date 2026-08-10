@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="view_nhs_simple_doctor_form" model="ir.ui.view">
+        <field name="name">nhs.simple.doctor.form</field>
+        <field name="model">nhs.simple.doctor</field>
+        <field name="arch" type="xml">
+            <form string="Doctor / GP">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="e.g. Dr. John Doe" required="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="gp_code"/>
+                        </group>
+                        <group>
+                            <field name="phone" widget="phone"/>
+                            <field name="email" widget="email"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_nhs_simple_doctor_list" model="ir.ui.view">
+        <field name="name">nhs.simple.doctor.list</field>
+        <field name="model">nhs.simple.doctor</field>
+        <field name="arch" type="xml">
+            <list string="Doctors / GPs">
+                <header>
+                    <button name="action_sync_nhs_gps" type="object" string="Sync NHS GPs" class="btn-primary" display="always"/>
+                </header>
+                <field name="name"/>
+                <field name="gp_code"/>
+                <field name="phone"/>
+                <field name="email"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_nhs_simple_doctor_search" model="ir.ui.view">
+        <field name="name">nhs.simple.doctor.search</field>
+        <field name="model">nhs.simple.doctor</field>
+        <field name="arch" type="xml">
+            <search string="Search Doctors">
+                <field name="name"/>
+                <field name="gp_code"/>
+                <separator/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_nhs_simple_doctor" model="ir.actions.act_window">
+        <field name="name">Doctors / GPs</field>
+        <field name="res_model">nhs.simple.doctor</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create the first Doctor / GP
+            </p>
+            <p>
+                Manage Doctors and General Practitioners to link them with NHS Patients.
+            </p>
+        </field>
+    </record>
+
+</odoo>

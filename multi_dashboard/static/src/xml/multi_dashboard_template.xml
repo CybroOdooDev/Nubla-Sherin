@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <!--DASHBOARD VIEW WITH NAVIGATION-BAR, INTERACTJS TEMPLATE-->
+    <t t-name="owl.MultiDashboard" owl="1">
+        <div t-att-class="{'o_sidebar_active': state.sidebarVisible, ['o-dashboard-theme-' + state.theme]: true}"
+             class="o_multi_dashboard_container d-flex h-100 w-100 position-absolute" style="overflow: hidden;">
+            <div class="o_dashboard_sidebar border-end transition-width position-relative"
+                 t-ref="sidebar"
+                 t-att-style="state.sidebarVisible ? `width: ${state.sidebarWidth}px; min-width: ${state.sidebarWidth}px;` : 'width: 0px; overflow: hidden;'">
+                 <DashboardSidebar
+                         dashboardId="state.dashboardId"
+                         sidebarWidth="state.sidebarWidth"
+                         currentLayout="state.dashboardLayout"
+                         favoriteDashboards="state.favoriteDashboards"
+                         onChangeLayout="(layoutId) => this.onChangeLayout(layoutId)"
+                         onItemClick="(item) => this.onItemClick(item)"
+                         onFavoriteClick="(dashboard) => this.onFavoriteDashboardClick(dashboard)"/>
+
+                 <!-- Resize Handle -->
+                 <div class="sidebar-resize-handle position-absolute top-0 end-0 h-100"
+                      t-if="state.sidebarVisible"
+                      t-ref="resizeHandle"
+                      t-on-mousedown="onResizeStart"
+                      style="width: 4px; cursor: col-resize; background: transparent; z-index: 1000;">
+                 </div>
+            </div>
+
+            <!-- Mobile-only backdrop when sidebar is open (off-canvas behavior) -->
+            <div t-if="state.sidebarVisible"
+                 class="o_dashboard_sidebar_backdrop"
+                 t-on-pointerdown="toggleSidebar"/>
+
+            <div class="o_dashboard_main flex-grow-1 d-flex flex-column bg-100 position-relative">
+                <div class="p-2 border-bottom border-top bg-white d-flex align-items-center">
+                    <button class="btn btn-outline-secondary border-0 shadow-none"
+                            t-on-click="toggleSidebar"
+                            title="Toggle Sidebar">
+                        <i t-att-class="state.sidebarVisible ? 'fa fa-chevron-left' : 'fa fa-chevron-right'"/>
+                    </button>
+                    <span class="ms-3 h4 mb-0"><t t-esc="state.dashboardName"/></span>
+                    <i class="fa fa-star ms-2 cursor-pointer favorite-star"
+                       t-att-class="state.isFavorite ? 'text-warning' : 'text-muted'"
+                       t-on-click="toggleFavorite"
+                       t-att-title="state.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'"/>
+
+                    <div class="ms-auto d-flex align-items-center gap-1">
+                        <!-- NLP Input Field -->
+                        <div class="nlp-search-container me-2">
+                            <div class="input-group">
+                                <input type="text"
+                                       class="form-control nlp-input shadow-none"
+                                       placeholder="Generate dashboard..."
+                                       t-model="state.nlpQuery"
+                                       t-on-keydown="onNlpInputKeydown"/>
+                                <button class="btn btn-primary nlp-btn" type="button" t-on-click="generateChartFromText" t-att-disabled="state.isGeneratingChart" title="Generate Chart">
+                                    <i t-att-class="state.isGeneratingChart ? 'fa fa-spinner fa-spin' : 'fa fa-magic'"/>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle"
+                                    type="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                    title="Dashboard Theme">
+                                <i class="fa fa-paint-brush"/>
+                            </button>
+                            <ul class="multi-dashboard dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.theme === 'light' ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       t-on-click.prevent="() => this.setTheme('light')">
+                                        <i t-att-class="state.theme === 'light' ? 'fa fa-check me-2' : 'fa fa-sun-o me-2'"/>
+                                        Light
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.theme === 'dark' ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       t-on-click.prevent="() => this.setTheme('dark')">
+                                        <i t-att-class="state.theme === 'dark' ? 'fa fa-check me-2' : 'fa fa-sun-o me-2'"/>
+                                        Dark
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.theme === 'blue' ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       t-on-click.prevent="() => this.setTheme('blue')">
+                                        <i t-att-class="state.theme === 'blue' ? 'fa fa-check me-2' : 'fa fa-sun-o me-2'"/>
+                                        Blue
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.theme === 'green' ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       t-on-click.prevent="() => this.setTheme('green')">
+                                        <i t-att-class="state.theme === 'green' ? 'fa fa-check me-2' : 'fa fa-sun-o me-2'"/>
+                                        Green
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.theme === 'purple' ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       t-on-click.prevent="() => this.setTheme('purple')">
+                                        <i t-att-class="state.theme === 'purple' ? 'fa fa-check me-2' : 'fa fa-sun-o me-2'"/>
+                                        Purple
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.theme === 'dark-gradient' ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       t-on-click.prevent="() => this.setTheme('dark-gradient')">
+                                        <i t-att-class="state.theme === 'dark-gradient' ? 'fa fa-check me-2' : 'fa fa-moon-o me-2'"/>
+                                        Dark Gradient
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dropdown me-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="false" aria-expanded="false" title="Date Filter" t-ref="dateFilterDropdownButton">
+                                <i class="fa fa-calendar me-1"/>
+                                <span class="d-none d-md-inline"><t t-esc="state.dateFilter.label"/></span>
+                            </button>
+                            <ul class="multi-dashboard multi-dashboard-date-dropdown dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.dateFilter.label === 'All Time' ? 'active-refresh' : ''"
+                                       t-on-click.prevent="() => this.setDateFilter('all')">
+                                        All Time
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"/></li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.dateFilter.label === 'Today' ? 'active-refresh' : ''"
+                                       t-on-click.prevent="() => this.setDateFilter('today')">
+                                        Today
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.dateFilter.label === 'This Week' ? 'active-refresh' : ''"
+                                       t-on-click.prevent="() => this.setDateFilter('this_week')">
+                                        This Week
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.dateFilter.label === 'This Month' ? 'active-refresh' : ''"
+                                       t-on-click.prevent="() => this.setDateFilter('this_month')">
+                                        This Month
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#"
+                                       t-att-class="state.dateFilter.label === 'This Year' ? 'active-refresh' : ''"
+                                       t-on-click.prevent="() => this.setDateFilter('this_year')">
+                                        This Year
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"/></li>
+                                <li class="px-3 py-2 multi-dashboard-date-range-item" t-on-click.stop="">
+                                    <div class="multi-dashboard-date-range-title">Custom Range</div>
+                                    <div class="multi-dashboard-date-range-row">
+                                        <span class="multi-dashboard-date-range-label">From</span>
+                                        <DateTimeInput
+                                            type="'date'"
+                                            class="'o-navigable multi-dashboard-date-input'"
+                                            value="getCustomDateValue(state.customStartDate)"
+                                            onChange="(date) => this.onCustomDateChange('start', date)"
+                                        />
+                                        <span class="multi-dashboard-date-range-label">to</span>
+                                        <DateTimeInput
+                                            type="'date'"
+                                            class="'o-navigable multi-dashboard-date-input'"
+                                            value="getCustomDateValue(state.customEndDate)"
+                                            onChange="(date) => this.onCustomDateChange('end', date)"
+                                        />
+                                    </div>
+                                    <button class="btn btn-sm btn-primary w-100 mt-1"
+                                            t-on-click.prevent="applyCustomDateFilter">
+                                        Apply Range
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dropdown me-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Auto Refresh">
+                                <i class="fa fa-refresh"/>
+                                <t t-if="state.refreshInterval > 0">
+                                    <span class="ms-1"><t t-esc="state.refreshInterval"/>m</span>
+                                </t>
+                            </button>
+                            <ul class="multi-dashboard dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item"
+                                       t-att-class="state.refreshInterval === 0 ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       href="#"
+                                       t-on-click.prevent="() => this.setRefreshInterval(0)">
+                                        <i t-att-class="state.refreshInterval === 0 ? 'fa fa-check me-2' : 'fa fa-stop-circle-o me-2'"/>
+                                        Off
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       t-att-class="state.refreshInterval === 1 ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       href="#"
+                                       t-on-click.prevent="() => this.setRefreshInterval(1)">
+                                        <i t-att-class="state.refreshInterval === 1 ? 'fa fa-check me-2' : 'fa fa-clock-o me-2'"/>
+                                        1 Minute
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       t-att-class="state.refreshInterval === 5 ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       href="#"
+                                       t-on-click.prevent="() => this.setRefreshInterval(5)">
+                                        <i t-att-class="state.refreshInterval === 5 ? 'fa fa-check me-2' : 'fa fa-clock-o me-2'"/>
+                                        5 Minutes
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       t-att-class="state.refreshInterval === 10 ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       href="#"
+                                       t-on-click.prevent="() => this.setRefreshInterval(10)">
+                                        <i t-att-class="state.refreshInterval === 10 ? 'fa fa-check me-2' : 'fa fa-clock-o me-2'"/>
+                                        10 Minutes
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       t-att-class="state.refreshInterval === 15 ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       href="#"
+                                       t-on-click.prevent="() => this.setRefreshInterval(15)">
+                                        <i t-att-class="state.refreshInterval === 15 ? 'fa fa-check me-2' : 'fa fa-clock-o me-2'"/>
+                                        15 Minutes
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       t-att-class="state.refreshInterval === 30 ? 'dropdown-item active-refresh' : 'dropdown-item'"
+                                       href="#"
+                                       t-on-click.prevent="() => this.setRefreshInterval(15)">
+                                        <i t-att-class="state.refreshInterval === 30 ? 'fa fa-check me-2' : 'fa fa-clock-o me-2'"/>
+                                        30 Minutes
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="import-chart"
+                             t-on-click="summarizeDashboard"
+                             t-att-class="state.isSummarizing ? 'pe-none opacity-50' : ''"
+                             title="AI Insights">
+                            <i t-att-class="state.isSummarizing ? 'fa fa-spinner fa-spin' : 'fa fa-lightbulb-o'"/>
+                        </div>
+                         <!-- Edit Mode Toggle (Mobile/Tablet helper) -->
+<!--                    <button t-if="state.isManager"-->
+<!--                            class="btn btn-outline-secondary border-0 shadow-none ms-1"-->
+<!--                            t-on-click="toggleEditMode"-->
+<!--                            t-att-class="state.isEditMode ? 'text-primary' : ''"-->
+<!--                            title="Toggle Edit Mode">-->
+<!--                        <i t-att-class="state.isEditMode ? 'fa fa-check-square-o' : 'fa fa-arrows'"/>-->
+<!--                        <span class="d-none d-md-inline ms-1"><t t-esc="state.isEditMode ? 'Done' : 'Move'"/></span>-->
+<!--                    </button>-->
+                        <div class="import-chart position-relative"
+                             t-on-click="toggleNotificationDropdown"
+                             title="Dashboard Alerts">
+                            <i class="fa fa-bell"/>
+                            <span t-if="state.notificationCount > 0"
+                                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                  style="font-size: 0.6rem; padding: 0.25em 0.4em;">
+                                <t t-esc="state.notificationCount"/>
+                            </span>
+                        </div>
+                        <div class="import-chart"
+                             t-on-click="sendDashboard"
+                             title="Send">
+                            <i class="fa fa-paper-plane"/>
+                        </div>
+                        <div class="import-chart"
+                             t-on-click="() => this.printDashboard(false)"
+                             title="Print">
+                            <i class="fa fa-print"/>
+                        </div>
+                        <div class="import-chart"
+                             t-on-click="exportDashboard"
+                             title="Export">
+                            <i class="fa fa-upload"/>
+                        </div>
+                        <div class="import-chart"
+                                t-on-click="importDashboard"
+                                title="Import">
+                            <i class="fa fa-download"/>
+                        </div>
+                        <div class="import-chart"
+                             t-if="state.sidebarVisible"
+                             t-on-click="toggleCompactView"
+                             title="Compact View">
+                            <i class="fa fa-window-restore"/>
+                        </div>
+                        <div class="import-chart bg-danger text-white border-0"
+                             t-if="state.sidebarVisible"
+                             t-on-click="clearDashboard"
+                             title="Clear Dashboard">
+                            <i class="fa fa-trash-o"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Summary Area -->
+                <div t-if="state.aiSummary" class="ai-summary-container">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fa fa-magic text-primary me-2"/>
+                        <h5 class="mb-0 text-primary">AI Dashboard Insights</h5>
+                        <button class="btn-close ms-auto shadow-none" t-on-click="() => state.aiSummary = false"/>
+                    </div>
+                    <div class="ai-summary-content">
+                        <t t-out="state.aiSummary"/>
+                    </div>
+                </div>
+
+                <!-- Notification Dropdown -->
+                <div t-if="state.showNotificationDropdown" class="dashboard-notification-dropdown shadow-lg rounded border position-absolute">
+                    <div class="d-flex align-items-center p-2 notification-header rounded-top">
+                        <h6 class="mb-0 fw-bold small">Dashboard Alerts</h6>
+                        <button class="btn-close ms-auto shadow-none" t-on-click="toggleNotificationDropdown" style="font-size: 0.7rem;"/>
+                    </div>
+                    <div class="notification-list overflow-auto" style="max-height: 300px;">
+                        <t t-if="state.notifications.length > 0">
+                            <t t-foreach="state.notifications" t-as="notif" t-key="notif.id">
+                                <div class="notification-item p-2 transition-base" t-on-click="() => this.onNotificationClick(notif)">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="fw-bold text-primary small"><t t-esc="notif.name"/></span>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span t-if="notif.isTarget" class="badge" t-attf-class="bg-{{notif.type}} text-white" style="font-size: 0.45rem;">
+                                                <t t-if="notif.type == 'success'">Achieved</t>
+                                                <t t-else="">Pending</t>
+                                            </span>
+                                            <span t-else="" class="badge bg-warning text-dark" style="font-size: 0.45rem;">Triggered</span>
+                                            <i class="fa fa-times text-muted cursor-pointer hover-text-danger p-1" 
+                                               t-on-click.stop="() => this.dismissNotification(notif)"
+                                               title="Dismiss"/>
+                                        </div>
+                                    </div>
+                                    <div class="small mb-1">
+                                        <span class="text-muted"><t t-esc="notif.widget"/></span>
+                                        <span class="mx-1 ms-2 fw-bold" t-attf-class="text-{{notif.isTarget ? notif.type : 'danger'}}">
+                                            <t t-if="notif.isTarget">Target: <t t-esc="notif.threshold"/></t>
+                                            <t t-else="">
+                                                <t t-if="notif.condition == 'greater'">></t>
+                                                <t t-elif="notif.condition == 'less'">&lt;</t>
+                                                <t t-else="">=</t>
+                                                <t t-esc="notif.threshold"/>
+                                            </t>
+                                        </span>
+                                        <span class="ms-2 text-muted" style="font-size: 0.6rem;">(Value: <t t-esc="notif.value"/>)</span>
+                                    </div>
+                                    <div class="text-end text-muted" style="font-size: 0.6rem;">
+                                        <t t-esc="notif.date"/>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                        <t t-else="">
+                            <div class="p-4 text-center text-muted small">
+                                <i class="fa fa-check-circle-o d-block mb-2 text-success" style="font-size: 1.5rem;"/>
+                                No active alerts
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- Grid Area -->
+                <div class="p-4 mb-5 overflow-auto grid-scrollbar flex-grow-1 bg-light" style="min-height: 0;">
+                    <div t-attf-class="icon-loader-wrapper d-flex flex-column align-items-center justify-content-center {{ state.loading ? '' : 'd-none' }}">
+                        <div class="icon-loader">
+                            <span class="shape s1"/>
+                            <span class="shape s2"/>
+                            <span class="shape s3"/>
+                            <span class="shape s4"/>
+                        </div>
+                        <div class="loader-text mt-3">
+                            Fetching data…
+                        </div>
+                    </div>
+
+
+                    <!-- Gridstack Container -->
+                    <div t-attf-class="grid-stack min-vh-100 {{state.loading ? 'd-none' : ''}}"
+                         t-ref="grid" id="dashboard-grid">
+                        <!-- Existing widgets would be loaded here -->
+                        <div t-if="state.isEmpty"
+                             class="d-flex align-items-center justify-content-center">
+
+                            <div class="empty-dashboard-card text-center p-4">
+                                <!-- Stock Image -->
+                                <img src="/multi_dashboard/static/src/icons/blank.png"
+                                     alt="Empty Dashboard"
+                                     class="mb-3 empty-dashboard-image"/>
+                                <!-- Title -->
+                                <h3 class="fw-bold mb-2">Your dashboard is empty</h3>
+                                <!-- Description -->
+                                <p class="text-muted mb-3">
+                                    Open the <strong>Sidebar</strong> and drag widgets onto the grid to get started.
+                                </p>
+                                <!-- Action Button -->
+                                <button t-if="!state.sidebarVisible"
+                                        class="btn btn-primary px-4"
+                                        t-on-click="toggleSidebar">
+                                    <i class="fa fa-bars me-1"/> Open Sidebar
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <DashboardChat dashboardId="state.dashboardId" dateFilter="state.dateFilter"/>
+            </div>
+        </div>
+    </t>
+</templates>

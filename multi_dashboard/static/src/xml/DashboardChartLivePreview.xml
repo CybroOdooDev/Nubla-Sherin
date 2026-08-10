@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!--  DashboardChartLivePreview template  -->
+    <t t-name="multi_dashboard.DashboardChartLivePreview">
+        <div class="o_dashboard_preview_container border rounded p-3 bg-light">
+            <h5 class="mb-3 text-muted">Live Preview</h5>
+
+            <t t-if="state.loading">
+                <div class="d-flex justify-content-center align-items-center" style="min-height: 300px;">
+                    <i class="fa fa-circle-o-notch fa-spin fa-2x text-primary"/>
+                </div>
+            </t>
+
+            <t t-elif="state.chartData">
+                <t t-if="state.config.chart_type === 'tile'">
+                    <DashboardTileWidget
+                            data="state.chartData"
+                            isPreview="true"/>
+                </t>
+                <t t-elif="state.config.chart_type === 'todo'">
+                    <DashboardTodoWidget
+                            data="state.chartData"
+                            isPreview="true"/>
+                </t>
+                <t t-elif="state.config.chart_type === 'list'">
+                    <DashboardListWidget
+                            data="state.chartData"
+                            isPreview="true"/>
+                </t>
+                <t t-elif="state.config.chart_type === 'clock'">
+                    <DashboardClock
+                            data="state.chartData"
+                            isPreview="true"/>
+                </t>
+                <t t-elif="state.config.chart_type === 'progress'">
+                    <t t-log="state"/>
+                    <DashboardProgressBar
+                            data="state.chartData"
+                            widget="state.config"
+                            isPreview="true"/>
+                </t>
+                <t t-else="">
+                    <DashboardChart
+                            data="state.chartResult.data"
+                            series="state.chartResult.series"
+                            chartType="state.chartResult.chart_type"
+                            theme="state.config.am_chart_theme"
+                            name="state.config.name"
+                            color="state.config.todo_color"
+                            orientation="state.chartResult.orientation"
+                            hasSubGroup="state.chartResult.has_sub_group"
+                            groupField="state.chartResult.groupField"
+                            groupFieldType="state.chartResult.groupFieldType"
+                            dateGranularity="state.chartResult.date_granularity"
+                            useBackgroundGradient="state.config.use_background_gradient"
+                            isPreview="true"
+                    />
+                </t>
+            </t>
+
+            <t t-else="">
+                <div class="d-flex flex-column justify-content-center align-items-center text-muted" style="height: 300px;">
+                    <i class="fa fa-bar-chart fa-4x mb-3 opacity-25"/>
+                    <p t-if="state.error" class="text-danger"><t t-esc="state.error"/></p>
+                    <p t-else="">Select a model and fields to see the chart preview</p>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

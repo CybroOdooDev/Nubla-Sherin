@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--    Demo data for book category    -->
+        <record id="product_category_books" model="product.category">
+            <field name="parent_id" ref="product.product_category_goods"/>
+            <field name="name">Books</field>
+        </record>
+    </data>
+</odoo>

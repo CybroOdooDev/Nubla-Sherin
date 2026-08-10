@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_nhs_simple_root"
+              name="NHS Patient"
+              sequence="10"/>
+
+    <menuitem id="menu_nhs_simple_patient"
+              name="Patients"
+              parent="menu_nhs_simple_root"
+              action="action_nhs_simple_patient"
+              sequence="10"/>
+
+    <menuitem id="menu_nhs_simple_doctor"
+              name="Doctors / GPs"
+              parent="menu_nhs_simple_root"
+              action="action_nhs_simple_doctor"
+              sequence="20"/>
+
+    <menuitem id="menu_nhs_simple_config"
+              name="Configuration"
+              parent="menu_nhs_simple_root"
+              sequence="90"/>
+
+    <menuitem id="menu_nhs_simple_log_link"
+              name="API Log"
+              parent="menu_nhs_simple_config"
+              action="action_nhs_simple_log"
+              sequence="10"/>
+
+    <menuitem id="menu_nhs_simple_settings"
+              name="Settings"
+              parent="menu_nhs_simple_config"
+              action="action_nhs_simple_settings"
+              sequence="20"/>
+
+</odoo>

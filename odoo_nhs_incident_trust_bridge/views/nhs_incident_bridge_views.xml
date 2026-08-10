@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Extends the NHS Incident form with:
+        1. trust_id field placed before location_id in the When &amp; Where group
+        2. A domain on location_id so only locations belonging to the trust appear
+        3. A CQC Inspections section on the Statutory tab
+    -->
+    <record id="view_nhs_incident_form_bridge" model="ir.ui.view">
+        <field name="name">nhs.incident.form.bridge</field>
+        <field name="model">nhs.incident</field>
+        <field name="inherit_id" ref="odoo_nhs_incident_risk.view_nhs_incident_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Scope location picker to the selected trust's sites/departments.
+                 When trust_id is empty the domain shows locations with no trust
+                 set (manually created ones). -->
+            <xpath expr="//field[@name='location_id']" position="attributes">
+                <attribute name="domain">[('trust_id', '=', trust_id)]</attribute>
+            </xpath>
+
+            <!-- NHS Trust appears before Location so users pick the trust first,
+                 which then scopes the location picker to that trust's sites. -->
+            <xpath expr="//field[@name='location_id']" position="before">
+                <field name="trust_id"/>
+            </xpath>
+
+            <!-- CQC Inspections on the Statutory tab, after CQC Notifications. -->
+            <xpath expr="//field[@name='cqc_notification_ids']"
+                   position="after">
+                <separator string="CQC Inspections" invisible="not trust_id"/>
+                <field name="cqc_inspection_ids" nolabel="1"
+                       invisible="not trust_id"
+                       domain="[('trust_id', '=', trust_id)]"
+                       options="{'no_create': True}"
+                       help="Link this incident to a formal CQC inspection visit where it was reviewed as evidence.">
+                    <list string="CQC Inspections">
+                        <field name="display_name"/>
+                        <field name="inspection_date"/>
+                        <field name="inspection_type"/>
+                        <field name="overall_rating" widget="badge"
+                               decoration-success="overall_rating == 'outstanding'"
+                               decoration-info="overall_rating == 'good'"
+                               decoration-warning="overall_rating == 'requires_improvement'"
+                               decoration-danger="overall_rating == 'inadequate'"/>
+                        <field name="state" widget="badge"
+                               decoration-success="state == 'active'"/>
+                    </list>
+                </field>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ── Incident list view: add trust column -->
+    <record id="view_nhs_incident_list_bridge" model="ir.ui.view">
+        <field name="name">nhs.incident.list.bridge</field>
+        <field name="model">nhs.incident</field>
+        <field name="inherit_id" ref="odoo_nhs_incident_risk.view_nhs_incident_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='handler_id']" position="before">
+                <field name="trust_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ── Incident search view: add trust filter -->
+    <record id="view_nhs_incident_search_bridge" model="ir.ui.view">
+        <field name="name">nhs.incident.search.bridge</field>
+        <field name="model">nhs.incident</field>
+        <field name="inherit_id" ref="odoo_nhs_incident_risk.view_nhs_incident_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='handler_id']" position="after">
+                <field name="trust_id" string="Trust"/>
+            </xpath>
+            <xpath expr="//group[@name='group_by']" position="inside">
+                <filter string="NHS Trust" name="group_by_trust"
+                        context="{'group_by': 'trust_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

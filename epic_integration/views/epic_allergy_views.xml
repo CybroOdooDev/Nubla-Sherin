@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="view_epic_allergy_list" model="ir.ui.view">
+        <field name="name">epic.allergy.list</field>
+        <field name="model">epic.allergy</field>
+        <field name="arch" type="xml">
+            <list string="Allergies">
+                <header>
+                    <button name="action_sync_allergies" type="object"
+                            string="Sync Allergies from Epic" class="btn-primary" display="always"/>
+                </header>
+                <field name="substance"/>
+                <field name="patient_id"/>
+                <field name="allergy_type"/>
+                <field name="category"/>
+                <field name="clinical_status"
+                       decoration-success="clinical_status == 'resolved'"
+                       decoration-warning="clinical_status == 'inactive'"
+                       decoration-danger="clinical_status == 'active'"
+                       widget="badge"/>
+                <field name="criticality"
+                       decoration-danger="criticality == 'high'"
+                       decoration-warning="criticality == 'low'"
+                       widget="badge"/>
+                <field name="reaction"/>
+                <field name="reaction_severity"/>
+                <field name="recorded_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_epic_allergy_form" model="ir.ui.view">
+        <field name="name">epic.allergy.form</field>
+        <field name="model">epic.allergy</field>
+        <field name="arch" type="xml">
+            <form string="Allergy / Intolerance">
+                <header>
+                    <button name="action_push_to_epic" type="object"
+                            string="Push to Epic" class="btn-primary"
+                            invisible="epic_id != False"/>
+                    <button name="action_sync_allergies" type="object"
+                            string="Sync Allergies from Epic" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="substance" placeholder="Substance / Allergen"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Classification">
+                            <field name="allergy_type"/>
+                            <field name="category"/>
+                            <field name="criticality"/>
+                            <field name="clinical_status"/>
+                            <field name="verification_status"/>
+                        </group>
+                        <group string="Patient &amp; Record">
+                            <field name="patient_id"/>
+                            <field name="patient_epic_id"/>
+                            <field name="onset_date"/>
+                            <field name="recorded_date"/>
+                            <field name="epic_id"/>
+                        </group>
+                    </group>
+                    <group string="Substance Code">
+                        <field name="substance_code"/>
+                        <field name="substance_system"/>
+                    </group>
+                    <group string="Reaction">
+                        <field name="reaction"/>
+                        <field name="reaction_severity"/>
+                    </group>
+                    <group string="Notes">
+                        <field name="note" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_epic_allergy" model="ir.actions.act_window">
+        <field name="name">Allergies</field>
+        <field name="res_model">epic.allergy</field>
+        <field name="view_mode">list,form,graph,pivot</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No Allergies Found</p>
+            <p>Click "Sync Allergies from Epic" to fetch allergy data, or create a new record to push to Epic.</p>
+        </field>
+    </record>
+
+</odoo>

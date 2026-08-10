@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="view_epic_clinical_note_list" model="ir.ui.view">
+        <field name="name">epic.clinical.note.list</field>
+        <field name="model">epic.clinical.note</field>
+        <field name="arch" type="xml">
+            <list string="Clinical Notes">
+                <header>
+                    <button name="action_sync_clinical_notes" type="object"
+                            string="Sync Clinical Notes from Epic" class="btn-primary" display="always"/>
+                </header>
+                <field name="title"/>
+                <field name="patient_id"/>
+                <field name="note_type"/>
+                <field name="author"/>
+                <field name="note_date"/>
+                <field name="status"
+                       decoration-success="status == 'current'"
+                       decoration-muted="status == 'superseded'"
+                       decoration-danger="status == 'entered-in-error'"
+                       widget="badge"/>
+                <field name="content_type"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_epic_clinical_note_form" model="ir.ui.view">
+        <field name="name">epic.clinical.note.form</field>
+        <field name="model">epic.clinical.note</field>
+        <field name="arch" type="xml">
+            <form string="Clinical Note">
+                <header>
+                    <button name="action_sync_clinical_notes" type="object"
+                            string="Sync from Epic" class="btn-secondary"/>
+                    <button name="action_fetch_content" type="object"
+                            string="Fetch Note Content" class="btn-primary"
+                            invisible="epic_id == False"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="title" placeholder="Note Title"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Note Details">
+                            <field name="note_type"/>
+                            <field name="note_date"/>
+                            <field name="author"/>
+                            <field name="status"/>
+                            <field name="content_type"/>
+                        </group>
+                        <group string="Patient &amp; Record">
+                            <field name="patient_id"/>
+                            <field name="patient_epic_id"/>
+                            <field name="epic_id" string="Binary FHIR ID"/>
+                            <field name="doc_ref_epic_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Note Content">
+                            <field name="content_html" widget="html" readonly="1" nolabel="1"/>
+                        </page>
+                        <page string="Raw Text">
+                            <field name="content_raw" widget="text" readonly="1" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_epic_clinical_note" model="ir.actions.act_window">
+        <field name="name">Clinical Notes</field>
+        <field name="res_model">epic.clinical.note</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No Clinical Notes Found</p>
+            <p>Click "Sync Clinical Notes from Epic" to fetch clinical note data from Epic FHIR.</p>
+        </field>
+    </record>
+
+</odoo>

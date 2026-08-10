@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="report_nhs_individual_record" model="ir.actions.report">
+        <field name="name">Individual Training Record</field>
+        <field name="model">nhs.workforce.member</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_training.report_nhs_individual_record_view</field>
+        <field name="report_file">odoo_nhs_training.report_nhs_individual_record_view</field>
+        <field name="binding_model_id" ref="model_nhs_workforce_member"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_nhs_individual_record_view">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="member_data" t-as="md">
+                    <div class="page">
+                        <h2 style="color:#005EB8;"><t t-out="md['member'].name"/> — Training Record</h2>
+                        <p class="text-muted">
+                            Reference <t t-out="md['member'].reference"/> —
+                            Team <t t-out="md['member'].org_unit_id.name"/> —
+                            Post <t t-out="md['member'].post_id.job_title"/>
+                        </p>
+                        <h4>Compliance: <t t-out="round(md['member'].compliance_pct, 1)"/>%
+                            (<t t-out="md['member'].compliance_status"/>)</h4>
+
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr><th>Subject</th><th>Status</th><th>Last Completed</th><th>Expiry</th></tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="md['rows']" t-as="row">
+                                    <tr>
+                                        <td><t t-out="row['subject']"/></td>
+                                        <td><t t-out="row['label']"/></td>
+                                        <td><t t-out="row['completion_date'] or '-'"/></td>
+                                        <td><t t-out="row['expiry_date'] or '-'"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <h4>Professional Registrations</h4>
+                        <table class="table table-sm table-bordered">
+                            <thead><tr><th>Regulator</th><th>Expiry</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <t t-foreach="md['member'].registration_ids" t-as="reg">
+                                    <tr>
+                                        <td><t t-out="reg.regulator_id.name"/></td>
+                                        <td><t t-out="reg.expiry_date"/></td>
+                                        <td><t t-out="reg.status"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

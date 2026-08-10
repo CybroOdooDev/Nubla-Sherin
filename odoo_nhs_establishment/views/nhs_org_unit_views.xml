@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── List ─────────────────────────────────────────────────── -->
+    <record id="view_nhs_org_unit_list" model="ir.ui.view">
+        <field name="name">nhs.org.unit.list</field>
+        <field name="model">nhs.org.unit</field>
+        <field name="arch" type="xml">
+            <list string="Organisational Units" decoration-muted="not active"
+                  decoration-danger="vacancy_rate &gt;= 0.15">
+                <field name="complete_name"/>
+                <field name="unit_type"/>
+                <field name="code"/>
+                <field name="manager_id" optional="show"/>
+                <field name="cost_centre" optional="hide"/>
+                <field name="post_count" sum="Posts"/>
+                <field name="funded_fte" sum="Funded FTE"/>
+                <field name="in_post_fte" sum="In-Post FTE"/>
+                <field name="vacant_fte" sum="Vacant FTE"/>
+                <field name="vacancy_rate" widget="percentage" avg="Avg Vacancy Rate"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Form ─────────────────────────────────────────────────── -->
+    <record id="view_nhs_org_unit_form" model="ir.ui.view">
+        <field name="name">nhs.org.unit.form</field>
+        <field name="model">nhs.org.unit</field>
+        <field name="arch" type="xml">
+            <form string="Organisational Unit">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_posts" type="object" class="oe_stat_button" icon="fa-id-badge">
+                            <field name="post_count" widget="statinfo" string="Posts"/>
+                        </button>
+                    </div>
+                    <field name="active" invisible="1"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code" readonly="1"/>
+                            <field name="unit_type"/>
+                            <field name="parent_id"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="manager_id"/>
+                            <field name="cost_centre"/>
+                        </group>
+                    </group>
+                    <group string="Establishment Roll-up (this unit + all descendants)">
+                        <group>
+                            <field name="funded_fte"/>
+                            <field name="in_post_fte"/>
+                        </group>
+                        <group>
+                            <field name="vacant_fte"/>
+                            <field name="vacancy_rate" widget="percentage"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Sub-units" name="sub_units">
+                            <field name="child_ids">
+                                <list>
+                                    <field name="complete_name"/>
+                                    <field name="unit_type"/>
+                                    <field name="funded_fte" sum="Funded FTE"/>
+                                    <field name="in_post_fte" sum="In-Post FTE"/>
+                                    <field name="vacant_fte" sum="Vacant FTE"/>
+                                    <field name="vacancy_rate" widget="percentage"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Posts" name="posts">
+                            <field name="post_ids" context="{'default_org_unit_id': id}">
+                                <list decoration-danger="vacancy_status == 'fully_vacant'"
+                                      decoration-warning="vacancy_status == 'part_vacant'"
+                                      decoration-info="vacancy_status == 'over_established'">
+                                    <field name="reference"/>
+                                    <field name="job_title"/>
+                                    <field name="staff_group_id"/>
+                                    <field name="band_id"/>
+                                    <field name="funded_fte" sum="Funded FTE"/>
+                                    <field name="in_post_fte" sum="In-Post FTE"/>
+                                    <field name="vacant_fte" sum="Vacant FTE"/>
+                                    <field name="vacancy_status"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Hierarchy (org chart) ───────────────────────────────────── -->
+    <record id="view_nhs_org_unit_hierarchy" model="ir.ui.view">
+        <field name="name">nhs.org.unit.hierarchy</field>
+        <field name="model">nhs.org.unit</field>
+        <field name="arch" type="xml">
+            <hierarchy child_field="child_ids" draggable="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="complete_name"/>
+                <field name="code"/>
+                <field name="unit_type"/>
+                <field name="manager_id"/>
+                <field name="post_count"/>
+                <field name="funded_fte"/>
+                <field name="in_post_fte"/>
+                <field name="vacant_fte"/>
+                <field name="vacancy_rate"/>
+                <field name="company_id"/>
+                <field name="parent_id"/>
+                <field name="parent_path"/>
+                <field name="child_ids"/>
+                <field name="active"/>
+                <templates>
+                    <t t-name="hierarchy-box">
+                        <div class="o_hierarchy_node_card">
+                            <div class="o_hierarchy_node_header d-flex align-items-center justify-content-between px-2 pt-2">
+                                <span class="fw-bold text-truncate" style="max-width: 160px;">
+                                    <field name="name"/>
+                                </span>
+                                <span class="badge text-bg-secondary ms-1" t-if="record.code.raw_value">
+                                    <field name="code"/>
+                                </span>
+                            </div>
+                            <div class="o_hierarchy_node_body p-2">
+                                <div class="d-flex gap-1 flex-wrap mb-1">
+                                    <span class="badge text-bg-primary">
+                                        <field name="unit_type"/>
+                                    </span>
+                                    <span t-if="record.vacancy_rate.raw_value or record.funded_fte.raw_value"
+                                          t-attf-class="badge #{record.vacancy_rate.raw_value >= 0.15 ? 'text-bg-danger' : (record.vacancy_rate.raw_value >= 0.05 ? 'text-bg-warning' : 'text-bg-success')}">
+                                        <field name="vacancy_rate" widget="percentage"/> vacant
+                                    </span>
+                                </div>
+                                <div class="text-muted small" t-if="record.manager_id.raw_value">
+                                    <i class="fa fa-user me-1" title="Manager"/>
+                                    <field name="manager_id"/>
+                                </div>
+                                <div class="d-flex gap-3 mt-1 pt-1 border-top small text-muted">
+                                    <span>
+                                        <i class="fa fa-id-badge me-1" title="Posts"/>
+                                        <field name="post_count"/> post<t t-if="record.post_count.raw_value != 1">s</t>
+                                    </span>
+                                    <span t-if="record.funded_fte.raw_value">
+                                        <i class="fa fa-users me-1" title="Funded FTE"/>
+                                        <field name="funded_fte"/> FTE
+                                    </span>
+                                </div>
+                                <div class="mt-1 small text-danger" t-if="record.vacant_fte.raw_value > 0">
+                                    <i class="fa fa-exclamation-triangle me-1" title="Vacant"/>
+                                    <field name="vacant_fte"/> FTE vacant
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </hierarchy>
+        </field>
+    </record>
+
+    <!-- ── Search ───────────────────────────────────────────────── -->
+    <record id="view_nhs_org_unit_search" model="ir.ui.view">
+        <field name="name">nhs.org.unit.search</field>
+        <field name="model">nhs.org.unit</field>
+        <field name="arch" type="xml">
+            <search string="Search Organisational Units">
+                <field name="complete_name" string="Unit"/>
+                <field name="code"/>
+                <field name="manager_id"/>
+                <field name="cost_centre"/>
+                <filter string="Directorates" name="filter_directorate" domain="[('unit_type','=','directorate')]"/>
+                <filter string="Divisions" name="filter_division" domain="[('unit_type','=','division')]"/>
+                <filter string="Departments" name="filter_department" domain="[('unit_type','=','department')]"/>
+                <filter string="Teams" name="filter_team" domain="[('unit_type','=','team')]"/>
+                <separator/>
+                <filter string="Archived" name="filter_archived" domain="[('active','=',False)]"/>
+                <group name="group_by">
+                    <filter string="Unit Type" name="groupby_unit_type" context="{'group_by': 'unit_type'}"/>
+                    <filter string="Parent Unit" name="groupby_parent" context="{'group_by': 'parent_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ── Action ───────────────────────────────────────────────── -->
+    <record id="action_nhs_org_unit" model="ir.actions.act_window">
+        <field name="name">Org Structure</field>
+        <field name="res_model">nhs.org.unit</field>
+        <field name="view_mode">hierarchy,list,form</field>
+        <field name="search_view_id" ref="view_nhs_org_unit_search"/>
+        <field name="context">{'search_default_filter_directorate': 0}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your organisational hierarchy — directorate, division, department, team.
+            </p>
+        </field>
+    </record>
+</odoo>

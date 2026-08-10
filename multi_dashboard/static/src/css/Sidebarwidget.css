@@ -1,0 +1,75 @@
+.dashboard-item-tile {
+    background: mediumturquoise;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: medium;
+    cursor: pointer !important;
+}
+
+.dashboard-item-tile::before,
+.dashboard-item-tile::after {
+    content: "";
+    position: absolute;
+    width: 20%;
+    height: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+    font-weight: bold;
+    background-color: lightblue;
+    transition: all 0.5s;
+}
+
+.dashboard-item-tile::before {
+    top: 0;
+    right: 0;
+    border-radius: 0 15px 0 100%;
+}
+
+.dashboard-item-tile::after {
+    bottom: 0;
+    left: 0;
+    border-radius: 0 100%  0 15px;
+}
+
+.dashboard-item-tile:hover:after {
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    transition: all 0.5s;
+}
+
+.dashboard-item-tile:hover:after {
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    top: 0;
+    background: rgba(255,255,255,0.12);
+}
+
+.dashboard-tile-icon {
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.dash-sidebar h3,
+.dash-sidebar p {
+    color: var(--widget-text-color) !important;
+}
+
+/* Target the actual container that overflows */
+.sidebar-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--widget-border);
+    border-radius: 10px;
+}
+
+/* Optional: Add a hover effect so you know it's working */
+.sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}

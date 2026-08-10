@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Standalone Board Members list action (all trusts, not scoped to active_id) -->
+    <record id="action_nhs_board_members" model="ir.actions.act_window">
+        <field name="name">Board Members</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_nhs_board_member', '=', True)]</field>
+        <field name="context">{'default_is_nhs_board_member': True, 'default_is_company': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add a board member contact.</p>
+            <p>Board members are stored as contacts with the NHS board member flag set.</p>
+        </field>
+    </record>
+
+    <record id="view_partner_form_nhs_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.nhs.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="is_nhs_board_member" widget="boolean_toggle"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="NHS Governance" name="nhs_governance" invisible="not is_nhs_board_member">
+                    <group string="Trust Board Membership Profile">
+                        <group>
+                            <field name="nhs_trust_id" required="is_nhs_board_member"/>
+                            <field name="nhs_board_role" required="is_nhs_board_member"/>
+                            <field name="is_voting_member"/>
+                        </group>
+                        <group>
+                            <field name="term_start_date"/>
+                            <field name="term_end_date"/>
+                            <field name="is_term_active" readonly="1"/>
+                            <field name="appointment_authority"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

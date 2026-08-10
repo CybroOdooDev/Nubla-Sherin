@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_dspt_bulk_owner_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.dspt.bulk.owner.wizard.form</field>
+        <field name="model">nhs.dspt.bulk.owner.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bulk Assign Owner">
+                <field name="active_model" invisible="1"/>
+                <group>
+                    <field name="record_count" readonly="1" string="Records Selected"/>
+                    <field name="owner_id" options="{'no_create': True}"/>
+                </group>
+                <p class="text-muted">
+                    Every selected item will be reassigned to the chosen owner —
+                    useful when setting up a new assessment or moving items to a
+                    new lead.
+                </p>
+                <footer>
+                    <button name="action_confirm" type="object" string="Assign" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Bound to the Evidence list view: appears in the Actions (⚙) menu once
+         one or more evidence rows are selected. -->
+    <record id="action_nhs_dspt_bulk_owner_evidence" model="ir.actions.act_window">
+        <field name="name">Bulk Assign Owner</field>
+        <field name="res_model">nhs.dspt.bulk.owner.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_nhs_dspt_evidence"/>
+        <field name="binding_view_types">list</field>
+    </record>
+
+    <!-- Bound to the Assertions list view likewise. -->
+    <record id="action_nhs_dspt_bulk_owner_assertion" model="ir.actions.act_window">
+        <field name="name">Bulk Assign Owner</field>
+        <field name="res_model">nhs.dspt.bulk.owner.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_nhs_dspt_assertion"/>
+        <field name="binding_view_types">list</field>
+    </record>
+</odoo>

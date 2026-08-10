@@ -1,0 +1,98 @@
+/* Fitness Center Website Custom Styles */
+
+.fitness-hero {
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+    color: white;
+    padding: 100px 0;
+    text-align: center;
+}
+
+.fitness-hero h1 {
+    font-size: 4rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.fitness-section-title {
+    position: relative;
+    margin-bottom: 50px;
+    text-align: center;
+    font-weight: 700;
+    color: #333;
+}
+
+.fitness-section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: #b21f1f;
+}
+
+.fitness-card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.fitness-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+.fitness-card img {
+    height: 250px;
+    object-fit: cover;
+}
+
+.fitness-price-tag {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #b21f1f;
+}
+
+.fitness-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.btn-fitness {
+    background: #b21f1f;
+    color: white;
+    border-radius: 25px;
+    padding: 10px 30px;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+.btn-fitness:hover {
+    background: #1a2a6c;
+    color: white;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+}

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fitness_member_kanban_attendance" model="ir.ui.view">
+        <field name="name">fitness.member.kanban.attendance</field>
+        <field name="model">fitness.member</field>
+        <field name="arch" type="xml">
+            <kanban class="o_attendance_kanban" create="false">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="age"/>
+                <field name="phone"/>
+                <field name="last_check_in"/>
+                <field name="last_check_out"/>
+                <field name="is_checked_in"/>
+                <field name="image_1920"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="o_kanban_record_has_image_fill o_attendance_kanban_record">
+                            <field name="image_1920" widget="image" class="o_kanban_image_fill_left" options="{'zoom': true, 'background': true, 'prevent_pause': true}"/>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title"><field name="name"/></strong>
+                                <div class="o_kanban_record_subtitle">
+                                    <div t-if="record.age.raw_value">Age: <field name="age"/></div>
+                                    <div t-if="record.phone.raw_value">Contact: <field name="phone"/></div>
+                                </div>
+                                <div class="mt-2 text-muted small">
+                                    <div><strong>Check In Time:</strong><br/> <field name="last_check_in"/></div>
+                                    <div class="mt-1"><strong>Check Out Time:</strong><br/> <field name="last_check_out"/></div>
+                                </div>
+                                <div class="o_kanban_record_bottom mt-3">
+                                    <div class="oe_kanban_bottom_left">
+                                        <!-- Manual buttons removed for automatic attendance -->
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <div t-if="record.is_checked_in.raw_value" class="o_status o_status_green" title="Checked In"/>
+                                        <div t-if="!record.is_checked_in.raw_value" class="o_status o_status_red" title="Checked Out"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_fitness_member_attendance_kanban" model="ir.actions.act_window">
+        <field name="name">Members Checkin Checkout</field>
+        <field name="res_model">fitness.member</field>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_fitness_member_kanban_attendance"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Manage member check-ins and check-outs.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_fitness_member_attendance_kanban"
+              name="Members Checkin Checkout"
+              parent="fitness_center_management.menu_fitness_operations"
+              action="action_fitness_member_attendance_kanban"
+              sequence="15"/>
+</odoo>

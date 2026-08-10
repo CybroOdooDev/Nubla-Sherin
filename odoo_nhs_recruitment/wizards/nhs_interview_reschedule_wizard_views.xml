@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard view: capture the new date/time before flagging an interview rescheduled -->
+    <record id="view_nhs_interview_reschedule_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.interview.reschedule.wizard.form</field>
+        <field name="model">nhs.interview.reschedule.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reschedule Interview">
+                <field name="interview_id" invisible="1"/>
+                <group>
+                    <field name="old_datetime"/>
+                    <field name="new_datetime"/>
+                    <field name="new_location" placeholder="Leave blank to keep the current location"/>
+                    <field name="reason"/>
+                </group>
+                <footer>
+                    <button name="action_apply" type="object" string="Reschedule" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

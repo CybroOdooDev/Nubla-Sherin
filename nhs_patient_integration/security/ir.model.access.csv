@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nhs_simple_patient_user,access.nhs.simple.patient.user,model_nhs_simple_patient,base.group_user,1,1,1,0
+access_nhs_simple_patient_admin,access.nhs.simple.patient.admin,model_nhs_simple_patient,base.group_system,1,1,1,1
+access_nhs_simple_log_user,access.nhs.simple.log.user,model_nhs_simple_log,base.group_user,1,0,0,0
+access_nhs_simple_log_admin,access.nhs.simple.log.admin,model_nhs_simple_log,base.group_system,1,1,1,1
+access_nhs_simple_doctor_user,access.nhs.simple.doctor.user,model_nhs_simple_doctor,base.group_user,1,1,1,0
+access_nhs_simple_doctor_admin,access.nhs.simple.doctor.admin,model_nhs_simple_doctor,base.group_system,1,1,1,1

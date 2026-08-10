@@ -1,0 +1,738 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Inject links into standard portal home -->
+    <template id="portal_my_home_fitness" name="Show Fitness in Portal" inherit_id="portal.portal_my_home" priority="30">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">My Fitness Dashboard</t>
+                <t t-set="url" t-value="'/my/fitness'"/>
+                <t t-set="placeholder_count" t-value="'fitness_member_count'"/>
+            </t>
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Trainer Area</t>
+                <t t-set="url" t-value="'/my/trainer'"/>
+                <t t-set="placeholder_count" t-value="'fitness_trainer_count'"/>
+            </t>
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Manager Dashboard</t>
+                <t t-set="url" t-value="'/my/manager'"/>
+                <t t-set="placeholder_count" t-value="'fitness_manager_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Breadcrumbs -->
+    <template id="portal_my_home_menu_fitness" name="Portal layout : fitness menu entries" inherit_id="portal.portal_breadcrumbs" priority="30">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'fitness_dashboard'" class="breadcrumb-item active">
+                My Fitness
+            </li>
+            <li t-if="page_name == 'fitness_subscription'" class="breadcrumb-item">
+                <a href="/my/fitness">My Fitness</a>
+            </li>
+            <li t-if="page_name == 'fitness_subscription'" class="breadcrumb-item active">
+                My Subscription
+            </li>
+            <li t-if="page_name == 'fitness_bookings'" class="breadcrumb-item">
+                <a href="/my/fitness">My Fitness</a>
+            </li>
+            <li t-if="page_name == 'fitness_bookings'" class="breadcrumb-item active">
+                My Bookings
+            </li>
+            <li t-if="page_name == 'fitness_checkins'" class="breadcrumb-item">
+                <a href="/my/fitness">My Fitness</a>
+            </li>
+            <li t-if="page_name == 'fitness_checkins'" class="breadcrumb-item active">
+                My Check-ins
+            </li>
+            <li t-if="page_name == 'fitness_profile'" class="breadcrumb-item">
+                <a href="/my/fitness">My Fitness</a>
+            </li>
+            <li t-if="page_name == 'fitness_profile'" class="breadcrumb-item active">
+                My Profile
+            </li>
+            <li t-if="page_name == 'fitness_invoices'" class="breadcrumb-item">
+                <a href="/my/fitness">My Fitness</a>
+            </li>
+            <li t-if="page_name == 'fitness_invoices'" class="breadcrumb-item active">
+                My Invoices
+            </li>
+            <!-- Trainer breadcrumbs -->
+            <li t-if="page_name == 'trainer_dashboard'" class="breadcrumb-item active">
+                Trainer Area
+            </li>
+            <li t-if="page_name == 'trainer_classes'" class="breadcrumb-item">
+                <a href="/my/trainer">Trainer Area</a>
+            </li>
+            <li t-if="page_name == 'trainer_classes'" class="breadcrumb-item active">
+                My Classes
+            </li>
+            <li t-if="page_name == 'trainer_clients'" class="breadcrumb-item">
+                <a href="/my/trainer">Trainer Area</a>
+            </li>
+            <li t-if="page_name == 'trainer_clients'" class="breadcrumb-item active">
+                My Clients
+            </li>
+            <!-- Manager breadcrumbs -->
+            <li t-if="page_name == 'manager_dashboard'" class="breadcrumb-item active">
+                Manager Dashboard
+            </li>
+        </xpath>
+    </template>
+
+    <!-- Error Pages -->
+    <template id="portal_fitness_not_member" name="Not a Member">
+        <t t-call="portal.portal_layout">
+            <div class="alert alert-warning mt-4" role="alert">
+                <h4 class="alert-heading">Not a Fitness Member</h4>
+                <p>You currently do not have a fitness member profile associated with this account. Please join a plan in the website to activate your account.</p>
+                <hr/>
+                <a href="/membership/plans" class="btn btn-primary">View Our Plans</a>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_trainer_not_trainer" name="Not a Trainer">
+        <t t-call="portal.portal_layout">
+            <div class="alert alert-warning mt-4" role="alert">
+                <h4 class="alert-heading">Trainer Access Denied</h4>
+                <p>This portal area is restricted to fitness trainers only.</p>
+                <hr/>
+                <a href="/my/home" class="btn btn-primary">Return to Portal Home</a>
+            </div>
+        </t>
+    </template>
+
+    <!-- Member Dashboard -->
+    <template id="portal_my_fitness_dashboard" name="My Fitness Dashboard">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-4 mb-5">
+                <div class="row">
+                    <!-- Left Sidebar (Menu) -->
+                    <div class="col-md-3 mb-4">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Fitness Menu</h5>
+                            </div>
+                            <div class="list-group list-group-flush">
+                                <a href="/my/fitness" class="list-group-item list-group-item-action active">Dashboard</a>
+                                <a href="/my/fitness/subscription" class="list-group-item list-group-item-action">My Subscription</a>
+                                <a href="/my/fitness/bookings" class="list-group-item list-group-item-action">My Bookings</a>
+                                <a href="/my/fitness/checkins" class="list-group-item list-group-item-action">My Check-ins</a>
+                                <a href="/my/fitness/profile" class="list-group-item list-group-item-action">My Profile &amp; Health</a>
+                                <a href="/my/fitness/invoices" class="list-group-item list-group-item-action">My Invoices</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Content -->
+                    <div class="col-md-9">
+                        <h2 class="mb-4">Welcome back, <t t-esc="member.name"/>!</h2>
+                        
+                        <div class="row mb-4">
+                            <!-- Subscription Card -->
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 border-primary">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary"><i class="fa fa-id-card-o"></i> Current Plan</h5>
+                                        <t t-if="subscription">
+                                            <h3 class="mb-2"><t t-esc="subscription.plan_id.name"/></h3>
+                                            <p class="text-muted mb-1">Status: <span class="badge text-bg-success" t-esc="subscription.state"/></p>
+                                            <p class="text-muted"><small>Valid until: <t t-esc="subscription.end_date"/></small></p>
+                                            <a href="/my/fitness/subscription" class="btn btn-outline-primary btn-sm mt-2">Manage</a>
+                                        </t>
+                                        <t t-else="">
+                                            <p>You don't have an active subscription.</p>
+                                            <a href="/membership/plans" class="btn btn-primary btn-sm">Join Now</a>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Check-ins stat -->
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 border-info">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title text-info mb-3"><i class="fa fa-bed"></i> Total Visits</h5> <!-- Bed icon for some reason? Let's fix in later iteration if needed -->
+                                        <!-- Will use sudo field directly if possible -->
+                                        <h1 class="display-3"><t t-esc="len(member.attendance_ids)"/></h1>
+                                        <a href="/my/fitness/checkins" class="btn btn-outline-info btn-sm mt-2">View History</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Upcoming Bookings -->
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Upcoming Bookings</h5>
+                                <a href="/my/fitness/bookings" class="btn btn-sm btn-link">View All</a>
+                            </div>
+                            <div class="card-body p-0">
+                                <t t-if="not bookings">
+                                    <p class="p-4 text-muted text-center mb-0">No upcoming bookings found.</p>
+                                </t>
+                                <t t-else="">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Class</th>
+                                                    <th>Date &amp; Time</th>
+                                                    <th>Trainer</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="bookings" t-as="b">
+                                                    <td><t t-esc="b.schedule_id.class_id.name"/></td>
+                                                    <td><t t-esc="b.schedule_id.date_start"/></td>
+                                                    <td><t t-esc="b.schedule_id.trainer_id.name"/></td>
+                                                    <td><span class="badge text-bg-info" t-esc="b.state"/></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Member Subscription -->
+    <template id="portal_my_fitness_subscription" name="My Subscription">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-4 mb-5">
+                <h3 class="mb-4">My Subscriptions</h3>
+                <div t-if="not subscriptions" class="alert alert-info">
+                    You have no subscription history.
+                </div>
+                <div class="row" t-if="subscriptions">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-striped border">
+                                <thead>
+                                    <tr>
+                                        <th>Reference</th>
+                                        <th>Plan</th>
+                                        <th>Period</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="subscriptions" t-as="subs">
+                                        <td><t t-esc="subs.name"/></td>
+                                        <td><t t-esc="subs.plan_id.name"/></td>
+                                        <td><t t-esc="subs.start_date"/> to <t t-esc="subs.end_date"/></td>
+                                        <td><t t-esc="subs.total_amount" t-options='{"widget": "monetary", "display_currency": subs.currency_id}'/></td>
+                                        <td>
+                                            <t t-if="subs.state == 'active'">
+                                                <span class="badge text-bg-success">Active</span>
+                                            </t>
+                                            <t t-elif="subs.state == 'draft'">
+                                                <span class="badge text-bg-secondary">Draft</span>
+                                            </t>
+                                            <t t-elif="subs.state == 'expired'">
+                                                <span class="badge text-bg-danger">Expired</span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="badge text-bg-info"><t t-esc="subs.state"/></span>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Member Bookings -->
+    <template id="portal_my_fitness_bookings" name="My Bookings">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Class Bookings</t>
+            </t>
+            <div t-if="not bookings" class="alert alert-info mt-3">
+                There are currently no bookings for your account.
+            </div>
+            <div class="table-responsive mt-3" t-if="bookings">
+                <table class="table table-hover o_portal_my_doc_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Class</th>
+                            <th>Schedule Date</th>
+                            <th>Trainer</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="bookings" t-as="b">
+                            <td><t t-esc="b.schedule_id.class_id.name"/></td>
+                            <td><t t-esc="b.schedule_id.date_start"/></td>
+                            <td><t t-esc="b.schedule_id.trainer_id.name"/></td>
+                            <td><span class="badge text-bg-info"><t t-esc="b.state"/></span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Member Check-ins -->
+    <template id="portal_my_fitness_checkins" name="My Check-ins">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Check-ins</t>
+            </t>
+            <div t-if="not checkins" class="alert alert-info mt-3">
+                There are currently no check-ins for your account.
+            </div>
+            <div class="table-responsive mt-3" t-if="checkins">
+                <table class="table table-hover o_portal_my_doc_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Date &amp; Time</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="checkins" t-as="c">
+                            <td><t t-esc="c.check_in"/></td>
+                            <td>
+                                <span class="badge text-bg-success">Facility Access</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+
+    <!-- Member Profile -->
+    <template id="portal_my_fitness_profile" name="My Profile">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-4 mb-5">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-white">
+                                <h4>My Personal Profile</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <strong>Name:</strong> <t t-esc="member.name"/><br/>
+                                        <strong>Email:</strong> <t t-esc="member.email"/><br/>
+                                        <strong>Phone:</strong> <t t-esc="member.phone"/><br/>
+                                        <strong>Join Date:</strong> <t t-esc="member.join_date"/><br/>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <strong>Date of Birth:</strong> <t t-esc="member.dob"/><br/>
+                                        <strong>Age:</strong> <t t-esc="member.age"/><br/>
+                                        <strong>Barcode:</strong> <t t-esc="member.barcode"/><br/>
+                                    </div>
+                                </div>
+                                <hr/>
+                                <h5>Health &amp; Measurements</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <strong>Height:</strong> <t t-esc="member.height"/> cm<br/>
+                                        <strong>Weight:</strong> <t t-esc="member.weight"/> kg<br/>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <strong>BMI:</strong> <t t-esc="member.bmi"/><br/>
+                                        <strong>Fitness Goal:</strong> <t t-esc="member.fitness_goal"/><br/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Member Invoices -->
+    <template id="portal_my_fitness_invoices" name="My Invoices">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">My Invoices</t>
+            </t>
+            <div t-if="not invoices" class="alert alert-info mt-3">
+                There are currently no invoices for your account.
+            </div>
+            <div class="table-responsive mt-3" t-if="invoices">
+                <table class="table table-hover o_portal_my_doc_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Invoice Number</th>
+                            <th>Invoice Date</th>
+                            <th>Amount Due</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="invoices" t-as="inv">
+                            <td><a t-att-href="inv.get_portal_url()"><t t-esc="inv.name"/></a></td>
+                            <td><t t-esc="inv.invoice_date"/></td>
+                            <td><t t-esc="inv.amount_residual" t-options='{"widget": "monetary", "display_currency": inv.currency_id}'/></td>
+                            <td>
+                                <span t-if="inv.payment_state in ('paid', 'in_payment')" class="badge text-bg-success">Paid</span>
+                                <span t-else="" class="badge text-bg-warning">Unpaid</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+
+    <!-- Trainer Dashboard -->
+    <template id="portal_my_trainer_dashboard" name="Trainer Dashboard">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-4 mb-5">
+                <div class="row">
+                    <!-- Sidebar -->
+                    <div class="col-md-3 mb-4">
+                        <div class="card">
+                            <div class="card-header bg-dark text-white">
+                                <h5 class="mb-0">Trainer Area</h5>
+                            </div>
+                            <div class="list-group list-group-flush">
+                                <a href="/my/trainer" class="list-group-item list-group-item-action active">Dashboard</a>
+                                <a href="/my/trainer/classes" class="list-group-item list-group-item-action">My Classes</a>
+                                <a href="/my/trainer/clients" class="list-group-item list-group-item-action">My Clients</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Content -->
+                    <div class="col-md-9">
+                        <h2 class="mb-4">Hello Trainer <t t-esc="trainer.name"/>!</h2>
+                        
+                        <!-- Upcoming Schedule -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Today's Classes</h5>
+                                <a href="/my/trainer/classes" class="btn btn-sm btn-link">View All Schedule</a>
+                            </div>
+                            <div class="card-body p-0">
+                                <t t-if="not classes">
+                                    <p class="p-4 text-muted text-center mb-0">No upcoming classes scheduled.</p>
+                                </t>
+                                <t t-else="">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Class</th>
+                                                    <th>Time</th>
+                                                    <th>Bookings</th>
+                                                    <th>Duration</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="classes" t-as="c">
+                                                    <td><t t-esc="c.class_id.name"/></td>
+                                                    <td><t t-esc="c.date_start"/></td>
+                                                    <td><t t-esc="c.booked_spots"/> / <t t-esc="c.capacity"/></td>
+                                                    <td><t t-esc="c.duration"/> hours</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Trainer Classes -->
+    <template id="portal_my_trainer_classes" name="My Classes">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-4 mb-5">
+                <h3 class="mb-4">My Class Schedule</h3>
+                <div t-if="not classes" class="alert alert-info">
+                    You have no classes scheduled.
+                </div>
+                <div class="row" t-if="classes">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-striped border">
+                                <thead>
+                                    <tr>
+                                        <th>Class</th>
+                                        <th>Date &amp; Time</th>
+                                        <th>Bookings</th>
+                                        <th>State</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="classes" t-as="c">
+                                        <td><t t-esc="c.class_id.name"/></td>
+                                        <td><t t-esc="c.date_start"/> to <t t-esc="c.date_end"/></td>
+                                        <td><t t-esc="c.booked_spots"/> / <t t-esc="c.capacity"/></td>
+                                        <td>
+                                            <span class="badge text-bg-primary"><t t-esc="c.state"/></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Trainer Clients -->
+    <template id="portal_my_trainer_clients" name="My Clients">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-4 mb-5">
+                <h3 class="mb-4">My Clients</h3>
+                <div t-if="not clients" class="alert alert-info">
+                    You have no personal training clients.
+                </div>
+                <div class="row" t-if="clients">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <t t-foreach="clients" t-as="client">
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-primary"><t t-esc="client.name"/></h5>
+                                            <p class="card-text">
+                                                <strong>Email:</strong> <t t-esc="client.email"/><br/>
+                                                <strong>Phone:</strong> <t t-esc="client.phone"/><br/>
+                                                <strong>Goal:</strong> <t t-esc="client.fitness_goal"/>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Manager Sidebar -->
+    <template id="portal_my_manager_sidebar" name="Manager Sidebar">
+        <div class="col-12 col-md-3 bg-light pt-3 pb-3 rounded border h-100">
+            <h5 class="mb-3 p-2 bg-dark text-white rounded">Manager Menu</h5>
+            <ul class="nav flex-column nav-pills">
+                <li class="nav-item"><a t-attf-class="nav-link #{'active bg-dark' if page_name == 'manager_dashboard' else 'text-dark'}" href="/my/manager">Overview</a></li>
+                <li class="nav-item mt-2"><a t-attf-class="nav-link #{'active bg-dark' if page_name in ['manager_members', 'manager_member_detail'] else 'text-dark'}" href="/my/manager/members">Member Directory</a></li>
+            </ul>
+        </div>
+    </template>
+
+    <!-- Manager Dashboard -->
+    <template id="portal_my_manager_dashboard" name="Manager Dashboard">
+        <t t-call="portal.portal_layout">
+            <div class="row mt-4 mb-5">
+                <t t-call="fitness_center_management.portal_my_manager_sidebar"/>
+                
+                <div class="col-12 col-md-9">
+                    <h2 class="mb-4 border-bottom pb-2">Center Overview</h2>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card text-white bg-primary h-100 shadow-sm border-0">
+                                <div class="card-body text-center py-4">
+                                    <h5 class="card-title text-uppercase font-weight-bold">Total Members</h5>
+                                    <h1 class="display-3 font-weight-bold"><t t-esc="member_count"/></h1>
+                                    <a href="/my/manager/members" class="btn btn-light btn-sm mt-3">View Directory</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="card text-white bg-success h-100 shadow-sm border-0">
+                                <div class="card-body text-center py-4">
+                                    <h5 class="card-title text-uppercase font-weight-bold">Active Subscriptions</h5>
+                                    <h1 class="display-3 font-weight-bold"><t t-esc="active_subscriptions"/></h1>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="card text-white bg-info h-100 shadow-sm border-0">
+                                <div class="card-body text-center py-4">
+                                    <h5 class="card-title text-uppercase font-weight-bold">Registered Trainers</h5>
+                                    <h1 class="display-3 font-weight-bold"><t t-esc="trainer_count"/></h1>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="card text-white bg-warning h-100 shadow-sm border-0">
+                                <div class="card-body text-center py-4">
+                                    <h5 class="card-title text-uppercase font-weight-bold">Active Classes</h5>
+                                    <h1 class="display-3 font-weight-bold"><t t-esc="active_classes"/></h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Manager Members List -->
+    <template id="portal_my_manager_members" name="Manager Members Directory">
+        <t t-call="portal.portal_layout">
+            <div class="row mt-4 mb-5">
+                <t t-call="fitness_center_management.portal_my_manager_sidebar"/>
+                
+                <div class="col-12 col-md-9">
+                    <h2 class="mb-4 border-bottom pb-2">Member Directory</h2>
+                    
+                    <t t-if="members">
+                        <div class="table-responsive">
+                            <table class="table table-hover bg-white shadow-sm rounded">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Phone</th>
+                                        <th>Email</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="members" t-as="m">
+                                        <tr>
+                                            <td class="align-middle font-weight-bold">
+                                                <t t-esc="m.name"/>
+                                            </td>
+                                            <td class="align-middle">
+                                                <t t-esc="m.phone or '-'"/>
+                                            </td>
+                                            <td class="align-middle">
+                                                <t t-esc="m.email or '-'"/>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                <a t-attf-href="/my/manager/member/#{m.id}" class="btn btn-sm btn-outline-dark">View Details</a>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Manager Member Detail -->
+    <template id="portal_my_manager_member_detail" name="Member Details">
+        <t t-call="portal.portal_layout">
+            <div class="row mt-4 mb-5">
+                <t t-call="fitness_center_management.portal_my_manager_sidebar"/>
+                
+                <div class="col-12 col-md-9">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2><span class="text-muted">Member / </span><t t-esc="target_member.name"/></h2>
+                        <a href="/my/manager/members" class="btn btn-sm btn-outline-secondary">Back to Directory</a>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-header bg-white font-weight-bold">Contact Info</div>
+                                <div class="card-body">
+                                    <p class="mb-1"><strong>Phone:</strong> <t t-esc="target_member.phone or 'N/A'"/></p>
+                                    <p class="mb-1"><strong>Email:</strong> <t t-esc="target_member.email or 'N/A'"/></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-header bg-info text-white font-weight-bold">Health Metrics</div>
+                                <div class="card-body">
+                                    <p class="mb-1"><strong>Height:</strong> <t t-esc="target_member.height or 0"/> cm</p>
+                                    <p class="mb-1"><strong>Weight:</strong> <t t-esc="target_member.weight or 0"/> kg</p>
+                                    <p class="mb-1"><strong>BMI:</strong> <t t-esc="round(target_member.bmi, 2) if target_member.bmi else '-'"/></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h4 class="mt-4 mb-3">Subscriptions</h4>
+                    <t t-if="subscriptions">
+                        <div class="card shadow-sm border-0 mb-4">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th>Plan</th>
+                                            <th>Start</th>
+                                            <th>End</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="subscriptions" t-as="sub">
+                                            <tr>
+                                                <td class="align-middle font-weight-bold"><t t-esc="sub.plan_id.name"/></td>
+                                                <td class="align-middle"><t t-esc="sub.start_date"/></td>
+                                                <td class="align-middle"><t t-esc="sub.end_date or '-'"/></td>
+                                                <td class="align-middle">
+                                                    <span t-attf-class="badge #{'bg-success' if sub.state == 'active' else 'bg-warning' if sub.state == 'draft' else 'bg-danger'} px-2 py-1 text-uppercase" t-esc="sub.state"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="alert alert-light text-center border">No subscriptions found for this member.</div>
+                    </t>
+                    
+                    <h4 class="mt-4 mb-3">Recent Class Bookings</h4>
+                    <t t-if="bookings">
+                        <div class="card shadow-sm border-0 mb-4">
+                            <ul class="list-group list-group-flush">
+                                <t t-foreach="bookings[:5]" t-as="bk">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                        <div>
+                                            <h6 class="mb-1 font-weight-bold"><t t-esc="bk.class_id.name"/></h6>
+                                            <small class="text-muted"><t t-esc="bk.schedule_id.date_start"/></small>
+                                        </div>
+                                        <span t-attf-class="badge #{'bg-success' if bk.state == 'booked' else 'bg-secondary'} px-2 py-1"><t t-esc="bk.state"/></span>
+                                    </li>
+                                </t>
+                            </ul>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="alert alert-light text-center border">No class bookings found for this member.</div>
+                    </t>
+                    
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

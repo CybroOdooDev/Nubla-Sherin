@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Kanban View -->
+    <record id="view_epic_patient_kanban" model="ir.ui.view">
+        <field name="name">epic.patient.kanban</field>
+        <field name="model">epic.patient</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="ward_id" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="nhs_number"/>
+                <field name="mrn"/>
+                <field name="gender"/>
+                <field name="ward_id"/>
+                <field name="birth_date"/>
+                <field name="admission_date"/>
+                <field name="active"/>
+                <templates>
+                    <t t-name="kanban-card">
+                        <div class="oe_kanban_card oe_kanban_global_click p-3">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                    </strong>
+                                </div>
+                                <div class="o_kanban_record_top_right">
+                                    <span t-if="record.gender.value" class="badge text-bg-secondary">
+                                        <field name="gender"/>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_body mt-1">
+                                <div t-if="record.nhs_number.value">
+                                    <small class="text-muted">NHS </small>
+                                    <small><field name="nhs_number"/></small>
+                                </div>
+                                <div t-if="record.mrn.value">
+                                    <small class="text-muted">MRN </small>
+                                    <small><field name="mrn"/></small>
+                                </div>
+                                <div t-if="record.admission_date.value" class="mt-1">
+                                    <small class="text-muted">Admitted: </small>
+                                    <small><field name="admission_date"/></small>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_epic_patient_list" model="ir.ui.view">
+        <field name="name">epic.patient.list</field>
+        <field name="model">epic.patient</field>
+        <field name="arch" type="xml">
+            <list string="Patients">
+                <header>
+                    <button name="action_sync_patients" type="object"
+                            string="Sync Patients from Epic" class="btn-primary" display="always"/>
+                </header>
+                <field name="name"/>
+                <field name="nhs_number" string="NHS Number"/>
+                <field name="mrn"/>
+                <field name="birth_date"/>
+                <field name="gender"/>
+                <field name="ward_id"/>
+                <field name="phone"/>
+                <field name="gp_practice"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_epic_patient_form" model="ir.ui.view">
+        <field name="name">epic.patient.form</field>
+        <field name="model">epic.patient</field>
+        <field name="arch" type="xml">
+            <form string="Patient">
+                <header>
+                    <button name="action_push_to_epic" type="object"
+                            string="Push to Epic" class="btn-primary"
+                            invisible="epic_id != False"
+                            groups="epic_integration.group_nhs_clinician"/>
+                    <button name="action_sync_patients" type="object"
+                            string="Sync from Epic" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Discharged" bg_color="text-bg-info"
+                            invisible="not discharge_date"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_allergies" icon="fa-exclamation-triangle"
+                                groups="epic_integration.group_nhs_clinician">
+                            <field name="allergy_count" widget="statinfo" string="Allergies"/>
+                        </button>
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_conditions" icon="fa-stethoscope"
+                                groups="epic_integration.group_nhs_clinician">
+                            <field name="condition_count" widget="statinfo" string="Conditions"/>
+                        </button>
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_notes" icon="fa-file-text-o"
+                                groups="epic_integration.group_nhs_clinician">
+                            <field name="note_count" widget="statinfo" string="Notes"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Patient Full Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="NHS Identifiers">
+                            <field name="nhs_number"/>
+                            <field name="mrn"/>
+                            <field name="epic_id" string="Epic FHIR ID"/>
+                        </group>
+                        <group string="Demographics">
+                            <field name="birth_date"/>
+                            <field name="gender"/>
+                            <field name="blood_type"/>
+                            <field name="ethnic_group"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Admission">
+                            <field name="ward_id"/>
+                            <field name="admission_date"/>
+                            <field name="discharge_date"/>
+                        </group>
+                        <group string="Contact">
+                            <field name="phone" widget="phone"/>
+                            <field name="email" widget="email"/>
+                            <field name="address"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="GP Details">
+                            <field name="gp_name"/>
+                            <field name="gp_practice"/>
+                        </group>
+                        <group string="Next of Kin">
+                            <field name="next_of_kin"/>
+                            <field name="next_of_kin_phone" widget="phone"/>
+                        </group>
+                    </group>
+                    <group string="US / SSN" groups="epic_integration.group_nhs_trust_admin">
+                        <field name="ssn" password="True"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_epic_patient" model="ir.actions.act_window">
+        <field name="name">Patients</field>
+        <field name="res_model">epic.patient</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No Patients Found</p>
+            <p>Click "Sync Patients from Epic" to import patient data from your Epic EHR system.</p>
+        </field>
+    </record>
+</odoo>

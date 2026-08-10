@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view for a declaration of interest -->
+    <record id="view_nhs_declaration_form" model="ir.ui.view">
+        <field name="name">nhs.declaration.form</field>
+        <field name="model">nhs.declaration</field>
+        <field name="arch" type="xml">
+            <form string="Declaration Of Interest">
+                <header>
+                    <button name="action_set_noted" string="Noted" type="object" class="oe_highlight" invisible="conflict_management or event != 'at_meeting'" />
+                    <button name="action_set_withdrew" string="Withdrew From Item" type="object" class="oe_highlight" invisible="conflict_management != 'noted' or event != 'at_meeting'" />
+                    <button name="action_set_left_room" string="Left The Room" type="object" class="oe_highlight" invisible="conflict_management != 'withdrew_from_item' or event != 'at_meeting'" />
+                    <button name="action_set_no_action" string="No Action Required" type="object" class="oe_highlight" invisible="conflict_management != 'left_room' or event != 'at_meeting'" />
+                    <field name="conflict_management" widget="statusbar" invisible="event != 'at_meeting'" />
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="director_id"/>
+                            <field name="category_id"/>
+                            <field name="event"/>
+                            <field name="is_published"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="related_org" invisible="category_code == 'nil'"/>
+                        </group>
+                    </group>
+                    <group string="Nature Of Interest" invisible="category_code == 'nil'">
+                        <field name="nature" nolabel="1" colspan="2" widget="text"/>
+                    </group>
+                    <group string="At-Meeting Declaration" invisible="event != 'at_meeting'">
+                        <field name="meeting_id"/>
+                        <field name="agenda_item_id" domain="[('meeting_id', '=', meeting_id)]"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List view for the declarations of interest register -->
+    <record id="view_nhs_declaration_list" model="ir.ui.view">
+        <field name="name">nhs.declaration.list</field>
+        <field name="model">nhs.declaration</field>
+        <field name="arch" type="xml">
+            <list string="Declarations Of Interest">
+                <field name="director_id"/>
+                <field name="category_id"/>
+                <field name="event"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="is_published"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search view with filters and group-bys for declarations -->
+    <record id="view_nhs_declaration_search" model="ir.ui.view">
+        <field name="name">nhs.declaration.search</field>
+        <field name="model">nhs.declaration</field>
+        <field name="arch" type="xml">
+            <search string="Search Declarations">
+                <field name="director_id"/>
+                <field name="category_id"/>
+                <filter name="published" string="Published Register" domain="[('is_published', '=', True)]"/>
+                <filter name="at_meeting" string="At-Meeting Declarations" domain="[('event', '=', 'at_meeting')]"/>
+                <filter name="annual" string="Annual Refresh" domain="[('event', '=', 'annual')]"/>
+                <group name="group_by">
+                    <filter name="group_director" string="Declared By" context="{'group_by': 'director_id'}"/>
+                    <filter name="group_category" string="Category" context="{'group_by': 'category_id'}"/>
+                    <filter name="group_event" string="Trigger" context="{'group_by': 'event'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window action opening the full Interests Register -->
+    <record id="action_nhs_declaration" model="ir.actions.act_window">
+        <field name="name">Interests Register</field>
+        <field name="res_model">nhs.declaration</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No declarations recorded yet</p>
+        </field>
+    </record>
+
+    <!-- List view restricted to annual-refresh declarations, no manual create -->
+    <record id="view_nhs_declaration_annual_list" model="ir.ui.view">
+        <field name="name">nhs.declaration.annual.list</field>
+        <field name="model">nhs.declaration</field>
+        <field name="arch" type="xml">
+            <list string="Annual Declarations" create="0">
+                <field name="director_id"/>
+                <field name="category_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="is_published"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Window action filtered to annual-refresh declarations -->
+    <record id="action_nhs_declaration_annual" model="ir.actions.act_window">
+        <field name="name">Annual Declarations</field>
+        <field name="res_model">nhs.declaration</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('event', '=', 'annual')]</field>
+        <field name="context">{'default_event': 'annual', 'search_default_group_director': 1}</field>
+    </record>
+
+    <!-- Binds the annual list view to the annual declarations window action -->
+    <record id="action_nhs_declaration_annual_list_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_nhs_declaration_annual_list"/>
+        <field name="act_window_id" ref="action_nhs_declaration_annual"/>
+    </record>
+</odoo>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--    Form view of books report model.-->
+    <record id="books_report_view_form" model="ir.ui.view">
+        <field name="name">book.report.view.form</field>
+        <field name="model">book.report</field>
+        <field name="arch" type="xml">
+            <form string="Books Report">
+                <form string="Import Book">
+                    <p class="oe_grey">
+                        Do you want to print the PDF report ?
+                    </p>
+                </form>
+                <footer>
+                    <button name="action_get_report" string="Print PDF"
+                            type="object"
+                            class="oe_highlight"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <!--Action for books report.-->
+    <record id="books_report_action" model="ir.actions.act_window">
+        <field name="name">Books Report</field>
+        <field name="res_model">book.report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="books_report_view_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

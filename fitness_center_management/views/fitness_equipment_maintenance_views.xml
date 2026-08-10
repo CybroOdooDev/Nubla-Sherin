@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fitness_equipment_maintenance_tree" model="ir.ui.view">
+        <field name="name">fitness.equipment.maintenance.tree</field>
+        <field name="model">fitness.equipment.maintenance</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <list string="Equipment Maintenance">
+                <field name="equipment_id"/>
+                <field name="maintenance_date"/>
+                <field name="technician"/>
+                <field name="cost" sum="Total Cost"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_fitness_equipment_maintenance" model="ir.actions.act_window">
+        <field name="name">Equipment Maintenance</field>
+        <field name="res_model">fitness.equipment.maintenance</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_fitness_equipment_maintenance"
+              name="Maintenance Logs"
+              parent="menu_fitness_equipment_root"
+              action="action_fitness_equipment_maintenance"
+              sequence="20"/>
+</odoo>

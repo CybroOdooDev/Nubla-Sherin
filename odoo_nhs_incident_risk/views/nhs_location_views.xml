@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_location_list" model="ir.ui.view">
+        <field name="name">nhs.location.list</field>
+        <field name="model">nhs.location</field>
+        <field name="arch" type="xml">
+            <list string="Locations">
+                <field name="complete_name"/>
+                <field name="location_type"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="default_handler_id"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_location_form" model="ir.ui.view">
+        <field name="name">nhs.location.form</field>
+        <field name="model">nhs.location</field>
+        <field name="arch" type="xml">
+            <form string="Location">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="parent_id"/>
+                            <field name="location_type"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="default_handler_id"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_location" model="ir.actions.act_window">
+        <field name="name">Locations</field>
+        <field name="res_model">nhs.location</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+    </record>
+</odoo>

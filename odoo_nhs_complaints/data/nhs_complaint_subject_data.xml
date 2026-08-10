@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ══════════════════════════════════════════════════
+         KO41a-aligned complaint subject taxonomy
+    ══════════════════════════════════════════════════════ -->
+
+    <!-- Clinical Treatment -->
+    <record id="subject_clinical_treatment" model="nhs.complaint.subject">
+        <field name="name">Clinical Treatment</field>
+        <field name="ko41a_code">CT</field>
+    </record>
+    <record id="subject_ct_diagnosis" model="nhs.complaint.subject">
+        <field name="name">Diagnosis / Misdiagnosis</field>
+        <field name="parent_id" ref="subject_clinical_treatment"/>
+        <field name="ko41a_code">CT01</field>
+    </record>
+    <record id="subject_ct_treatment_delay" model="nhs.complaint.subject">
+        <field name="name">Delay in Treatment</field>
+        <field name="parent_id" ref="subject_clinical_treatment"/>
+        <field name="ko41a_code">CT02</field>
+    </record>
+    <record id="subject_ct_surgical" model="nhs.complaint.subject">
+        <field name="name">Surgical / Procedural Complication</field>
+        <field name="parent_id" ref="subject_clinical_treatment"/>
+        <field name="ko41a_code">CT03</field>
+    </record>
+    <record id="subject_ct_medication" model="nhs.complaint.subject">
+        <field name="name">Medication / Prescribing Error</field>
+        <field name="parent_id" ref="subject_clinical_treatment"/>
+        <field name="ko41a_code">CT04</field>
+    </record>
+
+    <!-- Communication -->
+    <record id="subject_communication" model="nhs.complaint.subject">
+        <field name="name">Communication</field>
+        <field name="ko41a_code">CM</field>
+    </record>
+    <record id="subject_cm_patient" model="nhs.complaint.subject">
+        <field name="name">Communication with Patient</field>
+        <field name="parent_id" ref="subject_communication"/>
+        <field name="ko41a_code">CM01</field>
+    </record>
+    <record id="subject_cm_relatives" model="nhs.complaint.subject">
+        <field name="name">Communication with Relatives / Carers</field>
+        <field name="parent_id" ref="subject_communication"/>
+        <field name="ko41a_code">CM02</field>
+    </record>
+    <record id="subject_cm_records" model="nhs.complaint.subject">
+        <field name="name">Medical Records / Information</field>
+        <field name="parent_id" ref="subject_communication"/>
+        <field name="ko41a_code">CM03</field>
+    </record>
+
+    <!-- Values and Behaviours (Staff Attitude) -->
+    <record id="subject_values_behaviours" model="nhs.complaint.subject">
+        <field name="name">Values and Behaviours (Staff Attitude)</field>
+        <field name="ko41a_code">VB</field>
+    </record>
+    <record id="subject_vb_attitude" model="nhs.complaint.subject">
+        <field name="name">Staff Attitude / Rudeness</field>
+        <field name="parent_id" ref="subject_values_behaviours"/>
+        <field name="ko41a_code">VB01</field>
+    </record>
+    <record id="subject_vb_dignity" model="nhs.complaint.subject">
+        <field name="name">Dignity and Respect</field>
+        <field name="parent_id" ref="subject_values_behaviours"/>
+        <field name="ko41a_code">VB02</field>
+    </record>
+
+    <!-- Access to Services / Waiting Times -->
+    <record id="subject_access_waiting" model="nhs.complaint.subject">
+        <field name="name">Access to Services / Waiting Times</field>
+        <field name="ko41a_code">AW</field>
+    </record>
+    <record id="subject_aw_waiting_times" model="nhs.complaint.subject">
+        <field name="name">Waiting Times</field>
+        <field name="parent_id" ref="subject_access_waiting"/>
+        <field name="ko41a_code">AW01</field>
+    </record>
+    <record id="subject_aw_access" model="nhs.complaint.subject">
+        <field name="name">Access to Services</field>
+        <field name="parent_id" ref="subject_access_waiting"/>
+        <field name="ko41a_code">AW02</field>
+    </record>
+    <record id="subject_aw_referral" model="nhs.complaint.subject">
+        <field name="name">Referral Process</field>
+        <field name="parent_id" ref="subject_access_waiting"/>
+        <field name="ko41a_code">AW03</field>
+    </record>
+
+    <!-- Admissions and Discharges -->
+    <record id="subject_admissions_discharges" model="nhs.complaint.subject">
+        <field name="name">Admissions and Discharges</field>
+        <field name="ko41a_code">AD</field>
+    </record>
+    <record id="subject_ad_admission" model="nhs.complaint.subject">
+        <field name="name">Admission Process</field>
+        <field name="parent_id" ref="subject_admissions_discharges"/>
+        <field name="ko41a_code">AD01</field>
+    </record>
+    <record id="subject_ad_discharge" model="nhs.complaint.subject">
+        <field name="name">Discharge Process / Planning</field>
+        <field name="parent_id" ref="subject_admissions_discharges"/>
+        <field name="ko41a_code">AD02</field>
+    </record>
+    <record id="subject_ad_transfer" model="nhs.complaint.subject">
+        <field name="name">Transfer between Services</field>
+        <field name="parent_id" ref="subject_admissions_discharges"/>
+        <field name="ko41a_code">AD03</field>
+    </record>
+
+    <!-- Patient Care -->
+    <record id="subject_patient_care" model="nhs.complaint.subject">
+        <field name="name">Patient Care</field>
+        <field name="ko41a_code">PC</field>
+    </record>
+    <record id="subject_pc_nutrition" model="nhs.complaint.subject">
+        <field name="name">Nutrition and Hydration</field>
+        <field name="parent_id" ref="subject_patient_care"/>
+        <field name="ko41a_code">PC01</field>
+    </record>
+    <record id="subject_pc_privacy" model="nhs.complaint.subject">
+        <field name="name">Privacy and Dignity</field>
+        <field name="parent_id" ref="subject_patient_care"/>
+        <field name="ko41a_code">PC02</field>
+    </record>
+    <record id="subject_pc_general" model="nhs.complaint.subject">
+        <field name="name">General Nursing / Ward Care</field>
+        <field name="parent_id" ref="subject_patient_care"/>
+        <field name="ko41a_code">PC03</field>
+    </record>
+
+    <!-- Consent -->
+    <record id="subject_consent" model="nhs.complaint.subject">
+        <field name="name">Consent</field>
+        <field name="ko41a_code">CS</field>
+    </record>
+    <record id="subject_cs_information" model="nhs.complaint.subject">
+        <field name="name">Information for Consent</field>
+        <field name="parent_id" ref="subject_consent"/>
+        <field name="ko41a_code">CS01</field>
+    </record>
+    <record id="subject_cs_process" model="nhs.complaint.subject">
+        <field name="name">Consent Process</field>
+        <field name="parent_id" ref="subject_consent"/>
+        <field name="ko41a_code">CS02</field>
+    </record>
+
+    <!-- Prescribing / Medicines -->
+    <record id="subject_prescribing" model="nhs.complaint.subject">
+        <field name="name">Prescribing / Medicines Management</field>
+        <field name="ko41a_code">PM</field>
+    </record>
+    <record id="subject_pm_prescription" model="nhs.complaint.subject">
+        <field name="name">Prescription Error</field>
+        <field name="parent_id" ref="subject_prescribing"/>
+        <field name="ko41a_code">PM01</field>
+    </record>
+    <record id="subject_pm_dispensing" model="nhs.complaint.subject">
+        <field name="name">Dispensing Error</field>
+        <field name="parent_id" ref="subject_prescribing"/>
+        <field name="ko41a_code">PM02</field>
+    </record>
+    <record id="subject_pm_monitoring" model="nhs.complaint.subject">
+        <field name="name">Medicines Monitoring</field>
+        <field name="parent_id" ref="subject_prescribing"/>
+        <field name="ko41a_code">PM03</field>
+    </record>
+
+    <!-- Facilities and Environment -->
+    <record id="subject_facilities" model="nhs.complaint.subject">
+        <field name="name">Facilities and Environment</field>
+        <field name="ko41a_code">FE</field>
+    </record>
+    <record id="subject_fe_cleanliness" model="nhs.complaint.subject">
+        <field name="name">Cleanliness / Hygiene</field>
+        <field name="parent_id" ref="subject_facilities"/>
+        <field name="ko41a_code">FE01</field>
+    </record>
+    <record id="subject_fe_environment" model="nhs.complaint.subject">
+        <field name="name">Ward / Clinic Environment</field>
+        <field name="parent_id" ref="subject_facilities"/>
+        <field name="ko41a_code">FE02</field>
+    </record>
+
+    <!-- Transport -->
+    <record id="subject_transport" model="nhs.complaint.subject">
+        <field name="name">Transport</field>
+        <field name="ko41a_code">TR</field>
+    </record>
+    <record id="subject_tr_patient_transport" model="nhs.complaint.subject">
+        <field name="name">Patient Transport Service</field>
+        <field name="parent_id" ref="subject_transport"/>
+        <field name="ko41a_code">TR01</field>
+    </record>
+
+    <!-- Integrated / Joined-up Care -->
+    <record id="subject_integrated_care" model="nhs.complaint.subject">
+        <field name="name">Integrated / Joined-up Care</field>
+        <field name="ko41a_code">IC</field>
+    </record>
+    <record id="subject_ic_coordination" model="nhs.complaint.subject">
+        <field name="name">Care Coordination</field>
+        <field name="parent_id" ref="subject_integrated_care"/>
+        <field name="ko41a_code">IC01</field>
+    </record>
+    <record id="subject_ic_handover" model="nhs.complaint.subject">
+        <field name="name">Handover between Services</field>
+        <field name="parent_id" ref="subject_integrated_care"/>
+        <field name="ko41a_code">IC02</field>
+    </record>
+
+    <!-- Other -->
+    <record id="subject_other" model="nhs.complaint.subject">
+        <field name="name">Other</field>
+        <field name="ko41a_code">OT</field>
+    </record>
+    <record id="subject_ot_other" model="nhs.complaint.subject">
+        <field name="name">Other (specify in description)</field>
+        <field name="parent_id" ref="subject_other"/>
+        <field name="ko41a_code">OT01</field>
+    </record>
+</odoo>

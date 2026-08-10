@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- Dashboard list view -->
+    <record id="multi_dashboards_view_list" model="ir.ui.view">
+        <field name="name">multi.dashboards.view.list</field>
+        <field name="model">multi.dashboards</field>
+        <field name="arch" type="xml">
+            <list string="My Dashboards">
+                <field name="name"/>
+                <field name="allowed_groups" widget="many2many_tags"/>
+                <field name="company_id" invisible="1"/>
+            </list>
+        </field>
+    </record>
+    <!-- Dashboard form view -->
+    <record id="multi_dashboards_view_form" model="ir.ui.view">
+        <field name="name">multi.dashboards.view.form</field>
+        <field name="model">multi.dashboards</field>
+        <field name="arch" type="xml">
+            <form string="Form Title">
+                <header>
+                    <button name="action_create_menu"
+                            string="Create Menu"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="menu_id != False"/>
+                    <button name="action_view_menu"
+                            string="View"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="menu_id == False"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button"
+                                name="action_open_dashboard_charts"
+                                type="object"
+                                icon="fa-bar-chart">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Charts</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="parent_menu" options="{'no_create': True}"/>
+                            <field name="allowed_groups" widget="many2many_tags"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="menu_icon" widget="image"
+                                   class="oe_avatar"
+                                   invisible="parent_menu == True"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="menu_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Mail Template">
+                            <field name="user_ids" widget="many2many_tags"/>
+                            <field name="email_template_id" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Additional Options">
+                            <field name="theme"/>
+                            <field name="refresh_interval"/>
+                            <field name="dashboard_layout" widget="layout_selector"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!--    Dashboard action    -->
+    <record id="multi_dashboards_action" model="ir.actions.act_window">
+        <field name="name">Dashboards</field>
+        <field name="res_model">multi.dashboards</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first record
+            </p>
+        </field>
+    </record>
+    <!--  Menu items  -->
+    <menuitem id="config_multi_dashboards"
+              name="Configuration"
+              parent="multi_dashboard_root"
+              groups="multi_dashboard.group_multi_dashboard_manager"
+              sequence="100"/>
+    <menuitem id="menu_menu_dashboards"
+              name="Dashboards"
+              parent="config_multi_dashboards"
+              action="multi_dashboards_action"/>
+</odoo>
