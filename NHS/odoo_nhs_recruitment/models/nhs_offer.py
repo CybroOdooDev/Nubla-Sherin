@@ -19,8 +19,8 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import  api, fields, models
-from odoo.exceptions import UserError
+from odoo import api, fields, models
+from odoo.exceptions import UserError, ValidationError
 
 
 class NhsOffer(models.Model):
@@ -100,6 +100,21 @@ class NhsOffer(models.Model):
             offer.all_checks_cleared = bool(required) and all(
                 c.status == 'cleared' for c in required)
             offer.has_concern = bool(checks.filtered(lambda c: c.status == 'concern'))
+
+    @api.constrains('offer_type', 'state', 'all_checks_cleared')
+    def _check_hard_gate(self):
+        """Re-enforces the hard pre-employment-check gate at the model
+        level, so it can never be bypassed by editing offer_type/state
+        directly (e.g. via the statusbar or a list view) instead of going
+        through action_convert_unconditional()/the onboard wizard, which
+        are the only places this was previously checked."""
+        for offer in self:
+            hard_gate = offer.company_id.nhs_recruit_check_gate_hard
+            if hard_gate and not offer.all_checks_cleared and (
+                    offer.offer_type == 'unconditional' or offer.state == 'hired'):
+                raise ValidationError((
+                    'All required pre-employment checks must be cleared before this'
+                    ' offer can be made unconditional or the candidate hired.'))
 
     def _generate_checks(self):
         """Build the check set for this offer from the vacancy's check profile."""

@@ -114,6 +114,11 @@ class NhsRecruitmentPublic(http.Controller):
         vacancy = request.env['nhs.vacancy'].sudo().browse(vacancy_id)
         if not vacancy.exists() or vacancy.company_id.id != company.id or vacancy.internal_only:
             return request.not_found()
+        if vacancy.state not in ('open', 'in_progress'):
+            # Re-check on submit, not just on the GET form: the vacancy may
+            # have closed between the candidate loading the form and posting
+            # it, and this route is reachable directly regardless of the form.
+            return request.not_found()
 
         ip = request.httprequest.remote_addr
         if not _check_rate_limit(ip):

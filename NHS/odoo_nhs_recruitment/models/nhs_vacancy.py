@@ -96,6 +96,13 @@ class NhsVacancy(models.Model):
         digits=(16, 2),
         help="FTE being recruited (must not exceed the post's vacant FTE)."
     )
+    post_fte_display = fields.Char(
+        string='Post FTE (Funded / Vacant)',
+        compute='_compute_post_fte_display',
+        help="Live funded/vacant FTE from the establishment post, shown next to the post"
+             " link per the build spec — not a stored field; always reflects the post's"
+             " current state, e.g. after an approved Change Request."
+    )
     contract_type = fields.Selection([
         ('permanent', 'Permanent'),
         ('fixed_term', 'Fixed Term'),
@@ -106,7 +113,7 @@ class NhsVacancy(models.Model):
         ('growth', 'Growth'),
         ('fixed_term_cover', 'Fixed-Term Cover'),
     ], string='Recruitment Reason', default='replacement', required=True)
-    person_spec_id = fields.Many2one('nhs.person.spec', string='Person Specification')
+    person_spec_id = fields.Many2one('nhs.person.spec', string='Person Specification', required=True)
     check_profile_id = fields.Many2one(
         'nhs.check.profile',
         string='Check Profile',
@@ -116,7 +123,6 @@ class NhsVacancy(models.Model):
     state = fields.Selection(VACANCY_STATES, string='Status', required=True, default='draft', tracking=True)
     withdrawn_reason = fields.Text(string='Withdrawal Reason')
     advert_text = fields.Html(string='Advert Text')
-    advert_summary = fields.Char(string='Advert Summary')
     advertising_channel_ids = fields.Many2many(
         'nhs.recruitment.channel', string='Advertising Channels')
     open_date = fields.Date(string='Opening Date')
@@ -153,6 +159,18 @@ class NhsVacancy(models.Model):
         help="Open → filled days, once filled."
     )
     active = fields.Boolean(string='Active', default=True)
+
+    @api.depends('post_id.funded_fte', 'post_id.vacant_fte')
+    def _compute_post_fte_display(self):
+        """Non-stored text of the linked post's current funded/vacant FTE —
+        the view-only 'post link showing funded/vacant FTE' the spec calls for,
+        without adding persisted FTE columns beyond the vacancy's own fte."""
+        for vacancy in self:
+            post = vacancy.post_id
+            if post:
+                vacancy.post_fte_display = '%.2f / %.2f' % (post.funded_fte, post.vacant_fte)
+            else:
+                vacancy.post_fte_display = ''
 
     @api.depends('post_id.job_title', 'org_unit_id.name', 'reference')
     def _compute_name(self):
@@ -229,10 +247,18 @@ class NhsVacancy(models.Model):
 
     @api.constrains('fte', 'post_id')
     def _check_fte(self):
-        """Rejects vacancies with zero or negative FTE."""
+        """Rejects vacancies with zero or negative FTE, and FTE recruited beyond
+        the post's current vacant FTE — per the spec: 'FTE being recruited
+        (<= post vacant FTE)'."""
         for vacancy in self:
             if vacancy.fte <= 0:
                 raise ValidationError(('Vacancy FTE must be greater than zero.'))
+            if vacancy.post_id and float_compare(
+                    vacancy.fte, vacancy.post_id.vacant_fte, precision_digits=2) > 0:
+                raise ValidationError((
+                    "'%s' cannot recruit %.2f FTE: the post '%s' only has %.2f FTE vacant.")
+                    % (vacancy.name, vacancy.fte, vacancy.post_id.display_name,
+                       vacancy.post_id.vacant_fte))
 
     @api.constrains('open_date', 'close_date')
     def _check_advert_dates(self):
@@ -373,7 +399,9 @@ class NhsVacancy(models.Model):
         self.write({'state': 'withdrawn'})
 
     def action_view_applications(self):
-        """Opens this vacancy's applications in a dedicated list/kanban view."""
+        """Opens this vacancy's applications in a dedicated list/kanban view.
+        New applications can only be raised once the vacancy is actually
+        Open/In Progress — not while it's still draft or awaiting approval."""
         self.ensure_one()
         return {
             'name': ('Applications'),
@@ -381,11 +409,15 @@ class NhsVacancy(models.Model):
             'res_model': 'nhs.application',
             'view_mode': 'kanban,list,form',
             'domain': [('vacancy_id', '=', self.id)],
-            'context': {'default_vacancy_id': self.id},
+            'context': {
+                'default_vacancy_id': self.id,
+                'create': self.state in ('open', 'in_progress'),
+            },
         }
 
     def action_view_interviews(self):
-        """Opens this vacancy's interviews in a dedicated list view."""
+        """Opens this vacancy's interviews in a dedicated list view. New
+        interviews follow the same Open/In Progress gate as applications."""
         self.ensure_one()
         return {
             'name': ('Interviews'),
@@ -393,10 +425,14 @@ class NhsVacancy(models.Model):
             'res_model': 'nhs.interview',
             'view_mode': 'list,form',
             'domain': [('vacancy_id', '=', self.id)],
+            'context': {'create': self.state in ('open', 'in_progress')},
         }
 
     def action_view_offers(self):
-        """Opens this vacancy's offers in a dedicated list view."""
+        """Opens this vacancy's offers in a dedicated list view. New offers
+        follow the same Open/In Progress gate as applications/interviews —
+        normally made from an application, but this closes the direct-from-
+        vacancy smart-button path too."""
         self.ensure_one()
         return {
             'name': ('Offers'),
@@ -404,6 +440,7 @@ class NhsVacancy(models.Model):
             'res_model': 'nhs.offer',
             'view_mode': 'list,form',
             'domain': [('vacancy_id', '=', self.id)],
+            'context': {'create': self.state in ('open', 'in_progress')},
         }
 
     @api.model

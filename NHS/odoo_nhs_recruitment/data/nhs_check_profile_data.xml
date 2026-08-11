@@ -5,36 +5,36 @@
         <field name="name">Clinical (Enhanced DBS + Barred List)</field>
         <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_nursing_midwifery"/>
         <field name="line_ids">
-            <record>
+            <record id="check_profile_clinical_identity" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_identity"/>
                 <field name="sequence">10</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_clinical_rtw" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_rtw"/>
                 <field name="sequence">20</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_clinical_registration" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_registration"/>
                 <field name="sequence">30</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_clinical_references" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_references"/>
                 <field name="sequence">40</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_clinical_dbs" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_dbs"/>
                 <field name="sequence">50</field>
                 <field name="level">enhanced_barred</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_clinical_oh" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_oh"/>
                 <field name="sequence">60</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
         </field>
     </record>
@@ -44,36 +44,36 @@
         <field name="name">Medical &amp; Dental (Enhanced DBS + Barred List)</field>
         <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_medical_dental"/>
         <field name="line_ids">
-            <record>
+            <record id="check_profile_medical_identity" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_identity"/>
                 <field name="sequence">10</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_medical_rtw" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_rtw"/>
                 <field name="sequence">20</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_medical_registration" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_registration"/>
                 <field name="sequence">30</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_medical_references" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_references"/>
                 <field name="sequence">40</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_medical_dbs" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_dbs"/>
                 <field name="sequence">50</field>
                 <field name="level">enhanced_barred</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_medical_oh" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_oh"/>
                 <field name="sequence">60</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
         </field>
     </record>
@@ -83,36 +83,36 @@
         <field name="name">Allied Health Professions (Enhanced DBS)</field>
         <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_ahp"/>
         <field name="line_ids">
-            <record>
+            <record id="check_profile_ahp_identity" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_identity"/>
                 <field name="sequence">10</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_ahp_rtw" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_rtw"/>
                 <field name="sequence">20</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_ahp_registration" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_registration"/>
                 <field name="sequence">30</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_ahp_references" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_references"/>
                 <field name="sequence">40</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_ahp_dbs" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_dbs"/>
                 <field name="sequence">50</field>
                 <field name="level">enhanced</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_ahp_oh" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_oh"/>
                 <field name="sequence">60</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
         </field>
     </record>
@@ -122,36 +122,36 @@
         <field name="name">Additional Clinical Services (Enhanced DBS)</field>
         <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_additional_clinical_services"/>
         <field name="line_ids">
-            <record>
+            <record id="check_profile_clinical_support_identity" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_identity"/>
                 <field name="sequence">10</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_clinical_support_rtw" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_rtw"/>
                 <field name="sequence">20</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_clinical_support_registration" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_registration"/>
                 <field name="sequence">30</field>
-                <field name="is_required">False</field>
+                <field name="is_required" eval="False"/>
             </record>
-            <record>
+            <record id="check_profile_clinical_support_references" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_references"/>
                 <field name="sequence">40</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_clinical_support_dbs" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_dbs"/>
                 <field name="sequence">50</field>
                 <field name="level">enhanced</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_clinical_support_oh" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_oh"/>
                 <field name="sequence">60</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
         </field>
     </record>
@@ -161,36 +161,36 @@
         <field name="name">Admin &amp; Clerical (Standard DBS)</field>
         <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_admin_clerical"/>
         <field name="line_ids">
-            <record>
+            <record id="check_profile_admin_identity" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_identity"/>
                 <field name="sequence">10</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_admin_rtw" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_rtw"/>
                 <field name="sequence">20</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_admin_registration" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_registration"/>
                 <field name="sequence">30</field>
-                <field name="is_required">False</field>
+                <field name="is_required" eval="False"/>
             </record>
-            <record>
+            <record id="check_profile_admin_references" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_references"/>
                 <field name="sequence">40</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_admin_dbs" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_dbs"/>
                 <field name="sequence">50</field>
                 <field name="level">standard</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_admin_oh" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_oh"/>
                 <field name="sequence">60</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
         </field>
     </record>
@@ -200,36 +200,36 @@
         <field name="name">Estates &amp; Ancillary (Standard DBS)</field>
         <field name="staff_group_id" ref="odoo_nhs_establishment.staff_group_estates_ancillary"/>
         <field name="line_ids">
-            <record>
+            <record id="check_profile_estates_identity" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_identity"/>
                 <field name="sequence">10</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_estates_rtw" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_rtw"/>
                 <field name="sequence">20</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_estates_registration" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_registration"/>
                 <field name="sequence">30</field>
-                <field name="is_required">False</field>
+                <field name="is_required" eval="False"/>
             </record>
-            <record>
+            <record id="check_profile_estates_references" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_references"/>
                 <field name="sequence">40</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_estates_dbs" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_dbs"/>
                 <field name="sequence">50</field>
                 <field name="level">standard</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
-            <record>
+            <record id="check_profile_estates_oh" model="nhs.check.profile.line">
                 <field name="check_type_id" ref="check_type_oh"/>
                 <field name="sequence">60</field>
-                <field name="is_required">True</field>
+                <field name="is_required" eval="True"/>
             </record>
         </field>
     </record>

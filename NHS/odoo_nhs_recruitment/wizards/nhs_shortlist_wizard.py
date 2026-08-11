@@ -70,18 +70,24 @@ class NhsShortlistWizard(models.TransientModel):
         return res
 
     def action_apply(self):
-        """Require a reason for every line marked Not Shortlisted, then write
-        each line's outcome back onto its application and apply the
-        shortlist decision."""
+        """Require a reason for every line marked Not Shortlisted, then batch
+        each distinct outcome/reason combination onto its applications in one
+        write per group (instead of one write per line — most lines share the
+        same outcome with no reason), before applying the shortlist decision."""
         self.ensure_one()
         for line in self.line_ids:
             if line.outcome == 'not_shortlisted' and not line.reason:
                 raise UserError((
                     'A reason is required for every application marked Not Shortlisted.'))
-            line.application_id.write({
-                'shortlist_outcome': line.outcome,
-                'shortlist_reason': line.reason,
+        groups = {}
+        for line in self.line_ids:
+            key = (line.outcome, line.reason)
+            groups[key] = groups.get(key, line.application_id.browse()) | line.application_id
+        for (outcome, reason), applications in groups.items():
+            applications.write({
+                'shortlist_outcome': outcome,
+                'shortlist_reason': reason,
                 'stage': 'shortlisting',
             })
-            line.application_id.action_shortlist_decide()
+        self.line_ids.application_id.action_shortlist_decide()
         return {'type': 'ir.actions.act_window_close'}

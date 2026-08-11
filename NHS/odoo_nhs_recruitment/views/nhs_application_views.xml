@@ -43,7 +43,7 @@
                             </div>
                             <div class="o_kanban_record_bottom mt-2">
                                 <div class="oe_kanban_bottom_left text-muted">
-                                    <i class="fa fa-clock-o me-1"/> <field name="create_date" widget="date"/>
+                                    <i class="fa fa-clock-o me-1" title="Applied On"/> <field name="create_date" widget="date"/>
                                 </div>
                             </div>
                         </div>
@@ -87,8 +87,10 @@
                     <button name="action_shortlist_decide" type="object" string="Apply Shortlist Decision"
                             class="btn-primary" invisible="stage != 'shortlisting'"
                             groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
+                    <field name="has_appointable_interview" invisible="1"/>
                     <button name="action_make_offer" type="object" string="Make Offer"
-                            class="btn-primary" invisible="stage != 'interview'"
+                            class="btn-primary"
+                            invisible="stage != 'interview' or not has_appointable_interview"
                             groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_send_acknowledgement" type="object" string="Send Acknowledgement"
                             class="btn-primary" invisible="acknowledged or stage == 'received'"
@@ -101,7 +103,8 @@
                             class="btn-primary" invisible="stage in ('hired', 'rejected', 'withdrawn')"
                             groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <field name="stage" widget="statusbar"
-                           statusbar_visible="received,shortlisting,shortlisted,interview,offered,hired"/>
+                           statusbar_visible="received,shortlisting,shortlisted,interview,offered,hired"
+                           options="{'clickable': '0'}"/>
                 </header>
                 <sheet>
                     <div class="alert alert-warning" role="alert" invisible="not duplicate_warning">
@@ -141,9 +144,10 @@
                                 This vacancy has no Person Specification set — set one on the
                                 vacancy before scoring this application against it.
                             </div>
-                            <field name="score_line_ids">
+                            <field name="score_line_ids"
+                                   readonly="stage in ('offered', 'hired', 'rejected', 'withdrawn')">
                                 <list editable="bottom">
-                                    <field name="criterion_id"
+                                    <field name="criterion_id" options="{'no_create': True, 'no_create_edit': True}"
                                            domain="[('spec_id', '=', parent.person_spec_id)]"/>
                                     <field name="score"/>
                                     <field name="notes"/>
@@ -151,7 +155,14 @@
                             </field>
                         </page>
                         <page string="Interviews" invisible="stage in ('received', 'shortlisting')">
-                            <field name="interview_ids">
+                            <div class="alert alert-info" role="alert"
+                                 invisible="stage != 'interview' or has_appointable_interview">
+                                <strong>Make Offer</strong> won't appear on this application yet — it only
+                                shows once one of the interviews below has been marked <strong>Attended</strong>
+                                and then given an <strong>Appointable</strong> outcome.
+                            </div>
+                            <field name="interview_ids"
+                                   readonly="stage in ('offered', 'hired', 'rejected', 'withdrawn')">
                                 <list>
                                     <field name="interview_datetime"/>
                                     <field name="location"/>

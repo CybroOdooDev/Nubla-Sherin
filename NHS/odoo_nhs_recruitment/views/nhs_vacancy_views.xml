@@ -90,7 +90,8 @@
                             class="btn-primary" invisible="state != 'finance_approved'"
                             groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="%(odoo_nhs_recruitment.action_nhs_shortlist_wizard)d" type="action" string="Bulk Shortlist"
-                            class="btn-primary" invisible="state not in ('open', 'in_progress')"
+                            class="btn-primary"
+                            invisible="state not in ('open', 'in_progress') or application_count == 0"
                             context="{'default_vacancy_id': id}"
                             groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_close" type="object" string="Close"
@@ -122,35 +123,40 @@
                         <h1><field name="name" readonly="1"/></h1>
                     </div>
                     <group>
-                        <group string="Post">
+                        <group string="Post Details">
                             <field name="post_id"/>
+                            <field name="post_fte_display"/>
                             <field name="org_unit_id" readonly="1"/>
                             <field name="band_id" readonly="1"/>
                             <field name="staff_group_id" readonly="1"/>
                             <field name="fte"/>
+                        </group>
+                        <group string="Recruitment Details">
                             <field name="contract_type"/>
                             <field name="reason"/>
                             <field name="hiring_manager_id"/>
-                        </group>
-                        <group string="Approval &amp; Cost">
-                            <field name="company_id" groups="base.group_multi_company"/>
-                            <field name="indicative_cost" widget="monetary"/>
                             <field name="person_spec_id"/>
                             <field name="check_profile_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="indicative_cost" widget="monetary"/>
                             <field name="withdrawn_reason" invisible="state != 'withdrawn'"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Advert">
                             <group>
-                                <field name="advert_summary"/>
-                                <field name="advertising_channel_ids" widget="many2many_tags"/>
-                                <field name="internal_only"/>
-                                <field name="open_date"/>
-                                <field name="close_date"/>
-                                <field name="anonymised_shortlisting"/>
+                                <group>
+                                    <field name="advertising_channel_ids" widget="many2many_tags"/>
+                                    <field name="internal_only"/>
+                                </group>
+                                <group>
+                                    <field name="open_date"/>
+                                    <field name="close_date"/>
+                                    <field name="anonymised_shortlisting"/>
+                                </group>
                             </group>
-                            <field name="advert_text"/>
+                            <separator string="Advert Text"/>
+                            <field name="advert_text" nolabel="1" placeholder="Full advert content shown to candidates..."/>
                         </page>
                         <page string="Pipeline Analytics">
                             <group>

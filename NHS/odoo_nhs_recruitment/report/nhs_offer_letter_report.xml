@@ -29,7 +29,7 @@
                             <tr><td><strong>Salary</strong></td><td><span t-field="offer.salary" t-options="{'widget': 'monetary', 'display_currency': offer.currency_id}"/></td></tr>
                             <tr><td><strong>FTE / Hours</strong></td><td><span t-esc="'%.2f' % offer.fte"/> FTE / <span t-esc="offer.hours"/> hrs/wk</td></tr>
                             <tr><td><strong>Proposed Start Date</strong></td><td><span t-esc="offer.start_date"/></td></tr>
-                            <tr><td><strong>Offer Type</strong></td><td><span t-esc="offer.offer_type"/></td></tr>
+                            <tr><td><strong>Offer Type</strong></td><td><span t-field="offer.offer_type"/></td></tr>
                         </table>
                         <p t-if="offer.offer_type == 'conditional'">
                             This offer is conditional upon satisfactory completion of the NHS Employment Check

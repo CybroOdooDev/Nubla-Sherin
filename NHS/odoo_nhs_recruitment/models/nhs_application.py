@@ -128,6 +128,10 @@ class NhsApplication(models.Model):
     shortlist_reason = fields.Text(string='Shortlist Reason')
     interview_ids = fields.One2many('nhs.interview', 'application_id', string='Interviews')
     interview_count = fields.Integer(string='Interview Count', compute='_compute_interview_count')
+    has_appointable_interview = fields.Boolean(
+        string='Has Appointable Interview', compute='_compute_has_appointable_interview',
+        help="At least one of this application's interviews recorded an Appointable"
+             " outcome — required before an offer can be made.")
     offer_id = fields.Many2one('nhs.offer', string='Offer', readonly=True, copy=False)
     equality_id = fields.Many2one(
         'nhs.equality.monitoring', string='Equality Monitoring', copy=False,
@@ -145,7 +149,23 @@ class NhsApplication(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         """Assigns each application its sequence reference and creates its
-        segregated equality-monitoring record, kept off the main form."""
+        segregated equality-monitoring record, kept off the main form.
+
+        Also re-checks each vacancy is actually open for applications: the
+        vacancy_id field's UI domain only filters the picker, so it does
+        nothing when a vacancy is pre-filled via context (e.g. the "+" on
+        the vacancy's own Applications kanban, or the public portal submit
+        route) — this is the one place every creation path passes through,
+        so it's enforced here rather than relying on the domain alone."""
+        vacancy_ids = {vals['vacancy_id'] for vals in vals_list if vals.get('vacancy_id')}
+        if vacancy_ids:
+            for vacancy in self.env['nhs.vacancy'].browse(vacancy_ids):
+                if vacancy.state not in ('open', 'in_progress'):
+                    state_label = dict(
+                        vacancy._fields['state'].selection).get(vacancy.state, vacancy.state)
+                    raise UserError((
+                        "'%s' is not open for applications (status: %s)."
+                    ) % (vacancy.name, state_label))
         for vals in vals_list:
             if not vals.get('name') or vals.get('name') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code(
@@ -185,6 +205,14 @@ class NhsApplication(models.Model):
         """Counts interviews linked to this application."""
         for application in self:
             application.interview_count = len(application.interview_ids)
+
+    @api.depends('interview_ids.outcome')
+    def _compute_has_appointable_interview(self):
+        """Whether any interview on this application has recorded an
+        Appointable outcome — gates the Make Offer button."""
+        for application in self:
+            application.has_appointable_interview = bool(
+                application.interview_ids.filtered(lambda i: i.outcome == 'appointable'))
 
     def action_start_shortlisting(self):
         """Moves a received application into shortlisting, or straight to
@@ -227,6 +255,10 @@ class NhsApplication(models.Model):
             raise UserError(('An offer can only be made from the Interview stage.'))
         if self.offer_id:
             raise UserError(('This application already has an offer.'))
+        if not self.interview_ids.filtered(lambda i: i.outcome == 'appointable'):
+            raise UserError((
+                'An offer can only be made once an interview has recorded an'
+                ' Appointable outcome.'))
         offer = self.env['nhs.offer'].create({'application_id': self.id})
         self.write({'stage': 'offered', 'offer_id': offer.id})
         return {
@@ -260,3 +292,23 @@ class NhsApplication(models.Model):
             if application.shortlist_outcome == 'not_shortlisted' and not application.shortlist_reason:
                 raise ValidationError((
                     'A reason is required when an application is not shortlisted.'))
+
+    @api.constrains('stage', 'offer_id', 'interview_ids')
+    def _check_stage_progression(self):
+        """Blocks the pipeline stage from being set ahead of the records
+        that are supposed to justify it — closes the same class of bypass
+        as directly clicking the statusbar past steps that normally only
+        advance via the action_* methods (e.g. reaching 'hired' with no
+        offer ever made, or 'interview' with no interview ever scheduled)."""
+        for application in self:
+            if application.stage in ('offered', 'hired') and not application.offer_id:
+                raise ValidationError((
+                    "An application can't be in stage '%s' without an offer record."
+                ) % dict(application._fields['stage'].selection).get(application.stage))
+            if application.stage == 'hired' and application.offer_id.state != 'hired':
+                raise ValidationError((
+                    'An application can only be Hired once its offer itself is Hired.'))
+            if application.stage == 'interview' and not application.interview_ids:
+                raise ValidationError((
+                    "An application can't be in the Interview stage without an"
+                    " interview scheduled."))

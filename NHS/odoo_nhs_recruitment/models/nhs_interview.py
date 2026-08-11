@@ -95,7 +95,10 @@ class NhsInterview(models.Model):
         ('not_appointable', 'Not Appointable'),
         ('hold', 'Hold'),
         ('reserve', 'Reserve'),
-    ], string='Outcome', tracking=True)
+    ], string='Outcome', tracking=True,
+        help="Recorded once the interview is Attended. Setting this to Appointable is"
+             " what makes the 'Make Offer' button appear on the application — attending"
+             " an interview alone does not.")
     rank = fields.Integer(string='Rank')
     notes = fields.Text(string='Panel Notes')
     active = fields.Boolean(string='Active', default=True)

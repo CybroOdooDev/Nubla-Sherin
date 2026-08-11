@@ -16,35 +16,131 @@
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="vacancy">
                 <t t-call="web.external_layout">
-                    <div class="page">
-                        <h2><span t-esc="vacancy.name"/></h2>
-                        <p><strong>Reference:</strong> <span t-esc="vacancy.reference"/></p>
-                        <table class="table table-sm table-borderless">
-                            <tr><td><strong>Team / Department</strong></td><td><span t-esc="vacancy.org_unit_id.name"/></td></tr>
-                            <tr><td><strong>Band</strong></td><td><span t-esc="vacancy.band_id.name or 'Medical/Non-AfC'"/></td></tr>
-                            <tr><td><strong>Staff Group</strong></td><td><span t-esc="vacancy.staff_group_id.name"/></td></tr>
-                            <tr><td><strong>FTE</strong></td><td><span t-esc="'%.2f' % vacancy.fte"/></td></tr>
-                            <tr><td><strong>Contract Type</strong></td><td><span t-esc="vacancy.contract_type"/></td></tr>
-                            <tr><td><strong>Closing Date</strong></td><td><span t-esc="vacancy.close_date"/></td></tr>
+                    <div class="page nhs_vacancy_advert" style="font-size: 13px;">
+                        <style>
+                            /* NHS Identity colours: NHS Blue #005EB8, NHS Dark Blue #003087 */
+                            .nhs_vacancy_advert h1 { color: #003087; font-size: 26px; margin-bottom: 4px; }
+                            .nhs_vacancy_advert h3.nhs_section_title {
+                                color: #003087; font-size: 17px; border-bottom: 3px solid #005EB8;
+                                padding-bottom: 6px; margin: 22px 0 12px 0;
+                            }
+                            .nhs_vacancy_advert .nhs_subtitle { color: #4c4c4c; font-size: 14px; }
+                            .nhs_vacancy_advert .nhs_header_table { width: 100%; border-collapse: collapse; }
+                            .nhs_vacancy_advert .nhs_header_table td { border-bottom: 3px solid #005EB8; padding-bottom: 10px; }
+                            .nhs_vacancy_advert .nhs_ref_badge {
+                                background-color: #005EB8; color: #fff; font-size: 14px; font-weight: bold;
+                                padding: 8px 16px; border-radius: 4px; white-space: nowrap; display: inline-block;
+                            }
+                            .nhs_vacancy_advert .nhs_facts_table {
+                                width: 100%; border-collapse: collapse; background-color: #E8EDEE;
+                                margin: 18px 0; border-radius: 4px;
+                            }
+                            .nhs_vacancy_advert .nhs_facts_table td {
+                                padding: 12px 18px; vertical-align: top; width: 50%;
+                            }
+                            .nhs_vacancy_advert .nhs_fact_label {
+                                font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
+                                color: #003087; font-weight: bold; margin-bottom: 3px;
+                            }
+                            .nhs_vacancy_advert .nhs_fact_value { font-size: 14px; color: #212529; }
+                            .nhs_vacancy_advert .nhs_advert_body { font-size: 13px; line-height: 1.5; }
+                            .nhs_vacancy_advert .nhs_spec_table { width: 100%; font-size: 13px; }
+                            .nhs_vacancy_advert .nhs_spec_table th {
+                                background-color: #005EB8; color: #fff; font-size: 12px;
+                                padding: 8px; text-align: left;
+                            }
+                            .nhs_vacancy_advert .nhs_spec_table td { padding: 7px 8px; }
+                            .nhs_vacancy_advert .nhs_badge {
+                                display: inline-block; font-size: 12px; font-weight: bold; color: #fff;
+                                padding: 3px 10px; border-radius: 3px;
+                            }
+                            .nhs_vacancy_advert .nhs_badge_essential { background-color: #DA291C; }
+                            .nhs_vacancy_advert .nhs_badge_desirable { background-color: #41B6E6; }
+                        </style>
+
+                        <!-- Title band -->
+                        <table class="nhs_header_table">
+                            <tr>
+                                <td>
+                                    <h1><span t-esc="vacancy.post_id.job_title or vacancy.name"/></h1>
+                                    <div class="nhs_subtitle" t-if="vacancy.org_unit_id"><span t-esc="vacancy.org_unit_id.name"/></div>
+                                </td>
+                                <td style="width: 160px; text-align: right; vertical-align: top;">
+                                    <span class="nhs_ref_badge"><span t-esc="vacancy.reference"/></span>
+                                </td>
+                            </tr>
                         </table>
-                        <h4>Advert</h4>
-                        <p t-field="vacancy.advert_text"/>
-                        <h4 t-if="vacancy.person_spec_id">Person Specification</h4>
-                        <table t-if="vacancy.person_spec_id" class="table table-bordered table-sm">
-                            <thead>
-                                <tr class="table-dark">
-                                    <th>Criterion</th><th>Category</th><th>Essential/Desirable</th><th>Assessed At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr t-foreach="vacancy.person_spec_id.criterion_ids" t-as="criterion">
-                                    <td><span t-esc="criterion.name"/></td>
-                                    <td><span t-esc="criterion.category"/></td>
-                                    <td><span t-esc="criterion.essential"/></td>
-                                    <td><span t-esc="criterion.assessment_method"/></td>
-                                </tr>
-                            </tbody>
+
+                        <!-- At-a-glance facts -->
+                        <table class="nhs_facts_table">
+                            <tr>
+                                <td>
+                                    <div class="nhs_fact_label">Team / Department</div>
+                                    <div class="nhs_fact_value"><span t-esc="vacancy.org_unit_id.name"/></div>
+                                </td>
+                                <td>
+                                    <div class="nhs_fact_label">Band</div>
+                                    <div class="nhs_fact_value"><span t-esc="vacancy.band_id.name or 'Medical / Non-AfC'"/></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="nhs_fact_label">Staff Group</div>
+                                    <div class="nhs_fact_value"><span t-esc="vacancy.staff_group_id.name"/></div>
+                                </td>
+                                <td>
+                                    <div class="nhs_fact_label">FTE</div>
+                                    <div class="nhs_fact_value"><span t-esc="'%.2f' % vacancy.fte"/></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="nhs_fact_label">Contract Type</div>
+                                    <div class="nhs_fact_value">
+                                        <span t-esc="dict(vacancy._fields['contract_type'].selection).get(vacancy.contract_type)"/>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="nhs_fact_label">Closing Date</div>
+                                    <div class="nhs_fact_value"><span t-esc="vacancy.close_date"/></div>
+                                </td>
+                            </tr>
                         </table>
+
+                        <!-- Advert -->
+                        <t t-if="vacancy.advert_text">
+                            <h3 class="nhs_section_title">Advert</h3>
+                            <div class="nhs_advert_body" t-field="vacancy.advert_text"/>
+                        </t>
+
+                        <!-- Person Specification -->
+                        <t t-if="vacancy.person_spec_id">
+                            <h3 class="nhs_section_title">Person Specification</h3>
+                            <table class="nhs_spec_table">
+                                <thead>
+                                    <tr>
+                                        <th>Criterion</th><th>Category</th><th>Essential / Desirable</th><th>Assessed At</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="vacancy.person_spec_id.criterion_ids" t-as="criterion"
+                                        t-attf-style="background-color: #{'#F4F7F8' if criterion_index % 2 else '#FFFFFF'};">
+                                        <td><span t-esc="criterion.name"/></td>
+                                        <td>
+                                            <span t-esc="dict(criterion._fields['category'].selection).get(criterion.category)"/>
+                                        </td>
+                                        <td>
+                                            <span t-attf-class="nhs_badge #{'nhs_badge_essential' if criterion.essential == 'essential' else 'nhs_badge_desirable'}">
+                                                <span t-esc="dict(criterion._fields['essential'].selection).get(criterion.essential)"/>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span t-esc="dict(criterion._fields['assessment_method'].selection).get(criterion.assessment_method)"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
                     </div>
                 </t>
             </t>

@@ -42,7 +42,7 @@
                             class="btn-primary" invisible="invite_status != 'accepted'"
                             groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_mark_no_show" type="object" string="Mark No Show"
-                            invisible="invite_status not in ('accepted', 'attended')"
+                            invisible="invite_status != 'accepted'"
                             groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_mark_appointable" type="object" string="Mark Appointable"
                             class="btn-primary"
@@ -51,7 +51,8 @@
                     <button name="action_mark_not_appointable" type="object" string="Mark Not Appointable"
                             invisible="outcome == 'not_appointable' or invite_status != 'attended'"
                             groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
-                    <field name="invite_status" widget="statusbar" statusbar_visible="invited,accepted,attended"/>
+                    <field name="invite_status" widget="statusbar" statusbar_visible="invited,accepted,attended"
+                           options="{'clickable': '0'}"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -66,7 +67,8 @@
                         </group>
                         <group>
                             <field name="panel_ids" widget="many2many_tags"/>
-                            <field name="outcome"/>
+                            <field name="outcome" widget="radio" options="{'horizontal': true}"
+                                   invisible="invite_status != 'attended'"/>
                             <field name="rank"/>
                             <field name="total_score" readonly="1"/>
                         </group>
@@ -81,7 +83,7 @@
                             <field name="score_line_ids">
                                 <list editable="bottom">
                                     <field name="panellist_id" domain="[('id', 'in', parent.panel_ids)]"/>
-                                    <field name="criterion_id"
+                                    <field name="criterion_id" options="{'no_create': True, 'no_create_edit': True}"
                                            domain="[('spec_id', '=', parent.person_spec_id)]"/>
                                     <field name="score"/>
                                     <field name="notes"/>

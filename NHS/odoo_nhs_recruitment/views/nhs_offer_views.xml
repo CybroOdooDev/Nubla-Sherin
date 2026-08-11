@@ -45,7 +45,8 @@
                     <button name="action_withdraw" type="object" string="Withdraw"
                             invisible="state in ('hired', 'declined', 'withdrawn')"
                             groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
-                    <field name="state" widget="statusbar" statusbar_visible="made,accepted,hired"/>
+                    <field name="state" widget="statusbar" statusbar_visible="made,accepted,hired"
+                           options="{'clickable': '0'}"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -77,7 +78,7 @@
                             <field name="fte"/>
                             <field name="hours"/>
                             <field name="start_date"/>
-                            <field name="offer_type"/>
+                            <field name="offer_type" readonly="1"/>
                         </group>
                     </group>
                     <group string="Pre-Employment Checks">

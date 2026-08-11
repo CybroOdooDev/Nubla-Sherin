@@ -10,7 +10,6 @@
                 <field name="name"/>
                 <field name="code"/>
                 <field name="is_sensitive"/>
-                <field name="has_level"/>
                 <field name="default_required"/>
                 <field name="active" column_invisible="True"/>
             </list>

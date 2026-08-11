@@ -74,11 +74,6 @@ class NhsCandidate(models.Model):
         help="When this candidate's personal data is due for anonymisation/purge,"
              " for unsuccessful applicants without talent-pool consent."
     )
-    portal_user_id = fields.Many2one(
-        'res.users',
-        string='Portal User',
-        help="Optional portal access so the candidate can track their application(s)."
-    )
     is_anonymised = fields.Boolean(
         string='Anonymised',
         readonly=True,
@@ -126,19 +121,24 @@ class NhsCandidate(models.Model):
 
     def _anonymise(self):
         """Irreversibly scrub personal data, keeping the record (and any
-        aggregate equality-monitoring stats) for de-identified reporting."""
+        aggregate equality-monitoring stats) for de-identified reporting.
+        Only 'name' varies per candidate (it embeds the reference), so that's
+        the sole per-record write; everything else is identical across the
+        whole batch and is written once."""
         for candidate in self:
             candidate.with_context(mail_notrack=True).write({
                 'name': f'Anonymised Candidate {candidate.reference}',
-                'email': False,
-                'phone': False,
-                'is_anonymised': True,
-                'active': False,
             })
-            candidate.application_ids.write({
-                'supporting_statement': False,
-                'employment_history': False,
-            })
+        self.with_context(mail_notrack=True).write({
+            'email': False,
+            'phone': False,
+            'is_anonymised': True,
+            'active': False,
+        })
+        self.mapped('application_ids').write({
+            'supporting_statement': False,
+            'employment_history': False,
+        })
 
     @api.model
     def _cron_purge_retention(self):

@@ -46,10 +46,6 @@ class NhsCheckType(models.Model):
         help="Health/criminal-record data — heightened access restriction"
              " (visible only to the Pre-Employment Checks role and Recruitment Manager)."
     )
-    has_level = fields.Boolean(
-        string='Has Level',
-        help="Whether this check type carries a level (e.g. DBS standard/enhanced)."
-    )
     default_required = fields.Boolean(
         string='Required by Default',
         default=True,

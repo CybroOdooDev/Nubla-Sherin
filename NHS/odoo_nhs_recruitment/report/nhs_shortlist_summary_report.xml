@@ -31,7 +31,7 @@
                                 <tr t-foreach="vacancy.application_ids" t-as="application">
                                     <td><span t-esc="application.candidate_id.name"/></td>
                                     <td><span t-esc="'%.2f' % application.shortlist_score"/></td>
-                                    <td><span t-esc="application.shortlist_outcome"/></td>
+                                    <td><span t-field="application.shortlist_outcome"/></td>
                                     <td><span t-esc="application.shortlist_reason"/></td>
                                 </tr>
                             </tbody>
@@ -50,7 +50,7 @@
                                         <td><span t-esc="application.candidate_id.name"/></td>
                                         <td><span t-esc="interview.interview_datetime"/></td>
                                         <td><span t-esc="'%.2f' % interview.total_score"/></td>
-                                        <td><span t-esc="interview.outcome"/></td>
+                                        <td><span t-field="interview.outcome"/></td>
                                         <td><span t-esc="interview.rank"/></td>
                                     </tr>
                                 </t>

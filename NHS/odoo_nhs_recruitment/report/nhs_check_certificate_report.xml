@@ -34,8 +34,8 @@
                             <tbody>
                                 <tr t-foreach="offer.check_ids" t-as="check">
                                     <td><span t-esc="check.check_type_id.name"/></td>
-                                    <td><span t-esc="check.level"/></td>
-                                    <td><span t-esc="check.status"/></td>
+                                    <td><span t-field="check.level"/></td>
+                                    <td><span t-field="check.status"/></td>
                                     <td><span t-esc="check.verified_by_id.name"/></td>
                                     <td><span t-esc="check.verified_date"/></td>
                                     <td><span t-esc="check.expiry_date"/></td>
