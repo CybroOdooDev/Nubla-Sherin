@@ -44,6 +44,10 @@ class ResCompany(models.Model):
         string='Unsuccessful-Applicant Retention (Months)', default=24,
         help="How long an unsuccessful applicant's personal data is retained before"
              " automatic anonymisation, unless they have consented to the talent pool.")
+    nhs_recruit_warn_multiple_applications = fields.Boolean(
+        string='Warn on Multiple Applications', default=False,
+        help="Display a warning on the application form if the candidate has applied to multiple vacancies."
+    )
     nhs_recruit_public_form_enabled = fields.Boolean(
         string='Enable Public Application Form', default=False)
     nhs_recruit_public_form_token = fields.Char(
@@ -83,6 +87,8 @@ class ResConfigSettings(models.TransientModel):
         related='company_id.nhs_recruit_check_gate_hard', readonly=False)
     nhs_recruit_retention_months = fields.Integer(
         related='company_id.nhs_recruit_retention_months', readonly=False)
+    nhs_recruit_warn_multiple_applications = fields.Boolean(
+        related='company_id.nhs_recruit_warn_multiple_applications', readonly=False)
     nhs_recruit_public_form_enabled = fields.Boolean(
         related='company_id.nhs_recruit_public_form_enabled', readonly=False)
     nhs_recruit_public_form_token = fields.Char(

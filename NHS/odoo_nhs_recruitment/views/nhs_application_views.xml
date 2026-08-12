@@ -30,9 +30,7 @@
                                     <field name="shortlist_score"/>
                                 </div>
                                 <div class="mt-2">
-                                    <span t-if="record.duplicate_warning.raw_value" class="badge text-bg-danger me-1">
-                                        <i class="fa fa-exclamation-triangle"/> Duplicate?
-                                    </span>
+
                                     <span t-if="record.right_to_work_flagged.raw_value" class="badge text-bg-warning me-1" title="Right to Work Flagged">
                                         <i class="fa fa-globe"/> RTW
                                     </span>
@@ -104,11 +102,16 @@
                             groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <field name="stage" widget="statusbar"
                            statusbar_visible="received,shortlisting,shortlisted,interview,offered,hired"
-                           options="{'clickable': '0'}"/>
+                           options="{'clickable': False}"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_interviews" type="object" class="oe_stat_button" icon="fa-comments">
+                            <field name="interview_count" widget="statinfo" string="Interviews"/>
+                        </button>
+                    </div>
                     <div class="alert alert-warning" role="alert" invisible="not duplicate_warning">
-                        This candidate has applied to this vacancy more than once.
+                        <field name="duplicate_warning_message" readonly="1" nolabel="1"/>
                     </div>
                     <group>
                         <group>
@@ -137,6 +140,33 @@
                             <separator string="Employment History"/>
                             <field name="employment_history" placeholder="Details of previous employment, roles, and responsibilities..."/>
                             <field name="cv_attachment_ids" widget="many2many_binary"/>
+                        </page>
+                        <!-- Manager-only: fills in the segregated equality-monitoring record
+                             for applications entered internally (phone/paper) rather than via
+                             the public portal, which is otherwise the only place these get
+                             set. Restricted to Recruitment Manager and hidden until the
+                             application (and its auto-created equality record) is saved, so
+                             no other group — including shortlisting/interview panels — ever
+                             sees it, and it never influences selection. -->
+                        <page string="Equality &amp; Diversity Monitoring" invisible="not equality_id"
+                              groups="odoo_nhs_recruitment.group_nhs_recruit_manager">
+                            <p class="text-muted">
+                                Optional. Collected separately and never shown to the
+                                shortlisting or interview panel — used only for anonymous,
+                                aggregate monitoring.
+                            </p>
+                            <group>
+                                <group>
+                                    <field name="equality_age_band"/>
+                                    <field name="equality_disability"/>
+                                    <field name="equality_religion"/>
+                                </group>
+                                <group>
+                                    <field name="equality_ethnicity"/>
+                                    <field name="equality_sex"/>
+                                    <field name="equality_sexual_orientation"/>
+                                </group>
+                            </group>
                         </page>
                         <page string="Shortlisting Scores" invisible="stage == 'received'">
                             <field name="person_spec_id" invisible="1"/>

@@ -29,6 +29,10 @@
                      header action below is officer+ only; a Viewer gets no
                      clickable buttons on this form. -->
                 <header>
+                    <field name="invitation_sent" invisible="1"/>
+                    <button name="action_send_invitation" type="object" string="Send Invitation"
+                            class="btn-primary" invisible="invitation_sent or invite_status not in ('invited', 'rescheduled')"
+                            groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
                     <button name="action_mark_accepted" type="object" string="Mark Accepted"
                             class="btn-primary" invisible="invite_status not in ('invited', 'rescheduled')"
                             groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>

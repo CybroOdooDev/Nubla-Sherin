@@ -138,6 +138,18 @@ class NhsApplication(models.Model):
         help="Segregated equality & diversity record — never shown on this form"
              " or visible to the selection panel."
     )
+    equality_age_band = fields.Selection(
+        related='equality_id.age_band', string='Age Band', readonly=False)
+    equality_ethnicity = fields.Selection(
+        related='equality_id.ethnicity', string='Ethnicity', readonly=False)
+    equality_disability = fields.Selection(
+        related='equality_id.disability', string='Disability', readonly=False)
+    equality_sex = fields.Selection(
+        related='equality_id.sex', string='Sex', readonly=False)
+    equality_religion = fields.Char(
+        related='equality_id.religion', string='Religion / Belief', readonly=False)
+    equality_sexual_orientation = fields.Char(
+        related='equality_id.sexual_orientation', string='Sexual Orientation', readonly=False)
     acknowledged = fields.Boolean(string='Acknowledged', readonly=True)
     active = fields.Boolean(string='Active', default=True)
 
@@ -173,25 +185,38 @@ class NhsApplication(models.Model):
         applications = super().create(vals_list)
         for application in applications:
             if not application.equality_id:
-                # Auto-created as a transparent system action, regardless of
-                # the creating user's group — sudo() so viewer/officer/checks
-                # users (who have no rights on the segregated equality model)
-                # can still create an application.
                 application.equality_id = self.env['nhs.equality.monitoring'].sudo().create({
                     'application_id': application.id,
                 })
         return applications
 
+    duplicate_warning_message = fields.Char(
+        string='Warning Message', compute='_compute_duplicate_warning')
+
+    @api.depends('vacancy_id', 'candidate_id')
     def _compute_duplicate_warning(self):
         """Flags whether this candidate has another application against
-        the same vacancy."""
+        the same vacancy, or any other vacancy if the setting is enabled."""
         for application in self:
-            application.duplicate_warning = bool(application.candidate_id) and bool(
-                self.search_count([
-                    ('vacancy_id', '=', application.vacancy_id.id),
-                    ('candidate_id', '=', application.candidate_id.id),
-                    ('id', '!=', application.id),
-                ]))
+            domain = [('candidate_id', '=', application.candidate_id.id)]
+            
+            warn_multiple = self.env.company.nhs_recruit_warn_multiple_applications
+            if not warn_multiple:
+                domain.append(('vacancy_id', '=', application.vacancy_id.id))
+                
+            if application._origin.id:
+                domain.append(('id', '!=', application._origin.id))
+                
+            has_duplicate = bool(application.candidate_id) and bool(self.search_count(domain))
+            application.duplicate_warning = has_duplicate
+            
+            if has_duplicate:
+                if warn_multiple:
+                    application.duplicate_warning_message = "This candidate has multiple applications in the system."
+                else:
+                    application.duplicate_warning_message = "This candidate has applied to this vacancy more than once."
+            else:
+                application.duplicate_warning_message = False
 
     @api.depends('score_line_ids.score', 'score_line_ids.criterion_id.weight')
     def _compute_shortlist_score(self):
@@ -201,10 +226,23 @@ class NhsApplication(models.Model):
             application.shortlist_score = sum(
                 line.score * line.criterion_id.weight for line in application.score_line_ids)
 
+    @api.depends('interview_ids')
     def _compute_interview_count(self):
         """Counts interviews linked to this application."""
         for application in self:
             application.interview_count = len(application.interview_ids)
+
+    def action_view_interviews(self):
+        """Opens the list of interviews for this application."""
+        self.ensure_one()
+        return {
+            'name': 'Interviews',
+            'type': 'ir.actions.act_window',
+            'res_model': 'nhs.interview',
+            'view_mode': 'list,form',
+            'domain': [('application_id', '=', self.id)],
+            'context': {'default_application_id': self.id},
+        }
 
     @api.depends('interview_ids.outcome')
     def _compute_has_appointable_interview(self):

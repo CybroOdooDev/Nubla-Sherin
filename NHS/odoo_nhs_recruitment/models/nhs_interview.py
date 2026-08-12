@@ -101,6 +101,7 @@ class NhsInterview(models.Model):
              " an interview alone does not.")
     rank = fields.Integer(string='Rank')
     notes = fields.Text(string='Panel Notes')
+    invitation_sent = fields.Boolean(string='Invitation Sent', default=False, tracking=True)
     active = fields.Boolean(string='Active', default=True)
 
     @api.model_create_multi
@@ -129,6 +130,24 @@ class NhsInterview(models.Model):
                     line.score * line.criterion_id.weight for line in lines) / total_weight
             else:
                 interview.total_score = 0.0
+
+    def action_send_invitation(self):
+        """Sends the interview invitation email to the candidate."""
+        self.ensure_one()
+        template = self.env.ref('odoo_nhs_recruitment.mail_template_interview_invite', raise_if_not_found=False)
+        if template:
+            template.send_mail(self.id, force_send=True)
+            self.write({'invitation_sent': True})
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Success',
+                'message': 'Interview invitation email has been sent.',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
 
     def action_mark_accepted(self):
         """Records that the candidate accepted the interview invite."""

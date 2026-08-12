@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 
 
 class NhsEqualityMonitoring(models.Model):
@@ -29,7 +29,9 @@ class NhsEqualityMonitoring(models.Model):
     form or to the selection panel; reported only in aggregate."""
     _name = 'nhs.equality.monitoring'
     _description = 'Equality monitoring (segregated)'
+    _rec_name = 'name'
 
+    name = fields.Char(string='Reference', compute='_compute_name', store=True)
     application_id = fields.Many2one(
         'nhs.application', string='Application', required=True, ondelete='cascade')
     company_id = fields.Many2one(
@@ -52,6 +54,17 @@ class NhsEqualityMonitoring(models.Model):
     ], string='Sex')
     religion = fields.Char(string='Religion / Belief')
     sexual_orientation = fields.Char(string='Sexual Orientation')
+
+    @api.depends('application_id.name', 'application_id.candidate_id.name')
+    def _compute_name(self):
+        for record in self:
+            application = record.application_id
+            if not application:
+                record.name = _('New')
+                continue
+            candidate_name = application.candidate_id.name
+            record.name = ('%s - %s' % (application.name, candidate_name)
+                            if candidate_name else application.name)
 
     @api.model
     def get_aggregate_stats(self, domain=None):

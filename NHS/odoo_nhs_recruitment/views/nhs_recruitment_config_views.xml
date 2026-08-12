@@ -89,6 +89,11 @@
         <field name="arch" type="xml">
             <form string="Person Specification">
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_vacancies" type="object" class="oe_stat_button" icon="fa-briefcase">
+                            <field name="vacancy_count" widget="statinfo" string="Vacancies"/>
+                        </button>
+                    </div>
                     <group>
                         <field name="name"/>
                         <field name="company_id" groups="base.group_multi_company"/>
@@ -162,6 +167,12 @@
                         <setting id="nhs_recruit_check_gate"
                                  help="Block unconditional offers/starts until all required checks are cleared (disable for a soft/advisory gate only).">
                             <field name="nhs_recruit_check_gate_hard"/>
+                        </setting>
+                    </block>
+                    <block title="Application Settings" name="nhs_recruitment_application_block">
+                        <setting id="nhs_recruit_warn_multiple_applications"
+                                 help="Display a warning on the application form if the candidate has applied to multiple vacancies.">
+                            <field name="nhs_recruit_warn_multiple_applications"/>
                         </setting>
                     </block>
                     <block title="Data Protection &amp; Retention" name="nhs_recruitment_retention_block">

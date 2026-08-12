@@ -93,11 +93,59 @@
         </field>
     </record>
 
-    <!-- Equality monitoring (aggregate only): pivot/graph only, no list view,
-         so no screen ever shows one row per identifiable applicant -->
+    <!-- List view: used when drilling down from a pivot cell -->
+    <record id="view_nhs_equality_monitoring_list" model="ir.ui.view">
+        <field name="name">nhs.equality.monitoring.list</field>
+        <field name="model">nhs.equality.monitoring</field>
+        <field name="arch" type="xml">
+            <list string="Equality Monitoring">
+                <field name="name"/>
+                <field name="application_id"/>
+                <field name="age_band"/>
+                <field name="ethnicity"/>
+                <field name="disability"/>
+                <field name="sex"/>
+                <field name="religion"/>
+                <field name="sexual_orientation"/>
+                <field name="company_id" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view: used when opening a single record from the list -->
+    <record id="view_nhs_equality_monitoring_form" model="ir.ui.view">
+        <field name="name">nhs.equality.monitoring.form</field>
+        <field name="model">nhs.equality.monitoring</field>
+        <field name="arch" type="xml">
+            <form string="Equality Monitoring">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="application_id"/>
+                            <field name="age_band"/>
+                            <field name="disability"/>
+                            <field name="religion"/>
+                        </group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="ethnicity"/>
+                            <field name="sex"/>
+                            <field name="sexual_orientation"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Equality monitoring (aggregate): pivot/graph are the primary views;
+         list/form are kept for drill-down from a pivot cell. -->
     <record id="action_nhs_equality_monitoring" model="ir.actions.act_window">
         <field name="name">Equality Monitoring (Aggregate)</field>
         <field name="res_model">nhs.equality.monitoring</field>
-        <field name="view_mode">pivot,graph</field>
+        <field name="view_mode">pivot,graph,list,form</field>
     </record>
 </odoo>

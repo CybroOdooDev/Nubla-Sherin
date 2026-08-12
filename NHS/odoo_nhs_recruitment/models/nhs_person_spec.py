@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import fields, models
+from odoo import fields, models,api
 
 
 class NhsPersonSpecCriterion(models.Model):
@@ -90,12 +90,18 @@ class NhsPersonSpec(models.Model):
         'spec_id',
         string='Criteria',
     )
+    vacancy_ids = fields.One2many(
+        'nhs.vacancy',
+        'person_spec_id',
+        string='Vacancies'
+    )
     vacancy_count = fields.Integer(
         string='Vacancies Using This Spec',
         compute='_compute_vacancy_count',
     )
     active = fields.Boolean(string='Active', default=True)
 
+    @api.depends('vacancy_ids')
     def _compute_vacancy_count(self):
         """Count vacancies currently using each spec, for the smart button."""
         counts = self.env['nhs.vacancy']._read_group(
@@ -105,3 +111,15 @@ class NhsPersonSpec(models.Model):
         by_spec = {spec.id: count for spec, count in counts}
         for spec in self:
             spec.vacancy_count = by_spec.get(spec.id, 0)
+
+    def action_view_vacancies(self):
+        """Opens the list of vacancies linked to this spec."""
+        self.ensure_one()
+        return {
+            'name': 'Vacancies',
+            'type': 'ir.actions.act_window',
+            'res_model': 'nhs.vacancy',
+            'view_mode': 'list,form',
+            'domain': [('person_spec_id', '=', self.id)],
+            'context': {'default_person_spec_id': self.id},
+        }

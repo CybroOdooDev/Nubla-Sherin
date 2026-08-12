@@ -463,8 +463,6 @@ class NhsVacancy(models.Model):
         Check = self.env['nhs.check']
         can_view_checks = self.env.user.has_group('odoo_nhs_recruitment.group_nhs_recruit_checks') \
             or self.env.user.has_group('odoo_nhs_recruitment.group_nhs_recruit_manager')
-
-        # 1. Open vacancy pipeline
         open_domain = [('state', 'in', ('open', 'in_progress'))]
         open_recs = self.search(open_domain, limit=10, order='create_date desc')
         open_count = self.search_count(open_domain)
@@ -477,16 +475,10 @@ class NhsVacancy(models.Model):
             'days_open': v.days_open,
             'application_count': v.application_count,
         } for v in open_recs]
-
-        # 2. Awaiting approval
         approval_domain = [('state', 'in', ('submitted', 'workforce_approved'))]
         approval_count = self.search_count(approval_domain)
-
-        # 3. Applications in flight
         in_flight_domain = [('stage', 'not in', ('hired', 'rejected', 'withdrawn'))]
         in_flight_count = Application.search_count(in_flight_domain)
-
-        # 4. Stage funnel (application counts per pipeline stage)
         funnel_data = Application._read_group(
             [], ['stage'], ['__count'])
         funnel_counts = {stage: count for stage, count in funnel_data}
@@ -496,9 +488,6 @@ class NhsVacancy(models.Model):
             'label': label,
             'count': funnel_counts.get(stage, 0),
         } for stage, label in stage_labels.items()]
-
-        # 5. Vacancy ageing — longest-open vacancies (days_open is a live, non-stored
-        # computed field, so sort in Python rather than via ORM order)
         ageing_candidates = self.search(open_domain)
         ageing_sorted = ageing_candidates.sorted('days_open', reverse=True)[:10]
         ageing_list = [{
@@ -507,13 +496,9 @@ class NhsVacancy(models.Model):
             'org_unit': v.org_unit_id.name or '',
             'days_open': v.days_open,
         } for v in ageing_sorted if v.days_open]
-
-        # 6. Time-to-hire (average, across filled vacancies)
         filled_recs = self.search([('time_to_hire', '>', 0)])
         avg_time_to_hire = round(
             sum(filled_recs.mapped('time_to_hire')) / len(filled_recs), 1) if filled_recs else 0
-
-        # 7. Pre-employment checks (restricted — counts/list only for authorised users)
         checks_outstanding_count = 0
         checks_outstanding_list = []
         checks_concern_count = 0
