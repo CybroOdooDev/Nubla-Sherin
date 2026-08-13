@@ -119,8 +119,16 @@ class NhsAction(models.Model):
 
     @api.model
     def default_get(self, fields_list):
-        """Pre-fill risk_id from the parent investigation's incident when creating from that context."""
+        """Pre-fill investigation_id/risk_id from the parent record's own links when creating in context."""
         res = super().default_get(fields_list)
+        # Auto-fill investigation_id when creating from an incident context that already
+        # has a linked investigation — _check_single_parent allows incident + investigation
+        # together as long as they're consistent, so this is a safe, expected default.
+        incident_id = res.get('incident_id') or self.env.context.get('default_incident_id')
+        if incident_id and not res.get('investigation_id'):
+            incident = self.env['nhs.incident'].browse(incident_id)
+            if incident.investigation_id:
+                res['investigation_id'] = incident.investigation_id.id
         # Auto-fill risk_id when creating from an investigation context
         inv_id = res.get('investigation_id') or self.env.context.get('default_investigation_id')
         if inv_id and not res.get('risk_id'):
@@ -128,7 +136,40 @@ class NhsAction(models.Model):
             incident = investigation.incident_id
             if incident and incident.risk_ids:
                 res['risk_id'] = incident.risk_ids[0].id
+        # Auto-fill incident_id/investigation_id when creating from a risk context, but only
+        # when the risk has exactly one evidence incident (unambiguous) and that incident has
+        # a linked investigation — satisfies the incident+investigation+risk exception in
+        # _check_single_parent; a risk with zero or several evidence incidents, or one with
+        # no investigation, is left alone rather than guessing.
+        risk_id = res.get('risk_id') or self.env.context.get('default_risk_id')
+        if risk_id and not res.get('incident_id') and not res.get('investigation_id'):
+            risk = self.env['nhs.risk'].browse(risk_id)
+            if len(risk.incident_ids) == 1 and risk.incident_ids.investigation_id:
+                res['incident_id'] = risk.incident_ids.id
+                res['investigation_id'] = risk.incident_ids.investigation_id.id
         return res
+
+    @api.onchange('incident_id')
+    def _onchange_incident_id(self):
+        """Pre-fill investigation_id as soon as incident_id has a value with a linked investigation.
+
+        Covers the "Add a line" flow on the incident form's embedded Actions list, where
+        incident_id is set via the one2many relation itself rather than a default_incident_id
+        context key, so default_get() above never sees it.
+        """
+        if self.incident_id and not self.investigation_id and self.incident_id.investigation_id:
+            self.investigation_id = self.incident_id.investigation_id
+
+    @api.onchange('risk_id')
+    def _onchange_risk_id(self):
+        """Pre-fill incident_id/investigation_id from the risk's evidence incident, covering the
+        "Add a line" flow on the risk form's embedded Actions list (see default_get for the
+        same rule and why it only applies when the risk has exactly one evidence incident)."""
+        if self.risk_id and not self.incident_id and not self.investigation_id:
+            incidents = self.risk_id.incident_ids
+            if len(incidents) == 1 and incidents.investigation_id:
+                self.incident_id = incidents
+                self.investigation_id = incidents.investigation_id
 
     @api.constrains('incident_id', 'investigation_id', 'risk_id')
     def _check_single_parent(self):

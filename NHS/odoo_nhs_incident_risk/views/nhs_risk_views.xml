@@ -4,7 +4,6 @@
          workflow) and for the nhs.risk.register groupings (corporate/BAF/local tiers),
          plus the window actions exposing the risk list, heatmap and reviews-due queue. -->
 
-    <!-- ══ RISK FORM ══════════════════════════════════════════════════ -->
     <record id="view_nhs_risk_form" model="ir.ui.view">
         <field name="name">nhs.risk.form</field>
         <field name="model">nhs.risk</field>
@@ -164,7 +163,7 @@
         </field>
     </record>
 
-    <!-- ══ RISK LIST / PIVOT / SEARCH ═══════════════════════════════ -->
+    <!-- RISK LIST / PIVOT / SEARCH -->
     <record id="view_nhs_risk_list" model="ir.ui.view">
         <field name="name">nhs.risk.list</field>
         <field name="model">nhs.risk</field>

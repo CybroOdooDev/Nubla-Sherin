@@ -1,8 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_nhs_incident_reporter,nhs.incident reporter,model_nhs_incident,group_hc_reporter,1,0,1,0
+access_nhs_incident_reporter,nhs.incident reporter,model_nhs_incident,group_hc_reporter,1,1,1,0
 access_nhs_incident_handler,nhs.incident handler,model_nhs_incident,group_hc_handler,1,1,1,0
 access_nhs_incident_quality,nhs.incident quality lead,model_nhs_incident,group_hc_quality_lead,1,1,1,0
-access_nhs_incident_person_reporter,nhs.incident.person reporter,model_nhs_incident_person,group_hc_reporter,1,0,1,0
+access_nhs_incident_person_reporter,nhs.incident.person reporter,model_nhs_incident_person,group_hc_reporter,1,1,1,0
 access_nhs_incident_person_handler,nhs.incident.person handler,model_nhs_incident_person,group_hc_handler,1,1,1,1
 access_nhs_incident_category_reporter,nhs.incident.category reporter,model_nhs_incident_category,group_hc_reporter,1,0,0,0
 access_nhs_incident_category_handler,nhs.incident.category handler,model_nhs_incident_category,group_hc_handler,1,0,0,0
@@ -28,11 +28,11 @@ access_nhs_riddor_quality,nhs.riddor quality,model_nhs_riddor,group_hc_quality_l
 access_nhs_cqc_notification_type_reporter,nhs.cqc.notification.type reporter,model_nhs_cqc_notification_type,group_hc_reporter,1,0,0,0
 access_nhs_cqc_notification_type_handler,nhs.cqc.notification.type handler,model_nhs_cqc_notification_type,group_hc_handler,1,0,0,0
 access_nhs_cqc_notification_type_quality,nhs.cqc.notification.type quality,model_nhs_cqc_notification_type,group_hc_quality_lead,1,1,1,1
-access_nhs_cqc_notification_reporter,nhs.cqc.notification reporter,model_nhs_cqc_notification,group_hc_reporter,1,0,0,0
+access_nhs_cqc_notification_reporter,nhs.cqc.notification reporter,model_nhs_cqc_notification,group_hc_reporter,1,1,0,0
 access_nhs_cqc_notification_handler,nhs.cqc.notification handler,model_nhs_cqc_notification,group_hc_handler,1,1,1,0
 access_nhs_cqc_notification_quality,nhs.cqc.notification quality,model_nhs_cqc_notification,group_hc_quality_lead,1,1,1,0
 access_nhs_lfpse_submission_quality,nhs.lfpse.submission quality,model_nhs_lfpse_submission,group_hc_quality_lead,1,1,1,0
-access_nhs_action_reporter,nhs.action reporter,model_nhs_action,group_hc_reporter,1,0,0,0
+access_nhs_action_reporter,nhs.action reporter,model_nhs_action,group_hc_reporter,1,1,0,0
 access_nhs_action_handler,nhs.action handler,model_nhs_action,group_hc_handler,1,1,1,0
 access_nhs_action_quality,nhs.action quality,model_nhs_action,group_hc_quality_lead,1,1,1,1
 access_nhs_risk_reporter,nhs.risk reporter,model_nhs_risk,group_hc_reporter,1,0,0,0

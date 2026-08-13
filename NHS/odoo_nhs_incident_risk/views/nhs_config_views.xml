@@ -50,7 +50,7 @@
         <field name="context">{'search_default_active': 1}</field>
     </record>
 
-    <!-- ══ RISK CATEGORY CONFIG ─────────────────────────────────── -->
+    <!--  RISK CATEGORY CONFIG-->
     <record id="view_nhs_risk_category_list" model="ir.ui.view">
         <field name="name">nhs.risk.category.list</field>
         <field name="model">nhs.risk.category</field>
@@ -70,7 +70,7 @@
         <field name="view_mode">list,form</field>
     </record>
 
-    <!-- ══ NOTIFICATION RULES ───────────────────────────────────── -->
+    <!--  NOTIFICATION RULES -->
     <record id="view_nhs_notification_rule_list" model="ir.ui.view">
         <field name="name">nhs.notification.rule.list</field>
         <field name="model">nhs.notification.rule</field>
@@ -98,7 +98,7 @@
         <field name="view_mode">list,form</field>
     </record>
 
-    <!-- ══ TERMINOLOGY ──────────────────────────────────────────── -->
+    <!-- TERMINOLOGY  -->
     <record id="view_nhs_terminology_list" model="ir.ui.view">
         <field name="name">nhs.terminology.list</field>
         <field name="model">nhs.terminology</field>
@@ -117,7 +117,7 @@
         <field name="view_mode">list,form</field>
     </record>
 
-    <!-- ══ HOLIDAYS ─────────────────────────────────────────────── -->
+    <!-- HOLIDAYS -->
     <record id="view_nhs_holiday_list" model="ir.ui.view">
         <field name="name">nhs.holiday.list</field>
         <field name="model">nhs.holiday</field>
@@ -136,7 +136,7 @@
         <field name="view_mode">list,form</field>
     </record>
 
-    <!-- ══ CQC NOTIFICATION TYPES ───────────────────────────────── -->
+    <!--  CQC NOTIFICATION TYPES  -->
     <record id="view_nhs_cqc_type_list" model="ir.ui.view">
         <field name="name">nhs.cqc.notification.type.list</field>
         <field name="model">nhs.cqc.notification.type</field>
@@ -155,7 +155,6 @@
         <field name="view_mode">list,form</field>
     </record>
 
-    <!-- ══ SETTINGS ─────────────────────────────────────────────── -->
     <!-- "Quality & Safety" settings app, visible only to the quality-lead group; controls the public
          reporting form, anonymous reporting, Duty of Candour threshold and board pack recipients -->
     <record id="view_res_config_settings_nhs" model="ir.ui.view">

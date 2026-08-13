@@ -15,7 +15,7 @@
                     ⚠ This risk is currently rated <b>OUTSIDE appetite</b>
                 </div>
 
-                <!-- ── Risk Identity ──────────────────────────────── -->
+                <!-- Risk Identity -->
                 <group string="Risk Details">
                     <group>
                         <field name="risk_id" readonly="1"/>
@@ -31,14 +31,14 @@
                     </group>
                 </group>
 
-                <!-- ── Risk Description ───────────────────────────── -->
+                <!--  Risk Description -->
                 <group string="Risk Description">
                     <field name="cause" readonly="1"/>
                     <field name="event" readonly="1"/>
                     <field name="effect" readonly="1"/>
                 </group>
 
-                <!-- ── Scores: Inherent | Current side by side ────── -->
+                <!--  Scores: Inherent | Current side by side  -->
                 <group string="Risk Scores">
                     <group string="Inherent (No Controls)">
                         <field name="inherent_consequence" readonly="1"/>
@@ -54,7 +54,7 @@
                     </group>
                 </group>
 
-                <!-- ── Target Score ───────────────────────────────── -->
+                <!--  Target Score -->
                 <group>
                     <group string="Target (Post-Mitigation)">
                         <field name="target_consequence" readonly="1"/>
@@ -64,7 +64,7 @@
                     </group>
                 </group>
 
-                <!-- ── Review Decision ────────────────────────────── -->
+                <!--  Review Decision  -->
                 <separator string="Review Decision"/>
 
                 <group>

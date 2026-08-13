@@ -23,7 +23,9 @@ from odoo import api, fields, models
 
 
 class NhsNotificationRule(models.Model):
-    """Rule mapping provider type, category, and harm grade to required incident notifications."""
+    """A configurable rule mapping provider type × category × harm grade to the
+    statutory notifications/responses (CQC, LFPSE, safeguarding, RIDDOR) an
+    incident should trigger."""
     _name = 'nhs.notification.rule'
     _description = 'Notification Rule (provider-type × category × harm → required notifications)'
     _order = 'provider_type, sequence'
@@ -80,7 +82,7 @@ class NhsNotificationRule(models.Model):
     _HARM_ORDER = ['no_harm', 'low', 'moderate', 'severe', 'death']
 
     def _matches(self, incident):
-        """Return whether this rule's provider type, category, and harm-grade conditions match the incident."""
+        """Return True if this rule's provider type, category, and minimum harm grade conditions all match the incident."""
         self.ensure_one()
         company_ptype = incident.company_id.provider_type or 'nhs_trust'
         if self.provider_type not in ('all', company_ptype):

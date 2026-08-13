@@ -3,7 +3,6 @@
     <!-- Menu tree for the NHS Safety app: Incidents, Statutory, Risk Register, Actions, Reporting and
          Configuration; the root is open to any reporter and each branch/item below is further restricted
          to the more senior group actually responsible for that function -->
-    <!-- ══ ROOT APP MENU ════════════════════════════════════════════ -->
     <!-- Root menu uses the most permissive group (reporter) so all app users can see it; visible children vary by role -->
     <menuitem id="menu_nhs_root"
               name ="Incident &amp; Risk Management"
@@ -11,7 +10,6 @@
               web_icon="odoo_nhs_incident_risk,static/description/icon.png"
               groups="odoo_nhs_incident_risk.group_hc_reporter"/>
 
-    <!-- ══ INCIDENTS ════════════════════════════════════════════════ -->
     <menuitem id="menu_nhs_incidents"
               name="Incidents"
               parent="menu_nhs_root"
@@ -48,7 +46,6 @@
               sequence="40"
               groups="odoo_nhs_incident_risk.group_hc_investigator"/>
 
-    <!-- ══ STATUTORY ════════════════════════════════════════════════ -->
     <!-- Statutory/regulatory registers (Duty of Candour, RIDDOR, CQC, LFPSE), restricted to handlers -->
     <menuitem id="menu_nhs_statutory"
               name="Statutory"
@@ -82,7 +79,6 @@
               sequence="40"
               groups="odoo_nhs_incident_risk.group_hc_quality_lead"/>
 
-    <!-- ══ RISK REGISTER ════════════════════════════════════════════ -->
     <!-- Risk register branch restricted to risk managers, who own the organisation's risk log -->
     <menuitem id="menu_nhs_risk_register"
               name="Risk Register"
@@ -114,7 +110,7 @@
               action="action_nhs_risk_reviews_due"
               sequence="40"/>
 
-    <!-- ══ ACTIONS ══════════════════════════════════════════════════ -->
+    <!--  ACTIONS -->
     <menuitem id="menu_nhs_actions"
               name="Actions"
               parent="menu_nhs_root"
@@ -163,7 +159,6 @@
               sequence="30"
               groups="odoo_nhs_incident_risk.group_hc_quality_lead"/>
 
-    <!-- ══ CONFIGURATION ════════════════════════════════════════════ -->
     <!-- All setup/config items (categories, notification rules, settings, etc.) restricted to quality leads -->
     <menuitem id="menu_nhs_config"
               name="Configuration"

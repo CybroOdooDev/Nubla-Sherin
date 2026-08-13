@@ -29,7 +29,8 @@ DOC_TRIGGER_GRADES = {'moderate', 'severe', 'death'}
 
 
 class NhsIncident(models.Model):
-    """Patient safety incident, near-miss, or good-care event record."""
+    """Central record for a patient safety incident, near miss, or good-care event,
+    driving the triage → investigation → actions → closure workflow."""
     _name = 'nhs.incident'
     _description = 'NHS Incident / Patient Safety Event'
     _inherit = ['mail.thread', 'mail.activity.mixin']
@@ -219,7 +220,7 @@ class NhsIncident(models.Model):
 
     @api.depends('person_ids', 'action_ids', 'cqc_notification_ids', 'risk_ids', 'investigation_id')
     def _compute_counts(self):
-        """Compute smart-button counts for persons, actions, CQC notifications, risks, and investigation."""
+        """Compute the smart-button counts (persons, actions, CQC notifications, risks, investigation)."""
         for rec in self:
             rec.person_count = len(rec.person_ids)
             rec.action_count = len(rec.action_ids)
@@ -229,12 +230,9 @@ class NhsIncident(models.Model):
 
     @api.model
     def _read_group_state(self, stages, domain, order=None, **kwargs):
-        """Return the ordered list of states to display as kanban/list groups.
-
-        Parses the domain looking for a filter on 'state' so that only
-        states which could actually match are shown, while always
-        preserving the canonical workflow ordering.
-        """
+        """Return the full ordered list of kanban state columns, narrowed to whichever
+        states the current search domain restricts to, so filtered views (e.g. the
+        Triage Queue) don't show empty columns for states outside their scope."""
         if domain:
             try:
                 if not isinstance(domain, (list, tuple)) and hasattr(domain, '__iter__'):
@@ -246,7 +244,8 @@ class NhsIncident(models.Model):
         has_state_filter = False
 
         def parse_domain(dom):
-            """Recursively collect the states allowed by any 'state' leaf in dom."""
+            """Recursively scan a (possibly nested) domain for 'state' leaves and
+            narrow allowed_states accordingly."""
             nonlocal has_state_filter
             if not isinstance(dom, (list, tuple)):
                 return
@@ -276,7 +275,7 @@ class NhsIncident(models.Model):
 
     @api.depends('reported_at', 'closed_at')
     def _compute_days_to_close(self):
-        """Compute the number of working days (excluding weekends and bank holidays) from report to closure."""
+        """Compute working days (excluding weekends and bank holidays) between report and closure."""
         Holiday = self.env['nhs.holiday']
         holidays = set(Holiday.search([]).mapped('date'))
         for rec in self:
@@ -348,21 +347,21 @@ class NhsIncident(models.Model):
 
     @api.constrains('occurred_at')
     def _check_occurred_at(self):
-        """Ensure the incident date/time is not in the future."""
+        """Reject an incident date/time that is in the future."""
         for rec in self:
             if rec.occurred_at and rec.occurred_at > fields.Datetime.now():
                 raise ValidationError('Incident date/time cannot be in the future.')
 
     @api.constrains('state', 'rejection_reason')
     def _check_rejection_reason(self):
-        """Ensure a rejection reason is provided when the incident is rejected."""
+        """Require a rejection reason whenever the incident is rejected."""
         for rec in self:
             if rec.state == 'rejected' and not rec.rejection_reason:
                 raise ValidationError('A rejection reason is required.')
 
     @api.constrains('state', 'duplicate_of_id')
     def _check_duplicate_of(self):
-        """Ensure a valid, non-duplicate master incident is set when marked as a duplicate."""
+        """Require a master incident when marked as a duplicate, and forbid chaining duplicates."""
         for rec in self:
             if rec.state == 'duplicate':
                 if not rec.duplicate_of_id:
@@ -372,13 +371,13 @@ class NhsIncident(models.Model):
 
     @api.onchange('is_never_event')
     def _onchange_never_event(self):
-        """Force the response level to PSII when marked as a Never Event."""
+        """Force the response level to PSII as soon as Never Event is ticked."""
         if self.is_never_event:
             self.response_level = 'psii'
 
     @api.onchange('category_id')
     def _onchange_category(self):
-        """Prefill the response level and harm floor from the selected category's defaults."""
+        """Pre-fill response level and harm floor from the selected category's defaults."""
         if self.category_id:
             if self.category_id.default_response_level:
                 self.response_level = self.category_id.default_response_level
@@ -414,7 +413,7 @@ class NhsIncident(models.Model):
             })
 
     def action_start_investigation(self):
-        """Start the formal investigation, or skip straight to Actions if no response level is required."""
+        """Start the formal investigation, or skip straight to Actions if no separate response is required."""
         for rec in self:
             if rec.state != 'triage':
                 raise UserError('Incident must be in Triage state to start an investigation.')
@@ -530,7 +529,7 @@ class NhsIncident(models.Model):
         }
 
     def action_open_cqc_notifications(self):
-        """Open the list of CQC notifications linked to this incident."""
+        """Open the list of CQC statutory notifications for this incident."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
@@ -542,7 +541,7 @@ class NhsIncident(models.Model):
         }
 
     def action_open_risks(self):
-        """Open the list of risks related to this incident."""
+        """Open the list of risks associated with this incident."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
@@ -565,7 +564,7 @@ class NhsIncident(models.Model):
 
     @api.model
     def _cron_sla_triage(self):
-        """Schedule a to-do activity for handlers of new/triage incidents whose triage SLA (3 days) has been breached."""
+        """Schedule a to-do activity for the handler of any incident still untriaged 3+ days after reporting."""
         threshold = fields.Datetime.now() - timedelta(days=3)
         incidents = self.search([
             ('state', 'in', ['new', 'triage']),
@@ -581,5 +580,5 @@ class NhsIncident(models.Model):
 
     @api.model
     def _cron_anonymise(self):
-        """Placeholder cron for anonymising incident data (not yet implemented)."""
+        """Placeholder for the (currently inactive) data-retention anonymisation job — see data/ir_cron_data.xml."""
         pass

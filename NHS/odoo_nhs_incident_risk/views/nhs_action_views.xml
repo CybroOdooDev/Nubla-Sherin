@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Form/list views and actions for corrective/preventive Actions raised from incidents,
-         investigations, or risks, through the open → in_progress → evidence_review → done workflow -->
+         investigations, or risks, through the open → in_progress → evidence_review → done workflow. -->
     <record id="view_nhs_action_form" model="ir.ui.view">
         <field name="name">nhs.action.form</field>
         <field name="model">nhs.action</field>
         <field name="arch" type="xml">
             <form string="Action">
-                <!-- Only quality leads may verify submitted evidence and close the action, ensuring the
-                     completion check is independent of whoever carried out the action -->
+                <!-- Only quality leads may verify submitted evidence and close the action, so the
+                     completion check is independent of whoever carried out the action. -->
                 <header>
                     <button name="action_start" string="Start" type="object"
                             class="btn-primary" invisible="state != 'open'"/>
@@ -45,7 +45,7 @@
                         <field name="incident_id"/>
                         <field name="investigation_id"/>
                         <field name="incident_risk_count" invisible="1"/>
-                        <!-- Only offer the risk field when the source incident actually has risks linked to it -->
+                        <!-- Only offered once the source incident actually has linked risks to pick from -->
                         <field name="risk_id"
                                invisible="not incident_id or incident_risk_count == 0"/>
                     </group>
@@ -95,7 +95,7 @@
         <field name="name">My Actions</field>
         <field name="res_model">nhs.action</field>
         <field name="view_mode">list,form</field>
-        <field name="domain">[('owner_id','=',uid),('state','not in',['done','cancelled'])]</field>
+        <field name="domain">[('owner_id','=',uid)]</field>
     </record>
 
     <record id="action_nhs_action_all" model="ir.actions.act_window">

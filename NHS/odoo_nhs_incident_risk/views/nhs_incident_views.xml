@@ -1,52 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Views for the nhs.incident register: form/list/kanban/search/pivot/graph/calendar
-         covering the triage → investigation → actions → closure workflow, plus the
-         window actions and domains used to expose them (triage queue, all incidents,
-         my reports). -->
-    <!-- ══ INCIDENT FORM ══════════════════════════════════════════════ -->
+    <!-- INCIDENT FORM-->
     <record id="view_nhs_incident_form" model="ir.ui.view">
         <field name="name">nhs.incident.form</field>
         <field name="model">nhs.incident</field>
         <field name="arch" type="xml">
             <form string="Incident">
                 <header>
-                    <!-- One button per state transition; each is hidden except in the state it applies to.
-                         Reporters can read their own incident through every state (see rule_incident_reporter_own)
-                         but have no write access to nhs.incident or the triage/RIDDOR wizards, so these
-                         transition buttons are restricted to Handler/Quality Lead to match those ACLs — otherwise
-                         a reporter watching their own report progress would see a button they can't actually use
-                         and hit an Access Error on click. -->
                     <button name="action_open_triage_wizard" string="Triage"
                             type="object" class="btn-primary"
-                            groups="odoo_nhs_incident_risk.group_hc_handler,odoo_nhs_incident_risk.group_hc_quality_lead"
+                            groups="odoo_nhs_incident_risk.group_hc_handler"
                             invisible="state != 'new'"/>
                     <button name="action_start_investigation" string="Start Investigation"
                             type="object" class="btn-primary"
-                            groups="odoo_nhs_incident_risk.group_hc_handler,odoo_nhs_incident_risk.group_hc_quality_lead"
+                            groups="odoo_nhs_incident_risk.group_hc_handler"
                             invisible="state != 'triage'"/>
                     <button name="action_open_investigation" string="Open Investigation"
                             type="object" class="btn-primary"
+                            groups="odoo_nhs_incident_risk.group_hc_handler"
                             invisible="state != 'investigation' or not investigation_id"/>
                     <button name="action_advance_to_actions" string="Advance to Actions"
                             type="object"
-                            groups="odoo_nhs_incident_risk.group_hc_handler,odoo_nhs_incident_risk.group_hc_quality_lead"
+                            groups="odoo_nhs_incident_risk.group_hc_handler"
                             invisible="state != 'investigation' or action_count &gt; 0 or investigation_id != False"/>
                     <button name="action_request_closure" string="Request Closure"
                             type="object"
-                            groups="odoo_nhs_incident_risk.group_hc_handler,odoo_nhs_incident_risk.group_hc_quality_lead"
+                            groups="odoo_nhs_incident_risk.group_hc_handler"
                             invisible="state != 'actions'"/>
-                    <!-- Final sign-off gated to quality leads only -->
                     <button name="action_close" string="Close Incident"
                             type="object" class="btn-primary"
                             groups="odoo_nhs_incident_risk.group_hc_quality_lead"
                             invisible="state != 'pending_closure'"/>
-                    <!-- Offered only when the heuristic (riddor_hint) suggests this may be RIDDOR-reportable -->
                     <button name="action_open_riddor_wizard" string="RIDDOR Check"
                             type="object"
-                            groups="odoo_nhs_incident_risk.group_hc_handler,odoo_nhs_incident_risk.group_hc_quality_lead"
+                            groups="odoo_nhs_incident_risk.group_hc_handler"
                             invisible="not riddor_hint or riddor_id"/>
-                    <!-- Only worth promoting to the risk register above a moderate harm grade -->
                     <button name="action_create_risk" string="Create Risk"
                             type="object"
                             groups="odoo_nhs_incident_risk.group_hc_risk_manager"
@@ -59,7 +47,6 @@
                      invisible="not is_never_event">
                     ⚠ NEVER EVENT — PSII investigation required
                 </div>
-                <!-- Shown only to safeguarding officers, even though the flag field itself may be readable elsewhere -->
                 <div class="alert alert-warning" role="alert"
                      invisible="not safeguarding_flag"
                      groups="odoo_nhs_incident_risk.group_hc_safeguarding">
@@ -69,6 +56,7 @@
                     <div class="oe_button_box" name="button_box">
                         <button name="action_open_investigation" type="object"
                                 class="oe_stat_button" icon="fa-search"
+                                groups="odoo_nhs_incident_risk.group_hc_handler"
                                 invisible="not investigation_id">
                             <field name="investigation_count" widget="statinfo" string="Investigation"/>
                         </button>
@@ -139,6 +127,20 @@
                                     <field name="treatment_required"/>
                                     <field name="injury_description"/>
                                 </list>
+                                <form>
+                                    <group>
+                                        <group>
+                                            <field name="person_type"/>
+                                            <field name="name"/>
+                                            <field name="age_band"/>
+                                        </group>
+                                        <group>
+                                            <field name="harm_observed"/>
+                                            <field name="treatment_required"/>
+                                            <field name="injury_description"/>
+                                        </group>
+                                    </group>
+                                </form>
                             </field>
                         </page>
                         <!-- Visible from Triage onwards: grading is set during triage -->
@@ -157,8 +159,11 @@
                                 </group>
                             </group>
                         </page>
-                        <!-- Visible only once an investigation record exists -->
+                        <!-- Visible only once an investigation record exists, and only to Handler+ since
+                             opening it renders the full nhs.investigation form (Chronology tab included),
+                             which Reporter has no access to by design. -->
                         <page string="Investigation"
+                              groups="odoo_nhs_incident_risk.group_hc_handler"
                               invisible="not investigation_id">
                             <group>
                                 <field name="investigation_id" readonly="1"/>
@@ -223,7 +228,7 @@
         </field>
     </record>
 
-    <!-- ══ INCIDENT LIST ════════════════════════════════════════════ -->
+    <!-- INCIDENT LIST -->
     <record id="view_nhs_incident_list" model="ir.ui.view">
         <field name="name">nhs.incident.list</field>
         <field name="model">nhs.incident</field>
@@ -248,7 +253,7 @@
         </field>
     </record>
 
-    <!-- ══ TRIAGE KANBAN ════════════════════════════════════════════ -->
+    <!--  TRIAGE KANBAN -->
     <record id="view_nhs_incident_kanban_triage" model="ir.ui.view">
         <field name="name">nhs.incident.kanban.triage</field>
         <field name="model">nhs.incident</field>
@@ -272,7 +277,6 @@
                 <templates>
                     <t t-name="card">
                         <t t-set="harm" t-value="record.harm_grade.raw_value"/>
-                        <!-- Card left-border colour mirrors the harm grade severity -->
                         <t t-set="borderCol"
                            t-value="harm == 'death' or harm == 'severe' ? 'var(--bs-danger)'
                                     : harm == 'moderate' ? 'var(--bs-warning)'
@@ -367,7 +371,6 @@
                         domain="[('state','in',['new','triage'])]"/>
                 <filter name="never_event" string="Never Events"
                         domain="[('is_never_event','=',True)]"/>
-                <!-- Only offered to safeguarding officers, matching the form's restricted safeguarding page -->
                 <filter name="safeguarding" string="Safeguarding"
                         domain="[('safeguarding_flag','=',True)]"
                         groups="odoo_nhs_incident_risk.group_hc_safeguarding"/>
@@ -411,7 +414,7 @@
         </field>
     </record>
 
-    <!-- ══ CALENDAR ═════════════════════════════════════════════════ -->
+    <!--  CALENDAR -->
     <record id="view_nhs_incident_calendar" model="ir.ui.view">
         <field name="name">nhs.incident.calendar</field>
         <field name="model">nhs.incident</field>
@@ -425,8 +428,6 @@
     </record>
 
     <!-- ══ ACTIONS ══════════════════════════════════════════════════ -->
-    <!-- (5,0,0) clears the default view list so the triage-specific kanban view is used
-         first, instead of falling back to a generic kanban view -->
     <record id="action_nhs_incident_triage_queue" model="ir.actions.act_window">
         <field name="name">Triage Queue</field>
         <field name="res_model">nhs.incident</field>

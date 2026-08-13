@@ -96,7 +96,7 @@
         </t>
     </template>
 
-    <!-- ══ DUTY OF CANDOUR LETTER ═══════════════════════════════════ -->
+    <!--  DUTY OF CANDOUR LETTER -->
     <record id="action_report_doc_letter" model="ir.actions.report">
         <field name="name">Duty of Candour Letter</field>
         <field name="model">nhs.duty.of.candour</field>

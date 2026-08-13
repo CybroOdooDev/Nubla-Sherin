@@ -3,7 +3,7 @@
     <!-- Analysis/dashboard entry points (pivot, graph and list views) surfaced under
          the Reporting menu for incidents, risks, and open Duty of Candour clocks. -->
 
-    <!-- ── Incident Analysis pivot ──────────────────────────── -->
+    <!-- ── Incident Analysis pivot -->
     <record id="action_nhs_incident_analysis" model="ir.actions.act_window">
         <field name="name">Incident Analysis</field>
         <field name="res_model">nhs.incident</field>
@@ -11,14 +11,13 @@
         <field name="context">{'search_default_open': False}</field>
     </record>
 
-    <!-- ── Risk Analysis pivot ──────────────────────────────── -->
+    <!-- ── Risk Analysis pivot -->
     <record id="action_nhs_risk_analysis" model="ir.actions.act_window">
         <field name="name">Risk Analysis</field>
         <field name="res_model">nhs.risk</field>
         <field name="view_mode">pivot,list</field>
     </record>
 
-    <!-- ── Statutory dashboard ──────────────────────────────── -->
     <!-- DoC open clocks -->
     <record id="action_nhs_doc_open" model="ir.actions.act_window">
         <field name="name">Open Duty of Candour Records</field>
