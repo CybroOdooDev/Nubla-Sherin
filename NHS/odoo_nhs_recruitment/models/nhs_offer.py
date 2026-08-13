@@ -49,7 +49,15 @@ class NhsOffer(models.Model):
         string='Pay Point', related='band_id.pay_point', store=True, readonly=False)
     salary = fields.Monetary(string='Offered Salary', currency_field='currency_id')
     start_date = fields.Date(string='Proposed Start Date', tracking=True)
-    fte = fields.Float(string='FTE', related='vacancy_id.fte', store=True, readonly=False)
+    fte = fields.Float(
+        string='FTE', digits=(16, 2),
+        help="FTE being offered to this candidate. A vacancy's own FTE can"
+             " cover more than one hire (e.g. 3.0 FTE across 3 candidates),"
+             " so this is independent of and must not simply mirror the"
+             " vacancy's total FTE — it's what this specific offer counts"
+             " towards that total once hired. The vacancy only closes once"
+             " the sum of hired offers' FTE reaches the vacancy's own FTE."
+    )
     hours = fields.Float(string='Hours per Week')
     offer_type = fields.Selection([
         ('conditional', 'Conditional'),
@@ -78,11 +86,18 @@ class NhsOffer(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         """Assign the next 'nhs.offer' sequence number when none is
-        supplied, then generate the offer's pre-employment check set from
-        the vacancy's check profile."""
+        supplied, default the offer's FTE from the vacancy's remaining
+        unfilled FTE when not explicitly given, then generate the offer's
+        pre-employment check set from the vacancy's check profile."""
         for vals in vals_list:
             if not vals.get('name') or vals.get('name') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('nhs.offer') or 'New'
+            if not vals.get('fte') and vals.get('application_id'):
+                application = self.env['nhs.application'].browse(vals['application_id'])
+                vacancy = application.vacancy_id
+                if vacancy:
+                    remaining = vacancy.fte - vacancy.hired_fte
+                    vals['fte'] = min(1.0, remaining) if remaining > 0 else vacancy.fte
         offers = super().create(vals_list)
         offers._generate_checks()
         return offers

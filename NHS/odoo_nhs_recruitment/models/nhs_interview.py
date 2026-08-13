@@ -135,8 +135,13 @@ class NhsInterview(models.Model):
         """Sends the interview invitation email to the candidate."""
         self.ensure_one()
         template = self.env.ref('odoo_nhs_recruitment.mail_template_interview_invite', raise_if_not_found=False)
-        if template:
-            template.send_mail(self.id, force_send=True)
+        candidate_email = self.application_id.candidate_id.email
+        if template and candidate_email:
+            template.send_mail(
+                self.id,
+                force_send=True,
+                email_values={'email_to': candidate_email}
+            )
             self.write({'invitation_sent': True})
         return {
             'type': 'ir.actions.client',

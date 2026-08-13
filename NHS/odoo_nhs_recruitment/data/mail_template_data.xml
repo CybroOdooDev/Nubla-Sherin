@@ -7,6 +7,7 @@
             <field name="model_id" ref="model_nhs_application"/>
             <field name="email_from">{{ (user.email_formatted or '') }}</field>
             <field name="email_to">{{ object.candidate_id.email or '' }}</field>
+            <field name="use_default_to" eval="False"/>
             <field name="subject">We've received your application — {{ object.name }}</field>
             <field name="body_html" type="html">
                 <div style="margin: 0px; padding: 0px; font-size: 13px;">
@@ -28,6 +29,7 @@
             <field name="model_id" ref="model_nhs_interview"/>
             <field name="email_from">{{ (user.email_formatted or '') }}</field>
             <field name="email_to">{{ object.application_id.candidate_id.email or '' }}</field>
+            <field name="use_default_to" eval="False"/>
             <field name="subject">Interview invitation — {{ object.vacancy_id.name }}</field>
             <field name="body_html" type="html">
                 <div style="margin: 0px; padding: 0px; font-size: 13px;">
@@ -52,6 +54,7 @@
             <field name="model_id" ref="model_nhs_application"/>
             <field name="email_from">{{ (user.email_formatted or '') }}</field>
             <field name="email_to">{{ object.candidate_id.email or '' }}</field>
+            <field name="use_default_to" eval="False"/>
             <field name="subject">Application outcome — {{ object.vacancy_id.name }}</field>
             <field name="body_html" type="html">
                 <div style="margin: 0px; padding: 0px; font-size: 13px;">
@@ -73,6 +76,7 @@
             <field name="model_id" ref="model_nhs_offer"/>
             <field name="email_from">{{ (user.email_formatted or '') }}</field>
             <field name="email_to">{{ object.candidate_id.email or '' }}</field>
+            <field name="use_default_to" eval="False"/>
             <field name="subject">Offer of employment — {{ object.vacancy_id.name }}</field>
             <field name="body_html" type="html">
                 <div style="margin: 0px; padding: 0px; font-size: 13px;">
