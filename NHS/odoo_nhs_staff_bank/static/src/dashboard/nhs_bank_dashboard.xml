@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- OWL template: KPI fill-rate / bank-vs-agency dashboard with stat cards and panels -->
+    <t t-name="odoo_nhs_staff_bank.NhsBankDashboard" owl="1">
+        <div class="o_nhs_bank_dashboard o_content p-4" style="height: 100%; overflow-y: auto;">
+            <t t-if="state.loading">
+                <div class="d-flex justify-content-center align-items-center" style="height: 60vh;">
+                    <div class="spinner-border text-nhs-blue" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </t>
+
+            <t t-else="">
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom bg-white p-3 rounded-3 shadow-sm">
+                    <div>
+                        <h3 class="fw-bold mb-0 text-nhs-blue">
+                            <i class="fa fa-tachometer me-2"/>Staff Bank Dashboard
+                        </h3>
+                        <div class="text-muted small">Fill-Rate &amp; Bank-vs-Agency Overview</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-outline-nhs-blue btn-sm fw-semibold me-2" t-on-click="openAnalytics">
+                            <i class="fa fa-bar-chart me-1"/> Analytics
+                        </button>
+                        <button class="btn btn-outline-nhs-blue btn-sm fw-semibold" t-on-click="loadData">
+                            <i class="fa fa-refresh me-1"/> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Metric Cards Grid -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-4 col-xl-2">
+                        <div class="card h-100 shadow-sm rounded-3 bank-stat-card cursor-pointer" t-on-click="openOpenShifts">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-uppercase small fw-bold text-muted">Open</span>
+                                    <div class="stat-icon-wrapper"><i class="fa fa-calendar"/></div>
+                                </div>
+                                <h3 class="fw-bold mb-0 text-nhs-blue" t-esc="state.data.open_count"/>
+                                <small class="text-muted">Open shifts</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-4 col-xl-2">
+                        <div class="card h-100 shadow-sm rounded-3 bank-stat-card cursor-pointer" t-on-click="openUrgentShifts">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-uppercase small fw-bold text-muted">Urgent</span>
+                                    <div class="stat-icon-wrapper"><i class="fa fa-exclamation-triangle"/></div>
+                                </div>
+                                <h3 class="fw-bold mb-0 text-nhs-blue" t-esc="state.data.urgent_unfilled_count"/>
+                                <small class="text-muted">Urgent unfilled</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-4 col-xl-2">
+                        <div class="card h-100 shadow-sm rounded-3 bank-stat-card cursor-pointer" t-on-click="openFilledShifts">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-uppercase small fw-bold text-muted">Fill Rate</span>
+                                    <div class="stat-icon-wrapper"><i class="fa fa-check-circle"/></div>
+                                </div>
+                                <h3 class="fw-bold mb-0 text-nhs-blue"><t t-esc="state.data.fill_rate"/>%</h3>
+                                <small class="text-muted"><t t-esc="state.data.filled_count"/> filled by bank</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-4 col-xl-2">
+                        <div class="card h-100 shadow-sm rounded-3 bank-stat-card cursor-pointer" t-on-click="openAgencyShifts">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-uppercase small fw-bold text-muted">To Agency</span>
+                                    <div class="stat-icon-wrapper"><i class="fa fa-external-link"/></div>
+                                </div>
+                                <h3 class="fw-bold mb-0 text-nhs-blue" t-esc="state.data.to_agency_count"/>
+                                <small class="text-muted">Escalated shifts</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-4 col-xl-2">
+                        <div class="card h-100 shadow-sm rounded-3 bank-stat-card">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-uppercase small fw-bold text-muted">Cost Avoidance</span>
+                                    <div class="stat-icon-wrapper"><i class="fa fa-gbp"/></div>
+                                </div>
+                                <h3 class="fw-bold mb-0 text-nhs-blue"><t t-esc="Math.round(state.data.cost_avoidance)"/></h3>
+                                <small class="text-muted">vs agency comparator</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-4 col-xl-2">
+                        <div class="card h-100 shadow-sm rounded-3 bank-stat-card cursor-pointer" t-on-click="openComplianceExposure">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-uppercase small fw-bold text-muted">Non-Compliant</span>
+                                    <div class="stat-icon-wrapper"><i class="fa fa-shield"/></div>
+                                </div>
+                                <h3 class="fw-bold mb-0 text-nhs-blue" t-esc="state.data.compliance_exposure_count"/>
+                                <small class="text-muted">Members at risk</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spend Row -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm rounded-3 h-100">
+                            <div class="card-body">
+                                <div class="text-uppercase small fw-bold text-muted">Bank Spend</div>
+                                <h4 class="fw-bold text-nhs-blue"><t t-esc="Math.round(state.data.bank_spend)"/></h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm rounded-3 h-100">
+                            <div class="card-body">
+                                <div class="text-uppercase small fw-bold text-muted">Agency Spend</div>
+                                <h4 class="fw-bold text-nhs-blue"><t t-esc="Math.round(state.data.agency_spend)"/></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Panels -->
+                <div class="row g-4">
+                    <div class="col-lg-7">
+                        <div class="card shadow-sm mb-4 rounded-3">
+                            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                <h6 class="fw-bold mb-0 text-dark"><i class="fa fa-calendar text-nhs-blue me-2"/>Open Shifts</h6>
+                                <button class="btn btn-sm btn-link text-nhs-blue p-0 text-decoration-none fw-semibold" t-on-click="openOpenShifts">
+                                    View All <i class="fa fa-arrow-right ms-1"/>
+                                </button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr class="small"><th>Shift</th><th>Area</th><th>Status</th><th>Urgency</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-if="!state.data.open_list.length">
+                                                <tr><td colspan="4" class="text-center py-4 text-muted">No open shifts</td></tr>
+                                            </t>
+                                            <t t-foreach="state.data.open_list" t-as="s" t-key="s.id">
+                                                <tr class="cursor-pointer" t-on-click="() => this.openRecord('nhs.bank.shift', s.id)">
+                                                    <td class="fw-semibold text-nhs-blue" t-esc="s.name"/>
+                                                    <td class="small text-muted" t-esc="s.org_unit"/>
+                                                    <td><span class="badge text-bg-secondary" t-esc="s.state_label"/></td>
+                                                    <td class="small" t-esc="s.urgency"/>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm rounded-3">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="fw-bold mb-0 text-dark"><i class="fa fa-map-marker text-nhs-blue me-2"/>Demand Hot-Spots</h6>
+                            </div>
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush">
+                                    <t t-if="!state.data.hotspots.length">
+                                        <li class="list-group-item text-center py-4 text-muted small">No open demand</li>
+                                    </t>
+                                    <t t-foreach="state.data.hotspots" t-as="h" t-key="h.id">
+                                        <li class="list-group-item px-3 py-2 d-flex justify-content-between align-items-center">
+                                            <span class="small fw-semibold text-dark" t-esc="h.name"/>
+                                            <span class="badge bg-nhs-blue" t-esc="h.count"/>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <div class="card shadow-sm mb-4 rounded-3">
+                            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                <h6 class="fw-bold mb-0 text-dark"><i class="fa fa-shield text-nhs-blue me-2"/>Compliance Exposure</h6>
+                                <button class="btn btn-sm btn-link text-nhs-blue p-0 text-decoration-none fw-semibold" t-on-click="openComplianceExposure">
+                                    View All <i class="fa fa-arrow-right ms-1"/>
+                                </button>
+                            </div>
+                            <div class="card-body p-0">
+                                <t t-if="!state.data.compliance_list.length">
+                                    <div class="text-center py-4 text-muted small">
+                                        <i class="fa fa-check-circle text-success me-1"/> No members at risk
+                                    </div>
+                                </t>
+                                <ul class="list-group list-group-flush">
+                                    <t t-foreach="state.data.compliance_list" t-as="m" t-key="m.id">
+                                        <li class="list-group-item px-3 py-2 d-flex justify-content-between align-items-center cursor-pointer"
+                                            t-on-click="() => this.openRecord('nhs.bank.member', m.id)">
+                                            <div>
+                                                <div class="small fw-semibold text-dark" t-esc="m.name"/>
+                                                <div class="small text-muted opacity-75" t-esc="m.reason"/>
+                                            </div>
+                                            <span class="badge text-bg-danger">At Risk</span>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm rounded-3">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="fw-bold mb-0 text-dark"><i class="fa fa-users text-nhs-blue me-2"/>Top Member Utilisation</h6>
+                            </div>
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush">
+                                    <t t-if="!state.data.utilisation_top.length">
+                                        <li class="list-group-item text-center py-4 text-muted small">No worked shifts yet</li>
+                                    </t>
+                                    <t t-foreach="state.data.utilisation_top" t-as="u" t-key="u.id">
+                                        <li class="list-group-item px-3 py-2 d-flex justify-content-between align-items-center cursor-pointer"
+                                            t-on-click="() => this.openRecord('nhs.bank.member', u.id)">
+                                            <span class="small fw-semibold text-dark" t-esc="u.name"/>
+                                            <span class="badge bg-nhs-blue" t-esc="u.shifts + ' shifts'"/>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

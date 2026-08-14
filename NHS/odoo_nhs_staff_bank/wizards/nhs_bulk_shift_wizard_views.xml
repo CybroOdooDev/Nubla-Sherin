@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard view: bulk-create a recurring run of shifts -->
+    <record id="view_nhs_bulk_shift_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.bulk.shift.wizard.form</field>
+        <field name="model">nhs.bulk.shift.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bulk-Create Shifts">
+                <group>
+                    <group string="Shift Details">
+                        <field name="org_unit_id"/>
+                        <field name="band_id"/>
+                        <field name="role"/>
+                        <field name="skill_ids" widget="many2many_tags"/>
+                        <field name="shift_type_id"/>
+                        <field name="headcount"/>
+                        <field name="reason"/>
+                        <field name="urgency"/>
+                    </group>
+                    <group string="Pattern">
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="start_time" widget="float_time"/>
+                        <field name="end_time" widget="float_time"/>
+                        <label for="monday" string="Days"/>
+                        <div class="o_row">
+                            <field name="monday"/><span>Mon</span>
+                            <field name="tuesday"/><span>Tue</span>
+                            <field name="wednesday"/><span>Wed</span>
+                            <field name="thursday"/><span>Thu</span>
+                            <field name="friday"/><span>Fri</span>
+                            <field name="saturday"/><span>Sat</span>
+                            <field name="sunday"/><span>Sun</span>
+                        </div>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_create_shifts" type="object" string="Create Shifts" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_bulk_shift_wizard" model="ir.actions.act_window">
+        <field name="name">Bulk-Create Shifts</field>
+        <field name="res_model">nhs.bulk.shift.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

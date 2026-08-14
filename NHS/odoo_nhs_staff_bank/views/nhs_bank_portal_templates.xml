@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Portal home card: links into the Staff Bank self-service pages -->
+    <template id="portal_my_home_nhs_staff_bank" inherit_id="portal.portal_my_home" customize_show="True">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-if="bank_shift_count is not None">
+                <div class="o_portal_category col-lg-3 col-md-4 col-6 mb-2">
+                    <a href="/my/bank" class="o_portal_category_layout">
+                        <div class="d-flex align-items-center">
+                            <i class="fa fa-2x fa-calendar-check-o text-primary me-2"/>
+                            <div>
+                                <div class="fw-bold">Staff Bank</div>
+                                <span class="badge text-bg-primary" t-esc="bank_shift_count"/>
+                                <span class="text-muted small">shifts for you</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Shown when the logged-in portal user is not linked to a bank member -->
+    <template id="portal_bank_not_member" name="Not a Bank Member">
+        <t t-call="portal.portal_layout">
+            <div class="container o_portal_bank">
+                <div class="alert alert-info mt-3">
+                    You are not currently registered as a Staff Bank member. Contact the
+                    Staff Bank team if you believe this is incorrect.
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Bank member portal home: summary + quick links -->
+    <template id="portal_bank_home" name="Staff Bank Home">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="False"/>
+            <div class="container o_portal_bank mt-3">
+                <h2>Staff Bank</h2>
+                <p class="text-muted">
+                    Welcome, <t t-esc="member.name"/> —
+                    compliance status:
+                    <span t-attf-class="badge #{member.compliance_status == 'compliant' and 'text-bg-success' or 'text-bg-danger'}"
+                          t-esc="member.compliance_status"/>
+                </p>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Available Shifts</h5>
+                                <p class="card-text text-muted">Shifts you're eligible and compliant to work.</p>
+                                <a href="/my/bank/shifts" class="btn btn-primary btn-sm">View Shifts</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">My Bookings</h5>
+                                <p class="card-text text-muted">Your confirmed bookings and pay summary.</p>
+                                <a href="/my/bank/bookings" class="btn btn-primary btn-sm">View Bookings</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Availability</h5>
+                                <p class="card-text text-muted">Tell us when you can work.</p>
+                                <a href="/my/bank/availability" class="btn btn-primary btn-sm">Set Availability</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="mt-4">Shifts Matching You</h4>
+                <table class="table table-sm" t-if="eligible_shifts">
+                    <thead><tr><th>Shift</th><th>Start</th><th>End</th><th/></tr></thead>
+                    <tbody>
+                        <tr t-foreach="eligible_shifts" t-as="shift">
+                            <td t-esc="shift.name"/>
+                            <td t-esc="shift.shift_start"/>
+                            <td t-esc="shift.shift_end"/>
+                            <td>
+                                <form t-attf-action="/my/bank/shifts/#{shift.id}/accept" method="post">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <button type="submit" class="btn btn-sm btn-success">Accept</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p t-if="not eligible_shifts" class="text-muted">No matching shifts right now.</p>
+
+                <h4 class="mt-4">Upcoming Bookings</h4>
+                <table class="table table-sm" t-if="upcoming_bookings">
+                    <thead><tr><th>Shift</th><th>Start</th><th>End</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <tr t-foreach="upcoming_bookings" t-as="booking">
+                            <td t-esc="booking.shift_id.name"/>
+                            <td t-esc="booking.shift_start"/>
+                            <td t-esc="booking.shift_end"/>
+                            <td t-esc="booking.state"/>
+                        </tr>
+                    </tbody>
+                </table>
+                <p t-if="not upcoming_bookings" class="text-muted">No upcoming bookings.</p>
+            </div>
+        </t>
+    </template>
+
+    <!-- Bank member portal: available/eligible shifts, accept -->
+    <template id="portal_bank_shifts" name="Staff Bank Shifts">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="False"/>
+            <div class="container o_portal_bank mt-3">
+                <h2>Available Shifts</h2>
+                <table class="table table-sm" t-if="shifts">
+                    <thead><tr><th>Shift</th><th>Start</th><th>End</th><th>Band</th><th>Role</th><th/></tr></thead>
+                    <tbody>
+                        <tr t-foreach="shifts" t-as="shift">
+                            <td t-esc="shift.name"/>
+                            <td t-esc="shift.shift_start"/>
+                            <td t-esc="shift.shift_end"/>
+                            <td t-esc="shift.band_id.name"/>
+                            <td t-esc="shift.role"/>
+                            <td>
+                                <form t-attf-action="/my/bank/shifts/#{shift.id}/accept" method="post">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <button type="submit" class="btn btn-sm btn-success">Accept</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p t-if="not shifts" class="text-muted">No matching shifts right now.</p>
+            </div>
+        </t>
+    </template>
+
+    <!-- Bank member portal: own bookings + pay summary -->
+    <template id="portal_bank_bookings" name="Staff Bank Bookings">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="False"/>
+            <div class="container o_portal_bank mt-3">
+                <h2>My Bookings</h2>
+                <p><strong>Total pay (worked shifts):</strong> <span t-esc="'%.2f' % total_pay"/></p>
+                <table class="table table-sm" t-if="bookings">
+                    <thead><tr><th>Reference</th><th>Shift</th><th>Start</th><th>End</th><th>Status</th><th>Payable</th></tr></thead>
+                    <tbody>
+                        <tr t-foreach="bookings" t-as="booking">
+                            <td t-esc="booking.name"/>
+                            <td t-esc="booking.shift_id.name"/>
+                            <td t-esc="booking.shift_start"/>
+                            <td t-esc="booking.shift_end"/>
+                            <td t-esc="booking.state"/>
+                            <td t-esc="'%.2f' % booking.payable_amount"/>
+                        </tr>
+                    </tbody>
+                </table>
+                <p t-if="not bookings" class="text-muted">No bookings yet.</p>
+            </div>
+        </t>
+    </template>
+
+    <!-- Bank member portal: set availability -->
+    <template id="portal_bank_availability" name="Staff Bank Availability">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="False"/>
+            <div class="container o_portal_bank mt-3">
+                <h2>My Availability</h2>
+                <form action="/my/bank/availability/add" method="post" class="row g-2 mb-4">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="col-md-3">
+                        <label class="form-label">From</label>
+                        <input type="datetime-local" name="date_from" class="form-control" required="required"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">To</label>
+                        <input type="datetime-local" name="date_to" class="form-control" required="required"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Type</label>
+                        <select name="availability_type" class="form-select">
+                            <option value="available">Available</option>
+                            <option value="unavailable">Unavailable (Blackout)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Note</label>
+                        <input type="text" name="note" class="form-control"/>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Add</button>
+                    </div>
+                </form>
+                <table class="table table-sm" t-if="availability">
+                    <thead><tr><th>From</th><th>To</th><th>Type</th><th>Note</th></tr></thead>
+                    <tbody>
+                        <tr t-foreach="availability" t-as="a">
+                            <td t-esc="a.date_from"/>
+                            <td t-esc="a.date_to"/>
+                            <td t-esc="a.availability_type"/>
+                            <td t-esc="a.note"/>
+                        </tr>
+                    </tbody>
+                </table>
+                <p t-if="not availability" class="text-muted">No availability recorded yet.</p>
+            </div>
+        </t>
+    </template>
+</odoo>

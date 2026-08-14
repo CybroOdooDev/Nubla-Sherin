@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_bank_rate_list" model="ir.ui.view">
+        <field name="name">nhs.bank.rate.list</field>
+        <field name="model">nhs.bank.rate</field>
+        <field name="arch" type="xml">
+            <list string="Rate Cards" editable="bottom">
+                <field name="name"/>
+                <field name="band_id"/>
+                <field name="role"/>
+                <field name="shift_type_id"/>
+                <field name="hourly_rate"/>
+                <field name="enhancement_pct"/>
+                <field name="effective_from"/>
+                <field name="effective_to"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_bank_rate_form" model="ir.ui.view">
+        <field name="name">nhs.bank.rate.form</field>
+        <field name="model">nhs.bank.rate</field>
+        <field name="arch" type="xml">
+            <form string="Rate Card">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="band_id"/>
+                            <field name="role"/>
+                            <field name="shift_type_id"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="hourly_rate"/>
+                            <field name="enhancement_pct"/>
+                            <field name="effective_from"/>
+                            <field name="effective_to"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_bank_rate_search" model="ir.ui.view">
+        <field name="name">nhs.bank.rate.search</field>
+        <field name="model">nhs.bank.rate</field>
+        <field name="arch" type="xml">
+            <search string="Rate Cards">
+                <field name="name"/>
+                <field name="band_id"/>
+                <field name="shift_type_id"/>
+                <group>
+                    <filter string="Band" name="group_band" context="{'group_by': 'band_id'}"/>
+                    <filter string="Shift Type" name="group_shift_type" context="{'group_by': 'shift_type_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_bank_rate" model="ir.actions.act_window">
+        <field name="name">Rate Cards</field>
+        <field name="res_model">nhs.bank.rate</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Set up your first bank rate</p>
+        </field>
+    </record>
+</odoo>

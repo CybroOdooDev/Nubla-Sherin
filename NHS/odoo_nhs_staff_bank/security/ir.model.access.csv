@@ -1,0 +1,41 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nhs_establishment_post_bank_officer,nhs.establishment.post bank officer,odoo_nhs_establishment.model_nhs_establishment_post,group_nhs_bank_officer,1,0,0,0
+access_nhs_afc_band_bank_officer,nhs.afc.band bank officer,odoo_nhs_establishment.model_nhs_afc_band,group_nhs_bank_officer,1,0,0,0
+access_nhs_staff_group_bank_officer,nhs.staff.group bank officer,odoo_nhs_establishment.model_nhs_staff_group,group_nhs_bank_officer,1,0,0,0
+access_nhs_org_unit_bank_officer,nhs.org.unit bank officer,odoo_nhs_establishment.model_nhs_org_unit,group_nhs_bank_officer,1,0,0,0
+access_nhs_org_unit_bank_user,nhs.org.unit bank internal user,odoo_nhs_establishment.model_nhs_org_unit,base.group_user,1,0,0,0
+access_nhs_skill_officer,nhs.skill officer,model_nhs_skill,group_nhs_bank_officer,1,1,1,0
+access_nhs_skill_manager,nhs.skill manager,model_nhs_skill,group_nhs_bank_manager,1,1,1,1
+access_nhs_skill_member,nhs.skill member,model_nhs_skill,group_nhs_bank_member,1,0,0,0
+access_nhs_shift_type_officer,nhs.shift.type officer,model_nhs_shift_type,group_nhs_bank_officer,1,1,1,0
+access_nhs_shift_type_manager,nhs.shift.type manager,model_nhs_shift_type,group_nhs_bank_manager,1,1,1,1
+access_nhs_shift_type_member,nhs.shift.type member,model_nhs_shift_type,group_nhs_bank_member,1,0,0,0
+access_nhs_bank_rate_officer,nhs.bank.rate officer,model_nhs_bank_rate,group_nhs_bank_officer,1,0,0,0
+access_nhs_bank_rate_manager,nhs.bank.rate manager,model_nhs_bank_rate,group_nhs_bank_manager,1,1,1,1
+access_nhs_bank_member_officer,nhs.bank.member officer,model_nhs_bank_member,group_nhs_bank_officer,1,1,1,0
+access_nhs_bank_member_manager,nhs.bank.member manager,model_nhs_bank_member,group_nhs_bank_manager,1,1,1,1
+access_nhs_bank_member_self,nhs.bank.member self,model_nhs_bank_member,group_nhs_bank_member,1,0,0,0
+access_nhs_bank_member_user,nhs.bank.member area manager,model_nhs_bank_member,base.group_user,1,0,0,0
+access_nhs_member_availability_officer,nhs.member.availability officer,model_nhs_member_availability,group_nhs_bank_officer,1,1,1,1
+access_nhs_member_availability_manager,nhs.member.availability manager,model_nhs_member_availability,group_nhs_bank_manager,1,1,1,1
+access_nhs_member_availability_self,nhs.member.availability self,model_nhs_member_availability,group_nhs_bank_member,1,1,1,1
+access_nhs_bank_shift_officer,nhs.bank.shift officer,model_nhs_bank_shift,group_nhs_bank_officer,1,1,1,0
+access_nhs_bank_shift_manager,nhs.bank.shift manager,model_nhs_bank_shift,group_nhs_bank_manager,1,1,1,1
+access_nhs_bank_shift_member,nhs.bank.shift member,model_nhs_bank_shift,group_nhs_bank_member,1,0,0,0
+access_nhs_bank_shift_user,nhs.bank.shift area manager,model_nhs_bank_shift,base.group_user,1,1,1,0
+access_nhs_shift_offer_officer,nhs.shift.offer officer,model_nhs_shift_offer,group_nhs_bank_officer,1,1,1,1
+access_nhs_shift_offer_manager,nhs.shift.offer manager,model_nhs_shift_offer,group_nhs_bank_manager,1,1,1,1
+access_nhs_shift_offer_self,nhs.shift.offer self,model_nhs_shift_offer,group_nhs_bank_member,1,1,0,0
+access_nhs_shift_booking_officer,nhs.shift.booking officer,model_nhs_shift_booking,group_nhs_bank_officer,1,1,1,0
+access_nhs_shift_booking_manager,nhs.shift.booking manager,model_nhs_shift_booking,group_nhs_bank_manager,1,1,1,0
+access_nhs_shift_booking_self,nhs.shift.booking self,model_nhs_shift_booking,group_nhs_bank_member,1,0,0,0
+access_nhs_offer_shift_wizard_officer,nhs.offer.shift.wizard officer,model_nhs_offer_shift_wizard,group_nhs_bank_officer,1,1,1,1
+access_nhs_offer_shift_wizard_manager,nhs.offer.shift.wizard manager,model_nhs_offer_shift_wizard,group_nhs_bank_manager,1,1,1,1
+access_nhs_offer_shift_wizard_line_officer,nhs.offer.shift.wizard.line officer,model_nhs_offer_shift_wizard_line,group_nhs_bank_officer,1,1,1,1
+access_nhs_offer_shift_wizard_line_manager,nhs.offer.shift.wizard.line manager,model_nhs_offer_shift_wizard_line,group_nhs_bank_manager,1,1,1,1
+access_nhs_bulk_shift_wizard_officer,nhs.bulk.shift.wizard officer,model_nhs_bulk_shift_wizard,group_nhs_bank_officer,1,1,1,1
+access_nhs_bulk_shift_wizard_manager,nhs.bulk.shift.wizard manager,model_nhs_bulk_shift_wizard,group_nhs_bank_manager,1,1,1,1
+access_nhs_escalate_agency_wizard_officer,nhs.escalate.agency.wizard officer,model_nhs_escalate_agency_wizard,group_nhs_bank_officer,1,1,1,1
+access_nhs_escalate_agency_wizard_manager,nhs.escalate.agency.wizard manager,model_nhs_escalate_agency_wizard,group_nhs_bank_manager,1,1,1,1
+access_nhs_bank_report_wizard_officer,nhs.bank.report.wizard officer,model_nhs_bank_report_wizard,group_nhs_bank_officer,1,1,1,1
+access_nhs_bank_report_wizard_manager,nhs.bank.report.wizard manager,model_nhs_bank_report_wizard,group_nhs_bank_manager,1,1,1,1

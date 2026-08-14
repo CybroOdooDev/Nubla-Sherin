@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_member_availability_list" model="ir.ui.view">
+        <field name="name">nhs.member.availability.list</field>
+        <field name="model">nhs.member.availability</field>
+        <field name="arch" type="xml">
+            <list string="Availability" editable="bottom"
+                  decoration-danger="availability_type == 'unavailable'">
+                <field name="member_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="availability_type"/>
+                <field name="recurring"/>
+                <field name="weekday" invisible="not recurring"/>
+                <field name="recurrence_end_date" invisible="not recurring"/>
+                <field name="note"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_member_availability_form" model="ir.ui.view">
+        <field name="name">nhs.member.availability.form</field>
+        <field name="model">nhs.member.availability</field>
+        <field name="arch" type="xml">
+            <form string="Availability">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="member_id"/>
+                            <field name="availability_type"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group>
+                            <field name="recurring"/>
+                            <field name="weekday" invisible="not recurring"/>
+                            <field name="recurrence_end_date" invisible="not recurring"/>
+                            <field name="note"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_member_availability_calendar" model="ir.ui.view">
+        <field name="name">nhs.member.availability.calendar</field>
+        <field name="model">nhs.member.availability</field>
+        <field name="arch" type="xml">
+            <calendar string="Availability Calendar" date_start="date_from" date_stop="date_to"
+                      color="member_id" mode="month">
+                <field name="member_id"/>
+                <field name="availability_type"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_nhs_member_availability_search" model="ir.ui.view">
+        <field name="name">nhs.member.availability.search</field>
+        <field name="model">nhs.member.availability</field>
+        <field name="arch" type="xml">
+            <search string="Availability">
+                <field name="member_id"/>
+                <filter string="Available" name="available" domain="[('availability_type', '=', 'available')]"/>
+                <filter string="Blackout" name="unavailable" domain="[('availability_type', '=', 'unavailable')]"/>
+                <group>
+                    <filter string="Member" name="group_member" context="{'group_by': 'member_id'}"/>
+                    <filter string="Type" name="group_type" context="{'group_by': 'availability_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_member_availability" model="ir.actions.act_window">
+        <field name="name">Availability</field>
+        <field name="res_model">nhs.member.availability</field>
+        <field name="view_mode">calendar,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add an availability record</p>
+        </field>
+    </record>
+</odoo>

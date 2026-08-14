@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report action: Fill-Rate & Agency-Displacement board paper, bound to the report wizard -->
+    <record id="action_report_nhs_fill_rate" model="ir.actions.report">
+        <field name="name">Fill-Rate &amp; Agency-Displacement Report</field>
+        <field name="model">nhs.bank.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_staff_bank.report_nhs_fill_rate</field>
+        <field name="report_file">odoo_nhs_staff_bank.report_nhs_fill_rate</field>
+        <field name="print_report_name">'Fill-Rate Report - %s to %s' % (object.date_from, object.date_to)</field>
+    </record>
+
+    <template id="report_nhs_fill_rate">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="wizard">
+                <t t-set="data" t-value="wizard.get_fill_rate_data()"/>
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Fill-Rate &amp; Agency-Displacement Report</h2>
+                        <p>
+                            <strong>Period:</strong> <span t-esc="data['date_from']"/> to <span t-esc="data['date_to']"/><br/>
+                            <strong>Generated:</strong>
+                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d %B %Y')"/>
+                        </p>
+
+                        <h4>Headline</h4>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Resolved Shifts</th>
+                                    <th>Filled by Bank</th>
+                                    <th>To Agency</th>
+                                    <th>Fill Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span t-esc="data['total_resolved']"/></td>
+                                    <td><span t-esc="data['filled_count']"/></td>
+                                    <td><span t-esc="data['to_agency_count']"/></td>
+                                    <td><span t-esc="'%.1f' % data['fill_rate']"/>%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Bank vs Agency Spend</h4>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Bank Spend</th>
+                                    <th>Agency Spend</th>
+                                    <th>Cost Avoidance (Displacement)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span t-esc="'%.2f' % data['bank_spend']"/></td>
+                                    <td><span t-esc="'%.2f' % data['agency_spend']"/></td>
+                                    <td><span t-esc="'%.2f' % data['cost_avoidance']"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>By Area</h4>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Area</th>
+                                    <th>Resolved</th>
+                                    <th>Filled</th>
+                                    <th>Fill Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="data['area_rows']" t-as="row">
+                                    <td><span t-esc="row['name']"/></td>
+                                    <td><span t-esc="row['total']"/></td>
+                                    <td><span t-esc="row['filled']"/></td>
+                                    <td><span t-esc="'%.1f' % row['rate']"/>%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_shift_offer_list" model="ir.ui.view">
+        <field name="name">nhs.shift.offer.list</field>
+        <field name="model">nhs.shift.offer</field>
+        <field name="arch" type="xml">
+            <list string="Shift Offers" decoration-success="response == 'accepted'"
+                  decoration-danger="response == 'declined'" decoration-muted="response in ('expired', 'withdrawn')">
+                <field name="shift_id"/>
+                <field name="member_id"/>
+                <field name="offered_at"/>
+                <field name="expiry_datetime"/>
+                <field name="response" widget="badge"/>
+                <field name="eligible"/>
+                <field name="decline_reason"/>
+                <button name="action_accept" type="object" string="Accept" icon="fa-check"
+                        invisible="response != 'pending'"/>
+                <button name="action_decline" type="object" string="Decline" icon="fa-times"
+                        invisible="response != 'pending'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_shift_offer_form" model="ir.ui.view">
+        <field name="name">nhs.shift.offer.form</field>
+        <field name="model">nhs.shift.offer</field>
+        <field name="arch" type="xml">
+            <form string="Shift Offer">
+                <header>
+                    <button name="action_accept" type="object" string="Accept" class="btn-primary"
+                            invisible="response != 'pending'"/>
+                    <button name="action_decline" type="object" string="Decline"
+                            invisible="response != 'pending'"/>
+                    <field name="response" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="shift_id"/>
+                            <field name="member_id"/>
+                            <field name="offered_at"/>
+                            <field name="expiry_datetime"/>
+                        </group>
+                        <group>
+                            <field name="eligible" readonly="1"/>
+                            <field name="eligibility_reasons" readonly="1"/>
+                            <field name="responded_at" readonly="1"/>
+                            <field name="decline_reason"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_shift_offer_search" model="ir.ui.view">
+        <field name="name">nhs.shift.offer.search</field>
+        <field name="model">nhs.shift.offer</field>
+        <field name="arch" type="xml">
+            <search string="Shift Offers">
+                <field name="shift_id"/>
+                <field name="member_id"/>
+                <filter string="Pending" name="pending" domain="[('response', '=', 'pending')]"/>
+                <filter string="Accepted" name="accepted" domain="[('response', '=', 'accepted')]"/>
+                <filter string="Declined" name="declined" domain="[('response', '=', 'declined')]"/>
+                <group>
+                    <filter string="Shift" name="group_shift" context="{'group_by': 'shift_id'}"/>
+                    <filter string="Member" name="group_member" context="{'group_by': 'member_id'}"/>
+                    <filter string="Response" name="group_response" context="{'group_by': 'response'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_shift_offer" model="ir.actions.act_window">
+        <field name="name">Offers</field>
+        <field name="res_model">nhs.shift.offer</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

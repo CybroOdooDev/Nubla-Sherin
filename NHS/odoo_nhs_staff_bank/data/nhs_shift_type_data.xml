@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+    <!-- Seed shift-type reference data: day / night / weekend / bank holiday -->
+    <record id="nhs_shift_type_day" model="nhs.shift.type">
+        <field name="name">Day</field>
+        <field name="code">DAY</field>
+        <field name="sequence">10</field>
+        <field name="is_unsocial" eval="False"/>
+    </record>
+    <record id="nhs_shift_type_night" model="nhs.shift.type">
+        <field name="name">Night</field>
+        <field name="code">NIGHT</field>
+        <field name="sequence">20</field>
+        <field name="is_unsocial" eval="True"/>
+    </record>
+    <record id="nhs_shift_type_weekend" model="nhs.shift.type">
+        <field name="name">Weekend</field>
+        <field name="code">WKND</field>
+        <field name="sequence">30</field>
+        <field name="is_unsocial" eval="True"/>
+    </record>
+    <record id="nhs_shift_type_bank_holiday" model="nhs.shift.type">
+        <field name="name">Bank Holiday</field>
+        <field name="code">BH</field>
+        <field name="sequence">40</field>
+        <field name="is_unsocial" eval="True"/>
+    </record>
+</odoo>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Root menu: top-level Staff Bank app entry -->
+    <menuitem id="menu_nhs_staff_bank_root" name="Staff Bank"
+              sequence="55" web_icon="odoo_nhs_staff_bank,static/description/icon.png"
+              groups="odoo_nhs_staff_bank.group_nhs_bank_member,odoo_nhs_staff_bank.group_nhs_bank_officer"/>
+
+    <!-- Shifts -->
+    <menuitem id="menu_nhs_bank_shifts" name="Shifts"
+              parent="menu_nhs_staff_bank_root" sequence="10"
+              groups="odoo_nhs_staff_bank.group_nhs_bank_officer"/>
+    <menuitem id="menu_nhs_bank_shift" name="Open Shifts"
+              parent="menu_nhs_bank_shifts" action="action_nhs_bank_shift" sequence="10"/>
+    <menuitem id="menu_nhs_bank_shift_calendar" name="Shift Calendar"
+              parent="menu_nhs_bank_shifts" action="action_nhs_bank_shift_calendar" sequence="20"/>
+    <menuitem id="menu_nhs_shift_booking" name="Bookings"
+              parent="menu_nhs_bank_shifts" action="action_nhs_shift_booking" sequence="30"/>
+    <menuitem id="menu_nhs_bank_shift_unfilled" name="Unfilled / To Agency"
+              parent="menu_nhs_bank_shifts" action="action_nhs_bank_shift_unfilled" sequence="40"/>
+    <menuitem id="menu_nhs_bulk_shift_wizard" name="Bulk-Create Shifts"
+              parent="menu_nhs_bank_shifts" action="action_nhs_bulk_shift_wizard" sequence="50"/>
+
+    <!-- Members -->
+    <menuitem id="menu_nhs_bank_members" name="Members"
+              parent="menu_nhs_staff_bank_root" sequence="20"
+              groups="odoo_nhs_staff_bank.group_nhs_bank_officer"/>
+    <menuitem id="menu_nhs_bank_member" name="Bank Members"
+              parent="menu_nhs_bank_members" action="action_nhs_bank_member" sequence="10"/>
+    <menuitem id="menu_nhs_member_availability" name="Availability"
+              parent="menu_nhs_bank_members" action="action_nhs_member_availability" sequence="20"/>
+    <menuitem id="menu_nhs_bank_member_compliance_watch" name="Compliance Watch"
+              parent="menu_nhs_bank_members" action="action_nhs_bank_member_compliance_watch" sequence="30"/>
+
+    <!-- Reporting -->
+    <menuitem id="menu_nhs_bank_reporting" name="Reporting"
+              parent="menu_nhs_staff_bank_root" sequence="30"
+              groups="odoo_nhs_staff_bank.group_nhs_bank_officer"/>
+    <menuitem id="menu_nhs_bank_dashboard" name="Fill-Rate Dashboard"
+              parent="menu_nhs_bank_reporting" action="action_nhs_bank_dashboard_client" sequence="10"/>
+    <menuitem id="menu_nhs_bank_shift_analytics" name="Bank vs Agency"
+              parent="menu_nhs_bank_reporting" action="action_nhs_bank_shift_analytics" sequence="20"/>
+    <menuitem id="menu_nhs_member_utilisation" name="Member Utilisation"
+              parent="menu_nhs_bank_reporting" action="action_nhs_member_utilisation" sequence="30"/>
+    <menuitem id="menu_nhs_bank_report_wizard" name="Reports"
+              parent="menu_nhs_bank_reporting" action="action_nhs_bank_report_wizard" sequence="40"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_nhs_bank_config" name="Configuration"
+              parent="menu_nhs_staff_bank_root" sequence="40"
+              groups="odoo_nhs_staff_bank.group_nhs_bank_manager"/>
+    <menuitem id="menu_nhs_bank_rate" name="Rate Cards"
+              parent="menu_nhs_bank_config" action="action_nhs_bank_rate" sequence="10"/>
+    <menuitem id="menu_nhs_shift_type" name="Shift Types"
+              parent="menu_nhs_bank_config" action="action_nhs_shift_type" sequence="20"/>
+    <menuitem id="menu_nhs_skill" name="Skills"
+              parent="menu_nhs_bank_config" action="action_nhs_skill" sequence="30"/>
+    <menuitem id="menu_nhs_bank_settings" name="Settings"
+              parent="menu_nhs_bank_config" action="action_nhs_bank_config_settings" sequence="40"
+              groups="base.group_system"/>
+
+    <!-- Bank Member portal-adjacent menu: own offers/bookings, kept minimal since
+         self-service is primarily delivered through the /my portal, not backend menus -->
+    <menuitem id="menu_nhs_bank_member_own_offers" name="My Offers"
+              parent="menu_nhs_staff_bank_root" action="action_nhs_shift_offer" sequence="90"
+              groups="odoo_nhs_staff_bank.group_nhs_bank_member"/>
+</odoo>

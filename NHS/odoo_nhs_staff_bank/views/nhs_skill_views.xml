@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_skill_list" model="ir.ui.view">
+        <field name="name">nhs.skill.list</field>
+        <field name="model">nhs.skill</field>
+        <field name="arch" type="xml">
+            <list string="Skills" editable="bottom">
+                <field name="name"/>
+                <field name="category"/>
+                <field name="member_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_skill_search" model="ir.ui.view">
+        <field name="name">nhs.skill.search</field>
+        <field name="model">nhs.skill</field>
+        <field name="arch" type="xml">
+            <search string="Skills">
+                <field name="name"/>
+                <field name="category"/>
+                <group>
+                    <filter string="Category" name="group_category" context="{'group_by': 'category'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_skill" model="ir.actions.act_window">
+        <field name="name">Skills</field>
+        <field name="res_model">nhs.skill</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

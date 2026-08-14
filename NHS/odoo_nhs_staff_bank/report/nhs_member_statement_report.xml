@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report action: member activity statement (shifts worked, pay), bound to nhs.bank.member -->
+    <record id="action_report_nhs_member_statement" model="ir.actions.report">
+        <field name="name">Member Activity Statement</field>
+        <field name="model">nhs.bank.member</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_staff_bank.report_nhs_member_statement</field>
+        <field name="report_file">odoo_nhs_staff_bank.report_nhs_member_statement</field>
+        <field name="print_report_name">'Member Statement - %s' % object.reference</field>
+        <field name="binding_model_id" ref="model_nhs_bank_member"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_nhs_member_statement">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="member">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Member Activity Statement</h2>
+                        <p>
+                            <strong>Member:</strong> <span t-esc="member.name"/> (<span t-esc="member.reference"/>)<br/>
+                            <strong>Compliance Status:</strong> <span t-field="member.compliance_status"/>
+                        </p>
+
+                        <h4>Bookings</h4>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Booking</th>
+                                    <th>Shift</th>
+                                    <th>Start</th>
+                                    <th>End</th>
+                                    <th>Status</th>
+                                    <th>Payable</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="member.booking_ids" t-as="booking">
+                                    <td><span t-esc="booking.name"/></td>
+                                    <td><span t-esc="booking.shift_id.name"/></td>
+                                    <td><span t-esc="booking.shift_start"/></td>
+                                    <td><span t-esc="booking.shift_end"/></td>
+                                    <td><span t-field="booking.state"/></td>
+                                    <td><span t-esc="'%.2f' % booking.payable_amount"/></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="5"><strong>Total Pay (Worked)</strong></td>
+                                    <td>
+                                        <strong>
+                                            <span t-esc="'%.2f' % sum(member.booking_ids.filtered(lambda b: b.state == 'worked').mapped('payable_amount'))"/>
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

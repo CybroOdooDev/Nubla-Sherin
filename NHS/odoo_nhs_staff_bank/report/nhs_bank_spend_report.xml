@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report action: Bank-Spend report, bound to the report wizard -->
+    <record id="action_report_nhs_bank_spend" model="ir.actions.report">
+        <field name="name">Bank-Spend Report</field>
+        <field name="model">nhs.bank.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_staff_bank.report_nhs_bank_spend</field>
+        <field name="report_file">odoo_nhs_staff_bank.report_nhs_bank_spend</field>
+        <field name="print_report_name">'Bank Spend Report - %s to %s' % (object.date_from, object.date_to)</field>
+    </record>
+
+    <template id="report_nhs_bank_spend">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="wizard">
+                <t t-set="data" t-value="wizard.get_spend_data()"/>
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Bank-Spend Report</h2>
+                        <p>
+                            <strong>Period:</strong> <span t-esc="data['date_from']"/> to <span t-esc="data['date_to']"/><br/>
+                            <strong>Generated:</strong>
+                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d %B %Y')"/>
+                        </p>
+
+                        <h4>Totals</h4>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Total Bank Cost</th>
+                                    <th>Total Agency Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span t-esc="'%.2f' % data['total_bank_cost']"/></td>
+                                    <td><span t-esc="'%.2f' % data['total_agency_cost']"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Bank Spend by Band</h4>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Band</th>
+                                    <th>Hours</th>
+                                    <th>Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="data['band_rows']" t-as="row">
+                                    <td><span t-esc="row['name']"/></td>
+                                    <td><span t-esc="'%.1f' % row['hours']"/></td>
+                                    <td><span t-esc="'%.2f' % row['cost']"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Agency Escalations</h4>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Shift</th>
+                                    <th>Agency</th>
+                                    <th>Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="data['agency_rows']" t-as="row">
+                                    <td><span t-esc="row['name']"/></td>
+                                    <td><span t-esc="row['agency']"/></td>
+                                    <td><span t-esc="'%.2f' % row['cost']"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

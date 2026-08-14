@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Sequence: bank member reference numbers (BNK/YYYY/#####) -->
+    <record id="seq_nhs_bank_member" model="ir.sequence">
+        <field name="name">NHS Bank Member Reference</field>
+        <field name="code">nhs.bank.member</field>
+        <field name="prefix">BNK/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Sequence: open shift reference numbers (SFT/YYYY/#####) -->
+    <record id="seq_nhs_bank_shift" model="ir.sequence">
+        <field name="name">NHS Bank Shift Reference</field>
+        <field name="code">nhs.bank.shift</field>
+        <field name="prefix">SFT/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Sequence: booking reference numbers (BKG/YYYY/#####) -->
+    <record id="seq_nhs_shift_booking" model="ir.sequence">
+        <field name="name">NHS Shift Booking Reference</field>
+        <field name="code">nhs.shift.booking</field>
+        <field name="prefix">BKG/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

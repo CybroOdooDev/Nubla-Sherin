@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_shift_booking_list" model="ir.ui.view">
+        <field name="name">nhs.shift.booking.list</field>
+        <field name="model">nhs.shift.booking</field>
+        <field name="arch" type="xml">
+            <list string="Bookings" decoration-warning="working_time_breach"
+                  decoration-danger="state == 'no_show'" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="shift_id"/>
+                <field name="member_id"/>
+                <field name="shift_start"/>
+                <field name="shift_end"/>
+                <field name="state" widget="badge"/>
+                <field name="compliant_at_booking"/>
+                <field name="working_time_breach" widget="boolean_toggle"/>
+                <field name="payable_amount"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_shift_booking_form" model="ir.ui.view">
+        <field name="name">nhs.shift.booking.form</field>
+        <field name="model">nhs.shift.booking</field>
+        <field name="arch" type="xml">
+            <form string="Booking">
+                <header>
+                    <button name="action_confirm_worked" type="object" string="Confirm Worked" class="btn-primary"
+                            invisible="state != 'booked'"/>
+                    <button name="action_no_show" type="object" string="No-Show"
+                            invisible="state != 'booked'"/>
+                    <button name="action_authorise" type="object" string="Authorise"
+                            invisible="state != 'worked' or authorised_by_id"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('cancelled', 'worked')"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not working_time_breach">
+                        This booking may breach the member's safe/legal weekly hours limit.
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Booking">
+                            <field name="shift_id"/>
+                            <field name="member_id"/>
+                            <field name="shift_start"/>
+                            <field name="shift_end"/>
+                            <field name="compliant_at_booking" readonly="1"/>
+                            <field name="working_time_breach" readonly="1"/>
+                        </group>
+                        <group string="Worked">
+                            <field name="actual_start"/>
+                            <field name="actual_end"/>
+                            <field name="authorised_by_id" readonly="1"/>
+                            <field name="authorised_at" readonly="1"/>
+                            <field name="cancel_reason" invisible="state != 'cancelled'"/>
+                        </group>
+                    </group>
+                    <group string="Pay">
+                        <field name="currency_id" invisible="1"/>
+                        <field name="rate_id"/>
+                        <field name="rate_override"/>
+                        <field name="rate_override_reason" invisible="not rate_override"/>
+                        <field name="payable_amount" readonly="1"/>
+                        <field name="fill_source" readonly="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_shift_booking_search" model="ir.ui.view">
+        <field name="name">nhs.shift.booking.search</field>
+        <field name="model">nhs.shift.booking</field>
+        <field name="arch" type="xml">
+            <search string="Bookings">
+                <field name="name"/>
+                <field name="shift_id"/>
+                <field name="member_id"/>
+                <filter string="Booked" name="booked" domain="[('state', '=', 'booked')]"/>
+                <filter string="Worked" name="worked" domain="[('state', '=', 'worked')]"/>
+                <filter string="No-Show" name="no_show" domain="[('state', '=', 'no_show')]"/>
+                <filter string="Awaiting Authorisation" name="unauthorised"
+                        domain="[('state', '=', 'worked'), ('authorised_by_id', '=', False)]"/>
+                <filter string="Working-Time Breach" name="wt_breach" domain="[('working_time_breach', '=', True)]"/>
+                <group>
+                    <filter string="Member" name="group_member" context="{'group_by': 'member_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_shift_booking" model="ir.actions.act_window">
+        <field name="name">Bookings</field>
+        <field name="res_model">nhs.shift.booking</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

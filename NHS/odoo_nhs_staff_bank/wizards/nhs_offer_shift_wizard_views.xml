@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard view: offer a shift to eligible members, targeted or broadcast -->
+    <record id="view_nhs_offer_shift_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.offer.shift.wizard.form</field>
+        <field name="model">nhs.offer.shift.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Offer Shift">
+                <group>
+                    <field name="shift_id" invisible="1"/>
+                    <field name="broadcast"/>
+                    <field name="expiry_hours"/>
+                </group>
+                <field name="line_ids">
+                    <list editable="bottom" decoration-muted="not eligible">
+                        <field name="member_id" readonly="1"/>
+                        <field name="eligible" widget="boolean_toggle" readonly="1"/>
+                        <field name="reasons" readonly="1"/>
+                        <field name="already_offered" readonly="1"/>
+                        <field name="selected" invisible="not eligible or already_offered"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_send_offers" type="object" string="Send Offers" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_offer_shift_wizard" model="ir.actions.act_window">
+        <field name="name">Offer Shift</field>
+        <field name="res_model">nhs.offer.shift.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

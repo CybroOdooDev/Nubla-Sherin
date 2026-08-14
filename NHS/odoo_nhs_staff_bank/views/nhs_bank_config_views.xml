@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Settings panel: gate policy, booking mode, working-time, agency comparator, digest -->
+    <record id="view_res_config_settings_nhs_staff_bank" model="ir.ui.view">
+        <field name="name">res.config.settings.nhs.staff.bank</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="NHS Staff Bank" name="odoo_nhs_staff_bank"
+                     groups="odoo_nhs_staff_bank.group_nhs_bank_manager">
+                    <block title="Compliance Gate">
+                        <setting string="Gate Policy"
+                                 help="Hard block: a non-compliant member cannot be booked. Warn only: booking is allowed with a warning.">
+                            <field name="nhs_bank_gate_policy" widget="radio"/>
+                        </setting>
+                    </block>
+                    <block title="Booking &amp; Offers">
+                        <setting string="Booking Mode">
+                            <field name="nhs_bank_booking_mode" widget="radio"/>
+                        </setting>
+                        <setting string="Offer Expiry">
+                            <span><field name="nhs_bank_offer_expiry_hours"/> hours</span>
+                        </setting>
+                    </block>
+                    <block title="Working Time">
+                        <setting string="Safe Weekly Hours Limit">
+                            <span><field name="nhs_bank_weekly_hours_limit"/> hours/week</span>
+                        </setting>
+                    </block>
+                    <block title="Agency Comparator">
+                        <setting string="Agency Comparator Uplift">
+                            <span><field name="nhs_bank_agency_comparator_pct"/> %</span>
+                        </setting>
+                    </block>
+                    <block title="Notifications">
+                        <setting string="Coordinator Digest Recipients">
+                            <field name="nhs_bank_digest_recipients" placeholder="Comma-separated email addresses"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_nhs_bank_config_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_res_config_settings_nhs_staff_bank"/>
+        <field name="target">current</field>
+        <field name="context">{'module': 'odoo_nhs_staff_bank'}</field>
+    </record>
+</odoo>

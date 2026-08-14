@@ -1,0 +1,69 @@
+/* NHS Corporate Blue Theme for the Staff Bank Dashboard */
+
+.o_nhs_bank_dashboard {
+    background-color: #f4f6f9 !important;
+
+    .text-nhs-blue {
+        color: #005eb8 !important;
+    }
+
+    .bg-nhs-blue {
+        background-color: #005eb8 !important;
+        color: #ffffff !important;
+    }
+
+    .btn-outline-nhs-blue {
+        color: #005eb8;
+        border-color: #005eb8;
+        background-color: #ffffff;
+        &:hover {
+            background-color: #005eb8;
+            color: #ffffff;
+        }
+    }
+
+    .bank-stat-card {
+        border-left: 4px solid #005eb8 !important;
+        background: #ffffff;
+        transition: all 0.2s ease-in-out;
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.4rem 0.8rem rgba(0, 94, 184, 0.12) !important;
+            border-left-color: #003087 !important;
+        }
+
+        .stat-icon-wrapper {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #e8edf5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #005eb8;
+        }
+    }
+
+    .card {
+        border: 1px solid #e2e8f0 !important;
+    }
+
+    .card-header {
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+
+    .table {
+        thead {
+            background-color: #f1f5f9;
+            th {
+                color: #475569;
+                font-weight: 600;
+                border-bottom: 1px solid #e2e8f0;
+            }
+        }
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+}

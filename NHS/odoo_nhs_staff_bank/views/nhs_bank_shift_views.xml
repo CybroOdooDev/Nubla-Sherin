@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Kanban view: the coordinator's daily board — Open / Partially filled / Filled / To agency -->
+    <record id="view_nhs_bank_shift_kanban" model="ir.ui.view">
+        <field name="name">nhs.bank.shift.kanban</field>
+        <field name="model">nhs.bank.shift</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" records_draggable="0">
+                <field name="name"/>
+                <field name="urgency"/>
+                <field name="filled_count"/>
+                <field name="headcount"/>
+                <field name="state"/>
+                <field name="org_unit_id"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click p-2">
+                            <div class="d-flex justify-content-between">
+                                <strong t-out="record.name.value"/>
+                                <span t-if="record.urgency.raw_value in ('urgent', 'last_minute')"
+                                      class="badge text-bg-danger">Urgent</span>
+                            </div>
+                            <div class="text-muted small" t-out="record.org_unit_id.value"/>
+                            <div class="small">
+                                <span t-out="record.filled_count.value"/> / <span t-out="record.headcount.value"/> filled
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List view -->
+    <record id="view_nhs_bank_shift_list" model="ir.ui.view">
+        <field name="name">nhs.bank.shift.list</field>
+        <field name="model">nhs.bank.shift</field>
+        <field name="arch" type="xml">
+            <list string="Open Shifts" decoration-danger="urgency in ('urgent', 'last_minute')"
+                  decoration-muted="state in ('cancelled', 'expired')">
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="org_unit_id"/>
+                <field name="shift_start"/>
+                <field name="shift_end"/>
+                <field name="band_id"/>
+                <field name="role"/>
+                <field name="headcount"/>
+                <field name="filled_count"/>
+                <field name="urgency" widget="badge"/>
+                <field name="state" widget="badge"/>
+                <field name="estimated_cost" widget="monetary" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_nhs_bank_shift_form" model="ir.ui.view">
+        <field name="name">nhs.bank.shift.form</field>
+        <field name="model">nhs.bank.shift</field>
+        <field name="arch" type="xml">
+            <form string="Open Shift">
+                <header>
+                    <button name="action_offer" type="object" string="Offer Shift" class="btn-primary"
+                            invisible="state not in ('open', 'partially_filled')"/>
+                    <button name="action_escalate_agency" type="object" string="Escalate to Agency"
+                            invisible="state not in ('open', 'partially_filled')"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('cancelled', 'filled', 'to_agency')"/>
+                    <button name="action_reset_open" type="object" string="Reopen"
+                            invisible="state not in ('cancelled', 'expired', 'to_agency')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="open,partially_filled,filled"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_offers" type="object" class="oe_stat_button" icon="fa-paper-plane">
+                            <field name="offer_count" widget="statinfo" string="Offers"/>
+                        </button>
+                        <button name="action_view_bookings" type="object" class="oe_stat_button" icon="fa-check-square-o">
+                            <field name="filled_count" widget="statinfo" string="Filled"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <h3><field name="reference" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="Where &amp; When">
+                            <field name="org_unit_id"/>
+                            <field name="shift_start"/>
+                            <field name="shift_end"/>
+                            <field name="shift_type_id"/>
+                            <field name="offer_cutoff"/>
+                        </group>
+                        <group string="Cover Requirements">
+                            <field name="band_id"/>
+                            <field name="role"/>
+                            <field name="skill_ids" widget="many2many_tags"/>
+                            <field name="headcount"/>
+                            <field name="reason"/>
+                            <field name="urgency"/>
+                            <field name="source" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Cost">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="estimated_cost"/>
+                            <field name="agency_cost" invisible="state != 'to_agency'"/>
+                            <field name="agency_name" invisible="state != 'to_agency'"/>
+                        </group>
+                        <group string="Cancellation" invisible="state not in ('cancelled', 'to_agency')">
+                            <field name="cancel_reason" invisible="state != 'cancelled'"/>
+                            <field name="agency_escalation_reason" invisible="state != 'to_agency'"/>
+                            <field name="agency_escalated_by_id" invisible="state != 'to_agency'"/>
+                            <field name="agency_escalated_at" invisible="state != 'to_agency'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Offers">
+                            <field name="offer_ids" readonly="1">
+                                <list>
+                                    <field name="member_id"/>
+                                    <field name="offered_at"/>
+                                    <field name="response" widget="badge"/>
+                                    <field name="eligible"/>
+                                    <field name="decline_reason"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Bookings">
+                            <field name="booking_ids" readonly="1">
+                                <list>
+                                    <field name="member_id"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="compliant_at_booking"/>
+                                    <field name="payable_amount"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Calendar view: by area/date -->
+    <record id="view_nhs_bank_shift_calendar" model="ir.ui.view">
+        <field name="name">nhs.bank.shift.calendar</field>
+        <field name="model">nhs.bank.shift</field>
+        <field name="arch" type="xml">
+            <calendar string="Shift Calendar" date_start="shift_start" date_stop="shift_end"
+                      color="org_unit_id" mode="month">
+                <field name="org_unit_id"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_nhs_bank_shift_search" model="ir.ui.view">
+        <field name="name">nhs.bank.shift.search</field>
+        <field name="model">nhs.bank.shift</field>
+        <field name="arch" type="xml">
+            <search string="Open Shifts">
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="org_unit_id"/>
+                <field name="band_id"/>
+                <field name="role"/>
+                <filter string="Open" name="open" domain="[('state', 'in', ('open', 'partially_filled'))]"/>
+                <filter string="Urgent" name="urgent" domain="[('urgency', 'in', ('urgent', 'last_minute'))]"/>
+                <filter string="Filled" name="filled" domain="[('state', '=', 'filled')]"/>
+                <filter string="To Agency" name="to_agency" domain="[('state', '=', 'to_agency')]"/>
+                <separator/>
+                <filter string="This Week" name="this_week"
+                        domain="[('shift_start', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <group>
+                    <filter string="Area" name="group_area" context="{'group_by': 'org_unit_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Urgency" name="group_urgency" context="{'group_by': 'urgency'}"/>
+                    <filter string="Reason" name="group_reason" context="{'group_by': 'reason'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_bank_shift" model="ir.actions.act_window">
+        <field name="name">Open Shifts</field>
+        <field name="res_model">nhs.bank.shift</field>
+        <field name="view_mode">kanban,list,calendar,form</field>
+        <field name="context">{'search_default_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Raise your first open shift</p>
+        </field>
+    </record>
+
+    <record id="action_nhs_bank_shift_calendar" model="ir.actions.act_window">
+        <field name="name">Shift Calendar</field>
+        <field name="res_model">nhs.bank.shift</field>
+        <field name="view_mode">calendar,list,form</field>
+    </record>
+
+    <record id="action_nhs_bank_shift_unfilled" model="ir.actions.act_window">
+        <field name="name">Unfilled / To Agency</field>
+        <field name="res_model">nhs.bank.shift</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', 'in', ('open', 'partially_filled', 'to_agency', 'expired'))]</field>
+    </record>
+</odoo>

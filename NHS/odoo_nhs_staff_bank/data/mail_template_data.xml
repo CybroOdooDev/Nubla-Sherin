@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Mail template: shift offer notification sent to the bank member -->
+        <record id="mail_template_shift_offer" model="mail.template">
+            <field name="name">Staff Bank: Shift Offer</field>
+            <field name="model_id" ref="model_nhs_shift_offer"/>
+            <field name="email_from">{{ (user.email_formatted or '') }}</field>
+            <field name="email_to">{{ object.member_id.email or '' }}</field>
+            <field name="use_default_to" eval="False"/>
+            <field name="subject">A shift is available — {{ object.shift_id.name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p>Dear <t t-out="object.member_id.name or ''">Bank Member</t>,</p>
+                    <p>You have been offered the following bank shift:</p>
+                    <ul>
+                        <li><strong>Shift:</strong> <t t-out="object.shift_id.name or ''"/></li>
+                        <li><strong>Start:</strong> <t t-out="object.shift_id.shift_start or ''"/></li>
+                        <li><strong>End:</strong> <t t-out="object.shift_id.shift_end or ''"/></li>
+                    </ul>
+                    <p>Please log in to accept or decline this offer as soon as possible.</p>
+                    <p>Kind regards,<br/>Staff Bank Team</p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <!-- Mail template: booking confirmation sent to the bank member -->
+        <record id="mail_template_booking_confirmation_member" model="mail.template">
+            <field name="name">Staff Bank: Booking Confirmation (Member)</field>
+            <field name="model_id" ref="model_nhs_shift_booking"/>
+            <field name="email_from">{{ (user.email_formatted or '') }}</field>
+            <field name="email_to">{{ object.member_id.email or '' }}</field>
+            <field name="use_default_to" eval="False"/>
+            <field name="subject">Booking confirmed — {{ object.shift_id.name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p>Dear <t t-out="object.member_id.name or ''">Bank Member</t>,</p>
+                    <p>Your booking is confirmed:</p>
+                    <ul>
+                        <li><strong>Shift:</strong> <t t-out="object.shift_id.name or ''"/></li>
+                        <li><strong>Start:</strong> <t t-out="object.shift_start or ''"/></li>
+                        <li><strong>End:</strong> <t t-out="object.shift_end or ''"/></li>
+                        <li><strong>Reference:</strong> <t t-out="object.name or ''"/></li>
+                    </ul>
+                    <p>Kind regards,<br/>Staff Bank Team</p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <!-- Mail template: booking confirmation sent to the requesting area manager -->
+        <record id="mail_template_booking_confirmation_manager" model="mail.template">
+            <field name="name">Staff Bank: Booking Confirmation (Requesting Manager)</field>
+            <field name="model_id" ref="model_nhs_shift_booking"/>
+            <field name="email_from">{{ (user.email_formatted or '') }}</field>
+            <field name="email_to">{{ object.shift_id.org_unit_id.manager_id.email or '' }}</field>
+            <field name="use_default_to" eval="False"/>
+            <field name="subject">Shift filled — {{ object.shift_id.name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p>Dear <t t-out="object.shift_id.org_unit_id.manager_id.name or ''">Manager</t>,</p>
+                    <p>Your requested shift has been filled by the bank:</p>
+                    <ul>
+                        <li><strong>Shift:</strong> <t t-out="object.shift_id.name or ''"/></li>
+                        <li><strong>Member:</strong> <t t-out="object.member_id.name or ''"/></li>
+                        <li><strong>Start:</strong> <t t-out="object.shift_start or ''"/></li>
+                        <li><strong>End:</strong> <t t-out="object.shift_end or ''"/></li>
+                    </ul>
+                    <p>Kind regards,<br/>Staff Bank Team</p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <!-- Mail template: non-compliance alert sent to bank coordinators -->
+        <record id="mail_template_compliance_alert" model="mail.template">
+            <field name="name">Staff Bank: Member Non-Compliant</field>
+            <field name="model_id" ref="model_nhs_bank_member"/>
+            <field name="email_from">{{ (user.email_formatted or '') }}</field>
+            <field name="subject">Bank member no longer compliant — {{ object.name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p><t t-out="object.name or ''">Member</t> (<t t-out="object.reference or ''"/>) is now
+                        <strong>non-compliant</strong> and cannot be offered or booked onto shifts until this
+                        is resolved.</p>
+                    <p><strong>Reason:</strong> <t t-out="object.compliance_reason or ''"/></p>
+                    <p>Staff Bank Team</p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+    </data>
+</odoo>

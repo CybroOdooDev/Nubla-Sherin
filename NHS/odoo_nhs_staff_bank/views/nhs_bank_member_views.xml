@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List view: bank member register -->
+    <record id="view_nhs_bank_member_list" model="ir.ui.view">
+        <field name="name">nhs.bank.member.list</field>
+        <field name="model">nhs.bank.member</field>
+        <field name="arch" type="xml">
+            <list string="Bank Members" decoration-danger="compliance_status == 'non_compliant'"
+                  decoration-muted="state != 'active'">
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="member_type"/>
+                <field name="band_id"/>
+                <field name="role_ids" widget="many2many_tags"/>
+                <field name="compliance_status" widget="badge"
+                       decoration-success="compliance_status == 'compliant'"
+                       decoration-danger="compliance_status == 'non_compliant'"/>
+                <field name="state" widget="badge"/>
+                <field name="join_date" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view: bank member — type, roles/bands, skills, areas, checks-confirmed,
+         compliance-status ribbon, availability and booking history -->
+    <record id="view_nhs_bank_member_form" model="ir.ui.view">
+        <field name="name">nhs.bank.member.form</field>
+        <field name="model">nhs.bank.member</field>
+        <field name="arch" type="xml">
+            <form string="Bank Member">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_availability" type="object" class="oe_stat_button" icon="fa-calendar">
+                            <field name="availability_count" widget="statinfo" string="Availability"/>
+                        </button>
+                        <button name="action_view_offers" type="object" class="oe_stat_button" icon="fa-paper-plane">
+                            <field name="offer_count" widget="statinfo" string="Offers"/>
+                        </button>
+                        <button name="action_view_bookings" type="object" class="oe_stat_button" icon="fa-check-square-o">
+                            <field name="booking_count" widget="statinfo" string="Bookings"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Non-Compliant" bg_color="text-bg-danger"
+                            invisible="compliance_status != 'non_compliant'"/>
+                    <widget name="web_ribbon" title="Compliant" bg_color="text-bg-success"
+                            invisible="compliance_status != 'compliant'"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Member Name"/></h1>
+                        <h3><field name="reference" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="Type &amp; Link">
+                            <field name="member_type"/>
+                            <field name="post_id" invisible="member_type != 'substantive_bank'"/>
+                            <field name="workforce_member_id"/>
+                            <field name="user_id"/>
+                            <field name="partner_id"/>
+                            <field name="email"/>
+                            <field name="phone"/>
+                        </group>
+                        <group string="Roles, Bands &amp; Areas">
+                            <field name="role_ids" widget="many2many_tags"/>
+                            <field name="band_id"/>
+                            <field name="skill_ids" widget="many2many_tags"/>
+                            <field name="area_ids" widget="many2many_tags"/>
+                            <field name="preferred_shift_type_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Compliance &amp; Checks">
+                            <field name="checks_confirmed"/>
+                            <field name="compliance_status" readonly="1"/>
+                            <field name="compliance_reason" readonly="1"/>
+                            <field name="manual_compliance_flag"/>
+                            <field name="manual_compliance_note" invisible="manual_compliance_flag"/>
+                        </group>
+                        <group string="Working Time &amp; Preferences">
+                            <field name="join_date"/>
+                            <field name="weekly_hours_limit"/>
+                            <field name="substantive_weekly_hours"
+                                   invisible="member_type != 'substantive_bank'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view: bank members -->
+    <record id="view_nhs_bank_member_search" model="ir.ui.view">
+        <field name="name">nhs.bank.member.search</field>
+        <field name="model">nhs.bank.member</field>
+        <field name="arch" type="xml">
+            <search string="Bank Members">
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="band_id"/>
+                <field name="role_ids"/>
+                <field name="skill_ids"/>
+                <field name="area_ids"/>
+                <filter string="Active" name="active_state" domain="[('state', '=', 'active')]"/>
+                <filter string="Non-Compliant" name="non_compliant" domain="[('compliance_status', '=', 'non_compliant')]"/>
+                <filter string="Substantive Doing Bank" name="substantive" domain="[('member_type', '=', 'substantive_bank')]"/>
+                <filter string="Bank-Only" name="bank_only" domain="[('member_type', '=', 'bank_only')]"/>
+                <separator/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter string="Band" name="group_band" context="{'group_by': 'band_id'}"/>
+                    <filter string="Member Type" name="group_type" context="{'group_by': 'member_type'}"/>
+                    <filter string="Compliance Status" name="group_compliance" context="{'group_by': 'compliance_status'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_bank_member" model="ir.actions.act_window">
+        <field name="name">Bank Members</field>
+        <field name="res_model">nhs.bank.member</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active_state': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first bank member</p>
+            <p>Bank members are the flexible/bank workers available for shifts.</p>
+        </field>
+    </record>
+
+    <record id="action_nhs_bank_member_compliance_watch" model="ir.actions.act_window">
+        <field name="name">Compliance Watch</field>
+        <field name="res_model">nhs.bank.member</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'active'), ('compliance_status', '=', 'non_compliant')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No members currently non-compliant</p>
+        </field>
+    </record>
+</odoo>
