@@ -10,6 +10,8 @@
         <field name="print_report_name">'Fill-Rate Report - %s to %s' % (object.date_from, object.date_to)</field>
     </record>
 
+    <!-- QWeb report template: Fill-Rate & Agency-Displacement report body — headline, bank vs
+         agency spend, breakdown by area -->
     <template id="report_nhs_fill_rate">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="wizard">

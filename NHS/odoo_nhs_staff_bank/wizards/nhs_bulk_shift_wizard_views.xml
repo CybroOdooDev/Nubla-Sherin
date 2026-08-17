@@ -42,6 +42,7 @@
         </field>
     </record>
 
+    <!-- Window action: opens the bulk shift creation wizard as a popup dialog -->
     <record id="action_nhs_bulk_shift_wizard" model="ir.actions.act_window">
         <field name="name">Bulk-Create Shifts</field>
         <field name="res_model">nhs.bulk.shift.wizard</field>

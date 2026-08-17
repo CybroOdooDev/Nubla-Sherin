@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- List view: shift types register, editable inline, drag-handle sequence, flags unsocial-hours types -->
     <record id="view_nhs_shift_type_list" model="ir.ui.view">
         <field name="name">nhs.shift.type.list</field>
         <field name="model">nhs.shift.type</field>
@@ -14,6 +15,7 @@
         </field>
     </record>
 
+    <!-- Action: opens Shift Types list/form -->
     <record id="action_nhs_shift_type" model="ir.actions.act_window">
         <field name="name">Shift Types</field>
         <field name="res_model">nhs.shift.type</field>

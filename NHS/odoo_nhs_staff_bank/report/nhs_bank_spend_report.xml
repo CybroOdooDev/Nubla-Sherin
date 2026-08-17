@@ -10,6 +10,7 @@
         <field name="print_report_name">'Bank Spend Report - %s to %s' % (object.date_from, object.date_to)</field>
     </record>
 
+    <!-- QWeb report template: Bank-Spend report body — totals, spend by band, agency escalations -->
     <template id="report_nhs_bank_spend">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="wizard">

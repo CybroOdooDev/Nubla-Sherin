@@ -19,8 +19,8 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError
+from odoo import api, fields, models
+from odoo.exceptions import UserError, ValidationError
 
 REASONS = [
     ('sickness', 'Sickness Cover'),
@@ -36,11 +36,13 @@ URGENCY = [
 ]
 
 STATES = [
+    ('draft', 'Draft'),
     ('open', 'Open'),
     ('partially_filled', 'Partially Filled'),
     ('filled', 'Filled'),
     ('cancelled', 'Cancelled'),
     ('to_agency', 'To Agency'),
+    ('agency_filled', 'Agency Filled'),
     ('expired', 'Expired'),
 ]
 
@@ -141,9 +143,11 @@ class NhsBankShift(models.Model):
         STATES,
         string='Status',
         required=True,
-        default='open',
+        default='draft',
         tracking=True,
-        help="open / partially_filled / filled / cancelled / to_agency / expired."
+        help="draft / open / partially_filled / filled / cancelled / to_agency /"
+             " expired. New shifts start as draft and are not offered to the bank"
+             " or visible to bank members until opened."
     )
     source = fields.Selection(
         SOURCES,
@@ -155,6 +159,12 @@ class NhsBankShift(models.Model):
         string='Offer Cutoff',
         help="Deadline by which the shift must be filled by the bank before it is"
              " considered for agency escalation."
+    )
+    time_range = fields.Char(
+        string='Time',
+        compute='_compute_time_range',
+        help="Shift start-end time in the user's timezone, for compact display"
+             " (e.g. on the kanban board)."
     )
     offer_ids = fields.One2many(
         'nhs.shift.offer',
@@ -186,8 +196,18 @@ class NhsBankShift(models.Model):
     estimated_cost = fields.Monetary(
         string='Estimated Bank Cost',
         compute='_compute_estimated_cost',
+        store=True,
         currency_field='currency_id',
         help="Indicative bank cost from the rate card (headcount x hours x rate)."
+    )
+    rate_found = fields.Boolean(
+        string='Rate Found',
+        compute='_compute_estimated_cost',
+        store=True,
+        help="Whether a rate card matching this shift's band/shift type/date/"
+             " company was found. If false, the estimated cost is not a genuine"
+             " zero-cost shift — no applicable rate card is configured, so the"
+             " cost cannot be estimated."
     )
     agency_cost = fields.Monetary(
         string='Agency Cost',
@@ -209,6 +229,19 @@ class NhsBankShift(models.Model):
     agency_escalation_reason = fields.Char(
         string='Escalation Reason',
     )
+    agency_confirmed = fields.Boolean(
+        string='Agency Confirmed',
+        help="Ticked once the agency has actually completed/confirmed this shift."
+             " Locks the escalation in — the shift can no longer be reopened once"
+             " confirmed, only cancelled."
+    )
+    agency_confirmed_by_id = fields.Many2one(
+        'res.users',
+        string='Confirmed By',
+    )
+    agency_confirmed_at = fields.Datetime(
+        string='Confirmed At',
+    )
     cancel_reason = fields.Char(
         string='Cancel Reason',
     )
@@ -227,7 +260,19 @@ class NhsBankShift(models.Model):
                 shift.shift_type_id.name, shift.role or shift.band_id.name]))
             shift.name = ' — '.join(filter(None, [shift.org_unit_id.name, middle, date_part]))
 
+    @api.depends('shift_start', 'shift_end')
+    def _compute_time_range(self):
+        """Compact 'HH:MM - HH:MM' display of the shift's start/end time."""
+        for shift in self:
+            if shift.shift_start and shift.shift_end:
+                start = fields.Datetime.context_timestamp(shift, shift.shift_start)
+                end = fields.Datetime.context_timestamp(shift, shift.shift_end)
+                shift.time_range = f"{start.strftime('%H:%M')} - {end.strftime('%H:%M')}"
+            else:
+                shift.time_range = False
+
     def _compute_offer_count(self):
+        """Count of offers made for this shift."""
         for shift in self:
             shift.offer_count = len(shift.offer_ids)
 
@@ -237,7 +282,7 @@ class NhsBankShift(models.Model):
         for shift in self:
             confirmed = shift.booking_ids.filtered(lambda b: b.state in ('booked', 'worked'))
             shift.filled_count = len(confirmed)
-            if shift.state not in ('cancelled', 'to_agency', 'expired'):
+            if shift.state not in ('draft', 'cancelled', 'to_agency', 'agency_filled', 'expired'):
                 if shift.filled_count <= 0:
                     shift.state = 'open'
                 elif shift.filled_count < shift.headcount:
@@ -253,6 +298,7 @@ class NhsBankShift(models.Model):
         for shift in self:
             if not (shift.shift_start and shift.shift_end):
                 shift.estimated_cost = 0.0
+                shift.rate_found = False
                 continue
             hours = (shift.shift_end - shift.shift_start).total_seconds() / 3600.0
             rate = Rate._find_rate(
@@ -261,6 +307,7 @@ class NhsBankShift(models.Model):
                 date=fields.Date.to_date(shift.shift_start),
                 company_id=shift.company_id.id,
             )
+            shift.rate_found = bool(rate)
             if rate:
                 shift.estimated_cost = rate.compute_payable(hours) * max(shift.headcount, 1)
             else:
@@ -268,22 +315,35 @@ class NhsBankShift(models.Model):
 
     @api.constrains('shift_start', 'shift_end')
     def _check_times(self):
+        """Reject a shift whose end time is not after its start time, or whose
+        start time is set in the past."""
+        now = fields.Datetime.now()
         for shift in self:
             if shift.shift_end <= shift.shift_start:
                 raise ValidationError("The shift end time must be after the start time.")
+            if shift.shift_start < now:
+                raise ValidationError("The shift start time cannot be in the past.")
 
     @api.constrains('headcount')
     def _check_headcount(self):
+        """Reject a shift with a headcount below 1."""
         for shift in self:
             if shift.headcount < 1:
                 raise ValidationError("Headcount must be at least 1.")
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Assign a sequence reference when not provided, and mark shifts
+        already past their end time as expired."""
+        now = fields.Datetime.now()
         for vals in vals_list:
             if not vals.get('reference') or vals.get('reference') == 'New':
                 vals['reference'] = self.env['ir.sequence'].next_by_code(
                     'nhs.bank.shift') or 'New'
+            if vals.get('shift_end'):
+                end_dt = fields.Datetime.to_datetime(vals['shift_end'])
+                if end_dt and end_dt < now:
+                    vals['state'] = 'expired'
         return super().create(vals_list)
 
     def get_eligible_members(self):
@@ -303,7 +363,7 @@ class NhsBankShift(models.Model):
         """Open the offer wizard, pre-populated with eligible members."""
         self.ensure_one()
         return {
-            'name': _('Offer Shift'),
+            'name': ('Offer Shift'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.offer.shift.wizard',
             'view_mode': 'form',
@@ -315,13 +375,42 @@ class NhsBankShift(models.Model):
         """Open the agency-escalation wizard to record the cost and reason."""
         self.ensure_one()
         return {
-            'name': _('Escalate to Agency'),
+            'name': ('Escalate to Agency'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.escalate.agency.wizard',
             'view_mode': 'form',
             'target': 'new',
             'context': {'default_shift_id': self.id},
         }
+
+    def action_confirm_agency_filled(self):
+        """Confirm that the agency has actually completed this shift: moves
+        it to its own terminal 'Agency Filled' state, distinct from 'To
+        Agency' (escalated, outcome still pending). Once here, the shift can
+        no longer be reopened back into the bank pipeline — cancel it instead
+        if the confirmation itself was wrong."""
+        for shift in self:
+            if shift.state != 'to_agency':
+                raise UserError(("Only a shift that is escalated to agency can be"
+                                  " confirmed as agency-filled."))
+            shift.write({
+                'state': 'agency_filled',
+                'agency_confirmed': True,
+                'agency_confirmed_by_id': self.env.user.id,
+                'agency_confirmed_at': fields.Datetime.now(),
+            })
+            shift.message_post(body=("Agency booking confirmed as completed."))
+
+    def action_open(self):
+        """Confirm a draft shift, opening it for offering to the bank and
+        making it visible to bank members/coordinators."""
+        for shift in self:
+            if shift.filled_count <= 0:
+                shift.state = 'open'
+            elif shift.filled_count < shift.headcount:
+                shift.state = 'partially_filled'
+            else:
+                shift.state = 'filled'
 
     def action_cancel(self):
         """Cancel the shift, withdrawing any pending offers."""
@@ -330,13 +419,20 @@ class NhsBankShift(models.Model):
             shift.state = 'cancelled'
 
     def action_reset_open(self):
-        """Manually reopen a cancelled/expired/to-agency shift."""
+        """Manually reopen a cancelled/expired/to-agency shift. A confirmed
+        'Agency Filled' shift cannot be reopened — that's a settled fact, not
+        a mistake to undo; cancel the shift instead if the confirmation
+        itself was wrong."""
+        if any(shift.state == 'agency_filled' for shift in self):
+            raise UserError(("Cannot reopen: the agency booking has already been"
+                              " confirmed as completed."))
         self.write({'state': 'open'})
 
     def action_view_offers(self):
+        """Open the offers made for this shift."""
         self.ensure_one()
         return {
-            'name': _('Offers'),
+            'name': ('Offers'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.shift.offer',
             'view_mode': 'list,form',
@@ -345,9 +441,10 @@ class NhsBankShift(models.Model):
         }
 
     def action_view_bookings(self):
+        """Open the bookings made for this shift."""
         self.ensure_one()
         return {
-            'name': _('Bookings'),
+            'name': ('Bookings'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.shift.booking',
             'view_mode': 'list,form',
@@ -382,10 +479,11 @@ class NhsBankShift(models.Model):
 
     @api.model
     def _cron_expire_stale_shifts(self):
-        """Scheduled action: shifts still open/partially-filled well past their
-        end time without being filled or escalated are marked expired."""
+        """Scheduled action: shifts still draft/open/partially-filled well past
+        their end time without being filled or escalated are marked expired
+        (a draft never opened in time is stale too, not just a published one)."""
         stale = self.search([
-            ('state', 'in', ('open', 'partially_filled')),
+            ('state', 'in', ('draft', 'open', 'partially_filled')),
             ('shift_end', '<', fields.Datetime.now()),
         ])
         stale.write({'state': 'expired'})
@@ -399,7 +497,7 @@ class NhsBankShift(models.Model):
         Member = self.env['nhs.bank.member']
 
         all_shifts = Shift.search([])
-        resolved = all_shifts.filtered(lambda s: s.state in ('filled', 'to_agency', 'expired'))
+        resolved = all_shifts.filtered(lambda s: s.state in ('filled', 'to_agency', 'agency_filled', 'expired'))
         filled = resolved.filtered(lambda s: s.state == 'filled')
         fill_rate = (len(filled) / len(resolved) * 100.0) if resolved else 0.0
 
@@ -408,7 +506,7 @@ class NhsBankShift(models.Model):
 
         bank_bookings = Booking.search([('state', 'in', ('booked', 'worked')), ('fill_source', '=', 'bank')])
         bank_spend = sum(bank_bookings.mapped('payable_amount'))
-        agency_shifts = all_shifts.filtered(lambda s: s.state == 'to_agency')
+        agency_shifts = all_shifts.filtered(lambda s: s.state in ('to_agency', 'agency_filled'))
         agency_spend = sum(agency_shifts.mapped('agency_cost'))
         agency_comparator_pct = self.env.company.nhs_bank_agency_comparator_pct or 0.0
         cost_avoidance = bank_spend * (agency_comparator_pct / 100.0)

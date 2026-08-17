@@ -19,9 +19,6 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-"""Imports the models, wizards, controllers, and reports of the NHS Staff
-Bank module."""
-from . import models
-from . import wizards
-from . import controllers
-from . import report
+"""Report package: imports the board-report wizard and the compliance gate
+service model used to build report data."""
+from . import nhs_compliance_gate

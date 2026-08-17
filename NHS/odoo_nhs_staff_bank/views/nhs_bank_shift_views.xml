@@ -12,17 +12,55 @@
                 <field name="headcount"/>
                 <field name="state"/>
                 <field name="org_unit_id"/>
+                <field name="band_id"/>
+                <field name="shift_type_id"/>
+                <field name="role"/>
+                <field name="time_range"/>
                 <templates>
+                    <t t-name="menu">
+                        <a role="menuitem" type="object" name="action_open" class="dropdown-item"
+                           invisible="state != 'draft'">Open Shift</a>
+                        <a role="menuitem" type="object" name="action_offer" class="dropdown-item"
+                           invisible="state in ['draft', 'filled', 'cancelled', 'to_agency', 'agency_filled']">Offer Shift</a>
+                        <a role="menuitem" type="object" name="action_escalate_agency" class="dropdown-item"
+                           invisible="state in ['draft', 'filled', 'cancelled', 'to_agency', 'agency_filled']">Escalate to Agency</a>
+                        <div role="separator" class="dropdown-divider"/>
+                        <a role="menuitem" type="object" name="action_view_offers" class="dropdown-item">View Offers</a>
+                        <a role="menuitem" type="object" name="action_view_bookings" class="dropdown-item">View Bookings</a>
+                        <div role="separator" class="dropdown-divider"/>
+                        <a role="menuitem" type="object" name="action_cancel" class="dropdown-item text-danger"
+                           invisible="state == 'cancelled'">Cancel Shift</a>
+                    </t>
                     <t t-name="card">
-                        <div class="oe_kanban_global_click p-2">
-                            <div class="d-flex justify-content-between">
-                                <strong t-out="record.name.value"/>
-                                <span t-if="record.urgency.raw_value in ('urgent', 'last_minute')"
-                                      class="badge text-bg-danger">Urgent</span>
+                        <div t-attf-class="oe_kanban_global_click p-2 border-start border-4 #{record.urgency.raw_value == 'last_minute' ? 'border-danger' : (record.urgency.raw_value == 'urgent' ? 'border-warning' : 'border-secondary-subtle')}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <strong class="fs-6" t-out="record.name.value"/>
+                                <span t-if="record.urgency.raw_value == 'last_minute'" class="badge text-bg-danger">Last-Minute</span>
+                                <span t-elif="record.urgency.raw_value == 'urgent'" class="badge text-bg-warning">Urgent</span>
                             </div>
-                            <div class="text-muted small" t-out="record.org_unit_id.value"/>
-                            <div class="small">
-                                <span t-out="record.filled_count.value"/> / <span t-out="record.headcount.value"/> filled
+                            <div class="text-muted small mb-1">
+                                <i class="fa fa-map-marker me-1" title="Area"/><span t-out="record.org_unit_id.value"/>
+                            </div>
+                            <div class="d-flex flex-wrap gap-1 mb-1"
+                                 invisible="not band_id and not shift_type_id and not role">
+                                <span t-if="record.band_id.raw_value" class="badge text-bg-light border" t-out="record.band_id.value"/>
+                                <span t-if="record.shift_type_id.raw_value" class="badge text-bg-light border" t-out="record.shift_type_id.value"/>
+                                <span t-if="record.role.raw_value" class="badge text-bg-light border" t-out="record.role.value"/>
+                            </div>
+                            <div class="text-muted small mb-2" invisible="not time_range">
+                                <i class="fa fa-clock-o me-1" title="Time"/><span t-out="record.time_range.value"/>
+                            </div>
+                            <div class="progress mb-1" style="height: 6px;">
+                                <div class="progress-bar"
+                                     t-attf-class="#{record.filled_count.raw_value >= record.headcount.raw_value ? 'bg-success' : 'bg-info'}"
+                                     t-attf-style="width: #{Math.min(100, record.headcount.raw_value ? (record.filled_count.raw_value / record.headcount.raw_value) * 100 : 100)}%"/>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="small text-muted">
+                                    <span t-out="record.filled_count.value"/> / <span t-out="record.headcount.value"/> filled
+                                </span>
+                                <span t-attf-class="badge #{record.state.raw_value == 'draft' ? 'text-bg-light border' : (record.state.raw_value == 'open' ? 'text-bg-secondary' : (record.state.raw_value == 'partially_filled' ? 'text-bg-info' : (record.state.raw_value == 'filled' ? 'text-bg-success' : ((record.state.raw_value == 'to_agency' || record.state.raw_value == 'agency_filled') ? 'text-bg-dark' : 'text-bg-danger'))))}"
+                                      t-out="record.state.value"/>
                             </div>
                         </div>
                     </t>
@@ -36,8 +74,8 @@
         <field name="name">nhs.bank.shift.list</field>
         <field name="model">nhs.bank.shift</field>
         <field name="arch" type="xml">
-            <list string="Open Shifts" decoration-danger="urgency in ('urgent', 'last_minute')"
-                  decoration-muted="state in ('cancelled', 'expired')">
+            <list string="Open Shifts" decoration-danger="urgency in ['urgent', 'last_minute']"
+                  decoration-muted="state in ['draft', 'cancelled', 'expired']">
                 <field name="reference"/>
                 <field name="name"/>
                 <field name="org_unit_id"/>
@@ -61,16 +99,23 @@
         <field name="arch" type="xml">
             <form string="Open Shift">
                 <header>
+                    <button name="action_open" type="object" string="Open" class="btn-primary"
+                            invisible="state != 'draft'"
+                            help="Confirm this draft and open it for offering to the bank."/>
                     <button name="action_offer" type="object" string="Offer Shift" class="btn-primary"
-                            invisible="state not in ('open', 'partially_filled')"/>
+                            invisible="state not in ['open', 'partially_filled']"/>
                     <button name="action_escalate_agency" type="object" string="Escalate to Agency"
-                            invisible="state not in ('open', 'partially_filled')"/>
+                            invisible="state not in ['open', 'partially_filled']"/>
+                    <button name="action_confirm_agency_filled" type="object" string="Confirm Agency Filled"
+                            class="btn-primary"
+                            invisible="state != 'to_agency'"
+                            help="Confirm the agency has actually completed this shift. Moves it to Agency Filled — the shift can no longer be reopened afterwards."/>
                     <button name="action_cancel" type="object" string="Cancel"
-                            invisible="state in ('cancelled', 'filled', 'to_agency')"/>
+                            invisible="state in ['cancelled', 'filled', 'to_agency']"/>
                     <button name="action_reset_open" type="object" string="Reopen"
-                            invisible="state not in ('cancelled', 'expired', 'to_agency')"/>
+                            invisible="state not in ['cancelled', 'expired', 'to_agency']"/>
                     <field name="state" widget="statusbar"
-                           statusbar_visible="open,partially_filled,filled"/>
+                           statusbar_visible="draft,open,partially_filled,filled"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -106,15 +151,23 @@
                     <group>
                         <group string="Cost">
                             <field name="currency_id" invisible="1"/>
+                            <field name="rate_found" invisible="1"/>
                             <field name="estimated_cost"/>
-                            <field name="agency_cost" invisible="state != 'to_agency'"/>
-                            <field name="agency_name" invisible="state != 'to_agency'"/>
+                            <div class="text-warning" invisible="rate_found">
+                                <i class="fa fa-exclamation-triangle me-1" title="Warning"/>No rate card matches this
+                                band/shift type/date — cost cannot be estimated, not genuinely free.
+                            </div>
+                            <field name="agency_cost" invisible="state not in ('to_agency', 'agency_filled')"/>
+                            <field name="agency_name" invisible="state not in ('to_agency', 'agency_filled')"/>
                         </group>
-                        <group string="Cancellation" invisible="state not in ('cancelled', 'to_agency')">
+                        <group string="Cancellation" invisible="state not in ('cancelled', 'to_agency', 'agency_filled')">
                             <field name="cancel_reason" invisible="state != 'cancelled'"/>
-                            <field name="agency_escalation_reason" invisible="state != 'to_agency'"/>
-                            <field name="agency_escalated_by_id" invisible="state != 'to_agency'"/>
-                            <field name="agency_escalated_at" invisible="state != 'to_agency'"/>
+                            <field name="agency_escalation_reason" invisible="state not in ('to_agency', 'agency_filled')"/>
+                            <field name="agency_escalated_by_id" invisible="state not in ('to_agency', 'agency_filled')"/>
+                            <field name="agency_escalated_at" invisible="state not in ('to_agency', 'agency_filled')"/>
+                            <field name="agency_confirmed" invisible="state not in ('to_agency', 'agency_filled')" readonly="1"/>
+                            <field name="agency_confirmed_by_id" invisible="not agency_confirmed"/>
+                            <field name="agency_confirmed_at" invisible="not agency_confirmed"/>
                         </group>
                     </group>
                     <notebook>
@@ -159,6 +212,7 @@
         </field>
     </record>
 
+    <!-- Search view: open shifts — status/urgency/area filters and groupings -->
     <record id="view_nhs_bank_shift_search" model="ir.ui.view">
         <field name="name">nhs.bank.shift.search</field>
         <field name="model">nhs.bank.shift</field>
@@ -169,10 +223,13 @@
                 <field name="org_unit_id"/>
                 <field name="band_id"/>
                 <field name="role"/>
-                <filter string="Open" name="open" domain="[('state', 'in', ('open', 'partially_filled'))]"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Open" name="open"
+                        domain="[('state', 'in', ('open', 'partially_filled')), ('shift_end', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
                 <filter string="Urgent" name="urgent" domain="[('urgency', 'in', ('urgent', 'last_minute'))]"/>
                 <filter string="Filled" name="filled" domain="[('state', '=', 'filled')]"/>
                 <filter string="To Agency" name="to_agency" domain="[('state', '=', 'to_agency')]"/>
+                <filter string="Agency Filled" name="agency_filled" domain="[('state', '=', 'agency_filled')]"/>
                 <separator/>
                 <filter string="This Week" name="this_week"
                         domain="[('shift_start', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
@@ -186,6 +243,7 @@
         </field>
     </record>
 
+    <!-- Window action: main Open Shifts menu entry (kanban board), defaulting to open shifts -->
     <record id="action_nhs_bank_shift" model="ir.actions.act_window">
         <field name="name">Open Shifts</field>
         <field name="res_model">nhs.bank.shift</field>
@@ -196,12 +254,14 @@
         </field>
     </record>
 
+    <!-- Window action: shift calendar, opening on the calendar view by default -->
     <record id="action_nhs_bank_shift_calendar" model="ir.actions.act_window">
         <field name="name">Shift Calendar</field>
         <field name="res_model">nhs.bank.shift</field>
         <field name="view_mode">calendar,list,form</field>
     </record>
 
+    <!-- Window action: shifts still unfilled or escalated to agency -->
     <record id="action_nhs_bank_shift_unfilled" model="ir.actions.act_window">
         <field name="name">Unfilled / To Agency</field>
         <field name="res_model">nhs.bank.shift</field>

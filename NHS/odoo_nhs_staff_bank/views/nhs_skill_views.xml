@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- List view: skills register, editable inline, shows member count per skill -->
     <record id="view_nhs_skill_list" model="ir.ui.view">
         <field name="name">nhs.skill.list</field>
         <field name="model">nhs.skill</field>
@@ -12,6 +13,7 @@
         </field>
     </record>
 
+    <!-- Search view: skills, group by category -->
     <record id="view_nhs_skill_search" model="ir.ui.view">
         <field name="name">nhs.skill.search</field>
         <field name="model">nhs.skill</field>
@@ -26,6 +28,7 @@
         </field>
     </record>
 
+    <!-- Action: opens Skills list/form -->
     <record id="action_nhs_skill" model="ir.actions.act_window">
         <field name="name">Skills</field>
         <field name="res_model">nhs.skill</field>

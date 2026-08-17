@@ -12,6 +12,8 @@
         <field name="binding_type">report</field>
     </record>
 
+    <!-- QWeb report template: Member Activity Statement body — member details and booking history
+         with total pay worked -->
     <template id="report_nhs_member_statement">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="member">

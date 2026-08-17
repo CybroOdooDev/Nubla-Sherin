@@ -30,7 +30,13 @@
         <field name="arch" type="xml">
             <form string="Bank Member">
                 <header>
-                    <field name="state" widget="statusbar"/>
+                    <button name="action_activate" string="Activate" type="object" class="btn-primary" invisible="state == 'active'"/>
+                    <button name="action_suspend" string="Suspend" type="object" invisible="state == 'suspended'"/>
+                    <button name="action_deactivate" string="Set Inactive" type="object" invisible="state == 'inactive'"/>
+                    <button name="action_create_portal_user" string="Create Portal User" type="object"
+                            invisible="user_id or not email"
+                            help="Create a Contact and Portal User from this member's name/email/phone, and email them an invitation to set their password."/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,active,suspended,inactive"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -120,6 +126,7 @@
         </field>
     </record>
 
+    <!-- Window action: main Bank Members menu entry, defaulting to active members only -->
     <record id="action_nhs_bank_member" model="ir.actions.act_window">
         <field name="name">Bank Members</field>
         <field name="res_model">nhs.bank.member</field>
@@ -131,6 +138,7 @@
         </field>
     </record>
 
+    <!-- Window action: watchlist of active members flagged non-compliant -->
     <record id="action_nhs_bank_member_compliance_watch" model="ir.actions.act_window">
         <field name="name">Compliance Watch</field>
         <field name="res_model">nhs.bank.member</field>

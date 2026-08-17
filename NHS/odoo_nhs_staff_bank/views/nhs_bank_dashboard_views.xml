@@ -17,6 +17,7 @@
         </field>
     </record>
 
+    <!-- Pivot: shifts by org unit x state, estimated cost measure -->
     <record id="view_nhs_bank_shift_pivot" model="ir.ui.view">
         <field name="name">nhs.bank.shift.pivot</field>
         <field name="model">nhs.bank.shift</field>
@@ -29,6 +30,7 @@
         </field>
     </record>
 
+    <!-- Action: opens Bank vs Agency Analytics in pivot/graph/list, grouped by state by default -->
     <record id="action_nhs_bank_shift_analytics" model="ir.actions.act_window">
         <field name="name">Bank vs Agency Analytics</field>
         <field name="res_model">nhs.bank.shift</field>
@@ -36,6 +38,7 @@
         <field name="context">{'search_default_group_state': 1}</field>
     </record>
 
+    <!-- Pivot: member utilisation — bookings by member x state, payable amount measure -->
     <record id="view_nhs_shift_booking_pivot" model="ir.ui.view">
         <field name="name">nhs.shift.booking.pivot</field>
         <field name="model">nhs.shift.booking</field>
@@ -48,6 +51,7 @@
         </field>
     </record>
 
+    <!-- Action: opens Member Utilisation pivot/list -->
     <record id="action_nhs_member_utilisation" model="ir.actions.act_window">
         <field name="name">Member Utilisation</field>
         <field name="res_model">nhs.shift.booking</field>

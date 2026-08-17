@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- List view: rate cards — hourly rate and enhancement percentage per band/role/shift type -->
     <record id="view_nhs_bank_rate_list" model="ir.ui.view">
         <field name="name">nhs.bank.rate.list</field>
         <field name="model">nhs.bank.rate</field>
         <field name="arch" type="xml">
-            <list string="Rate Cards" editable="bottom">
+            <list string="Rate Cards">
                 <field name="name"/>
                 <field name="band_id"/>
                 <field name="role"/>
@@ -18,6 +19,7 @@
         </field>
     </record>
 
+    <!-- Form view: rate card — band/role/shift type link, currency-aware rate and validity period -->
     <record id="view_nhs_bank_rate_form" model="ir.ui.view">
         <field name="name">nhs.bank.rate.form</field>
         <field name="model">nhs.bank.rate</field>
@@ -45,6 +47,7 @@
         </field>
     </record>
 
+    <!-- Search view: rate cards, groupable by band and shift type -->
     <record id="view_nhs_bank_rate_search" model="ir.ui.view">
         <field name="name">nhs.bank.rate.search</field>
         <field name="model">nhs.bank.rate</field>
@@ -61,6 +64,7 @@
         </field>
     </record>
 
+    <!-- Window action: Rate Cards menu entry -->
     <record id="action_nhs_bank_rate" model="ir.actions.act_window">
         <field name="name">Rate Cards</field>
         <field name="res_model">nhs.bank.rate</field>

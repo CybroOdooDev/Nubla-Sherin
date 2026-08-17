@@ -3,34 +3,41 @@
     <!-- Seed a starting skill/competency catalogue -->
     <record id="nhs_skill_iv_administration" model="nhs.skill">
         <field name="name">IV Administration</field>
-        <field name="category">Clinical</field>
+        <field name="category">clinical</field>
     </record>
+    <!-- Skill: Paediatric (clinical) -->
     <record id="nhs_skill_paediatric" model="nhs.skill">
         <field name="name">Paediatric</field>
-        <field name="category">Clinical</field>
+        <field name="category">clinical</field>
     </record>
+    <!-- Skill: Venepuncture (clinical) -->
     <record id="nhs_skill_venepuncture" model="nhs.skill">
         <field name="name">Venepuncture</field>
-        <field name="category">Clinical</field>
+        <field name="category">clinical</field>
     </record>
+    <!-- Skill: Manual Handling (mandatory training) -->
     <record id="nhs_skill_manual_handling" model="nhs.skill">
         <field name="name">Manual Handling</field>
-        <field name="category">Mandatory</field>
+        <field name="category">mandatory</field>
     </record>
+    <!-- Skill: Mental Health First Aid (clinical) -->
     <record id="nhs_skill_mental_health" model="nhs.skill">
         <field name="name">Mental Health First Aid</field>
-        <field name="category">Clinical</field>
+        <field name="category">clinical</field>
     </record>
+    <!-- Skill: Theatre Scrub (clinical) -->
     <record id="nhs_skill_theatre" model="nhs.skill">
         <field name="name">Theatre Scrub</field>
-        <field name="category">Clinical</field>
+        <field name="category">clinical</field>
     </record>
+    <!-- Skill: Critical Care / ICU (clinical) -->
     <record id="nhs_skill_icu" model="nhs.skill">
         <field name="name">Critical Care / ICU</field>
-        <field name="category">Clinical</field>
+        <field name="category">clinical</field>
     </record>
+    <!-- Skill: Dementia Care (clinical) -->
     <record id="nhs_skill_dementia" model="nhs.skill">
         <field name="name">Dementia Care</field>
-        <field name="category">Clinical</field>
+        <field name="category">clinical</field>
     </record>
 </odoo>

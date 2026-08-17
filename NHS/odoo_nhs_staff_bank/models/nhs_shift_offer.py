@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -30,6 +30,9 @@ class NhsShiftOffer(models.Model):
     _name = 'nhs.shift.offer'
     _description = 'Shift Offer'
     _order = 'offered_at desc'
+    _rec_name = 'member_id'
+
+
 
     shift_id = fields.Many2one(
         'nhs.bank.shift',
@@ -107,7 +110,7 @@ class NhsShiftOffer(models.Model):
         """Member accepts: confirm/book the shift, preventing double-booking."""
         for offer in self:
             if offer.response != 'pending':
-                raise UserError(_("This offer has already been responded to."))
+                raise UserError(("This offer has already been responded to."))
             existing = self.env['nhs.shift.booking'].search([
                 ('member_id', '=', offer.member_id.id),
                 ('state', 'in', ('booked', 'worked')),
@@ -115,10 +118,10 @@ class NhsShiftOffer(models.Model):
                 ('shift_end', '>', offer.shift_id.shift_start),
             ])
             if existing:
-                raise UserError(_(
+                raise UserError((
                     "%s already has a booking that overlaps this shift.") % offer.member_id.name)
             if offer.shift_id.filled_count >= offer.shift_id.headcount:
-                raise UserError(_("This shift is already fully booked."))
+                raise UserError(("This shift is already fully booked."))
             offer.write({'response': 'accepted', 'responded_at': fields.Datetime.now()})
             self.env['nhs.shift.booking'].create({
                 'shift_id': offer.shift_id.id,
@@ -129,9 +132,10 @@ class NhsShiftOffer(models.Model):
             # explicitly if the shift is now full, via the shift's own state.
 
     def action_decline(self, reason=None):
+        """Member declines the offer, recording an optional reason."""
         for offer in self:
             if offer.response != 'pending':
-                raise UserError(_("This offer has already been responded to."))
+                raise UserError(("This offer has already been responded to."))
             offer.write({
                 'response': 'declined',
                 'responded_at': fields.Datetime.now(),
@@ -139,6 +143,7 @@ class NhsShiftOffer(models.Model):
             })
 
     def action_withdraw(self):
+        """Withdraw all still-pending offers in the set."""
         self.filtered(lambda o: o.response == 'pending').write({'response': 'withdrawn'})
 
     @api.model

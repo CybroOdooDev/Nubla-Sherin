@@ -21,7 +21,7 @@
 #############################################################################
 from datetime import timedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -152,6 +152,7 @@ class NhsShiftBooking(models.Model):
 
     @api.onchange('shift_id')
     def _onchange_shift_id(self):
+        """Default the booked start/end times from the shift when it is set."""
         for booking in self:
             if booking.shift_id:
                 booking.shift_start = booking.shift_id.shift_start
@@ -160,6 +161,8 @@ class NhsShiftBooking(models.Model):
     @api.depends('shift_start', 'shift_end', 'actual_start', 'actual_end',
                  'rate_id', 'rate_override')
     def _compute_payable_amount(self):
+        """Compute hours x rate (+ enhancements) as the payable amount, or use
+        the flat override when one is set."""
         for booking in self:
             if booking.rate_override:
                 booking.payable_amount = booking.rate_override
@@ -206,13 +209,14 @@ class NhsShiftBooking(models.Model):
                 compliant, _reason = gate.is_member_compliant_with_reason(member)
                 vals['compliant_at_booking'] = compliant
                 if not compliant and hard_gate:
-                    raise UserError(_(
+                    raise UserError((
                         "%(member)s cannot be booked: %(reason)s") % {
                         'member': member.name, 'reason': _reason})
         return super().create(vals_list)
 
     def unlink(self):
-        raise UserError(_(
+        """Block hard deletion of bookings; cancel instead to preserve the audit trail."""
+        raise UserError((
             "Bookings cannot be deleted, to preserve the pay and compliance audit"
             " trail. Cancel the booking instead."))
 
@@ -227,9 +231,11 @@ class NhsShiftBooking(models.Model):
             })
 
     def action_no_show(self):
+        """Mark the booking as a no-show."""
         self.write({'state': 'no_show'})
 
     def action_authorise(self):
+        """Record who authorised the worked shift for pay, and when."""
         for booking in self:
             booking.write({
                 'authorised_by_id': self.env.user.id,

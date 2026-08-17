@@ -23,14 +23,16 @@
             <field name="active" eval="True"/>
         </record>
 
-        <!-- Cron: expire shifts still open/partially-filled well past their end time -->
+        <!-- Cron: expire shifts still open/partially-filled well past their end time.
+             Runs hourly (not daily) so a shift that's fully in the past no longer
+             lingers as "Open" for most of a day before its state catches up. -->
         <record id="ir_cron_nhs_bank_shift_expiry" model="ir.cron">
             <field name="name">NHS Staff Bank: Shift Expiry</field>
             <field name="model_id" ref="model_nhs_bank_shift"/>
             <field name="state">code</field>
             <field name="code">model._cron_expire_stale_shifts()</field>
             <field name="interval_number">1</field>
-            <field name="interval_type">days</field>
+            <field name="interval_type">hours</field>
             <field name="active" eval="True"/>
         </record>
 

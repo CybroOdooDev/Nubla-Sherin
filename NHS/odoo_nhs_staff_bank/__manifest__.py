@@ -43,11 +43,7 @@ its compliance gate, degrading gracefully when that module is absent.
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'depends': ['base', 'mail', 'portal', 'odoo_nhs_establishment'],
-    # Soft-link only: if odoo_nhs_training happens to be installed, the
-    # compliance gate reads real training/registration compliance from it
-    # (via 'nhs.workforce.member' in self.env + a fields.Reference, never a
-    # hard Many2one to its model). NOT a hard dependency.
+    'depends': ['base', 'mail', 'portal', 'odoo_nhs_establishment', 'odoo_nhs_training'],
     'data': [
         'security/nhs_staff_bank_security.xml',
         'security/ir.model.access.csv',
@@ -83,8 +79,10 @@ its compliance gate, degrading gracefully when that module is absent.
             'odoo_nhs_staff_bank/static/src/dashboard/nhs_bank_dashboard.scss',
         ],
     },
+    'images': ['static/description/banner.jpg'],
     'license': 'LGPL-3',
-    'application': True,
     'installable': True,
     'auto_install': False,
+    'application': True,
+
 }

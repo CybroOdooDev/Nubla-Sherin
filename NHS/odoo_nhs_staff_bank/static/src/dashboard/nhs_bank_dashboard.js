@@ -81,7 +81,7 @@ export class NhsBankDashboard extends Component {
         this.openAction(
             "nhs.bank.shift",
             [[false, "list"], [false, "form"]],
-            [["state", "=", "to_agency"]],
+            [["state", "in", ["to_agency", "agency_filled"]]],
             {}, "Shifts Gone to Agency"
         );
     }

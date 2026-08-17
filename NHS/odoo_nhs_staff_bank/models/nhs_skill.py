@@ -35,10 +35,14 @@ class NhsSkill(models.Model):
         required=True,
         help="Skill/competency name, e.g. 'IV administration', 'Paediatric'."
     )
-    category = fields.Char(
+    category = fields.Selection([
+        ('clinical', 'Clinical'),
+        ('technical', 'Technical'),
+        ('language', 'Language'),
+        ('mandatory', 'Mandatory'),
+    ],
         string='Category',
-        help="Free-text grouping for the skill catalogue, e.g. 'Clinical',"
-             " 'Technical', 'Language'."
+        help="Grouping for the skill catalogue."
     )
     member_count = fields.Integer(
         string='Member Count',

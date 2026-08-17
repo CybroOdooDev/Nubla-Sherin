@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- List view: shift offers — colour-coded by response, with inline accept/decline buttons for pending offers -->
     <record id="view_nhs_shift_offer_list" model="ir.ui.view">
         <field name="name">nhs.shift.offer.list</field>
         <field name="model">nhs.shift.offer</field>
@@ -17,10 +18,14 @@
                         invisible="response != 'pending'"/>
                 <button name="action_decline" type="object" string="Decline" icon="fa-times"
                         invisible="response != 'pending'"/>
+                <button name="action_withdraw" type="object" string="Withdraw" icon="fa-ban"
+                        invisible="response != 'pending'"
+                        groups="odoo_nhs_staff_bank.group_nhs_bank_officer"/>
             </list>
         </field>
     </record>
 
+    <!-- Form view: shift offer — response statusbar with accept/decline actions and read-only eligibility info -->
     <record id="view_nhs_shift_offer_form" model="ir.ui.view">
         <field name="name">nhs.shift.offer.form</field>
         <field name="model">nhs.shift.offer</field>
@@ -31,6 +36,9 @@
                             invisible="response != 'pending'"/>
                     <button name="action_decline" type="object" string="Decline"
                             invisible="response != 'pending'"/>
+                    <button name="action_withdraw" type="object" string="Withdraw"
+                            invisible="response != 'pending'"
+                            groups="odoo_nhs_staff_bank.group_nhs_bank_officer"/>
                     <field name="response" widget="statusbar"/>
                 </header>
                 <sheet>
@@ -53,6 +61,7 @@
         </field>
     </record>
 
+    <!-- Search view: shift offers — filter/group by response, shift and member -->
     <record id="view_nhs_shift_offer_search" model="ir.ui.view">
         <field name="name">nhs.shift.offer.search</field>
         <field name="model">nhs.shift.offer</field>
@@ -72,6 +81,7 @@
         </field>
     </record>
 
+    <!-- Window action: Offers menu entry -->
     <record id="action_nhs_shift_offer" model="ir.actions.act_window">
         <field name="name">Offers</field>
         <field name="res_model">nhs.shift.offer</field>

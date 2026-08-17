@@ -34,6 +34,7 @@ class NhsMemberAvailability(models.Model):
     _name = 'nhs.member.availability'
     _description = 'Bank Member Availability'
     _order = 'date_from desc'
+    _rec_name = 'member_id'
 
     member_id = fields.Many2one(
         'nhs.bank.member',

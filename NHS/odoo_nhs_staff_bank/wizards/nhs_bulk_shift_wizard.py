@@ -21,7 +21,7 @@
 #############################################################################
 from datetime import datetime, timedelta
 
-from odoo import _, api, fields, models
+from odoo import fields, models
 from odoo.exceptions import UserError
 
 WEEKDAY_FIELDS = ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')
@@ -60,6 +60,7 @@ class NhsBulkShiftWizard(models.TransientModel):
     sunday = fields.Boolean(default=True)
 
     def _float_to_time(self, value):
+        """Split a 24h decimal time (e.g. 20.5) into (hours, minutes)."""
         hours = int(value)
         minutes = int(round((value - hours) * 60))
         return hours, minutes
@@ -68,10 +69,10 @@ class NhsBulkShiftWizard(models.TransientModel):
         """Create one nhs.bank.shift per matching weekday in the date range."""
         self.ensure_one()
         if self.date_to < self.date_from:
-            raise UserError(_("'To Date' cannot be before 'From Date'."))
+            raise UserError(("'To Date' cannot be before 'From Date'."))
         active_weekdays = {i for i, field_name in enumerate(WEEKDAY_FIELDS) if self[field_name]}
         if not active_weekdays:
-            raise UserError(_("Select at least one day of the week."))
+            raise UserError(("Select at least one day of the week."))
 
         start_h, start_m = self._float_to_time(self.start_time)
         end_h, end_m = self._float_to_time(self.end_time)
@@ -95,13 +96,16 @@ class NhsBulkShiftWizard(models.TransientModel):
                     'urgency': self.urgency,
                     'shift_start': fields.Datetime.to_string(shift_start),
                     'shift_end': fields.Datetime.to_string(shift_end),
+                    # Bulk creation is a deliberate "raise these shifts now" action —
+                    # skip the draft review step new single shifts get by default.
+                    'state': 'open',
                 })
             current += timedelta(days=1)
         if not vals_list:
-            raise UserError(_("No dates in range matched the selected weekdays."))
+            raise UserError(("No dates in range matched the selected weekdays."))
         shifts = self.env['nhs.bank.shift'].create(vals_list)
         return {
-            'name': _('Created Shifts'),
+            'name': ('Created Shifts'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.bank.shift',
             'view_mode': 'list,form',

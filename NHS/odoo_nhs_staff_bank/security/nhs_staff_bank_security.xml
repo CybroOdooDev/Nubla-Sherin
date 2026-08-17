@@ -15,12 +15,18 @@
             <field name="sequence">10</field>
         </record>
 
-        <!-- Security group: Bank Member - portal self-service only. Implies
-             base.group_portal so assigning it also grants portal access. -->
+        <!-- Security group: Bank Member - portal self-service role. Deliberately
+             does NOT imply base.group_portal: this group sits in the same
+             "Role" selection widget as internal-user access levels, and an
+             implied portal group would conflict with base.group_user the
+             moment an internal user's access level is set to Bank Member
+             (Portal/User/Public are mutually exclusive). Portal access is
+             granted explicitly by action_create_portal_user() when a real
+             portal account is created for the member. -->
         <record id="group_nhs_bank_member" model="res.groups">
             <field name="name">Bank Member</field>
             <field name="privilege_id" ref="privilege_staff_bank_access_level"/>
-            <field name="implied_ids" eval="[(4, ref('base.group_portal'))]"/>
+            <field name="implied_ids" eval="[(3, ref('base.group_portal'))]"/>
             <field name="comment">Portal role: a bank member sees available shifts,
                 accepts/declines, sets availability, sees own bookings and pay
                 summary. No access to other members, other members' data, or
@@ -55,30 +61,35 @@
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_bank_officer'))]"/>
         </record>
+        <!-- Record Rule: bank officers/managers only see shifts in their own company/companies -->
         <record id="rule_nhs_bank_shift_company" model="ir.rule">
             <field name="name">nhs.bank.shift: company scope (officer/manager)</field>
             <field name="model_id" ref="model_nhs_bank_shift"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_bank_officer'))]"/>
         </record>
+        <!-- Record Rule: bank officers/managers only see shift offers in their own company/companies -->
         <record id="rule_nhs_shift_offer_company" model="ir.rule">
             <field name="name">nhs.shift.offer: company scope (officer/manager)</field>
             <field name="model_id" ref="model_nhs_shift_offer"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_bank_officer'))]"/>
         </record>
+        <!-- Record Rule: bank officers/managers only see bookings in their own company/companies -->
         <record id="rule_nhs_shift_booking_company" model="ir.rule">
             <field name="name">nhs.shift.booking: company scope (officer/manager)</field>
             <field name="model_id" ref="model_nhs_shift_booking"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_bank_officer'))]"/>
         </record>
+        <!-- Record Rule: bank officers/managers only see member availability in their own company/companies -->
         <record id="rule_nhs_member_availability_company" model="ir.rule">
             <field name="name">nhs.member.availability: company scope (officer/manager)</field>
             <field name="model_id" ref="model_nhs_member_availability"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_bank_officer'))]"/>
         </record>
+        <!-- Record Rule: bank managers only see rate cards in their own company/companies -->
         <record id="rule_nhs_bank_rate_company" model="ir.rule">
             <field name="name">nhs.bank.rate: company scope (manager)</field>
             <field name="model_id" ref="model_nhs_bank_rate"/>
@@ -94,24 +105,28 @@
             <field name="domain_force">[('user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_bank_member'))]"/>
         </record>
+        <!-- Record Rule: a bank member sees only their own availability entries -->
         <record id="rule_nhs_member_availability_self" model="ir.rule">
             <field name="name">nhs.member.availability: own record only (bank member)</field>
             <field name="model_id" ref="model_nhs_member_availability"/>
             <field name="domain_force">[('member_id.user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_bank_member'))]"/>
         </record>
+        <!-- Record Rule: a bank member sees only shift offers made to them -->
         <record id="rule_nhs_shift_offer_self" model="ir.rule">
             <field name="name">nhs.shift.offer: own offers only (bank member)</field>
             <field name="model_id" ref="model_nhs_shift_offer"/>
             <field name="domain_force">[('member_id.user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_bank_member'))]"/>
         </record>
+        <!-- Record Rule: a bank member sees only their own bookings -->
         <record id="rule_nhs_shift_booking_self" model="ir.rule">
             <field name="name">nhs.shift.booking: own bookings only (bank member)</field>
             <field name="model_id" ref="model_nhs_shift_booking"/>
             <field name="domain_force">[('member_id.user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_bank_member'))]"/>
         </record>
+        <!-- Record Rule: bank members can see company shifts (portal browsing of open/offered shifts) -->
         <record id="rule_nhs_bank_shift_member_visible" model="ir.rule">
             <field name="name">nhs.bank.shift: open shifts visible to bank members</field>
             <field name="model_id" ref="model_nhs_bank_shift"/>
@@ -138,6 +153,7 @@
             <field name="domain_force">[(1, '=', 1)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_bank_officer'))]"/>
         </record>
+        <!-- Record Rule: shift types visible if global (no company) or in the user's company/companies -->
         <record id="rule_nhs_shift_type_company" model="ir.rule">
             <field name="name">nhs.shift.type: company scope or global</field>
             <field name="model_id" ref="model_nhs_shift_type"/>

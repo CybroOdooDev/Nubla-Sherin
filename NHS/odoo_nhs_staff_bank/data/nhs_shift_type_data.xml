@@ -7,18 +7,21 @@
         <field name="sequence">10</field>
         <field name="is_unsocial" eval="False"/>
     </record>
+    <!-- Shift type: Night (unsocial hours) -->
     <record id="nhs_shift_type_night" model="nhs.shift.type">
         <field name="name">Night</field>
         <field name="code">NIGHT</field>
         <field name="sequence">20</field>
         <field name="is_unsocial" eval="True"/>
     </record>
+    <!-- Shift type: Weekend (unsocial hours) -->
     <record id="nhs_shift_type_weekend" model="nhs.shift.type">
         <field name="name">Weekend</field>
         <field name="code">WKND</field>
         <field name="sequence">30</field>
         <field name="is_unsocial" eval="True"/>
     </record>
+    <!-- Shift type: Bank Holiday (unsocial hours) -->
     <record id="nhs_shift_type_bank_holiday" model="nhs.shift.type">
         <field name="name">Bank Holiday</field>
         <field name="code">BH</field>

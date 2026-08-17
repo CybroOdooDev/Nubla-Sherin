@@ -43,6 +43,7 @@
         </field>
     </record>
 
+    <!-- Action: opens the NHS Staff Bank settings panel directly -->
     <record id="action_nhs_bank_config_settings" model="ir.actions.act_window">
         <field name="name">Settings</field>
         <field name="res_model">res.config.settings</field>

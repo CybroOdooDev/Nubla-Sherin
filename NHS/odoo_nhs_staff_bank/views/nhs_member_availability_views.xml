@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- List view: member availability register, editable inline, highlights blackout/unavailable entries -->
     <record id="view_nhs_member_availability_list" model="ir.ui.view">
         <field name="name">nhs.member.availability.list</field>
         <field name="model">nhs.member.availability</field>
         <field name="arch" type="xml">
-            <list string="Availability" editable="bottom"
+            <list string="Availability"
                   decoration-danger="availability_type == 'unavailable'">
                 <field name="member_id"/>
                 <field name="date_from"/>
@@ -18,6 +19,7 @@
         </field>
     </record>
 
+    <!-- Form view: single availability window — type, date range, recurring weekday pattern and note -->
     <record id="view_nhs_member_availability_form" model="ir.ui.view">
         <field name="name">nhs.member.availability.form</field>
         <field name="model">nhs.member.availability</field>
@@ -43,6 +45,7 @@
         </field>
     </record>
 
+    <!-- Calendar view: availability windows colored by member, monthly view -->
     <record id="view_nhs_member_availability_calendar" model="ir.ui.view">
         <field name="name">nhs.member.availability.calendar</field>
         <field name="model">nhs.member.availability</field>
@@ -55,6 +58,7 @@
         </field>
     </record>
 
+    <!-- Search view: availability — filter by available/blackout, group by member or type -->
     <record id="view_nhs_member_availability_search" model="ir.ui.view">
         <field name="name">nhs.member.availability.search</field>
         <field name="model">nhs.member.availability</field>
@@ -71,6 +75,7 @@
         </field>
     </record>
 
+    <!-- Action: opens member Availability in calendar/list/form -->
     <record id="action_nhs_member_availability" model="ir.actions.act_window">
         <field name="name">Availability</field>
         <field name="res_model">nhs.member.availability</field>

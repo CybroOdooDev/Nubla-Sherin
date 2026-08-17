@@ -28,15 +28,9 @@ class NhsComplianceGate(models.AbstractModel):
 
     This gate isolates ALL knowledge of the Mandatory Training module — if
     that module changes, only this file needs to change. It reads
-    odoo_nhs_training where installed (via the member's `workforce_member_id`
-    Reference field, never a hard Many2one, so the co-model is not required
-    to exist), and falls back to a light in-module flag when the Training
-    module is absent, so the gate always functions.
-
-    The gate is enforced at OFFER time (only eligible+compliant members are
-    offered) and re-checked at BOOKING time (compliance can lapse between
-    offer and booking); `compliant_at_booking` is then snapshotted on the
-    booking for the audit trail.
+    odoo_nhs_training (a hard dependency) via the member's
+    `workforce_member_id` link when set, and falls back to a light in-module
+    flag when no workforce member is linked, so the gate always functions.
     """
     _name = 'nhs.compliance.gate'
     _description = 'Bank Compliance Gate (service)'
@@ -56,10 +50,26 @@ class NhsComplianceGate(models.AbstractModel):
         surfaced to the coordinator wherever a member is excluded."""
         workforce_member = self._resolve_workforce_member(member)
         if workforce_member:
-            if hasattr(workforce_member, 'is_training_compliant') and not workforce_member.is_training_compliant():
+            lapsed_registration = workforce_member.registration_ids.filtered(
+                lambda r: r.status == 'lapsed')
+            if lapsed_registration:
                 return False, (
-                    "Mandatory training or professional registration has lapsed"
+                    "Professional registration has lapsed"
                     " (via NHS Mandatory Training)."
+                )
+            # Use the workforce member's own real compliance status, so a
+            # required subject that is simply not yet done (never started —
+            # not "expired") also counts as not compliant, not just lapsed
+            # or failed items.
+            if workforce_member.compliance_status == 'non_compliant':
+                return False, (
+                    "Mandatory training is not compliant — required subjects are"
+                    " incomplete or expired (via NHS Mandatory Training)."
+                )
+            if workforce_member.compliance_status == 'at_risk':
+                return False, (
+                    "Mandatory training compliance is at risk — required subjects"
+                    " are nearing expiry or incomplete (via NHS Mandatory Training)."
                 )
             return True, ''
         # Standalone fallback: odoo_nhs_training absent, or no link set.
@@ -73,13 +83,11 @@ class NhsComplianceGate(models.AbstractModel):
 
     def _resolve_workforce_member(self, member):
         """Resolve the linked odoo_nhs_training workforce member, if the
-        Training module is installed and the member is linked to it."""
-        ref = member.workforce_member_id
-        if ref and ref._name == 'nhs.workforce.member' and 'nhs.workforce.member' in self.env:
-            return ref
-        return False
+        bank member is linked to one."""
+        return member.workforce_member_id or False
 
-    def eligibility(self, shift, member):
+    def eligibility(self, shift,
+                    member):
         """Combine role/band + skills + area + availability + compliance
         into a single eligible/ineligible result with human-readable reasons,
         for a candidate `member` against an open `shift`."""

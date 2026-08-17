@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- List view: bookings — flags working-time breaches, no-shows and cancellations by decoration -->
     <record id="view_nhs_shift_booking_list" model="ir.ui.view">
         <field name="name">nhs.shift.booking.list</field>
         <field name="model">nhs.shift.booking</field>
@@ -19,6 +20,7 @@
         </field>
     </record>
 
+    <!-- Form view: booking — confirm/no-show/authorise/cancel workflow, working-time-breach warning banner and pay details -->
     <record id="view_nhs_shift_booking_form" model="ir.ui.view">
         <field name="name">nhs.shift.booking.form</field>
         <field name="model">nhs.shift.booking</field>
@@ -73,6 +75,7 @@
         </field>
     </record>
 
+    <!-- Search view: bookings — status filters including awaiting authorisation and working-time breaches -->
     <record id="view_nhs_shift_booking_search" model="ir.ui.view">
         <field name="name">nhs.shift.booking.search</field>
         <field name="model">nhs.shift.booking</field>
@@ -95,6 +98,7 @@
         </field>
     </record>
 
+    <!-- Window action: Bookings menu entry -->
     <record id="action_nhs_shift_booking" model="ir.actions.act_window">
         <field name="name">Bookings</field>
         <field name="res_model">nhs.shift.booking</field>

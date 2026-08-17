@@ -34,6 +34,8 @@ class NhsBankReportWizard(models.TransientModel):
     org_unit_id = fields.Many2one('nhs.org.unit', string='Area / Ward (optional)')
 
     def _get_shifts(self):
+        """Bank shifts starting within the selected date range, optionally
+        restricted to the selected area/ward and its sub-units."""
         self.ensure_one()
         domain = [
             ('shift_start', '>=', self.date_from),
@@ -47,9 +49,9 @@ class NhsBankReportWizard(models.TransientModel):
         """Fill-rate & bank-vs-agency displacement figures for the period."""
         self.ensure_one()
         shifts = self._get_shifts()
-        resolved = shifts.filtered(lambda s: s.state in ('filled', 'to_agency', 'expired'))
+        resolved = shifts.filtered(lambda s: s.state in ('filled', 'to_agency', 'agency_filled', 'expired'))
         filled = resolved.filtered(lambda s: s.state == 'filled')
-        to_agency = resolved.filtered(lambda s: s.state == 'to_agency')
+        to_agency = resolved.filtered(lambda s: s.state in ('to_agency', 'agency_filled'))
         fill_rate = (len(filled) / len(resolved) * 100.0) if resolved else 0.0
         by_area = {}
         for shift in resolved:
@@ -90,7 +92,7 @@ class NhsBankReportWizard(models.TransientModel):
             if booking.shift_start and booking.shift_end:
                 entry['hours'] += (booking.shift_end - booking.shift_start).total_seconds() / 3600.0
             entry['cost'] += booking.payable_amount
-        agency_shifts = shifts.filtered(lambda s: s.state == 'to_agency')
+        agency_shifts = shifts.filtered(lambda s: s.state in ('to_agency', 'agency_filled'))
         return {
             'date_from': self.date_from, 'date_to': self.date_to,
             'band_rows': sorted(by_band.values(), key=lambda r: r['name'] or ''),
@@ -102,7 +104,9 @@ class NhsBankReportWizard(models.TransientModel):
         }
 
     def action_print_fill_rate(self):
+        """Trigger the Fill-Rate & Agency-Displacement PDF report."""
         return self.env.ref('odoo_nhs_staff_bank.action_report_nhs_fill_rate').report_action(self)
 
     def action_print_spend(self):
+        """Trigger the Bank-Spend PDF report."""
         return self.env.ref('odoo_nhs_staff_bank.action_report_nhs_bank_spend').report_action(self)

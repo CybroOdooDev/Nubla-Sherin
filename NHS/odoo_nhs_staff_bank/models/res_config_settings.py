@@ -33,6 +33,9 @@ BOOKING_MODES = [
 
 
 class ResCompany(models.Model):
+    """Company-level settings for the NHS Staff Bank: the compliance gate
+    policy, booking mode, safe working-hours limit, offer expiry, agency
+    comparator uplift and digest recipients."""
     _inherit = 'res.company'
 
     nhs_bank_gate_policy = fields.Selection(
@@ -75,6 +78,7 @@ class ResCompany(models.Model):
 
 
 class ResConfigSettings(models.TransientModel):
+    """Exposes the NHS Staff Bank company settings on the Settings screen."""
     _inherit = 'res.config.settings'
 
     nhs_bank_gate_policy = fields.Selection(

@@ -19,7 +19,8 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import  api, fields, models, _
+from odoo.exceptions import UserError
 
 MEMBER_TYPES = [
     ('substantive_bank', 'Substantive Staff Doing Bank'),
@@ -27,6 +28,7 @@ MEMBER_TYPES = [
 ]
 
 STATES = [
+    ('pending', 'Pending'),
     ('active', 'Active'),
     ('inactive', 'Inactive'),
     ('suspended', 'Suspended'),
@@ -78,13 +80,12 @@ class NhsBankMember(models.Model):
         help="Substantive staff doing extra bank shifts, or a dedicated bank-only"
              " worker with no substantive post."
     )
-    workforce_member_id = fields.Reference(
-        selection=[('nhs.workforce.member', 'Workforce Member')],
+    workforce_member_id = fields.Many2one(
+        'nhs.workforce.member',
         string='Workforce Member (Training)',
-        help="Optional soft link to the Mandatory Training module's workforce-member"
-             " record — the source of real compliance data when that module is"
-             " installed. A Reference field, not a Many2one, so this module never"
-             " requires odoo_nhs_training to be installed."
+        help="Link to the Mandatory Training module's workforce-member record —"
+             " the source of real compliance data (training + professional"
+             " registration) used by the compliance gate."
     )
     post_id = fields.Many2one(
         'nhs.establishment.post',
@@ -174,9 +175,9 @@ class NhsBankMember(models.Model):
         STATES,
         string='Status',
         required=True,
-        default='active',
+        default='pending',
         tracking=True,
-        help="Active / inactive / suspended (e.g. pending re-check)."
+        help="Pending / Active / Inactive / Suspended (e.g. pending re-check)."
     )
     join_date = fields.Date(
         string='Bank Join Date',
@@ -245,7 +246,9 @@ class NhsBankMember(models.Model):
                     'nhs.bank.member') or 'New'
         return super().create(vals_list)
 
-    @api.depends('workforce_member_id', 'checks_confirmed', 'manual_compliance_flag',
+    @api.depends('workforce_member_id', 'workforce_member_id.compliance_status',
+                 'workforce_member_id.registration_ids.status',
+                 'checks_confirmed', 'manual_compliance_flag',
                  'manual_compliance_note', 'state')
     def _compute_compliance_status(self):
         """Resolve compliance status/reason through the compliance gate."""
@@ -253,21 +256,24 @@ class NhsBankMember(models.Model):
         for member in self:
             if member.state != 'active':
                 member.compliance_status = 'unknown'
-                member.compliance_reason = _("Member is not active.")
+                member.compliance_reason = ("Member is not active.")
                 continue
             compliant, reason = gate.is_member_compliant_with_reason(member)
             member.compliance_status = 'compliant' if compliant else 'non_compliant'
             member.compliance_reason = reason
 
     def _compute_availability_count(self):
+        """Count of linked availability records."""
         for member in self:
             member.availability_count = len(member.availability_ids)
 
     def _compute_offer_count(self):
+        """Count of shift offers made to this member."""
         for member in self:
             member.offer_count = len(member.offer_ids)
 
     def _compute_booking_count(self):
+        """Count of this member's bookings."""
         for member in self:
             member.booking_count = len(member.booking_ids)
 
@@ -309,9 +315,10 @@ class NhsBankMember(models.Model):
         return projected > limit
 
     def action_view_availability(self):
+        """Open this member's availability records."""
         self.ensure_one()
         return {
-            'name': _('Availability'),
+            'name': ('Availability'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.member.availability',
             'view_mode': 'list,form',
@@ -320,9 +327,10 @@ class NhsBankMember(models.Model):
         }
 
     def action_view_offers(self):
+        """Open the shift offers made to this member."""
         self.ensure_one()
         return {
-            'name': _('Offers'),
+            'name': ('Offers'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.shift.offer',
             'view_mode': 'list,form',
@@ -330,14 +338,99 @@ class NhsBankMember(models.Model):
         }
 
     def action_view_bookings(self):
+        """Open this member's bookings."""
         self.ensure_one()
         return {
-            'name': _('Bookings'),
+            'name': ('Bookings'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.shift.booking',
             'view_mode': 'list,form',
             'domain': [('member_id', '=', self.id)],
         }
+
+    def action_create_portal_user(self):
+        """Create (or reuse) a Contact and a Portal User for this bank member
+        in one step, so they can log in to the self-service portal to accept
+        shifts, set availability and see their own bookings — instead of an
+        admin having to create/link both records manually.
+
+        An invitation email (standard "set your password" template) is sent
+        to the new portal user."""
+        self.ensure_one()
+        if self.user_id:
+            raise UserError(_("%s is already linked to a portal user (%s).")
+                             % (self.name, self.user_id.name))
+        if not self.email:
+            raise UserError(_("Set an email address before creating a portal user."))
+
+        partner = self.partner_id
+        if not partner:
+            partner = self.env['res.partner'].search(
+                [('email', '=', self.email)], limit=1)
+        if not partner:
+            partner = self.env['res.partner'].create({
+                'name': self.name,
+                'email': self.email,
+                'phone': self.phone,
+                'company_id': self.company_id.id,
+            })
+
+        group_bank_member = self.env.ref('odoo_nhs_staff_bank.group_nhs_bank_member')
+        group_portal = self.env.ref('base.group_portal')
+
+        user = self.env['res.users'].with_context(active_test=False).search(
+            [('login', '=', self.email)], limit=1)
+        if user:
+            if user._is_internal():
+                raise UserError(_("A user with the email %s already exists as an"
+                                   " internal user — link them manually instead.")
+                                 % self.email)
+            user.sudo().write({
+                'active': True,
+                'group_ids': [(4, group_bank_member.id), (4, group_portal.id)],
+            })
+        else:
+            user = self.env['res.users'].sudo().with_context(
+                no_reset_password=True)._create_user_from_template({
+                    'name': self.name,
+                    'email': self.email,
+                    'login': self.email,
+                    'partner_id': partner.id,
+                    'company_id': self.company_id.id,
+                    'company_ids': [(6, 0, self.company_id.ids)],
+                })
+            # _create_user_from_template copies base.template_portal_user_id,
+            # which already carries base.group_portal — added explicitly here
+            # too so portal access no longer depends on group_bank_member's
+            # (now removed) implied_ids.
+            user.sudo().write({
+                'group_ids': [(4, group_bank_member.id), (4, group_portal.id)],
+            })
+
+        self.write({'partner_id': partner.id, 'user_id': user.id})
+
+        template = self.env.ref('auth_signup.portal_set_password_email',
+                                 raise_if_not_found=False)
+        if template:
+            user.partner_id.sudo().signup_prepare()
+            template.with_context(
+                lang=user.lang, medium='portalinvite'
+            ).send_mail(user.id, force_send=True)
+
+    def action_activate(self):
+        """Set the member's status to active."""
+        for record in self:
+            record.state = 'active'
+
+    def action_suspend(self):
+        """Set the member's status to suspended."""
+        for record in self:
+            record.state = 'suspended'
+
+    def action_deactivate(self):
+        """Set the member's status to inactive."""
+        for record in self:
+            record.state = 'inactive'
 
     @api.model
     def _cron_recompute_compliance(self):
