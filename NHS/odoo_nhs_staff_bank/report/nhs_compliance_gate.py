@@ -90,7 +90,14 @@ class NhsComplianceGate(models.AbstractModel):
                     member):
         """Combine role/band + skills + area + availability + compliance
         into a single eligible/ineligible result with human-readable reasons,
-        for a candidate `member` against an open `shift`."""
+        for a candidate `member` against an open `shift`.
+
+        Compliance is gated by the company's Compliance Gate policy: under
+        Hard Block a non-compliant member is ineligible outright; under Warn
+        Only they remain eligible (so they can still be offered/booked) but
+        the compliance issue is still surfaced as a warning, matching the
+        hard/soft distinction already enforced at booking time in
+        nhs.shift.booking.create()."""
         reasons = []
         if shift.band_id and member.band_id and shift.band_id != member.band_id:
             reasons.append("Band mismatch (needs %s, member is %s)." % (
@@ -109,10 +116,17 @@ class NhsComplianceGate(models.AbstractModel):
             reasons.append("Member is not active (%s)." % member.state)
         if not member._is_available_for(shift.shift_start, shift.shift_end):
             reasons.append("Not available for these dates/times.")
+        eligible = not reasons
+
         compliant, reason = self.is_member_compliant_with_reason(member, at_date=fields.Date.to_date(shift.shift_start))
         if not compliant:
-            reasons.append(reason)
-        return {'eligible': not reasons, 'reasons': reasons}
+            if self.env.company.nhs_bank_gate_policy == 'hard':
+                reasons.append(reason)
+                eligible = False
+            else:
+                reasons.append(("Warning (Gate Policy is Warn Only — offer/booking still"
+                                 " allowed): %s") % reason)
+        return {'eligible': eligible, 'reasons': reasons}
 
     def reason(self, member, at_date=None):
         """Human-readable reason `member` is currently ineligible/non-compliant

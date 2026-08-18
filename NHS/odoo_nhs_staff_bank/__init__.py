@@ -19,8 +19,6 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-"""Imports the models, wizards, controllers, and reports of the NHS Staff
-Bank module."""
 from . import models
 from . import wizards
 from . import controllers

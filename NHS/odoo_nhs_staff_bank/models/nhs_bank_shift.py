@@ -188,6 +188,12 @@ class NhsBankShift(models.Model):
         store=True,
         help="Confirmed (non-cancelled) bookings vs headcount."
     )
+    booking_count = fields.Integer(
+        string='Booking Count',
+        compute='_compute_booking_count',
+        help="All bookings made for this shift, regardless of status —"
+             " unlike Filled, which only counts confirmed (booked/worked) ones."
+    )
     currency_id = fields.Many2one(
         'res.currency',
         related='company_id.currency_id',
@@ -275,6 +281,11 @@ class NhsBankShift(models.Model):
         """Count of offers made for this shift."""
         for shift in self:
             shift.offer_count = len(shift.offer_ids)
+
+    def _compute_booking_count(self):
+        """Count of all bookings made for this shift, regardless of status."""
+        for shift in self:
+            shift.booking_count = len(shift.booking_ids)
 
     @api.depends('booking_ids.state', 'headcount')
     def _compute_filled_count(self):

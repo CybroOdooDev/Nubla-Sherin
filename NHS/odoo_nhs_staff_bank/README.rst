@@ -12,11 +12,11 @@ Configuration
 No configuration
 
 Company
--------
+=======
 * `Cybrosys Techno Solutions <https://cybrosys.com/>`__
 
 License
--------
+=======
 General Public License, Version 3 (LGPL v3).
 (http://www.gnu.org/licenses/lgpl-3.0-standalone.html)
 
@@ -27,12 +27,12 @@ Developer: (V19) Nubla Sherin K ,
 Contact: odoo@cybrosys.com
 
 Contacts
---------
+=======
 * Mail Contact : odoo@cybrosys.com
 * Website : https://cybrosys.com
 
 Bug Tracker
------------
+=======
 Bugs are tracked on GitHub Issues. In case of trouble, please check there if your issue has already been reported.
 
 Maintainer

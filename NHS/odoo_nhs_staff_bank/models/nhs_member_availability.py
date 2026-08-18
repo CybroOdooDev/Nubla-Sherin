@@ -91,7 +91,12 @@ class NhsMemberAvailability(models.Model):
 
     @api.constrains('date_from', 'date_to')
     def _check_dates(self):
-        """Reject a window whose end is not after its start."""
+        """Reject a window whose end is not after its start, or whose start
+        is already in the past — an availability/blackout window only makes
+        sense for a future (or currently-open) period."""
+        now = fields.Datetime.now()
         for record in self:
             if record.date_to <= record.date_from:
                 raise ValidationError("'To' must be after 'From'.")
+            if record.date_from < now:
+                raise ValidationError("'From' cannot be in the past.")

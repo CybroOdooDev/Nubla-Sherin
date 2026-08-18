@@ -19,6 +19,4 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-"""Report package: imports the board-report wizard and the compliance gate
-service model used to build report data."""
 from . import nhs_compliance_gate

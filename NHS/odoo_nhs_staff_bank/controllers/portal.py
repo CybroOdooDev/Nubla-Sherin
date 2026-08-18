@@ -20,11 +20,10 @@
 #
 #############################################################################
 from datetime import datetime
-
 import pytz
-
-from odoo import http
+from odoo import http, fields
 from odoo.addons.portal.controllers.portal import CustomerPortal
+from odoo.exceptions import UserError, ValidationError
 from odoo.http import request
 
 
@@ -56,6 +55,18 @@ class NhsStaffBankPortal(CustomerPortal):
         except pytz.UnknownTimeZoneError:
             local_tz = pytz.UTC
         return local_tz.localize(naive).astimezone(pytz.UTC).replace(tzinfo=None)
+
+    @staticmethod
+    def _local_now_str():
+        """Current time in the logged-in user's timezone, formatted for use
+        as the 'min' attribute of a <input type="datetime-local">, so the
+        date picker itself won't offer a past date/time."""
+        try:
+            local_tz = pytz.timezone(request.env.user.tz or 'UTC')
+        except pytz.UnknownTimeZoneError:
+            local_tz = pytz.UTC
+        now_local = pytz.UTC.localize(fields.Datetime.now()).astimezone(local_tz)
+        return now_local.strftime('%Y-%m-%dT%H:%M')
 
     def _prepare_home_portal_values(self, counters):
         """Add the bank shift counter (eligible open shifts) to the portal
@@ -173,6 +184,7 @@ class NhsStaffBankPortal(CustomerPortal):
             'member': member,
             'availability': member.availability_ids.sorted('date_from', reverse=True),
             'page_name': 'bank_availability',
+            'min_datetime': self._local_now_str(),
         }
         return request.render('odoo_nhs_staff_bank.portal_bank_availability', values)
 
@@ -180,16 +192,31 @@ class NhsStaffBankPortal(CustomerPortal):
     def portal_bank_availability_add(self, **kw):
         """`/my/bank/availability/add`: creates a new availability/blackout
         record for the member from submitted form data, then redirects back
-        to the availability page."""
+        to the availability page. On a validation error (e.g. a past date,
+        or 'To' before 'From'), re-renders the page with the error shown
+        instead of crashing or silently dropping the submission."""
         member = self._get_bank_member()
         date_from = self._parse_portal_datetime(kw.get('date_from'))
         date_to = self._parse_portal_datetime(kw.get('date_to'))
+        error = None
         if member and date_from and date_to:
-            request.env['nhs.member.availability'].sudo().create({
-                'member_id': member.id,
-                'date_from': date_from,
-                'date_to': date_to,
-                'availability_type': kw.get('availability_type') or 'available',
-                'note': kw.get('note'),
-            })
+            try:
+                request.env['nhs.member.availability'].sudo().create({
+                    'member_id': member.id,
+                    'date_from': date_from,
+                    'date_to': date_to,
+                    'availability_type': kw.get('availability_type') or 'available',
+                    'note': kw.get('note'),
+                })
+            except (ValidationError, UserError) as exc:
+                error = str(exc)
+        if error:
+            values = {
+                'member': member,
+                'availability': member.availability_ids.sorted('date_from', reverse=True),
+                'page_name': 'bank_availability',
+                'min_datetime': self._local_now_str(),
+                'error': error,
+            }
+            return request.render('odoo_nhs_staff_bank.portal_bank_availability', values)
         return request.redirect('/my/bank/availability')

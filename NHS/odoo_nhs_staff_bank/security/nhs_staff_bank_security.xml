@@ -20,9 +20,7 @@
              "Role" selection widget as internal-user access levels, and an
              implied portal group would conflict with base.group_user the
              moment an internal user's access level is set to Bank Member
-             (Portal/User/Public are mutually exclusive). Portal access is
-             granted explicitly by action_create_portal_user() when a real
-             portal account is created for the member. -->
+             (Portal/User/Public are mutually exclusive)-->
         <record id="group_nhs_bank_member" model="res.groups">
             <field name="name">Bank Member</field>
             <field name="privilege_id" ref="privilege_staff_bank_access_level"/>
@@ -105,6 +103,17 @@
             <field name="domain_force">[('user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_bank_member'))]"/>
         </record>
+        <!-- Record Rule: a bank member can read their own partner record (prevents 403 in portal layout if base.group_portal is missing) -->
+        <record id="rule_nhs_bank_member_partner" model="ir.rule">
+            <field name="name">res.partner: bank member reads own partner</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="domain_force">[('id', 'child_of', user.commercial_partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_bank_member'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
         <!-- Record Rule: a bank member sees only their own availability entries -->
         <record id="rule_nhs_member_availability_self" model="ir.rule">
             <field name="name">nhs.member.availability: own record only (bank member)</field>
@@ -136,8 +145,7 @@
 
         <!-- Record Rule — ward/area-manager scoping: any internal user who manages
              an org unit (Establishment nhs.org.unit.manager_id) may raise/view shifts
-             for that unit, without needing full Bank Officer rights. Combines via OR
-             with the officer/manager company-wide rule for users who hold both. -->
+             for that unit, without needing full Bank Officer rights-->
         <record id="rule_nhs_bank_shift_area_manager" model="ir.rule">
             <field name="name">nhs.bank.shift: own area only (ward/area manager)</field>
             <field name="model_id" ref="model_nhs_bank_shift"/>

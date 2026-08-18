@@ -75,6 +75,13 @@ class ResCompany(models.Model):
         string='Coordinator Digest Recipients',
         help="Comma-separated fallback email addresses for the bank coordinator digest."
     )
+    nhs_bank_auto_create_portal_user = fields.Boolean(
+        string='Auto-Create Portal User on Member Creation',
+        help="When a new bank member is created with an email address set (and no"
+             " portal user already linked), automatically create their portal"
+             " account and send the invitation — instead of an admin having to"
+             " click 'Create Portal User' on every member by hand."
+    )
 
 
 class ResConfigSettings(models.TransientModel):
@@ -93,3 +100,5 @@ class ResConfigSettings(models.TransientModel):
         related='company_id.nhs_bank_agency_comparator_pct', readonly=False)
     nhs_bank_digest_recipients = fields.Char(
         related='company_id.nhs_bank_digest_recipients', readonly=False)
+    nhs_bank_auto_create_portal_user = fields.Boolean(
+        related='company_id.nhs_bank_auto_create_portal_user', readonly=False)

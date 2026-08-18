@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import  api, fields, models, _
+from odoo import  api, fields, models
 from odoo.exceptions import UserError
 
 MEMBER_TYPES = [
@@ -28,7 +28,7 @@ MEMBER_TYPES = [
 ]
 
 STATES = [
-    ('pending', 'Pending'),
+    ('draft', 'Draft'),
     ('active', 'Active'),
     ('inactive', 'Inactive'),
     ('suspended', 'Suspended'),
@@ -99,6 +99,13 @@ class NhsBankMember(models.Model):
         help="Linked user for portal self-service (accept shifts, set availability,"
              " see own pay)."
     )
+    company_auto_create_portal_user = fields.Boolean(
+        related='company_id.nhs_bank_auto_create_portal_user',
+        string='Auto-Create Portal User (Company Setting)',
+        help="Technical: mirrors the company setting so the Portal User field can"
+             " hide itself on brand-new members when the automation will fill it"
+             " in on save anyway."
+    )
     partner_id = fields.Many2one(
         'res.partner',
         string='Contact',
@@ -106,7 +113,9 @@ class NhsBankMember(models.Model):
     )
     email = fields.Char(
         string='Email',
-        help="Email address used for offer/booking notifications."
+        required=True,
+        help="Email address used for offer/booking notifications, and required"
+             " for portal-user creation (manual or automatic)."
     )
     phone = fields.Char(
         string='Phone',
@@ -175,9 +184,9 @@ class NhsBankMember(models.Model):
         STATES,
         string='Status',
         required=True,
-        default='pending',
+        default='draft',
         tracking=True,
-        help="Pending / Active / Inactive / Suspended (e.g. pending re-check)."
+        help="Draft / Active / Inactive / Suspended (e.g. pending re-check)."
     )
     join_date = fields.Date(
         string='Bank Join Date',
@@ -237,6 +246,11 @@ class NhsBankMember(models.Model):
         help="Archive flag. Leavers are archived, retaining their history."
     )
 
+    _sql_constraints = [
+        ('user_id_unique', 'unique(user_id)',
+         'This user is already linked to another bank member.'),
+    ]
+
     @api.model_create_multi
     def create(self, vals_list):
         """Assign a sequence reference when not provided."""
@@ -244,7 +258,46 @@ class NhsBankMember(models.Model):
             if not vals.get('reference') or vals.get('reference') == 'New':
                 vals['reference'] = self.env['ir.sequence'].next_by_code(
                     'nhs.bank.member') or 'New'
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        records._sync_user_group()
+        records._auto_create_portal_user()
+        return records
+
+    def _auto_create_portal_user(self):
+        """When the company setting is on, automatically grant portal access
+        to newly-created members with an email set (and no portal user
+        already linked) — so a coordinator doesn't have to click "Create
+        Portal User" on every member by hand. Runs after create(), so any
+        failure (no email, address already used elsewhere, etc.) is logged
+        on the member instead of blocking the member's own creation."""
+        for member in self:
+            if not member.company_id.nhs_bank_auto_create_portal_user:
+                continue
+            if member.user_id or not member.email:
+                continue
+            try:
+                member.action_create_portal_user()
+            except UserError as error:
+                member.message_post(body=(
+                    "Automatic portal user creation skipped: %s") % error)
+
+    def write(self, vals):
+        res = super().write(vals)
+        if 'user_id' in vals:
+            self._sync_user_group()
+        return res
+
+    def _sync_user_group(self):
+        """Whenever a member ends up linked to a user — whether via "Create
+        Portal User", or by directly picking an already-existing user in the
+        Portal User field on this form — make sure that user actually
+        carries group_nhs_bank_member. Without it, the member-scoped record
+        rules (own offers/bookings/availability/shifts) silently never apply
+        to them, no matter how the link was made."""
+        group_bank_member = self.env.ref('odoo_nhs_staff_bank.group_nhs_bank_member')
+        for member in self.filtered('user_id'):
+            if group_bank_member not in member.user_id.group_ids:
+                member.user_id.sudo().write({'group_ids': [(4, group_bank_member.id)]})
 
     @api.depends('workforce_member_id', 'workforce_member_id.compliance_status',
                  'workforce_member_id.registration_ids.status',
@@ -349,19 +402,24 @@ class NhsBankMember(models.Model):
         }
 
     def action_create_portal_user(self):
-        """Create (or reuse) a Contact and a Portal User for this bank member
-        in one step, so they can log in to the self-service portal to accept
-        shifts, set availability and see their own bookings — instead of an
-        admin having to create/link both records manually.
+        """Grant this bank member portal access in one step, so they can log
+        in to the self-service portal to accept shifts, set availability and
+        see their own bookings — instead of an admin having to create/link
+        the contact and portal user manually.
 
-        An invitation email (standard "set your password" template) is sent
-        to the new portal user."""
+        Delegates the actual user creation/portal-grant to Odoo's own
+        portal.wizard (the same mechanism behind "Grant Portal Access" on a
+        Contact) rather than re-implementing it — that gets us its email
+        validation/duplicate checks, its already-portal/already-internal
+        distinction, and standard invite/revoke compatibility for free; the
+        only bank-specific step layered on top is adding the member to
+        group_nhs_bank_member."""
         self.ensure_one()
         if self.user_id:
-            raise UserError(_("%s is already linked to a portal user (%s).")
+            raise UserError(("%s is already linked to a portal user (%s).")
                              % (self.name, self.user_id.name))
         if not self.email:
-            raise UserError(_("Set an email address before creating a portal user."))
+            raise UserError(("Set an email address before creating a portal user."))
 
         partner = self.partner_id
         if not partner:
@@ -374,48 +432,28 @@ class NhsBankMember(models.Model):
                 'phone': self.phone,
                 'company_id': self.company_id.id,
             })
+        elif partner.email != self.email:
+            # The wizard drives the login off partner.email — keep it in
+            # sync with the member's own (authoritative) email so the
+            # portal login matches what offer/booking notifications use.
+            partner.write({'email': self.email})
 
-        group_bank_member = self.env.ref('odoo_nhs_staff_bank.group_nhs_bank_member')
-        group_portal = self.env.ref('base.group_portal')
-
-        user = self.env['res.users'].with_context(active_test=False).search(
-            [('login', '=', self.email)], limit=1)
-        if user:
-            if user._is_internal():
-                raise UserError(_("A user with the email %s already exists as an"
-                                   " internal user — link them manually instead.")
-                                 % self.email)
-            user.sudo().write({
-                'active': True,
-                'group_ids': [(4, group_bank_member.id), (4, group_portal.id)],
-            })
+        wizard = self.env['portal.wizard'].sudo().create({
+            'partner_ids': [(6, 0, partner.ids)],
+        })
+        wizard_user = wizard.user_ids
+        if wizard_user.is_internal:
+            raise UserError(("A user with the email %s already exists as an"
+                               " internal user — link them manually instead.")
+                             % self.email)
+        if wizard_user.is_portal:
+            wizard_user.action_invite_again()
         else:
-            user = self.env['res.users'].sudo().with_context(
-                no_reset_password=True)._create_user_from_template({
-                    'name': self.name,
-                    'email': self.email,
-                    'login': self.email,
-                    'partner_id': partner.id,
-                    'company_id': self.company_id.id,
-                    'company_ids': [(6, 0, self.company_id.ids)],
-                })
-            # _create_user_from_template copies base.template_portal_user_id,
-            # which already carries base.group_portal — added explicitly here
-            # too so portal access no longer depends on group_bank_member's
-            # (now removed) implied_ids.
-            user.sudo().write({
-                'group_ids': [(4, group_bank_member.id), (4, group_portal.id)],
-            })
+            wizard_user.action_grant_access()
 
-        self.write({'partner_id': partner.id, 'user_id': user.id})
-
-        template = self.env.ref('auth_signup.portal_set_password_email',
-                                 raise_if_not_found=False)
-        if template:
-            user.partner_id.sudo().signup_prepare()
-            template.with_context(
-                lang=user.lang, medium='portalinvite'
-            ).send_mail(user.id, force_send=True)
+        # write() below syncs group_nhs_bank_member onto the user automatically
+        # (_sync_user_group) — same as it would for a manually-picked user.
+        self.write({'partner_id': partner.id, 'user_id': wizard_user.user_id.id})
 
     def action_activate(self):
         """Set the member's status to active."""

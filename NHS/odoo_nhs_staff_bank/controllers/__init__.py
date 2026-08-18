@@ -19,5 +19,4 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-"""Controllers package: imports the staff bank's portal self-service routes."""
 from . import portal

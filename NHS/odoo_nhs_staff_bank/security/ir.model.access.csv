@@ -39,3 +39,6 @@ access_nhs_escalate_agency_wizard_officer,nhs.escalate.agency.wizard officer,mod
 access_nhs_escalate_agency_wizard_manager,nhs.escalate.agency.wizard manager,model_nhs_escalate_agency_wizard,group_nhs_bank_manager,1,1,1,1
 access_nhs_bank_report_wizard_officer,nhs.bank.report.wizard officer,model_nhs_bank_report_wizard,group_nhs_bank_officer,1,1,1,1
 access_nhs_bank_report_wizard_manager,nhs.bank.report.wizard manager,model_nhs_bank_report_wizard,group_nhs_bank_manager,1,1,1,1
+access_res_partner_bank_member,res.partner bank member,base.model_res_partner,group_nhs_bank_member,1,0,0,0
+access_res_users_bank_member,res.users bank member,base.model_res_users,group_nhs_bank_member,1,0,0,0
+access_res_company_bank_member,res.company bank member,base.model_res_company,group_nhs_bank_member,1,0,0,0

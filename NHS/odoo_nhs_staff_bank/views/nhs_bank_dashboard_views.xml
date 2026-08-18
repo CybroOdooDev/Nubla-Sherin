@@ -26,16 +26,20 @@
                 <field name="org_unit_id" type="row"/>
                 <field name="state" type="col"/>
                 <field name="estimated_cost" type="measure"/>
+                <field name="agency_cost" type="measure"/>
             </pivot>
         </field>
     </record>
 
-    <!-- Action: opens Bank vs Agency Analytics in pivot/graph/list, grouped by state by default -->
+    <!-- Action: opens Bank vs Agency Analytics in pivot/graph/list. No default
+         search group-by here — the pivot view already sets its own deliberate
+         Org Unit (row) x Status (col) layout, and a search_default group-by
+         on the same 'state' field would override that row axis, collapsing
+         the pivot into a confusing Status-vs-Status cross-tab. -->
     <record id="action_nhs_bank_shift_analytics" model="ir.actions.act_window">
         <field name="name">Bank vs Agency Analytics</field>
         <field name="res_model">nhs.bank.shift</field>
         <field name="view_mode">pivot,graph,list</field>
-        <field name="context">{'search_default_group_state': 1}</field>
     </record>
 
     <!-- Pivot: member utilisation — bookings by member x state, payable amount measure -->

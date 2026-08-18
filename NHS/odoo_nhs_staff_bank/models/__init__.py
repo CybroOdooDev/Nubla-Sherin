@@ -19,7 +19,6 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-"""Import all model modules of the NHS Staff Bank module."""
 from . import res_config_settings
 from . import nhs_skill
 from . import nhs_shift_type

@@ -38,6 +38,12 @@
                             <field name="nhs_bank_digest_recipients" placeholder="Comma-separated email addresses"/>
                         </setting>
                     </block>
+                    <block title="Portal Access">
+                        <setting string="Auto-Create Portal User on Member Creation"
+                                 help="When a new bank member is created with an email set, automatically create and invite their portal account — no need to click 'Create Portal User' by hand.">
+                            <field name="nhs_bank_auto_create_portal_user"/>
+                        </setting>
+                    </block>
                 </app>
             </xpath>
         </field>

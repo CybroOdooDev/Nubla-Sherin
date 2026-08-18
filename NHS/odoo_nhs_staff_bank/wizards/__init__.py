@@ -19,8 +19,6 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-"""Imports the transient wizard models: offer, bulk-create, and agency
-escalation wizards for the NHS Staff Bank."""
 from . import nhs_offer_shift_wizard
 from . import nhs_bulk_shift_wizard
 from . import nhs_escalate_agency_wizard

@@ -202,11 +202,11 @@
                                     <t t-foreach="state.data.compliance_list" t-as="m" t-key="m.id">
                                         <li class="list-group-item px-3 py-2 d-flex justify-content-between align-items-center cursor-pointer"
                                             t-on-click="() => this.openRecord('nhs.bank.member', m.id)">
-                                            <div>
-                                                <div class="small fw-semibold text-dark" t-esc="m.name"/>
+                                            <div class="me-2" style="min-width: 0;">
+                                                <div class="small fw-semibold text-dark text-truncate" t-esc="m.name"/>
                                                 <div class="small text-muted opacity-75" t-esc="m.reason"/>
                                             </div>
-                                            <span class="badge text-bg-danger">At Risk</span>
+                                            <span class="badge text-bg-danger flex-shrink-0">At Risk</span>
                                         </li>
                                     </t>
                                 </ul>
@@ -225,8 +225,8 @@
                                     <t t-foreach="state.data.utilisation_top" t-as="u" t-key="u.id">
                                         <li class="list-group-item px-3 py-2 d-flex justify-content-between align-items-center cursor-pointer"
                                             t-on-click="() => this.openRecord('nhs.bank.member', u.id)">
-                                            <span class="small fw-semibold text-dark" t-esc="u.name"/>
-                                            <span class="badge bg-nhs-blue" t-esc="u.shifts + ' shifts'"/>
+                                            <span class="small fw-semibold text-dark text-truncate me-2" t-esc="u.name"/>
+                                            <span class="badge bg-nhs-blue flex-shrink-0" t-esc="u.shifts + ' shifts'"/>
                                         </li>
                                     </t>
                                 </ul>

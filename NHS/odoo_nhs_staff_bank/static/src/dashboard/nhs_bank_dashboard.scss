@@ -66,4 +66,16 @@
     .cursor-pointer {
         cursor: pointer;
     }
+
+    // Odoo's base .badge rule clips long text with an ellipsis (max-width +
+    // text-overflow), which cuts off "At Risk" etc. in the list-group rows
+    // below — those badges are short, fixed labels, not a candidate for
+    // truncation, so restore full width/wrapping here.
+    .list-group-item .badge {
+        max-width: none;
+        overflow: visible;
+        text-overflow: unset;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
 }
