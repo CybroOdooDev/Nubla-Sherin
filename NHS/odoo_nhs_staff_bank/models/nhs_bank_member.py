@@ -344,6 +344,17 @@ class NhsBankMember(models.Model):
             and a.date_from <= shift_start and a.date_to >= shift_end)
         return bool(available)
 
+    def get_eligible_shifts(self):
+        """All open/partially-filled shifts this member is eligible for
+        (role/band + skills + area + available + compliant) — the mirror,
+        in the other direction, of nhs.bank.shift.get_eligible_members().
+        Used e.g. to restrict the Shift field when manually creating an
+        Offer for this member."""
+        self.ensure_one()
+        gate = self.env['nhs.compliance.gate']
+        shifts = self.env['nhs.bank.shift'].search([('state', 'in', ('open', 'partially_filled'))])
+        return shifts.filtered(lambda shift: gate.eligibility(shift, self)['eligible'])
+
     def get_booked_hours(self, date_from, date_to):
         """Sum of booked/worked hours for this member within [date_from, date_to]."""
         self.ensure_one()
@@ -388,6 +399,7 @@ class NhsBankMember(models.Model):
             'res_model': 'nhs.shift.offer',
             'view_mode': 'list,form',
             'domain': [('member_id', '=', self.id)],
+            'context': {'default_member_id': self.id},
         }
 
     def action_view_bookings(self):
@@ -399,6 +411,7 @@ class NhsBankMember(models.Model):
             'res_model': 'nhs.shift.booking',
             'view_mode': 'list,form',
             'domain': [('member_id', '=', self.id)],
+            'context': {'default_member_id': self.id},
         }
 
     def action_create_portal_user(self):

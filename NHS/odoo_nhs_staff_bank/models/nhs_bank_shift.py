@@ -155,11 +155,6 @@ class NhsBankShift(models.Model):
         default='manual',
         help="Created manually, or pushed in from the Rostering module (capstone)."
     )
-    offer_cutoff = fields.Datetime(
-        string='Offer Cutoff',
-        help="Deadline by which the shift must be filled by the bank before it is"
-             " considered for agency escalation."
-    )
     time_range = fields.Char(
         string='Time',
         compute='_compute_time_range',

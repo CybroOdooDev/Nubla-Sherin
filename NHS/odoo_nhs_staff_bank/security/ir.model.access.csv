@@ -4,6 +4,8 @@ access_nhs_afc_band_bank_officer,nhs.afc.band bank officer,odoo_nhs_establishmen
 access_nhs_staff_group_bank_officer,nhs.staff.group bank officer,odoo_nhs_establishment.model_nhs_staff_group,group_nhs_bank_officer,1,0,0,0
 access_nhs_org_unit_bank_officer,nhs.org.unit bank officer,odoo_nhs_establishment.model_nhs_org_unit,group_nhs_bank_officer,1,0,0,0
 access_nhs_org_unit_bank_user,nhs.org.unit bank internal user,odoo_nhs_establishment.model_nhs_org_unit,base.group_user,1,0,0,0
+access_nhs_workforce_member_bank_officer,nhs.workforce.member bank officer,odoo_nhs_training.model_nhs_workforce_member,group_nhs_bank_officer,1,0,0,0
+access_nhs_weekday_officer,nhs.weekday officer,model_nhs_weekday,group_nhs_bank_officer,1,0,0,0
 access_nhs_skill_officer,nhs.skill officer,model_nhs_skill,group_nhs_bank_officer,1,1,1,0
 access_nhs_skill_manager,nhs.skill manager,model_nhs_skill,group_nhs_bank_manager,1,1,1,1
 access_nhs_skill_member,nhs.skill member,model_nhs_skill,group_nhs_bank_member,1,0,0,0

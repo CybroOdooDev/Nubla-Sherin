@@ -20,7 +20,7 @@
 #
 #############################################################################
 from odoo import api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class NhsShiftOffer(models.Model):
@@ -40,7 +40,10 @@ class NhsShiftOffer(models.Model):
         required=True,
         ondelete='cascade',
         index=True,
-        help="The shift offered."
+        domain="[('state', 'in', ('open', 'partially_filled'))]",
+        help="The shift offered. Only open/partially-filled shifts can be offered —"
+             " a draft shift hasn't been opened to the bank yet, and a filled one"
+             " no longer needs offers."
     )
     member_id = fields.Many2one(
         'nhs.bank.member',
@@ -93,10 +96,35 @@ class NhsShiftOffer(models.Model):
         default=True,
     )
 
+    @api.onchange('member_id')
+    def _onchange_member_id(self):
+        """Restrict the Shift field to shifts this member is actually
+        eligible for (role/band + skills + area + available + compliant),
+        mirroring the eligibility check the offer wizard already applies
+        in the other direction."""
+        if self.member_id:
+            eligible_shifts = self.member_id.get_eligible_shifts()
+            if self.shift_id and self.shift_id not in eligible_shifts:
+                self.shift_id = False
+            return {'domain': {'shift_id': [('id', 'in', eligible_shifts.ids)]}}
+        return {'domain': {'shift_id': []}}
+
     @api.model_create_multi
     def create(self, vals_list):
-        """Snapshot eligibility at creation, as the offer-time audit record."""
+        """Snapshot eligibility at creation, as the offer-time audit record.
+        Also guards that an offer can only be made against a shift that's
+        actually open for offers — the domain on shift_id is only a UI hint
+        and can be bypassed (direct write, import, API), so it's enforced
+        here too."""
         gate = self.env['nhs.compliance.gate']
+        shift_ids = {vals['shift_id'] for vals in vals_list if vals.get('shift_id')}
+        shifts = self.env['nhs.bank.shift'].browse(shift_ids)
+        for shift in shifts:
+            if shift.state not in ('open', 'partially_filled'):
+                raise ValidationError(
+                    "An offer can only be made for an open or partially-filled shift. "
+                    "'%s' is currently '%s'." % (shift.display_name, shift.state)
+                )
         for vals in vals_list:
             if 'eligible' not in vals and vals.get('shift_id') and vals.get('member_id'):
                 shift = self.env['nhs.bank.shift'].browse(vals['shift_id'])

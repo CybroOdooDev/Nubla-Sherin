@@ -83,8 +83,18 @@ class NhsComplianceGate(models.AbstractModel):
 
     def _resolve_workforce_member(self, member):
         """Resolve the linked odoo_nhs_training workforce member, if the
-        bank member is linked to one."""
-        return member.workforce_member_id or False
+        bank member is linked to one.
+
+        Sudoed: nhs.workforce.member is deliberately data-minimised and its
+        ACL only grants read to Training-module groups (+ portal), so a
+        Bank Officer/Manager (or the compute/booking/offer code running as
+        them) has no direct access to it. The compliance gate is the one
+        place that's meant to know about odoo_nhs_training at all, so it's
+        also the one place that should cross that access boundary — every
+        caller (action_offer, compliance compute, booking/offer creation)
+        just needs a compliant/non-compliant answer, not read access to the
+        underlying training record."""
+        return member.sudo().workforce_member_id or False
 
     def eligibility(self, shift,
                     member):

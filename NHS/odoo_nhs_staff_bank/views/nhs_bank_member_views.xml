@@ -110,13 +110,16 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_view_availability" type="object" class="oe_stat_button" icon="fa-calendar">
+                        <button name="action_view_availability" type="object" class="oe_stat_button" icon="fa-calendar"
+                                invisible="state == 'draft'">
                             <field name="availability_count" widget="statinfo" string="Availability"/>
                         </button>
-                        <button name="action_view_offers" type="object" class="oe_stat_button" icon="fa-paper-plane">
+                        <button name="action_view_offers" type="object" class="oe_stat_button" icon="fa-paper-plane"
+                                invisible="state == 'draft'">
                             <field name="offer_count" widget="statinfo" string="Offers"/>
                         </button>
-                        <button name="action_view_bookings" type="object" class="oe_stat_button" icon="fa-check-square-o">
+                        <button name="action_view_bookings" type="object" class="oe_stat_button" icon="fa-check-square-o"
+                                invisible="state == 'draft'">
                             <field name="booking_count" widget="statinfo" string="Bookings"/>
                         </button>
                     </div>
@@ -132,7 +135,8 @@
                         <group string="Type &amp; Link">
                             <field name="member_type"/>
                             <field name="post_id" invisible="member_type != 'substantive_bank'"/>
-                            <field name="workforce_member_id"/>
+                            <field name="workforce_member_id"
+                                   domain="[('post_id', '=', post_id)] if member_type == 'substantive_bank' and post_id else []"/>
                             <field name="company_auto_create_portal_user" invisible="1"/>
                             <field name="user_id" invisible="not id and company_auto_create_portal_user"/>
                             <field name="partner_id" invisible="1"/>

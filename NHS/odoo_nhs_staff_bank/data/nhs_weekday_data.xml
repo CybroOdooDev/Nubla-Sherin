@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- The 7 fixed weekdays — index matches Python's date.weekday(). -->
+    <record id="nhs_weekday_monday" model="nhs.weekday">
+        <field name="name">Monday</field>
+        <field name="index">0</field>
+    </record>
+    <record id="nhs_weekday_tuesday" model="nhs.weekday">
+        <field name="name">Tuesday</field>
+        <field name="index">1</field>
+    </record>
+    <record id="nhs_weekday_wednesday" model="nhs.weekday">
+        <field name="name">Wednesday</field>
+        <field name="index">2</field>
+    </record>
+    <record id="nhs_weekday_thursday" model="nhs.weekday">
+        <field name="name">Thursday</field>
+        <field name="index">3</field>
+    </record>
+    <record id="nhs_weekday_friday" model="nhs.weekday">
+        <field name="name">Friday</field>
+        <field name="index">4</field>
+    </record>
+    <record id="nhs_weekday_saturday" model="nhs.weekday">
+        <field name="name">Saturday</field>
+        <field name="index">5</field>
+    </record>
+    <record id="nhs_weekday_sunday" model="nhs.weekday">
+        <field name="name">Sunday</field>
+        <field name="index">6</field>
+    </record>
+</odoo>

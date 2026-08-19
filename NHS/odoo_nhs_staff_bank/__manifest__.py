@@ -50,6 +50,7 @@ its compliance gate, degrading gracefully when that module is absent.
         'data/nhs_bank_sequence_data.xml',
         'data/nhs_shift_type_data.xml',
         'data/nhs_skill_data.xml',
+        'data/nhs_weekday_data.xml',
         'data/mail_template_data.xml',
         'data/ir_cron_data.xml',
         'wizards/nhs_offer_shift_wizard_views.xml',

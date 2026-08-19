@@ -139,7 +139,6 @@
                             <field name="shift_start"/>
                             <field name="shift_end"/>
                             <field name="shift_type_id"/>
-                            <field name="offer_cutoff"/>
                         </group>
                         <group string="Cover Requirements">
                             <field name="band_id"/>

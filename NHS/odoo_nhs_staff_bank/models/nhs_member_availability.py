@@ -89,6 +89,24 @@ class NhsMemberAvailability(models.Model):
         default=True,
     )
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Only an active bank member can have availability declared —
+        a member still in Draft (or Suspended/Inactive) isn't confirmed
+        yet, so availability windows for them wouldn't mean anything.
+        This also gates the portal self-service form, which creates
+        these records via sudo()."""
+        member_ids = {vals['member_id'] for vals in vals_list if vals.get('member_id')}
+        members = self.env['nhs.bank.member'].browse(member_ids)
+        state_labels = dict(members._fields['state'].selection)
+        for member in members:
+            if member.state != 'active':
+                raise ValidationError(
+                    "Availability can only be added for an active bank member. "
+                    "'%s' is currently '%s'." % (member.name, state_labels.get(member.state, member.state))
+                )
+        return super().create(vals_list)
+
     @api.constrains('date_from', 'date_to')
     def _check_dates(self):
         """Reject a window whose end is not after its start, or whose start
