@@ -8,7 +8,7 @@
             <list string="Rate Cards">
                 <field name="name"/>
                 <field name="band_id"/>
-                <field name="role"/>
+                <field name="role_id"/>
                 <field name="shift_type_id"/>
                 <field name="hourly_rate"/>
                 <field name="enhancement_pct"/>
@@ -26,20 +26,24 @@
         <field name="arch" type="xml">
             <form string="Rate Card">
                 <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="e.g. Band 5 Weekend Rate"/>
+                        </h1>
+                    </div>
                     <group>
-                        <group>
-                            <field name="name"/>
+                        <group string="Configuration">
                             <field name="band_id"/>
-                            <field name="role"/>
+                            <field name="role_id"/>
                             <field name="shift_type_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
                         </group>
-                        <group>
+                        <group string="Pricing &amp; Validity">
                             <field name="currency_id" invisible="1"/>
                             <field name="hourly_rate"/>
                             <field name="enhancement_pct"/>
                             <field name="effective_from"/>
                             <field name="effective_to"/>
-                            <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                     </group>
                 </sheet>

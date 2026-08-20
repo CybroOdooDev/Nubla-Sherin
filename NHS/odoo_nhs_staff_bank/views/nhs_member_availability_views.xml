@@ -27,13 +27,13 @@
             <form string="Availability">
                 <sheet>
                     <group>
-                        <group>
+                        <group string="Details">
                             <field name="member_id"/>
-                            <field name="availability_type"/>
+                            <field name="availability_type" widget="radio" options="{'horizontal': true}"/>
                             <field name="date_from"/>
                             <field name="date_to"/>
                         </group>
-                        <group>
+                        <group string="Recurrence &amp; Notes">
                             <field name="recurring"/>
                             <field name="weekday" invisible="not recurring"/>
                             <field name="recurrence_end_date" invisible="not recurring"/>

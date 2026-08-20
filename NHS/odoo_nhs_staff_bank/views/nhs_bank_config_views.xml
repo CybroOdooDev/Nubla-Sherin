@@ -34,8 +34,10 @@
                         </setting>
                     </block>
                     <block title="Notifications">
-                        <setting string="Coordinator Digest Recipients">
-                            <field name="nhs_bank_digest_recipients" placeholder="Comma-separated email addresses"/>
+                        <setting string="Coordinator Digest Recipients"
+                                 help="Only Bank Officers/Managers can be picked. Whoever is selected here gets the daily digest of open/unfilled shifts.">
+                            <field name="nhs_bank_digest_recipient_ids" widget="many2many_tags"
+                                   placeholder="Pick Bank Officers/Managers to notify"/>
                         </setting>
                     </block>
                     <block title="Portal Access">

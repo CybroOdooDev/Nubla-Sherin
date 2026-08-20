@@ -20,6 +20,7 @@
 #
 #############################################################################
 from datetime import timedelta
+from markupsafe import Markup
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
@@ -50,7 +51,11 @@ class NhsOfferShiftWizard(models.TransientModel):
         shift_id = res.get('shift_id') or self.env.context.get('default_shift_id')
         if shift_id:
             shift = self.env['nhs.bank.shift'].browse(shift_id)
-            already_offered = shift.offer_ids.filtered(lambda o: o.response == 'pending').member_id
+            # Pending: still awaiting a response, don't re-offer. Accepted: already
+            # booked (or booking in progress), never re-offer. Declined/expired/
+            # withdrawn are legitimate to retry, so they're left offerable again.
+            already_offered = shift.offer_ids.filtered(
+                lambda o: o.response in ('pending', 'accepted')).member_id
             lines = []
             for outcome in shift.get_eligible_members():
                 member = outcome['member']
@@ -88,10 +93,25 @@ class NhsOfferShiftWizard(models.TransientModel):
                 'expiry_datetime': expiry,
             })
         template = self.env.ref('odoo_nhs_staff_bank.mail_template_shift_offer', raise_if_not_found=False)
-        if template:
-            for offer in offers:
-                if offer.member_id.email:
-                    template.send_mail(offer.id, force_send=True)
+        no_email = self.env['nhs.bank.member']
+        for offer in offers:
+            if template and offer.member_id.email:
+                mail_id = template.send_mail(offer.id, force_send=True)
+                mail = self.env['mail.mail'].sudo().browse(mail_id)
+                self.shift_id.message_post(
+                    subject=mail.subject,
+                    body=Markup(mail.body_html) if mail.body_html else (
+                        "Shift offer emailed to %s." % offer.member_id.name),
+                    subtype_xmlid='mail.mt_note',
+                )
+            else:
+                no_email |= offer.member_id
+        if no_email:
+            self.shift_id.message_post(
+                body="Shift offer created but not emailed (no email on file) for: %s" % (
+                    ', '.join(no_email.mapped('name'))),
+                subtype_xmlid='mail.mt_note',
+            )
         return {'type': 'ir.actions.act_window_close'}
 
 

@@ -88,6 +88,15 @@ class NhsBankShift(models.Model):
         tracking=True,
         help="Area/ward needing cover (Establishment org unit)."
     )
+    manager_id = fields.Many2one(
+        'res.users',
+        string='Area Manager',
+        related='org_unit_id.manager_id',
+        readonly=True,
+        help="Manager/lead of the requesting area, from its Establishment"
+             " record. This is who gets emailed when the shift is filled —"
+             " if blank, set a Manager / Lead on that Area/Ward record."
+    )
     shift_start = fields.Datetime(
         string='Start',
         required=True,
@@ -103,17 +112,20 @@ class NhsBankShift(models.Model):
     shift_type_id = fields.Many2one(
         'nhs.shift.type',
         string='Shift Type',
+        required=True,
         help="Day / night / weekend / bank holiday — drives the rate applied."
     )
     band_id = fields.Many2one(
         'nhs.afc.band',
         string='Band',
+        required=True,
         help="Required Agenda for Change band."
     )
-    role = fields.Char(
+    role_id = fields.Many2one(
+        comodel_name='nhs.staff.group',
         string='Role',
-        help="Required role, e.g. 'Registered Nurse', 'HCA' (free text; matched"
-             " loosely against a member's roles when computing eligibility)."
+        required=True,
+        help="Required role/staff group."
     )
     skill_ids = fields.Many2many(
         'nhs.skill',
@@ -138,6 +150,12 @@ class NhsBankShift(models.Model):
         default='planned',
         tracking=True,
         help="Last-minute vs planned."
+    )
+    urgency_label = fields.Char(
+        string='Urgency Label',
+        compute='_compute_urgency_label',
+        help="Human-readable urgency, for use in plain-text/QWeb contexts"
+             " (e.g. mail templates) where the raw selection key isn't shown."
     )
     state = fields.Selection(
         STATES,
@@ -182,6 +200,13 @@ class NhsBankShift(models.Model):
         compute='_compute_filled_count',
         store=True,
         help="Confirmed (non-cancelled) bookings vs headcount."
+    )
+    filled_member_names = fields.Char(
+        string='Filled By',
+        compute='_compute_filled_member_names',
+        help="Names of all members currently booked (booked/worked) onto this"
+             " shift, comma-separated — for headcount > 1, every member, not"
+             " just one."
     )
     booking_count = fields.Integer(
         string='Booking Count',
@@ -251,14 +276,14 @@ class NhsBankShift(models.Model):
         default=True,
     )
 
-    @api.depends('org_unit_id', 'shift_type_id', 'shift_start', 'role')
+    @api.depends('org_unit_id', 'shift_type_id', 'shift_start', 'role_id')
     def _compute_name(self):
         """Build the display name from area, shift type/role and date."""
         for shift in self:
             date_part = fields.Datetime.context_timestamp(
                 shift, shift.shift_start).strftime('%d %b') if shift.shift_start else ''
             middle = ' — '.join(filter(None, [
-                shift.shift_type_id.name, shift.role or shift.band_id.name]))
+                shift.shift_type_id.name, shift.role_id.name or shift.band_id.name]))
             shift.name = ' — '.join(filter(None, [shift.org_unit_id.name, middle, date_part]))
 
     @api.depends('shift_start', 'shift_end')
@@ -296,7 +321,21 @@ class NhsBankShift(models.Model):
                 else:
                     shift.state = 'filled'
 
-    @api.depends('band_id', 'role', 'shift_type_id', 'shift_start', 'shift_end',
+    @api.depends('booking_ids.state', 'booking_ids.member_id')
+    def _compute_filled_member_names(self):
+        """All confirmed (booked/worked) members' names, for notifications
+        that need to list everyone covering a multi-headcount shift."""
+        for shift in self:
+            confirmed = shift.booking_ids.filtered(lambda b: b.state in ('booked', 'worked'))
+            shift.filled_member_names = ', '.join(confirmed.mapped('member_id.name')) or ''
+
+    @api.depends('urgency')
+    def _compute_urgency_label(self):
+        urgency_labels = dict(URGENCY)
+        for shift in self:
+            shift.urgency_label = urgency_labels.get(shift.urgency) or ''
+
+    @api.depends('band_id', 'role_id', 'shift_type_id', 'shift_start', 'shift_end',
                  'headcount', 'company_id')
     def _compute_estimated_cost(self):
         """Indicative bank cost = headcount x hours x best-matching rate."""
@@ -308,7 +347,7 @@ class NhsBankShift(models.Model):
                 continue
             hours = (shift.shift_end - shift.shift_start).total_seconds() / 3600.0
             rate = Rate._find_rate(
-                band_id=shift.band_id.id, role=shift.role,
+                band_id=shift.band_id.id, role_id=shift.role_id.id,
                 shift_type_id=shift.shift_type_id.id,
                 date=fields.Date.to_date(shift.shift_start),
                 company_id=shift.company_id.id,
@@ -460,28 +499,26 @@ class NhsBankShift(models.Model):
 
     @api.model
     def _cron_send_coordinator_digest(self):
-        """Scheduled action: daily digest of open/urgent shifts to the bank
-        coordinator recipients configured in Settings."""
-        recipients = self.env.company.nhs_bank_digest_recipients
+        """Scheduled action: daily digest of open/urgent shifts and any
+        currently non-compliant members, rendered from the digest mail
+        template and sent individually to each Bank Officer/Manager picked
+        in Settings — no one else, and no one missed by collapsing them into
+        one shared 'To' line."""
+        recipients = self.env.company.nhs_bank_digest_recipient_ids.filtered('email')
         if not recipients:
             return
-        open_shifts = self.search([('state', 'in', ('open', 'partially_filled'))])
-        if not open_shifts:
+        company = self.env.company
+        if not company.nhs_bank_digest_shift_ids and not company.nhs_bank_digest_noncompliant_member_ids:
             return
-        urgent = open_shifts.filtered(lambda s: s.urgency in ('urgent', 'last_minute'))
-        lines = ''.join(
-            '<li>%s (%s)</li>' % (s.name, dict(URGENCY).get(s.urgency))
-            for s in open_shifts[:30]
-        )
-        body = (
-            "<p>Staff Bank daily digest: %(open)d open shift(s), %(urgent)d urgent/last-minute.</p>"
-            "<ul>%(lines)s</ul>"
-        ) % {'open': len(open_shifts), 'urgent': len(urgent), 'lines': lines}
-        self.env['mail.mail'].sudo().create({
-            'subject': 'Staff Bank Daily Digest — %d open shift(s)' % len(open_shifts),
-            'body_html': body,
-            'email_to': recipients,
-        }).send()
+        template = self.env.ref(
+            'odoo_nhs_staff_bank.mail_template_coordinator_digest', raise_if_not_found=False)
+        if not template:
+            return
+        for user in recipients:
+            template.send_mail(
+                company.id, force_send=True,
+                email_values={'email_to': user.email, 'recipient_ids': []},
+            )
 
     @api.model
     def _cron_expire_stale_shifts(self):

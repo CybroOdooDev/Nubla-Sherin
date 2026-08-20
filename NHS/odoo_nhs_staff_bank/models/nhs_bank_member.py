@@ -251,6 +251,14 @@ class NhsBankMember(models.Model):
          'This user is already linked to another bank member.'),
     ]
 
+    @api.onchange('workforce_member_id')
+    def _onchange_workforce_member_id_sync_department(self):
+        """Automatically add the primary department of the workforce member to the cleared areas."""
+        if self.workforce_member_id and getattr(self.workforce_member_id, 'org_unit_id', False):
+            # Check if it's not already in there to avoid duplication
+            if self.workforce_member_id.org_unit_id.id not in self.area_ids.ids:
+                self.area_ids = [(4, self.workforce_member_id.org_unit_id.id)]
+
     @api.model_create_multi
     def create(self, vals_list):
         """Assign a sequence reference when not provided."""
@@ -267,9 +275,7 @@ class NhsBankMember(models.Model):
         """When the company setting is on, automatically grant portal access
         to newly-created members with an email set (and no portal user
         already linked) — so a coordinator doesn't have to click "Create
-        Portal User" on every member by hand. Runs after create(), so any
-        failure (no email, address already used elsewhere, etc.) is logged
-        on the member instead of blocking the member's own creation."""
+        Portal User" on every member by hand."""
         for member in self:
             if not member.company_id.nhs_bank_auto_create_portal_user:
                 continue
@@ -293,11 +299,24 @@ class NhsBankMember(models.Model):
         Portal User field on this form — make sure that user actually
         carries group_nhs_bank_member. Without it, the member-scoped record
         rules (own offers/bookings/availability/shifts) silently never apply
-        to them, no matter how the link was made."""
+        to them, no matter how the link was made.
+
+        Skipped for a user who already holds group_nhs_bank_officer (which
+        group_nhs_bank_manager implies): they already have the broader
+        Officer/Manager access level, and adding the narrower Bank Member
+        group on top would also saddle them with its member-only record
+        rules (e.g. res.partner restricted to just their own partner tree),
+        silently breaking unrelated things like Discuss for a coordinator or
+        admin who happens to be linked as a bank member's user for
+        testing/reference purposes."""
         group_bank_member = self.env.ref('odoo_nhs_staff_bank.group_nhs_bank_member')
+        group_bank_officer = self.env.ref('odoo_nhs_staff_bank.group_nhs_bank_officer')
         for member in self.filtered('user_id'):
-            if group_bank_member not in member.user_id.group_ids:
-                member.user_id.sudo().write({'group_ids': [(4, group_bank_member.id)]})
+            user = member.user_id
+            if group_bank_officer in user.group_ids:
+                continue
+            if group_bank_member not in user.group_ids:
+                user.sudo().write({'group_ids': [(4, group_bank_member.id)]})
 
     @api.depends('workforce_member_id', 'workforce_member_id.compliance_status',
                  'workforce_member_id.registration_ids.status',
@@ -334,14 +353,48 @@ class NhsBankMember(models.Model):
         """True if this member has declared availability spanning the whole
         of [shift_start, shift_end] and no overlapping blackout."""
         self.ensure_one()
-        blackout = self.availability_ids.filtered(
-            lambda a: a.availability_type == 'unavailable'
-            and a.date_from < shift_end and a.date_to > shift_start)
+        from datetime import datetime, timedelta
+
+        def _overlaps(a):
+            if not a.recurring:
+                return a.date_from < shift_end and a.date_to > shift_start
+            if shift_start.date() < a.date_from.date():
+                return False
+            if a.recurrence_end_date and shift_start.date() > a.recurrence_end_date:
+                return False
+            if a.weekday and str(shift_start.weekday()) != a.weekday:
+                return False
+            time_from = a.date_from.time()
+            time_to = a.date_to.time()
+            window_start = datetime.combine(shift_start.date(), time_from)
+            window_end_date = shift_start.date()
+            if time_to <= time_from:
+                window_end_date += timedelta(days=1)
+            window_end = datetime.combine(window_end_date, time_to)
+            return window_start < shift_end and window_end > shift_start
+
+        def _covers(a):
+            if not a.recurring:
+                return a.date_from <= shift_start and a.date_to >= shift_end
+            if shift_start.date() < a.date_from.date():
+                return False
+            if a.recurrence_end_date and shift_start.date() > a.recurrence_end_date:
+                return False
+            if a.weekday and str(shift_start.weekday()) != a.weekday:
+                return False
+            time_from = a.date_from.time()
+            time_to = a.date_to.time()
+            window_start = datetime.combine(shift_start.date(), time_from)
+            window_end_date = shift_start.date()
+            if time_to <= time_from:
+                window_end_date += timedelta(days=1)
+            window_end = datetime.combine(window_end_date, time_to)
+            return window_start <= shift_start and window_end >= shift_end
+
+        blackout = self.availability_ids.filtered(lambda a: a.availability_type == 'unavailable' and _overlaps(a))
         if blackout:
             return False
-        available = self.availability_ids.filtered(
-            lambda a: a.availability_type == 'available'
-            and a.date_from <= shift_start and a.date_to >= shift_end)
+        available = self.availability_ids.filtered(lambda a: a.availability_type == 'available' and _covers(a))
         return bool(available)
 
     def get_eligible_shifts(self):
@@ -485,15 +538,8 @@ class NhsBankMember(models.Model):
 
     @api.model
     def _cron_recompute_compliance(self):
-        """Scheduled action: refresh every active member's compliance status
-        and alert the bank coordinators about anyone who has newly become
-        non-compliant, so they are not offered/booked while lapsed."""
+        """Scheduled action: refresh every active member's compliance status.
+        Anyone currently non-compliant is surfaced to coordinators via the
+        daily digest (see nhs.bank.shift/res.company), not a separate alert."""
         members = self.search([('state', '=', 'active')])
-        before = {m.id: m.compliance_status for m in members}
         members._compute_compliance_status()
-        template = self.env.ref('odoo_nhs_staff_bank.mail_template_compliance_alert', raise_if_not_found=False)
-        if not template:
-            return
-        for member in members:
-            if before.get(member.id) != 'non_compliant' and member.compliance_status == 'non_compliant':
-                template.send_mail(member.id, force_send=True)

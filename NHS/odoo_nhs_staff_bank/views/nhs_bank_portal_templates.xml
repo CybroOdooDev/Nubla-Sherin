@@ -199,7 +199,7 @@
                                     <td t-esc="shift.shift_start"/>
                                     <td t-esc="shift.shift_end"/>
                                     <td t-esc="shift.band_id.name"/>
-                                    <td t-esc="shift.role"/>
+                                    <td t-esc="shift.role_id.name"/>
                                     <td>
                                         <form t-attf-action="/my/bank/shifts/#{shift.id}/accept" method="post">
                                             <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>

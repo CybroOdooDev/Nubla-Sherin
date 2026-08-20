@@ -32,7 +32,7 @@ class NhsBulkShiftWizard(models.TransientModel):
 
     org_unit_id = fields.Many2one('nhs.org.unit', string='Area / Ward', required=True)
     band_id = fields.Many2one('nhs.afc.band', string='Band')
-    role = fields.Char(string='Role')
+    role_id = fields.Many2one('nhs.staff.group', string='Role')
     skill_ids = fields.Many2many('nhs.skill', string='Skills Required')
     shift_type_id = fields.Many2one('nhs.shift.type', string='Shift Type')
     headcount = fields.Integer(string='Headcount Needed', default=1)
@@ -84,7 +84,7 @@ class NhsBulkShiftWizard(models.TransientModel):
                 vals_list.append({
                     'org_unit_id': self.org_unit_id.id,
                     'band_id': self.band_id.id,
-                    'role': self.role,
+                    'role_id': self.role_id.id,
                     'skill_ids': [(6, 0, self.skill_ids.ids)],
                     'shift_type_id': self.shift_type_id.id,
                     'headcount': self.headcount,

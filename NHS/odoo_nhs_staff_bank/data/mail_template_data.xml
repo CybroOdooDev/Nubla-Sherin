@@ -49,7 +49,7 @@
             <field name="auto_delete" eval="False"/>
         </record>
 
-        <!-- Mail template: booking confirmation sent to the requesting area manager -->
+        <!-- Mail `template`: booking confirmation sent to the requesting area manager -->
         <record id="mail_template_booking_confirmation_manager" model="mail.template">
             <field name="name">Staff Bank: Booking Confirmation (Requesting Manager)</field>
             <field name="model_id" ref="model_nhs_shift_booking"/>
@@ -63,7 +63,7 @@
                     <p>Your requested shift has been filled by the bank:</p>
                     <ul>
                         <li><strong>Shift:</strong> <t t-out="object.shift_id.name or ''"/></li>
-                        <li><strong>Member:</strong> <t t-out="object.member_id.name or ''"/></li>
+                        <li><strong>Member(s):</strong> <t t-out="object.shift_id.filled_member_names or object.member_id.name or ''"/></li>
                         <li><strong>Start:</strong> <t t-out="object.shift_start or ''"/></li>
                         <li><strong>End:</strong> <t t-out="object.shift_end or ''"/></li>
                     </ul>
@@ -73,18 +73,33 @@
             <field name="auto_delete" eval="False"/>
         </record>
 
-        <!-- Mail template: non-compliance alert sent to bank coordinators -->
-        <record id="mail_template_compliance_alert" model="mail.template">
-            <field name="name">Staff Bank: Member Non-Compliant</field>
-            <field name="model_id" ref="model_nhs_bank_member"/>
+        <!-- Mail template: daily digest of open/urgent shifts, sent to the
+             Bank Officers/Managers picked in Settings -->
+        <record id="mail_template_coordinator_digest" model="mail.template">
+            <field name="name">Staff Bank: Coordinator Digest</field>
+            <field name="model_id" ref="base.model_res_company"/>
             <field name="email_from">{{ (user.email_formatted or '') }}</field>
-            <field name="subject">Bank member no longer compliant — {{ object.name }}</field>
+            <field name="use_default_to" eval="False"/>
+            <field name="subject">Staff Bank Daily Digest — {{ object.nhs_bank_digest_open_count }} open shift(s)</field>
             <field name="body_html" type="html">
                 <div style="margin: 0px; padding: 0px; font-size: 13px;">
-                    <p><t t-out="object.name or ''">Member</t> (<t t-out="object.reference or ''"/>) is now
-                        <strong>non-compliant</strong> and cannot be offered or booked onto shifts until this
-                        is resolved.</p>
-                    <p><strong>Reason:</strong> <t t-out="object.compliance_reason or ''"/></p>
+                    <p>Staff Bank daily digest:
+                        <t t-out="object.nhs_bank_digest_open_count"/> open shift(s),
+                        <t t-out="object.nhs_bank_digest_urgent_count"/> urgent/last-minute.</p>
+                    <ul>
+                        <li t-foreach="object.nhs_bank_digest_shift_ids[:30]" t-as="shift">
+                            <t t-out="shift.name or ''"/> (<t t-out="shift.urgency_label or ''"/>)
+                        </li>
+                    </ul>
+                    <t t-if="object.nhs_bank_digest_noncompliant_member_ids">
+                        <p><strong>Non-compliant members</strong> (cannot be offered/booked until resolved):</p>
+                        <ul>
+                            <li t-foreach="object.nhs_bank_digest_noncompliant_member_ids[:30]" t-as="member">
+                                <t t-out="member.name or ''"/> (<t t-out="member.reference or ''"/>) —
+                                <t t-out="member.compliance_reason or ''"/>
+                            </li>
+                        </ul>
+                    </t>
                     <p>Staff Bank Team</p>
                 </div>
             </field>

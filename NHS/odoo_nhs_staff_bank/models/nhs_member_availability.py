@@ -107,7 +107,7 @@ class NhsMemberAvailability(models.Model):
                 )
         return super().create(vals_list)
 
-    @api.constrains('date_from', 'date_to')
+    @api.constrains('date_from', 'date_to', 'recurrence_end_date', 'recurring')
     def _check_dates(self):
         """Reject a window whose end is not after its start, or whose start
         is already in the past — an availability/blackout window only makes
@@ -118,3 +118,6 @@ class NhsMemberAvailability(models.Model):
                 raise ValidationError("'To' must be after 'From'.")
             if record.date_from < now:
                 raise ValidationError("'From' cannot be in the past.")
+            if record.recurring and record.recurrence_end_date:
+                if record.recurrence_end_date < record.date_from.date():
+                    raise ValidationError("'Recurs Until' date cannot be before the 'From' date.")

@@ -103,9 +103,7 @@
                     <button name="action_activate" string="Activate" type="object" class="btn-primary" invisible="state == 'active'"/>
                     <button name="action_suspend" string="Suspend" type="object" invisible="state == 'suspended'"/>
                     <button name="action_deactivate" string="Set Inactive" type="object" invisible="state == 'inactive'"/>
-                    <button name="action_create_portal_user" string="Create Portal User" type="object"
-                            invisible="user_id or not email"
-                            help="Create a Contact and Portal User from this member's name/email/phone, and email them an invitation to set their password."/>
+
                     <field name="state" widget="statusbar" statusbar_visible="draft,active,suspended,inactive"/>
                 </header>
                 <sheet>
@@ -201,12 +199,12 @@
         </field>
     </record>
 
-    <!-- Window action: main Bank Members menu entry, showing members in all states -->
+    <!-- Window action: main Bank Members menu entry, defaulting to active members only -->
     <record id="action_nhs_bank_member" model="ir.actions.act_window">
         <field name="name">Bank Members</field>
         <field name="res_model">nhs.bank.member</field>
         <field name="view_mode">kanban,list,form</field>
-        <field name="context">{}</field>
+        <field name="context">{'search_default_active_state': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Create your first bank member</p>
             <p>Bank members are the flexible/bank workers available for shifts.</p>

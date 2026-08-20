@@ -58,6 +58,10 @@ class NhsShiftOffer(models.Model):
         related='shift_id.company_id',
         store=True,
     )
+    company_booking_mode = fields.Selection(
+        related='company_id.nhs_bank_booking_mode',
+        string='Company Booking Mode',
+    )
     offered_at = fields.Datetime(
         string='Offered At',
         default=fields.Datetime.now,
@@ -95,6 +99,20 @@ class NhsShiftOffer(models.Model):
         string='Active',
         default=True,
     )
+    eligible_member_ids = fields.Many2many(
+        'nhs.bank.member',
+        compute='_compute_eligible_member_ids',
+        help="Technical field for UI domain filtering."
+    )
+
+    @api.depends('shift_id')
+    def _compute_eligible_member_ids(self):
+        for offer in self:
+            if offer.shift_id:
+                outcomes = offer.shift_id.get_eligible_members()
+                offer.eligible_member_ids = [o['member'].id for o in outcomes if o['eligible']]
+            else:
+                offer.eligible_member_ids = False
 
     @api.onchange('member_id')
     def _onchange_member_id(self):
@@ -108,6 +126,18 @@ class NhsShiftOffer(models.Model):
                 self.shift_id = False
             return {'domain': {'shift_id': [('id', 'in', eligible_shifts.ids)]}}
         return {'domain': {'shift_id': []}}
+
+    @api.onchange('shift_id')
+    def _onchange_shift_id(self):
+        """Restrict the Member field to members who are actually eligible
+        for this shift."""
+        if self.shift_id:
+            eligible_outcomes = self.shift_id.get_eligible_members()
+            eligible_member_ids = [outcome['member'].id for outcome in eligible_outcomes if outcome['eligible']]
+            if self.member_id and self.member_id.id not in eligible_member_ids:
+                self.member_id = False
+            return {'domain': {'member_id': [('id', 'in', eligible_member_ids)]}}
+        return {'domain': {'member_id': []}}
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -151,13 +181,39 @@ class NhsShiftOffer(models.Model):
             if offer.shift_id.filled_count >= offer.shift_id.headcount:
                 raise UserError(("This shift is already fully booked."))
             offer.write({'response': 'accepted', 'responded_at': fields.Datetime.now()})
+            
+            if offer.company_id.nhs_bank_booking_mode != 'manager_allocated':
+                self.env['nhs.shift.booking'].create({
+                    'shift_id': offer.shift_id.id,
+                    'member_id': offer.member_id.id,
+                })
+            # Any other still-pending offers for the same shift/member become moot
+            # once headcount is reached; leave them for the coordinator to withdraw
+            # explicitly if the shift is now full, via the shift's own state.
+
+    def action_allocate_booking(self):
+        """Manager allocates an accepted offer to a booking (Manager-Allocated mode)."""
+        if not self.env.user.has_group('odoo_nhs_staff_bank.group_nhs_bank_manager'):
+            raise UserError("Only Bank Managers can manually allocate shifts.")
+        for offer in self:
+            if offer.response != 'accepted':
+                raise UserError(("Can only allocate offers that have been accepted by the member."))
+            existing = self.env['nhs.shift.booking'].search([
+                ('member_id', '=', offer.member_id.id),
+                ('state', 'in', ('booked', 'worked')),
+                ('shift_start', '<', offer.shift_id.shift_end),
+                ('shift_end', '>', offer.shift_id.shift_start),
+            ])
+            if existing:
+                raise UserError((
+                    "%s already has a booking that overlaps this shift.") % offer.member_id.name)
+            if offer.shift_id.filled_count >= offer.shift_id.headcount:
+                raise UserError(("This shift is already fully booked."))
+            
             self.env['nhs.shift.booking'].create({
                 'shift_id': offer.shift_id.id,
                 'member_id': offer.member_id.id,
             })
-            # Any other still-pending offers for the same shift/member become moot
-            # once headcount is reached; leave them for the coordinator to withdraw
-            # explicitly if the shift is now full, via the shift's own state.
 
     def action_decline(self, reason=None):
         """Member declines the offer, recording an optional reason."""

@@ -23,21 +23,11 @@
     'name': 'NHS Staff Bank Management',
     'version': '19.0.1.0.0',
     'category': 'Healthcare/NHS',
-    'summary': 'Internal flexible-staffing bank for the NHS — bank members, open shifts, '
-               'offer & booking, availability, rates, a training/registration compliance '
-               'gate, and bank-vs-agency spend reporting. Reduces agency cost.',
+    'summary': 'NHS internal staff bank management for workforce, shifts, availability, bookings and compliance.',
     'description': """
-NHS Staff Bank Management runs an organisation's internal flexible-staffing
-bank — the pool of workers (substantive staff doing extra shifts, and
-dedicated bank-only workers) used to fill temporary gaps instead of paying
-agency rates. It holds the bank members and their skills, publishes open
-shifts, offers and books them, tracks availability and rates, and —
-critically — only lets compliant workers be booked. It measures
-bank-versus-agency fill and spend, the number every NHS board watches.
-
-It depends on the Establishment Register (shifts are cover against
-established posts/areas) and soft-links to the Mandatory Training module for
-its compliance gate, degrading gracefully when that module is absent.
+    NHS Staff Bank Management manages bank members, open shifts, availability, shift offers,
+bookings, rates and workforce compliance. It helps NHS organisations manage flexible staffing
+requirements, fill temporary shifts efficiently, and monitor bank and agency staffing costs.
 """,
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',

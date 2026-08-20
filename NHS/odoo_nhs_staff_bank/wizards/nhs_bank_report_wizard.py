@@ -65,7 +65,7 @@ class NhsBankReportWizard(models.TransientModel):
             entry['rate'] = round(entry['filled'] / entry['total'] * 100.0, 1) if entry['total'] else 0.0
             area_rows.append(entry)
         bank_spend = sum(self.env['nhs.shift.booking'].search([
-            ('shift_id', 'in', filled.ids), ('state', 'in', ('booked', 'worked')),
+            ('shift_id', 'in', shifts.ids), ('state', 'in', ('booked', 'worked')),
         ]).mapped('payable_amount'))
         agency_spend = sum(to_agency.mapped('agency_cost'))
         comparator_pct = self.env.company.nhs_bank_agency_comparator_pct or 0.0
@@ -102,6 +102,7 @@ class NhsBankReportWizard(models.TransientModel):
                 'name': s.name, 'agency': s.agency_name, 'cost': s.agency_cost,
             } for s in agency_shifts],
         }
+
 
     def action_print_fill_rate(self):
         """Trigger the Fill-Rate & Agency-Displacement PDF report."""

@@ -20,6 +20,7 @@
 #
 #############################################################################
 from datetime import timedelta
+from markupsafe import Markup
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
@@ -63,6 +64,18 @@ class NhsShiftBooking(models.Model):
         string='Company',
         related='shift_id.company_id',
         store=True,
+    )
+    shift_band_id = fields.Many2one(
+        'nhs.afc.band',
+        related='shift_id.band_id',
+    )
+    shift_role_id = fields.Many2one(
+        'nhs.staff.group',
+        related='shift_id.role_id',
+    )
+    shift_type_id = fields.Many2one(
+        'nhs.shift.type',
+        related='shift_id.shift_type_id',
     )
     shift_start = fields.Datetime(
         string='Start',
@@ -195,23 +208,91 @@ class NhsShiftBooking(models.Model):
         compliant_at_booking as the audit trail."""
         gate = self.env['nhs.compliance.gate']
         hard_gate = self.env.company.nhs_bank_gate_policy == 'hard'
+        new_vals_list = []
         for vals in vals_list:
-            if not vals.get('name') or vals.get('name') == 'New':
-                vals['name'] = self.env['ir.sequence'].next_by_code('nhs.shift.booking') or 'New'
-            shift = self.env['nhs.bank.shift'].browse(vals.get('shift_id'))
-            member = self.env['nhs.bank.member'].browse(vals.get('member_id'))
-            if shift and not vals.get('shift_start'):
-                vals['shift_start'] = shift.shift_start
-            if shift and not vals.get('shift_end'):
-                vals['shift_end'] = shift.shift_end
+            new_vals = dict(vals)
+            if not new_vals.get('name') or new_vals.get('name') == 'New':
+                new_vals['name'] = self.env['ir.sequence'].next_by_code('nhs.shift.booking') or 'New'
+            shift = self.env['nhs.bank.shift'].browse(new_vals.get('shift_id'))
+            member = self.env['nhs.bank.member'].browse(new_vals.get('member_id'))
+            if shift and not new_vals.get('shift_start'):
+                new_vals['shift_start'] = shift.shift_start
+            if shift and not new_vals.get('shift_end'):
+                new_vals['shift_end'] = shift.shift_end
             if member:
                 compliant, _reason = gate.is_member_compliant_with_reason(member)
-                vals['compliant_at_booking'] = compliant
+                new_vals['compliant_at_booking'] = compliant
                 if not compliant and hard_gate:
                     raise UserError((
                         "%(member)s cannot be booked: %(reason)s") % {
                         'member': member.name, 'reason': _reason})
-        return super().create(vals_list)
+            new_vals_list.append(new_vals)
+        records = super().create(new_vals_list)
+        records._send_booking_confirmation()
+        records._notify_manager_if_filled()
+        return records
+
+    def _send_booking_confirmation(self):
+        """Email the member their booking confirmation, logging the send
+        (or the reason it wasn't sent) on the booking's own chatter."""
+        template = self.env.ref(
+            'odoo_nhs_staff_bank.mail_template_booking_confirmation_member',
+            raise_if_not_found=False)
+        for booking in self:
+            if template and booking.member_id.email:
+                mail_id = template.send_mail(booking.id, force_send=True)
+                mail = self.env['mail.mail'].sudo().browse(mail_id)
+                booking.message_post(
+                    subject=mail.subject,
+                    body=Markup(mail.body_html) if mail.body_html else (
+                        "Booking confirmation emailed to %s." % booking.member_id.name),
+                    subtype_xmlid='mail.mt_note',
+                )
+            else:
+                booking.message_post(
+                    body="Booking created but not emailed (no email on file) for %s." % (
+                        booking.member_id.name),
+                    subtype_xmlid='mail.mt_note',
+                )
+
+    def _notify_manager_if_filled(self):
+        """Once a new booking pushes its shift to fully 'filled', tell the
+        requesting area manager — once per shift, even if several bookings
+        for the same shift were created together."""
+        template = self.env.ref(
+            'odoo_nhs_staff_bank.mail_template_booking_confirmation_manager',
+            raise_if_not_found=False)
+        if not template:
+            return
+        notified_shifts = self.env['nhs.bank.shift']
+        for booking in self:
+            shift = booking.shift_id
+            if shift in notified_shifts:
+                continue
+            # 'state' is a plain field, only updated as a side effect inside
+            # _compute_filled_count() (the compute for 'filled_count'); force it
+            # here so we see the shift's fresh post-booking state, not the
+            # stale pre-booking value.
+            shift._compute_filled_count()
+            if shift.state != 'filled':
+                continue
+            notified_shifts |= shift
+            manager = shift.org_unit_id.manager_id
+            if manager.email:
+                mail_id = template.send_mail(booking.id, force_send=True)
+                mail = self.env['mail.mail'].sudo().browse(mail_id)
+                shift.message_post(
+                    subject=mail.subject,
+                    body=Markup(mail.body_html) if mail.body_html else (
+                        "Manager %s notified: shift filled." % manager.name),
+                    subtype_xmlid='mail.mt_note',
+                )
+            else:
+                shift.message_post(
+                    body="Shift filled but the area manager could not be emailed"
+                         " (no manager, or no email on file).",
+                    subtype_xmlid='mail.mt_note',
+                )
 
     def unlink(self):
         """Block hard deletion of bookings; cancel instead to preserve the audit trail."""

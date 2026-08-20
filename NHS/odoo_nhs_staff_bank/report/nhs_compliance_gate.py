@@ -25,12 +25,6 @@ from odoo import fields, models
 class NhsComplianceGate(models.AbstractModel):
     """Service model: determines whether a bank member is compliant (and
     therefore bookable) at a given date.
-
-    This gate isolates ALL knowledge of the Mandatory Training module — if
-    that module changes, only this file needs to change. It reads
-    odoo_nhs_training (a hard dependency) via the member's
-    `workforce_member_id` link when set, and falls back to a light in-module
-    flag when no workforce member is linked, so the gate always functions.
     """
     _name = 'nhs.compliance.gate'
     _description = 'Bank Compliance Gate (service)'
@@ -57,10 +51,7 @@ class NhsComplianceGate(models.AbstractModel):
                     "Professional registration has lapsed"
                     " (via NHS Mandatory Training)."
                 )
-            # Use the workforce member's own real compliance status, so a
-            # required subject that is simply not yet done (never started —
-            # not "expired") also counts as not compliant, not just lapsed
-            # or failed items.
+
             if workforce_member.compliance_status == 'non_compliant':
                 return False, (
                     "Mandatory training is not compliant — required subjects are"
@@ -72,7 +63,6 @@ class NhsComplianceGate(models.AbstractModel):
                     " are nearing expiry or incomplete (via NHS Mandatory Training)."
                 )
             return True, ''
-        # Standalone fallback: odoo_nhs_training absent, or no link set.
         if not member.checks_confirmed:
             return False, "Employment checks are not confirmed for this member."
         if not member.manual_compliance_flag:
@@ -83,40 +73,21 @@ class NhsComplianceGate(models.AbstractModel):
 
     def _resolve_workforce_member(self, member):
         """Resolve the linked odoo_nhs_training workforce member, if the
-        bank member is linked to one.
-
-        Sudoed: nhs.workforce.member is deliberately data-minimised and its
-        ACL only grants read to Training-module groups (+ portal), so a
-        Bank Officer/Manager (or the compute/booking/offer code running as
-        them) has no direct access to it. The compliance gate is the one
-        place that's meant to know about odoo_nhs_training at all, so it's
-        also the one place that should cross that access boundary — every
-        caller (action_offer, compliance compute, booking/offer creation)
-        just needs a compliant/non-compliant answer, not read access to the
-        underlying training record."""
+        bank member is linked to one."""
         return member.sudo().workforce_member_id or False
 
     def eligibility(self, shift,
                     member):
         """Combine role/band + skills + area + availability + compliance
         into a single eligible/ineligible result with human-readable reasons,
-        for a candidate `member` against an open `shift`.
-
-        Compliance is gated by the company's Compliance Gate policy: under
-        Hard Block a non-compliant member is ineligible outright; under Warn
-        Only they remain eligible (so they can still be offered/booked) but
-        the compliance issue is still surfaced as a warning, matching the
-        hard/soft distinction already enforced at booking time in
-        nhs.shift.booking.create()."""
+        for a candidate `member` against an open `shift`."""
         reasons = []
         if shift.band_id and member.band_id and shift.band_id != member.band_id:
             reasons.append("Band mismatch (needs %s, member is %s)." % (
                 shift.band_id.name, member.band_id.name))
-        if shift.role and member.role_ids:
-            role_text = shift.role.strip().lower()
-            if not any(role_text in r.name.lower() or r.name.lower() in role_text
-                       for r in member.role_ids):
-                reasons.append("Role mismatch (needs '%s')." % shift.role)
+        if shift.role_id and member.role_ids:
+            if shift.role_id not in member.role_ids:
+                reasons.append("Role mismatch (needs '%s')." % shift.role_id.name)
         if shift.skill_ids and not shift.skill_ids <= member.skill_ids:
             missing = shift.skill_ids - member.skill_ids
             reasons.append("Missing skill(s): %s." % ', '.join(missing.mapped('name')))

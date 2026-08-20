@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>NHS Staff Bank Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+</head>
+
+
+<body style="font-family: &quot;Montserrat&quot;, sans-serif;background-color: #71639e08;">
+
+
+<div class="container-fluid cmpad">
+    <div class="supports my-3 py-3" style="    border: 2px solid #71639e10;
+    padding: 0 35px;
+    border-radius: 10px;    border: 2px solid #e9ecef;background-color: white;">
+        <div class="row justify-content-between align-items-center">
+            <div class="col-lg-3">
+                <div class="my-3 mx-auto mx-sm-0" style="width: 250px; ">
+                    <img src="//apps.odoocdn.com/apps/assets/17.0/theme_boec/images/Cybrosys.png?fcdde35"
+                         style="width: 100%;">
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="row">
+                    <div class="my-3 d-flex align-items-center justify-content-center justify-content-sm-end">
+                        <span class="me-3"><b>Supports: </b></span>
+                        <div class="text-center" style="
+                    background-color: #71639e !important;
+                    font-size: 1rem !important;
+                    color: #fff !important;
+                    font-weight: 500 !important;
+                    padding: 8px !important;
+                    margin: 0 3px !important;
+                    border-radius: 50px !important;
+                    min-width: 130px !important;
+                  ">
+                            Community
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 10px;display: flex;justify-content: end;float: right;">
+                    <div class="d-flex align-items-center justify-content-end flex-wrap gap-2">
+                        <span class="me-3"><b>Availability: </b></span>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-center col" style="
+                    border: 2px solid #ebebeb;
+    font-size: 1rem !important;
+    color: #333 !important;
+    font-weight: 500 !important;
+    padding: 8px !important;
+    margin: 0 3px !important;
+    border-radius: 20px !important;
+    min-width: 150px !important;
+
+                  ">
+
+                            <img src="./assets/icons/close.png" alt="" width="18" height="18">
+                            Odoo Online
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-center col" style="
+                    border: 2px solid #ebebeb;
+    font-size: 1rem !important;
+    color: #333 !important;
+    font-weight: 500 !important;
+    padding: 8px !important;
+    margin: 0 3px !important;
+    border-radius: 20px !important;
+    min-width: 150px !important;
+
+                  ">
+
+                            <img src="./assets/icons/close.png" alt="" width="18" height="18">
+                            Odoo.sh
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-center col" style="
+                   border: 2px solid #ebebeb;
+    font-size: 1rem !important;
+    color: #333 !important;
+    font-weight: 500 !important;
+    padding: 8px !important;
+    margin: 0 3px !important;
+    border-radius: 20px !important;
+    min-width: 150px !important;
+
+                  ">
+
+                            <img src="./assets/icons/tick.png" alt="" width="18" height="18">
+                            On Premise
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid cmpad text-center py-5 py-md-3">
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="mainhead" style="font-size: 2.3rem;padding-top: 1rem;font-weight: 700;color: black;">NHS
+                Staff Bank Management</h3>
+            <p class="para mb-4" style="font-size: 20px;color: #6b7280;">Manage bank members, open shifts,
+                eligibility-checked offers, bookings, rate cards and working-time compliance — fill temporary NHS
+                shifts fast and track bank spend against agency cost.</p>
+
+            <div class="d-flex justify-content-center gap-1 flex-wrap">
+                <a href="mailto:"
+                   class="contact-btn email-btn d-flex align-items-center gap-2 justify-content-center"
+                   style="position: relative;padding: 15px 25px;border: none;border-radius: 50px;font-size: 16px;font-weight: 600;text-decoration: none;color: white;cursor: pointer;min-width: 200px;justify-content: center;background-color: #4facfe">
+                    <img src="./assets/icons/mail.png" alt="" width="25" height="25">
+                    <span class="btn-text" style="font-size: 15px;letter-spacing: 0.5px;">Email Us</span>
+                </a>
+
+
+                <a href="https://wa.me/919074270811"
+                   class="contact-btn whatsapp-btn d-flex align-items-center gap-2 justify-content-center"
+                   style="position: relative;padding: 15px 25px;border: none;border-radius: 50px;font-size: 16px;font-weight: 600;text-decoration: none;color: white;cursor: pointer;min-width: 200px;justify-content: center;background-color: #25d366;">
+                    <img src="./assets/icons/whatsapp.png" alt="" width="25" height="25">
+                    <span class="btn-text" style="font-size: 15px;letter-spacing: 0.5px;">+91 9074270811</span>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="row">
+        <div class="col-md-6 mb-3 mb-md-0">
+            <!-- Blog Card -->
+            <div class="content-card blog-card h-100" style="    background-color: #8b5cf612;
+    border: 2px solid #8a5cf615;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    overflow: hidden;">
+                <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                     style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #8B5CF6;">
+                    <img src="./assets/icons/document.png" alt="" width="30" height="30">
+                </div>
+                <h3 class="card-title"
+                    style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                    Read Blog</h3>
+                <p class="card-description mb-3"
+                   style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Dive into our
+                    comprehensive blog posts covering NHS staff bank management, shift-fill strategy and
+                    reducing agency spend.</p>
+
+                <a href="https://www.cybrosys.com/blog"
+                   class="card-action video-action d-flex align-items-center justify-content-center gap-2"
+                   style="padding: 10px 20px;border-radius: 8px;font-weight: 500;font-size: 15px;text-decoration: none;border: none;width: max-content;background-color: #9e6390;color: white;transition: .3s;">
+                    <img src="./assets/icons/copy.png" alt="" width="18" height="18">
+                    Read Blog
+                </a>
+
+
+            </div>
+        </div>
+        <div class="col-md-6">
+            <!-- Video Card -->
+            <div class="content-card video-card h-100" style="    background-color: #ef444421;
+    border: 2px solid #ef44441f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    overflow: hidden;">
+                <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                     style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #EF4444;">
+                    <img src="./assets/icons/play.png" alt="" width="23px" height="23px">
+                </div>
+                <h3 class="card-title"
+                    style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                    Video Tutorial</h3>
+                <p class="card-description mb-3"
+                   style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Watch our detailed
+                    walkthrough of raising a shift, offering it to the bank, booking a member and the
+                    Fill-Rate Dashboard on YouTube.</p>
+                <a href="https://www.youtube.com/@Cybrosys"
+                   class="card-action video-action d-flex align-items-center justify-content-center gap-2"
+                   style="padding: 10px 20px;border-radius: 8px;font-weight: 500;font-size: 15px;text-decoration: none;border: none;width: max-content;background-color: #9e6390;color: white;transition: .3s;">
+                    <img src="./assets/icons/play.png" alt="" width="15px" height="15px">
+                    Watch Demo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="highlights-section">
+
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Key
+            <span>Highlights</span>
+        </h2>
+
+        <div class="row" style="margin-top: 20px;">
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100" style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Open Shift → Offer → Booking Workflow</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Raise a shift
+                        needing cover, offer it to the bank — singly, in bulk or as a recurring pattern — and
+                        watch it move through Draft, Open, Partially Filled and Filled automatically.</p>
+
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100" style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Eligibility-Checked Shift Offers</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Before an offer
+                        is sent, every member is checked against band, role, required skills and availability —
+                        with the exact reason surfaced when someone isn't eligible.</p>
+
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100" style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+
+                        Rate Cards by Band, Role &amp; Shift Type </h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Hourly rates and
+                        unsocial-hours enhancements defined per band/role/shift-type combination drive an
+                        estimated cost on every shift, booking and analytics report.</p>
+
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100" style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Compliance Gate &amp; Safe-Hours Guard </h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;"> A configurable
+                        Hard Block / Warn Only gate stops or flags bookings for non-compliant members, and every
+                        booking is checked against the safe weekly hours limit before it's confirmed.</p>
+
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100" style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Bank vs Agency Cost Displacement </h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Escalate an
+                        unfilled shift to agency with its cost recorded, then measure the cost avoidance against
+                        a configurable agency comparator uplift on the Fill-Rate Dashboard.</p>
+
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100" style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Member Self-Service Portal </h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Bank members log
+                        in to see shifts offered to them, respond, set their own availability and review their
+                        booking history — no back-office follow-up needed.</p>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="tabs-design1">
+
+
+        <ul class="nav nav-pills justify-content-start justify-content-md-center pb-4" style="    flex-flow: nowrap;
+    overflow: hidden;
+    overflow-x: auto;" id="pills1" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="screenshot-tab" data-bs-toggle="pill" data-bs-target="#screenshot"
+                   type="button" role="tab" style="width: max-content;border-radius: 50px;
+    margin: 0 5px;
+    padding: 12px 24px;
+    font-weight: 500;
+
+    border: 2px solid #e9ecef;
+    position: relative;
+
+    ">
+                    Screenshot
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="features-tab" data-bs-toggle="pill" data-bs-target="#features" type="button"
+                   role="tab" style="width: max-content;border-radius: 50px;
+    margin: 0 5px;
+    padding: 12px 24px;
+    font-weight: 500;
+
+    border: 2px solid #e9ecef;
+    position: relative;
+
+    ">
+                    Features
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="faq-tab" data-bs-toggle="pill" data-bs-target="#faq" type="button"
+                   role="tab" style="width: max-content;border-radius: 50px;
+    margin: 0 5px;
+    padding: 12px 24px;
+    font-weight: 500;
+
+    border: 2px solid #e9ecef;
+    position: relative;
+
+    ">
+                    Frequent Questions
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="latest-release-tab" data-bs-toggle="pill" data-bs-target="#latest-release"
+                   type="button" role="tab" style="width: max-content;border-radius: 50px;
+    margin: 0 5px;
+    padding: 12px 24px;
+    font-weight: 500;
+
+    border: 2px solid #e9ecef;
+    position: relative;
+
+    ">
+                    Latest Release
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content bg-white rounded-4" style="border: 2px solid #e9ecef;border-radius: 10px;"
+             id="pills1Content">
+            <div class="tab-pane fade show active" id="screenshot" role="tabpane2">
+                <div class="p-3 py-md-5">
+
+
+                    <h2 class="mainhead text-center mb-2" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Assign <span>Staff Bank Access Levels</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Grant a user Bank Member, Bank Officer or Bank Manager access directly from Settings ▸
+                        Users, alongside the module's other NHS access levels.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/1.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Configure <span>Compliance Gate &amp; Booking Rules</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Set the compliance Gate Policy (Hard Block or Warn Only), the booking mode and offer expiry,
+                        the safe weekly hours limit, and the agency comparator uplift used for cost-avoidance
+                        reporting.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/2.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Rate Cards <span>by Band, Role &amp; Shift Type</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Every Band / Role / Shift Type combination carries its own hourly rate and enhancement
+                        percentage, effective from a given date — the figures behind every shift's estimated
+                        cost.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/3.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Configure <span>a Rate Card</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Set the hourly rate, enhancement % and effective-from / effective-to dates for a single
+                        band, role and shift-type combination.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/4.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Shift Types <span>with an Unsocial-Hours Flag</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Day, Night, Weekend and Bank Holiday shift types, each with a short code and an Unsocial
+                        Hours flag that feeds the rate-card enhancement.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/5.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Skills &amp; <span>Competencies Catalogue</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Clinical and mandatory skills grouped by category, each showing how many bank members
+                        currently hold it — the tags used to require and match skills on a shift.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/6.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Open Shifts <span>Kanban — Draft to Filled</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Every shift needing cover, grouped by status, with ward, band, role, shift type and a
+                        live headcount-filled progress bar on each card.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/7.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Raise <span>a Shift Needing Cover</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Area/ward, dates and shift type on one side; band, role, required skills, headcount,
+                        reason and urgency on the other — with the estimated bank cost calculated automatically
+                        and Offer Shift / Escalate to Agency actions on the header.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/8.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Offer a Shift — <span>Eligibility Checked Automatically</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Broadcast to every eligible member or hand-pick who to offer, with an offer expiry in
+                        hours. Ineligible members are shown with the exact reason — missing skill, band
+                        mismatch or unavailable — before the offer ever goes out.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/9.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Track <span>Every Offer Sent</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        The shift's Offers stat button and tab list who was offered the shift, when, and their
+                        response — at a glance, without leaving the shift record.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/10.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Accept, Decline <span>or Withdraw an Offer</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        The full offers register — offered at, expires at, response, eligibility at the time of
+                        offer and decline reason — with Accept, Decline and Withdraw available inline.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/11.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Offer Lifecycle — <span>Pending to Accepted</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Pending ▸ Accepted ▸ Declined ▸ Expired ▸ Withdrawn — a clear statusbar on every offer,
+                        with the decline reason kept for the record.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/12.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        A Booking Is Created <span>the Moment an Offer Is Accepted</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        The shift moves to Partially Filled or Filled, and its Bookings tab shows the booked
+                        member, compliance flag and payable amount straight away.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/13.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        A Booking Record <span>with a Working-Time Safeguard</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Booked ▸ Worked ▸ No-Show ▸ Cancelled, with a visible warning whenever a booking may
+                        breach the member's safe/legal weekly hours limit, plus rate override and fill-source
+                        fields.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/14.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Confirm Worked <span>&amp; Authorise Pay</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Recording actual start/end and who authorised the shift computes the payable amount
+                        automatically from the applicable rate card.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/15.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Shift Calendar — <span>Every Booked Shift at a Glance</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        A month view of every shift across the bank, so rota gaps and cover are visible
+                        immediately.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/16.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Every Booking, <span>Compliance Flag &amp; Payable Amount</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        The full bookings register — shift, member, dates, status, compliant-at-booking flag,
+                        working-time breach warning and payable amount — filterable across the organisation.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/17.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Unfilled Shifts <span>Ready for Agency Escalation</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Shifts still short of headcount after being offered to the bank, with urgency and fill
+                        progress, ready to be escalated to an agency in one click.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/18.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Bulk-Create <span>a Recurring Shift Pattern</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Define the shift details once — ward, band, role, skills, headcount, reason — then a
+                        date range, start/end time and days of the week, and generate every occurrence of the
+                        pattern in a single click.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/19.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Bank Members — <span>Active, Draft &amp; Suspended</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Every bank member grouped by status, with a live Compliant / Unknown tag, member type,
+                        roles, staff groups and contact details on the card.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/20.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Workforce Member Profile — <span>Roles, Bands &amp; Compliance</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Member type, substantive post, linked Training-register record, roles, primary band,
+                        skills, cleared areas, preferred shift types, weekly hours override and a live
+                        Compliant ribbon, with Availability, Offers and Bookings stat buttons.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/21.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Record <span>When a Member Is Available</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        A simple Available/Unavailable window with a from/to range, an optional recurrence and a
+                        note — the record eligibility checks read when a shift is offered.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/22.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Availability Calendar <span>Across the Bank</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        A month view of every member's declared availability, side by side, for quick visual
+                        planning.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/23.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                            Compliance Watch <span>Across the Staff Bank</span>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                       Monitor workforce compliance at a glance, identify non-compliant bank members,
+    and keep track of their current compliance status for safe and effective staffing.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/24.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Staff Bank Dashboard — <span>Fill Rate &amp; Cost Avoidance</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Open shifts, urgent unfilled, fill rate, shifts escalated to agency, cost avoidance and
+                        non-compliant members, alongside open shifts, compliance exposure, demand hot-spots and
+                        top member utilisation — the manager's home page.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/25.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Bank vs Agency <span>Analytics</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        A pivot of estimated bank cost against agency cost by shift status and by area/ward —
+                        drillable for a deeper cost breakdown.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/26.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Member Utilisation — <span>Worked Hours &amp; Pay</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        A pivot of worked bookings and payable amount by member, for reviewing who is carrying
+                        the bank's workload.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/27.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Generate <span>PDF Reports</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Pick a date range and an optional area/ward, then generate a Fill-Rate &amp;
+                        Agency-Displacement report or a Bank-Spend report as a formatted PDF.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/28.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Fill-Rate &amp; <span>Agency-Displacement Report</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Resolved shifts, filled by bank, sent to agency and fill rate, plus bank vs agency spend
+                        and cost avoidance by area — the evidence pack for finance and workforce leads.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/29.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Bank-Spend <span>Report</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Total bank cost against total agency cost, bank spend broken down by band, and every
+                        agency escalation with its cost — in one printable document.
+                    </div>
+
+                    <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/30.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="features" role="tabpanel">
+                <div class="p-3 py-md-5">
+
+                    <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">Our
+                        <span>Features</span>
+                    </h2>
+                    <div class="row" style="
+    border-radius: 10px;">
+
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4  d-flex flex-column align-items-center justify-content-center"
+                                 style="
+    padding: 25px;
+    background-color: #637eea0d;
+    border-radius: 10px;
+    text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="    width: 45px;
+    height: 45px;
+    background-color: #7877c633;
+    border-radius: 50%;
+
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #71639e;
+    margin-bottom: 15px;
+    ">01
+                                </div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: black;
+    line-height: 1.3;">Open Shift Lifecycle &amp; Bulk Creation</h3>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4  d-flex flex-column align-items-center justify-content-center"
+                                 style="
+    padding: 25px;
+    background-color: #637eea0d;
+    border-radius: 10px;
+    text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="    width: 45px;
+    height: 45px;
+    background-color: #7877c633;
+    border-radius: 50%;
+
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #71639e;
+    margin-bottom: 15px;
+    ">02
+                                </div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: black;
+    line-height: 1.3;">Eligibility-Checked Shift Offers</h3>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4  d-flex flex-column align-items-center justify-content-center"
+                                 style="
+    padding: 25px;
+    background-color: #637eea0d;
+    border-radius: 10px;
+    text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="    width: 45px;
+    height: 45px;
+    background-color: #7877c633;
+    border-radius: 50%;
+
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #71639e;
+    margin-bottom: 15px;
+    ">03
+                                </div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: black;
+    line-height: 1.3;">Rate Cards by Band, Role &amp; Shift Type</h3>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4  d-flex flex-column align-items-center justify-content-center"
+                                 style="
+    padding: 25px;
+    background-color: #637eea0d;
+    border-radius: 10px;
+    text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="    width: 45px;
+    height: 45px;
+    background-color: #7877c633;
+    border-radius: 50%;
+
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #71639e;
+    margin-bottom: 15px;
+    ">04
+                                </div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: black;
+    line-height: 1.3;">Compliance Gate Linked to Training &amp; Registrations</h3>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4  d-flex flex-column align-items-center justify-content-center"
+                                 style="
+    padding: 25px;
+    background-color: #637eea0d;
+    border-radius: 10px;
+    text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="    width: 45px;
+    height: 45px;
+    background-color: #7877c633;
+    border-radius: 50%;
+
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #71639e;
+    margin-bottom: 15px;
+    ">05
+                                </div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: black;
+    line-height: 1.3;">Safe Weekly-Hours Safeguard</h3>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4  d-flex flex-column align-items-center justify-content-center"
+                                 style="
+    padding: 25px;
+    background-color: #637eea0d;
+    border-radius: 10px;
+    text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="    width: 45px;
+    height: 45px;
+    background-color: #7877c633;
+    border-radius: 50%;
+
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #71639e;
+    margin-bottom: 15px;
+    ">06
+                                </div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: black;
+    line-height: 1.3;">Fill-Rate Dashboard &amp; Bank vs Agency Analytics</h3>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="tab-pane fade" id="faq" role="tabpane2 ">
+                <div class="p-3 py-md-5">
+
+                    <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Frequently Asked <span>Questions</span></h2>
+
+                    <div class="modern-accordion">
+                        <div class="accordion accordion-flush" id="accordionFlushExample">
+                            <div class="accordion-item loading-animation"
+                                 style="margin-bottom: 1rem;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                <h2 class="accordion-header" style="border-radius: 10px;">
+                                    <a class="accordion-button  collapsed" type="button" style="box-shadow: unset;
+    border: none !important;
+    padding: 1.5rem 2rem !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem;
+
+    color: #71639e !important;
+    background-color: #e3e3f3a9 !important;
+    position: relative;
+    overflow: hidden;" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false"
+                                       aria-controls="flush-collapseOne"
+                                       style="font-size: 1.1rem;position: relative;overflow: hidden;background-color: white !important;border: none !important;padding: 1.5rem 2rem !important;font-weight: 600 !important;color: #1e293b !important;border-radius: 10px !important;">
+                                        How is a member's eligibility for a shift offer decided?
+                                    </a>
+                                </h2>
+                                <div id="flush-collapseOne" class="accordion-collapse collapse"
+                                     data-bs-parent="#accordionFlushExample" style="border-top: 1px solid #e2e8f0;">
+                                    <div class="accordion-body"
+                                         style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                        <p style="margin-bottom: 1rem;">When a shift is offered, each member is
+                                            checked against the shift's required band, role and skills, their
+                                            cleared areas and their declared availability. Anyone who doesn't
+                                            match is shown as ineligible with the exact reason — missing skill,
+                                            band mismatch, or not available for those dates/times — before the
+                                            offer is sent, so managers know exactly why someone was skipped.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item loading-animation"
+                                 style="margin-bottom: 1rem;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                <h2 class="accordion-header" style="border-radius: 10px;">
+                                    <a class="accordion-button  collapsed" type="button" style="box-shadow: unset;
+    border: none !important;
+    padding: 1.5rem 2rem !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem;
+
+    color: #71639e !important;
+    background-color: #e3e3f3a9 !important;
+    position: relative;
+    overflow: hidden;" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false"
+                                       aria-controls="flush-collapseTwo"
+                                       style="font-size: 1.1rem;position: relative;overflow: hidden;background-color: white !important;border: none !important;padding: 1.5rem 2rem !important;font-weight: 600 !important;color: #1e293b !important;border-radius: 10px !important;">
+                                        What happens if a booking would breach a member's safe working-hours limit?
+                                    </a>
+                                </h2>
+                                <div id="flush-collapseTwo" class="accordion-collapse collapse"
+                                     data-bs-parent="#accordionFlushExample" style="border-top: 1px solid #e2e8f0;">
+                                    <div class="accordion-body"
+                                         style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                        <p style="margin-bottom: 1rem;">It depends on the Gate Policy set in
+                                            Configuration ▸ Settings. Hard Block prevents the booking outright
+                                            while a non-compliant or over-hours situation exists; Warn Only lets
+                                            the booking go ahead but flags a visible working-time breach warning
+                                            on the booking record, so the decision and its risk stay on file.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item loading-animation"
+                                 style="margin-bottom: 0;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                <h2 class="accordion-header" style="border-radius: 10px;">
+                                    <a class="accordion-button  collapsed" type="button" style="box-shadow: unset;
+    border: none !important;
+    padding: 1.5rem 2rem !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem;
+
+    color: #71639e !important;
+    background-color: #e3e3f3a9 !important;
+    position: relative;
+    overflow: hidden;" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false"
+                                       aria-controls="flush-collapseThree"
+                                       style="font-size: 1.1rem;position: relative;overflow: hidden;background-color: white !important;border: none !important;padding: 1.5rem 2rem !important;font-weight: 600 !important;color: #1e293b !important;border-radius: 10px !important;">
+                                        Can the module show how much bank use is saving against agency?
+                                    </a>
+                                </h2>
+                                <div id="flush-collapseThree" class="accordion-collapse collapse"
+                                     data-bs-parent="#accordionFlushExample" style="border-top: 1px solid #e2e8f0;">
+                                    <div class="accordion-body"
+                                         style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                        <p style="margin-bottom: 1rem;">Yes. Escalating an unfilled shift to
+                                            agency records the agency's cost against the shift, and the
+                                            Fill-Rate Dashboard compares that to the bank cost using a
+                                            configurable agency comparator uplift to show cost avoidance. The
+                                            Fill-Rate &amp; Agency-Displacement and Bank-Spend PDF reports turn
+                                            the same figures into a document for finance and workforce
+                                            leads.</p>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="latest-release" role="tabpanel">
+                <div class="p-3 py-md-5">
+                    <h2 class="mainhead text-center mb-4"
+                        style="font-size: 2rem;font-weight: 700;color: black;">
+                        Latest <span>Releases</span></h2>
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="release-item h-100" style="position: relative;
+                        padding: 30px;
+                        border: 2px solid #71639e24;
+                        border-radius: 15px;">
+                                <div class="release-header d-flex align-items-center flex-wrap gap-3"
+                                     style="margin-bottom: 0.75rem;">
+                                    <div class="version" style="font-size: 1.25rem;
+                                font-weight: 700;
+                                color: #1a202c;">Latest Release 19.0.1.0.0
+                                    </div>
+                                    <div style="padding: 0.25rem 0.75rem;
+                                border-radius: 20px;
+                                font-size: 0.75rem;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                                position: relative;
+                                overflow: hidden;
+                                background-color: #9ae6b4;
+                                color: #2d7d32;
+                                border: 2px solid #68d391;">Add
+                                    </div>
+                                    <div class="date" style="color: #64748b;
+                                font-size: 0.875rem;
+                                font-weight: 500;
+                                gap: 0.5rem;">
+                                        <img src="./assets/icons/calendar.png" alt="" width="16" height="16"
+                                             style="margin-right: 5px;">
+                                        19th August, 2026
+                                    </div>
+                                </div>
+                                <div class="feature-list">
+                                    <div class="feature-item p-3" style="display: flex;
+                                align-items: center;
+                                padding: 25px;
+                                background-color: #f5f5f5e7;
+                                border-radius: 10px;
+                                text-align: left;">
+                                        <div class="feature-text" style="color: #6b7280;
+                                line-height: 1.6;
+                                font-size: 0.95rem;">Initial Commit
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+        <div class="container-fluid cmpad py-2 py-md-5">
+    <div class="highlights-section">
+
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Related
+            <span>Modules</span>
+        </h2>
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/base_accounting_kit"
+                   style="text-decoration: none;">
+                    <div class="highlight-card h-100 p-4" style="background-color: white;
+                       backdrop-filter: blur(20px);
+                       border-radius: 10px;
+                       padding: 32px;
+                       border: 2px solid #71639e1a;
+                       position: relative;
+                       overflow: hidden;">
+
+
+                        <div class="card-image" style="    border: 2px solid #71639e1c;
+                       margin-bottom: 1rem;
+                       border-radius: 10px;
+                       overflow: hidden;">
+                            <img src="./assets/modules/module1.gif" alt=""
+                                 style="width: 100%;border-radius: 10px;">
+                        </div>
+
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo 19 Full Accounting Kit for Community</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/hide_menu_user"
+                   style="text-decoration: none;">
+                    <div class="highlight-card h-100 p-4" style="background-color: white;
+                       backdrop-filter: blur(20px);
+                       border-radius: 10px;
+                       padding: 32px;
+                       border: 2px solid #71639e1a;
+                       position: relative;
+                       overflow: hidden;">
+
+
+                        <div class="card-image" style="    border: 2px solid #71639e1c;
+                       margin-bottom: 1rem;
+                       border-radius: 10px;
+                       overflow: hidden;">
+                            <img src="./assets/modules/module2.jpg" alt=""
+                                 style="width: 100%;border-radius: 10px;">
+                        </div>
+
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Hide Any Menu User Wise</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/base_account_budget"
+                   style="text-decoration: none;">
+                    <div class="highlight-card h-100 p-4" style="background-color: white;
+                       backdrop-filter: blur(20px);
+                       border-radius: 10px;
+                       padding: 32px;
+                       border: 2px solid #71639e1a;
+                       position: relative;
+                       overflow: hidden;">
+
+                        <div class="card-image" style="    border: 2px solid #71639e1c;
+                           margin-bottom: 1rem;
+                           border-radius: 10px;
+                           overflow: hidden;">
+                            <img src="./assets/modules/module3.jpg" alt=""
+                                 style="width: 100%;border-radius: 10px;">
+                        </div>
+
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo 19 Budget Management</h3>
+
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+        <div class="container-fluid cmpad py-2 py-md-5">
+            <div class="highlights-section">
+
+                <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Our
+                    <span>Services</span>
+                </h2>
+                <div class="row">
+
+                    <div class="col-md-3 mb-4">
+                        <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                             style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                            <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                                 style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                                <img src="./assets/icons/setting.png" alt="" width="30" height="30">
+                            </div>
+                            <h3 class="card-title"
+                                style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                                Odoo Customization</h3>
+
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-4">
+                        <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                             style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                            <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                                 style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                                <img src="./assets/icons/imple.png" alt="" width="30" height="30">
+                            </div>
+                            <h3 class="card-title"
+                                style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                                Odoo Implementation</h3>
+
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-4">
+                        <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                             style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                            <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                                 style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                                <img src="./assets/icons/support.png" alt="" width="30" height="30">
+                            </div>
+                            <h3 class="card-title"
+                                style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                                Odoo Support</h3>
+
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-4">
+                        <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                             style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                            <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                                 style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                                <img src="./assets/icons/transfer.png" alt="" width="30" height="30">
+                            </div>
+                            <h3 class="card-title"
+                                style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                                Odoo Migration</h3>
+
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-4">
+                        <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                             style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                            <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                                 style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                                <img src="./assets/icons/idea.png" alt="" width="30" height="30">
+                            </div>
+                            <h3 class="card-title"
+                                style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                                Odoo integration</h3>
+
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-4">
+                        <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                             style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                            <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                                 style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                                <img src="./assets/icons/chat.png" alt="" width="30" height="30">
+                            </div>
+                            <h3 class="card-title"
+                                style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                                Odoo Consultancy</h3>
+
+
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-3 mb-4">
+                        <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                             style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                            <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                                 style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                                <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                            </div>
+                            <h3 class="card-title"
+                                style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                                Odoo Licensing</h3>
+
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-4">
+                        <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                             style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                            <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                                 style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                                <img src="./assets/icons/people.png" alt="" width="30" height="30">
+                            </div>
+                            <h3 class="card-title"
+                                style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                                Hire Odoo Developer</h3>
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+</html>

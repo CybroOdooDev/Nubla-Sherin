@@ -10,7 +10,7 @@
                     <group string="Shift Details">
                         <field name="org_unit_id"/>
                         <field name="band_id"/>
-                        <field name="role"/>
+                        <field name="role_id"/>
                         <field name="skill_ids" widget="many2many_tags"/>
                         <field name="shift_type_id"/>
                         <field name="headcount"/>

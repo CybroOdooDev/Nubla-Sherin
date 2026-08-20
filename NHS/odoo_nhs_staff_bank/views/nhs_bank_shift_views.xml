@@ -14,7 +14,7 @@
                 <field name="org_unit_id"/>
                 <field name="band_id"/>
                 <field name="shift_type_id"/>
-                <field name="role"/>
+                <field name="role_id"/>
                 <field name="time_range"/>
                 <templates>
                     <t t-name="menu">
@@ -42,10 +42,10 @@
                                 <i class="fa fa-map-marker me-1" title="Area"/><span t-out="record.org_unit_id.value"/>
                             </div>
                             <div class="d-flex flex-wrap gap-1 mb-1"
-                                 invisible="not band_id and not shift_type_id and not role">
+                                 invisible="not band_id and not shift_type_id and not role_id">
                                 <span t-if="record.band_id.raw_value" class="badge text-bg-light border" t-out="record.band_id.value"/>
                                 <span t-if="record.shift_type_id.raw_value" class="badge text-bg-light border" t-out="record.shift_type_id.value"/>
-                                <span t-if="record.role.raw_value" class="badge text-bg-light border" t-out="record.role.value"/>
+                                <span t-if="record.role_id.raw_value" class="badge text-bg-light border" t-out="record.role_id.value"/>
                             </div>
                             <div class="text-muted small mb-2" invisible="not time_range">
                                 <i class="fa fa-clock-o me-1" title="Time"/><span t-out="record.time_range.value"/>
@@ -82,7 +82,7 @@
                 <field name="shift_start"/>
                 <field name="shift_end"/>
                 <field name="band_id"/>
-                <field name="role"/>
+                <field name="role_id"/>
                 <field name="headcount"/>
                 <field name="filled_count"/>
                 <field name="urgency" widget="badge"/>
@@ -122,9 +122,6 @@
                         <button name="action_view_offers" type="object" class="oe_stat_button" icon="fa-paper-plane">
                             <field name="offer_count" widget="statinfo" string="Offers"/>
                         </button>
-                        <button name="action_view_bookings" type="object" class="oe_stat_button" icon="fa-check-square-o">
-                            <field name="filled_count" widget="statinfo" string="Filled"/>
-                        </button>
                         <button name="action_view_bookings" type="object" class="oe_stat_button" icon="fa-calendar-check-o">
                             <field name="booking_count" widget="statinfo" string="Bookings"/>
                         </button>
@@ -136,13 +133,15 @@
                     <group>
                         <group string="Where &amp; When">
                             <field name="org_unit_id"/>
+                            <field name="manager_id"
+                                   placeholder="No manager set on this Area/Ward — the 'shift filled' email has nowhere to send"/>
                             <field name="shift_start"/>
                             <field name="shift_end"/>
                             <field name="shift_type_id"/>
                         </group>
                         <group string="Cover Requirements">
                             <field name="band_id"/>
-                            <field name="role"/>
+                            <field name="role_id"/>
                             <field name="skill_ids" widget="many2many_tags"/>
                             <field name="headcount"/>
                             <field name="reason"/>
@@ -174,13 +173,15 @@
                     </group>
                     <notebook>
                         <page string="Offers">
-                            <field name="offer_ids" readonly="1">
-                                <list>
+                            <field name="offer_ids">
+                                <list create="0" edit="0" delete="0">
                                     <field name="member_id"/>
                                     <field name="offered_at"/>
                                     <field name="response" widget="badge"/>
                                     <field name="eligible"/>
                                     <field name="decline_reason"/>
+                                    <field name="company_booking_mode" column_invisible="True"/>
+                                    <button name="action_allocate_booking" type="object" string="Allocate" class="btn-primary" invisible="response != 'accepted' or company_booking_mode != 'manager_allocated'" groups="odoo_nhs_staff_bank.group_nhs_bank_manager" icon="fa-check"/>
                                 </list>
                             </field>
                         </page>
@@ -224,7 +225,7 @@
                 <field name="name"/>
                 <field name="org_unit_id"/>
                 <field name="band_id"/>
-                <field name="role"/>
+                <field name="role_id"/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Open" name="open"
                         domain="[('state', 'in', ('open', 'partially_filled')), ('shift_end', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>

@@ -63,7 +63,10 @@
                     </group>
                     <group string="Pay">
                         <field name="currency_id" invisible="1"/>
-                        <field name="rate_id"/>
+                        <field name="shift_band_id" invisible="1"/>
+                        <field name="shift_role_id" invisible="1"/>
+                        <field name="shift_type_id" invisible="1"/>
+                        <field name="rate_id" domain="['|', ('band_id', '=', False), ('band_id', '=', shift_band_id), '|', ('role_id', '=', False), ('role_id', '=', shift_role_id), '|', ('shift_type_id', '=', False), ('shift_type_id', '=', shift_type_id)]"/>
                         <field name="rate_override"/>
                         <field name="rate_override_reason" invisible="not rate_override"/>
                         <field name="payable_amount" readonly="1"/>

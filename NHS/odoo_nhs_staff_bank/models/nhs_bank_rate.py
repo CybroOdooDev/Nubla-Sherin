@@ -32,7 +32,7 @@ class NhsBankRate(models.Model):
     _order = 'band_id, effective_from desc'
 
     name = fields.Char(
-        string='Rate Label',
+        string='Name',
         required=True,
         help="Rate label, e.g. 'Band 5 Night — Ward'."
     )
@@ -46,17 +46,20 @@ class NhsBankRate(models.Model):
     band_id = fields.Many2one(
         'nhs.afc.band',
         string='Band',
+        required=True,
         help="Agenda for Change band the rate applies to. Leave blank for a"
              " role-only (non-AfC) rate."
     )
-    role = fields.Char(
+    role_id = fields.Many2one(
+        comodel_name='nhs.staff.group',
         string='Role',
-        help="Role the rate is specific to, where relevant (e.g. 'Registered Nurse')."
-             " Leave blank for a band-wide rate."
+        required=True,
+        help="Role the rate is specific to, where relevant. Leave blank for a band-wide rate."
     )
     shift_type_id = fields.Many2one(
         'nhs.shift.type',
         string='Shift Type',
+        required=True,
         help="Day / night / weekend / bank holiday. Leave blank for a rate that"
              " applies regardless of shift type."
     )
@@ -105,7 +108,7 @@ class NhsBankRate(models.Model):
                     "The 'Effective To' date cannot be before 'Effective From'.")
 
     @api.model
-    def _find_rate(self, band_id=False, role=False, shift_type_id=False, date=None, company_id=False):
+    def _find_rate(self, band_id=False, role_id=False, shift_type_id=False, date=None, company_id=False):
         """Resolve the single best-matching effective rate for a band/role/shift-type
         combination on a given date, preferring the most specific match
         (band + role + shift type) down to the least specific (band only).
@@ -123,15 +126,15 @@ class NhsBankRate(models.Model):
         if shift_type_id:
             candidates = candidates.filtered(
                 lambda r: not r.shift_type_id or r.shift_type_id.id == shift_type_id)
-        if role:
-            role_candidates = candidates.filtered(lambda r: r.role and r.role.strip().lower() == role.strip().lower())
-            generic_candidates = candidates.filtered(lambda r: not r.role)
+        if role_id:
+            role_candidates = candidates.filtered(lambda r: r.role_id and r.role_id.id == role_id)
+            generic_candidates = candidates.filtered(lambda r: not r.role_id)
         else:
             role_candidates = self.browse()
-            generic_candidates = candidates.filtered(lambda r: not r.role)
+            generic_candidates = candidates.filtered(lambda r: not r.role_id)
 
         def _score(rate):
-            return (bool(rate.band_id), bool(rate.role), bool(rate.shift_type_id))
+            return (bool(rate.band_id), bool(rate.role_id), bool(rate.shift_type_id))
 
         pool = (role_candidates or generic_candidates)
         if band_id:
