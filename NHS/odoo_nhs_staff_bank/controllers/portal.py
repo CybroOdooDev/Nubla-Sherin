@@ -119,6 +119,7 @@ class NhsStaffBankPortal(CustomerPortal):
             'member': member,
             'shifts': eligible_shifts,
             'page_name': 'bank_shifts',
+            'accepted': kw.get('accepted'),
         }
         return request.render('odoo_nhs_staff_bank.portal_bank_shifts', values)
 
@@ -126,24 +127,44 @@ class NhsStaffBankPortal(CustomerPortal):
     def portal_bank_shift_accept(self, shift_id, **kw):
         """`/my/bank/shifts/<id>/accept`: creates (or reuses) a pending offer
         for the member on this shift and accepts it, provided the member is
-        still eligible; then redirects back to the shift list."""
+        still eligible; then redirects back to the shift list. On a
+        validation error (e.g. an overlapping booking, or the shift filling
+        up in the meantime), re-renders the shift list with the error shown
+        instead of crashing or silently dropping the click."""
         member = self._get_bank_member()
+        if not member:
+            return request.redirect('/my/bank')
         shift = request.env['nhs.bank.shift'].sudo().browse(shift_id).exists()
-        if member and shift:
+        error = None
+        if shift:
             gate = request.env['nhs.compliance.gate'].sudo()
             outcome = gate.eligibility(shift, member)
             if outcome['eligible']:
-                offer = shift.offer_ids.filtered(
-                    lambda o: o.member_id == member and o.response == 'pending')
-                if not offer:
-                    offer = request.env['nhs.shift.offer'].sudo().create({
-                        'shift_id': shift.id, 'member_id': member.id,
-                    })
                 try:
+                    offer = shift.offer_ids.filtered(
+                        lambda o: o.member_id == member and o.response == 'pending')
+                    if not offer:
+                        offer = request.env['nhs.shift.offer'].sudo().create({
+                            'shift_id': shift.id, 'member_id': member.id,
+                        })
                     offer.sudo().action_accept()
-                except Exception:
-                    pass
-        return request.redirect('/my/bank/shifts')
+                except (ValidationError, UserError) as exc:
+                    error = str(exc)
+            else:
+                error = "You're no longer eligible for this shift."
+        if error:
+            open_shifts = request.env['nhs.bank.shift'].sudo().search(
+                [('state', 'in', ('open', 'partially_filled'))], order='shift_start')
+            gate = request.env['nhs.compliance.gate'].sudo()
+            eligible_shifts = open_shifts.filtered(lambda s: gate.eligibility(s, member)['eligible'])
+            values = {
+                'member': member,
+                'shifts': eligible_shifts,
+                'page_name': 'bank_shifts',
+                'error': error,
+            }
+            return request.render('odoo_nhs_staff_bank.portal_bank_shifts', values)
+        return request.redirect('/my/bank/shifts?accepted=1')
 
     @http.route(['/my/bank/offers/<int:offer_id>/decline'], type='http', auth='user', website=True, methods=['POST'])
     def portal_bank_offer_decline(self, offer_id, **kw):

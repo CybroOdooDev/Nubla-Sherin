@@ -34,9 +34,9 @@
                     <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click p-2 border-start border-4 #{record.urgency.raw_value == 'last_minute' ? 'border-danger' : (record.urgency.raw_value == 'urgent' ? 'border-warning' : 'border-secondary-subtle')}">
                             <div class="d-flex justify-content-between align-items-start">
-                                <strong class="fs-6" t-out="record.name.value"/>
-                                <span t-if="record.urgency.raw_value == 'last_minute'" class="badge text-bg-danger">Last-Minute</span>
-                                <span t-elif="record.urgency.raw_value == 'urgent'" class="badge text-bg-warning">Urgent</span>
+                                <strong class="fs-6 me-2" t-out="record.name.value"/>
+                                <span t-if="record.urgency.raw_value == 'last_minute'" class="badge text-bg-danger flex-shrink-0" style="max-width: none;overflow: visible;text-overflow: unset;">Last-Minute</span>
+                                <span t-elif="record.urgency.raw_value == 'urgent'" class="badge text-bg-warning flex-shrink-0" style="max-width: none;overflow: visible;text-overflow: unset;">Urgent</span>
                             </div>
                             <div class="text-muted small mb-1">
                                 <i class="fa fa-map-marker me-1" title="Area"/><span t-out="record.org_unit_id.value"/>
@@ -137,7 +137,7 @@
                                    placeholder="No manager set on this Area/Ward — the 'shift filled' email has nowhere to send"/>
                             <field name="shift_start"/>
                             <field name="shift_end"/>
-                            <field name="shift_type_id"/>
+                            <field name="shift_type_id" widget="radio" options="{'horizontal': true}"/>
                         </group>
                         <group string="Cover Requirements">
                             <field name="band_id"/>

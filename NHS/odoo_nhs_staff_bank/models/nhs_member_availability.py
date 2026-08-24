@@ -121,3 +121,32 @@ class NhsMemberAvailability(models.Model):
             if record.recurring and record.recurrence_end_date:
                 if record.recurrence_end_date < record.date_from.date():
                     raise ValidationError("'Recurs Until' date cannot be before the 'From' date.")
+
+    @api.constrains('member_id', 'date_from', 'date_to', 'active', 'recurring')
+    def _check_no_overlap(self):
+        """A member can't have two windows overlapping in time for the same
+        period — it'd be ambiguous whether they're available or not. Scoped
+        to non-recurring windows only: a recurring record's date_from/date_to
+        is just its first occurrence, not its actual span, so comparing that
+        raw range against other windows would misfire."""
+        for record in self:
+            if not record.active or record.recurring:
+                continue
+            overlapping = self.search([
+                ('id', '!=', record.id),
+                ('member_id', '=', record.member_id.id),
+                ('active', '=', True),
+                ('recurring', '=', False),
+                ('date_from', '<', record.date_to),
+                ('date_to', '>', record.date_from),
+            ], limit=1)
+            if overlapping:
+                raise ValidationError(
+                    "%s already has an availability window (%s, %s → %s) "
+                    "that overlaps this one." % (
+                        record.member_id.name,
+                        dict(overlapping._fields['availability_type'].selection).get(
+                            overlapping.availability_type, overlapping.availability_type),
+                        overlapping.date_from, overlapping.date_to,
+                    )
+                )

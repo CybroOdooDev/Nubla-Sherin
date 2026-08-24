@@ -156,6 +156,22 @@ class NhsShiftOffer(models.Model):
                     "'%s' is currently '%s'." % (shift.display_name, shift.state)
                 )
         for vals in vals_list:
+            if vals.get('shift_id') and vals.get('member_id'):
+                shift = self.env['nhs.bank.shift'].browse(vals['shift_id'])
+                member = self.env['nhs.bank.member'].browse(vals['member_id'])
+                overlapping = self.env['nhs.shift.booking'].search([
+                    ('member_id', '=', member.id),
+                    ('state', 'in', ('booked', 'worked')),
+                    ('shift_start', '<', shift.shift_end),
+                    ('shift_end', '>', shift.shift_start),
+                ])
+                if overlapping:
+                    raise ValidationError(
+                        "%s already has a booking that overlaps this shift. "
+                        "An offer can't be made to a member who's already booked "
+                        "on it." % member.name
+                    )
+        for vals in vals_list:
             if 'eligible' not in vals and vals.get('shift_id') and vals.get('member_id'):
                 shift = self.env['nhs.bank.shift'].browse(vals['shift_id'])
                 member = self.env['nhs.bank.member'].browse(vals['member_id'])
@@ -187,9 +203,6 @@ class NhsShiftOffer(models.Model):
                     'shift_id': offer.shift_id.id,
                     'member_id': offer.member_id.id,
                 })
-            # Any other still-pending offers for the same shift/member become moot
-            # once headcount is reached; leave them for the coordinator to withdraw
-            # explicitly if the shift is now full, via the shift's own state.
 
     def action_allocate_booking(self):
         """Manager allocates an accepted offer to a booking (Manager-Allocated mode)."""

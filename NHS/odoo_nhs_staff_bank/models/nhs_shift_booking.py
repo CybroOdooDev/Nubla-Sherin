@@ -269,10 +269,6 @@ class NhsShiftBooking(models.Model):
             shift = booking.shift_id
             if shift in notified_shifts:
                 continue
-            # 'state' is a plain field, only updated as a side effect inside
-            # _compute_filled_count() (the compute for 'filled_count'); force it
-            # here so we see the shift's fresh post-booking state, not the
-            # stale pre-booking value.
             shift._compute_filled_count()
             if shift.state != 'filled':
                 continue

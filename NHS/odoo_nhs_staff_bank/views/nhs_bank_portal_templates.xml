@@ -180,6 +180,10 @@
             <t t-set="breadcrumbs_searchbar" t-value="False"/>
             <div class="container o_portal_bank mt-3">
                 <h2>Available Shifts</h2>
+                <div class="alert alert-danger" role="alert" t-if="error" t-esc="error"/>
+                <div class="alert alert-success" role="alert" t-if="accepted">
+                    Shift accepted — see it under <a href="/my/bank/bookings">My Bookings</a>.
+                </div>
                 <t t-if="shifts">
                     <div class="card shadow-sm rounded-3 mb-4">
                         <t t-call="portal.portal_table">

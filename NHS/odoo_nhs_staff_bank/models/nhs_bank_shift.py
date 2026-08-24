@@ -474,13 +474,24 @@ class NhsBankShift(models.Model):
         self.write({'state': 'open'})
 
     def action_view_offers(self):
-        """Open the offers made for this shift."""
+        """Open the offers made for this shift. Once the shift is Filled,
+        there's no valid member left to manually offer it to (an eligible
+        member wouldn't include one already filling it, and offering it
+        again makes no sense) — swap in the "New"-disabled view variants so
+        that state doesn't dead-end into a create form whose Shift field
+        just gets silently cleared the moment a member is picked."""
         self.ensure_one()
+        list_view = self.env.ref('odoo_nhs_staff_bank.view_nhs_shift_offer_list')
+        form_view = self.env.ref('odoo_nhs_staff_bank.view_nhs_shift_offer_form')
+        if self.state == 'filled':
+            list_view = self.env.ref('odoo_nhs_staff_bank.view_nhs_shift_offer_list_filled')
+            form_view = self.env.ref('odoo_nhs_staff_bank.view_nhs_shift_offer_form_filled')
         return {
             'name': ('Offers'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.shift.offer',
             'view_mode': 'list,form',
+            'views': [(list_view.id, 'list'), (form_view.id, 'form')],
             'domain': [('shift_id', '=', self.id)],
             'context': {'default_shift_id': self.id},
         }

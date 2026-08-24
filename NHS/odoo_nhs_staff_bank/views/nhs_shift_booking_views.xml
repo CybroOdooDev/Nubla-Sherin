@@ -5,7 +5,7 @@
         <field name="name">nhs.shift.booking.list</field>
         <field name="model">nhs.shift.booking</field>
         <field name="arch" type="xml">
-            <list string="Bookings" decoration-warning="working_time_breach"
+            <list string="Bookings" create="0" decoration-warning="working_time_breach"
                   decoration-danger="state == 'no_show'" decoration-muted="state == 'cancelled'">
                 <field name="name"/>
                 <field name="shift_id"/>
@@ -25,7 +25,7 @@
         <field name="name">nhs.shift.booking.form</field>
         <field name="model">nhs.shift.booking</field>
         <field name="arch" type="xml">
-            <form string="Booking">
+            <form string="Booking" create="0">
                 <header>
                     <button name="action_confirm_worked" type="object" string="Confirm Worked" class="btn-primary"
                             invisible="state != 'booked'"/>
@@ -101,7 +101,11 @@
         </field>
     </record>
 
-    <!-- Window action: Bookings menu entry -->
+    <!-- Window action: Bookings menu entry. Read/manage only — bookings are
+         only ever created via the Offer -> Accept flow (or Manager-Allocated
+         allocation), which enforce the overlap/headcount/eligibility checks
+         that a direct "New" here would bypass; create is disabled on both
+         views above accordingly. -->
     <record id="action_nhs_shift_booking" model="ir.actions.act_window">
         <field name="name">Bookings</field>
         <field name="res_model">nhs.shift.booking</field>

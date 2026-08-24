@@ -51,20 +51,26 @@ class NhsOfferShiftWizard(models.TransientModel):
         shift_id = res.get('shift_id') or self.env.context.get('default_shift_id')
         if shift_id:
             shift = self.env['nhs.bank.shift'].browse(shift_id)
-            # Pending: still awaiting a response, don't re-offer. Accepted: already
-            # booked (or booking in progress), never re-offer. Declined/expired/
-            # withdrawn are legitimate to retry, so they're left offerable again.
             already_offered = shift.offer_ids.filtered(
                 lambda o: o.response in ('pending', 'accepted')).member_id
+            already_booked = self.env['nhs.shift.booking'].search([
+                ('state', 'in', ('booked', 'worked')),
+                ('shift_start', '<', shift.shift_end),
+                ('shift_end', '>', shift.shift_start),
+            ]).member_id
+            skip = already_offered | already_booked
             lines = []
             for outcome in shift.get_eligible_members():
                 member = outcome['member']
+                reasons = outcome['reasons']
+                if member in already_booked and member not in already_offered:
+                    reasons = reasons + ['Already has a booking that overlaps this shift.']
                 lines.append((0, 0, {
                     'member_id': member.id,
-                    'eligible': outcome['eligible'],
-                    'reasons': '; '.join(outcome['reasons']),
-                    'already_offered': member in already_offered,
-                    'selected': outcome['eligible'] and member not in already_offered,
+                    'eligible': outcome['eligible'] and member not in already_booked,
+                    'reasons': '; '.join(reasons),
+                    'already_offered': member in skip,
+                    'selected': outcome['eligible'] and member not in skip,
                 }))
             res['line_ids'] = lines
         return res
@@ -125,5 +131,8 @@ class NhsOfferShiftWizardLine(models.TransientModel):
     member_id = fields.Many2one('nhs.bank.member', string='Member', required=True)
     eligible = fields.Boolean(string='Eligible', readonly=True)
     reasons = fields.Char(string='Reason / Warning', readonly=True)
-    already_offered = fields.Boolean(string='Already Offered', readonly=True)
+    already_offered = fields.Boolean(
+        string='Already Offered / Booked', readonly=True,
+        help="True if the member already has a pending/accepted offer, or an"
+             " existing booking that overlaps this shift.")
     selected = fields.Boolean(string='Offer')

@@ -136,7 +136,8 @@
                             <field name="workforce_member_id"
                                    domain="[('post_id', '=', post_id)] if member_type == 'substantive_bank' and post_id else []"/>
                             <field name="company_auto_create_portal_user" invisible="1"/>
-                            <field name="user_id" invisible="not id and company_auto_create_portal_user"/>
+                            <field name="user_id" invisible="not id and company_auto_create_portal_user"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
                             <field name="partner_id" invisible="1"/>
                             <field name="email"/>
                             <field name="phone"/>

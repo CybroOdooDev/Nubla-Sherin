@@ -6,10 +6,12 @@ access_nhs_org_unit_bank_officer,nhs.org.unit bank officer,odoo_nhs_establishmen
 access_nhs_org_unit_bank_user,nhs.org.unit bank internal user,odoo_nhs_establishment.model_nhs_org_unit,base.group_user,1,0,0,0
 access_nhs_workforce_member_bank_officer,nhs.workforce.member bank officer,odoo_nhs_training.model_nhs_workforce_member,group_nhs_bank_officer,1,0,0,0
 access_nhs_weekday_officer,nhs.weekday officer,model_nhs_weekday,group_nhs_bank_officer,1,0,0,0
-access_nhs_skill_officer,nhs.skill officer,model_nhs_skill,group_nhs_bank_officer,1,1,1,0
+access_nhs_weekday_user,nhs.weekday user,model_nhs_weekday,base.group_user,1,0,0,0
+access_nhs_weekday_member,nhs.weekday member,model_nhs_weekday,group_nhs_bank_member,1,0,0,0
+access_nhs_skill_officer,nhs.skill officer,model_nhs_skill,group_nhs_bank_officer,1,0,0,0
 access_nhs_skill_manager,nhs.skill manager,model_nhs_skill,group_nhs_bank_manager,1,1,1,1
 access_nhs_skill_member,nhs.skill member,model_nhs_skill,group_nhs_bank_member,1,0,0,0
-access_nhs_shift_type_officer,nhs.shift.type officer,model_nhs_shift_type,group_nhs_bank_officer,1,1,1,0
+access_nhs_shift_type_officer,nhs.shift.type officer,model_nhs_shift_type,group_nhs_bank_officer,1,0,0,0
 access_nhs_shift_type_manager,nhs.shift.type manager,model_nhs_shift_type,group_nhs_bank_manager,1,1,1,1
 access_nhs_shift_type_member,nhs.shift.type member,model_nhs_shift_type,group_nhs_bank_member,1,0,0,0
 access_nhs_bank_rate_officer,nhs.bank.rate officer,model_nhs_bank_rate,group_nhs_bank_officer,1,0,0,0
@@ -24,7 +26,7 @@ access_nhs_member_availability_self,nhs.member.availability self,model_nhs_membe
 access_nhs_bank_shift_officer,nhs.bank.shift officer,model_nhs_bank_shift,group_nhs_bank_officer,1,1,1,0
 access_nhs_bank_shift_manager,nhs.bank.shift manager,model_nhs_bank_shift,group_nhs_bank_manager,1,1,1,1
 access_nhs_bank_shift_member,nhs.bank.shift member,model_nhs_bank_shift,group_nhs_bank_member,1,0,0,0
-access_nhs_bank_shift_user,nhs.bank.shift area manager,model_nhs_bank_shift,base.group_user,1,1,1,0
+access_nhs_bank_shift_area_manager,nhs.bank.shift area manager,model_nhs_bank_shift,group_nhs_bank_area_manager,1,1,1,0
 access_nhs_shift_offer_officer,nhs.shift.offer officer,model_nhs_shift_offer,group_nhs_bank_officer,1,1,1,1
 access_nhs_shift_offer_manager,nhs.shift.offer manager,model_nhs_shift_offer,group_nhs_bank_manager,1,1,1,1
 access_nhs_shift_offer_self,nhs.shift.offer self,model_nhs_shift_offer,group_nhs_bank_member,1,1,0,0

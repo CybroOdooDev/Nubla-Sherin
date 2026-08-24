@@ -92,8 +92,6 @@ class NhsBulkShiftWizard(models.TransientModel):
                     'urgency': self.urgency,
                     'shift_start': fields.Datetime.to_string(shift_start),
                     'shift_end': fields.Datetime.to_string(shift_end),
-                    # Bulk creation is a deliberate "raise these shifts now" action —
-                    # skip the draft review step new single shifts get by default.
                     'state': 'open',
                 })
             current += timedelta(days=1)

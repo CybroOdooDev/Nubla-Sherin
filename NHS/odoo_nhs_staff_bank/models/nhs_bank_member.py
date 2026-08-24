@@ -259,6 +259,13 @@ class NhsBankMember(models.Model):
             if self.workforce_member_id.org_unit_id.id not in self.area_ids.ids:
                 self.area_ids = [(4, self.workforce_member_id.org_unit_id.id)]
 
+    @api.onchange('user_id')
+    def _onchange_user_id_sync_email(self):
+        """When a Portal User is linked, default Email from that user's own
+        email (falling back to their login) if Email isn't already set."""
+        if self.user_id and not self.email:
+            self.email = self.user_id.email or self.user_id.login
+
     @api.model_create_multi
     def create(self, vals_list):
         """Assign a sequence reference when not provided."""
@@ -273,9 +280,13 @@ class NhsBankMember(models.Model):
 
     def _auto_create_portal_user(self):
         """When the company setting is on, automatically grant portal access
-        to newly-created members with an email set (and no portal user
-        already linked) — so a coordinator doesn't have to click "Create
-        Portal User" on every member by hand."""
+        to members with an email set (and no portal user already linked) —
+        so a coordinator doesn't have to click "Create Portal User" by hand.
+        Called both from create() and from write() (when email is added on
+        a member that had none yet), since a member created without an
+        email correctly skips this at creation time and would otherwise
+        never get a portal user unless someone remembers to click the
+        button after filling in the email later."""
         for member in self:
             if not member.company_id.nhs_bank_auto_create_portal_user:
                 continue
@@ -291,6 +302,8 @@ class NhsBankMember(models.Model):
         res = super().write(vals)
         if 'user_id' in vals:
             self._sync_user_group()
+        if 'email' in vals and vals.get('email'):
+            self._auto_create_portal_user()
         return res
 
     def _sync_user_group(self):

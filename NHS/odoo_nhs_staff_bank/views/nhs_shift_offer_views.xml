@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- List view: shift offers — colour-coded by response, with inline accept/decline buttons for pending offers -->
+    <!-- List view: shift offers — colour-coded by response, with inline accept/decline buttons for pending offers. -->
     <record id="view_nhs_shift_offer_list" model="ir.ui.view">
         <field name="name">nhs.shift.offer.list</field>
         <field name="model">nhs.shift.offer</field>
@@ -22,6 +22,38 @@
                         invisible="response != 'pending'"
                         groups="odoo_nhs_staff_bank.group_nhs_bank_officer"/>
             </list>
+        </field>
+    </record>
+
+    <!-- List view variant: same as above but with "New" disabled — used when opening Offers from an
+         already-Filled shift, where a manually-added offer has nowhere valid to go (get_eligible_shifts/
+         get_eligible_members already exclude a Filled shift, so the Shift field would just get silently
+         cleared by the member_id onchange the moment a member is picked). Open/Partially Filled shifts keep
+         using the base view above, where "New" stays available. -->
+    <record id="view_nhs_shift_offer_list_filled" model="ir.ui.view">
+        <field name="name">nhs.shift.offer.list.filled</field>
+        <field name="model">nhs.shift.offer</field>
+        <field name="inherit_id" ref="view_nhs_shift_offer_list"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="create">0</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Form view variant: same as below but with "New" disabled, for the same reason — paired with the list
+         variant above so a Filled shift's Offers smart button can't reach a create form at all, including by
+         direct URL. -->
+    <record id="view_nhs_shift_offer_form_filled" model="ir.ui.view">
+        <field name="name">nhs.shift.offer.form.filled</field>
+        <field name="model">nhs.shift.offer</field>
+        <field name="inherit_id" ref="view_nhs_shift_offer_form"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="create">0</attribute>
+            </xpath>
         </field>
     </record>
 

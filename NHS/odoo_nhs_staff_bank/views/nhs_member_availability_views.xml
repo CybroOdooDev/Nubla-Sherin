@@ -51,7 +51,7 @@
         <field name="model">nhs.member.availability</field>
         <field name="arch" type="xml">
             <calendar string="Availability Calendar" date_start="date_from" date_stop="date_to"
-                      color="member_id" mode="month">
+                      color="member_id" mode="month" quick_create="0" event_open_popup="1">
                 <field name="member_id"/>
                 <field name="availability_type"/>
             </calendar>
