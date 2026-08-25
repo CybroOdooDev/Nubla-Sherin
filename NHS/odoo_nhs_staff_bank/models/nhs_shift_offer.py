@@ -95,6 +95,15 @@ class NhsShiftOffer(models.Model):
     decline_reason = fields.Char(
         string='Decline Reason',
     )
+    booking_id = fields.Many2one(
+        'nhs.shift.booking',
+        string='Booking',
+        readonly=True,
+        help="The booking this offer produced, once accepted (and, in"
+             " Manager-Allocated mode, allocated). Empty for a pending/"
+             "declined/expired/withdrawn offer, or an accepted one still"
+             " awaiting manual allocation."
+    )
     active = fields.Boolean(
         string='Active',
         default=True,
@@ -197,9 +206,9 @@ class NhsShiftOffer(models.Model):
             if offer.shift_id.filled_count >= offer.shift_id.headcount:
                 raise UserError(("This shift is already fully booked."))
             offer.write({'response': 'accepted', 'responded_at': fields.Datetime.now()})
-            
+
             if offer.company_id.nhs_bank_booking_mode != 'manager_allocated':
-                self.env['nhs.shift.booking'].create({
+                offer.booking_id = self.env['nhs.shift.booking'].sudo().create({
                     'shift_id': offer.shift_id.id,
                     'member_id': offer.member_id.id,
                 })
@@ -211,6 +220,8 @@ class NhsShiftOffer(models.Model):
         for offer in self:
             if offer.response != 'accepted':
                 raise UserError(("Can only allocate offers that have been accepted by the member."))
+            if offer.booking_id:
+                raise UserError(("This offer has already been allocated to a booking."))
             existing = self.env['nhs.shift.booking'].search([
                 ('member_id', '=', offer.member_id.id),
                 ('state', 'in', ('booked', 'worked')),
@@ -222,22 +233,42 @@ class NhsShiftOffer(models.Model):
                     "%s already has a booking that overlaps this shift.") % offer.member_id.name)
             if offer.shift_id.filled_count >= offer.shift_id.headcount:
                 raise UserError(("This shift is already fully booked."))
-            
-            self.env['nhs.shift.booking'].create({
+
+            offer.booking_id = self.env['nhs.shift.booking'].create({
                 'shift_id': offer.shift_id.id,
                 'member_id': offer.member_id.id,
             })
 
     def action_decline(self, reason=None):
-        """Member declines the offer, recording an optional reason."""
+        """Member declines the offer, recording the reason. A reason is
+        required — via the Decline Offer wizard from the backend, or the
+        portal's own decline form — so there's always an audit trail of
+        why an offer was turned down."""
         for offer in self:
             if offer.response != 'pending':
                 raise UserError(("This offer has already been responded to."))
+            reason = reason or offer.decline_reason
+            if not reason:
+                raise UserError(("A reason is required to decline this offer."))
             offer.write({
                 'response': 'declined',
                 'responded_at': fields.Datetime.now(),
-                'decline_reason': reason or offer.decline_reason,
+                'decline_reason': reason,
             })
+
+    def action_open_decline_wizard(self):
+        """Open the Decline Offer wizard to collect the (required) reason —
+        the backend "Decline" button opens this instead of declining
+        directly, since action_decline() itself now requires a reason."""
+        self.ensure_one()
+        return {
+            'name': ('Decline Offer'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'nhs.offer.decline.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_offer_id': self.id},
+        }
 
     def action_withdraw(self):
         """Withdraw all still-pending offers in the set."""

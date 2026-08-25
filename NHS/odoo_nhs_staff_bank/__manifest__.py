@@ -44,6 +44,7 @@ requirements, fill temporary shifts efficiently, and monitor bank and agency sta
         'data/mail_template_data.xml',
         'data/ir_cron_data.xml',
         'wizards/nhs_offer_shift_wizard_views.xml',
+        'wizards/nhs_offer_decline_wizard_views.xml',
         'wizards/nhs_bulk_shift_wizard_views.xml',
         'wizards/nhs_escalate_agency_wizard_views.xml',
         'wizards/nhs_bank_report_wizard_views.xml',
@@ -75,5 +76,4 @@ requirements, fill temporary shifts efficiently, and monitor bank and agency sta
     'installable': True,
     'auto_install': False,
     'application': True,
-
 }

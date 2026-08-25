@@ -276,7 +276,7 @@ class NhsBankShift(models.Model):
         default=True,
     )
 
-    @api.depends('org_unit_id', 'shift_type_id', 'shift_start', 'role_id')
+    @api.depends('org_unit_id', 'shift_type_id', 'shift_start', 'role_id', 'band_id')
     def _compute_name(self):
         """Build the display name from area, shift type/role and date."""
         for shift in self:
@@ -297,11 +297,13 @@ class NhsBankShift(models.Model):
             else:
                 shift.time_range = False
 
+    @api.depends('offer_ids')
     def _compute_offer_count(self):
         """Count of offers made for this shift."""
         for shift in self:
             shift.offer_count = len(shift.offer_ids)
 
+    @api.depends('booking_ids')
     def _compute_booking_count(self):
         """Count of all bookings made for this shift, regardless of status."""
         for shift in self:
@@ -321,7 +323,7 @@ class NhsBankShift(models.Model):
                 else:
                     shift.state = 'filled'
 
-    @api.depends('booking_ids.state', 'booking_ids.member_id')
+    @api.depends('booking_ids.state', 'booking_ids.member_id.name')
     def _compute_filled_member_names(self):
         """All confirmed (booked/worked) members' names, for notifications
         that need to list everyone covering a multi-headcount shift."""

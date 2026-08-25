@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard view: collect the (required) reason before declining an offer -->
+    <record id="view_nhs_offer_decline_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.offer.decline.wizard.form</field>
+        <field name="model">nhs.offer.decline.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Decline Offer">
+                <field name="offer_id" invisible="1"/>
+                <group>
+                    <field name="reason" placeholder="Why is this offer being declined?"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" type="object" string="Decline" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

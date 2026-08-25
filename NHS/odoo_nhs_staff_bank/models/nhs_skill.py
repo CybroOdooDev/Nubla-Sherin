@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class NhsSkill(models.Model):
@@ -60,6 +60,7 @@ class NhsSkill(models.Model):
         'A skill with this name already exists!'
     )
 
+    @api.depends()
     def _compute_member_count(self):
         """Count active bank members holding each skill."""
         member_data = self.env['nhs.bank.member']._read_group(

@@ -22,7 +22,7 @@
 from datetime import timedelta
 from markupsafe import Markup
 from odoo import api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class NhsShiftBooking(models.Model):
@@ -30,8 +30,7 @@ class NhsShiftBooking(models.Model):
     outcome. Compliance is re-checked at booking time (it may have lapsed
     since the offer) and `compliant_at_booking` is snapshotted as the audit
     evidence that the worker was compliant when booked, regardless of the
-    gate policy. No hard delete — bookings are archived to preserve the pay
-    and compliance audit trail."""
+    gate policy."""
     _name = 'nhs.shift.booking'
     _inherit = ['mail.thread']
     _description = "A confirmed booking, and its worked outcome"
@@ -169,6 +168,18 @@ class NhsShiftBooking(models.Model):
             if booking.shift_id:
                 booking.shift_start = booking.shift_id.shift_start
                 booking.shift_end = booking.shift_id.shift_end
+
+    @api.constrains('shift_start', 'shift_end', 'actual_start', 'actual_end')
+    def _check_times(self):
+        """Reject an end time that isn't after its start — for both the
+        booked window and the actual worked times. Without this, an end
+        set earlier than its start silently produces negative hours, and
+        therefore a negative payable amount."""
+        for booking in self:
+            if booking.shift_start and booking.shift_end and booking.shift_end <= booking.shift_start:
+                raise ValidationError("'End' must be after 'Start'.")
+            if booking.actual_start and booking.actual_end and booking.actual_end <= booking.actual_start:
+                raise ValidationError("'Actual End' must be after 'Actual Start'.")
 
     @api.depends('shift_start', 'shift_end', 'actual_start', 'actual_end',
                  'rate_id', 'rate_override')

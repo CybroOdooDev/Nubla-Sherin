@@ -120,9 +120,6 @@ class ResCompany(models.Model):
 
     @api.depends()
     def _compute_nhs_bank_digest_shift_ids(self):
-        # No field dependency: this is a live cross-model search (current
-        # open/partially-filled shifts), always (re)computed on access rather
-        # than cached against some other field's change.
         for company in self:
             shifts = self.env['nhs.bank.shift'].search([
                 ('company_id', '=', company.id),

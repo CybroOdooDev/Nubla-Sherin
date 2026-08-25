@@ -281,12 +281,7 @@ class NhsBankMember(models.Model):
     def _auto_create_portal_user(self):
         """When the company setting is on, automatically grant portal access
         to members with an email set (and no portal user already linked) —
-        so a coordinator doesn't have to click "Create Portal User" by hand.
-        Called both from create() and from write() (when email is added on
-        a member that had none yet), since a member created without an
-        email correctly skips this at creation time and would otherwise
-        never get a portal user unless someone remembers to click the
-        button after filling in the email later."""
+        so a coordinator doesn't have to click "Create Portal User" by hand."""
         for member in self:
             if not member.company_id.nhs_bank_auto_create_portal_user:
                 continue
@@ -312,16 +307,7 @@ class NhsBankMember(models.Model):
         Portal User field on this form — make sure that user actually
         carries group_nhs_bank_member. Without it, the member-scoped record
         rules (own offers/bookings/availability/shifts) silently never apply
-        to them, no matter how the link was made.
-
-        Skipped for a user who already holds group_nhs_bank_officer (which
-        group_nhs_bank_manager implies): they already have the broader
-        Officer/Manager access level, and adding the narrower Bank Member
-        group on top would also saddle them with its member-only record
-        rules (e.g. res.partner restricted to just their own partner tree),
-        silently breaking unrelated things like Discuss for a coordinator or
-        admin who happens to be linked as a bank member's user for
-        testing/reference purposes."""
+        to them, no matter how the link was made."""
         group_bank_member = self.env.ref('odoo_nhs_staff_bank.group_nhs_bank_member')
         group_bank_officer = self.env.ref('odoo_nhs_staff_bank.group_nhs_bank_officer')
         for member in self.filtered('user_id'):
@@ -347,16 +333,19 @@ class NhsBankMember(models.Model):
             member.compliance_status = 'compliant' if compliant else 'non_compliant'
             member.compliance_reason = reason
 
+    @api.depends('availability_ids')
     def _compute_availability_count(self):
         """Count of linked availability records."""
         for member in self:
             member.availability_count = len(member.availability_ids)
 
+    @api.depends('offer_ids')
     def _compute_offer_count(self):
         """Count of shift offers made to this member."""
         for member in self:
             member.offer_count = len(member.offer_ids)
 
+    @api.depends('booking_ids')
     def _compute_booking_count(self):
         """Count of this member's bookings."""
         for member in self:
@@ -484,15 +473,7 @@ class NhsBankMember(models.Model):
         """Grant this bank member portal access in one step, so they can log
         in to the self-service portal to accept shifts, set availability and
         see their own bookings — instead of an admin having to create/link
-        the contact and portal user manually.
-
-        Delegates the actual user creation/portal-grant to Odoo's own
-        portal.wizard (the same mechanism behind "Grant Portal Access" on a
-        Contact) rather than re-implementing it — that gets us its email
-        validation/duplicate checks, its already-portal/already-internal
-        distinction, and standard invite/revoke compatibility for free; the
-        only bank-specific step layered on top is adding the member to
-        group_nhs_bank_member."""
+        the contact and portal user manually."""
         self.ensure_one()
         if self.user_id:
             raise UserError(("%s is already linked to a portal user (%s).")
@@ -512,9 +493,6 @@ class NhsBankMember(models.Model):
                 'company_id': self.company_id.id,
             })
         elif partner.email != self.email:
-            # The wizard drives the login off partner.email — keep it in
-            # sync with the member's own (authoritative) email so the
-            # portal login matches what offer/booking notifications use.
             partner.write({'email': self.email})
 
         wizard = self.env['portal.wizard'].sudo().create({
@@ -529,9 +507,6 @@ class NhsBankMember(models.Model):
             wizard_user.action_invite_again()
         else:
             wizard_user.action_grant_access()
-
-        # write() below syncs group_nhs_bank_member onto the user automatically
-        # (_sync_user_group) — same as it would for a manually-picked user.
         self.write({'partner_id': partner.id, 'user_id': wizard_user.user_id.id})
 
     def action_activate(self):

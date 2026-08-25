@@ -26,10 +26,7 @@ class NhsWeekday(models.Model):
     """The 7 fixed days of the week, as real records rather than 7 separate
     boolean fields — lets a multi-day selection (e.g. the Bulk-Create Shifts
     wizard's recurrence pattern) use a single Many2many field with a compact
-    tag widget instead of a hand-laid-out row of checkboxes.
-
-    `index` matches Python's `date.weekday()` (0=Monday ... 6=Sunday), so
-    callers can match a computed date's weekday straight against it."""
+    tag widget instead of a hand-laid-out row of checkboxes."""
     _name = 'nhs.weekday'
     _description = 'Day of the Week'
     _order = 'index'
@@ -45,3 +42,4 @@ class NhsWeekday(models.Model):
         'UNIQUE(index)',
         'Each weekday index must be unique.'
     )
+

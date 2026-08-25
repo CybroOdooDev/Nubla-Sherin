@@ -19,8 +19,22 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from . import nhs_offer_shift_wizard
-from . import nhs_offer_decline_wizard
-from . import nhs_bulk_shift_wizard
-from . import nhs_escalate_agency_wizard
-from . import nhs_bank_report_wizard
+from odoo import fields, models
+
+
+class NhsOfferDeclineWizard(models.TransientModel):
+    """Collects the reason before declining an offer. A separate step (rather
+    than declining directly off the button) so a reason can actually be
+    required — nhs.shift.offer.action_decline() itself enforces that, so
+    this wizard is the only way the backend "Decline" button can supply one."""
+    _name = 'nhs.offer.decline.wizard'
+    _description = 'Decline Offer Wizard'
+
+    offer_id = fields.Many2one('nhs.shift.offer', string='Offer', required=True)
+    reason = fields.Char(string='Decline Reason', required=True)
+
+    def action_confirm(self):
+        """Decline the offer with the reason collected here."""
+        self.ensure_one()
+        self.offer_id.action_decline(reason=self.reason)
+        return {'type': 'ir.actions.act_window_close'}

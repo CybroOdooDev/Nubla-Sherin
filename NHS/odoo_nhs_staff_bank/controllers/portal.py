@@ -169,12 +169,30 @@ class NhsStaffBankPortal(CustomerPortal):
     @http.route(['/my/bank/offers/<int:offer_id>/decline'], type='http', auth='user', website=True, methods=['POST'])
     def portal_bank_offer_decline(self, offer_id, **kw):
         """`/my/bank/offers/<id>/decline`: declines the member's own pending
-        offer (with an optional reason) and redirects back to the shift
-        list."""
+        offer, with a reason (now required by action_decline() itself), and
+        redirects back to the shift list. On a validation error (e.g. no
+        reason given), re-renders the shift list with the error shown
+        instead of crashing."""
         member = self._get_bank_member()
         offer = request.env['nhs.shift.offer'].sudo().browse(offer_id).exists()
+        error = None
         if member and offer and offer.member_id == member:
-            offer.sudo().action_decline(reason=kw.get('reason'))
+            try:
+                offer.sudo().action_decline(reason=kw.get('reason'))
+            except (ValidationError, UserError) as exc:
+                error = str(exc)
+        if error:
+            open_shifts = request.env['nhs.bank.shift'].sudo().search(
+                [('state', 'in', ('open', 'partially_filled'))], order='shift_start')
+            gate = request.env['nhs.compliance.gate'].sudo()
+            eligible_shifts = open_shifts.filtered(lambda s: gate.eligibility(s, member)['eligible'])
+            values = {
+                'member': member,
+                'shifts': eligible_shifts,
+                'page_name': 'bank_shifts',
+                'error': error,
+            }
+            return request.render('odoo_nhs_staff_bank.portal_bank_shifts', values)
         return request.redirect('/my/bank/shifts')
 
     @http.route(['/my/bank/bookings'], type='http', auth='user', website=True)

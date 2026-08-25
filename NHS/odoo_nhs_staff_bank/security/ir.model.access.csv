@@ -1,9 +1,12 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_nhs_establishment_post_bank_officer,nhs.establishment.post bank officer,odoo_nhs_establishment.model_nhs_establishment_post,group_nhs_bank_officer,1,0,0,0
 access_nhs_afc_band_bank_officer,nhs.afc.band bank officer,odoo_nhs_establishment.model_nhs_afc_band,group_nhs_bank_officer,1,0,0,0
+access_nhs_afc_band_bank_member,nhs.afc.band bank member,odoo_nhs_establishment.model_nhs_afc_band,group_nhs_bank_member,1,0,0,0
 access_nhs_staff_group_bank_officer,nhs.staff.group bank officer,odoo_nhs_establishment.model_nhs_staff_group,group_nhs_bank_officer,1,0,0,0
+access_nhs_staff_group_bank_member,nhs.staff.group bank member,odoo_nhs_establishment.model_nhs_staff_group,group_nhs_bank_member,1,0,0,0
 access_nhs_org_unit_bank_officer,nhs.org.unit bank officer,odoo_nhs_establishment.model_nhs_org_unit,group_nhs_bank_officer,1,0,0,0
 access_nhs_org_unit_bank_user,nhs.org.unit bank internal user,odoo_nhs_establishment.model_nhs_org_unit,base.group_user,1,0,0,0
+access_nhs_org_unit_bank_member,nhs.org.unit bank member,odoo_nhs_establishment.model_nhs_org_unit,group_nhs_bank_member,1,0,0,0
 access_nhs_workforce_member_bank_officer,nhs.workforce.member bank officer,odoo_nhs_training.model_nhs_workforce_member,group_nhs_bank_officer,1,0,0,0
 access_nhs_weekday_officer,nhs.weekday officer,model_nhs_weekday,group_nhs_bank_officer,1,0,0,0
 access_nhs_weekday_user,nhs.weekday user,model_nhs_weekday,base.group_user,1,0,0,0
@@ -26,7 +29,6 @@ access_nhs_member_availability_self,nhs.member.availability self,model_nhs_membe
 access_nhs_bank_shift_officer,nhs.bank.shift officer,model_nhs_bank_shift,group_nhs_bank_officer,1,1,1,0
 access_nhs_bank_shift_manager,nhs.bank.shift manager,model_nhs_bank_shift,group_nhs_bank_manager,1,1,1,1
 access_nhs_bank_shift_member,nhs.bank.shift member,model_nhs_bank_shift,group_nhs_bank_member,1,0,0,0
-access_nhs_bank_shift_area_manager,nhs.bank.shift area manager,model_nhs_bank_shift,group_nhs_bank_area_manager,1,1,1,0
 access_nhs_shift_offer_officer,nhs.shift.offer officer,model_nhs_shift_offer,group_nhs_bank_officer,1,1,1,1
 access_nhs_shift_offer_manager,nhs.shift.offer manager,model_nhs_shift_offer,group_nhs_bank_manager,1,1,1,1
 access_nhs_shift_offer_self,nhs.shift.offer self,model_nhs_shift_offer,group_nhs_bank_member,1,1,0,0
@@ -34,6 +36,8 @@ access_nhs_shift_booking_officer,nhs.shift.booking officer,model_nhs_shift_booki
 access_nhs_shift_booking_manager,nhs.shift.booking manager,model_nhs_shift_booking,group_nhs_bank_manager,1,1,1,0
 access_nhs_shift_booking_self,nhs.shift.booking self,model_nhs_shift_booking,group_nhs_bank_member,1,0,0,0
 access_nhs_offer_shift_wizard_officer,nhs.offer.shift.wizard officer,model_nhs_offer_shift_wizard,group_nhs_bank_officer,1,1,1,1
+access_nhs_offer_decline_wizard_officer,nhs.offer.decline.wizard officer,model_nhs_offer_decline_wizard,group_nhs_bank_officer,1,1,1,1
+access_nhs_offer_decline_wizard_manager,nhs.offer.decline.wizard manager,model_nhs_offer_decline_wizard,group_nhs_bank_manager,1,1,1,1
 access_nhs_offer_shift_wizard_manager,nhs.offer.shift.wizard manager,model_nhs_offer_shift_wizard,group_nhs_bank_manager,1,1,1,1
 access_nhs_offer_shift_wizard_line_officer,nhs.offer.shift.wizard.line officer,model_nhs_offer_shift_wizard_line,group_nhs_bank_officer,1,1,1,1
 access_nhs_offer_shift_wizard_line_manager,nhs.offer.shift.wizard.line manager,model_nhs_offer_shift_wizard_line,group_nhs_bank_manager,1,1,1,1
