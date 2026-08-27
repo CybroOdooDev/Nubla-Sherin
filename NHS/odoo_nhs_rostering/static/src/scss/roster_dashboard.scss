@@ -1,0 +1,27 @@
+/* NHS Corporate Blue Theme for the e-Rostering Dashboard */
+
+.o_nhs_roster_dashboard {
+    background-color: #f4f6f9 !important;
+
+    .text-nhs-blue { color: #005eb8 !important; }
+    .btn-outline-nhs-blue {
+        color: #005eb8;
+        border-color: #005eb8;
+        background-color: #ffffff;
+        &:hover { background-color: #005eb8; color: #ffffff; }
+    }
+
+    .roster-stat-card {
+        border-left: 4px solid #005eb8 !important;
+        background: #ffffff;
+        transition: all 0.2s ease-in-out;
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.4rem 0.8rem rgba(0, 94, 184, 0.12) !important;
+        }
+    }
+
+    .cursor-pointer { cursor: pointer; }
+    .card { border: 1px solid #e2e8f0 !important; }
+    .card-header { border-bottom: 1px solid #e2e8f0 !important; }
+}

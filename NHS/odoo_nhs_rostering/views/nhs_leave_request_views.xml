@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_leave_request_list" model="ir.ui.view">
+        <field name="name">nhs.leave.request.list</field>
+        <field name="model">nhs.leave.request</field>
+        <field name="arch" type="xml">
+            <list string="Leave Requests" decoration-success="state == 'approved'"
+                  decoration-danger="state == 'rejected'" decoration-muted="state == 'cancelled'">
+                <field name="member_id"/>
+                <field name="leave_type_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="hours"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_leave_request_form" model="ir.ui.view">
+        <field name="name">nhs.leave.request.form</field>
+        <field name="model">nhs.leave.request</field>
+        <field name="arch" type="xml">
+            <form string="Leave Request">
+                <header>
+                    <button name="action_submit" type="object" string="Submit"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="btn-primary" invisible="state != 'submitted'"
+                            groups="odoo_nhs_rostering.group_nhs_roster_manager"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            invisible="state != 'submitted'"
+                            groups="odoo_nhs_rostering.group_nhs_roster_manager"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('cancelled', 'rejected')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="member_id"/>
+                            <field name="leave_type_id"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="hours" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Decision" invisible="state not in ('approved', 'rejected')">
+                        <field name="approved_by" readonly="1"/>
+                        <field name="approved_at" readonly="1"/>
+                        <field name="rejection_reason" readonly="1"/>
+                    </group>
+                    <field name="reason"/>
+                    <chatter/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_leave_request_calendar" model="ir.ui.view">
+        <field name="name">nhs.leave.request.calendar</field>
+        <field name="model">nhs.leave.request</field>
+        <field name="arch" type="xml">
+            <calendar string="Leave" date_start="date_from" date_stop="date_to" color="leave_type_id" mode="month">
+                <field name="member_id"/>
+                <field name="leave_type_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_nhs_leave_request_search" model="ir.ui.view">
+        <field name="name">nhs.leave.request.search</field>
+        <field name="model">nhs.leave.request</field>
+        <field name="arch" type="xml">
+            <search string="Leave Requests">
+                <field name="member_id"/>
+                <field name="leave_type_id"/>
+                <filter string="To Approve" name="filter_submitted" domain="[('state', '=', 'submitted')]"/>
+                <group>
+                    <filter string="Leave Type" name="group_type" context="{'group_by': 'leave_type_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_leave_request" model="ir.actions.act_window">
+        <field name="name">Leave Requests</field>
+        <field name="res_model">nhs.leave.request</field>
+        <field name="view_mode">list,form,calendar</field>
+    </record>
+</odoo>

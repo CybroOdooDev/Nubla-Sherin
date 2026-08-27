@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="leave_type_annual" model="nhs.leave.type">
+            <field name="name">Annual Leave</field>
+            <field name="code">ANNUAL</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="leave_type_study" model="nhs.leave.type">
+            <field name="name">Study Leave</field>
+            <field name="code">STUDY</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="leave_type_maternity" model="nhs.leave.type">
+            <field name="name">Maternity / Paternity / Parental</field>
+            <field name="code">MAT_PAT</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="leave_type_toil" model="nhs.leave.type">
+            <field name="name">TOIL</field>
+            <field name="code">TOIL</field>
+            <field name="sequence">40</field>
+        </record>
+        <record id="leave_type_sickness" model="nhs.leave.type">
+            <field name="name">Sickness (Unplanned)</field>
+            <field name="code">SICKNESS</field>
+            <field name="sequence">50</field>
+            <field name="requires_approval" eval="False"/>
+        </record>
+        <record id="leave_type_other" model="nhs.leave.type">
+            <field name="name">Other</field>
+            <field name="code">OTHER</field>
+            <field name="sequence">90</field>
+        </record>
+    </data>
+</odoo>

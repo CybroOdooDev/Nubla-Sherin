@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="mail_template_roster_published" model="mail.template">
+            <field name="name">Roster: Published</field>
+            <field name="model_id" ref="model_nhs_roster_period"/>
+            <field name="subject">Your roster for {{ object.unit_id.display_name }} has been published</field>
+            <field name="email_from">{{ (object.company_id.email or user.email) }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p>Hello,</p>
+                    <p>
+                        The roster for <strong t-out="object.unit_id.display_name"/>
+                        (<span t-out="object.date_start"/> to <span t-out="object.date_end"/>) has
+                        been published. You can view your duties on the portal under
+                        <strong>My Roster</strong>.
+                    </p>
+                    <p>Thank you.</p>
+                </div>
+            </field>
+        </record>
+
+        <record id="mail_template_duty_changed" model="mail.template">
+            <field name="name">Roster: Duty Changed</field>
+            <field name="model_id" ref="model_nhs_duty_assignment"/>
+            <field name="subject">A duty on your roster has changed</field>
+            <field name="email_from">{{ (object.company_id.email or user.email) }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p>Hello,</p>
+                    <p>
+                        Your duty on <span t-out="object.duty_date"/>
+                        (<span t-out="object.shift_type_id.name"/>) has changed.
+                        <t t-if="object.change_note">Reason: <span t-out="object.change_note"/>.</t>
+                        Please check <strong>My Roster</strong> on the portal for the current position.
+                    </p>
+                </div>
+            </field>
+        </record>
+
+        <record id="mail_template_swap_decided" model="mail.template">
+            <field name="name">Roster: Swap Decided</field>
+            <field name="model_id" ref="model_nhs_swap_request"/>
+            <field name="subject">Your duty swap request has been {{ object.state }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email) }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p>Hello,</p>
+                    <p>
+                        The duty swap between <span t-out="object.requester_member_id.name"/> and
+                        <span t-out="object.target_member_id.name"/> has been
+                        <strong t-out="object.state"/>.
+                    </p>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

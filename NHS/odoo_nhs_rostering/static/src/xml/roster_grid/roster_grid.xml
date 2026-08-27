@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="odoo_nhs_rostering.NhsRosterGrid" owl="1">
+        <div class="o_nhs_roster_grid o_content p-3" style="height: 100%; overflow: auto;">
+            <t t-if="state.loading">
+                <div class="d-flex justify-content-center align-items-center" style="height: 60vh;">
+                    <div class="spinner-border text-nhs-blue" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </t>
+            <t t-elif="!state.data or !state.data.period">
+                <div class="alert alert-warning">Roster period not found.</div>
+            </t>
+            <t t-else="">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom bg-white p-3 rounded-3 shadow-sm">
+                    <div>
+                        <h4 class="fw-bold mb-0 text-nhs-blue">
+                            <i class="fa fa-th me-2"/><t t-esc="state.data.period.name"/>
+                        </h4>
+                        <div class="text-muted small">
+                            Fill <t t-esc="state.data.period.fill_pct"/>% ·
+                            <span t-attf-class="fw-bold #{state.data.period.hard_violation_count ? 'text-danger' : 'text-success'}">
+                                <t t-esc="state.data.period.hard_violation_count"/> open hard violation(s)
+                            </span>
+                            · status <t t-esc="state.data.period.state"/>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-outline-nhs-blue btn-sm fw-semibold me-2" t-on-click="recomputeCheck">
+                            <i class="fa fa-refresh me-1"/> Recheck Rules
+                        </button>
+                        <button class="btn btn-outline-nhs-blue btn-sm fw-semibold" t-on-click="openPeriodForm">
+                            <i class="fa fa-arrow-left me-1"/> Back to Period
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-lg-9">
+                        <div class="table-responsive nhs_roster_grid_table_wrap">
+                            <table class="table table-bordered table-sm align-middle nhs_roster_grid_table">
+                                <thead>
+                                    <tr>
+                                        <th class="nhs_grid_member_col">Staff</th>
+                                        <t t-foreach="state.data.dates" t-as="date" t-key="date">
+                                            <th class="text-center">
+                                                <div class="small"><t t-esc="date"/></div>
+                                                <span t-if="dayShort(date) &gt; 0" class="badge text-bg-danger">
+                                                    <t t-esc="dayShort(date)"/> short
+                                                </span>
+                                                <span t-else="" class="badge text-bg-success">OK</span>
+                                            </th>
+                                        </t>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="state.data.members" t-as="m" t-key="m.id">
+                                        <td class="nhs_grid_member_col">
+                                            <div class="fw-semibold small" t-esc="m.name"/>
+                                            <div class="text-muted" style="font-size: 0.7rem;" t-esc="m.band"/>
+                                            <span t-if="memberViolations(m.id).length" class="badge text-bg-warning">
+                                                <t t-esc="memberViolations(m.id).length"/> violation(s)
+                                            </span>
+                                        </td>
+                                        <t t-foreach="state.data.dates" t-as="date" t-key="date">
+                                            <td class="nhs_grid_cell position-relative"
+                                                t-on-click="() => this.openPicker(m.id, date)">
+                                                <t t-foreach="cellAssignments(m.id, date)" t-as="a" t-key="a.id">
+                                                    <span t-attf-class="badge nhs_shift_chip #{!a.compliant ? 'nhs_chip_noncompliant' : ''}"
+                                                          t-attf-style="background-color: #{(shiftTypeById(a.shift_type_id) || {}).color || '#78909c'};"
+                                                          t-att-title="(shiftTypeById(a.shift_type_id) || {}).name"
+                                                          t-on-click.stop="() => this.unassign(m.id, date, a.shift_type_id)">
+                                                        <t t-esc="(shiftTypeById(a.shift_type_id) || {}).code"/>
+                                                        <i class="fa fa-times ms-1"/>
+                                                    </span>
+                                                </t>
+                                                <t t-if="state.picker and state.picker.memberId === m.id and state.picker.date === date">
+                                                    <div class="nhs_shift_picker shadow" t-on-click.stop="() => {}">
+                                                        <t t-foreach="state.data.shift_types" t-as="st" t-key="st.id">
+                                                            <div class="nhs_shift_picker_option"
+                                                                 t-attf-style="border-left: 4px solid #{st.color};"
+                                                                 t-on-click="() => this.pickShiftType(st.id)">
+                                                                <t t-esc="st.name"/>
+                                                            </div>
+                                                        </t>
+                                                        <div class="nhs_shift_picker_option text-muted" t-on-click="closePicker">
+                                                            Cancel
+                                                        </div>
+                                                    </div>
+                                                </t>
+                                            </td>
+                                        </t>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <div class="card shadow-sm rounded-3">
+                            <div class="card-header bg-white py-2">
+                                <h6 class="fw-bold mb-0"><i class="fa fa-exclamation-triangle text-warning me-2"/>Open Violations</h6>
+                            </div>
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush">
+                                    <t t-if="!state.data.violations.length">
+                                        <li class="list-group-item text-center text-muted small py-3">None open.</li>
+                                    </t>
+                                    <t t-foreach="state.data.violations" t-as="v" t-key="v.id">
+                                        <li class="list-group-item px-2 py-2">
+                                            <div class="small fw-semibold" t-esc="v.member_name"/>
+                                            <div class="small" t-esc="v.rule_name + ' (' + v.duty_date + ')'"/>
+                                            <div class="text-muted" style="font-size: 0.7rem;" t-esc="v.message"/>
+                                            <span t-attf-class="badge #{v.severity === 'hard' ? 'text-bg-danger' : 'text-bg-warning'}"
+                                                  t-esc="v.severity"/>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

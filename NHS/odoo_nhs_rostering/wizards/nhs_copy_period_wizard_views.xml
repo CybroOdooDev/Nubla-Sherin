@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_copy_period_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.copy.period.wizard.form</field>
+        <field name="model">nhs.copy.period.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Copy Roster Period">
+                <field name="source_period_id" invisible="1"/>
+                <group>
+                    <field name="new_date_start"/>
+                    <field name="new_date_end"/>
+                    <field name="copy_assignments"/>
+                </group>
+                <footer>
+                    <button name="action_copy" type="object" string="Copy" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

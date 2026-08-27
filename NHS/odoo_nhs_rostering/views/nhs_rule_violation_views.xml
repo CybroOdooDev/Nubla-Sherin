@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_rule_violation_list" model="ir.ui.view">
+        <field name="name">nhs.rule.violation.list</field>
+        <field name="model">nhs.rule.violation</field>
+        <field name="arch" type="xml">
+            <list string="Rule Violations" decoration-danger="severity == 'hard' and state == 'open'"
+                  decoration-warning="severity == 'soft' and state == 'open'"
+                  decoration-muted="state != 'open'">
+                <field name="create_date"/>
+                <field name="rule_id"/>
+                <field name="member_id"/>
+                <field name="duty_id"/>
+                <field name="period_id"/>
+                <field name="severity" widget="badge"/>
+                <field name="state" widget="badge"/>
+                <field name="message"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_rule_violation_form" model="ir.ui.view">
+        <field name="name">nhs.rule.violation.form</field>
+        <field name="model">nhs.rule.violation</field>
+        <field name="arch" type="xml">
+            <form string="Rule Violation">
+                <header>
+                    <button name="action_resolve" type="object" string="Resolve"
+                            invisible="state != 'open'"/>
+                    <button name="action_justify_from_field" type="object" string="Justify"
+                            invisible="state != 'open' or severity == 'hard'"/>
+                    <button name="action_reopen" type="object" string="Reopen"
+                            invisible="state == 'open'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="open,resolved,justified"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="rule_id"/>
+                            <field name="member_id"/>
+                            <field name="duty_id"/>
+                            <field name="period_id"/>
+                            <field name="severity"/>
+                        </group>
+                        <group>
+                            <field name="justification" invisible="severity == 'hard'"/>
+                            <field name="justified_by" readonly="1"/>
+                            <field name="justified_at" readonly="1"/>
+                            <field name="resolved_at" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="message"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_rule_violation_search" model="ir.ui.view">
+        <field name="name">nhs.rule.violation.search</field>
+        <field name="model">nhs.rule.violation</field>
+        <field name="arch" type="xml">
+            <search string="Rule Violations">
+                <field name="member_id"/>
+                <field name="period_id"/>
+                <field name="rule_id"/>
+                <filter string="Open" name="filter_open" domain="[('state', '=', 'open')]"/>
+                <filter string="Hard" name="filter_hard" domain="[('severity', '=', 'hard')]"/>
+                <group>
+                    <filter string="Rule" name="group_rule" context="{'group_by': 'rule_id'}"/>
+                    <filter string="Period" name="group_period" context="{'group_by': 'period_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_rule_violation" model="ir.actions.act_window">
+        <field name="name">Rule Violations</field>
+        <field name="res_model">nhs.rule.violation</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filter_open': 1}</field>
+    </record>
+</odoo>

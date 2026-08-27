@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_duty_list" model="ir.ui.view">
+        <field name="name">nhs.duty.list</field>
+        <field name="model">nhs.duty</field>
+        <field name="arch" type="xml">
+            <list string="Duties" decoration-danger="state == 'unfilled'"
+                  decoration-warning="state == 'partially_filled'"
+                  decoration-success="state in ('filled', 'covered_bank', 'covered_agency')"
+                  decoration-muted="state == 'cancelled'">
+                <field name="unit_id"/>
+                <field name="period_id"/>
+                <field name="duty_date"/>
+                <field name="shift_type_id"/>
+                <field name="required_band_id"/>
+                <field name="required_headcount"/>
+                <field name="assigned_count"/>
+                <field name="state" widget="badge"/>
+                <field name="notes"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_duty_form" model="ir.ui.view">
+        <field name="name">nhs.duty.form</field>
+        <field name="model">nhs.duty</field>
+        <field name="arch" type="xml">
+            <form string="Duty">
+                <header>
+                    <button name="action_cancel" type="object" string="Cancel Duty"
+                            invisible="is_cancelled"/>
+                    <button name="action_reinstate" type="object" string="Reinstate"
+                            invisible="not is_cancelled"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="unfilled,partially_filled,filled,escalated,covered_bank,covered_agency"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="period_id"/>
+                            <field name="unit_id" readonly="1"/>
+                            <field name="duty_date"/>
+                            <field name="shift_type_id"/>
+                        </group>
+                        <group>
+                            <field name="required_band_id"/>
+                            <field name="required_skill_ids" widget="many2many_tags"/>
+                            <field name="required_headcount"/>
+                            <field name="assigned_count" readonly="1"/>
+                            <field name="notes"/>
+                        </group>
+                    </group>
+                    <field name="assignment_ids">
+                        <list editable="bottom">
+                            <field name="member_id"/>
+                            <field name="state"/>
+                            <field name="compliant_at_assignment" readonly="1"/>
+                            <field name="paid_hours" readonly="1"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_duty_search" model="ir.ui.view">
+        <field name="name">nhs.duty.search</field>
+        <field name="model">nhs.duty</field>
+        <field name="arch" type="xml">
+            <search string="Duties">
+                <field name="period_id"/>
+                <field name="unit_id"/>
+                <field name="duty_date"/>
+                <filter string="Unfilled" name="filter_unfilled" domain="[('state', '=', 'unfilled')]"/>
+                <filter string="Partially Filled" name="filter_partial" domain="[('state', '=', 'partially_filled')]"/>
+                <group>
+                    <filter string="Unit" name="group_unit" context="{'group_by': 'unit_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'duty_date'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_duty_gaps" model="ir.actions.act_window">
+        <field name="name">Gaps &amp; Escalation</field>
+        <field name="res_model">nhs.duty</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', 'in', ('unfilled', 'partially_filled'))]</field>
+        <field name="context">{'search_default_group_unit': 1}</field>
+    </record>
+</odoo>

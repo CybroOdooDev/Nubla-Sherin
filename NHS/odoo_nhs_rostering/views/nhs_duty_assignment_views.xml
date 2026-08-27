@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_duty_assignment_list" model="ir.ui.view">
+        <field name="name">nhs.duty.assignment.list</field>
+        <field name="model">nhs.duty.assignment</field>
+        <field name="arch" type="xml">
+            <list string="Duty Assignments" decoration-muted="state == 'cancelled'"
+                  decoration-danger="state == 'dna'">
+                <field name="duty_date"/>
+                <field name="unit_id"/>
+                <field name="shift_type_id"/>
+                <field name="member_id"/>
+                <field name="state" widget="badge"/>
+                <field name="compliant_at_assignment"/>
+                <field name="paid_hours"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_duty_assignment_form" model="ir.ui.view">
+        <field name="name">nhs.duty.assignment.form</field>
+        <field name="model">nhs.duty.assignment</field>
+        <field name="arch" type="xml">
+            <form string="Duty Assignment">
+                <header>
+                    <button name="action_mark_worked" type="object" string="Mark Worked"
+                            invisible="state != 'published'"/>
+                    <button name="action_mark_dna" type="object" string="Mark DNA"
+                            invisible="state != 'published'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="assigned,published,worked"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="duty_id"/>
+                            <field name="member_id"/>
+                            <field name="unit_id" readonly="1"/>
+                            <field name="duty_date" readonly="1"/>
+                            <field name="shift_type_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="compliant_at_assignment" readonly="1"/>
+                            <field name="paid_hours" readonly="1"/>
+                            <field name="actual_start"/>
+                            <field name="actual_end"/>
+                            <field name="change_note"/>
+                        </group>
+                    </group>
+                    <chatter/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_duty_assignment_calendar" model="ir.ui.view">
+        <field name="name">nhs.duty.assignment.calendar</field>
+        <field name="model">nhs.duty.assignment</field>
+        <field name="arch" type="xml">
+            <calendar string="Duty Assignments" date_start="duty_date" color="shift_type_id" mode="month">
+                <field name="member_id"/>
+                <field name="shift_type_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="action_nhs_duty_assignment" model="ir.actions.act_window">
+        <field name="name">Duty Assignments</field>
+        <field name="res_model">nhs.duty.assignment</field>
+        <field name="view_mode">list,form,calendar</field>
+    </record>
+</odoo>

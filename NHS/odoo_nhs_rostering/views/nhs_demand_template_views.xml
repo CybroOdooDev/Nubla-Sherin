@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_demand_template_list" model="ir.ui.view">
+        <field name="name">nhs.demand.template.list</field>
+        <field name="model">nhs.demand.template</field>
+        <field name="arch" type="xml">
+            <list string="Demand Templates">
+                <field name="roster_unit_id"/>
+                <field name="name"/>
+                <field name="effective_from"/>
+                <field name="effective_to"/>
+                <field name="line_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nhs_demand_template_form" model="ir.ui.view">
+        <field name="name">nhs.demand.template.form</field>
+        <field name="model">nhs.demand.template</field>
+        <field name="arch" type="xml">
+            <form string="Demand Template">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="roster_unit_id"/>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="effective_from"/>
+                            <field name="effective_to"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <field name="line_ids" context="{'default_roster_unit_id': roster_unit_id}">
+                        <list editable="bottom">
+                            <field name="weekday"/>
+                            <field name="date_override"/>
+                            <field name="shift_type_id"/>
+                            <field name="band_id"/>
+                            <field name="staff_group_id"/>
+                            <field name="required_headcount"/>
+                            <field name="required_skill_ids" widget="many2many_tags"/>
+                            <field name="notes"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nhs_demand_template" model="ir.actions.act_window">
+        <field name="name">Demand Templates</field>
+        <field name="res_model">nhs.demand.template</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

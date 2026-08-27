@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Portal home card: links into the e-Rostering self-service pages. -->
+    <template id="portal_my_home_nhs_rostering" inherit_id="portal.portal_my_home" customize_show="True">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
+            <t t-set="portal_service_category_enable" t-value="True"/>
+        </xpath>
+        <div id="portal_service_category" position="inside">
+            <t t-if="roster_duty_count is not None">
+                <div class="o_portal_index_card col-md-6 order-2">
+                    <a href="/my/roster" title="My Roster"
+                       class="d-flex gap-2 gap-md-3 py-3 pe-2 px-md-3 h-100 rounded text-decoration-none bg-100">
+                        <div class="o_portal_icon d-block align-self-start">
+                            <i class="fa fa-2x fa-calendar text-primary"/>
+                        </div>
+                        <div>
+                            <div class="mt-0 mb-1 fs-5 fw-normal lh-1">
+                                <span>My Roster</span>
+                            </div>
+                            <div class="opacity-75">Your published duties, leave and swaps</div>
+                        </div>
+                    </a>
+                </div>
+            </t>
+        </div>
+    </template>
+
+    <!-- Breadcrumb trail for the roster portal pages -->
+    <template id="portal_my_home_menu_nhs_rostering" inherit_id="portal.portal_breadcrumbs" priority="31">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'roster_home'" class="breadcrumb-item active">My Roster</li>
+            <li t-elif="page_name in ('roster_duties', 'roster_leave', 'roster_swaps', 'roster_availability')"
+                class="breadcrumb-item">
+                <a href="/my/roster" aria-label="My Roster" title="My Roster">My Roster</a>
+            </li>
+            <li t-if="page_name == 'roster_duties'" class="breadcrumb-item active">My Duties</li>
+            <li t-if="page_name == 'roster_leave'" class="breadcrumb-item active">Leave</li>
+            <li t-if="page_name == 'roster_swaps'" class="breadcrumb-item active">Swaps</li>
+            <li t-if="page_name == 'roster_availability'" class="breadcrumb-item active">Availability</li>
+        </xpath>
+    </template>
+
+    <template id="portal_roster_not_member" name="Not a Rostered Member">
+        <t t-call="portal.portal_layout">
+            <div class="container o_portal_roster">
+                <div class="alert alert-info mt-3">
+                    You are not currently linked to a workforce member record. Contact your
+                    manager if you believe this is incorrect.
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_roster_home" name="My Roster">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="False"/>
+            <div class="container o_portal_roster mt-3">
+                <h2>My Roster</h2>
+                <p class="text-muted">Welcome, <t t-esc="member.name"/>.</p>
+                <div class="row g-3 mt-1">
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm rounded-3">
+                            <div class="card-body">
+                                <i class="fa fa-calendar text-primary mb-2 fs-4"/>
+                                <h5 class="card-title">My Duties</h5>
+                                <a href="/my/roster/duties" class="btn btn-primary btn-sm">View Duties</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm rounded-3">
+                            <div class="card-body">
+                                <i class="fa fa-plane text-primary mb-2 fs-4"/>
+                                <h5 class="card-title">Leave</h5>
+                                <a href="/my/roster/leave" class="btn btn-primary btn-sm">Request / View Leave</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm rounded-3">
+                            <div class="card-body">
+                                <i class="fa fa-exchange text-primary mb-2 fs-4"/>
+                                <h5 class="card-title">Swaps</h5>
+                                <a href="/my/roster/swaps" class="btn btn-primary btn-sm">Propose / Respond</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="mt-4">Upcoming Duties</h4>
+                <t t-if="upcoming_duties">
+                    <div class="card shadow-sm rounded-3 mb-4">
+                        <t t-call="portal.portal_table">
+                            <thead>
+                                <tr class="active"><th>Date</th><th>Shift</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="upcoming_duties" t-as="duty">
+                                    <td t-esc="duty.duty_date"/>
+                                    <td t-esc="duty.shift_type_id.name"/>
+                                    <td t-esc="duty.state"/>
+                                </tr>
+                            </tbody>
+                        </t>
+                    </div>
+                </t>
+                <t t-if="not upcoming_duties">
+                    <p class="text-muted">No upcoming published duties.</p>
+                </t>
+
+                <h4 class="mt-4" t-if="pending_swaps">Pending Swaps</h4>
+                <t t-if="pending_swaps">
+                    <div class="card shadow-sm rounded-3 mb-4">
+                        <t t-call="portal.portal_table">
+                            <thead>
+                                <tr class="active"><th>With</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="pending_swaps" t-as="swap">
+                                    <td>
+                                        <span t-esc="swap.requester_member_id.name"/> ↔
+                                        <span t-esc="swap.target_member_id.name"/>
+                                    </td>
+                                    <td t-esc="swap.state"/>
+                                </tr>
+                            </tbody>
+                        </t>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_roster_duties" name="My Duties">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="False"/>
+            <div class="container o_portal_roster mt-3">
+                <h2>My Duties</h2>
+                <t t-if="duties">
+                    <div class="card shadow-sm rounded-3 mb-4">
+                        <t t-call="portal.portal_table">
+                            <thead>
+                                <tr class="active"><th>Date</th><th>Shift</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="duties" t-as="duty">
+                                    <td t-esc="duty.duty_date"/>
+                                    <td t-esc="duty.shift_type_id.name"/>
+                                    <td t-esc="duty.state"/>
+                                </tr>
+                            </tbody>
+                        </t>
+                    </div>
+                </t>
+                <t t-if="not duties"><p class="text-muted">No duties yet.</p></t>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_roster_leave" name="My Leave">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="False"/>
+            <div class="container o_portal_roster mt-3">
+                <h2>Leave</h2>
+                <div class="alert alert-danger" role="alert" t-if="error" t-esc="error"/>
+
+                <h4>Balance</h4>
+                <div class="card shadow-sm rounded-3 mb-4">
+                    <t t-call="portal.portal_table">
+                        <thead>
+                            <tr class="active"><th>Leave Type</th><th>Year</th><th>Entitled</th><th>Taken</th><th>Remaining</th></tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="not entitlements">
+                                <tr><td colspan="5" class="text-center text-muted py-3">No entitlements set up.</td></tr>
+                            </t>
+                            <tr t-foreach="entitlements" t-as="ent">
+                                <td t-esc="ent.leave_type_id.name"/>
+                                <td t-esc="ent.leave_year"/>
+                                <td t-esc="'%.1f' % ent.entitlement_hours"/>
+                                <td t-esc="'%.1f' % ent.taken_hours"/>
+                                <td t-esc="'%.1f' % ent.remaining_hours"/>
+                            </tr>
+                        </tbody>
+                    </t>
+                </div>
+
+                <h4>Request Leave</h4>
+                <div class="card shadow-sm rounded-3 mb-4">
+                    <div class="card-body">
+                        <form action="/my/roster/leave/request" method="post" class="row g-2">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="col-md-3">
+                                <label class="form-label">Type</label>
+                                <select name="leave_type_id" class="form-select">
+                                    <option t-foreach="leave_types" t-as="lt" t-att-value="lt.id" t-esc="lt.name"/>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">From</label>
+                                <input type="date" name="date_from" class="form-control" required="required"/>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">To</label>
+                                <input type="date" name="date_to" class="form-control" required="required"/>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Reason</label>
+                                <input type="text" name="reason" class="form-control"/>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">Submit Request</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <h4>My Requests</h4>
+                <div class="card shadow-sm rounded-3 mb-4">
+                    <t t-call="portal.portal_table">
+                        <thead>
+                            <tr class="active"><th>Type</th><th>From</th><th>To</th><th>Hours</th><th>Status</th><th/></tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="not leave_requests">
+                                <tr><td colspan="6" class="text-center text-muted py-3">No leave requests yet.</td></tr>
+                            </t>
+                            <tr t-foreach="leave_requests" t-as="lr">
+                                <td t-esc="lr.leave_type_id.name"/>
+                                <td t-esc="lr.date_from"/>
+                                <td t-esc="lr.date_to"/>
+                                <td t-esc="'%.1f' % lr.hours"/>
+                                <td t-esc="lr.state"/>
+                                <td>
+                                    <form t-if="lr.state in ('draft', 'submitted')"
+                                          t-attf-action="/my/roster/leave/#{lr.id}/cancel" method="post">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_roster_swaps" name="My Swaps">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="False"/>
+            <div class="container o_portal_roster mt-3">
+                <h2>Duty Swaps</h2>
+                <div class="alert alert-danger" role="alert" t-if="error" t-esc="error"/>
+
+                <h4>Propose a Swap</h4>
+                <div class="card shadow-sm rounded-3 mb-4">
+                    <div class="card-body">
+                        <form action="/my/roster/swaps/propose" method="post" class="row g-2">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="col-md-5">
+                                <label class="form-label">One of My Duties</label>
+                                <select name="requester_assignment_id" class="form-select">
+                                    <option t-foreach="own_duties" t-as="d" t-att-value="d.id"
+                                            t-esc="'%s - %s' % (d.duty_date, d.shift_type_id.name)"/>
+                                </select>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label">Colleague's Duty Assignment ID</label>
+                                <input type="number" name="target_assignment_id" class="form-control" required="required"/>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Note</label>
+                                <input type="text" name="notes" class="form-control"/>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">Propose Swap</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <h4>My Swaps</h4>
+                <div class="card shadow-sm rounded-3 mb-4">
+                    <t t-call="portal.portal_table">
+                        <thead>
+                            <tr class="active"><th>Requester</th><th>Colleague</th><th>Status</th><th/></tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="not swaps">
+                                <tr><td colspan="4" class="text-center text-muted py-3">No swaps yet.</td></tr>
+                            </t>
+                            <tr t-foreach="swaps" t-as="swap">
+                                <td t-esc="swap.requester_member_id.name"/>
+                                <td t-esc="swap.target_member_id.name"/>
+                                <td t-esc="swap.state"/>
+                                <td>
+                                    <t t-if="swap.state == 'proposed' and swap.target_member_id.id == member.id">
+                                        <form t-attf-action="/my/roster/swaps/#{swap.id}/accept" method="post"
+                                              style="display:inline">
+                                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                            <button type="submit" class="btn btn-sm btn-success">Accept</button>
+                                        </form>
+                                        <form t-attf-action="/my/roster/swaps/#{swap.id}/reject" method="post"
+                                              style="display:inline">
+                                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Decline</button>
+                                        </form>
+                                    </t>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_roster_availability" name="My Availability">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="False"/>
+            <div class="container o_portal_roster mt-3">
+                <h2>Availability / Preferences</h2>
+                <div class="card shadow-sm rounded-3 mb-4">
+                    <div class="card-body">
+                        <form action="/my/roster/availability/add" method="post" class="row g-2">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="col-md-4">
+                                <label class="form-label">Date</label>
+                                <input type="date" name="date" class="form-control" required="required"/>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Preference</label>
+                                <select name="preference_type" class="form-select">
+                                    <option value="prefer">Prefer to Work</option>
+                                    <option value="avoid">Prefer to Avoid</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Note</label>
+                                <input type="text" name="note" class="form-control"/>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">Add</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <t t-if="preferences">
+                    <div class="card shadow-sm rounded-3 mb-4">
+                        <t t-call="portal.portal_table">
+                            <thead>
+                                <tr class="active"><th>Date</th><th>Preference</th><th>Note</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="preferences" t-as="p">
+                                    <td t-esc="p.date"/>
+                                    <td t-esc="p.preference_type"/>
+                                    <td t-esc="p.note"/>
+                                </tr>
+                            </tbody>
+                        </t>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_roster_skill_list" model="ir.ui.view">
+        <field name="name">nhs.roster.skill.list</field>
+        <field name="model">nhs.roster.skill</field>
+        <field name="arch" type="xml">
+            <list string="Skills" editable="bottom">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_nhs_roster_skill" model="ir.actions.act_window">
+        <field name="name">Skills</field>
+        <field name="res_model">nhs.roster.skill</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

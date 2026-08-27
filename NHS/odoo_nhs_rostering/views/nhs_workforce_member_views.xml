@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_workforce_member_form_rostering" model="ir.ui.view">
+        <field name="name">nhs.workforce.member.form.rostering</field>
+        <field name="model">nhs.workforce.member</field>
+        <field name="inherit_id" ref="odoo_nhs_training.view_nhs_workforce_member_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <button name="action_view_duty_assignments" type="object"
+                        class="oe_stat_button" icon="fa-calendar-check-o">
+                    <field name="duty_assignment_count" widget="statinfo" string="Duties"/>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="rostering" string="Rostering">
+                    <group>
+                        <group string="Contract">
+                            <field name="contracted_weekly_hours" readonly="1"/>
+                            <field name="band_id" readonly="1"/>
+                            <field name="roster_part_time_note"/>
+                        </group>
+                        <group string="Constraints">
+                            <field name="roster_no_nights"/>
+                            <field name="roster_fixed_weekday_ids" widget="many2many_tags"/>
+                            <field name="roster_max_consecutive_days_override"/>
+                            <field name="roster_max_consecutive_nights_override"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="roster_skill_ids" widget="many2many_tags"/>
+                        <field name="secondary_roster_unit_ids" widget="many2many_tags"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,78 @@
+/* NHS Corporate Blue Theme for the e-Rostering Grid */
+
+.o_nhs_roster_grid {
+    background-color: #f4f6f9 !important;
+
+    .text-nhs-blue { color: #005eb8 !important; }
+    .bg-nhs-blue { background-color: #005eb8 !important; color: #ffffff !important; }
+    .btn-outline-nhs-blue {
+        color: #005eb8;
+        border-color: #005eb8;
+        background-color: #ffffff;
+        &:hover { background-color: #005eb8; color: #ffffff; }
+    }
+
+    .nhs_roster_grid_table_wrap {
+        max-height: 75vh;
+        overflow: auto;
+    }
+
+    .nhs_roster_grid_table {
+        background: #ffffff;
+        min-width: 100%;
+
+        th, td { white-space: nowrap; }
+
+        .nhs_grid_member_col {
+            position: sticky;
+            left: 0;
+            background: #ffffff;
+            z-index: 1;
+            min-width: 160px;
+        }
+    }
+
+    .nhs_grid_cell {
+        min-width: 90px;
+        height: 56px;
+        cursor: pointer;
+        vertical-align: top;
+        position: relative;
+
+        &:hover { background-color: #eef4fb; }
+    }
+
+    .nhs_shift_chip {
+        display: inline-block;
+        color: #ffffff;
+        font-size: 0.7rem;
+        margin: 1px;
+        cursor: pointer;
+
+        &.nhs_chip_noncompliant {
+            outline: 2px solid #d32f2f;
+        }
+    }
+
+    .nhs_shift_picker {
+        position: absolute;
+        z-index: 20;
+        top: 100%;
+        left: 0;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        min-width: 160px;
+        cursor: default;
+    }
+
+    .nhs_shift_picker_option {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        &:hover { background-color: #eef4fb; }
+    }
+
+    .card { border: 1px solid #e2e8f0 !important; }
+    .card-header { border-bottom: 1px solid #e2e8f0 !important; }
+}

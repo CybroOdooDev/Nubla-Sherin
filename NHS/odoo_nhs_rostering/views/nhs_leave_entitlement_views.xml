@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_leave_entitlement_list" model="ir.ui.view">
+        <field name="name">nhs.leave.entitlement.list</field>
+        <field name="model">nhs.leave.entitlement</field>
+        <field name="arch" type="xml">
+            <list string="Leave Entitlements" editable="bottom">
+                <field name="member_id"/>
+                <field name="leave_type_id"/>
+                <field name="leave_year"/>
+                <field name="entitlement_hours"/>
+                <field name="taken_hours"/>
+                <field name="remaining_hours"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_nhs_leave_entitlement" model="ir.actions.act_window">
+        <field name="name">Leave Entitlements</field>
+        <field name="res_model">nhs.leave.entitlement</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

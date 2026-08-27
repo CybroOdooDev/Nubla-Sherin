@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhs_roster_period_list" model="ir.ui.view">
+        <field name="name">nhs.roster.period.list</field>
+        <field name="model">nhs.roster.period</field>
+        <field name="arch" type="xml">
+            <list string="Roster Periods" decoration-success="state == 'published'"
+                  decoration-muted="state == 'finalised'">
+                <field name="name"/>
+                <field name="unit_id"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="fill_pct" widget="percentage"/>
+                <field name="gap_count"/>
+                <field name="hard_violation_count"/>
+                <field name="publish_lead_days"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_nhs_copy_period_wizard" model="ir.actions.act_window">
+        <field name="name">Copy Roster Period</field>
+        <field name="res_model">nhs.copy.period.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="action_nhs_apply_template_wizard" model="ir.actions.act_window">
+        <field name="name">Apply Rotation Template</field>
+        <field name="res_model">nhs.apply.template.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="action_nhs_publish_wizard" model="ir.actions.act_window">
+        <field name="name">Publish Roster</field>
+        <field name="res_model">nhs.publish.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_nhs_roster_period_form" model="ir.ui.view">
+        <field name="name">nhs.roster.period.form</field>
+        <field name="model">nhs.roster.period</field>
+        <field name="arch" type="xml">
+            <form string="Roster Period">
+                <header>
+                    <button name="action_generate_duties" type="object" string="Generate Duties"
+                            invisible="state not in ('draft', 'in_progress')"/>
+                    <button name="action_start_build" type="object" string="Start Build"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="%(action_nhs_apply_template_wizard)d" type="action"
+                            string="Apply Rotation Template"
+                            invisible="state not in ('in_progress', 'checked')"
+                            context="{'default_period_id': id}"/>
+                    <button name="action_view_grid" type="object" string="Open Roster Grid"
+                            class="btn-primary" invisible="state == 'draft'"/>
+                    <button name="action_recompute_check" type="object" string="Check"
+                            invisible="state not in ('in_progress', 'checked')"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="btn-primary" invisible="state != 'checked'"/>
+                    <button name="%(action_nhs_publish_wizard)d" type="action" string="Publish"
+                            class="btn-primary" invisible="state != 'approved'"
+                            context="{'default_period_id': id}"/>
+                    <button name="action_finalise" type="object" string="Finalise"
+                            invisible="state != 'published'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state in ('published', 'finalised')" groups="odoo_nhs_rostering.group_nhs_workforce_admin"/>
+                    <button name="%(action_nhs_copy_period_wizard)d" type="action" string="Copy as New Period"
+                            context="{'default_source_period_id': id}"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,checked,approved,published,finalised"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_grid" icon="fa-th">
+                            <field name="duty_count" widget="statinfo" string="Duties"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_grid" icon="fa-exclamation-triangle">
+                            <field name="open_violation_count" widget="statinfo" string="Open Violations"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_export_worked_hours" icon="fa-download"
+                                invisible="state not in ('published', 'finalised')">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Export</span>
+                                <span class="o_stat_text">Worked Hours</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="unit_id" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="date_start" readonly="state != 'draft'"/>
+                            <field name="date_end" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group string="Position">
+                        <group>
+                            <field name="fill_pct" widget="percentage"/>
+                            <field name="required_headcount_total"/>
+                            <field name="assigned_headcount_total"/>
+                            <field name="gap_count"/>
+                        </group>
+                        <group>
+                            <field name="open_violation_count"/>
+                            <field name="hard_violation_count"/>
+                            <field name="published_at"/>
+                            <field name="publish_lead_days"/>
+                            <field name="finalised_at"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Duties">
+                            <field name="duty_ids">
+                                <list decoration-danger="state == 'unfilled'"
+                                      decoration-warning="state == 'partially_filled'"
+                                      decoration-success="state == 'filled'">
+                                    <field name="duty_date"/>
+                                    <field name="shift_type_id"/>
+                                    <field name="required_band_id"/>
+                                    <field name="required_headcount"/>
+                                    <field name="assigned_count"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                    <chatter/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nhs_roster_period_search" model="ir.ui.view">
+        <field name="name">nhs.roster.period.search</field>
+        <field name="model">nhs.roster.period</field>
+        <field name="arch" type="xml">
+            <search string="Roster Periods">
+                <field name="name"/>
+                <field name="unit_id"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Building" name="filter_in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Published" name="filter_published" domain="[('state', '=', 'published')]"/>
+                <filter string="Has Hard Violations" name="filter_hard_violations"
+                        domain="[('hard_violation_count', '&gt;', 0)]"/>
+                <group>
+                    <filter string="Unit" name="group_unit" context="{'group_by': 'unit_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nhs_roster_period" model="ir.actions.act_window">
+        <field name="name">Roster Periods</field>
+        <field name="res_model">nhs.roster.period</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filter_in_progress': 1}</field>
+    </record>
+</odoo>
