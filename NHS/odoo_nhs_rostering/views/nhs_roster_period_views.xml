@@ -10,7 +10,7 @@
                 <field name="unit_id"/>
                 <field name="date_start"/>
                 <field name="date_end"/>
-                <field name="fill_pct" widget="percentage"/>
+                <field name="fill_pct" widget="progressbar"/>
                 <field name="gap_count"/>
                 <field name="hard_violation_count"/>
                 <field name="publish_lead_days"/>
@@ -24,6 +24,21 @@
         <field name="res_model">nhs.copy.period.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
+        <field name="context">{'default_source_period_id': active_id}</field>
+        <!-- Utility action, not part of the core workflow: exposed via the
+             record's Action (gear) menu instead of the header button row. -->
+        <field name="binding_model_id" ref="model_nhs_roster_period"/>
+        <field name="binding_view_types">form</field>
+    </record>
+
+    <record id="action_nhs_reset_to_draft_binding" model="ir.actions.server">
+        <field name="name">Reset to Draft</field>
+        <field name="model_id" ref="model_nhs_roster_period"/>
+        <field name="binding_model_id" ref="model_nhs_roster_period"/>
+        <field name="binding_view_types">form</field>
+        <field name="group_ids" eval="[(6, 0, [ref('odoo_nhs_rostering.group_nhs_workforce_admin')])]"/>
+        <field name="state">code</field>
+        <field name="code">records.action_reset_to_draft()</field>
     </record>
 
     <record id="action_nhs_apply_template_wizard" model="ir.actions.act_window">
@@ -48,7 +63,7 @@
                 <header>
                     <button name="action_generate_duties" type="object" string="Generate Duties"
                             invisible="state not in ('draft', 'in_progress')"/>
-                    <button name="action_start_build" type="object" string="Start Build"
+                    <button name="action_start_build" type="object" string="Start"
                             class="btn-primary" invisible="state != 'draft'"/>
                     <button name="%(action_nhs_apply_template_wizard)d" type="action"
                             string="Apply Rotation Template"
@@ -65,10 +80,6 @@
                             context="{'default_period_id': id}"/>
                     <button name="action_finalise" type="object" string="Finalise"
                             invisible="state != 'published'"/>
-                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
-                            invisible="state in ('published', 'finalised')" groups="odoo_nhs_rostering.group_nhs_workforce_admin"/>
-                    <button name="%(action_nhs_copy_period_wizard)d" type="action" string="Copy as New Period"
-                            context="{'default_source_period_id': id}"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,in_progress,checked,approved,published,finalised"/>
                 </header>
@@ -103,7 +114,7 @@
                     </group>
                     <group string="Position">
                         <group>
-                            <field name="fill_pct" widget="percentage"/>
+                            <field name="fill_pct" widget="progressbar"/>
                             <field name="required_headcount_total"/>
                             <field name="assigned_headcount_total"/>
                             <field name="gap_count"/>
@@ -135,8 +146,8 @@
                             <field name="notes"/>
                         </page>
                     </notebook>
-                    <chatter/>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -149,7 +160,7 @@
                 <field name="name"/>
                 <field name="unit_id"/>
                 <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
-                <filter string="Building" name="filter_in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="In Progress" name="filter_in_progress" domain="[('state', '=', 'in_progress')]"/>
                 <filter string="Published" name="filter_published" domain="[('state', '=', 'published')]"/>
                 <filter string="Has Hard Violations" name="filter_hard_violations"
                         domain="[('hard_violation_count', '&gt;', 0)]"/>

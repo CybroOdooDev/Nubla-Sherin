@@ -19,7 +19,15 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from . import nhs_apply_template_wizard
-from . import nhs_copy_period_wizard
-from . import nhs_publish_wizard
-from . import nhs_escalate_wizard
+from odoo import models
+
+
+class ReportNhsRosterPersonalRota(models.AbstractModel):
+    """The personal rota PDF: one member's published/worked duties -
+    what staff take away/print for themselves."""
+    _name = 'report.odoo_nhs_rostering.report_nhs_roster_personal_rota'
+    _description = 'Personal Rota Report'
+
+    def _get_report_values(self, docids, data=None):
+        members = self.env['nhs.workforce.member'].browse(docids)
+        return {'doc_ids': docids, 'doc_model': 'nhs.workforce.member', 'docs': members}

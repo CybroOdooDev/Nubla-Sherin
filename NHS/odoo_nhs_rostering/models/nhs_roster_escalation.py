@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 
 ESCALATION_STATES = [
     ('needed', 'Needed'),
@@ -57,6 +57,7 @@ class NhsRosterEscalation(models.Model):
     _inherit = ['mail.thread']
     _description = 'Roster Escalation'
     _order = 'create_date desc'
+    _rec_name = 'reference'
 
     reference = fields.Char(string='Reference', copy=False, readonly=True, default='New')
     duty_id = fields.Many2one('nhs.duty', string='Duty', required=True, ondelete='cascade')
@@ -106,6 +107,21 @@ class NhsRosterEscalation(models.Model):
             matched |= BankSkill.search([('name', 'ilike', skill.name)], limit=1)
         return matched
 
+    PUSH_FAILURE_MARKER = 'Could not push to Staff Bank:'
+
+    def _log_push_failure(self, message):
+        """Record a push-to-bank failure onto Notes, replacing any previous
+        failure line rather than piling on top of it - so a note about an
+        issue that has since been fixed (e.g. a missing Role) doesn't linger
+        and read as still-current after a later, different failure (or a
+        fix). The user's own free-text notes are left untouched."""
+        self.ensure_one()
+        first_line = str(message).splitlines()[0] if message else ''
+        kept = [line for line in (self.notes or '').splitlines()
+                if self.PUSH_FAILURE_MARKER not in line]
+        kept.append('%s %s' % (self.PUSH_FAILURE_MARKER, first_line))
+        self.notes = '\n'.join(kept).strip()
+
     def action_push_to_bank(self):
         """Create (or reuse) an open nhs.bank.shift for this escalation,
         source='roster'. No-op if Staff Bank isn't installed - callers
@@ -113,29 +129,41 @@ class NhsRosterEscalation(models.Model):
         best-effort (Staff Bank owns its own band/role/skill requirements
         and may reject an incomplete shift) - a failure is logged onto the
         escalation rather than raised, so one bad mapping never blocks the
-        rest of a bulk/cron escalation run."""
+        rest of a bulk/cron escalation run. When called from the UI and Staff
+        Bank isn't installed at all, a notification is returned so the click
+        doesn't just silently do nothing - cron/bulk callers get the same
+        True they always did, since a client action is meaningless there."""
+        no_bank = self.browse()
         for escalation in self:
             if not escalation._bank_available():
+                no_bank |= escalation
                 continue
             duty = escalation.duty_id
+            role = duty.demand_line_id.staff_group_id
+            band = duty.required_band_id
+            missing = [label for label, value in (
+                ('Role / Staff Group (on the duty\'s demand line)', role),
+                ('Required Band (on the duty)', band)) if not value]
+            if missing:
+                escalation._log_push_failure(
+                    '%s not set - both are required by Staff Bank. Set them and'
+                    ' re-push.' % ' and '.join(missing))
+                continue
             start, end = duty.get_datetime_bounds()
             BankShift = self.env['nhs.bank.shift'].sudo()
-            role = duty.demand_line_id.staff_group_id
             vals = {
                 'org_unit_id': duty.unit_id.org_unit_id.id,
                 'shift_start': start,
                 'shift_end': end,
                 'shift_type_id': escalation._resolve_bank_shift_type(
                     duty.shift_type_id.category).id,
+                'role_id': role.id,
+                'band_id': band.id,
                 'headcount': escalation.headcount or 1,
                 'reason': 'demand',
                 'urgency': escalation.urgency or 'planned',
                 'source': 'roster',
             }
-            if duty.required_band_id:
-                vals['band_id'] = duty.required_band_id.id
-            if role:
-                vals['role_id'] = role.id
             skills = escalation._resolve_bank_skills(duty.required_skill_ids)
             if skills:
                 vals['skill_ids'] = [(6, 0, skills.ids)]
@@ -144,8 +172,7 @@ class NhsRosterEscalation(models.Model):
                 if hasattr(bank_shift, 'action_open'):
                     bank_shift.action_open()
             except Exception as exc:  # noqa: BLE001 - Staff Bank's own validation, not ours to predict
-                escalation.notes = (escalation.notes or '') + (
-                    '\nCould not push to Staff Bank: %s' % exc)
+                escalation._log_push_failure(str(exc))
                 continue
             escalation.write({
                 'state': 'pushed_to_bank',
@@ -153,6 +180,18 @@ class NhsRosterEscalation(models.Model):
                 'bank_shift_reference': getattr(bank_shift, 'name', str(bank_shift.id)),
                 'pushed_at': fields.Datetime.now(),
             })
+        if no_bank and len(no_bank) == len(self):
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Staff Bank not installed'),
+                    'message': _('The Staff Bank module (odoo_nhs_staff_bank) isn\'t'
+                                 ' installed, so nothing was pushed. Use "Mark Manual'
+                                 ' Cover" instead, or install it to push gaps there.'),
+                    'type': 'warning',
+                },
+            }
         return True
 
     def action_sync_from_bank(self):

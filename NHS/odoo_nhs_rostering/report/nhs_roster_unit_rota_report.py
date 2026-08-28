@@ -19,7 +19,15 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from . import nhs_apply_template_wizard
-from . import nhs_copy_period_wizard
-from . import nhs_publish_wizard
-from . import nhs_escalate_wizard
+from odoo import models
+
+
+class ReportNhsRosterUnitRota(models.AbstractModel):
+    """The unit rota PDF: every duty in the period, grouped by date, with
+    who is assigned - the manager/ward-office print-out."""
+    _name = 'report.odoo_nhs_rostering.report_nhs_roster_unit_rota'
+    _description = 'Unit Rota Report'
+
+    def _get_report_values(self, docids, data=None):
+        periods = self.env['nhs.roster.period'].browse(docids)
+        return {'doc_ids': docids, 'doc_model': 'nhs.roster.period', 'docs': periods}

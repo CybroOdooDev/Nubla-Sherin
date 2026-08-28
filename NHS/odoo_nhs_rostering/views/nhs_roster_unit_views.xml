@@ -9,7 +9,7 @@
                 <field name="member_count"/>
                 <field name="shift_type_count"/>
                 <field name="period_count"/>
-                <field name="leave_capacity_pct" widget="percentage"/>
+                <field name="leave_capacity_pct" widget="progressbar"/>
                 <field name="escalation_lead_days"/>
                 <field name="roster_manager_ids" widget="many2many_tags"/>
             </list>
@@ -41,7 +41,7 @@
                             <field name="roster_manager_ids" widget="many2many_tags"/>
                         </group>
                         <group>
-                            <field name="leave_capacity_pct"/>
+                            <field name="leave_capacity_pct" widget="progressbar"/>
                             <field name="escalation_lead_days"/>
                             <field name="escalation_auto_push"/>
                             <field name="active"/>
@@ -81,8 +81,8 @@
                             </field>
                         </page>
                     </notebook>
-                    <chatter/>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>

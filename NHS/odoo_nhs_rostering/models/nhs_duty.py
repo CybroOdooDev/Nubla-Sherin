@@ -22,6 +22,7 @@
 from datetime import datetime, timedelta
 
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 DUTY_STATES = [
     ('unfilled', 'Unfilled'),
@@ -112,6 +113,18 @@ class NhsDuty(models.Model):
             duty.display_name = '%s — %s — %s' % (
                 duty.unit_id.display_name or '', fields.Date.to_string(duty.duty_date) or '',
                 duty.shift_type_id.name or '')
+
+    @api.constrains('duty_date', 'period_id')
+    def _check_duty_date_within_period(self):
+        for duty in self:
+            period = duty.period_id
+            if period.date_start and period.date_end and not (
+                    period.date_start <= duty.duty_date <= period.date_end):
+                raise ValidationError(
+                    'Duty date %s falls outside the roster period (%s to %s).' % (
+                        fields.Date.to_string(duty.duty_date),
+                        fields.Date.to_string(period.date_start),
+                        fields.Date.to_string(period.date_end)))
 
     def get_datetime_bounds(self):
         """(start, end) naive datetimes for this duty, combining duty_date with

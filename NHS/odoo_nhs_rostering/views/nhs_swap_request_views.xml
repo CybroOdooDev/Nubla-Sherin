@@ -51,8 +51,8 @@
                         <field name="rule_check_note" readonly="1"/>
                     </group>
                     <field name="notes"/>
-                    <chatter/>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>

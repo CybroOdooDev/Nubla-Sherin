@@ -70,7 +70,6 @@ class NhsRosterRuleEngine(models.AbstractModel):
     _name = 'nhs.roster.rule.engine'
     _description = 'Roster Rules Engine (service)'
 
-    # ---------------------------------------------------------------- data --
 
     def _active_rules(self, company):
         return self.env['nhs.roster.rule'].search([
@@ -192,7 +191,6 @@ class NhsRosterRuleEngine(models.AbstractModel):
                 existing.write({'state': 'resolved', 'resolved_at': fields.Datetime.now()})
         return results
 
-    # -------------------------------------------------------------- rules --
 
     def _eval_wtr_avg_48(self, rule, assignment):
         member, duty = assignment.member_id, assignment.duty_id

@@ -19,7 +19,15 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from . import nhs_apply_template_wizard
-from . import nhs_copy_period_wizard
-from . import nhs_publish_wizard
-from . import nhs_escalate_wizard
+from odoo import models
+
+
+class ReportNhsRosterFillGaps(models.AbstractModel):
+    """Fill & gaps report: demand vs assigned per duty, with escalation
+    status - the evidence trail for safe-staffing/CQC review."""
+    _name = 'report.odoo_nhs_rostering.report_nhs_roster_fill_gaps'
+    _description = 'Fill & Gaps Report'
+
+    def _get_report_values(self, docids, data=None):
+        periods = self.env['nhs.roster.period'].browse(docids)
+        return {'doc_ids': docids, 'doc_model': 'nhs.roster.period', 'docs': periods}

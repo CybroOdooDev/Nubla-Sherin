@@ -9,18 +9,9 @@ templates, demand-based rotas, a rule-checked roster grid, the training/registra
 compliance gate, leave handling, staff self-service, duty swaps, publication, and automatic
 escalation of unfilled duties to the Staff Bank (and on to agency) with cost visibility.
 
-v1 scope: RULE-CHECKED ROTA BUILDING. A manager builds the rota from templates and manual
-assignment, and the system continuously validates it against demand, working-time, rest,
-skill-mix and compliance rules. Auto-generation / optimisation of rosters is a roadmap item,
-not part of this version.
-
 Configuration
 =============
-* Configure shift types, rotation/demand templates and the statutory rule set under
-  **NHS e-Rostering > Configuration**.
-* Create rostered units from Establishment org units, and add team members via their post.
-* The Staff Bank link (escalation) activates automatically when ``odoo_nhs_staff_bank`` is
-  installed - no separate configuration needed.
+No configuration
 
 Company
 =======
@@ -33,7 +24,7 @@ General Public License, Version 3 (LGPL v3).
 
 Credits
 =======
-Developer: (V19) Nubla,
+Developer: (V19) Nubla Sherin K ,
 
 Contact: odoo@cybrosys.com
 
@@ -53,8 +44,8 @@ Maintainer
 
 This module is maintained by Cybrosys Technologies.
 
-For support and more information, please visit https://www.cybrosys.com
+For support and more information, please visit `Our Website <https://cybrosys.com/>`__
 
 Further information
-====================
+===================
 HTML Description: `<static/description/index.html>`__

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_nhs_roster_unit_rota" model="ir.actions.report">
+        <field name="name">Unit Rota</field>
+        <field name="model">nhs.roster.period</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_rostering.report_nhs_roster_unit_rota</field>
+        <field name="report_file">odoo_nhs_rostering.report_nhs_roster_unit_rota</field>
+        <field name="print_report_name">'Unit Rota - %s' % object.name</field>
+        <field name="binding_model_id" ref="model_nhs_roster_period"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_nhs_roster_unit_rota">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="period">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Unit Rota - <span t-esc="period.name"/></h2>
+                        <p>
+                            <strong>Unit:</strong> <span t-esc="period.unit_id.display_name"/><br/>
+                            <strong>Period:</strong> <span t-esc="period.date_start"/> to <span t-esc="period.date_end"/><br/>
+                            <strong>Status:</strong> <span t-esc="period.state"/> ·
+                            <strong>Fill:</strong> <span t-esc="'%.1f' % period.fill_pct"/>%
+                        </p>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Date</th>
+                                    <th>Shift</th>
+                                    <th>Required</th>
+                                    <th>Assigned</th>
+                                    <th>Staff</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="period.duty_ids.sorted(key=lambda d: (d.duty_date, d.shift_type_id.name))" t-as="duty">
+                                    <td><span t-esc="duty.duty_date"/></td>
+                                    <td><span t-esc="duty.shift_type_id.name"/></td>
+                                    <td><span t-esc="duty.required_headcount"/></td>
+                                    <td><span t-esc="duty.assigned_count"/></td>
+                                    <td>
+                                        <span t-esc="', '.join(duty.assignment_ids.filtered(lambda a: a.state != 'cancelled').mapped('member_id.name'))"/>
+                                    </td>
+                                    <td><span t-esc="duty.state"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -68,6 +68,17 @@ class NhsDutyAssignment(models.Model):
         string='Paid Hours', compute='_compute_paid_hours', store=True, digits=(16, 2))
     change_note = fields.Char(
         string='Change Reason', help="Reason for a post-publication change (versioned via chatter).")
+    display_name = fields.Char(compute='_compute_display_name')
+
+    @api.depends('member_id.display_name', 'duty_id.display_name')
+    def _compute_display_name(self):
+        for assignment in self:
+            if assignment.member_id and assignment.duty_id:
+                assignment.display_name = '%s on %s' % (
+                    assignment.member_id.display_name,
+                    assignment.duty_id.display_name)
+            else:
+                assignment.display_name = 'New Duty Assignment'
 
     @api.depends('actual_start', 'actual_end', 'shift_type_id.duration_hours')
     def _compute_paid_hours(self):

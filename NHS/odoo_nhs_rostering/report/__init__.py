@@ -19,7 +19,6 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from . import nhs_apply_template_wizard
-from . import nhs_copy_period_wizard
-from . import nhs_publish_wizard
-from . import nhs_escalate_wizard
+from . import nhs_roster_unit_rota_report
+from . import nhs_roster_personal_rota_report
+from . import nhs_roster_fill_gaps_report

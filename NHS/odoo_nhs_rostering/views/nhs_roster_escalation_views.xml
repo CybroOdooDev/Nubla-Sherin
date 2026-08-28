@@ -59,8 +59,8 @@
                         <field name="agency_cost"/>
                     </group>
                     <field name="notes"/>
-                    <chatter/>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>

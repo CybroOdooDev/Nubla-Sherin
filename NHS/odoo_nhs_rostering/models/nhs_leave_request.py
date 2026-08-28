@@ -42,6 +42,10 @@ class NhsLeaveRequest(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Leave Request'
     _order = 'date_from desc'
+    _rec_name = 'member_id'
+
+
+
 
     member_id = fields.Many2one(
         'nhs.workforce.member', string='Member', required=True, tracking=True, index=True)

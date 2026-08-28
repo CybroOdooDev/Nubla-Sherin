@@ -47,8 +47,8 @@
                             <field name="change_note"/>
                         </group>
                     </group>
-                    <chatter/>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>

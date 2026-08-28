@@ -20,13 +20,10 @@
 #
 #############################################################################
 from datetime import timedelta
-
 from odoo import _, fields, models
 from odoo.exceptions import ValidationError
 
-# Minimal fixed-date UK bank holiday stub (Good Friday/Easter Monday/movable
-# bank holidays are NOT included - a full calendar is a natural roadmap
-# enhancement; this v1 checkbox handles the common fixed dates only).
+
 FIXED_UK_BANK_HOLIDAYS = {(1, 1), (12, 25), (12, 26)}
 
 

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_nhs_roster_personal_rota" model="ir.actions.report">
+        <field name="name">Personal Rota</field>
+        <field name="model">nhs.workforce.member</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_rostering.report_nhs_roster_personal_rota</field>
+        <field name="report_file">odoo_nhs_rostering.report_nhs_roster_personal_rota</field>
+        <field name="print_report_name">'Personal Rota - %s' % object.name</field>
+        <field name="binding_model_id" ref="odoo_nhs_training.model_nhs_workforce_member"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_nhs_roster_personal_rota">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="member">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Personal Rota - <span t-esc="member.name"/></h2>
+                        <p><strong>Reference:</strong> <span t-esc="member.reference"/></p>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Date</th><th>Unit</th><th>Shift</th><th>Status</th><th>Paid Hours</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="member.duty_assignment_ids.filtered(lambda a: a.state in ('published', 'worked', 'dna')).sorted('duty_date')" t-as="assignment">
+                                    <td><span t-esc="assignment.duty_date"/></td>
+                                    <td><span t-esc="assignment.unit_id.display_name"/></td>
+                                    <td><span t-esc="assignment.shift_type_id.name"/></td>
+                                    <td><span t-esc="assignment.state"/></td>
+                                    <td><span t-esc="'%.2f' % assignment.paid_hours"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

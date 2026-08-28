@@ -31,6 +31,13 @@ SHIFT_CATEGORIES = [
     ('other', 'Other'),
 ]
 
+# Same fixed vocabulary as SHIFT_CATEGORIES, but keyed by the label itself
+# (not a snake_case code) - unlike category, nothing elsewhere switches on
+# this field's raw value, so the stored value can just BE the readable text.
+# That keeps every existing `shift_type_id.name` read (reports, portal pages,
+# the mail template, duty's own display_name) working unchanged.
+SHIFT_TYPE_NAMES = [(label, label) for _, label in SHIFT_CATEGORIES]
+
 # Bootstrap-ish colour per category, used by the roster grid to colour-code cells.
 CATEGORY_COLORS = {
     'early': '#f4b400', 'late': '#ff7043', 'long_day': '#ab47bc',
@@ -48,7 +55,13 @@ class NhsRosterShiftType(models.Model):
 
     roster_unit_id = fields.Many2one(
         'nhs.roster.unit', string='Unit', required=True, ondelete='cascade', index=True)
-    name = fields.Char(string='Shift Type', required=True, help="e.g. 'Early', 'Night'.")
+    name = fields.Selection(
+        SHIFT_TYPE_NAMES, string='Shift Type', required=True, default='Other',
+        help="Picked from the same fixed set as Category. Note: this means Shift Type"
+             " and Category will often hold the same value - Category still exists"
+             " separately because it's what actually drives colour-coding and the"
+             " MAX_CONSEC_NIGHTS rule, independent of what this record is named."
+    )
     code = fields.Char(string='Code', help="Short code, used on the roster grid/exports.")
     category = fields.Selection(
         SHIFT_CATEGORIES, string='Category', required=True, default='other',

@@ -26,7 +26,7 @@ from odoo.exceptions import UserError, ValidationError
 
 STATES = [
     ('draft', 'Draft'),
-    ('in_progress', 'Building'),
+    ('in_progress', 'In Progress'),
     ('checked', 'Checked'),
     ('approved', 'Approved'),
     ('published', 'Published'),

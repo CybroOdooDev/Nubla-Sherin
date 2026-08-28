@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_nhs_roster_fill_gaps" model="ir.actions.report">
+        <field name="name">Fill &amp; Gaps</field>
+        <field name="model">nhs.roster.period</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_rostering.report_nhs_roster_fill_gaps</field>
+        <field name="report_file">odoo_nhs_rostering.report_nhs_roster_fill_gaps</field>
+        <field name="print_report_name">'Fill and Gaps - %s' % object.name</field>
+        <field name="binding_model_id" ref="model_nhs_roster_period"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_nhs_roster_fill_gaps">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="period">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Fill &amp; Gaps - <span t-esc="period.name"/></h2>
+                        <p>
+                            <strong>Fill:</strong> <span t-esc="'%.1f' % period.fill_pct"/>% ·
+                            <strong>Open Gaps:</strong> <span t-esc="period.gap_count"/> ·
+                            <strong>Open Hard Violations:</strong> <span t-esc="period.hard_violation_count"/>
+                        </p>
+                        <h4>Unfilled / Escalated Duties</h4>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Date</th><th>Shift</th><th>Required</th><th>Assigned</th>
+                                    <th>Short</th><th>Status</th><th>Escalation</th><th>Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="period.duty_ids.filtered(lambda d: d.state not in ('filled', 'cancelled')).sorted('duty_date')" t-as="duty">
+                                    <td><span t-esc="duty.duty_date"/></td>
+                                    <td><span t-esc="duty.shift_type_id.name"/></td>
+                                    <td><span t-esc="duty.required_headcount"/></td>
+                                    <td><span t-esc="duty.assigned_count"/></td>
+                                    <td><span t-esc="duty.required_headcount - duty.assigned_count"/></td>
+                                    <td><span t-esc="duty.state"/></td>
+                                    <td><span t-esc="duty.escalation_id.state or ''"/></td>
+                                    <td><span t-esc="duty.escalation_id.agency_cost or ''"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

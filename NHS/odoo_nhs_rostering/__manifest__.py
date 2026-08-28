@@ -32,11 +32,6 @@ types and rotation templates, demand (required staffing per shift), a rule-check
 grid, the training/registration compliance gate, leave handling, staff self-service,
 duty-swap requests, publication, and automatic escalation of unfilled duties into the
 Staff Bank (and on to agency) with cost visibility.
-
-v1 scope: RULE-CHECKED ROTA BUILDING. A manager builds the rota from templates and manual
-assignment, and the system continuously validates it against demand, working-time, rest,
-skill-mix and compliance rules. Auto-generation / optimisation of rosters is explicitly a
-roadmap item, not part of this version.
 """,
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
@@ -80,9 +75,6 @@ roadmap item, not part of this version.
         'report/nhs_roster_personal_rota_report.xml',
         'report/nhs_roster_fill_gaps_report.xml',
         'views/nhs_rostering_menus.xml',
-    ],
-    'demo': [
-        'demo/demo_data.xml',
     ],
     'assets': {
         'web.assets_backend': [

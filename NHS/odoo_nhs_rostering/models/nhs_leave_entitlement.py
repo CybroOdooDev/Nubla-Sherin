@@ -28,6 +28,7 @@ class NhsLeaveEntitlement(models.Model):
     _name = 'nhs.leave.entitlement'
     _description = 'Leave Entitlement'
     _order = 'leave_year desc, member_id'
+    _rec_name =  'member_id'
 
     member_id = fields.Many2one(
         'nhs.workforce.member', string='Member', required=True, ondelete='cascade', index=True)

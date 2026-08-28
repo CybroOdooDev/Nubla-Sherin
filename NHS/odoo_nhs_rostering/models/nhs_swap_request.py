@@ -68,6 +68,17 @@ class NhsSwapRequest(models.Model):
     approved_by = fields.Many2one('res.users', string='Approved By', readonly=True)
     approved_at = fields.Datetime(string='Approved At', readonly=True)
     notes = fields.Text(string='Notes')
+    display_name = fields.Char(compute='_compute_display_name')
+
+    @api.depends('requester_member_id.display_name', 'target_member_id.display_name')
+    def _compute_display_name(self):
+        for swap in self:
+            if swap.requester_member_id and swap.target_member_id:
+                swap.display_name = 'Swap: %s ⇆ %s' % (
+                    swap.requester_member_id.display_name,
+                    swap.target_member_id.display_name)
+            else:
+                swap.display_name = 'New Swap Request'
 
     @api.constrains('requester_assignment_id', 'target_assignment_id')
     def _check_different_members(self):
