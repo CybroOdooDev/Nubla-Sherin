@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
-        <record id="mail_template_roster_published" model="mail.template">
+        <!-- Record: mail_template_roster_published for mail.template -->
+    <record id="mail_template_roster_published" model="mail.template">
             <field name="name">Roster: Published</field>
             <field name="model_id" ref="model_nhs_roster_period"/>
             <field name="subject">Your roster for {{ object.unit_id.display_name }} has been published</field>
@@ -21,7 +22,8 @@
             </field>
         </record>
 
-        <record id="mail_template_duty_changed" model="mail.template">
+        <!-- Record: mail_template_duty_changed for mail.template -->
+    <record id="mail_template_duty_changed" model="mail.template">
             <field name="name">Roster: Duty Changed</field>
             <field name="model_id" ref="model_nhs_duty_assignment"/>
             <field name="subject">A duty on your roster has changed</field>
@@ -40,7 +42,8 @@
             </field>
         </record>
 
-        <record id="mail_template_swap_decided" model="mail.template">
+        <!-- Record: mail_template_swap_decided for mail.template -->
+    <record id="mail_template_swap_decided" model="mail.template">
             <field name="name">Roster: Swap Decided</field>
             <field name="model_id" ref="model_nhs_swap_request"/>
             <field name="subject">Your duty swap request has been {{ object.state }}</field>

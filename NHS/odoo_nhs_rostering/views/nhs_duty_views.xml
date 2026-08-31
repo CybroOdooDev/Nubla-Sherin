@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Record: view_nhs_duty_list for ir.ui.view -->
     <record id="view_nhs_duty_list" model="ir.ui.view">
         <field name="name">nhs.duty.list</field>
         <field name="model">nhs.duty</field>
@@ -12,6 +13,7 @@
                 <field name="period_id"/>
                 <field name="duty_date"/>
                 <field name="shift_type_id"/>
+                <field name="staff_group_id"/>
                 <field name="required_band_id"/>
                 <field name="required_headcount"/>
                 <field name="assigned_count"/>
@@ -21,6 +23,7 @@
         </field>
     </record>
 
+    <!-- Record: view_nhs_duty_form for ir.ui.view -->
     <record id="view_nhs_duty_form" model="ir.ui.view">
         <field name="name">nhs.duty.form</field>
         <field name="model">nhs.duty</field>
@@ -28,13 +31,27 @@
             <form string="Duty">
                 <header>
                     <button name="action_cancel" type="object" string="Cancel Duty"
-                            invisible="is_cancelled"/>
+                            invisible="not id or is_cancelled"/>
                     <button name="action_reinstate" type="object" string="Reinstate"
-                            invisible="not is_cancelled"/>
+                            invisible="not id or not is_cancelled"/>
+                    <button name="action_escalate_to_bank" type="object" string="Escalate to Bank"
+                            invisible="not id or is_cancelled or escalation_id or state not in ('unfilled', 'partially_filled')"
+                            class="btn-secondary"/>
                     <field name="state" widget="statusbar"
-                           statusbar_visible="unfilled,partially_filled,filled,escalated,covered_bank,covered_agency"/>
+                           statusbar_visible="draft,unfilled,partially_filled,filled,escalated"/>
                 </header>
                 <sheet>
+                    <field name="escalation_id" invisible="1"/>
+                    <field name="bank_filled_count" invisible="1"/>
+                    <div class="alert alert-warning" role="alert" invisible="not is_overstaffed">
+                        <strong>Possibly overstaffed:</strong>
+                        <field name="assigned_count" readonly="1" class="oe_inline"/> assigned directly on the
+                        roster plus <field name="bank_filled_count" readonly="1" class="oe_inline"/> confirmed
+                        via the linked bank shift together exceed the
+                        <field name="required_headcount" readonly="1" class="oe_inline"/> required. The roster
+                        and Staff Bank fill this duty independently and aren't reconciled automatically -
+                        check the linked bank shift and stand down the extra cover if it isn't needed.
+                    </div>
                     <group>
                         <group>
                             <field name="period_id"/>
@@ -43,6 +60,7 @@
                             <field name="shift_type_id"/>
                         </group>
                         <group>
+                            <field name="staff_group_id"/>
                             <field name="required_band_id"/>
                             <field name="required_skill_ids" widget="many2many_tags"/>
                             <field name="required_headcount"/>
@@ -50,9 +68,10 @@
                             <field name="notes"/>
                         </group>
                     </group>
+                    <field name="eligible_member_ids" invisible="1"/>
                     <field name="assignment_ids">
                         <list editable="bottom">
-                            <field name="member_id"/>
+                            <field name="member_id" domain="[('id', 'in', parent.eligible_member_ids)]"/>
                             <field name="state"/>
                             <field name="compliant_at_assignment" readonly="1"/>
                             <field name="paid_hours" readonly="1"/>
@@ -63,6 +82,7 @@
         </field>
     </record>
 
+    <!-- Record: view_nhs_duty_search for ir.ui.view -->
     <record id="view_nhs_duty_search" model="ir.ui.view">
         <field name="name">nhs.duty.search</field>
         <field name="model">nhs.duty</field>
@@ -82,6 +102,7 @@
         </field>
     </record>
 
+    <!-- Record: action_nhs_duty_gaps for ir.actions.act_window -->
     <record id="action_nhs_duty_gaps" model="ir.actions.act_window">
         <field name="name">Gaps &amp; Escalation</field>
         <field name="res_model">nhs.duty</field>

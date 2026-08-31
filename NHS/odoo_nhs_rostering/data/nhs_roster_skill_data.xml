@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Reference skills/competencies, used on demand lines (required skills) and
+         held by workforce members - a representative real-world NHS clinical
+         competency set, not tied to any specific unit (company_id left blank so
+         they're available everywhere). Trusts extend/trim this under
+         Configuration > Skills as needed. -->
+    <!-- Record: roster_skill_iv_therapy for nhs.roster.skill -->
+    <record id="roster_skill_iv_therapy" model="nhs.roster.skill">
+        <field name="name">IV Therapy &amp; Cannulation</field>
+        <field name="code">IV</field>
+    </record>
+    <!-- Record: roster_skill_venepuncture for nhs.roster.skill -->
+    <record id="roster_skill_venepuncture" model="nhs.roster.skill">
+        <field name="name">Venepuncture</field>
+        <field name="code">VP</field>
+    </record>
+    <!-- Record: roster_skill_catheterisation for nhs.roster.skill -->
+    <record id="roster_skill_catheterisation" model="nhs.roster.skill">
+        <field name="name">Catheterisation</field>
+        <field name="code">CATH</field>
+    </record>
+    <!-- Record: roster_skill_wound_care for nhs.roster.skill -->
+    <record id="roster_skill_wound_care" model="nhs.roster.skill">
+        <field name="name">Wound Care Management</field>
+        <field name="code">WC</field>
+    </record>
+    <!-- Record: roster_skill_tracheostomy for nhs.roster.skill -->
+    <record id="roster_skill_tracheostomy" model="nhs.roster.skill">
+        <field name="name">Tracheostomy Care</field>
+        <field name="code">TRACH</field>
+    </record>
+    <!-- Record: roster_skill_syringe_driver for nhs.roster.skill -->
+    <record id="roster_skill_syringe_driver" model="nhs.roster.skill">
+        <field name="name">Syringe Driver / Infusion Pump Competent</field>
+        <field name="code">SD</field>
+    </record>
+    <!-- Record: roster_skill_phlebotomy for nhs.roster.skill -->
+    <record id="roster_skill_phlebotomy" model="nhs.roster.skill">
+        <field name="name">Phlebotomy</field>
+        <field name="code">PHLEB</field>
+    </record>
+    <!-- Record: roster_skill_ils for nhs.roster.skill -->
+    <record id="roster_skill_ils" model="nhs.roster.skill">
+        <field name="name">Immediate Life Support (ILS)</field>
+        <field name="code">ILS</field>
+    </record>
+    <!-- Record: roster_skill_als for nhs.roster.skill -->
+    <record id="roster_skill_als" model="nhs.roster.skill">
+        <field name="name">Advanced Life Support (ALS)</field>
+        <field name="code">ALS</field>
+    </record>
+    <!-- Record: roster_skill_news2 for nhs.roster.skill -->
+    <record id="roster_skill_news2" model="nhs.roster.skill">
+        <field name="name">NEWS2 Trained</field>
+        <field name="code">NEWS2</field>
+    </record>
+    <!-- Record: roster_skill_mentor for nhs.roster.skill -->
+    <record id="roster_skill_mentor" model="nhs.roster.skill">
+        <field name="name">Practice Assessor / Mentor (SSSA)</field>
+        <field name="code">MENTOR</field>
+    </record>
+    <!-- Record: roster_skill_safeguarding for nhs.roster.skill -->
+    <record id="roster_skill_safeguarding" model="nhs.roster.skill">
+        <field name="name">Safeguarding Level 3</field>
+        <field name="code">SG3</field>
+    </record>
+    <!-- Record: roster_skill_manual_handling for nhs.roster.skill -->
+    <record id="roster_skill_manual_handling" model="nhs.roster.skill">
+        <field name="name">Manual Handling (People)</field>
+        <field name="code">MH</field>
+    </record>
+    <!-- Record: roster_skill_ipc_link for nhs.roster.skill -->
+    <record id="roster_skill_ipc_link" model="nhs.roster.skill">
+        <field name="name">Infection Prevention &amp; Control Link</field>
+        <field name="code">IPC</field>
+    </record>
+    <!-- Record: roster_skill_non_medical_prescriber for nhs.roster.skill -->
+    <record id="roster_skill_non_medical_prescriber" model="nhs.roster.skill">
+        <field name="name">Non-Medical Prescriber</field>
+        <field name="code">NMP</field>
+    </record>
+    <!-- Record: roster_skill_triage for nhs.roster.skill -->
+    <record id="roster_skill_triage" model="nhs.roster.skill">
+        <field name="name">Triage Competent</field>
+        <field name="code">TRIAGE</field>
+    </record>
+    <!-- Record: roster_skill_paediatric_ils for nhs.roster.skill -->
+    <record id="roster_skill_paediatric_ils" model="nhs.roster.skill">
+        <field name="name">Paediatric Immediate Life Support (PILS)</field>
+        <field name="code">PILS</field>
+    </record>
+    <!-- Record: roster_skill_coordination for nhs.roster.skill -->
+    <record id="roster_skill_coordination" model="nhs.roster.skill">
+        <field name="name">Shift Coordination (Nurse-in-Charge)</field>
+        <field name="code">COORD</field>
+    </record>
+</odoo>

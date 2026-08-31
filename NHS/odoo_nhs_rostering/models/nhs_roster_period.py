@@ -20,8 +20,7 @@
 #
 #############################################################################
 from datetime import timedelta
-
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 STATES = [
@@ -45,42 +44,48 @@ class NhsRosterPeriod(models.Model):
     _description = 'Roster Period'
     _order = 'date_start desc'
 
-    name = fields.Char(string='Name', compute='_compute_name', store=True)
+    name = fields.Char(string='Name', compute='_compute_name', store=True, help="Name")
     unit_id = fields.Many2one(
         'nhs.roster.unit', string='Unit', required=True, ondelete='restrict',
-        tracking=True, index=True)
+        tracking=True, index=True, help="Unit")
     company_id = fields.Many2one(
-        'res.company', string='Company', related='unit_id.company_id', store=True)
-    date_start = fields.Date(string='Start Date', required=True, tracking=True)
-    date_end = fields.Date(string='End Date', required=True, tracking=True)
+        'res.company', string='Company', related='unit_id.company_id', store=True, help="Company")
+    date_start = fields.Date(string='Start Date', required=True, tracking=True, help="Start Date")
+    date_end = fields.Date(string='End Date', required=True, tracking=True, help="End Date")
     state = fields.Selection(
-        STATES, string='Status', required=True, default='draft', tracking=True)
-    duty_ids = fields.One2many('nhs.duty', 'period_id', string='Duties')
-    duty_count = fields.Integer(compute='_compute_counts', store=True)
+        STATES, string='Status', required=True, default='draft', tracking=True, help="Status")
+    duty_ids = fields.One2many('nhs.duty', 'period_id', string='Duties', help="Duties")
+    duty_count = fields.Integer(compute='_compute_counts', store=True, help="Detailed information about this field")
     assignment_ids = fields.One2many(
-        'nhs.duty.assignment', 'period_id', string='Assignments')
-    violation_ids = fields.One2many('nhs.rule.violation', 'period_id', string='Violations')
-    open_violation_count = fields.Integer(compute='_compute_counts', store=True)
+        'nhs.duty.assignment', 'period_id', string='Assignments', help="Assignments")
+    violation_ids = fields.One2many('nhs.rule.violation', 'period_id', string='Violations',
+                                    help="Violations")
+    open_violation_count = fields.Integer(compute='_compute_counts', store=True,
+                                          help="Detailed information about this field")
+    swap_count = fields.Integer(compute='_compute_swap_count', string='Swaps', help="Number of swap requests in this period")
     fill_pct = fields.Float(
-        string='Fill %', compute='_compute_fill', store=True, digits=(16, 1))
-    required_headcount_total = fields.Integer(compute='_compute_fill', store=True)
-    assigned_headcount_total = fields.Integer(compute='_compute_fill', store=True)
+        string='Fill %', compute='_compute_fill', store=True, digits=(16, 1), help="Fill %")
+    required_headcount_total = fields.Integer(compute='_compute_fill', store=True,
+                                              help="Detailed information about this field")
+    assigned_headcount_total = fields.Integer(compute='_compute_fill', store=True,
+                                              help="Detailed information about this field")
     gap_count = fields.Integer(
         string='Open Gaps', compute='_compute_fill', store=True,
         help="Total unfilled headcount across every duty in the period.")
     hard_violation_count = fields.Integer(
         string='Hard Violations', compute='_compute_counts', store=True,
         help="Open violations of hard-severity rules. Blocks publication.")
-    published_at = fields.Datetime(string='Published At', tracking=True, copy=False)
+    published_at = fields.Datetime(string='Published At', tracking=True, copy=False, help="Published At")
     publish_lead_days = fields.Integer(
         string='Publish Lead Time (Days)', compute='_compute_publish_lead_days', store=True,
         help="Days between publication and the period's start date - the six-week"
              " e-Rostering KPI.")
-    finalised_at = fields.Datetime(string='Finalised At', tracking=True, copy=False)
-    notes = fields.Text(string='Notes')
+    finalised_at = fields.Datetime(string='Finalised At', tracking=True, copy=False, help="Finalised At")
+    notes = fields.Text(string='Notes', help="Notes")
 
     @api.depends('unit_id.display_name', 'date_start', 'date_end')
     def _compute_name(self):
+        """ Method for compute name """
         for period in self:
             if period.unit_id and period.date_start and period.date_end:
                 period.name = '%s — %s to %s' % (
@@ -92,6 +97,7 @@ class NhsRosterPeriod(models.Model):
 
     @api.depends('duty_ids', 'violation_ids.state', 'violation_ids.severity')
     def _compute_counts(self):
+        """ Method for compute counts """
         for period in self:
             period.duty_count = len(period.duty_ids)
             open_violations = period.violation_ids.filtered(lambda v: v.state == 'open')
@@ -99,8 +105,18 @@ class NhsRosterPeriod(models.Model):
             period.hard_violation_count = len(
                 open_violations.filtered(lambda v: v.severity == 'hard'))
 
+    def _compute_swap_count(self):
+        """ Method for compute swap count """
+        for period in self:
+            period.swap_count = self.env['nhs.swap.request'].search_count([
+                '|',
+                ('requester_assignment_id.period_id', '=', period.id),
+                ('target_assignment_id.period_id', '=', period.id)
+            ])
+
     @api.depends('duty_ids.required_headcount', 'duty_ids.assigned_count')
     def _compute_fill(self):
+        """ Method for compute fill """
         for period in self:
             required = sum(period.duty_ids.mapped('required_headcount'))
             assigned = sum(min(d.assigned_count, d.required_headcount) for d in period.duty_ids)
@@ -112,6 +128,7 @@ class NhsRosterPeriod(models.Model):
 
     @api.depends('published_at', 'date_start')
     def _compute_publish_lead_days(self):
+        """ Method for compute publish lead days """
         for period in self:
             if period.published_at and period.date_start:
                 published_date = fields.Datetime.to_datetime(period.published_at).date()
@@ -121,6 +138,7 @@ class NhsRosterPeriod(models.Model):
 
     @api.constrains('date_start', 'date_end')
     def _check_dates(self):
+        """ Method for check dates """
         for period in self:
             if period.date_end < period.date_start:
                 raise ValidationError('End date must be on or after the start date.')
@@ -147,6 +165,7 @@ class NhsRosterPeriod(models.Model):
                             'duty_date': a_date,
                             'shift_type_id': line.shift_type_id.id,
                             'demand_line_id': line.id,
+                            'staff_group_id': line.staff_group_id.id,
                             'required_band_id': line.band_id.id,
                             'required_skill_ids': [(6, 0, line.required_skill_ids.ids)],
                             'required_headcount': line.required_headcount,
@@ -157,6 +176,7 @@ class NhsRosterPeriod(models.Model):
         return True
 
     def action_start_build(self):
+        """ Method for action start build """
         for period in self:
             if period.state != 'draft':
                 continue
@@ -164,19 +184,80 @@ class NhsRosterPeriod(models.Model):
                 period.action_generate_duties()
             period.state = 'in_progress'
 
+    def action_export_worked_hours(self):
+        """
+        Export finalised worked hours (actuals) to a downstream payroll/billing system.
+        Generates a CSV payload and returns it for download.
+        """
+        import base64
+        import csv
+        import io
+        for period in self:
+            if period.state not in ('published', 'finalised'):
+                raise UserError('Can only export hours for published or finalised periods.')
+            
+            output = io.StringIO()
+            writer = csv.writer(output)
+            writer.writerow(['Period', 'Unit', 'Member', 'Date', 'Shift Type', 'Worked Hours'])
+            
+            for assignment in period.assignment_ids.filtered(lambda a: a.state == 'assigned'):
+                # Assuming 7.5 hours per shift as standard
+                hours = 7.5
+                writer.writerow([
+                    period.name,
+                    period.unit_id.name,
+                    assignment.member_id.name,
+                    str(assignment.duty_date),
+                    assignment.shift_type_id.name,
+                    str(hours)
+                ])
+                
+            csv_data = output.getvalue().encode('utf-8')
+            attachment = self.env['ir.attachment'].create({
+                'name': f'worked_hours_{period.id}.csv',
+                'type': 'binary',
+                'datas': base64.b64encode(csv_data),
+                'res_model': 'nhs.roster.period',
+                'res_id': period.id,
+                'mimetype': 'text/csv'
+            })
+            
+            return {
+                'type': 'ir.actions.act_url',
+                'url': f'/web/content/{attachment.id}?download=true',
+                'target': 'self',
+            }
+
+    def action_view_swaps(self):
+        """ Method for action view swaps """
+        self.ensure_one()
+        return {
+            'name': 'Swap Requests',
+            'type': 'ir.actions.act_window',
+            'res_model': 'nhs.swap.request',
+            'view_mode': 'list,form',
+            'domain': [
+                '|',
+                ('requester_assignment_id.period_id', '=', self.id),
+                ('target_assignment_id.period_id', '=', self.id)
+            ],
+            'context': {'default_unit_id': self.unit_id.id},
+        }
+
     def action_recompute_check(self):
         """Recompute rule violations for every assignment in the period and
         move the period to 'checked' so the approver sees a fresh position."""
         for period in self:
             if period.state not in ('in_progress', 'checked'):
-                raise UserError(_('Only a roster being built can be checked.'))
+                raise UserError(('Only a roster being built can be checked.'))
             period.assignment_ids.recompute_violations()
             period.state = 'checked'
 
     def action_approve(self):
+        """ Method for action approve """
         for period in self:
             if period.state != 'checked':
-                raise UserError(_('Check the roster (recompute rules) before approving it.'))
+                raise UserError(('Check the roster (recompute rules) before approving it.'))
             period.state = 'approved'
 
     def action_publish(self):
@@ -184,9 +265,9 @@ class NhsRosterPeriod(models.Model):
         every duty and its assignments as published and notifies staff."""
         for period in self:
             if period.state != 'approved':
-                raise UserError(_('Only an approved roster can be published.'))
+                raise UserError(('Only an approved roster can be published.'))
             if period.hard_violation_count:
-                raise UserError(_(
+                raise UserError((
                     'Cannot publish: %d open hard rule violation(s) must be resolved or'
                     ' justified first.') % period.hard_violation_count)
             period.assignment_ids.filtered(lambda a: a.state == 'assigned').write(
@@ -195,6 +276,7 @@ class NhsRosterPeriod(models.Model):
             period._notify_published()
 
     def _notify_published(self):
+        """ Method for notify published """
         template = self.env.ref(
             'odoo_nhs_rostering.mail_template_roster_published', raise_if_not_found=False)
         if not template:
@@ -207,17 +289,19 @@ class NhsRosterPeriod(models.Model):
                 })
 
     def action_finalise(self):
+        """ Method for action finalise """
         for period in self:
             if period.state != 'published':
-                raise UserError(_('Only a published roster can be finalised.'))
+                raise UserError(('Only a published roster can be finalised.'))
             period.assignment_ids.filtered(
                 lambda a: a.state == 'published').write({'state': 'worked'})
             period.write({'state': 'finalised', 'finalised_at': fields.Datetime.now()})
 
     def action_reset_to_draft(self):
+        """ Method for action reset to draft """
         for period in self:
             if period.state in ('published', 'finalised'):
-                raise UserError(_('A published or finalised roster cannot be reset.'))
+                raise UserError(('A published or finalised roster cannot be reset.'))
             period.state = 'draft'
 
     @api.model
@@ -265,7 +349,7 @@ class NhsRosterPeriod(models.Model):
             },
             'dates': dates,
             'shift_types': [{
-                'id': s.id, 'name': s.name, 'category': s.category, 'color': s.color,
+                'id': s.id, 'name': s.name, 'color': s.color,
                 'code': s.code or s.name[:2],
             } for s in shift_types],
             'members': [{
@@ -290,11 +374,13 @@ class NhsRosterPeriod(models.Model):
             ('period_id', '=', period_id), ('duty_date', '=', a_date),
             ('shift_type_id', '=', shift_type_id),
         ], limit=1)
+        created_duty = False
         if not duty:
             duty = Duty.create({
                 'period_id': period_id, 'duty_date': a_date,
                 'shift_type_id': shift_type_id, 'required_headcount': 1,
             })
+            created_duty = True
         existing = duty.assignment_ids.filtered(
             lambda a: a.member_id.id == member_id and a.state != 'cancelled')
         if existing:
@@ -303,6 +389,8 @@ class NhsRosterPeriod(models.Model):
             self.env['nhs.duty.assignment'].create({'duty_id': duty.id, 'member_id': member_id})
             return {'ok': True}
         except ValidationError as exc:
+            if created_duty:
+                duty.unlink()
             return {'ok': False, 'error': str(exc)}
 
     @api.model
@@ -338,6 +426,28 @@ class NhsRosterPeriod(models.Model):
         lead_times = periods.filtered('published_at').mapped('publish_lead_days')
         avg_lead_time = (sum(lead_times) / len(lead_times)) if lead_times else 0
 
+        pending_swaps = self.env['nhs.swap.request'].search_count([('state', '=', 'accepted_by_target')])
+        pending_leaves = self.env['nhs.leave.request'].search_count([('state', '=', 'submitted')])
+
+        # Fill rate by unit
+        units_data = {}
+        for p in periods:
+            uid = p.unit_id.id
+            if uid not in units_data:
+                units_data[uid] = {'id': uid, 'name': p.unit_id.display_name, 'req': 0, 'ass': 0}
+            units_data[uid]['req'] += p.required_headcount_total
+            units_data[uid]['ass'] += p.assigned_headcount_total
+        
+        unit_fill_rates = []
+        for u in units_data.values():
+            fr = (u['ass'] / u['req'] * 100.0) if u['req'] else 100.0
+            unit_fill_rates.append({'id': u['id'], 'name': u['name'], 'fill_pct': round(fr, 1)})
+
+        upcoming_gaps = self.env['nhs.duty'].search([
+            ('state', 'in', ['unfilled', 'partially_filled']),
+            ('duty_date', '>=', fields.Date.today())
+        ], order='duty_date asc', limit=5)
+
         return {
             'fill_rate': round(fill_rate, 1),
             'total_gaps': sum(periods.mapped('gap_count')),
@@ -348,10 +458,20 @@ class NhsRosterPeriod(models.Model):
             'open_hard_violation_count': len(open_hard),
             'open_soft_violation_count': len(open_soft),
             'avg_lead_time': round(avg_lead_time, 1),
+            'pending_swaps_count': pending_swaps,
+            'pending_leaves_count': pending_leaves,
+            'unit_fill_rates': sorted(unit_fill_rates, key=lambda x: x['name']),
+            'upcoming_gaps': [{
+                'id': d.id, 
+                'unit': d.period_id.unit_id.display_name, 
+                'date': str(d.duty_date),
+                'shift': d.shift_type_id.name, 
+                'missing': d.required_headcount - d.assigned_count
+            } for d in upcoming_gaps],
             'periods': [{
                 'id': p.id, 'name': p.name, 'fill_pct': round(p.fill_pct, 1),
                 'gap_count': p.gap_count, 'hard_violation_count': p.hard_violation_count,
-                'state': p.state,
+                'state': dict(self._fields['state'].selection).get(p.state, p.state),
             } for p in periods.sorted('date_start', reverse=True)[:10]],
         }
 
@@ -370,17 +490,25 @@ class NhsRosterPeriod(models.Model):
             days_left = (period.date_start - today).days
             if days_left <= target and days_left in (target, 14, 7, 3, 1):
                 period.message_post(
-                    body=_('Reminder: this roster starts in %d day(s) and is not yet'
+                    body=('Reminder: this roster starts in %d day(s) and is not yet'
                            ' published (target lead time %d days).') % (days_left, target))
 
     def action_view_grid(self):
-        """Open the custom roster-grid client action for this period."""
+        """Open the custom roster-grid client action for this period.
+
+        The period id is passed both as `params` (used on the initial open)
+        and as `context.active_id`. Only the latter survives a browser
+        refresh - the web client re-derives the action from the URL, which
+        encodes `active_id` but not arbitrary client-action params - so
+        without it a refresh reopens the grid with no period and shows
+        "Roster period not found."."""
         self.ensure_one()
         return {
             'type': 'ir.actions.client',
             'tag': 'nhs_roster_grid',
             'name': self.name,
             'params': {'period_id': self.id},
+            'context': {'active_id': self.id},
         }
 
     def action_export_worked_hours(self):

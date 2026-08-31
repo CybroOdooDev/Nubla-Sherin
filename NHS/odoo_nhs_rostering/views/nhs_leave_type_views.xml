@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Record: view_nhs_leave_type_list for ir.ui.view -->
     <record id="view_nhs_leave_type_list" model="ir.ui.view">
         <field name="name">nhs.leave.type.list</field>
         <field name="model">nhs.leave.type</field>
@@ -17,6 +18,7 @@
         </field>
     </record>
 
+    <!-- Record: action_nhs_leave_type for ir.actions.act_window -->
     <record id="action_nhs_leave_type" model="ir.actions.act_window">
         <field name="name">Leave Types</field>
         <field name="res_model">nhs.leave.type</field>

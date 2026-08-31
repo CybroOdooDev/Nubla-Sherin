@@ -43,6 +43,7 @@ Staff Bank (and on to agency) with cost visibility.
         'security/ir.model.access.csv',
         'data/nhs_roster_sequence_data.xml',
         'data/nhs_roster_rule_data.xml',
+        'data/nhs_roster_skill_data.xml',
         'data/nhs_leave_type_data.xml',
         'data/mail_template_data.xml',
         'data/ir_cron_data.xml',

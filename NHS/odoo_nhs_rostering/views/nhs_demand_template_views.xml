@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Record: view_nhs_demand_template_list for ir.ui.view -->
     <record id="view_nhs_demand_template_list" model="ir.ui.view">
         <field name="name">nhs.demand.template.list</field>
         <field name="model">nhs.demand.template</field>
@@ -14,6 +15,7 @@
         </field>
     </record>
 
+    <!-- Record: view_nhs_demand_template_form for ir.ui.view -->
     <record id="view_nhs_demand_template_form" model="ir.ui.view">
         <field name="name">nhs.demand.template.form</field>
         <field name="model">nhs.demand.template</field>
@@ -48,6 +50,7 @@
         </field>
     </record>
 
+    <!-- Record: action_nhs_demand_template for ir.actions.act_window -->
     <record id="action_nhs_demand_template" model="ir.actions.act_window">
         <field name="name">Demand Templates</field>
         <field name="res_model">nhs.demand.template</field>

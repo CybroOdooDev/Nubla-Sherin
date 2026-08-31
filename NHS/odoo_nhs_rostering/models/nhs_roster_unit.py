@@ -38,10 +38,10 @@ class NhsRosterUnit(models.Model):
         index=True, help="The Establishment org unit (ward/department) this rosters."
     )
     display_name = fields.Char(
-        string='Name', compute='_compute_display_name', store=True)
+        string='Name', compute='_compute_display_name', store=True, help="Name")
     company_id = fields.Many2one(
         'res.company', string='Company', related='org_unit_id.company_id',
-        store=True, readonly=True)
+        store=True, readonly=True, help="Company")
     roster_manager_ids = fields.Many2many(
         'res.users', 'nhs_roster_unit_manager_rel', 'roster_unit_id', 'user_id',
         string='Roster Managers',
@@ -66,19 +66,19 @@ class NhsRosterUnit(models.Model):
              " they enter the escalation lead-time window."
     )
     shift_type_ids = fields.One2many(
-        'nhs.roster.shift.type', 'roster_unit_id', string='Shift Types')
-    shift_type_count = fields.Integer(compute='_compute_counts')
+        'nhs.roster.shift.type', 'roster_unit_id', string='Shift Types', help="Shift Types")
+    shift_type_count = fields.Integer(compute='_compute_counts', help="Detailed information about this field")
     rotation_template_ids = fields.One2many(
-        'nhs.rotation.template', 'roster_unit_id', string='Rotation Templates')
+        'nhs.rotation.template', 'roster_unit_id', string='Rotation Templates', help="Rotation Templates")
     demand_template_ids = fields.One2many(
-        'nhs.demand.template', 'roster_unit_id', string='Demand Templates')
+        'nhs.demand.template', 'roster_unit_id', string='Demand Templates', help="Demand Templates")
     period_ids = fields.One2many(
-        'nhs.roster.period', 'unit_id', string='Roster Periods')
-    period_count = fields.Integer(compute='_compute_counts')
+        'nhs.roster.period', 'unit_id', string='Roster Periods', help="Roster Periods")
+    period_count = fields.Integer(compute='_compute_counts', help="Detailed information about this field")
     member_ids = fields.Many2many(
-        'nhs.workforce.member', compute='_compute_member_ids', string='Team')
-    member_count = fields.Integer(compute='_compute_member_ids')
-    active = fields.Boolean(string='Active', default=True)
+        'nhs.workforce.member', compute='_compute_member_ids', string='Team', help="Team")
+    member_count = fields.Integer(compute='_compute_member_ids', help="Detailed information about this field")
+    active = fields.Boolean(string='Active', default=True, help="Active")
 
     _org_unit_uniq = models.Constraint(
         'UNIQUE(org_unit_id)',
@@ -87,15 +87,18 @@ class NhsRosterUnit(models.Model):
 
     @api.depends('org_unit_id.complete_name')
     def _compute_display_name(self):
+        """ Method for compute display name """
         for unit in self:
             unit.display_name = unit.org_unit_id.complete_name or 'New Rostered Unit'
 
     def _compute_counts(self):
+        """ Method for compute counts """
         for unit in self:
             unit.shift_type_count = len(unit.shift_type_ids)
             unit.period_count = len(unit.period_ids)
 
     def _compute_member_ids(self):
+        """ Method for compute member ids """
         Member = self.env['nhs.workforce.member']
         for unit in self:
             members = Member.search([
@@ -108,6 +111,7 @@ class NhsRosterUnit(models.Model):
             unit.member_count = len(members)
 
     def action_view_team(self):
+        """ Method for action view team """
         self.ensure_one()
         return {
             'name': 'Team',
@@ -118,6 +122,7 @@ class NhsRosterUnit(models.Model):
         }
 
     def action_view_periods(self):
+        """ Method for action view periods """
         self.ensure_one()
         return {
             'name': 'Roster Periods',

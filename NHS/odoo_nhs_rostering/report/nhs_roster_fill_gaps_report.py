@@ -29,5 +29,6 @@ class ReportNhsRosterFillGaps(models.AbstractModel):
     _description = 'Fill & Gaps Report'
 
     def _get_report_values(self, docids, data=None):
+        """ Method for get report values """
         periods = self.env['nhs.roster.period'].browse(docids)
         return {'doc_ids': docids, 'doc_model': 'nhs.roster.period', 'docs': periods}

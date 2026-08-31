@@ -36,17 +36,19 @@ class NhsRotationTemplate(models.Model):
     _order = 'roster_unit_id, name'
 
     roster_unit_id = fields.Many2one(
-        'nhs.roster.unit', string='Unit', required=True, ondelete='cascade', index=True)
+        'nhs.roster.unit', string='Unit', required=True, ondelete='cascade', index=True, help="Unit")
     name = fields.Char(string='Template Name', required=True, help="e.g. '4-week Early/Late/Night'.")
     weeks = fields.Integer(
         string='Pattern Length (Weeks)', required=True, default=4,
         help="How many weeks the pattern repeats over before looping back to week 1."
     )
-    line_ids = fields.One2many('nhs.rotation.template.line', 'template_id', string='Pattern Lines')
-    line_count = fields.Integer(compute='_compute_line_count')
-    active = fields.Boolean(string='Active', default=True)
+    line_ids = fields.One2many('nhs.rotation.template.line', 'template_id',
+                               string='Pattern Lines', help="Pattern Lines")
+    line_count = fields.Integer(compute='_compute_line_count', help="Detailed information about this field")
+    active = fields.Boolean(string='Active', default=True, help="Active")
 
     def _compute_line_count(self):
+        """ Method for compute line count """
         for template in self:
             template.line_count = len(template.line_ids)
 
@@ -59,9 +61,10 @@ class NhsRotationTemplateLine(models.Model):
     _order = 'template_id, week_number, weekday'
 
     template_id = fields.Many2one(
-        'nhs.rotation.template', string='Template', required=True, ondelete='cascade', index=True)
-    week_number = fields.Integer(string='Week', required=True, default=1)
-    weekday = fields.Selection(WEEKDAYS, string='Weekday', required=True)
+        'nhs.rotation.template', string='Template', required=True, ondelete='cascade',
+        index=True, help="Template")
+    week_number = fields.Integer(string='Week', required=True, default=1, help="Week")
+    weekday = fields.Selection(WEEKDAYS, string='Weekday', required=True, help="Weekday")
     shift_type_id = fields.Many2one(
         'nhs.roster.shift.type', string='Shift Type',
         domain="[('roster_unit_id', '=', parent.roster_unit_id)]",

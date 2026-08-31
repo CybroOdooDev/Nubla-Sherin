@@ -40,6 +40,7 @@ class NhsOrgUnit(models.Model):
     )
 
     def _compute_is_rostered(self):
+        """ Method for compute is rostered """
         for unit in self:
             unit.is_rostered = bool(unit.roster_unit_ids)
 

@@ -75,12 +75,17 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     nhs_roster_reference_period_weeks = fields.Integer(
-        related='company_id.nhs_roster_reference_period_weeks', readonly=False)
+        related='company_id.nhs_roster_reference_period_weeks', readonly=False,
+        help="Detailed information about this field")
     nhs_roster_publish_lead_days_target = fields.Integer(
-        related='company_id.nhs_roster_publish_lead_days_target', readonly=False)
+        related='company_id.nhs_roster_publish_lead_days_target', readonly=False,
+        help="Detailed information about this field")
     nhs_roster_default_leave_capacity_pct = fields.Float(
-        related='company_id.nhs_roster_default_leave_capacity_pct', readonly=False)
+        related='company_id.nhs_roster_default_leave_capacity_pct', readonly=False,
+        help="Detailed information about this field")
     nhs_roster_default_escalation_lead_days = fields.Integer(
-        related='company_id.nhs_roster_default_escalation_lead_days', readonly=False)
+        related='company_id.nhs_roster_default_escalation_lead_days', readonly=False,
+        help="Detailed information about this field")
     nhs_roster_auto_escalate = fields.Boolean(
-        related='company_id.nhs_roster_auto_escalate', readonly=False)
+        related='company_id.nhs_roster_auto_escalate', readonly=False,
+        help="Detailed information about this field")

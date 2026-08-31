@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 SWAP_STATES = [
@@ -48,30 +48,35 @@ class NhsSwapRequest(models.Model):
     _order = 'create_date desc'
 
     requester_assignment_id = fields.Many2one(
-        'nhs.duty.assignment', string='Requester Duty', required=True, tracking=True)
+        'nhs.duty.assignment', string='Requester Duty', required=True, tracking=True, help="Requester Duty")
     target_assignment_id = fields.Many2one(
-        'nhs.duty.assignment', string='Colleague Duty', required=True, tracking=True)
+        'nhs.duty.assignment', string='Colleague Duty', required=True, tracking=True, help="Colleague Duty")
     requester_member_id = fields.Many2one(
         'nhs.workforce.member', related='requester_assignment_id.member_id',
-        store=True, string='Requester')
+        store=True, string='Requester', help="Requester")
     target_member_id = fields.Many2one(
         'nhs.workforce.member', related='target_assignment_id.member_id',
-        store=True, string='Colleague')
+        store=True, string='Colleague', help="Colleague")
+    requester_duty_id = fields.Many2one(
+        'nhs.duty', related='requester_assignment_id.duty_id', string='Requester Duty (Hidden)')
     unit_id = fields.Many2one(
-        'nhs.roster.unit', related='requester_assignment_id.unit_id', store=True)
+        'nhs.roster.unit', related='requester_assignment_id.unit_id', store=True,
+        help="Detailed information about this field")
     company_id = fields.Many2one(
-        'res.company', related='requester_assignment_id.company_id', store=True)
+        'res.company', related='requester_assignment_id.company_id', store=True,
+        help="Detailed information about this field")
     state = fields.Selection(
-        SWAP_STATES, string='Status', required=True, default='draft', tracking=True)
-    rule_check_note = fields.Text(string='Rule Check Result', readonly=True)
-    rule_check_passed = fields.Boolean(string='Rule Check Passed', readonly=True)
-    approved_by = fields.Many2one('res.users', string='Approved By', readonly=True)
-    approved_at = fields.Datetime(string='Approved At', readonly=True)
-    notes = fields.Text(string='Notes')
-    display_name = fields.Char(compute='_compute_display_name')
+        SWAP_STATES, string='Status', required=True, default='draft', tracking=True, help="Status")
+    rule_check_note = fields.Text(string='Rule Check Result', readonly=True, help="Rule Check Result")
+    rule_check_passed = fields.Boolean(string='Rule Check Passed', readonly=True, help="Rule Check Passed")
+    approved_by = fields.Many2one('res.users', string='Approved By', readonly=True, help="Approved By")
+    approved_at = fields.Datetime(string='Approved At', readonly=True, help="Approved At")
+    notes = fields.Text(string='Notes', help="Notes")
+    display_name = fields.Char(compute='_compute_display_name', help="Detailed information about this field")
 
     @api.depends('requester_member_id.display_name', 'target_member_id.display_name')
     def _compute_display_name(self):
+        """ Method for compute display name """
         for swap in self:
             if swap.requester_member_id and swap.target_member_id:
                 swap.display_name = 'Swap: %s ⇆ %s' % (
@@ -82,24 +87,35 @@ class NhsSwapRequest(models.Model):
 
     @api.constrains('requester_assignment_id', 'target_assignment_id')
     def _check_different_members(self):
+        """ Method for check different members """
         for swap in self:
             if swap.requester_assignment_id.member_id == swap.target_assignment_id.member_id:
                 raise ValidationError('A swap needs two different members.')
 
     def action_propose(self):
+        """ Method for action propose """
+        for swap in self:
+            if swap.requester_assignment_id.member_id == swap.target_assignment_id.member_id:
+                raise ValidationError('A swap needs two different members.')
+            if swap.requester_assignment_id.duty_id == swap.target_assignment_id.duty_id:
+                raise ValidationError('You cannot swap assignments for the exact same duty!')
+            swap._run_rule_check()
         self.filtered(lambda s: s.state == 'draft').write({'state': 'proposed'})
 
     def action_accept_by_target(self):
+        """ Method for action accept by target """
         for swap in self:
             if swap.state != 'proposed':
-                raise UserError(_('Only a proposed swap can be accepted.'))
+                raise UserError(('Only a proposed swap can be accepted.'))
             swap._run_rule_check()
             swap.state = 'accepted_by_target'
 
     def action_reject(self):
+        """ Method for action reject """
         self.write({'state': 'rejected'})
 
     def action_cancel(self):
+        """ Method for action cancel """
         self.filtered(lambda s: s.state not in ('approved',)).write({'state': 'cancelled'})
 
     def _run_rule_check(self):
@@ -107,19 +123,13 @@ class NhsSwapRequest(models.Model):
         capturing whether every rule would still pass for both parties.
         Reuses nhs.duty.assignment.write() - and therefore the real rule
         engine - so there is exactly one code path for 'would this
-        assignment be valid', not a parallel copy.
-
-        Swaps duty_id (which duty this assignment record points to), NOT
-        member_id: swapping member_id would, for one write, leave the
-        *receiving* member still holding their other original assignment
-        (the one not yet reassigned) at the same time as the new one -
-        overlapping *themselves* mid-swap and falsely failing DOUBLE_BOOK/
-        REST_11H even when the final swapped state has no conflict at all.
-        Moving duty_id instead means each assignment record - and the one
-        member it belongs to - transitions atomically from their old duty
-        straight to their new one, with no such phantom intermediate
-        overlap possible."""
+        assignment be valid', not a parallel copy."""
         self.ensure_one()
+        if not self.requester_assignment_id or not self.target_assignment_id:
+            self.rule_check_passed = False
+            self.rule_check_note = ''
+            return True
+            
         requester_duty_id = self.requester_assignment_id.duty_id.id
         target_duty_id = self.target_assignment_id.duty_id.id
         messages = []
@@ -139,11 +149,12 @@ class NhsSwapRequest(models.Model):
         return passed
 
     def action_approve(self):
+        """ Method for action approve """
         for swap in self:
             if swap.state != 'accepted_by_target':
-                raise UserError(_('The colleague must accept the swap before it can be approved.'))
+                raise UserError(('The colleague must accept the swap before it can be approved.'))
             if not swap._run_rule_check():
-                raise UserError(_(
+                raise UserError((
                     'The rules engine would not allow this swap:\n%s') % swap.rule_check_note)
             requester_duty_id = swap.requester_assignment_id.duty_id.id
             target_duty_id = swap.target_assignment_id.duty_id.id

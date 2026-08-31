@@ -38,21 +38,24 @@ class NhsDemandTemplate(models.Model):
     _order = 'roster_unit_id, effective_from desc'
 
     roster_unit_id = fields.Many2one(
-        'nhs.roster.unit', string='Unit', required=True, ondelete='cascade', index=True)
+        'nhs.roster.unit', string='Unit', required=True, ondelete='cascade', index=True, help="Unit")
     name = fields.Char(string='Name', required=True, help="e.g. 'Standard Demand 2026'.")
     effective_from = fields.Date(string='Effective From', required=True,
-                                  default=fields.Date.context_today)
+                                  default=fields.Date.context_today, help="Effective From")
     effective_to = fields.Date(string='Effective To', help="Leave blank for still in effect.")
-    line_ids = fields.One2many('nhs.demand.line', 'template_id', string='Demand Lines')
-    line_count = fields.Integer(compute='_compute_line_count')
-    active = fields.Boolean(string='Active', default=True)
+    line_ids = fields.One2many('nhs.demand.line', 'template_id', string='Demand Lines',
+                               help="Demand Lines")
+    line_count = fields.Integer(compute='_compute_line_count', help="Detailed information about this field")
+    active = fields.Boolean(string='Active', default=True, help="Active")
 
     def _compute_line_count(self):
+        """ Method for compute line count """
         for template in self:
             template.line_count = len(template.line_ids)
 
     @api.constrains('effective_from', 'effective_to')
     def _check_dates(self):
+        """ Method for check dates """
         for template in self:
             if template.effective_to and template.effective_to < template.effective_from:
                 raise ValidationError('Effective To must be on or after Effective From.')
@@ -88,9 +91,9 @@ class NhsDemandLine(models.Model):
 
     template_id = fields.Many2one(
         'nhs.demand.template', string='Demand Template', required=True,
-        ondelete='cascade', index=True)
+        ondelete='cascade', index=True, help="Demand Template")
     roster_unit_id = fields.Many2one(
-        related='template_id.roster_unit_id', store=True, string='Unit')
+        related='template_id.roster_unit_id', store=True, string='Unit', help="Unit")
     weekday = fields.Selection(
         WEEKDAYS, string='Weekday',
         help="Standing weekly requirement for this day of the week. Leave blank and set"
@@ -104,21 +107,23 @@ class NhsDemandLine(models.Model):
     )
     shift_type_id = fields.Many2one(
         'nhs.roster.shift.type', string='Shift Type', required=True,
-        domain="[('roster_unit_id', '=', roster_unit_id)]")
-    band_id = fields.Many2one('nhs.afc.band', string='Band')
-    staff_group_id = fields.Many2one('nhs.staff.group', string='Role / Staff Group')
-    required_headcount = fields.Integer(string='Required Headcount', required=True, default=1)
-    required_skill_ids = fields.Many2many('nhs.roster.skill', string='Required Skills')
-    notes = fields.Char(string='Notes')
+        domain="[('roster_unit_id', '=', roster_unit_id)]", help="Shift Type")
+    band_id = fields.Many2one('nhs.afc.band', string='Band', help="Band")
+    staff_group_id = fields.Many2one('nhs.staff.group', string='Role / Staff Group', help="Role / Staff Group")
+    required_headcount = fields.Integer(string='Required Headcount', required=True, default=1, help="Required Headcount")
+    required_skill_ids = fields.Many2many('nhs.roster.skill', string='Required Skills', help="Required Skills")
+    notes = fields.Char(string='Notes', help="Notes")
 
     @api.constrains('weekday', 'date_override')
     def _check_weekday_or_date(self):
+        """ Method for check weekday or date """
         for line in self:
             if not line.weekday and not line.date_override:
                 raise ValidationError('Set either a weekday or a specific-date override.')
 
     @api.constrains('required_headcount')
     def _check_headcount(self):
+        """ Method for check headcount """
         for line in self:
             if line.required_headcount < 1:
                 raise ValidationError('Required headcount must be at least 1.')

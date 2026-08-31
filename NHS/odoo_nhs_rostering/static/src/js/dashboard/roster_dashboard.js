@@ -53,6 +53,39 @@ export class NhsRosterDashboard extends Component {
             target: "current",
         });
     }
+
+    openSwaps() {
+        this.action.doAction({
+            type: "ir.actions.act_window",
+            name: "Pending Swaps",
+            res_model: "nhs.swap.request",
+            views: [[false, "list"], [false, "form"]],
+            domain: [["state", "=", "accepted_by_target"]],
+            target: "current",
+        });
+    }
+
+    openLeaves() {
+        this.action.doAction({
+            type: "ir.actions.act_window",
+            name: "Pending Leaves",
+            res_model: "nhs.leave.request",
+            views: [[false, "list"], [false, "form"]],
+            domain: [["state", "=", "submitted"]],
+            target: "current",
+        });
+    }
+
+    openGaps() {
+        this.action.doAction({
+            type: "ir.actions.act_window",
+            name: "Open Gaps",
+            res_model: "nhs.duty",
+            views: [[false, "list"], [false, "form"]],
+            domain: [["state", "in", ["unfilled", "partially_filled"]]],
+            target: "current",
+        });
+    }
 }
 
 NhsRosterDashboard.template = "odoo_nhs_rostering.NhsRosterDashboard";

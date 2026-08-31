@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Record: view_nhs_roster_skill_list for ir.ui.view -->
     <record id="view_nhs_roster_skill_list" model="ir.ui.view">
         <field name="name">nhs.roster.skill.list</field>
         <field name="model">nhs.roster.skill</field>
@@ -13,6 +14,7 @@
         </field>
     </record>
 
+    <!-- Record: action_nhs_roster_skill for ir.actions.act_window -->
     <record id="action_nhs_roster_skill" model="ir.actions.act_window">
         <field name="name">Skills</field>
         <field name="res_model">nhs.roster.skill</field>

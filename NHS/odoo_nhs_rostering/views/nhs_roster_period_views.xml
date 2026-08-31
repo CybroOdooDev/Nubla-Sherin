@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Record: view_nhs_roster_period_list for ir.ui.view -->
     <record id="view_nhs_roster_period_list" model="ir.ui.view">
         <field name="name">nhs.roster.period.list</field>
         <field name="model">nhs.roster.period</field>
@@ -19,6 +20,7 @@
         </field>
     </record>
 
+    <!-- Record: action_nhs_copy_period_wizard for ir.actions.act_window -->
     <record id="action_nhs_copy_period_wizard" model="ir.actions.act_window">
         <field name="name">Copy Roster Period</field>
         <field name="res_model">nhs.copy.period.wizard</field>
@@ -31,6 +33,7 @@
         <field name="binding_view_types">form</field>
     </record>
 
+    <!-- Record: action_nhs_reset_to_draft_binding for ir.actions.server -->
     <record id="action_nhs_reset_to_draft_binding" model="ir.actions.server">
         <field name="name">Reset to Draft</field>
         <field name="model_id" ref="model_nhs_roster_period"/>
@@ -41,6 +44,7 @@
         <field name="code">records.action_reset_to_draft()</field>
     </record>
 
+    <!-- Record: action_nhs_apply_template_wizard for ir.actions.act_window -->
     <record id="action_nhs_apply_template_wizard" model="ir.actions.act_window">
         <field name="name">Apply Rotation Template</field>
         <field name="res_model">nhs.apply.template.wizard</field>
@@ -48,6 +52,7 @@
         <field name="target">new</field>
     </record>
 
+    <!-- Record: action_nhs_publish_wizard for ir.actions.act_window -->
     <record id="action_nhs_publish_wizard" model="ir.actions.act_window">
         <field name="name">Publish Roster</field>
         <field name="res_model">nhs.publish.wizard</field>
@@ -55,6 +60,7 @@
         <field name="target">new</field>
     </record>
 
+    <!-- Record: view_nhs_roster_period_form for ir.ui.view -->
     <record id="view_nhs_roster_period_form" model="ir.ui.view">
         <field name="name">nhs.roster.period.form</field>
         <field name="model">nhs.roster.period</field>
@@ -72,7 +78,7 @@
                     <button name="action_view_grid" type="object" string="Open Roster Grid"
                             class="btn-primary" invisible="state == 'draft'"/>
                     <button name="action_recompute_check" type="object" string="Check"
-                            invisible="state not in ('in_progress', 'checked')"/>
+                            invisible="state != 'in_progress'"/>
                     <button name="action_approve" type="object" string="Approve"
                             class="btn-primary" invisible="state != 'checked'"/>
                     <button name="%(action_nhs_publish_wizard)d" type="action" string="Publish"
@@ -90,6 +96,9 @@
                         </button>
                         <button class="oe_stat_button" type="object" name="action_view_grid" icon="fa-exclamation-triangle">
                             <field name="open_violation_count" widget="statinfo" string="Open Violations"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_swaps" icon="fa-exchange">
+                            <field name="swap_count" widget="statinfo" string="Swaps"/>
                         </button>
                         <button class="oe_stat_button" type="object" name="action_export_worked_hours" icon="fa-download"
                                 invisible="state not in ('published', 'finalised')">
@@ -129,7 +138,7 @@
                     </group>
                     <notebook>
                         <page string="Duties">
-                            <field name="duty_ids">
+                            <field name="duty_ids" readonly="state == 'draft'">
                                 <list decoration-danger="state == 'unfilled'"
                                       decoration-warning="state == 'partially_filled'"
                                       decoration-success="state == 'filled'">
@@ -152,6 +161,7 @@
         </field>
     </record>
 
+    <!-- Record: view_nhs_roster_period_search for ir.ui.view -->
     <record id="view_nhs_roster_period_search" model="ir.ui.view">
         <field name="name">nhs.roster.period.search</field>
         <field name="model">nhs.roster.period</field>
@@ -172,6 +182,7 @@
         </field>
     </record>
 
+    <!-- Record: action_nhs_roster_period for ir.actions.act_window -->
     <record id="action_nhs_roster_period" model="ir.actions.act_window">
         <field name="name">Roster Periods</field>
         <field name="res_model">nhs.roster.period</field>

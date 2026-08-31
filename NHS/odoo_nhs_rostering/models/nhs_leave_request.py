@@ -20,8 +20,7 @@
 #
 #############################################################################
 from datetime import timedelta
-
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 LEAVE_STATES = [
@@ -45,29 +44,40 @@ class NhsLeaveRequest(models.Model):
     _rec_name = 'member_id'
 
 
-
-
     member_id = fields.Many2one(
-        'nhs.workforce.member', string='Member', required=True, tracking=True, index=True)
+        'nhs.workforce.member', string='Member', required=True, tracking=True, index=True, help="Member")
     company_id = fields.Many2one(
-        'res.company', related='member_id.company_id', store=True)
+        'res.company', related='member_id.company_id', store=True,
+        help="Detailed information about this field")
     leave_type_id = fields.Many2one(
-        'nhs.leave.type', string='Leave Type', required=True, tracking=True)
-    date_from = fields.Date(string='From', required=True, tracking=True)
-    date_to = fields.Date(string='To', required=True, tracking=True)
+        'nhs.leave.type', string='Leave Type', required=True, tracking=True, help="Leave Type")
+    date_from = fields.Date(string='From', required=True, tracking=True, help="From")
+    date_to = fields.Date(string='To', required=True, tracking=True, help="To")
     hours = fields.Float(
         string='Hours', compute='_compute_hours', store=True, digits=(16, 2),
         help="Estimated from the member's contracted weekly hours over the weekdays"
              " covered (Mon-Fri) - an approximation, not a shift-by-shift calculation.")
-    reason = fields.Text(string='Reason')
+    reason = fields.Text(string='Reason', help="Reason")
     state = fields.Selection(
-        LEAVE_STATES, string='Status', required=True, default='draft', tracking=True)
-    approved_by = fields.Many2one('res.users', string='Approved By', readonly=True)
-    approved_at = fields.Datetime(string='Approved At', readonly=True)
-    rejection_reason = fields.Char(string='Rejection Reason')
+        LEAVE_STATES, string='Status', required=True, default='draft', tracking=True, help="Status")
+    approved_by = fields.Many2one('res.users', string='Approved By', readonly=True, help="Approved By")
+    approved_at = fields.Datetime(string='Approved At', readonly=True, help="Approved At")
+    rejection_reason = fields.Char(string='Rejection Reason', help="Rejection Reason")
+    capacity_override = fields.Boolean(
+        string='Capacity Overridden', readonly=True, copy=False,
+        help="Approved despite breaching the unit's leave-capacity limit, by a"
+             " Workforce Admin with a logged reason - a deliberate, audited exception"
+             " rather than a silent bypass.")
+    capacity_override_reason = fields.Char(
+        string='Override Reason',
+        help="Required before this request can be Force Approved past the unit's"
+             " leave-capacity limit.")
+    capacity_override_by_id = fields.Many2one(
+        'res.users', string='Overridden By', readonly=True, copy=False, help="Overridden By")
 
     @api.depends('date_from', 'date_to', 'member_id.contracted_weekly_hours')
     def _compute_hours(self):
+        """ Method for compute hours """
         for request in self:
             if not (request.date_from and request.date_to):
                 request.hours = 0.0
@@ -83,55 +93,93 @@ class NhsLeaveRequest(models.Model):
 
     @api.constrains('date_from', 'date_to')
     def _check_dates(self):
+        """ Method for check dates """
         for request in self:
             if request.date_to < request.date_from:
                 raise ValidationError('End date must be on or after the start date.')
 
     def action_submit(self):
+        """ Method for action submit """
         self.filtered(lambda r: r.state == 'draft').write({'state': 'submitted'})
 
     def action_approve(self):
+        """ Method for action approve """
         for request in self:
             if request.state != 'submitted':
-                raise UserError(_('Only a submitted request can be approved.'))
-            request._check_leave_capacity()
+                raise UserError(('Only a submitted request can be approved.'))
+            breach = request._leave_capacity_breach()
+            if breach:
+                raise UserError(breach)
             request.write({
                 'state': 'approved', 'approved_by': self.env.user.id,
                 'approved_at': fields.Datetime.now(),
             })
 
+    def action_force_approve(self):
+        """Approve past the unit's leave-capacity limit. Restricted to
+        Workforce Admins and only with a logged reason, so a breach is a
+        deliberate, auditable management call rather than a silent bypass -
+        mirrors the hard/soft gate pattern used for Staff Bank's compliance
+        gate elsewhere in the suite."""
+        for request in self:
+            if request.state != 'submitted':
+                raise UserError(('Only a submitted request can be approved.'))
+            if not self.env.user.has_group('odoo_nhs_rostering.group_nhs_workforce_admin'):
+                raise UserError((
+                    'Only a Workforce Admin can force-approve past the leave-capacity'
+                    ' limit.'))
+            if not request.capacity_override_reason:
+                raise UserError((
+                    'Enter an Override Reason before force-approving past the'
+                    ' leave-capacity limit.'))
+            breach = request._leave_capacity_breach()
+            request.write({
+                'state': 'approved', 'approved_by': self.env.user.id,
+                'approved_at': fields.Datetime.now(),
+                'capacity_override': True,
+                'capacity_override_by_id': self.env.user.id,
+            })
+            request.message_post(body=
+                'Leave capacity limit overridden by %(user)s: %(reason)s%(breach)s',
+                user=self.env.user.name, reason=request.capacity_override_reason,
+                breach=(' (%s)' % breach) if breach else '')
+
     def action_reject(self, reason=None):
+        """ Method for action reject """
         for request in self:
             request.write({
                 'state': 'rejected', 'rejection_reason': reason or request.rejection_reason,
             })
 
     def action_cancel(self):
+        """ Method for action cancel """
         self.write({'state': 'cancelled'})
 
-    def _check_leave_capacity(self):
-        """Block approval if it would push the unit's simultaneous-absence
-        percentage, on any day in the request's range, above the unit's
-        configured leave_capacity_pct."""
-        for request in self:
-            roster_unit = request.member_id.org_unit_id.roster_unit_ids[:1]
-            if not roster_unit or not roster_unit.leave_capacity_pct:
-                continue
-            team_size = roster_unit.member_count
-            if not team_size:
-                continue
-            a_date = request.date_from
-            while a_date <= request.date_to:
-                concurrent = self.search_count([
-                    ('member_id', 'in', roster_unit.member_ids.ids),
-                    ('state', '=', 'approved'),
-                    ('date_from', '<=', a_date), ('date_to', '>=', a_date),
-                    ('id', '!=', request.id),
-                ])
-                pct = (concurrent + 1) / team_size * 100.0
-                if pct > roster_unit.leave_capacity_pct:
-                    raise UserError(_(
-                        'Approving this request would put %.0f%% of %s on leave on %s'
-                        ' (limit %.0f%%).') % (
-                            pct, roster_unit.display_name, a_date, roster_unit.leave_capacity_pct))
-                a_date += timedelta(days=1)
+    def _leave_capacity_breach(self):
+        """Return the first capacity-breach message for this request across
+        its date range, or False if approving it would stay within the
+        unit's configured leave_capacity_pct. Used by both action_approve
+        (which blocks on it) and action_force_approve (which logs it)."""
+        self.ensure_one()
+        roster_unit = self.member_id.org_unit_id.roster_unit_ids[:1]
+        if not roster_unit or not roster_unit.leave_capacity_pct:
+            return False
+        team_size = roster_unit.member_count
+        if not team_size:
+            return False
+        a_date = self.date_from
+        while a_date <= self.date_to:
+            concurrent = self.search_count([
+                ('member_id', 'in', roster_unit.member_ids.ids),
+                ('state', '=', 'approved'),
+                ('date_from', '<=', a_date), ('date_to', '>=', a_date),
+                ('id', '!=', self.id),
+            ])
+            pct = (concurrent + 1) / team_size * 100.0
+            if pct > roster_unit.leave_capacity_pct:
+                return (
+                    'Approving this request would put %.0f%% of %s on leave on %s'
+                    ' (limit %.0f%%).') % (
+                        pct, roster_unit.display_name, a_date, roster_unit.leave_capacity_pct)
+            a_date += timedelta(days=1)
+        return False

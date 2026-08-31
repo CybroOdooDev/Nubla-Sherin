@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
+<!--    This template displays the NHS roster grid with staff, dates, assigned shifts,
+ and roster violations, allowing users to add or remove duties and recheck roster rules.-->
     <t t-name="odoo_nhs_rostering.NhsRosterGrid" owl="1">
         <div class="o_nhs_roster_grid o_content p-3" style="height: 100%; overflow: auto;">
             <t t-if="state.loading">
@@ -13,20 +15,12 @@
                 <div class="alert alert-warning">Roster period not found.</div>
             </t>
             <t t-else="">
-                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom bg-white p-3 rounded-3 shadow-sm">
+                <div class="d-flex justify-content-end align-items-center mb-3 pb-2 border-bottom bg-white p-3 rounded-3 shadow-sm">
                     <div>
-                        <h4 class="fw-bold mb-0 text-nhs-blue">
-                            <i class="fa fa-th me-2"/><t t-esc="state.data.period.name"/>
-                        </h4>
-                        <div class="text-muted small">
-                            Fill <t t-esc="state.data.period.fill_pct"/>% ·
-                            <span t-attf-class="fw-bold #{state.data.period.hard_violation_count ? 'text-danger' : 'text-success'}">
-                                <t t-esc="state.data.period.hard_violation_count"/> open hard violation(s)
-                            </span>
-                            · status <t t-esc="state.data.period.state"/>
-                        </div>
-                    </div>
-                    <div>
+                        <button class="btn btn-outline-secondary btn-sm fw-semibold me-2" t-on-click="toggleViolations">
+                            <i t-attf-class="fa #{state.showViolations ? 'fa-eye-slash' : 'fa-eye'} me-1"/>
+                            <t t-esc="state.showViolations ? 'Hide Violations' : 'Show Violations'"/>
+                        </button>
                         <button class="btn btn-outline-nhs-blue btn-sm fw-semibold me-2" t-on-click="recomputeCheck">
                             <i class="fa fa-refresh me-1"/> Recheck Rules
                         </button>
@@ -37,7 +31,7 @@
                 </div>
 
                 <div class="row g-3">
-                    <div class="col-lg-9">
+                    <div t-attf-class="#{state.showViolations ? 'col-lg-9' : 'col-lg-12'}">
                         <div class="table-responsive nhs_roster_grid_table_wrap">
                             <table class="table table-bordered table-sm align-middle nhs_roster_grid_table">
                                 <thead>
@@ -97,11 +91,13 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-3">
-                        <div class="card shadow-sm rounded-3">
-                            <div class="card-header bg-white py-2">
-                                <h6 class="fw-bold mb-0"><i class="fa fa-exclamation-triangle text-warning me-2"/>Open Violations</h6>
-                            </div>
+                    <t t-if="state.showViolations">
+                        <div class="col-lg-3">
+                            <div class="card shadow-sm rounded-3">
+                                <div class="card-header bg-white py-2 d-flex justify-content-between align-items-center">
+                                    <h6 class="fw-bold mb-0"><i class="fa fa-exclamation-triangle text-warning me-2"/>Open Violations</h6>
+                                    <button type="button" class="btn-close" aria-label="Close" t-on-click="toggleViolations"></button>
+                                </div>
                             <div class="card-body p-0">
                                 <ul class="list-group list-group-flush">
                                     <t t-if="!state.data.violations.length">
@@ -118,8 +114,9 @@
                                     </t>
                                 </ul>
                             </div>
+                            </div>
                         </div>
-                    </div>
+                    </t>
                 </div>
             </t>
         </div>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Record: action_report_nhs_roster_fill_gaps for ir.actions.report -->
     <record id="action_report_nhs_roster_fill_gaps" model="ir.actions.report">
         <field name="name">Fill &amp; Gaps</field>
         <field name="model">nhs.roster.period</field>

@@ -4,7 +4,8 @@
          module upgrades won't reset an organisation's local tuning. Verify
          current statutory values before relying on these seed figures. -->
     <data noupdate="1">
-        <record id="roster_rule_wtr_avg_48" model="nhs.roster.rule">
+        <!-- Record: roster_rule_wtr_avg_48 for nhs.roster.rule -->
+    <record id="roster_rule_wtr_avg_48" model="nhs.roster.rule">
             <field name="code">WTR_AVG_48</field>
             <field name="name">48-Hour Average Week</field>
             <field name="severity">hard</field>
@@ -14,7 +15,8 @@
 linked bank duties, where the Staff Bank module is installed) must stay within the limit over the
 reference period (Settings &gt; e-Rostering &gt; WTR Reference Period, statutory default 17 weeks).</field>
         </record>
-        <record id="roster_rule_rest_11h" model="nhs.roster.rule">
+        <!-- Record: roster_rule_rest_11h for nhs.roster.rule -->
+    <record id="roster_rule_rest_11h" model="nhs.roster.rule">
             <field name="code">REST_11H</field>
             <field name="name">11-Hour Daily Rest</field>
             <field name="severity">hard</field>
@@ -23,7 +25,8 @@ reference period (Settings &gt; e-Rostering &gt; WTR Reference Period, statutory
             <field name="description">Minimum rest between the end of one duty and the start of the
 next.</field>
         </record>
-        <record id="roster_rule_weekly_rest" model="nhs.roster.rule">
+        <!-- Record: roster_rule_weekly_rest for nhs.roster.rule -->
+    <record id="roster_rule_weekly_rest" model="nhs.roster.rule">
             <field name="code">WEEKLY_REST</field>
             <field name="name">Weekly Rest</field>
             <field name="severity">hard</field>
@@ -32,7 +35,8 @@ next.</field>
             <field name="description">At least one unbroken rest period of this many hours within any
 trailing 7-day window.</field>
         </record>
-        <record id="roster_rule_max_consec_days" model="nhs.roster.rule">
+        <!-- Record: roster_rule_max_consec_days for nhs.roster.rule -->
+    <record id="roster_rule_max_consec_days" model="nhs.roster.rule">
             <field name="code">MAX_CONSEC_DAYS</field>
             <field name="name">Maximum Consecutive Working Days</field>
             <field name="severity">hard</field>
@@ -41,7 +45,8 @@ trailing 7-day window.</field>
             <field name="description">Maximum number of consecutive working days (overridable per
 member for agreed exceptions).</field>
         </record>
-        <record id="roster_rule_max_consec_nights" model="nhs.roster.rule">
+        <!-- Record: roster_rule_max_consec_nights for nhs.roster.rule -->
+    <record id="roster_rule_max_consec_nights" model="nhs.roster.rule">
             <field name="code">MAX_CONSEC_NIGHTS</field>
             <field name="name">Maximum Consecutive Nights</field>
             <field name="severity">hard</field>
@@ -50,7 +55,8 @@ member for agreed exceptions).</field>
             <field name="description">Maximum number of consecutive night duties (overridable per
 member for agreed exceptions).</field>
         </record>
-        <record id="roster_rule_contract_hours" model="nhs.roster.rule">
+        <!-- Record: roster_rule_contract_hours for nhs.roster.rule -->
+    <record id="roster_rule_contract_hours" model="nhs.roster.rule">
             <field name="code">CONTRACT_HOURS</field>
             <field name="name">Contracted Hours Position</field>
             <field name="severity">soft</field>
@@ -60,7 +66,8 @@ member for agreed exceptions).</field>
 contracted hours by more than this many hours (over or under) - an informational position, not a
 hard block.</field>
         </record>
-        <record id="roster_rule_skill_mix" model="nhs.roster.rule">
+        <!-- Record: roster_rule_skill_mix for nhs.roster.rule -->
+    <record id="roster_rule_skill_mix" model="nhs.roster.rule">
             <field name="code">SKILL_MIX</field>
             <field name="name">Skill Mix</field>
             <field name="severity">hard</field>
@@ -68,7 +75,8 @@ hard block.</field>
             <field name="description">The duty's required band and skills must actually be met by the
 assigned person, not just the headcount.</field>
         </record>
-        <record id="roster_rule_compliance_gate" model="nhs.roster.rule">
+        <!-- Record: roster_rule_compliance_gate for nhs.roster.rule -->
+    <record id="roster_rule_compliance_gate" model="nhs.roster.rule">
             <field name="code">COMPLIANCE_GATE</field>
             <field name="name">Compliance Gate</field>
             <field name="severity">hard</field>
@@ -76,7 +84,8 @@ assigned person, not just the headcount.</field>
             <field name="description">Only members with in-date mandatory training and professional
 registration can be assigned (reads odoo_nhs_training) - the same standard the Staff Bank enforces.</field>
         </record>
-        <record id="roster_rule_double_book" model="nhs.roster.rule">
+        <!-- Record: roster_rule_double_book for nhs.roster.rule -->
+    <record id="roster_rule_double_book" model="nhs.roster.rule">
             <field name="code">DOUBLE_BOOK</field>
             <field name="name">No Double-Booking</field>
             <field name="severity">hard</field>
@@ -84,7 +93,8 @@ registration can be assigned (reads odoo_nhs_training) - the same standard the S
             <field name="description">No overlapping duties for the same member, across duties, units,
 and (where installed) Staff Bank bookings.</field>
         </record>
-        <record id="roster_rule_leave_conflict" model="nhs.roster.rule">
+        <!-- Record: roster_rule_leave_conflict for nhs.roster.rule -->
+    <record id="roster_rule_leave_conflict" model="nhs.roster.rule">
             <field name="code">LEAVE_CONFLICT</field>
             <field name="name">Leave Conflict</field>
             <field name="severity">hard</field>

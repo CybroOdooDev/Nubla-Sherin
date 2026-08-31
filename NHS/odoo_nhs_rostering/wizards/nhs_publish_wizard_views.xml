@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Record: view_nhs_publish_wizard_form for ir.ui.view -->
+    <record id="view_nhs_publish_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.publish.wizard.form</field>
+        <field name="model">nhs.publish.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Publish Roster">
+                <field name="period_id" invisible="1"/>
+                <group>
+                    <group string="Position">
+                        <field name="fill_pct" widget="progressbar"/>
+                        <field name="gap_count"/>
+                        <field name="open_violation_count"/>
+                        <field name="hard_violation_count"/>
+                    </group>
+                    <group string="Publication Lead Time">
+                        <field name="lead_days_preview"/>
+                        <field name="lead_days_target"/>
+                    </group>
+                </group>
+                <div class="alert alert-danger" role="alert"
+                     invisible="hard_violation_count == 0">
+                    This roster has open hard rule violations and cannot be published until
+                    they are resolved.
+                </div>
+                <footer>
+                    <button name="action_confirm" type="object" string="Publish" class="btn-primary"
+                            invisible="hard_violation_count &gt; 0"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

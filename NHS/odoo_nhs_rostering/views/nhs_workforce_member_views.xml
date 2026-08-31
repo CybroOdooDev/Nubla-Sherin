@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Record: view_nhs_workforce_member_form_rostering for ir.ui.view -->
     <record id="view_nhs_workforce_member_form_rostering" model="ir.ui.view">
         <field name="name">nhs.workforce.member.form.rostering</field>
         <field name="model">nhs.workforce.member</field>
         <field name="inherit_id" ref="odoo_nhs_training.view_nhs_workforce_member_form"/>
         <field name="arch" type="xml">
+            <!-- Training hides this field (portal self-view wasn't its concern); it's the
+                 only link that makes a member's rota/leave/swaps show on their portal
+                 login, so e-Rostering exposes it, editable only by managers who should
+                 be the ones deciding who a given login maps to. -->
+            <xpath expr="//field[@name='user_id']" position="attributes">
+                <attribute name="invisible">0</attribute>
+                <attribute name="string">Portal User</attribute>
+                <attribute name="groups">odoo_nhs_rostering.group_nhs_roster_manager</attribute>
+            </xpath>
             <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
                 <button name="action_view_duty_assignments" type="object"
                         class="oe_stat_button" icon="fa-calendar-check-o">

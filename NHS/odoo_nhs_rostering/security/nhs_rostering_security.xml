@@ -1,25 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
-        <!-- Module Category -->
-        <record id="module_category_nhs_rostering" model="ir.module.category">
+        <!-- Record: module_category_nhs_rostering for ir.module.category -->
+    <record id="module_category_nhs_rostering" model="ir.module.category">
             <field name="name">NHS e-Rostering</field>
             <field name="description">NHS e-Rostering access levels.</field>
             <field name="sequence">56</field>
         </record>
 
-        <!-- Privilege (Odoo 19 - replaces category_id on res.groups) -->
-        <record id="privilege_rostering_access_level" model="res.groups.privilege">
+        <!-- Record: privilege_rostering_access_level for res.groups.privilege -->
+    <record id="privilege_rostering_access_level" model="res.groups.privilege">
             <field name="name">Rostering Access Level</field>
             <field name="category_id" ref="module_category_nhs_rostering"/>
             <field name="sequence">10</field>
         </record>
 
-        <!-- Security group: Staff - portal self-service role. Deliberately does NOT
-             imply base.group_portal: this group sits in the same "Role" selection
-             widget as internal-user access levels, and an implied portal group
-             would conflict with base. -->
-        <record id="group_nhs_roster_staff" model="res.groups">
+        <!-- Record: group_nhs_roster_staff for res.groups -->
+    <record id="group_nhs_roster_staff" model="res.groups">
             <field name="name">Staff</field>
             <field name="privilege_id" ref="privilege_rostering_access_level"/>
             <field name="implied_ids" eval="[(3, ref('base.group_portal'))]"/>
@@ -29,7 +26,8 @@
         </record>
 
         <!-- Security group: Roster Manager - build/approve/publish for their own unit(s) -->
-        <record id="group_nhs_roster_manager" model="res.groups">
+        <!-- Record: group_nhs_roster_manager for res.groups -->
+    <record id="group_nhs_roster_manager" model="res.groups">
             <field name="name">Roster Manager</field>
             <field name="privilege_id" ref="privilege_rostering_access_level"/>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
@@ -40,7 +38,8 @@
         </record>
 
         <!-- Security group: Workforce Admin - full control across all units + configuration -->
-        <record id="group_nhs_workforce_admin" model="res.groups">
+        <!-- Record: group_nhs_workforce_admin for res.groups -->
+    <record id="group_nhs_workforce_admin" model="res.groups">
             <field name="name">Workforce Admin</field>
             <field name="privilege_id" ref="privilege_rostering_access_level"/>
             <field name="implied_ids" eval="[(4, ref('group_nhs_roster_manager'))]"/>
@@ -51,166 +50,180 @@
     </data>
 
     <data noupdate="0">
-        <!-- ==================================================================
-             Record Rules - company scope (Workforce Admin sees every company
-             they belong to; managers/staff are further scoped below).
-             ================================================================== -->
-        <record id="rule_nhs_roster_unit_company" model="ir.rule">
+        <!-- Record: rule_nhs_roster_unit_company for ir.rule -->
+    <record id="rule_nhs_roster_unit_company" model="ir.rule">
             <field name="name">nhs.roster.unit: company scope (admin)</field>
             <field name="model_id" ref="model_nhs_roster_unit"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_workforce_admin'))]"/>
         </record>
-        <record id="rule_nhs_roster_period_company" model="ir.rule">
+        <!-- Record: rule_nhs_roster_period_company for ir.rule -->
+    <record id="rule_nhs_roster_period_company" model="ir.rule">
             <field name="name">nhs.roster.period: company scope (admin)</field>
             <field name="model_id" ref="model_nhs_roster_period"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_workforce_admin'))]"/>
         </record>
-        <record id="rule_nhs_duty_company" model="ir.rule">
+        <!-- Record: rule_nhs_duty_company for ir.rule -->
+    <record id="rule_nhs_duty_company" model="ir.rule">
             <field name="name">nhs.duty: company scope (admin)</field>
             <field name="model_id" ref="model_nhs_duty"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_workforce_admin'))]"/>
         </record>
-        <record id="rule_nhs_duty_assignment_company" model="ir.rule">
+        <!-- Record: rule_nhs_duty_assignment_company for ir.rule -->
+    <record id="rule_nhs_duty_assignment_company" model="ir.rule">
             <field name="name">nhs.duty.assignment: company scope (admin)</field>
             <field name="model_id" ref="model_nhs_duty_assignment"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_workforce_admin'))]"/>
         </record>
-        <record id="rule_nhs_rule_violation_company" model="ir.rule">
+        <!-- Record: rule_nhs_rule_violation_company for ir.rule -->
+    <record id="rule_nhs_rule_violation_company" model="ir.rule">
             <field name="name">nhs.rule.violation: company scope (admin)</field>
             <field name="model_id" ref="model_nhs_rule_violation"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_workforce_admin'))]"/>
         </record>
-        <record id="rule_nhs_leave_request_company" model="ir.rule">
+        <!-- Record: rule_nhs_leave_request_company for ir.rule -->
+    <record id="rule_nhs_leave_request_company" model="ir.rule">
             <field name="name">nhs.leave.request: company scope (admin)</field>
             <field name="model_id" ref="model_nhs_leave_request"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_workforce_admin'))]"/>
         </record>
-        <record id="rule_nhs_leave_entitlement_company" model="ir.rule">
+        <!-- Record: rule_nhs_leave_entitlement_company for ir.rule -->
+    <record id="rule_nhs_leave_entitlement_company" model="ir.rule">
             <field name="name">nhs.leave.entitlement: company scope (admin)</field>
             <field name="model_id" ref="model_nhs_leave_entitlement"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_workforce_admin'))]"/>
         </record>
-        <record id="rule_nhs_swap_request_company" model="ir.rule">
+        <!-- Record: rule_nhs_swap_request_company for ir.rule -->
+    <record id="rule_nhs_swap_request_company" model="ir.rule">
             <field name="name">nhs.swap.request: company scope (admin)</field>
             <field name="model_id" ref="model_nhs_swap_request"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_workforce_admin'))]"/>
         </record>
-        <record id="rule_nhs_roster_preference_company" model="ir.rule">
+        <!-- Record: rule_nhs_roster_preference_company for ir.rule -->
+    <record id="rule_nhs_roster_preference_company" model="ir.rule">
             <field name="name">nhs.roster.preference: company scope (admin)</field>
             <field name="model_id" ref="model_nhs_roster_preference"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_workforce_admin'))]"/>
         </record>
-        <record id="rule_nhs_roster_escalation_company" model="ir.rule">
+        <!-- Record: rule_nhs_roster_escalation_company for ir.rule -->
+    <record id="rule_nhs_roster_escalation_company" model="ir.rule">
             <field name="name">nhs.roster.escalation: company scope (admin)</field>
             <field name="model_id" ref="model_nhs_roster_escalation"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_workforce_admin'))]"/>
         </record>
 
-        <!-- ==================================================================
-             Record Rules - unit scope (Roster Manager: only the unit(s) they
-             are listed as a manager of, via nhs.roster.unit.roster_manager_ids).
-             ================================================================== -->
-        <record id="rule_nhs_roster_unit_manager" model="ir.rule">
+
+        <!-- Record: rule_nhs_roster_unit_manager for ir.rule -->
+    <record id="rule_nhs_roster_unit_manager" model="ir.rule">
             <field name="name">nhs.roster.unit: own units only (roster manager)</field>
             <field name="model_id" ref="model_nhs_roster_unit"/>
             <field name="domain_force">[('roster_manager_ids', 'in', [user.id])]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_manager'))]"/>
         </record>
-        <record id="rule_nhs_roster_period_manager" model="ir.rule">
+        <!-- Record: rule_nhs_roster_period_manager for ir.rule -->
+    <record id="rule_nhs_roster_period_manager" model="ir.rule">
             <field name="name">nhs.roster.period: own units only (roster manager)</field>
             <field name="model_id" ref="model_nhs_roster_period"/>
             <field name="domain_force">[('unit_id.roster_manager_ids', 'in', [user.id])]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_manager'))]"/>
         </record>
-        <record id="rule_nhs_duty_manager" model="ir.rule">
+        <!-- Record: rule_nhs_duty_manager for ir.rule -->
+    <record id="rule_nhs_duty_manager" model="ir.rule">
             <field name="name">nhs.duty: own units only (roster manager)</field>
             <field name="model_id" ref="model_nhs_duty"/>
             <field name="domain_force">[('unit_id.roster_manager_ids', 'in', [user.id])]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_manager'))]"/>
         </record>
-        <record id="rule_nhs_duty_assignment_manager" model="ir.rule">
+        <!-- Record: rule_nhs_duty_assignment_manager for ir.rule -->
+    <record id="rule_nhs_duty_assignment_manager" model="ir.rule">
             <field name="name">nhs.duty.assignment: own units only (roster manager)</field>
             <field name="model_id" ref="model_nhs_duty_assignment"/>
             <field name="domain_force">[('unit_id.roster_manager_ids', 'in', [user.id])]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_manager'))]"/>
         </record>
-        <record id="rule_nhs_rule_violation_manager" model="ir.rule">
+        <!-- Record: rule_nhs_rule_violation_manager for ir.rule -->
+    <record id="rule_nhs_rule_violation_manager" model="ir.rule">
             <field name="name">nhs.rule.violation: own units only (roster manager)</field>
             <field name="model_id" ref="model_nhs_rule_violation"/>
             <field name="domain_force">[('period_id.unit_id.roster_manager_ids', 'in', [user.id])]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_manager'))]"/>
         </record>
-        <record id="rule_nhs_leave_request_manager" model="ir.rule">
+        <!-- Record: rule_nhs_leave_request_manager for ir.rule -->
+    <record id="rule_nhs_leave_request_manager" model="ir.rule">
             <field name="name">nhs.leave.request: own units only (roster manager)</field>
             <field name="model_id" ref="model_nhs_leave_request"/>
             <field name="domain_force">[('member_id.org_unit_id.roster_unit_ids.roster_manager_ids', 'in', [user.id])]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_manager'))]"/>
         </record>
-        <record id="rule_nhs_leave_entitlement_manager" model="ir.rule">
+        <!-- Record: rule_nhs_leave_entitlement_manager for ir.rule -->
+    <record id="rule_nhs_leave_entitlement_manager" model="ir.rule">
             <field name="name">nhs.leave.entitlement: own units only (roster manager)</field>
             <field name="model_id" ref="model_nhs_leave_entitlement"/>
             <field name="domain_force">[('member_id.org_unit_id.roster_unit_ids.roster_manager_ids', 'in', [user.id])]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_manager'))]"/>
         </record>
-        <record id="rule_nhs_swap_request_manager" model="ir.rule">
+        <!-- Record: rule_nhs_swap_request_manager for ir.rule -->
+    <record id="rule_nhs_swap_request_manager" model="ir.rule">
             <field name="name">nhs.swap.request: own units only (roster manager)</field>
             <field name="model_id" ref="model_nhs_swap_request"/>
             <field name="domain_force">[('requester_assignment_id.unit_id.roster_manager_ids', 'in', [user.id])]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_manager'))]"/>
         </record>
-        <record id="rule_nhs_roster_preference_manager" model="ir.rule">
+        <!-- Record: rule_nhs_roster_preference_manager for ir.rule -->
+    <record id="rule_nhs_roster_preference_manager" model="ir.rule">
             <field name="name">nhs.roster.preference: own units only (roster manager)</field>
             <field name="model_id" ref="model_nhs_roster_preference"/>
             <field name="domain_force">[('unit_id.roster_manager_ids', 'in', [user.id])]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_manager'))]"/>
         </record>
-        <record id="rule_nhs_roster_escalation_manager" model="ir.rule">
+        <!-- Record: rule_nhs_roster_escalation_manager for ir.rule -->
+    <record id="rule_nhs_roster_escalation_manager" model="ir.rule">
             <field name="name">nhs.roster.escalation: own units only (roster manager)</field>
             <field name="model_id" ref="model_nhs_roster_escalation"/>
             <field name="domain_force">[('duty_id.unit_id.roster_manager_ids', 'in', [user.id])]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_manager'))]"/>
         </record>
 
-        <!-- ==================================================================
-             Record Rules - Staff portal scoping: a member sees only their own
-             assignments, leave, entitlement, swaps and preferences.
-             ================================================================== -->
-        <record id="rule_nhs_duty_assignment_self" model="ir.rule">
+        <!-- Record: rule_nhs_duty_assignment_self for ir.rule -->
+    <record id="rule_nhs_duty_assignment_self" model="ir.rule">
             <field name="name">nhs.duty.assignment: own record only (staff)</field>
             <field name="model_id" ref="model_nhs_duty_assignment"/>
             <field name="domain_force">[('member_id.user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_staff'))]"/>
         </record>
-        <record id="rule_nhs_leave_request_self" model="ir.rule">
+        <!-- Record: rule_nhs_leave_request_self for ir.rule -->
+    <record id="rule_nhs_leave_request_self" model="ir.rule">
             <field name="name">nhs.leave.request: own record only (staff)</field>
             <field name="model_id" ref="model_nhs_leave_request"/>
             <field name="domain_force">[('member_id.user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_staff'))]"/>
         </record>
-        <record id="rule_nhs_leave_entitlement_self" model="ir.rule">
+        <!-- Record: rule_nhs_leave_entitlement_self for ir.rule -->
+    <record id="rule_nhs_leave_entitlement_self" model="ir.rule">
             <field name="name">nhs.leave.entitlement: own record only (staff)</field>
             <field name="model_id" ref="model_nhs_leave_entitlement"/>
             <field name="domain_force">[('member_id.user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_staff'))]"/>
         </record>
-        <record id="rule_nhs_swap_request_self" model="ir.rule">
+        <!-- Record: rule_nhs_swap_request_self for ir.rule -->
+    <record id="rule_nhs_swap_request_self" model="ir.rule">
             <field name="name">nhs.swap.request: own record only (staff)</field>
             <field name="model_id" ref="model_nhs_swap_request"/>
             <field name="domain_force">['|', ('requester_assignment_id.member_id.user_id', '=', user.id),
                                               ('target_assignment_id.member_id.user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_staff'))]"/>
         </record>
-        <record id="rule_nhs_roster_preference_self" model="ir.rule">
+        <!-- Record: rule_nhs_roster_preference_self for ir.rule -->
+    <record id="rule_nhs_roster_preference_self" model="ir.rule">
             <field name="name">nhs.roster.preference: own record only (staff)</field>
             <field name="model_id" ref="model_nhs_roster_preference"/>
             <field name="domain_force">[('member_id.user_id', '=', user.id)]</field>
@@ -218,25 +231,29 @@
         </record>
 
         <!-- Reference/config models (global-or-company-scoped) -->
-        <record id="rule_nhs_roster_weekday_global" model="ir.rule">
+        <!-- Record: rule_nhs_roster_weekday_global for ir.rule -->
+    <record id="rule_nhs_roster_weekday_global" model="ir.rule">
             <field name="name">nhs.roster.weekday: global reference data</field>
             <field name="model_id" ref="model_nhs_roster_weekday"/>
             <field name="domain_force">[(1, '=', 1)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_manager'))]"/>
         </record>
-        <record id="rule_nhs_roster_skill_company" model="ir.rule">
+        <!-- Record: rule_nhs_roster_skill_company for ir.rule -->
+    <record id="rule_nhs_roster_skill_company" model="ir.rule">
             <field name="name">nhs.roster.skill: company scope or global</field>
             <field name="model_id" ref="model_nhs_roster_skill"/>
             <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_manager'))]"/>
         </record>
-        <record id="rule_nhs_roster_rule_company" model="ir.rule">
+        <!-- Record: rule_nhs_roster_rule_company for ir.rule -->
+    <record id="rule_nhs_roster_rule_company" model="ir.rule">
             <field name="name">nhs.roster.rule: company scope or global</field>
             <field name="model_id" ref="model_nhs_roster_rule"/>
             <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_manager'))]"/>
         </record>
-        <record id="rule_nhs_leave_type_company" model="ir.rule">
+        <!-- Record: rule_nhs_leave_type_company for ir.rule -->
+    <record id="rule_nhs_leave_type_company" model="ir.rule">
             <field name="name">nhs.leave.type: company scope or global</field>
             <field name="model_id" ref="model_nhs_leave_type"/>
             <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Record: view_nhs_org_unit_form_rostering for ir.ui.view -->
     <record id="view_nhs_org_unit_form_rostering" model="ir.ui.view">
         <field name="name">nhs.org.unit.form.rostering</field>
         <field name="model">nhs.org.unit</field>

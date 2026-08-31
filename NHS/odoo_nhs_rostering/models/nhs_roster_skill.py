@@ -32,7 +32,7 @@ class NhsRosterSkill(models.Model):
     _description = 'Skill (Rostering)'
     _order = 'name'
 
-    name = fields.Char(string='Skill', required=True, translate=True)
+    name = fields.Char(string='Skill', required=True, translate=True, help="Skill")
     code = fields.Char(string='Code', help="Short code, used in exports.")
     company_id = fields.Many2one(
         'res.company',
@@ -40,7 +40,7 @@ class NhsRosterSkill(models.Model):
         default=lambda self: self.env.company,
         help="Leave blank to make this skill available to every company."
     )
-    active = fields.Boolean(string='Active', default=True)
+    active = fields.Boolean(string='Active', default=True, help="Active")
 
     _name_uniq = models.Constraint(
         'UNIQUE(name, company_id)',

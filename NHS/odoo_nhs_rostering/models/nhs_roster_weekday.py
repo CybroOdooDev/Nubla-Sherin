@@ -31,13 +31,13 @@ class NhsRosterWeekday(models.Model):
     _description = 'Weekday (Rostering)'
     _order = 'sequence'
 
-    name = fields.Char(string='Day', required=True, translate=True)
+    name = fields.Char(string='Day', required=True, translate=True, help="Day")
     index = fields.Integer(
         string='Index',
         required=True,
         help="ISO weekday index, 0 = Monday .. 6 = Sunday."
     )
-    sequence = fields.Integer(string='Sequence', default=10)
+    sequence = fields.Integer(string='Sequence', default=10, help="Sequence")
 
     _index_uniq = models.Constraint(
         'UNIQUE(index)',

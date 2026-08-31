@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--This template displays the NHS e-Rostering dashboard with fill rate,
+open gaps, escalations, violations, bank and agency duties, and recent roster periods.-->
 <templates xml:space="preserve">
     <t t-name="odoo_nhs_rostering.NhsRosterDashboard" owl="1">
         <div class="o_nhs_roster_dashboard o_content p-4" style="height: 100%; overflow-y: auto;">
@@ -21,7 +23,7 @@
                 </div>
 
                 <div class="row g-3 mb-4">
-                    <div class="col-6 col-md-4 col-xl-2">
+                    <div class="col-6 col-md-4 col-xl-3">
                         <div class="card h-100 shadow-sm rounded-3 roster-stat-card">
                             <div class="card-body p-3">
                                 <span class="text-uppercase small fw-bold text-muted">Fill Rate</span>
@@ -29,15 +31,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 col-md-4 col-xl-2">
-                        <div class="card h-100 shadow-sm rounded-3 roster-stat-card">
+                    <div class="col-6 col-md-4 col-xl-3">
+                        <div class="card h-100 shadow-sm rounded-3 roster-stat-card cursor-pointer" t-on-click="openGaps">
                             <div class="card-body p-3">
                                 <span class="text-uppercase small fw-bold text-muted">Open Gaps</span>
                                 <h3 class="fw-bold mb-0 text-nhs-blue" t-esc="state.data.total_gaps"/>
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 col-md-4 col-xl-2">
+                    <div class="col-6 col-md-4 col-xl-3">
                         <div class="card h-100 shadow-sm rounded-3 roster-stat-card cursor-pointer" t-on-click="openEscalations">
                             <div class="card-body p-3">
                                 <span class="text-uppercase small fw-bold text-muted">In-Flight Escalations</span>
@@ -45,7 +47,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 col-md-4 col-xl-2">
+                    <div class="col-6 col-md-4 col-xl-3">
+                        <div class="card h-100 shadow-sm rounded-3 roster-stat-card">
+                            <div class="card-body p-3">
+                                <span class="text-uppercase small fw-bold text-muted">Avg. Publish Lead Time</span>
+                                <h3 class="fw-bold mb-0 text-nhs-blue"><t t-esc="state.data.avg_lead_time"/>d</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-xl-3">
                         <div class="card h-100 shadow-sm rounded-3 roster-stat-card cursor-pointer"
                              t-on-click="() => this.openViolations('hard')">
                             <div class="card-body p-3">
@@ -54,7 +64,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 col-md-4 col-xl-2">
+                    <div class="col-6 col-md-4 col-xl-3">
                         <div class="card h-100 shadow-sm rounded-3 roster-stat-card cursor-pointer"
                              t-on-click="() => this.openViolations('soft')">
                             <div class="card-body p-3">
@@ -63,11 +73,19 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 col-md-4 col-xl-2">
-                        <div class="card h-100 shadow-sm rounded-3 roster-stat-card">
+                    <div class="col-6 col-md-4 col-xl-3">
+                        <div class="card h-100 shadow-sm rounded-3 roster-stat-card cursor-pointer" t-on-click="openSwaps">
                             <div class="card-body p-3">
-                                <span class="text-uppercase small fw-bold text-muted">Avg. Publish Lead Time</span>
-                                <h3 class="fw-bold mb-0 text-nhs-blue"><t t-esc="state.data.avg_lead_time"/>d</h3>
+                                <span class="text-uppercase small fw-bold text-muted">Pending Swaps</span>
+                                <h3 class="fw-bold mb-0 text-nhs-blue" t-esc="state.data.pending_swaps_count"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-xl-3">
+                        <div class="card h-100 shadow-sm rounded-3 roster-stat-card cursor-pointer" t-on-click="openLeaves">
+                            <div class="card-body p-3">
+                                <span class="text-uppercase small fw-bold text-muted">Pending Leaves</span>
+                                <h3 class="fw-bold mb-0 text-nhs-blue" t-esc="state.data.pending_leaves_count"/>
                             </div>
                         </div>
                     </div>
@@ -94,29 +112,84 @@
                     </div>
                 </div>
 
-                <div class="card shadow-sm rounded-3">
-                    <div class="card-header bg-white py-3">
-                        <h6 class="fw-bold mb-0"><i class="fa fa-calendar text-nhs-blue me-2"/>Recent Periods</h6>
+                <div class="row g-3">
+                    <div class="col-md-7">
+                        <div class="card shadow-sm rounded-3 mb-4">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="fw-bold mb-0"><i class="fa fa-calendar text-nhs-blue me-2"/>Recent Periods</h6>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead>
+                                        <tr class="small"><th>Period</th><th>Fill %</th><th>Gaps</th><th>Hard Violations</th><th>Status</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="!state.data.periods.length">
+                                            <tr><td colspan="5" class="text-center py-4 text-muted">No periods yet</td></tr>
+                                        </t>
+                                        <tr t-foreach="state.data.periods" t-as="p" t-key="p.id" class="cursor-pointer"
+                                            t-on-click="() => this.openPeriod(p.id)">
+                                            <td class="fw-semibold text-nhs-blue" t-esc="p.name"/>
+                                            <td t-esc="p.fill_pct + '%'"/>
+                                            <td t-esc="p.gap_count"/>
+                                            <td t-esc="p.hard_violation_count"/>
+                                            <td><span class="badge text-bg-secondary" t-esc="p.state"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body p-0">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
-                                <tr class="small"><th>Period</th><th>Fill %</th><th>Gaps</th><th>Hard Violations</th><th>Status</th></tr>
-                            </thead>
-                            <tbody>
-                                <t t-if="!state.data.periods.length">
-                                    <tr><td colspan="5" class="text-center py-4 text-muted">No periods yet</td></tr>
-                                </t>
-                                <tr t-foreach="state.data.periods" t-as="p" t-key="p.id" class="cursor-pointer"
-                                    t-on-click="() => this.openPeriod(p.id)">
-                                    <td class="fw-semibold text-nhs-blue" t-esc="p.name"/>
-                                    <td t-esc="p.fill_pct + '%'"/>
-                                    <td t-esc="p.gap_count"/>
-                                    <td t-esc="p.hard_violation_count"/>
-                                    <td><span class="badge text-bg-secondary" t-esc="p.state"/></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="col-md-5">
+                        <div class="card shadow-sm rounded-3 mb-4">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="fw-bold mb-0"><i class="fa fa-building text-nhs-blue me-2"/>Fill Rate by Unit</h6>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead>
+                                        <tr class="small"><th>Unit</th><th class="text-end">Fill %</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="!state.data.unit_fill_rates.length">
+                                            <tr><td colspan="2" class="text-center py-4 text-muted">No data yet</td></tr>
+                                        </t>
+                                        <tr t-foreach="state.data.unit_fill_rates" t-as="u" t-key="u.id">
+                                            <td class="fw-semibold text-nhs-blue" t-esc="u.name"/>
+                                            <td class="text-end fw-bold" t-esc="u.fill_pct + '%'"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card shadow-sm rounded-3">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="fw-bold mb-0"><i class="fa fa-exclamation-circle text-danger me-2"/>Upcoming Critical Gaps</h6>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead>
+                                        <tr class="small"><th>Unit</th><th>Date</th><th>Shift</th><th class="text-end">Missing Headcount</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="!state.data.upcoming_gaps.length">
+                                            <tr><td colspan="4" class="text-center py-4 text-muted">No upcoming gaps!</td></tr>
+                                        </t>
+                                        <tr t-foreach="state.data.upcoming_gaps" t-as="g" t-key="g.id">
+                                            <td class="fw-semibold text-nhs-blue" t-esc="g.unit"/>
+                                            <td t-esc="g.date"/>
+                                            <td t-esc="g.shift"/>
+                                            <td class="text-end fw-bold text-danger" t-esc="g.missing"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </t>

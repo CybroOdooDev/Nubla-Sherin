@@ -39,26 +39,29 @@ class NhsRuleViolation(models.Model):
     _inherit = ['mail.thread']
     _description = 'Rule Violation'
     _order = 'create_date desc'
+    _rec_name = 'rule_id'
 
-    rule_id = fields.Many2one('nhs.roster.rule', string='Rule', required=True, index=True)
+    rule_id = fields.Many2one('nhs.roster.rule', string='Rule', required=True, index=True, help="Rule")
     member_id = fields.Many2one(
-        'nhs.workforce.member', string='Member', required=True, index=True)
-    duty_id = fields.Many2one('nhs.duty', string='Duty', required=True, ondelete='cascade')
+        'nhs.workforce.member', string='Member', required=True, index=True, help="Member")
+    duty_id = fields.Many2one('nhs.duty', string='Duty', required=True, ondelete='cascade', help="Duty")
     period_id = fields.Many2one(
-        'nhs.roster.period', string='Roster Period', required=True, index=True)
+        'nhs.roster.period', string='Roster Period', required=True, index=True, help="Roster Period")
     company_id = fields.Many2one(
-        'res.company', related='period_id.company_id', store=True)
+        'res.company', related='period_id.company_id', store=True,
+        help="Detailed information about this field")
     severity = fields.Selection(
-        [('hard', 'Hard'), ('soft', 'Soft')], string='Severity', required=True)
-    message = fields.Text(string='Detail')
+        [('hard', 'Hard'), ('soft', 'Soft')], string='Severity', required=True, help="Severity")
+    message = fields.Text(string='Detail', help="Detail")
     state = fields.Selection(
-        VIOLATION_STATES, string='Status', required=True, default='open', tracking=True)
-    justification = fields.Text(string='Justification')
-    justified_by = fields.Many2one('res.users', string='Justified By', readonly=True)
-    justified_at = fields.Datetime(string='Justified At', readonly=True)
-    resolved_at = fields.Datetime(string='Resolved At', readonly=True)
+        VIOLATION_STATES, string='Status', required=True, default='open', tracking=True, help="Status")
+    justification = fields.Text(string='Justification', help="Justification")
+    justified_by = fields.Many2one('res.users', string='Justified By', readonly=True, help="Justified By")
+    justified_at = fields.Datetime(string='Justified At', readonly=True, help="Justified At")
+    resolved_at = fields.Datetime(string='Resolved At', readonly=True, help="Resolved At")
 
     def action_justify(self, justification):
+        """ Method for action justify """
         for violation in self:
             if violation.severity == 'hard':
                 raise UserError(
@@ -80,8 +83,10 @@ class NhsRuleViolation(models.Model):
             violation.action_justify(violation.justification)
 
     def action_resolve(self):
+        """ Method for action resolve """
         self.write({'state': 'resolved', 'resolved_at': fields.Datetime.now()})
 
     def action_reopen(self):
+        """ Method for action reopen """
         self.write({'state': 'open', 'resolved_at': False, 'justified_at': False,
                     'justified_by': False, 'justification': False})

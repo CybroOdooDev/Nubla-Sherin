@@ -17,11 +17,19 @@ export class NhsRosterGrid extends Component {
         this.orm = useService("orm");
         this.notification = useService("notification");
         this.action = useService("action");
-        this.periodId = this.props.action.params && this.props.action.params.period_id;
+        // `params.period_id` is only present on the initial open. A browser
+        // refresh rebuilds the action from the URL, which doesn't carry
+        // arbitrary client-action params but does carry `active_id` (the
+        // web client encodes it specifically for this purpose) - so fall
+        // back to it to keep the grid working after a refresh.
+        const params = this.props.action.params || {};
+        const context = this.props.action.context || {};
+        this.periodId = params.period_id || context.active_id;
         this.state = useState({
             data: null,
             loading: true,
             picker: null, // { memberId, date } while the assign popover is open
+            showViolations: true,
         });
         onWillStart(async () => {
             await this.loadData();
@@ -65,6 +73,10 @@ export class NhsRosterGrid extends Component {
 
     closePicker() {
         this.state.picker = null;
+    }
+
+    toggleViolations() {
+        this.state.showViolations = !this.state.showViolations;
     }
 
     async pickShiftType(shiftTypeId) {

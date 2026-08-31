@@ -33,20 +33,22 @@ class NhsCopyPeriodWizard(models.TransientModel):
     _name = 'nhs.copy.period.wizard'
     _description = 'Copy Roster Period Wizard'
 
-    source_period_id = fields.Many2one('nhs.roster.period', string='Source Period', required=True)
-    new_date_start = fields.Date(string='New Start Date', required=True)
-    new_date_end = fields.Date(string='New End Date', required=True)
+    source_period_id = fields.Many2one('nhs.roster.period', string='Source Period', required=True, help="Source Period")
+    new_date_start = fields.Date(string='New Start Date', required=True, help="New Start Date")
+    new_date_end = fields.Date(string='New End Date', required=True, help="New End Date")
     copy_assignments = fields.Boolean(
         string='Copy Assignments', default=True,
         help="Carry the source period's assignments across to the equivalent new duty.")
 
     @api.onchange('source_period_id', 'new_date_start')
     def _onchange_new_date_start(self):
+        """ Method for onchange new date start """
         if self.source_period_id and self.new_date_start:
             length = (self.source_period_id.date_end - self.source_period_id.date_start).days
             self.new_date_end = self.new_date_start + timedelta(days=length)
 
     def action_copy(self):
+        """ Method for action copy """
         self.ensure_one()
         source = self.source_period_id
         new_period = self.env['nhs.roster.period'].create({

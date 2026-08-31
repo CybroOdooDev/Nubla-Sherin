@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Record: view_nhs_roster_preference_list for ir.ui.view -->
     <record id="view_nhs_roster_preference_list" model="ir.ui.view">
         <field name="name">nhs.roster.preference.list</field>
         <field name="model">nhs.roster.preference</field>
@@ -16,6 +17,7 @@
         </field>
     </record>
 
+    <!-- Record: action_nhs_roster_preference for ir.actions.act_window -->
     <record id="action_nhs_roster_preference" model="ir.actions.act_window">
         <field name="name">Roster Preferences</field>
         <field name="res_model">nhs.roster.preference</field>

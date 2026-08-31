@@ -31,18 +31,22 @@ class NhsLeaveEntitlement(models.Model):
     _rec_name =  'member_id'
 
     member_id = fields.Many2one(
-        'nhs.workforce.member', string='Member', required=True, ondelete='cascade', index=True)
-    leave_type_id = fields.Many2one('nhs.leave.type', string='Leave Type', required=True)
+        'nhs.workforce.member', string='Member', required=True, ondelete='cascade',
+        index=True, help="Member")
+    leave_type_id = fields.Many2one('nhs.leave.type', string='Leave Type', required=True,
+                                    help="Leave Type")
     leave_year = fields.Char(
         string='Leave Year', required=True, default=lambda self: str(fields.Date.context_today(self).year),
         help="e.g. '2026'.")
     company_id = fields.Many2one(
-        'res.company', related='member_id.company_id', store=True)
-    entitlement_hours = fields.Float(string='Entitlement (Hours)', required=True, default=0.0)
+        'res.company', related='member_id.company_id', store=True,
+        help="Detailed information about this field")
+    entitlement_hours = fields.Float(string='Entitlement (Hours)', required=True, default=0.0,
+                                     help="Entitlement (Hours)")
     taken_hours = fields.Float(
-        string='Taken (Hours)', compute='_compute_taken_hours', store=True)
+        string='Taken (Hours)', compute='_compute_taken_hours', store=True, help="Taken (Hours)")
     remaining_hours = fields.Float(
-        string='Remaining (Hours)', compute='_compute_taken_hours', store=True)
+        string='Remaining (Hours)', compute='_compute_taken_hours', store=True, help="Remaining (Hours)")
 
     _member_type_year_uniq = models.Constraint(
         'UNIQUE(member_id, leave_type_id, leave_year)',
@@ -52,7 +56,9 @@ class NhsLeaveEntitlement(models.Model):
     @api.depends('member_id.leave_request_ids.state', 'member_id.leave_request_ids.hours',
                  'member_id.leave_request_ids.leave_type_id', 'member_id.leave_request_ids.date_from',
                  'entitlement_hours', 'leave_type_id', 'leave_year')
+
     def _compute_taken_hours(self):
+        """ Method for compute taken hours """
         for entitlement in self:
             requests = entitlement.member_id.leave_request_ids.filtered(
                 lambda r: r.leave_type_id == entitlement.leave_type_id

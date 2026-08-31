@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Record: view_nhs_leave_entitlement_list for ir.ui.view -->
     <record id="view_nhs_leave_entitlement_list" model="ir.ui.view">
         <field name="name">nhs.leave.entitlement.list</field>
         <field name="model">nhs.leave.entitlement</field>
@@ -15,6 +16,7 @@
         </field>
     </record>
 
+    <!-- Record: view_nhs_leave_entitlement_form for ir.ui.view -->
     <record id="view_nhs_leave_entitlement_form" model="ir.ui.view">
         <field name="name">nhs.leave.entitlement.form</field>
         <field name="model">nhs.leave.entitlement</field>
@@ -38,6 +40,7 @@
         </field>
     </record>
 
+    <!-- Record: action_nhs_leave_entitlement for ir.actions.act_window -->
     <record id="action_nhs_leave_entitlement" model="ir.actions.act_window">
         <field name="name">Leave Entitlements</field>
         <field name="res_model">nhs.leave.entitlement</field>

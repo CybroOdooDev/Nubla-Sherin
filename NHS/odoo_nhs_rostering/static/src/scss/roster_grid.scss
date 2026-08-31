@@ -3,32 +3,67 @@
 .o_nhs_roster_grid {
     background-color: #f4f6f9 !important;
 
-    .text-nhs-blue { color: #005eb8 !important; }
-    .bg-nhs-blue { background-color: #005eb8 !important; color: #ffffff !important; }
+    .text-nhs-blue {
+        color: #005eb8 !important;
+    }
+
+    .bg-nhs-blue {
+        background-color: #005eb8 !important;
+        color: #ffffff !important;
+    }
+
     .btn-outline-nhs-blue {
         color: #005eb8;
         border-color: #005eb8;
         background-color: #ffffff;
-        &:hover { background-color: #005eb8; color: #ffffff; }
+
+        &:hover {
+            background-color: #005eb8;
+            color: #ffffff;
+        }
     }
 
     .nhs_roster_grid_table_wrap {
         max-height: 75vh;
         overflow: auto;
+        padding-bottom: 150px; /* prevent picker clipping on last rows */
     }
 
     .nhs_roster_grid_table {
         background: #ffffff;
         min-width: 100%;
+        border-collapse: collapse;
 
-        th, td { white-space: nowrap; }
+        th, td {
+            white-space: nowrap;
+            border: 1px solid #e2e8f0;
+        }
+
+        th {
+            position: sticky;
+            top: 0;
+            background: #f8f9fa;
+            z-index: 2;
+            color: #495057;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            padding: 0.75rem !important;
+            border-bottom: 2px solid #dee2e6;
+        }
 
         .nhs_grid_member_col {
             position: sticky;
             left: 0;
-            background: #ffffff;
+            background: #f8f9fa;
             z-index: 1;
             min-width: 160px;
+            font-weight: 500;
+            border-right: 2px solid #dee2e6;
+        }
+
+        th.nhs_grid_member_col {
+            z-index: 3; /* Top left corner needs highest z-index */
         }
     }
 
@@ -36,10 +71,15 @@
         min-width: 90px;
         height: 56px;
         cursor: pointer;
-        vertical-align: top;
+        vertical-align: middle;
+        text-align: center;
         position: relative;
+        transition: background-color 0.1s ease;
 
-        &:hover { background-color: #eef4fb; }
+        &:hover {
+            background-color: #eef4fb;
+            box-shadow: inset 0 0 0 1px #005eb8;
+        }
     }
 
     .nhs_shift_chip {
@@ -70,9 +110,17 @@
         padding: 6px 10px;
         font-size: 0.8rem;
         cursor: pointer;
-        &:hover { background-color: #eef4fb; }
+
+        &:hover {
+            background-color: #eef4fb;
+        }
     }
 
-    .card { border: 1px solid #e2e8f0 !important; }
-    .card-header { border-bottom: 1px solid #e2e8f0 !important; }
+    .card {
+        border: 1px solid #e2e8f0 !important;
+    }
+
+    .card-header {
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
 }

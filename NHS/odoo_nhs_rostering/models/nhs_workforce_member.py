@@ -77,19 +77,24 @@ class NhsWorkforceMember(models.Model):
              " double-booking is possible between units either."
     )
     duty_assignment_ids = fields.One2many(
-        'nhs.duty.assignment', 'member_id', string='Duty Assignments')
+        'nhs.duty.assignment', 'member_id', string='Duty Assignments',
+        help="Duty Assignments")
     duty_assignment_count = fields.Integer(
-        string='Duty Count', compute='_compute_duty_assignment_count')
+        string='Duty Count', compute='_compute_duty_assignment_count', help="Duty Count")
     leave_request_ids = fields.One2many(
-        'nhs.leave.request', 'member_id', string='Leave Requests')
+        'nhs.leave.request', 'member_id', string='Leave Requests',
+        help="Leave Requests")
     leave_entitlement_ids = fields.One2many(
-        'nhs.leave.entitlement', 'member_id', string='Leave Entitlements')
+        'nhs.leave.entitlement', 'member_id', string='Leave Entitlements',
+        help="Leave Entitlements")
 
     def _compute_duty_assignment_count(self):
+        """ Method for compute duty assignment count """
         for member in self:
             member.duty_assignment_count = len(member.duty_assignment_ids)
 
     def action_view_duty_assignments(self):
+        """ Method for action view duty assignments """
         self.ensure_one()
         return {
             'name': 'Duty Assignments',

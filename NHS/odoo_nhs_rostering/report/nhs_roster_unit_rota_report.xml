@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Record: action_report_nhs_roster_unit_rota for ir.actions.report -->
     <record id="action_report_nhs_roster_unit_rota" model="ir.actions.report">
         <field name="name">Unit Rota</field>
         <field name="model">nhs.roster.period</field>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Record: view_nhs_duty_assignment_list for ir.ui.view -->
     <record id="view_nhs_duty_assignment_list" model="ir.ui.view">
         <field name="name">nhs.duty.assignment.list</field>
         <field name="model">nhs.duty.assignment</field>
@@ -17,6 +18,7 @@
         </field>
     </record>
 
+    <!-- Record: view_nhs_duty_assignment_form for ir.ui.view -->
     <record id="view_nhs_duty_assignment_form" model="ir.ui.view">
         <field name="name">nhs.duty.assignment.form</field>
         <field name="model">nhs.duty.assignment</field>
@@ -34,7 +36,8 @@
                     <group>
                         <group>
                             <field name="duty_id"/>
-                            <field name="member_id"/>
+                            <field name="eligible_member_ids" invisible="1"/>
+                            <field name="member_id" domain="[('id', 'in', eligible_member_ids)]"/>
                             <field name="unit_id" readonly="1"/>
                             <field name="duty_date" readonly="1"/>
                             <field name="shift_type_id" readonly="1"/>
@@ -53,6 +56,7 @@
         </field>
     </record>
 
+    <!-- Record: view_nhs_duty_assignment_calendar for ir.ui.view -->
     <record id="view_nhs_duty_assignment_calendar" model="ir.ui.view">
         <field name="name">nhs.duty.assignment.calendar</field>
         <field name="model">nhs.duty.assignment</field>
@@ -64,9 +68,34 @@
         </field>
     </record>
 
+    <!-- Record: view_nhs_duty_assignment_graph for ir.ui.view -->
+    <record id="view_nhs_duty_assignment_graph" model="ir.ui.view">
+        <field name="name">nhs.duty.assignment.graph</field>
+        <field name="model">nhs.duty.assignment</field>
+        <field name="arch" type="xml">
+            <graph string="Duty Assignments">
+                <field name="member_id"/>
+                <field name="shift_type_id"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Record: view_nhs_duty_assignment_pivot for ir.ui.view -->
+    <record id="view_nhs_duty_assignment_pivot" model="ir.ui.view">
+        <field name="name">nhs.duty.assignment.pivot</field>
+        <field name="model">nhs.duty.assignment</field>
+        <field name="arch" type="xml">
+            <pivot string="Duty Assignments">
+                <field name="member_id" type="row"/>
+                <field name="period_id" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Record: action_nhs_duty_assignment for ir.actions.act_window -->
     <record id="action_nhs_duty_assignment" model="ir.actions.act_window">
         <field name="name">Duty Assignments</field>
         <field name="res_model">nhs.duty.assignment</field>
-        <field name="view_mode">list,form,calendar</field>
+        <field name="view_mode">graph,pivot,list,form,calendar</field>
     </record>
 </odoo>

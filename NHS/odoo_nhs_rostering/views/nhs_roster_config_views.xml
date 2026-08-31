@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Record: view_res_config_settings_nhs_rostering for ir.ui.view -->
     <record id="view_res_config_settings_nhs_rostering" model="ir.ui.view">
         <field name="name">res.config.settings.nhs.rostering</field>
         <field name="model">res.config.settings</field>
@@ -10,13 +11,15 @@
                      groups="odoo_nhs_rostering.group_nhs_workforce_admin">
                     <block title="Rules Engine">
                         <setting string="WTR Reference Period"
-                                 help="Reference period, in weeks, for the 48-hour average week rule (statutory default: 17 weeks).">
+                                 help="Reference period, in weeks, for the 48-hour average week rule
+                                  (statutory default: 17 weeks).">
                             <span><field name="nhs_roster_reference_period_weeks"/> weeks</span>
                         </setting>
                     </block>
                     <block title="Publication">
                         <setting string="Publication Lead-Time Target"
-                                 help="Target days ahead of a period's start it should be published - the widely-cited six-week expectation.">
+                                 help="Target days ahead of a period's start it should be published -
+                                  the widely-cited six-week expectation.">
                             <span><field name="nhs_roster_publish_lead_days_target"/> days</span>
                         </setting>
                     </block>
@@ -32,7 +35,8 @@
                             <span><field name="nhs_roster_default_escalation_lead_days"/> days</span>
                         </setting>
                         <setting string="Auto-Escalate Unfilled Duties"
-                                 help="Automatically push unfilled duties to the Staff Bank as they enter the escalation lead-time window.">
+                                 help="Automatically push unfilled duties to the Staff Bank as they enter
+                                  the escalation lead-time window.">
                             <field name="nhs_roster_auto_escalate"/>
                         </setting>
                     </block>
@@ -41,6 +45,7 @@
         </field>
     </record>
 
+    <!-- Record: action_nhs_roster_config_settings for ir.actions.act_window -->
     <record id="action_nhs_roster_config_settings" model="ir.actions.act_window">
         <field name="name">Settings</field>
         <field name="res_model">res.config.settings</field>

@@ -20,7 +20,6 @@
 #
 #############################################################################
 from datetime import timedelta
-
 from odoo import fields, models
 from odoo.exceptions import ValidationError
 
@@ -43,19 +42,19 @@ class NhsRosterRule(models.Model):
 
     code = fields.Char(string='Code', required=True, index=True,
                         help="Stable code the engine dispatches on, e.g. WTR_AVG_48.")
-    name = fields.Char(string='Name', required=True)
+    name = fields.Char(string='Name', required=True, help="Name")
     severity = fields.Selection(
         RULE_SEVERITIES, string='Severity', required=True, default='hard',
         help="Hard: blocks the assignment outright. Soft: allowed, but opens a"
              " logged violation an approver can resolve or justify.")
-    sequence = fields.Integer(string='Sequence', default=10)
-    active = fields.Boolean(string='Active', default=True)
+    sequence = fields.Integer(string='Sequence', default=10, help="Sequence")
+    active = fields.Boolean(string='Active', default=True, help="Active")
     company_id = fields.Many2one(
         'res.company', string='Company', help="Leave blank to apply to every company.")
     limit_value = fields.Float(string='Limit', help="Primary numeric limit - meaning depends"
                                 " on the rule, see its description.")
-    limit_value_2 = fields.Float(string='Secondary Limit')
-    description = fields.Text(string='Description')
+    limit_value_2 = fields.Float(string='Secondary Limit', help="Secondary Limit")
+    description = fields.Text(string='Description', help="Description")
 
     _code_company_uniq = models.Constraint(
         'UNIQUE(code, company_id)',
@@ -72,12 +71,14 @@ class NhsRosterRuleEngine(models.AbstractModel):
 
 
     def _active_rules(self, company):
+        """ Method for active rules """
         return self.env['nhs.roster.rule'].search([
             ('active', '=', True),
             '|', ('company_id', '=', False), ('company_id', '=', company.id),
         ])
 
     def _assignments_for_member(self, member, date_from, date_to, exclude=None):
+        """ Method for assignments for member """
         domain = [
             ('member_id', '=', member.id),
             ('duty_date', '>=', date_from),
@@ -90,6 +91,7 @@ class NhsRosterRuleEngine(models.AbstractModel):
         return assignments
 
     def _bank_member(self, member):
+        """ Method for bank member """
         if 'nhs.bank.member' not in self.env:
             return False
         return self.env['nhs.bank.member'].sudo().search(
@@ -118,6 +120,7 @@ class NhsRosterRuleEngine(models.AbstractModel):
         return total
 
     def _bank_overlaps(self, member, start, end):
+        """ Method for bank overlaps """
         bank_member = self._bank_member(member)
         if not bank_member:
             return False
@@ -130,7 +133,6 @@ class NhsRosterRuleEngine(models.AbstractModel):
                 return True
         return False
 
-    # ------------------------------------------------------------ dispatch --
 
     def evaluate(self, assignment):
         """Evaluate every active rule for `assignment` (already written to
@@ -193,6 +195,7 @@ class NhsRosterRuleEngine(models.AbstractModel):
 
 
     def _eval_wtr_avg_48(self, rule, assignment):
+        """ Method for eval wtr avg 48 """
         member, duty = assignment.member_id, assignment.duty_id
         weeks = (duty.company_id or self.env.company).nhs_roster_reference_period_weeks or 17
         date_to = duty.duty_date
@@ -207,6 +210,7 @@ class NhsRosterRuleEngine(models.AbstractModel):
         return True, ''
 
     def _eval_rest_11h(self, rule, assignment):
+        """ Method for eval rest 11h """
         duty = assignment.duty_id
         member = assignment.member_id
         start, end = duty.get_datetime_bounds()
@@ -228,6 +232,7 @@ class NhsRosterRuleEngine(models.AbstractModel):
         return True, ''
 
     def _eval_weekly_rest(self, rule, assignment):
+        """ Method for eval weekly rest """
         duty = assignment.duty_id
         member = assignment.member_id
         date_from = duty.duty_date - timedelta(days=6)
@@ -249,6 +254,7 @@ class NhsRosterRuleEngine(models.AbstractModel):
         return True, ''
 
     def _consecutive_run(self, member, center_date, only_nights=False, exclude=None):
+        """ Method for consecutive run """
         window_from = center_date - timedelta(days=21)
         window_to = center_date + timedelta(days=21)
         assignments = self._assignments_for_member(member, window_from, window_to, exclude=exclude)
@@ -268,6 +274,7 @@ class NhsRosterRuleEngine(models.AbstractModel):
         return run
 
     def _eval_max_consecutive_days(self, rule, assignment):
+        """ Method for eval max consecutive days """
         member, duty = assignment.member_id, assignment.duty_id
         limit = member.roster_max_consecutive_days_override or rule.limit_value or 7
         run = self._consecutive_run(member, duty.duty_date)
@@ -276,6 +283,7 @@ class NhsRosterRuleEngine(models.AbstractModel):
         return True, ''
 
     def _eval_max_consecutive_nights(self, rule, assignment):
+        """ Method for eval max consecutive nights """
         member, duty = assignment.member_id, assignment.duty_id
         if not duty.shift_type_id.is_night:
             return True, ''
@@ -286,6 +294,7 @@ class NhsRosterRuleEngine(models.AbstractModel):
         return True, ''
 
     def _eval_contract_hours(self, rule, assignment):
+        """ Method for eval contract hours """
         member = assignment.member_id
         period = assignment.duty_id.period_id
         if not member.contracted_weekly_hours or not period.date_start:
@@ -303,6 +312,7 @@ class NhsRosterRuleEngine(models.AbstractModel):
         return True, ''
 
     def _eval_skill_mix(self, rule, assignment):
+        """ Method for eval skill mix """
         member, duty = assignment.member_id, assignment.duty_id
         missing = duty.required_skill_ids - member.roster_skill_ids
         if missing:
@@ -313,12 +323,14 @@ class NhsRosterRuleEngine(models.AbstractModel):
         return True, ''
 
     def _eval_compliance_gate(self, rule, assignment):
+        """ Method for eval compliance gate """
         member = assignment.member_id
         if not member.is_training_compliant():
             return False, 'Mandatory training or professional registration is not compliant.'
         return True, ''
 
     def _eval_double_book(self, rule, assignment):
+        """ Method for eval double book """
         member, duty = assignment.member_id, assignment.duty_id
         start, end = duty.get_datetime_bounds()
         others = self._assignments_for_member(
@@ -333,6 +345,7 @@ class NhsRosterRuleEngine(models.AbstractModel):
         return True, ''
 
     def _eval_leave_conflict(self, rule, assignment):
+        """ Method for eval leave conflict """
         member, duty = assignment.member_id, assignment.duty_id
         approved_leave = self.env['nhs.leave.request'].search([
             ('member_id', '=', member.id), ('state', '=', 'approved'),

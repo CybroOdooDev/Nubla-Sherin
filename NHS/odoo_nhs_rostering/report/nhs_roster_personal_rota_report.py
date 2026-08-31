@@ -29,5 +29,6 @@ class ReportNhsRosterPersonalRota(models.AbstractModel):
     _description = 'Personal Rota Report'
 
     def _get_report_values(self, docids, data=None):
+        """ Method for get report values """
         members = self.env['nhs.workforce.member'].browse(docids)
         return {'doc_ids': docids, 'doc_model': 'nhs.workforce.member', 'docs': members}

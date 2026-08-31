@@ -38,13 +38,9 @@ URGENCIES = [
     ('last_minute', 'Last Minute'),
 ]
 
-# odoo_nhs_staff_bank's nhs.shift.type is a coarse rate-card classifier
-# (day/night/weekend/bank holiday), distinct from this module's own richer
-# nhs.roster.shift.type catalogue - map our shift category to a best-guess
-# match by name rather than assuming the codes line up.
 BANK_SHIFT_TYPE_HINTS = {
-    'night': 'night', 'early': 'day', 'late': 'day', 'long_day': 'day',
-    'twilight': 'day', 'on_call': 'day', 'other': 'day',
+    'Night': 'night', 'Early': 'day', 'Late': 'day', 'Long Day': 'day',
+    'Twilight': 'day', 'On-Call': 'day', 'Other': 'day',
 }
 
 
@@ -59,30 +55,39 @@ class NhsRosterEscalation(models.Model):
     _order = 'create_date desc'
     _rec_name = 'reference'
 
-    reference = fields.Char(string='Reference', copy=False, readonly=True, default='New')
-    duty_id = fields.Many2one('nhs.duty', string='Duty', required=True, ondelete='cascade')
-    company_id = fields.Many2one('res.company', related='duty_id.company_id', store=True)
-    state = fields.Selection(
-        ESCALATION_STATES, string='Status', required=True, default='needed', tracking=True)
-    urgency = fields.Selection(URGENCIES, string='Urgency', default='planned', tracking=True)
-    headcount = fields.Integer(
-        string='Headcount Needed', default=1,
+    reference = fields.Char(string='Reference', copy=False, readonly=True, default='New', help="Reference")
+    duty_id = fields.Many2one('nhs.duty', string='Duty', required=True, ondelete='cascade', help="Duty")
+    company_id = fields.Many2one('res.company', related='duty_id.company_id', store=True,
+                                 help="Detailed information about this field")
+    state = fields.Selection( ESCALATION_STATES, string='Status', required=True, default='needed',
+                              tracking=True, help="Status")
+    urgency = fields.Selection(URGENCIES, string='Urgency', default='planned', tracking=True, help="Urgency")
+    headcount = fields.Integer(string='Headcount Needed', default=1,
         help="Remaining unfilled headcount when this escalation was raised.")
     bank_shift_id = fields.Integer(
         string='Bank Shift ID', copy=False,
         help="Id of the linked odoo_nhs_staff_bank nhs.bank.shift record, if that"
              " module is installed and the escalation has been pushed. Stored as a"
              " plain id (not a relation) since Staff Bank is only a soft/runtime link.")
-    bank_shift_reference = fields.Char(string='Bank Shift Reference', readonly=True)
-    agency_name = fields.Char(string='Agency')
-    currency_id = fields.Many2one('res.currency', related='company_id.currency_id')
-    agency_cost = fields.Monetary(string='Agency Cost', currency_field='currency_id')
-    pushed_at = fields.Datetime(string='Pushed At', readonly=True)
-    filled_at = fields.Datetime(string='Filled At', readonly=True)
-    notes = fields.Text(string='Notes')
+    bank_shift_reference = fields.Char(string='Bank Shift Reference', readonly=True, help="Bank Shift Reference")
+    bank_filled_count = fields.Integer(
+        string='Bank Filled Count', readonly=True, copy=False,
+        help="Confirmed (booked/worked) bookings on the linked bank shift, as of the last"
+             " sync. Used to warn when this duty's direct roster assignments plus bank"
+             " cover together exceed its required headcount - the two are filled"
+             " independently and never reconciled automatically, so this is what makes an"
+             " overlap visible.")
+    agency_name = fields.Char(string='Agency', help="Agency")
+    currency_id = fields.Many2one('res.currency', related='company_id.currency_id',
+                                  help="Detailed information about this field")
+    agency_cost = fields.Monetary(string='Agency Cost', currency_field='currency_id', help="Agency Cost")
+    pushed_at = fields.Datetime(string='Pushed At', readonly=True, help="Pushed At")
+    filled_at = fields.Datetime(string='Filled At', readonly=True, help="Filled At")
+    notes = fields.Text(string='Notes', help="Notes")
 
     @api.model_create_multi
     def create(self, vals_list):
+        """ Method for create """
         for vals in vals_list:
             if not vals.get('reference') or vals.get('reference') == 'New':
                 vals['reference'] = self.env['ir.sequence'].next_by_code(
@@ -90,15 +95,18 @@ class NhsRosterEscalation(models.Model):
         return super().create(vals_list)
 
     def _bank_available(self):
+        """ Method for bank available """
         return 'nhs.bank.shift' in self.env
 
-    def _resolve_bank_shift_type(self, category):
+    def _resolve_bank_shift_type(self, shift_type_name):
+        """ Method for resolve bank shift type """
         BankShiftType = self.env['nhs.shift.type'].sudo()
-        hint = BANK_SHIFT_TYPE_HINTS.get(category, 'day')
+        hint = BANK_SHIFT_TYPE_HINTS.get(shift_type_name, 'day')
         shift_type = BankShiftType.search([('name', 'ilike', hint)], limit=1)
         return shift_type or BankShiftType.search([], limit=1)
 
     def _resolve_bank_skills(self, skills):
+        """ Method for resolve bank skills """
         if not skills:
             return self.env['nhs.skill'].sudo().browse()
         BankSkill = self.env['nhs.skill'].sudo()
@@ -129,20 +137,17 @@ class NhsRosterEscalation(models.Model):
         best-effort (Staff Bank owns its own band/role/skill requirements
         and may reject an incomplete shift) - a failure is logged onto the
         escalation rather than raised, so one bad mapping never blocks the
-        rest of a bulk/cron escalation run. When called from the UI and Staff
-        Bank isn't installed at all, a notification is returned so the click
-        doesn't just silently do nothing - cron/bulk callers get the same
-        True they always did, since a client action is meaningless there."""
+        rest of a bulk/cron escalation run."""
         no_bank = self.browse()
         for escalation in self:
             if not escalation._bank_available():
                 no_bank |= escalation
                 continue
             duty = escalation.duty_id
-            role = duty.demand_line_id.staff_group_id
+            role = duty.staff_group_id or duty.demand_line_id.staff_group_id
             band = duty.required_band_id
             missing = [label for label, value in (
-                ('Role / Staff Group (on the duty\'s demand line)', role),
+                ('Role / Staff Group (on the duty or its demand line)', role),
                 ('Required Band (on the duty)', band)) if not value]
             if missing:
                 escalation._log_push_failure(
@@ -156,7 +161,7 @@ class NhsRosterEscalation(models.Model):
                 'shift_start': start,
                 'shift_end': end,
                 'shift_type_id': escalation._resolve_bank_shift_type(
-                    duty.shift_type_id.category).id,
+                    duty.shift_type_id.name).id,
                 'role_id': role.id,
                 'band_id': band.id,
                 'headcount': escalation.headcount or 1,
@@ -204,6 +209,7 @@ class NhsRosterEscalation(models.Model):
             bank_shift = BankShift.browse(escalation.bank_shift_id).exists()
             if not bank_shift:
                 continue
+            escalation.bank_filled_count = getattr(bank_shift, 'filled_count', 0) or 0
             bank_state = getattr(bank_shift, 'state', False)
             if bank_state == 'filled':
                 escalation.write({'state': 'bank_filled', 'filled_at': fields.Datetime.now()})
@@ -216,18 +222,22 @@ class NhsRosterEscalation(models.Model):
                     escalation.agency_cost = agency_cost
 
     def action_mark_manual_cover(self):
+        """ Method for action mark manual cover """
         self.write({'state': 'manual_cover', 'filled_at': fields.Datetime.now()})
 
     def action_send_to_agency(self):
+        """ Method for action send to agency """
         self.write({'state': 'to_agency'})
 
     def action_confirm_agency_filled(self, agency_name, cost):
+        """ Method for action confirm agency filled """
         self.write({
             'state': 'agency_filled', 'agency_name': agency_name, 'agency_cost': cost,
             'filled_at': fields.Datetime.now(),
         })
 
     def action_cancel(self):
+        """ Method for action cancel """
         self.write({'state': 'cancelled'})
 
     @api.model

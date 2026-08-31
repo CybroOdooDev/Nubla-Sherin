@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Record: view_nhs_swap_request_list for ir.ui.view -->
     <record id="view_nhs_swap_request_list" model="ir.ui.view">
         <field name="name">nhs.swap.request.list</field>
         <field name="model">nhs.swap.request</field>
@@ -15,6 +16,7 @@
         </field>
     </record>
 
+    <!-- Record: view_nhs_swap_request_form for ir.ui.view -->
     <record id="view_nhs_swap_request_form" model="ir.ui.view">
         <field name="name">nhs.swap.request.form</field>
         <field name="model">nhs.swap.request</field>
@@ -42,7 +44,8 @@
                             <field name="requester_member_id" readonly="1"/>
                         </group>
                         <group>
-                            <field name="target_assignment_id"/>
+                            <field name="requester_duty_id" invisible="1"/>
+                            <field name="target_assignment_id" domain="[('member_id', '!=', requester_member_id), ('duty_id', '!=', requester_duty_id)]"/>
                             <field name="target_member_id" readonly="1"/>
                         </group>
                     </group>
@@ -57,6 +60,7 @@
         </field>
     </record>
 
+    <!-- Record: action_nhs_swap_request for ir.actions.act_window -->
     <record id="action_nhs_swap_request" model="ir.actions.act_window">
         <field name="name">Duty Swap Requests</field>
         <field name="res_model">nhs.swap.request</field>

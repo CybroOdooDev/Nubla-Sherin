@@ -34,28 +34,30 @@ class NhsRosterPreference(models.Model):
     _name = 'nhs.roster.preference'
     _description = 'Roster Preference'
     _order = 'date'
+    _rec_name = 'member_id'
 
     member_id = fields.Many2one(
-        'nhs.workforce.member', string='Member', required=True, index=True)
+        'nhs.workforce.member', string='Member', required=True, index=True, help="Member")
     unit_id = fields.Many2one(
         'nhs.roster.unit', string='Unit', required=True,
-        default=lambda self: self._default_unit_id())
+        default=lambda self: self._default_unit_id(), help="Unit")
     company_id = fields.Many2one(
-        'res.company', related='unit_id.company_id', store=True)
+        'res.company', related='unit_id.company_id', store=True, help="Detailed information about this field")
     period_id = fields.Many2one(
         'nhs.roster.period', string='Roster Period',
         domain="[('unit_id', '=', unit_id)]",
         help="The period this preference is meant for, if known.")
-    date = fields.Date(string='Date', required=True)
+    date = fields.Date(string='Date', required=True, help="Date")
     shift_type_id = fields.Many2one(
         'nhs.roster.shift.type', string='Shift Type',
         domain="[('roster_unit_id', '=', unit_id)]",
         help="Leave blank for a whole-day preference.")
     preference_type = fields.Selection(
-        PREFERENCE_TYPES, string='Preference', required=True, default='prefer')
-    note = fields.Char(string='Note')
+        PREFERENCE_TYPES, string='Preference', required=True, default='prefer', help="Preference")
+    note = fields.Char(string='Note', help="Note")
 
     def _default_unit_id(self):
+        """ Method for default unit id """
         member = self.env['nhs.workforce.member'].browse(
             self.env.context.get('default_member_id'))
         return member.org_unit_id.roster_unit_ids[:1].id if member else False
