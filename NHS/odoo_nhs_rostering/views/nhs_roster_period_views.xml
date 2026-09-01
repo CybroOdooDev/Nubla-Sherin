@@ -138,7 +138,7 @@
                     </group>
                     <notebook>
                         <page string="Duties">
-                            <field name="duty_ids" readonly="state == 'draft'">
+                            <field name="duty_ids" readonly="state != 'in_progress'">
                                 <list decoration-danger="state == 'unfilled'"
                                       decoration-warning="state == 'partially_filled'"
                                       decoration-success="state == 'filled'">

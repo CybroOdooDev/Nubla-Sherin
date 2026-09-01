@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <menuitem id="menu_nhs_rostering_root" name="NHS e-Rostering" sequence="57"
-              groups="odoo_nhs_rostering.group_nhs_roster_manager"/>
+              groups="odoo_nhs_rostering.group_nhs_roster_manager,odoo_nhs_rostering.group_nhs_roster_staff"/>
 
     <!-- Rosters -->
-    <menuitem id="menu_nhs_rostering_rosters" name="Rosters" parent="menu_nhs_rostering_root" sequence="10"/>
+    <menuitem id="menu_nhs_rostering_rosters" name="Rosters" parent="menu_nhs_rostering_root" sequence="10"
+              groups="odoo_nhs_rostering.group_nhs_roster_manager"/>
     <menuitem id="menu_nhs_roster_period" name="Roster Periods" parent="menu_nhs_rostering_rosters"
               action="action_nhs_roster_period" sequence="10"/>
     <menuitem id="menu_nhs_roster_unit" name="Rostered Units" parent="menu_nhs_rostering_rosters"
               action="action_nhs_roster_unit" sequence="20"/>
 
     <!-- Gaps & Escalation -->
-    <menuitem id="menu_nhs_rostering_gaps" name="Gaps &amp; Escalation" parent="menu_nhs_rostering_root" sequence="20"/>
+    <menuitem id="menu_nhs_rostering_gaps" name="Gaps &amp; Escalation" parent="menu_nhs_rostering_root" sequence="20"
+              groups="odoo_nhs_rostering.group_nhs_roster_manager"/>
     <menuitem id="menu_nhs_duty_gaps" name="Gaps" parent="menu_nhs_rostering_gaps"
               action="action_nhs_duty_gaps" sequence="10"/>
     <menuitem id="menu_nhs_roster_escalation" name="Escalations" parent="menu_nhs_rostering_gaps"
@@ -29,7 +31,8 @@
               action="action_nhs_swap_request" sequence="40"/>
 
     <!-- Reporting -->
-    <menuitem id="menu_nhs_rostering_reporting" name="Reporting" parent="menu_nhs_rostering_root" sequence="50"/>
+    <menuitem id="menu_nhs_rostering_reporting" name="Reporting" parent="menu_nhs_rostering_root" sequence="50"
+              groups="odoo_nhs_rostering.group_nhs_roster_manager"/>
     <menuitem id="menu_nhs_roster_dashboard" name="Dashboard" parent="menu_nhs_rostering_reporting"
               action="action_nhs_roster_dashboard_client" sequence="10"/>
     <menuitem id="menu_nhs_rule_violation" name="Rule Violations" parent="menu_nhs_rostering_reporting"
@@ -52,8 +55,6 @@
               action="action_nhs_roster_rule" sequence="50"/>
     <menuitem id="menu_nhs_leave_type" name="Leave Types" parent="menu_nhs_rostering_config"
               action="action_nhs_leave_type" sequence="60"/>
-    <menuitem id="menu_nhs_roster_preference" name="Preferences" parent="menu_nhs_rostering_config"
-              action="action_nhs_roster_preference" sequence="70"/>
     <menuitem id="menu_nhs_roster_settings" name="Settings" parent="menu_nhs_rostering_config"
               action="action_nhs_roster_config_settings" sequence="80"/>
 </odoo>

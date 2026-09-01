@@ -44,8 +44,27 @@ class NhsLeaveRequest(models.Model):
     _rec_name = 'member_id'
 
 
+    is_manager = fields.Boolean(compute='_compute_is_manager')
+
+    def _compute_is_manager(self):
+        is_mgr = self.env.user.has_group('odoo_nhs_rostering.group_nhs_roster_manager')
+        for rec in self:
+            rec.is_manager = is_mgr
+
+    def _default_member_id(self):
+        member = self.env['nhs.workforce.member'].search([('user_id', '=', self.env.uid)], limit=1)
+        if member:
+            return member.id
+        if self.env.user.email:
+            member = self.env['nhs.workforce.member'].search([('email', '=ilike', self.env.user.email)], limit=1)
+            if member:
+                return member.id
+        member = self.env['nhs.workforce.member'].search([('name', '=ilike', self.env.user.name)], limit=1)
+        return member.id if member else False
+
     member_id = fields.Many2one(
-        'nhs.workforce.member', string='Member', required=True, tracking=True, index=True, help="Member")
+        'nhs.workforce.member', string='Member', required=True, tracking=True, index=True, help="Member",
+        default=_default_member_id)
     company_id = fields.Many2one(
         'res.company', related='member_id.company_id', store=True,
         help="Detailed information about this field")
@@ -104,16 +123,16 @@ class NhsLeaveRequest(models.Model):
 
     def action_approve(self):
         """ Method for action approve """
+        if any(request.state != 'submitted' for request in self):
+            raise UserError(('Only a submitted request can be approved.'))
         for request in self:
-            if request.state != 'submitted':
-                raise UserError(('Only a submitted request can be approved.'))
             breach = request._leave_capacity_breach()
             if breach:
                 raise UserError(breach)
-            request.write({
-                'state': 'approved', 'approved_by': self.env.user.id,
-                'approved_at': fields.Datetime.now(),
-            })
+        self.write({
+            'state': 'approved', 'approved_by': self.env.user.id,
+            'approved_at': fields.Datetime.now(),
+        })
 
     def action_force_approve(self):
         """Approve past the unit's leave-capacity limit. Restricted to
@@ -121,35 +140,35 @@ class NhsLeaveRequest(models.Model):
         deliberate, auditable management call rather than a silent bypass -
         mirrors the hard/soft gate pattern used for Staff Bank's compliance
         gate elsewhere in the suite."""
+        if any(request.state != 'submitted' for request in self):
+            raise UserError(('Only a submitted request can be approved.'))
+        if not self.env.user.has_group('odoo_nhs_rostering.group_nhs_workforce_admin'):
+            raise UserError((
+                'Only a Workforce Admin can force-approve past the leave-capacity'
+                ' limit.'))
+        if any(not request.capacity_override_reason for request in self):
+            raise UserError((
+                'Enter an Override Reason before force-approving past the'
+                ' leave-capacity limit.'))
         for request in self:
-            if request.state != 'submitted':
-                raise UserError(('Only a submitted request can be approved.'))
-            if not self.env.user.has_group('odoo_nhs_rostering.group_nhs_workforce_admin'):
-                raise UserError((
-                    'Only a Workforce Admin can force-approve past the leave-capacity'
-                    ' limit.'))
-            if not request.capacity_override_reason:
-                raise UserError((
-                    'Enter an Override Reason before force-approving past the'
-                    ' leave-capacity limit.'))
             breach = request._leave_capacity_breach()
-            request.write({
-                'state': 'approved', 'approved_by': self.env.user.id,
-                'approved_at': fields.Datetime.now(),
-                'capacity_override': True,
-                'capacity_override_by_id': self.env.user.id,
-            })
             request.message_post(body=
                 'Leave capacity limit overridden by %(user)s: %(reason)s%(breach)s',
                 user=self.env.user.name, reason=request.capacity_override_reason,
                 breach=(' (%s)' % breach) if breach else '')
+        self.write({
+            'state': 'approved', 'approved_by': self.env.user.id,
+            'approved_at': fields.Datetime.now(),
+            'capacity_override': True,
+            'capacity_override_by_id': self.env.user.id,
+        })
 
     def action_reject(self, reason=None):
         """ Method for action reject """
-        for request in self:
-            request.write({
-                'state': 'rejected', 'rejection_reason': reason or request.rejection_reason,
-            })
+        vals = {'state': 'rejected'}
+        if reason:
+            vals['rejection_reason'] = reason
+        self.write(vals)
 
     def action_cancel(self):
         """ Method for action cancel """

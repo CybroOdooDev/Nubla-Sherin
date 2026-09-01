@@ -44,7 +44,8 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="member_id"/>
+                            <field name="is_manager" invisible="1"/>
+                            <field name="member_id" readonly="is_manager == False"/>
                             <field name="leave_type_id"/>
                         </group>
                         <group>

@@ -29,6 +29,7 @@ access_nhs_rule_violation_manager,nhs.rule.violation manager,model_nhs_rule_viol
 access_nhs_rule_violation_admin,nhs.rule.violation admin,model_nhs_rule_violation,group_nhs_workforce_admin,1,1,1,1
 access_nhs_leave_type_manager,nhs.leave.type manager,model_nhs_leave_type,group_nhs_roster_manager,1,0,0,0
 access_nhs_leave_type_admin,nhs.leave.type admin,model_nhs_leave_type,group_nhs_workforce_admin,1,1,1,1
+access_nhs_leave_type_staff,nhs.leave.type staff,model_nhs_leave_type,group_nhs_roster_staff,1,0,0,0
 access_nhs_leave_entitlement_manager,nhs.leave.entitlement manager,model_nhs_leave_entitlement,group_nhs_roster_manager,1,1,1,0
 access_nhs_leave_entitlement_admin,nhs.leave.entitlement admin,model_nhs_leave_entitlement,group_nhs_workforce_admin,1,1,1,1
 access_nhs_leave_entitlement_staff,nhs.leave.entitlement staff,model_nhs_leave_entitlement,group_nhs_roster_staff,1,0,0,0
@@ -38,9 +39,7 @@ access_nhs_leave_request_staff,nhs.leave.request staff,model_nhs_leave_request,g
 access_nhs_swap_request_manager,nhs.swap.request manager,model_nhs_swap_request,group_nhs_roster_manager,1,1,0,1
 access_nhs_swap_request_admin,nhs.swap.request admin,model_nhs_swap_request,group_nhs_workforce_admin,1,1,1,1
 access_nhs_swap_request_staff,nhs.swap.request staff,model_nhs_swap_request,group_nhs_roster_staff,1,1,1,0
-access_nhs_roster_preference_manager,nhs.roster.preference manager,model_nhs_roster_preference,group_nhs_roster_manager,1,1,0,1
-access_nhs_roster_preference_admin,nhs.roster.preference admin,model_nhs_roster_preference,group_nhs_workforce_admin,1,1,1,1
-access_nhs_roster_preference_staff,nhs.roster.preference staff,model_nhs_roster_preference,group_nhs_roster_staff,1,1,1,1
+
 access_nhs_roster_escalation_manager,nhs.roster.escalation manager,model_nhs_roster_escalation,group_nhs_roster_manager,1,1,1,0
 access_nhs_roster_escalation_admin,nhs.roster.escalation admin,model_nhs_roster_escalation,group_nhs_workforce_admin,1,1,1,1
 access_nhs_apply_template_wizard_manager,nhs.apply.template.wizard manager,model_nhs_apply_template_wizard,group_nhs_roster_manager,1,1,1,1

@@ -186,27 +186,3 @@ class NhsRosterPortal(CustomerPortal):
             swap.action_reject()
         return request.redirect('/my/roster/swaps')
 
-    @http.route(['/my/roster/availability'], type='http', auth='user', website=True)
-    def portal_roster_availability(self, **kw):
-        """ Method for portal roster availability """
-        member = self._get_member()
-        if not member:
-            return request.redirect('/my/roster')
-        preferences = request.env['nhs.roster.preference'].sudo().search(
-            [('member_id', '=', member.id)], order='date desc')
-        values = {'member': member, 'preferences': preferences, 'page_name': 'roster_availability'}
-        return request.render('odoo_nhs_rostering.portal_roster_availability', values)
-
-    @http.route(['/my/roster/availability/add'], type='http', auth='user', website=True, methods=['POST'])
-    def portal_roster_availability_add(self, **kw):
-        """ Method for portal roster availability add """
-        member = self._get_member()
-        if member and member.org_unit_id.roster_unit_ids:
-            request.env['nhs.roster.preference'].sudo().create({
-                'member_id': member.id,
-                'unit_id': member.org_unit_id.roster_unit_ids[0].id,
-                'date': kw.get('date'),
-                'preference_type': kw.get('preference_type') or 'prefer',
-                'note': kw.get('note'),
-            })
-        return request.redirect('/my/roster/availability')

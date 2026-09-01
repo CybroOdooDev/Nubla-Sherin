@@ -83,6 +83,7 @@ class NhsRosterPeriod(models.Model):
     finalised_at = fields.Datetime(string='Finalised At', tracking=True, copy=False, help="Finalised At")
     notes = fields.Text(string='Notes', help="Notes")
 
+
     @api.depends('unit_id.display_name', 'date_start', 'date_end')
     def _compute_name(self):
         """ Method for compute name """

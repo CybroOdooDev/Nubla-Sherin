@@ -29,14 +29,14 @@
     <template id="portal_my_home_menu_nhs_rostering" inherit_id="portal.portal_breadcrumbs" priority="31">
         <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
             <li t-if="page_name == 'roster_home'" class="breadcrumb-item active">My Roster</li>
-            <li t-elif="page_name in ('roster_duties', 'roster_leave', 'roster_swaps', 'roster_availability')"
+            <li t-elif="page_name in ('roster_duties', 'roster_leave', 'roster_swaps')"
                 class="breadcrumb-item">
                 <a href="/my/roster" aria-label="My Roster" title="My Roster">My Roster</a>
             </li>
             <li t-if="page_name == 'roster_duties'" class="breadcrumb-item active">My Duties</li>
             <li t-if="page_name == 'roster_leave'" class="breadcrumb-item active">Leave</li>
             <li t-if="page_name == 'roster_swaps'" class="breadcrumb-item active">Swaps</li>
-            <li t-if="page_name == 'roster_availability'" class="breadcrumb-item active">Availability</li>
+
         </xpath>
     </template>
 
@@ -316,53 +316,5 @@
         </t>
     </template>
 
-    <template id="portal_roster_availability" name="My Availability">
-        <t t-call="portal.portal_layout">
-            <t t-set="breadcrumbs_searchbar" t-value="False"/>
-            <div class="container o_portal_roster mt-3">
-                <h2>Availability / Preferences</h2>
-                <div class="card shadow-sm rounded-3 mb-4">
-                    <div class="card-body">
-                        <form action="/my/roster/availability/add" method="post" class="row g-2">
-                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                            <div class="col-md-4">
-                                <label class="form-label">Date</label>
-                                <input type="date" name="date" class="form-control" required="required"/>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Preference</label>
-                                <select name="preference_type" class="form-select">
-                                    <option value="prefer">Prefer to Work</option>
-                                    <option value="avoid">Prefer to Avoid</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Note</label>
-                                <input type="text" name="note" class="form-control"/>
-                            </div>
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-primary">Add</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <t t-if="preferences">
-                    <div class="card shadow-sm rounded-3 mb-4">
-                        <t t-call="portal.portal_table">
-                            <thead>
-                                <tr class="active"><th>Date</th><th>Preference</th><th>Note</th></tr>
-                            </thead>
-                            <tbody>
-                                <tr t-foreach="preferences" t-as="p">
-                                    <td t-esc="p.date"/>
-                                    <td t-esc="p.preference_type"/>
-                                    <td t-esc="p.note"/>
-                                </tr>
-                            </tbody>
-                        </t>
-                    </div>
-                </t>
-            </div>
-        </t>
-    </template>
+
 </odoo>

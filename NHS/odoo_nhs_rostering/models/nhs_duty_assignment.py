@@ -57,6 +57,16 @@ class NhsDutyAssignment(models.Model):
              " - mirrors nhs.duty's own eligible_member_ids so the two Member pickers"
              " (this standalone form, and the one nested under a duty) never disagree.")
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if 'duty_id' in vals:
+                duty = self.env['nhs.duty'].browse(vals['duty_id'])
+                if duty.period_id.state != 'in_progress':
+                    from odoo.exceptions import ValidationError
+                    raise ValidationError("You can only create assignments when the Roster Period is 'In Progress'.")
+        return super().create(vals_list)
+
     @api.depends('duty_id.eligible_member_ids')
     def _compute_eligible_member_ids(self):
         """ Method for compute eligible member ids """

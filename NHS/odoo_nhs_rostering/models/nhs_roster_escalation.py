@@ -139,6 +139,7 @@ class NhsRosterEscalation(models.Model):
         escalation rather than raised, so one bad mapping never blocks the
         rest of a bulk/cron escalation run."""
         no_bank = self.browse()
+        successful_escalations = self.env['nhs.roster.escalation']
         for escalation in self:
             if not escalation._bank_available():
                 no_bank |= escalation
@@ -179,12 +180,16 @@ class NhsRosterEscalation(models.Model):
             except Exception as exc:  # noqa: BLE001 - Staff Bank's own validation, not ours to predict
                 escalation._log_push_failure(str(exc))
                 continue
-            escalation.write({
+            escalation.bank_shift_id = bank_shift.id
+            escalation.bank_shift_reference = getattr(bank_shift, 'name', str(bank_shift.id))
+            successful_escalations |= escalation
+
+        if successful_escalations:
+            successful_escalations.write({
                 'state': 'pushed_to_bank',
-                'bank_shift_id': bank_shift.id,
-                'bank_shift_reference': getattr(bank_shift, 'name', str(bank_shift.id)),
                 'pushed_at': fields.Datetime.now(),
             })
+
         if no_bank and len(no_bank) == len(self):
             return {
                 'type': 'ir.actions.client',

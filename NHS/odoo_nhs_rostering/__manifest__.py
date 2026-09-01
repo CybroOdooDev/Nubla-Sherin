@@ -65,7 +65,6 @@ Staff Bank (and on to agency) with cost visibility.
         'views/nhs_leave_entitlement_views.xml',
         'views/nhs_leave_request_views.xml',
         'views/nhs_swap_request_views.xml',
-        'views/nhs_roster_preference_views.xml',
         'views/nhs_roster_escalation_views.xml',
         'views/nhs_org_unit_views.xml',
         'views/nhs_workforce_member_views.xml',

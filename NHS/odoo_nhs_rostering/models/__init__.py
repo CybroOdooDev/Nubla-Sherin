@@ -38,5 +38,4 @@ from . import nhs_leave_type
 from . import nhs_leave_entitlement
 from . import nhs_leave_request
 from . import nhs_swap_request
-from . import nhs_roster_preference
 from . import nhs_roster_escalation

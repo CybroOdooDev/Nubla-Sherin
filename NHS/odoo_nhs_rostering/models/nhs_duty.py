@@ -104,17 +104,29 @@ class NhsDuty(models.Model):
              " applied here as the Member domain so a non-matching person never shows in"
              " the picker in the first place.")
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if 'period_id' in vals:
+                period = self.env['nhs.roster.period'].browse(vals['period_id'])
+                if period.state not in ('draft', 'in_progress'):
+                    from odoo.exceptions import ValidationError
+                    raise ValidationError("You can only create duties when the Roster Period is 'Draft' or 'In Progress'.")
+        return super().create(vals_list)
+
     @api.depends('unit_id', 'required_band_id', 'required_skill_ids')
     def _compute_eligible_member_ids(self):
         """ Method for compute eligible member ids """
         for duty in self:
-            members = duty.unit_id.member_ids
+            members = self.env['nhs.workforce.member'].search([('is_leaver', '=', False)])
             if duty.required_band_id:
+                req_band_id = duty.required_band_id._origin.id or duty.required_band_id.id
                 members = members.filtered(
-                    lambda m: not m.band_id or m.band_id == duty.required_band_id)
+                    lambda m: not m.band_id or m.band_id.id == req_band_id)
             if duty.required_skill_ids:
+                req_skill_ids = set(duty.required_skill_ids._origin.ids or duty.required_skill_ids.ids)
                 members = members.filtered(
-                    lambda m: duty.required_skill_ids <= m.roster_skill_ids)
+                    lambda m: req_skill_ids.issubset(set(m.roster_skill_ids.ids)))
             duty.eligible_member_ids = members
 
     @api.depends('assignment_ids.state')

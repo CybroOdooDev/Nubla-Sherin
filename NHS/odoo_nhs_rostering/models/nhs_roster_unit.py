@@ -61,9 +61,12 @@ class NhsRosterUnit(models.Model):
              " (when auto-escalation is on)."
     )
     escalation_auto_push = fields.Boolean(
-        string='Auto-Escalate to Bank', default=True,
+        string='Auto-Escalate to Bank',
+        default=lambda self: self.env.company.nhs_roster_auto_escalate,
         help="Automatically push unfilled duties to the Staff Bank (when installed) as"
-             " they enter the escalation lead-time window."
+             " they enter the escalation lead-time window. Defaults from the company's"
+             " Auto-Escalate Unfilled Duties setting; the cron still checks both this"
+             " and the company setting before escalating."
     )
     shift_type_ids = fields.One2many(
         'nhs.roster.shift.type', 'roster_unit_id', string='Shift Types', help="Shift Types")

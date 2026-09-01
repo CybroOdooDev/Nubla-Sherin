@@ -106,13 +106,7 @@
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_workforce_admin'))]"/>
         </record>
-        <!-- Record: rule_nhs_roster_preference_company for ir.rule -->
-    <record id="rule_nhs_roster_preference_company" model="ir.rule">
-            <field name="name">nhs.roster.preference: company scope (admin)</field>
-            <field name="model_id" ref="model_nhs_roster_preference"/>
-            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-            <field name="groups" eval="[(4, ref('group_nhs_workforce_admin'))]"/>
-        </record>
+
         <!-- Record: rule_nhs_roster_escalation_company for ir.rule -->
     <record id="rule_nhs_roster_escalation_company" model="ir.rule">
             <field name="name">nhs.roster.escalation: company scope (admin)</field>
@@ -178,13 +172,7 @@
             <field name="domain_force">[('requester_assignment_id.unit_id.roster_manager_ids', 'in', [user.id])]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_manager'))]"/>
         </record>
-        <!-- Record: rule_nhs_roster_preference_manager for ir.rule -->
-    <record id="rule_nhs_roster_preference_manager" model="ir.rule">
-            <field name="name">nhs.roster.preference: own units only (roster manager)</field>
-            <field name="model_id" ref="model_nhs_roster_preference"/>
-            <field name="domain_force">[('unit_id.roster_manager_ids', 'in', [user.id])]</field>
-            <field name="groups" eval="[(4, ref('group_nhs_roster_manager'))]"/>
-        </record>
+
         <!-- Record: rule_nhs_roster_escalation_manager for ir.rule -->
     <record id="rule_nhs_roster_escalation_manager" model="ir.rule">
             <field name="name">nhs.roster.escalation: own units only (roster manager)</field>
@@ -195,9 +183,9 @@
 
         <!-- Record: rule_nhs_duty_assignment_self for ir.rule -->
     <record id="rule_nhs_duty_assignment_self" model="ir.rule">
-            <field name="name">nhs.duty.assignment: own record only (staff)</field>
+            <field name="name">nhs.duty.assignment: global read (staff for swaps)</field>
             <field name="model_id" ref="model_nhs_duty_assignment"/>
-            <field name="domain_force">[('member_id.user_id', '=', user.id)]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_staff'))]"/>
         </record>
         <!-- Record: rule_nhs_leave_request_self for ir.rule -->
@@ -222,13 +210,7 @@
                                               ('target_assignment_id.member_id.user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_roster_staff'))]"/>
         </record>
-        <!-- Record: rule_nhs_roster_preference_self for ir.rule -->
-    <record id="rule_nhs_roster_preference_self" model="ir.rule">
-            <field name="name">nhs.roster.preference: own record only (staff)</field>
-            <field name="model_id" ref="model_nhs_roster_preference"/>
-            <field name="domain_force">[('member_id.user_id', '=', user.id)]</field>
-            <field name="groups" eval="[(4, ref('group_nhs_roster_staff'))]"/>
-        </record>
+
 
         <!-- Reference/config models (global-or-company-scoped) -->
         <!-- Record: rule_nhs_roster_weekday_global for ir.rule -->

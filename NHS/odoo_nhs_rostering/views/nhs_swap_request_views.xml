@@ -24,28 +24,33 @@
             <form string="Duty Swap Request">
                 <header>
                     <button name="action_propose" type="object" string="Propose"
-                            class="btn-primary" invisible="state != 'draft'"/>
+                            class="btn-primary" invisible="state != 'draft' or (not is_requester_user and not is_manager)"/>
                     <button name="action_accept_by_target" type="object" string="Accept (Colleague)"
-                            invisible="state != 'proposed'"/>
+                            class="btn-primary" invisible="state != 'proposed' or (not is_target_user and not is_manager)"/>
                     <button name="action_approve" type="object" string="Approve"
                             class="btn-primary" invisible="state != 'accepted_by_target'"
                             groups="odoo_nhs_rostering.group_nhs_roster_manager"/>
                     <button name="action_reject" type="object" string="Reject"
-                            invisible="state in ('approved', 'rejected', 'cancelled')"/>
+                            invisible="state in ('approved', 'rejected', 'cancelled') or (not is_target_user and not is_manager)"/>
                     <button name="action_cancel" type="object" string="Cancel"
-                            invisible="state in ('approved', 'cancelled')"/>
+                            invisible="state in ('approved', 'cancelled') or (not is_requester_user and not is_manager)"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,proposed,accepted_by_target,approved"/>
                 </header>
                 <sheet>
                     <group>
                         <group>
-                            <field name="requester_assignment_id"/>
+                            <field name="is_manager" invisible="1"/>
+                            <field name="is_requester_user" invisible="1"/>
+                            <field name="is_target_user" invisible="1"/>
+                            <field name="requester_assignment_id" domain="[('member_id.user_id', '=', uid)]" invisible="is_manager"/>
+                            <field name="requester_assignment_id" invisible="not is_manager"/>
                             <field name="requester_member_id" readonly="1"/>
                         </group>
                         <group>
                             <field name="requester_duty_id" invisible="1"/>
-                            <field name="target_assignment_id" domain="[('member_id', '!=', requester_member_id), ('duty_id', '!=', requester_duty_id)]"/>
+                            <field name="unit_id" invisible="1"/>
+                            <field name="target_assignment_id" domain="[('member_id', '!=', requester_member_id), ('duty_id', '!=', requester_duty_id), ('unit_id', '=', unit_id)]"/>
                             <field name="target_member_id" readonly="1"/>
                         </group>
                     </group>

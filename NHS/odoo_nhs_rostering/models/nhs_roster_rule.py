@@ -174,13 +174,15 @@ class NhsRosterRuleEngine(models.AbstractModel):
             raise ValidationError('\n'.join(
                 '%s: %s' % (r['rule'].name, r['message']) for r in hard_failures))
         Violation = self.env['nhs.rule.violation']
+        vals_to_create = []
+        violations_to_resolve = self.env['nhs.rule.violation']
         for r in results:
             existing = Violation.search([
                 ('rule_id', '=', r['rule'].id), ('member_id', '=', assignment.member_id.id),
                 ('duty_id', '=', assignment.duty_id.id), ('state', '=', 'open'),
             ], limit=1)
             if not r['passed'] and not existing:
-                Violation.create({
+                vals_to_create.append({
                     'rule_id': r['rule'].id,
                     'member_id': assignment.member_id.id,
                     'duty_id': assignment.duty_id.id,
@@ -190,7 +192,11 @@ class NhsRosterRuleEngine(models.AbstractModel):
                     'state': 'open',
                 })
             elif r['passed'] and existing:
-                existing.write({'state': 'resolved', 'resolved_at': fields.Datetime.now()})
+                violations_to_resolve |= existing
+        if vals_to_create:
+            Violation.create(vals_to_create)
+        if violations_to_resolve:
+            violations_to_resolve.write({'state': 'resolved', 'resolved_at': fields.Datetime.now()})
         return results
 
 

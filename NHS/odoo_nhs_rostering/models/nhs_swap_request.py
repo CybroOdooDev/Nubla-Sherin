@@ -47,6 +47,23 @@ class NhsSwapRequest(models.Model):
     _description = 'Duty Swap Request'
     _order = 'create_date desc'
 
+    is_manager = fields.Boolean(compute='_compute_is_manager')
+    is_requester_user = fields.Boolean(compute='_compute_is_requester_user')
+    is_target_user = fields.Boolean(compute='_compute_is_target_user')
+
+    def _compute_is_manager(self):
+        is_mgr = self.env.user.has_group('odoo_nhs_rostering.group_nhs_roster_manager')
+        for rec in self:
+            rec.is_manager = is_mgr
+
+    def _compute_is_requester_user(self):
+        for rec in self:
+            rec.is_requester_user = (rec.requester_member_id.user_id.id == self.env.uid)
+
+    def _compute_is_target_user(self):
+        for rec in self:
+            rec.is_target_user = (rec.target_member_id.user_id.id == self.env.uid)
+
     requester_assignment_id = fields.Many2one(
         'nhs.duty.assignment', string='Requester Duty', required=True, tracking=True, help="Requester Duty")
     target_assignment_id = fields.Many2one(
@@ -136,8 +153,8 @@ class NhsSwapRequest(models.Model):
         passed = True
         try:
             with self.env.cr.savepoint():
-                self.requester_assignment_id.write({'duty_id': target_duty_id})
-                self.target_assignment_id.write({'duty_id': requester_duty_id})
+                self.requester_assignment_id.sudo().write({'duty_id': target_duty_id})
+                self.target_assignment_id.sudo().write({'duty_id': requester_duty_id})
                 raise _DryRunRollback()
         except _DryRunRollback:
             pass
@@ -150,9 +167,9 @@ class NhsSwapRequest(models.Model):
 
     def action_approve(self):
         """ Method for action approve """
+        if any(swap.state != 'accepted_by_target' for swap in self):
+            raise UserError(('The colleague must accept the swap before it can be approved.'))
         for swap in self:
-            if swap.state != 'accepted_by_target':
-                raise UserError(('The colleague must accept the swap before it can be approved.'))
             if not swap._run_rule_check():
                 raise UserError((
                     'The rules engine would not allow this swap:\n%s') % swap.rule_check_note)
@@ -162,7 +179,7 @@ class NhsSwapRequest(models.Model):
                 'duty_id': target_duty_id, 'change_note': 'Swap %s' % swap.id})
             swap.target_assignment_id.write({
                 'duty_id': requester_duty_id, 'change_note': 'Swap %s' % swap.id})
-            swap.write({
-                'state': 'approved', 'approved_by': self.env.user.id,
-                'approved_at': fields.Datetime.now(),
-            })
+        self.write({
+            'state': 'approved', 'approved_by': self.env.user.id,
+            'approved_at': fields.Datetime.now(),
+        })
