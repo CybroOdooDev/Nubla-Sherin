@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Record: oncall_rate_1_in_4_a for nhs.oncall.supplement.rate -->
+        <record id="oncall_rate_1_in_4_a" model="nhs.oncall.supplement.rate">
+            <field name="frequency_code">1_in_4_a</field>
+            <field name="frequency_n">4</field>
+            <field name="category">a</field>
+            <field name="supplement_pct">8.0</field>
+        </record>
+        <!-- Record: oncall_rate_1_in_6_a for nhs.oncall.supplement.rate -->
+        <record id="oncall_rate_1_in_6_a" model="nhs.oncall.supplement.rate">
+            <field name="frequency_code">1_in_6_a</field>
+            <field name="frequency_n">6</field>
+            <field name="category">a</field>
+            <field name="supplement_pct">5.0</field>
+        </record>
+        <!-- Record: oncall_rate_1_in_8_a for nhs.oncall.supplement.rate -->
+        <record id="oncall_rate_1_in_8_a" model="nhs.oncall.supplement.rate">
+            <field name="frequency_code">1_in_8_a</field>
+            <field name="frequency_n">8</field>
+            <field name="category">a</field>
+            <field name="supplement_pct">3.0</field>
+        </record>
+        <!-- Record: oncall_rate_1_in_8_b for nhs.oncall.supplement.rate -->
+        <record id="oncall_rate_1_in_8_b" model="nhs.oncall.supplement.rate">
+            <field name="frequency_code">1_in_8_b</field>
+            <field name="frequency_n">8</field>
+            <field name="category">b</field>
+            <field name="supplement_pct">1.5</field>
+        </record>
+        <!-- Record: oncall_rate_1_in_10_b for nhs.oncall.supplement.rate -->
+        <record id="oncall_rate_1_in_10_b" model="nhs.oncall.supplement.rate">
+            <field name="frequency_code">1_in_10_b</field>
+            <field name="frequency_n">10</field>
+            <field name="category">b</field>
+            <field name="supplement_pct">1.0</field>
+        </record>
+        <!-- Record: oncall_rate_1_in_12_b for nhs.oncall.supplement.rate -->
+        <record id="oncall_rate_1_in_12_b" model="nhs.oncall.supplement.rate">
+            <field name="frequency_code">1_in_12_b</field>
+            <field name="frequency_n">12</field>
+            <field name="category">b</field>
+            <field name="supplement_pct">0.5</field>
+        </record>
+    </data>
+</odoo>

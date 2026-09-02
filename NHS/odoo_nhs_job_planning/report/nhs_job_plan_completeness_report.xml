@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Record: action_report_nhs_job_plan_completeness for ir.actions.report -->
+    <record id="action_report_nhs_job_plan_completeness" model="ir.actions.report">
+        <field name="name">Completeness</field>
+        <field name="model">nhs.plan.year</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_job_planning.report_nhs_job_plan_completeness</field>
+        <field name="report_file">odoo_nhs_job_planning.report_nhs_job_plan_completeness</field>
+        <field name="print_report_name">'Job Planning Completeness - %s' % object.name</field>
+        <field name="binding_model_id" ref="model_nhs_plan_year"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_nhs_job_plan_completeness">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="year">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Job Planning Completeness - <span t-esc="year.name"/></h2>
+                        <p>
+                            <strong>Overall completeness:</strong>
+                            <span t-esc="'%.2f' % year.completeness_pct"/>%
+                        </p>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Directorate / Unit</th><th>Posts</th><th>Signed</th>
+                                    <th>%</th><th>Gaps</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="breakdown_by_year[year.id]" t-as="row">
+                                    <td><span t-esc="row['unit_name']"/></td>
+                                    <td><span t-esc="row['total']"/></td>
+                                    <td><span t-esc="row['signed']"/></td>
+                                    <td><span t-esc="'%.2f' % row['pct']"/></td>
+                                    <td><span t-esc="', '.join(row['gaps']) or '-'"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

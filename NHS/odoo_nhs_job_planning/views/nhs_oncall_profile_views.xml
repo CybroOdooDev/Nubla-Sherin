@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Record: view_nhs_oncall_supplement_rate_list for ir.ui.view -->
+    <record id="view_nhs_oncall_supplement_rate_list" model="ir.ui.view">
+        <field name="name">nhs.oncall.supplement.rate.list</field>
+        <field name="model">nhs.oncall.supplement.rate</field>
+        <field name="arch" type="xml">
+            <list string="On-Call Supplement Rates">
+                <field name="frequency_code"/>
+                <field name="frequency_n"/>
+                <field name="category"/>
+                <field name="supplement_pct"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Record: view_nhs_oncall_supplement_rate_form for ir.ui.view -->
+    <record id="view_nhs_oncall_supplement_rate_form" model="ir.ui.view">
+        <field name="name">nhs.oncall.supplement.rate.form</field>
+        <field name="model">nhs.oncall.supplement.rate</field>
+        <field name="arch" type="xml">
+            <form string="On-Call Supplement Rate">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="frequency_code"/>
+                            <field name="frequency_n"/>
+                            <field name="category"/>
+                        </group>
+                        <group>
+                            <field name="supplement_pct"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Record: action_nhs_oncall_supplement_rate for ir.actions.act_window -->
+    <record id="action_nhs_oncall_supplement_rate" model="ir.actions.act_window">
+        <field name="name">On-Call Supplement Table</field>
+        <field name="res_model">nhs.oncall.supplement.rate</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Record: view_nhs_oncall_profile_list for ir.ui.view -->
+    <record id="view_nhs_oncall_profile_list" model="ir.ui.view">
+        <field name="name">nhs.oncall.profile.list</field>
+        <field name="model">nhs.oncall.profile</field>
+        <field name="arch" type="xml">
+            <list string="On-Call Profiles">
+                <field name="name"/>
+                <field name="frequency_n"/>
+                <field name="category"/>
+                <field name="supplement_pct"/>
+                <field name="predictable_pas"/>
+                <field name="unpredictable_pas"/>
+                <field name="total_oncall_pas"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Record: view_nhs_oncall_profile_form for ir.ui.view -->
+    <record id="view_nhs_oncall_profile_form" model="ir.ui.view">
+        <field name="name">nhs.oncall.profile.form</field>
+        <field name="model">nhs.oncall.profile</field>
+        <field name="arch" type="xml">
+            <form string="On-Call Profile">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="supplement_rate_id"/>
+                            <field name="category" readonly="1"/>
+                            <field name="supplement_pct" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="predictable_pas"/>
+                            <field name="unpredictable_pas"/>
+                            <field name="total_oncall_pas" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Record: action_nhs_oncall_profile for ir.actions.act_window -->
+    <record id="action_nhs_oncall_profile" model="ir.actions.act_window">
+        <field name="name">On-Call Profiles</field>
+        <field name="res_model">nhs.oncall.profile</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

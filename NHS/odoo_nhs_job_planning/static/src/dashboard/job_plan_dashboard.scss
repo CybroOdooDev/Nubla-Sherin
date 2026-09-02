@@ -1,0 +1,209 @@
+// NHS Identity colour palette — https://www.england.nhs.uk/nhsidentity/
+.o_nhs_jobplan_dashboard {
+    --nhs-blue: #005EB8;
+    --nhs-dark-blue: #003087;
+    --nhs-black: #212B32;
+    --nhs-grey: #425563;
+    --nhs-pale-grey: #F0F4F5;
+    --nhs-mid-grey: #D8DDE0;
+    --nhs-pale-blue: #E8F1FA;
+    --nhs-red: #DA291C;
+    --nhs-warm-yellow: #FFB81C;
+    --nhs-green: #009639;
+    --nhs-amber: #ED8B00;
+    --nhs-white: #FFFFFF;
+
+    background-color: var(--nhs-pale-grey);
+    padding: 1.5rem !important;
+
+    .nhs-dashboard-header {
+        background-color: var(--nhs-white);
+        border-bottom: 1px solid var(--nhs-mid-grey);
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+
+        h2 {
+            color: var(--nhs-blue);
+            font-weight: 700;
+            font-size: 1.75rem;
+
+            i {
+                color: var(--nhs-blue);
+            }
+
+            small {
+                font-size: 1rem;
+                font-weight: 500;
+            }
+        }
+    }
+
+    .btn-nhs {
+        background-color: var(--nhs-blue);
+        border-color: var(--nhs-blue);
+        color: var(--nhs-white);
+        font-weight: 600;
+        box-shadow: 0 2px 6px rgba(0, 94, 184, 0.35);
+
+        &:hover, &:focus {
+            background-color: var(--nhs-dark-blue);
+            border-color: var(--nhs-dark-blue);
+            color: var(--nhs-white);
+        }
+    }
+
+    // ---- Stat cards --------------------------------------------------
+    .nhs-stat-card {
+        position: relative;
+        background-color: var(--nhs-white);
+        border: 1px solid var(--nhs-mid-grey);
+        border-left: 4px solid var(--nhs-blue) !important;
+        border-radius: 8px;
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: all 0.2s ease-in-out;
+
+        .card-body {
+            padding: 1.25rem 1.5rem;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0;
+            color: var(--nhs-blue);
+        }
+
+        small {
+            font-size: 0.8rem;
+            color: var(--nhs-grey);
+            font-weight: 500;
+            margin-top: 0.25rem;
+            display: inline-block;
+        }
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.4rem 0.8rem rgba(0, 94, 184, 0.12) !important;
+            border-left-color: var(--nhs-dark-blue) !important;
+        }
+
+        .nhs-stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            background-color: var(--nhs-pale-blue);
+            color: var(--nhs-blue);
+        }
+    }
+
+    // ---- Panels -------------------------------------------------------
+    .nhs-panel {
+        background-color: var(--nhs-white);
+        border: 1px solid var(--nhs-mid-grey);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+        .card-header {
+            background-color: var(--nhs-white);
+            color: var(--nhs-black);
+            font-weight: 700;
+            border-bottom: 1px solid var(--nhs-mid-grey);
+            padding: 0.85rem 1.15rem;
+            font-size: 0.95rem;
+
+            i {
+                color: var(--nhs-blue);
+            }
+        }
+
+        .list-group-item {
+            border-color: var(--nhs-pale-grey);
+            padding: 0.75rem 1.15rem;
+            color: var(--nhs-black);
+            transition: background-color 0.15s ease-in-out;
+
+            &:hover {
+                background-color: var(--nhs-pale-grey);
+            }
+        }
+
+        table.table {
+            tr {
+                cursor: pointer;
+                transition: background-color 0.15s ease-in-out;
+
+                &:hover {
+                    background-color: var(--nhs-pale-grey);
+                }
+            }
+
+            th {
+                color: var(--nhs-grey);
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                border-bottom: 1px solid var(--nhs-mid-grey);
+                padding: 0.6rem 1.15rem;
+            }
+
+            td {
+                color: var(--nhs-black);
+                vertical-align: middle;
+                padding: 0.75rem 1.15rem;
+                border-bottom: 1px solid var(--nhs-pale-grey);
+            }
+
+            tr:last-child td {
+                border-bottom: none;
+            }
+        }
+    }
+
+    // ---- Rate badges & progress bars -----------------------------------
+    .nhs-badge-good {
+        background-color: var(--nhs-green) !important;
+        color: var(--nhs-white) !important;
+    }
+
+    .nhs-badge-warn {
+        background-color: var(--nhs-amber) !important;
+        color: var(--nhs-black) !important;
+    }
+
+    .nhs-badge-bad {
+        background-color: var(--nhs-red) !important;
+        color: var(--nhs-white) !important;
+    }
+
+    .nhs-progress {
+        height: 6px;
+        border-radius: 3px;
+        background-color: var(--nhs-pale-grey);
+        overflow: hidden;
+    }
+
+    .nhs-progress-bar {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.3s ease-in-out;
+    }
+
+    .nhs-progress-good {
+        background-color: var(--nhs-green);
+    }
+
+    .nhs-progress-warn {
+        background-color: var(--nhs-amber);
+    }
+
+    .nhs-progress-bad {
+        background-color: var(--nhs-red);
+    }
+}

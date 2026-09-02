@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Seed the current NHS financial year (April-March) so the module is
+             usable immediately after install. Adjust or add further years from
+             Configuration > Plan Years. -->
+        <record id="plan_year_2026_27" model="nhs.plan.year">
+            <field name="date_start">2026-04-01</field>
+            <field name="date_end">2027-03-31</field>
+            <field name="state">open</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Record: mail_template_job_plan_reminder for mail.template -->
+        <record id="mail_template_job_plan_reminder" model="mail.template">
+            <field name="name">Job Plan: Review Reminder</field>
+            <field name="model_id" ref="model_nhs_job_plan"/>
+            <field name="subject">Your job plan needs attention</field>
+            <field name="email_from">{{ (object.company_id.email or user.email) }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p>Hello,</p>
+                    <p>
+                        The job plan <strong t-out="object.reference"/> for
+                        <span t-out="object.doctor_name"/> (<span t-out="object.plan_year_id.name"/>)
+                        is not yet signed and its annual review is due on
+                        <span t-out="object.review_due_date"/>.
+                    </p>
+                    <p>Please log in and progress the plan through discussion, agreement and sign-off.</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Record: mail_template_job_plan_signed for mail.template -->
+        <record id="mail_template_job_plan_signed" model="mail.template">
+            <field name="name">Job Plan: Signed</field>
+            <field name="model_id" ref="model_nhs_job_plan"/>
+            <field name="subject">Your job plan has been signed by both parties</field>
+            <field name="email_from">{{ (object.company_id.email or user.email) }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p>Hello,</p>
+                    <p>
+                        The job plan <strong t-out="object.reference"/> for
+                        <span t-out="object.doctor_name"/> (<span t-out="object.plan_year_id.name"/>)
+                        has now been signed by both the doctor and the clinical manager and is locked.
+                    </p>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

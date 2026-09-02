@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- Main dashboard: job-planning completeness and capacity KPIs. -->
+    <t t-name="odoo_nhs_job_planning.NhsJobPlanDashboard" owl="1">
+        <div class="o_nhs_jobplan_dashboard o_content p-4" style="height: 100%; overflow-y: auto;">
+            <t t-if="state.loading">
+                <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+                    <div class="spinner-border text-primary" role="status"/>
+                </div>
+            </t>
+            <t t-else="">
+                <div class="d-flex justify-content-between align-items-center mb-4 nhs-dashboard-header">
+                    <h2 class="mb-0">
+                        <i class="fa fa-stethoscope me-2"/> Capacity &amp; Completeness
+                        <small class="text-muted ms-2" t-esc="state.metrics.year_name"/>
+                    </h2>
+                    <button class="btn btn-nhs btn-sm" t-on-click="openAllPlans">
+                        <i class="fa fa-list me-1"/> All Plans
+                    </button>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="card h-100 shadow-sm nhs-stat-card nhs-stat-blue" t-on-click="openGaps">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-uppercase small fw-bold text-muted">Completeness</span>
+                                    <div class="nhs-stat-icon mb-0"><i class="fa fa-pie-chart"/></div>
+                                </div>
+                                <h2 class="fw-bold mb-0" t-esc="state.metrics.completeness_pct + '%'"/>
+                                <small class="text-muted">
+                                    <t t-esc="state.metrics.signed_count"/> of <t t-esc="state.metrics.post_count"/> posts signed
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100 shadow-sm nhs-stat-card nhs-stat-red" t-on-click="openGaps">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-uppercase small fw-bold text-muted">Gaps</span>
+                                    <div class="nhs-stat-icon mb-0"><i class="fa fa-exclamation-triangle"/></div>
+                                </div>
+                                <h2 class="fw-bold mb-0" t-esc="state.metrics.gap_count"/>
+                                <small class="text-muted">Posts with no signed plan</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100 shadow-sm nhs-stat-card nhs-stat-yellow" t-on-click="openUnsigned">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-uppercase small fw-bold text-muted">Unsigned Plans</span>
+                                    <div class="nhs-stat-icon mb-0"><i class="fa fa-pencil"/></div>
+                                </div>
+                                <h2 class="fw-bold mb-0" t-esc="state.metrics.unsigned_count"/>
+                                <small class="text-muted">Not yet signed/revised</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100 shadow-sm nhs-stat-card nhs-stat-dark" t-on-click="openStalled">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-uppercase small fw-bold text-muted">Stalled Discussions</span>
+                                    <div class="nhs-stat-icon mb-0"><i class="fa fa-clock-o"/></div>
+                                </div>
+                                <h2 class="fw-bold mb-0" t-esc="state.metrics.stalled_count"/>
+                                <small class="text-muted">Proposed / In Discussion</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-5" t-if="state.metrics.weakest_directorates.length">
+                        <div class="card h-100 shadow-sm nhs-panel">
+                            <div class="card-header"><i class="fa fa-building-o me-2"/>Weakest Directorates (Completeness)</div>
+                            <ul class="list-group list-group-flush">
+                                <t t-foreach="state.metrics.weakest_directorates" t-as="d" t-key="d.id">
+                                    <li class="list-group-item" style="cursor: pointer;"
+                                        t-on-click="() => this.openDirectorateGaps(d.id)">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span t-esc="d.name"/>
+                                            <span t-attf-class="badge nhs-badge-{{ getRateLevel(d.rate) }}" t-esc="d.rate + '%'"/>
+                                        </div>
+                                        <div class="nhs-progress">
+                                            <div t-attf-class="nhs-progress-bar nhs-progress-{{ getRateLevel(d.rate) }}"
+                                                 t-attf-style="width: {{ d.rate }}%;"/>
+                                        </div>
+                                        <small class="text-muted"><t t-esc="d.signed"/> of <t t-esc="d.total"/> posts signed</small>
+                                    </li>
+                                </t>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-7" t-if="state.metrics.capacity_rows.length">
+                        <div class="card h-100 shadow-sm nhs-panel">
+                            <div class="card-header"><i class="fa fa-calendar-check-o me-2"/>Capacity by Directorate</div>
+                            <table class="table table-sm mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Directorate</th>
+                                        <th class="text-end">Doctors</th>
+                                        <th class="text-end">Contracted PAs</th>
+                                        <th class="text-end">Total PAs</th>
+                                        <th class="text-end">Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.metrics.capacity_rows" t-as="c" t-key="c.id">
+                                        <tr t-on-click="() => this.openDirectoratePlans(c.id)">
+                                            <td t-esc="c.name"/>
+                                            <td class="text-end" t-esc="c.doctors"/>
+                                            <td class="text-end" t-esc="c.contracted_pas.toFixed(2)"/>
+                                            <td class="text-end" t-esc="c.total_pas.toFixed(2)"/>
+                                            <td class="text-end">
+                                                <span t-attf-class="badge {{ c.balance &lt; 0 ? 'nhs-badge-warn' : (c.balance &gt; 0 ? 'nhs-badge-bad' : 'nhs-badge-good') }}"
+                                                      t-esc="c.balance.toFixed(2)"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-muted mt-4"
+                     t-if="!state.metrics.weakest_directorates.length &amp;&amp; !state.metrics.capacity_rows.length">
+                    No active medical posts or signed plans yet for this plan year.
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

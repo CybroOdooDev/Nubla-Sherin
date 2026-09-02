@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Record: view_nhs_job_plan_pivot for ir.ui.view -->
+    <record id="view_nhs_job_plan_pivot" model="ir.ui.view">
+        <field name="name">nhs.job.plan.pivot</field>
+        <field name="model">nhs.job.plan</field>
+        <field name="arch" type="xml">
+            <pivot string="Job Planning Dashboard">
+                <field name="org_unit_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="dcc_pas" type="measure"/>
+                <field name="spa_pas" type="measure"/>
+                <field name="additional_pas" type="measure"/>
+                <field name="external_pas" type="measure"/>
+                <field name="total_pas" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Record: view_nhs_job_plan_graph for ir.ui.view -->
+    <record id="view_nhs_job_plan_graph" model="ir.ui.view">
+        <field name="name">nhs.job.plan.graph</field>
+        <field name="model">nhs.job.plan</field>
+        <field name="arch" type="xml">
+            <graph string="Job Planning Dashboard" type="bar">
+                <field name="org_unit_id"/>
+                <field name="dcc_pas" type="measure"/>
+                <field name="spa_pas" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Record: action_nhs_job_plan_analysis for ir.actions.act_window -->
+    <!-- Raw pivot/graph drill-down, kept for ad-hoc analysis alongside the
+         KPI dashboard client action below. -->
+    <record id="action_nhs_job_plan_analysis" model="ir.actions.act_window">
+        <field name="name">Job Plan Analysis</field>
+        <field name="res_model">nhs.job.plan</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="domain">[('state', 'in', ('signed', 'revised'))]</field>
+        <field name="context">{'search_default_group_org_unit': 1}</field>
+    </record>
+
+    <!-- Record: action_nhs_job_plan_dashboard_client for ir.actions.client -->
+    <record id="action_nhs_job_plan_dashboard_client" model="ir.actions.client">
+        <field name="name">Capacity &amp; Completeness Dashboard</field>
+        <field name="tag">nhs_job_plan_dashboard</field>
+    </record>
+</odoo>

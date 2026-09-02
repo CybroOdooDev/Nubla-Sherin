@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Record: view_res_config_settings_nhs_job_planning for ir.ui.view -->
+    <record id="view_res_config_settings_nhs_job_planning" model="ir.ui.view">
+        <field name="name">res.config.settings.nhs.job.planning</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="NHS Medical Job Planning" name="odoo_nhs_job_planning"
+                     groups="odoo_nhs_job_planning.group_nhs_jobplan_admin">
+                    <block title="Programmed Activities">
+                        <setting string="PAs per WTE"
+                                 help="Programmed Activities representing 1.0 Whole Time Equivalent -
+                                  the divisor used to derive FTE from contracted PAs.">
+                            <field name="nhs_jobplan_pas_per_wte"/>
+                        </setting>
+                        <setting string="PA Length"
+                                 help="Nominal hours represented by one Programmed Activity.">
+                            <span><field name="nhs_jobplan_pa_length_hours"/> hours</span>
+                        </setting>
+                    </block>
+                    <block title="Premium Time">
+                        <setting string="Evening Threshold"
+                                 help="A weekday session starting at/after this hour is flagged as
+                                  premium time. Weekend sessions are always premium time.">
+                            <field name="nhs_jobplan_evening_start_hour" widget="float_time"/>
+                        </setting>
+                    </block>
+                    <block title="Annual Review">
+                        <setting string="Review Lead Days"
+                                 help="Days before plan-year end that a job plan's review is due and
+                                  reminders begin.">
+                            <span><field name="nhs_jobplan_review_lead_days"/> days</span>
+                        </setting>
+                        <setting string="Stale Discussion Threshold"
+                                 help="Days a plan may remain proposed/in discussion before being
+                                  flagged as stalled in reminders.">
+                            <span><field name="nhs_jobplan_stale_discussion_days"/> days</span>
+                        </setting>
+                    </block>
+                    <block title="Rollover">
+                        <setting string="Automatic Annual Rollover"
+                                 help="Automatically clone next year's draft job plans rather than only
+                                  via the manual rollover wizard.">
+                            <field name="nhs_jobplan_auto_rollover"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Record: action_nhs_job_planning_config_settings for ir.actions.act_window -->
+    <record id="action_nhs_job_planning_config_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_res_config_settings_nhs_job_planning"/>
+        <field name="target">current</field>
+        <field name="context">{'module': 'odoo_nhs_job_planning'}</field>
+    </record>
+</odoo>

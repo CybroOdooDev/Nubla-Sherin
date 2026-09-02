@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Record: view_nhs_plan_year_list for ir.ui.view -->
+    <record id="view_nhs_plan_year_list" model="ir.ui.view">
+        <field name="name">nhs.plan.year.list</field>
+        <field name="model">nhs.plan.year</field>
+        <field name="arch" type="xml">
+            <list string="Plan Years" decoration-success="state == 'open'" decoration-muted="state == 'closed'">
+                <field name="name"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="job_plan_count"/>
+                <field name="completeness_pct" widget="progressbar"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Record: view_nhs_plan_year_form for ir.ui.view -->
+    <record id="view_nhs_plan_year_form" model="ir.ui.view">
+        <field name="name">nhs.plan.year.form</field>
+        <field name="model">nhs.plan.year</field>
+        <field name="arch" type="xml">
+            <form string="Plan Year">
+                <header>
+                    <button name="action_open" type="object" string="Open" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_close" type="object" string="Close"
+                            invisible="state != 'open'"/>
+                    <button name="%(action_nhs_job_plan_rollover_wizard)d" type="action"
+                            string="Roll Over" invisible="state == 'closed'"
+                            context="{'default_source_plan_year_id': id}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,open,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_job_plans"
+                                icon="fa-file-text-o" invisible="job_plan_count == 0">
+                            <field name="job_plan_count" widget="statinfo" string="Job Plans"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="completeness_pct" widget="progressbar"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Record: action_nhs_plan_year for ir.actions.act_window -->
+    <record id="action_nhs_plan_year" model="ir.actions.act_window">
+        <field name="name">Plan Years</field>
+        <field name="res_model">nhs.plan.year</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

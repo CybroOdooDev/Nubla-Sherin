@@ -1,0 +1,23 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nhs_plan_year_manager,nhs.plan.year manager,model_nhs_plan_year,group_nhs_jobplan_manager,1,0,0,0
+access_nhs_plan_year_admin,nhs.plan.year admin,model_nhs_plan_year,group_nhs_jobplan_admin,1,1,1,1
+access_nhs_job_plan_session_category_manager,nhs.job.plan.session.category manager,model_nhs_job_plan_session_category,group_nhs_jobplan_manager,1,0,0,0
+access_nhs_job_plan_session_category_admin,nhs.job.plan.session.category admin,model_nhs_job_plan_session_category,group_nhs_jobplan_admin,1,1,1,1
+access_nhs_oncall_supplement_rate_manager,nhs.oncall.supplement.rate manager,model_nhs_oncall_supplement_rate,group_nhs_jobplan_manager,1,0,0,0
+access_nhs_oncall_supplement_rate_admin,nhs.oncall.supplement.rate admin,model_nhs_oncall_supplement_rate,group_nhs_jobplan_admin,1,1,1,1
+access_nhs_oncall_profile_doctor,nhs.oncall.profile doctor,model_nhs_oncall_profile,group_nhs_jobplan_doctor,1,0,0,0
+access_nhs_oncall_profile_manager,nhs.oncall.profile manager,model_nhs_oncall_profile,group_nhs_jobplan_manager,1,1,1,0
+access_nhs_oncall_profile_admin,nhs.oncall.profile admin,model_nhs_oncall_profile,group_nhs_jobplan_admin,1,1,1,1
+access_nhs_job_plan_doctor,nhs.job.plan doctor,model_nhs_job_plan,group_nhs_jobplan_doctor,1,1,1,0
+access_nhs_job_plan_manager,nhs.job.plan manager,model_nhs_job_plan,group_nhs_jobplan_manager,1,1,1,1
+access_nhs_job_plan_admin,nhs.job.plan admin,model_nhs_job_plan,group_nhs_jobplan_admin,1,1,1,1
+access_nhs_job_plan_activity_doctor,nhs.job.plan.activity doctor,model_nhs_job_plan_activity,group_nhs_jobplan_doctor,1,1,1,1
+access_nhs_job_plan_activity_manager,nhs.job.plan.activity manager,model_nhs_job_plan_activity,group_nhs_jobplan_manager,1,1,1,1
+access_nhs_job_plan_activity_admin,nhs.job.plan.activity admin,model_nhs_job_plan_activity,group_nhs_jobplan_admin,1,1,1,1
+access_nhs_job_plan_objective_doctor,nhs.job.plan.objective doctor,model_nhs_job_plan_objective,group_nhs_jobplan_doctor,1,1,1,1
+access_nhs_job_plan_objective_manager,nhs.job.plan.objective manager,model_nhs_job_plan_objective,group_nhs_jobplan_manager,1,1,1,1
+access_nhs_job_plan_objective_admin,nhs.job.plan.objective admin,model_nhs_job_plan_objective,group_nhs_jobplan_admin,1,1,1,1
+access_nhs_job_plan_rollover_wizard_manager,nhs.job.plan.rollover.wizard manager,model_nhs_job_plan_rollover_wizard,group_nhs_jobplan_manager,1,1,1,1
+access_nhs_job_plan_rollover_wizard_admin,nhs.job.plan.rollover.wizard admin,model_nhs_job_plan_rollover_wizard,group_nhs_jobplan_admin,1,1,1,1
+access_nhs_job_plan_reminder_wizard_manager,nhs.job.plan.reminder.wizard manager,model_nhs_job_plan_reminder_wizard,group_nhs_jobplan_manager,1,1,1,1
+access_nhs_job_plan_reminder_wizard_admin,nhs.job.plan.reminder.wizard admin,model_nhs_job_plan_reminder_wizard,group_nhs_jobplan_admin,1,1,1,1

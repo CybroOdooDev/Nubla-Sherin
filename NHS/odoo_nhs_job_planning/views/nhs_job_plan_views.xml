@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Record: view_nhs_job_plan_list for ir.ui.view -->
+    <record id="view_nhs_job_plan_list" model="ir.ui.view">
+        <field name="name">nhs.job.plan.list</field>
+        <field name="model">nhs.job.plan</field>
+        <field name="arch" type="xml">
+            <list string="Job Plans" decoration-success="state in ('signed', 'revised')"
+                  decoration-info="state == 'agreed'" decoration-muted="state == 'superseded'">
+                <field name="reference"/>
+                <field name="doctor_name"/>
+                <field name="post_id"/>
+                <field name="org_unit_id"/>
+                <field name="plan_year_id"/>
+                <field name="contracted_pas"/>
+                <field name="total_pas"/>
+                <field name="pa_balance"/>
+                <field name="dcc_spa_ratio"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Record: view_nhs_job_plan_form for ir.ui.view -->
+    <record id="view_nhs_job_plan_form" model="ir.ui.view">
+        <field name="name">nhs.job.plan.form</field>
+        <field name="model">nhs.job.plan</field>
+        <field name="arch" type="xml">
+            <form string="Job Plan">
+                <header>
+                    <button name="action_propose" type="object" string="Propose"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_open_discussion" type="object" string="Open Discussion"
+                            invisible="state != 'proposed'"/>
+                    <button name="action_agree" type="object" string="Mark Agreed"
+                            class="btn-primary" invisible="state != 'in_discussion'"/>
+                    <button name="action_doctor_sign" type="object" string="Sign as Doctor"
+                            class="btn-primary" invisible="state != 'agreed' or doctor_signed_at"
+                            groups="odoo_nhs_job_planning.group_nhs_jobplan_doctor,odoo_nhs_job_planning.group_nhs_jobplan_admin"/>
+                    <button name="action_manager_sign" type="object" string="Sign as Manager"
+                            class="btn-primary" invisible="state != 'agreed' or manager_signed_at"
+                            groups="odoo_nhs_job_planning.group_nhs_jobplan_manager"/>
+                    <button name="action_start_revision" type="object" string="Start Revision"
+                            invisible="state != 'signed'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state in ('signed', 'revised')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,proposed,in_discussion,agreed,signed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_activities" icon="fa-calendar">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Activities</span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_objectives" icon="fa-bullseye">
+                            <field name="objective_count" widget="statinfo" string="Objectives"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_previous_revision"
+                                icon="fa-history" invisible="not previous_plan_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Previous</span>
+                                <span class="o_stat_text">Revision</span>
+                            </div>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Locked" bg_color="text-bg-success" invisible="not is_locked"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="doctor_name" readonly="is_locked"/>
+                            <field name="doctor_user_id" readonly="is_locked"/>
+                            <field name="doctor_member_ref" widget="reference_single" readonly="is_locked"/>
+                            <field name="post_id" readonly="is_locked"/>
+                            <field name="specialty" readonly="is_locked"/>
+                            <field name="org_unit_id" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="plan_year_id" readonly="is_locked"/>
+                            <field name="contracted_pas" readonly="is_locked"/>
+                            <field name="fte" readonly="1"/>
+                            <field name="oncall_profile_id" readonly="is_locked"/>
+                            <field name="proposed_by" readonly="1"/>
+                            <field name="review_due_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Programmed Activities">
+                        <group>
+                            <field name="dcc_pas" readonly="1"/>
+                            <field name="spa_pas" readonly="1"/>
+                            <field name="dcc_spa_ratio" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="additional_pas" readonly="1"/>
+                            <field name="external_pas" readonly="1"/>
+                            <field name="total_pas" readonly="1"/>
+                            <field name="pa_balance" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Weekly Timetable" name="timetable">
+                            <field name="timetable_activity_ids" readonly="is_locked">
+                                <!-- No editable="bottom": "Add a line" (and clicking an
+                                     existing row) opens the popup form below instead of an
+                                     inline row. -->
+                                <list default_order="weekday,sequence"
+                                      decoration-info="classification == 'dcc'"
+                                      decoration-success="classification == 'spa'"
+                                      decoration-warning="classification == 'additional'"
+                                      decoration-muted="classification == 'external'">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="weekday"/>
+                                    <field name="week_pattern"/>
+                                    <field name="activity"/>
+                                    <field name="classification"/>
+                                    <field name="pa_value" sum="Total PA"/>
+                                    <field name="effective_pa_value" sum="Effective PA" optional="hide"/>
+                                    <field name="time_start" widget="float_time" optional="hide"/>
+                                    <field name="time_end" widget="float_time" optional="hide"/>
+                                    <field name="session_category_id" optional="hide"/>
+                                    <field name="location" optional="hide"/>
+                                    <field name="is_annualised" optional="hide"/>
+                                    <field name="frequency_factor" optional="hide"/>
+                                    <field name="is_premium_time" optional="hide"/>
+                                    <field name="notes" optional="hide"/>
+                                </list>
+                                <form string="Timetable Activity">
+                                    <group>
+                                        <group string="When">
+                                            <field name="weekday"/>
+                                            <field name="week_pattern"/>
+                                            <field name="time_start" widget="float_time"/>
+                                            <field name="time_end" widget="float_time"/>
+                                            <field name="is_premium_time" readonly="1"/>
+                                        </group>
+                                        <group string="What">
+                                            <field name="session_category_id"/>
+                                            <field name="activity"/>
+                                            <field name="classification"/>
+                                            <field name="location"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <group string="PAs">
+                                            <field name="pa_value"/>
+                                            <field name="is_annualised"/>
+                                            <field name="frequency_factor" invisible="not is_annualised"/>
+                                            <field name="effective_pa_value" readonly="1"/>
+                                        </group>
+                                        <group string="Notes">
+                                            <field name="notes" nolabel="1"/>
+                                        </group>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="On-Call" name="oncall">
+                            <group>
+                                <field name="oncall_profile_id" readonly="is_locked"/>
+                            </group>
+                            <p class="text-muted" invisible="oncall_profile_id">
+                                No on-call profile selected. Open the linked profile's internal
+                                link to view or edit its frequency, category, supplement % and
+                                predictable/unpredictable PAs.
+                            </p>
+                        </page>
+                        <page string="Objectives" name="objectives">
+                            <field name="objective_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="linked_service_objective"/>
+                                    <field name="target_date"/>
+                                    <field name="status"/>
+                                    <field name="description" optional="hide"/>
+                                    <field name="review_notes" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Sign-Off" name="signoff">
+                            <group>
+                                <group string="Doctor">
+                                    <field name="doctor_signed_at" readonly="1"/>
+                                    <field name="doctor_signed_by" readonly="1"/>
+                                </group>
+                                <group string="Clinical Manager">
+                                    <field name="manager_signed_at" readonly="1"/>
+                                    <field name="manager_signed_by" readonly="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="escalation_note"/>
+                                <field name="supporting_resources_note"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Record: view_nhs_job_plan_search for ir.ui.view -->
+    <record id="view_nhs_job_plan_search" model="ir.ui.view">
+        <field name="name">nhs.job.plan.search</field>
+        <field name="model">nhs.job.plan</field>
+        <field name="arch" type="xml">
+            <search string="Job Plans">
+                <field name="doctor_name"/>
+                <field name="post_id"/>
+                <field name="org_unit_id"/>
+                <field name="plan_year_id"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="In Discussion" name="filter_discussion" domain="[('state', 'in', ('proposed', 'in_discussion'))]"/>
+                <filter string="Agreed" name="filter_agreed" domain="[('state', '=', 'agreed')]"/>
+                <filter string="Signed" name="filter_signed" domain="[('state', 'in', ('signed', 'revised'))]"/>
+                <filter string="My Plan" name="filter_mine" domain="[('doctor_user_id', '=', uid)]"/>
+                <group>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Directorate / Unit" name="group_org_unit" context="{'group_by': 'org_unit_id'}"/>
+                    <filter string="Plan Year" name="group_plan_year" context="{'group_by': 'plan_year_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Record: action_nhs_job_plan for ir.actions.act_window -->
+    <record id="action_nhs_job_plan" model="ir.actions.act_window">
+        <field name="name">Job Plans</field>
+        <field name="res_model">nhs.job.plan</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_state': 1}</field>
+    </record>
+
+    <!-- Record: action_nhs_job_plan_my for ir.actions.act_window -->
+    <record id="action_nhs_job_plan_my" model="ir.actions.act_window">
+        <field name="name">My Plan</field>
+        <field name="res_model">nhs.job.plan</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('doctor_user_id', '=', uid)]</field>
+        <field name="context">{'default_doctor_user_id': uid}</field>
+    </record>
+
+    <!-- Record: view_nhs_job_plan_objective_form for ir.ui.view -->
+    <!-- Only reached directly in developer mode (e.g. "Open Form View" from
+         a list row) - day to day, objectives are edited inline on the job
+         plan's Objectives tab. Given a proper layout anyway, since Odoo
+         falls back to an unstyled auto-generated form otherwise. -->
+    <record id="view_nhs_job_plan_objective_form" model="ir.ui.view">
+        <field name="name">nhs.job.plan.objective.form</field>
+        <field name="model">nhs.job.plan.objective</field>
+        <field name="arch" type="xml">
+            <form string="Job Plan Objective">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Objective"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="plan_id" readonly="1"/>
+                            <field name="linked_service_objective"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="target_date"/>
+                            <field name="status"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                    <group string="Review Notes">
+                        <field name="review_notes" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherited form view for nhs.establishment.post: surfaces this post's
+         job-planning status and history directly on the post, so opening a
+         post from the Gaps list (or from the Establishment app) shows more
+         than raw establishment data - the point of drilling into a "gap"
+         is to see/act on its job plan, not just its vacancy figures. -->
+    <record id="view_nhs_establishment_post_form_inherit_jobplan" model="ir.ui.view">
+        <field name="name">nhs.establishment.post.form.inherit.jobplan</field>
+        <field name="model">nhs.establishment.post</field>
+        <field name="inherit_id" ref="odoo_nhs_establishment.view_nhs_establishment_post_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_job_plans" type="object"
+                        class="oe_stat_button" icon="fa-calendar-check-o"
+                        invisible="not is_medical">
+                    <field name="job_plan_count" widget="statinfo" string="Job Plans"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='company_id']" position="after">
+                <field name="current_job_plan_id" invisible="not is_medical" readonly="1"/>
+                <field name="job_plan_state" widget="badge" string="Job Plan Status" invisible="not is_medical"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

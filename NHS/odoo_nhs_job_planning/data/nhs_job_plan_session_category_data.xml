@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Record: session_category_outpatient_clinic for nhs.job.plan.session.category -->
+        <record id="session_category_outpatient_clinic" model="nhs.job.plan.session.category">
+            <field name="name">Outpatient Clinic</field>
+            <field name="code">OPC</field>
+            <field name="default_classification">dcc</field>
+            <field name="sequence">10</field>
+        </record>
+        <!-- Record: session_category_theatre_list for nhs.job.plan.session.category -->
+        <record id="session_category_theatre_list" model="nhs.job.plan.session.category">
+            <field name="name">Theatre List</field>
+            <field name="code">THEATRE</field>
+            <field name="default_classification">dcc</field>
+            <field name="sequence">20</field>
+        </record>
+        <!-- Record: session_category_ward_round for nhs.job.plan.session.category -->
+        <record id="session_category_ward_round" model="nhs.job.plan.session.category">
+            <field name="name">Ward Round</field>
+            <field name="code">WARD</field>
+            <field name="default_classification">dcc</field>
+            <field name="sequence">30</field>
+        </record>
+        <!-- Record: session_category_endoscopy for nhs.job.plan.session.category -->
+        <record id="session_category_endoscopy" model="nhs.job.plan.session.category">
+            <field name="name">Endoscopy</field>
+            <field name="code">ENDO</field>
+            <field name="default_classification">dcc</field>
+            <field name="sequence">40</field>
+        </record>
+        <!-- Record: session_category_mdt for nhs.job.plan.session.category -->
+        <record id="session_category_mdt" model="nhs.job.plan.session.category">
+            <field name="name">MDT</field>
+            <field name="code">MDT</field>
+            <field name="default_classification">spa</field>
+            <field name="sequence">50</field>
+        </record>
+        <!-- Record: session_category_cpd for nhs.job.plan.session.category -->
+        <record id="session_category_cpd" model="nhs.job.plan.session.category">
+            <field name="name">CPD / Study</field>
+            <field name="code">CPD</field>
+            <field name="default_classification">spa</field>
+            <field name="sequence">60</field>
+        </record>
+        <!-- Record: session_category_audit for nhs.job.plan.session.category -->
+        <record id="session_category_audit" model="nhs.job.plan.session.category">
+            <field name="name">Audit / Governance</field>
+            <field name="code">AUDIT</field>
+            <field name="default_classification">spa</field>
+            <field name="sequence">70</field>
+        </record>
+        <!-- Record: session_category_teaching for nhs.job.plan.session.category -->
+        <record id="session_category_teaching" model="nhs.job.plan.session.category">
+            <field name="name">Teaching / Training</field>
+            <field name="code">TEACH</field>
+            <field name="default_classification">spa</field>
+            <field name="sequence">80</field>
+        </record>
+        <!-- Record: session_category_admin for nhs.job.plan.session.category -->
+        <record id="session_category_admin" model="nhs.job.plan.session.category">
+            <field name="name">Admin / Correspondence</field>
+            <field name="code">ADMIN</field>
+            <field name="default_classification">spa</field>
+            <field name="sequence">90</field>
+        </record>
+        <!-- Record: session_category_management for nhs.job.plan.session.category -->
+        <record id="session_category_management" model="nhs.job.plan.session.category">
+            <field name="name">Management Duties</field>
+            <field name="code">MGMT</field>
+            <field name="default_classification">additional</field>
+            <field name="sequence">100</field>
+        </record>
+        <!-- Record: session_category_trust_committee for nhs.job.plan.session.category -->
+        <record id="session_category_trust_committee" model="nhs.job.plan.session.category">
+            <field name="name">Trust Committee</field>
+            <field name="code">COMMITTEE</field>
+            <field name="default_classification">additional</field>
+            <field name="sequence">110</field>
+        </record>
+        <!-- Record: session_category_external_duty for nhs.job.plan.session.category -->
+        <record id="session_category_external_duty" model="nhs.job.plan.session.category">
+            <field name="name">Regional / National Duty</field>
+            <field name="code">EXTERNAL</field>
+            <field name="default_classification">external</field>
+            <field name="sequence">120</field>
+        </record>
+    </data>
+</odoo>

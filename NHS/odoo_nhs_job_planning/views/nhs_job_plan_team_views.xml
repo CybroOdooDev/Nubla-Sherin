@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Record: view_nhs_job_plan_team_kanban for ir.ui.view -->
+    <record id="view_nhs_job_plan_team_kanban" model="ir.ui.view">
+        <field name="name">nhs.job.plan.team.kanban</field>
+        <field name="model">nhs.job.plan</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="org_unit_id">
+                <field name="doctor_name"/>
+                <field name="specialty"/>
+                <field name="state"/>
+                <field name="total_pas"/>
+                <field name="contracted_pas"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click p-2">
+                            <strong><field name="doctor_name"/></strong>
+                            <div class="text-muted"><field name="specialty"/></div>
+                            <div>
+                                <field name="total_pas"/> / <field name="contracted_pas"/> PAs
+                            </div>
+                            <span class="badge rounded-pill text-bg-secondary">
+                                <field name="state"/>
+                            </span>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Record: action_nhs_job_plan_team for ir.actions.act_window -->
+    <record id="action_nhs_job_plan_team" model="ir.actions.act_window">
+        <field name="name">Plans</field>
+        <field name="res_model">nhs.job.plan</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_nhs_job_plan_search"/>
+        <field name="context">{'search_default_group_org_unit': 1}</field>
+    </record>
+
+    <!-- Record: view_nhs_establishment_post_jobplan_gaps_list for ir.ui.view -->
+    <record id="view_nhs_establishment_post_jobplan_gaps_list" model="ir.ui.view">
+        <field name="name">nhs.establishment.post.jobplan.gaps.list</field>
+        <field name="model">nhs.establishment.post</field>
+        <field name="arch" type="xml">
+            <list string="Job Plan Gaps" create="0">
+                <field name="reference"/>
+                <field name="job_title"/>
+                <field name="org_unit_id"/>
+                <field name="job_plan_state" widget="badge"/>
+                <field name="job_plan_count"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Record: action_nhs_establishment_post_jobplan_gaps for ir.actions.act_window -->
+    <record id="action_nhs_establishment_post_jobplan_gaps" model="ir.actions.act_window">
+        <field name="name">Gaps</field>
+        <field name="res_model">nhs.establishment.post</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_nhs_establishment_post_jobplan_gaps_list"/>
+        <field name="domain">[('is_medical', '=', True), ('status', '=', 'active'),
+                               '|', ('job_plan_state', '=', False),
+                                    ('job_plan_state', 'not in', ('signed', 'revised'))]</field>
+        <field name="help">Medical posts with no job plan, or one that is not yet signed.</field>
+    </record>
+</odoo>

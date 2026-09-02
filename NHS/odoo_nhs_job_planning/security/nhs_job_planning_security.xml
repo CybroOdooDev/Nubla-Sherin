@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Record: module_category_nhs_job_planning for ir.module.category -->
+        <record id="module_category_nhs_job_planning" model="ir.module.category">
+            <field name="name">NHS Medical Job Planning</field>
+            <field name="description">NHS Medical Job Planning access levels.</field>
+            <field name="sequence">58</field>
+        </record>
+
+        <!-- Record: privilege_jobplan_access_level for res.groups.privilege -->
+        <record id="privilege_jobplan_access_level" model="res.groups.privilege">
+            <field name="name">Job Planning Access Level</field>
+            <field name="category_id" ref="module_category_nhs_job_planning"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- Security group: Doctor - own job plan self-service only. Unlike the
+             sibling rostering module's portal-style Staff group, this module has
+             no portal controller (see 5.7/11.2 - self-service happens through the
+             backend "My Plan" menu, record-rule scoped), so the Doctor group
+             grants base.group_user rather than standing alone. -->
+        <record id="group_nhs_jobplan_doctor" model="res.groups">
+            <field name="name">Doctor</field>
+            <field name="privilege_id" ref="privilege_jobplan_access_level"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">A doctor sees and negotiates only their own job plan(s): timetable,
+                objectives, on-call and doctor-side sign-off, via the "My Plan" backend menu.
+                No access to other doctors' plans, team views, or configuration.</field>
+        </record>
+
+        <!-- Record: group_nhs_jobplan_manager for res.groups -->
+        <record id="group_nhs_jobplan_manager" model="res.groups">
+            <field name="name">Clinical Manager</field>
+            <field name="privilege_id" ref="privilege_jobplan_access_level"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">Clinical/service manager: proposes and discusses plans, manager-side
+                sign-off, team job-planning views and capacity/completeness reporting - scoped to
+                their directorate(s). Cannot edit session categories, the on-call supplement table
+                or plan-year configuration.</field>
+        </record>
+
+        <!-- Security group: Medical Director / Admin - full control + configuration -->
+        <record id="group_nhs_jobplan_admin" model="res.groups">
+            <field name="name">Medical Director / Admin</field>
+            <field name="privilege_id" ref="privilege_jobplan_access_level"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+            <field name="comment">Full control: every job plan across every directorate, plan-year
+                rollover, session categories, the on-call supplement table and all other
+                configuration.</field>
+        </record>
+    </data>
+
+    <data noupdate="0">
+        <!-- Record: rule_nhs_job_plan_company for ir.rule -->
+        <record id="rule_nhs_job_plan_company" model="ir.rule">
+            <field name="name">nhs.job.plan: company scope (admin)</field>
+            <field name="model_id" ref="model_nhs_job_plan"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_admin'))]"/>
+        </record>
+        <!-- Record: rule_nhs_job_plan_activity_company for ir.rule -->
+        <record id="rule_nhs_job_plan_activity_company" model="ir.rule">
+            <field name="name">nhs.job.plan.activity: company scope (admin)</field>
+            <field name="model_id" ref="model_nhs_job_plan_activity"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_admin'))]"/>
+        </record>
+        <!-- Record: rule_nhs_job_plan_objective_company for ir.rule -->
+        <record id="rule_nhs_job_plan_objective_company" model="ir.rule">
+            <field name="name">nhs.job.plan.objective: company scope (admin)</field>
+            <field name="model_id" ref="model_nhs_job_plan_objective"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_admin'))]"/>
+        </record>
+        <!-- Record: rule_nhs_oncall_profile_company for ir.rule -->
+        <record id="rule_nhs_oncall_profile_company" model="ir.rule">
+            <field name="name">nhs.oncall.profile: company scope (admin)</field>
+            <field name="model_id" ref="model_nhs_oncall_profile"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_admin'))]"/>
+        </record>
+        <!-- Record: rule_nhs_plan_year_company for ir.rule -->
+        <record id="rule_nhs_plan_year_company" model="ir.rule">
+            <field name="name">nhs.plan.year: company scope (admin)</field>
+            <field name="model_id" ref="model_nhs_plan_year"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_admin'))]"/>
+        </record>
+
+        <!-- Directorate scope (clinical manager) -->
+        <record id="rule_nhs_job_plan_manager" model="ir.rule">
+            <field name="name">nhs.job.plan: own directorate (clinical manager)</field>
+            <field name="model_id" ref="model_nhs_job_plan"/>
+            <field name="domain_force">[('manager_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
+        </record>
+        <!-- Record: rule_nhs_job_plan_activity_manager for ir.rule -->
+        <record id="rule_nhs_job_plan_activity_manager" model="ir.rule">
+            <field name="name">nhs.job.plan.activity: own directorate (clinical manager)</field>
+            <field name="model_id" ref="model_nhs_job_plan_activity"/>
+            <field name="domain_force">[('plan_id.manager_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
+        </record>
+        <!-- Record: rule_nhs_job_plan_objective_manager for ir.rule -->
+        <record id="rule_nhs_job_plan_objective_manager" model="ir.rule">
+            <field name="name">nhs.job.plan.objective: own directorate (clinical manager)</field>
+            <field name="model_id" ref="model_nhs_job_plan_objective"/>
+            <field name="domain_force">[('plan_id.manager_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
+        </record>
+
+        <!-- Own record only (doctor) -->
+        <record id="rule_nhs_job_plan_self" model="ir.rule">
+            <field name="name">nhs.job.plan: own record only (doctor)</field>
+            <field name="model_id" ref="model_nhs_job_plan"/>
+            <field name="domain_force">[('doctor_user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_doctor'))]"/>
+        </record>
+        <!-- Record: rule_nhs_job_plan_activity_self for ir.rule -->
+        <record id="rule_nhs_job_plan_activity_self" model="ir.rule">
+            <field name="name">nhs.job.plan.activity: own record only (doctor)</field>
+            <field name="model_id" ref="model_nhs_job_plan_activity"/>
+            <field name="domain_force">[('plan_id.doctor_user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_doctor'))]"/>
+        </record>
+        <!-- Record: rule_nhs_job_plan_objective_self for ir.rule -->
+        <record id="rule_nhs_job_plan_objective_self" model="ir.rule">
+            <field name="name">nhs.job.plan.objective: own record only (doctor)</field>
+            <field name="model_id" ref="model_nhs_job_plan_objective"/>
+            <field name="domain_force">[('plan_id.doctor_user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_doctor'))]"/>
+        </record>
+
+        <!-- Reference/config models (global-or-company-scoped, manager read access) -->
+        <record id="rule_nhs_job_plan_session_category_company" model="ir.rule">
+            <field name="name">nhs.job.plan.session.category: company scope or global</field>
+            <field name="model_id" ref="model_nhs_job_plan_session_category"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
+        </record>
+        <!-- Record: rule_nhs_oncall_supplement_rate_company for ir.rule -->
+        <record id="rule_nhs_oncall_supplement_rate_company" model="ir.rule">
+            <field name="name">nhs.oncall.supplement.rate: company scope or global</field>
+            <field name="model_id" ref="model_nhs_oncall_supplement_rate"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
+        </record>
+        <!-- Record: rule_nhs_plan_year_manager for ir.rule -->
+        <record id="rule_nhs_plan_year_manager" model="ir.rule">
+            <field name="name">nhs.plan.year: company scope (clinical manager, read)</field>
+            <field name="model_id" ref="model_nhs_plan_year"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
+        </record>
+    </data>
+</odoo>
