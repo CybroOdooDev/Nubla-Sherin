@@ -10,7 +10,8 @@
                 <field name="name"/>
                 <field name="code"/>
                 <field name="default_classification"/>
-                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="company_id" groups="base.group_multi_company"
+                       domain="[('id', 'in', allowed_company_ids)]"/>
                 <field name="active"/>
             </list>
         </field>

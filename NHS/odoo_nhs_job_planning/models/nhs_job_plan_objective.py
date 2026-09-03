@@ -19,7 +19,8 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import fields, models
+from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 OBJECTIVE_STATUSES = [
     ('not_started', 'Not Started'),
@@ -56,6 +57,11 @@ class NhsJobPlanObjective(models.Model):
         default=10,
         help="Display order."
     )
+    active = fields.Boolean(
+        string='Active',
+        default=True,
+        help="Set to False to hide the objective without removing it."
+    )
     name = fields.Char(
         string='Objective',
         required=True,
@@ -79,7 +85,62 @@ class NhsJobPlanObjective(models.Model):
         default='not_started',
         help="Progress against the objective."
     )
+    active = fields.Boolean(
+        default=True,
+        help="Achieved objectives are archived automatically, dropping them"
+             " out of the Objectives tab's default list so it stays focused"
+             " on what's still in progress. Recoverable from the plan's"
+             " 'Objectives' stat button, which includes an Archived filter."
+    )
     review_notes = fields.Text(
         string='Review Notes',
         help="Notes recorded at annual review."
     )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('status') == 'achieved':
+                vals.setdefault('active', False)
+        return super().create(vals_list)
+
+    def write(self, vals):
+        """Keep active in sync with status: reaching Achieved archives the
+        line (dropping it out of the Objectives tab's default list), and
+        moving off Achieved un-archives it again."""
+        if 'status' in vals and 'active' not in vals:
+            vals = dict(vals, active=vals['status'] != 'achieved')
+        return super().write(vals)
+
+    def _check_plan_is_draft(self):
+        """Objective status is only changeable while the owning plan is in
+        Draft - same rule nhs.job.plan.write() enforces for objective_ids
+        edited through the parent form. These status buttons write directly
+        on this model, which bypasses that parent-side guard, so the check
+        is repeated here. Only reachable on a saved record anyway (the view
+        hides these buttons with invisible="not id" on a brand-new line)."""
+        for objective in self:
+            if objective.plan_id.state != 'draft':
+                raise UserError(
+                    "'%s' is no longer in Draft. Reset it to Draft to change"
+                    " an objective's status." % objective.plan_id.display_name)
+
+    def action_set_status_not_started(self):
+        self._check_plan_is_draft()
+        self.write({'status': 'not_started'})
+
+    def action_set_status_on_track(self):
+        self._check_plan_is_draft()
+        self.write({'status': 'on_track'})
+
+    def action_set_status_at_risk(self):
+        self._check_plan_is_draft()
+        self.write({'status': 'at_risk'})
+
+    def action_set_status_achieved(self):
+        self._check_plan_is_draft()
+        self.write({'status': 'achieved'})
+
+    def action_set_status_not_achieved(self):
+        self._check_plan_is_draft()
+        self.write({'status': 'not_achieved'})

@@ -79,7 +79,7 @@
                             <ul class="list-group list-group-flush">
                                 <t t-foreach="state.metrics.weakest_directorates" t-as="d" t-key="d.id">
                                     <li class="list-group-item" style="cursor: pointer;"
-                                        t-on-click="() => this.openDirectorateGaps(d.id)">
+                                        t-on-click="() => d.signed &lt; d.total ? this.openDirectorateGaps(d.id) : this.openDirectoratePlans(d.id)">
                                         <div class="d-flex justify-content-between mb-1">
                                             <span t-esc="d.name"/>
                                             <span t-attf-class="badge nhs-badge-{{ getRateLevel(d.rate) }}" t-esc="d.rate + '%'"/>

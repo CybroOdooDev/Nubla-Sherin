@@ -10,7 +10,8 @@
                 <field name="frequency_n"/>
                 <field name="category"/>
                 <field name="supplement_pct"/>
-                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="company_id" groups="base.group_multi_company"
+                       domain="[('id', 'in', allowed_company_ids)]"/>
                 <field name="active"/>
             </list>
         </field>
@@ -34,7 +35,8 @@
                         </group>
                         <group>
                             <field name="supplement_pct"/>
-                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   domain="[('id', 'in', allowed_company_ids)]"/>
                             <field name="active"/>
                         </group>
                     </group>

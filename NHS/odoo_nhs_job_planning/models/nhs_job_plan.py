@@ -34,7 +34,7 @@ STATES = [
 ]
 
 LOCKED_STATES = ('signed', 'revised')
-CONTROLLED_FIELDS = ('timetable_activity_ids', 'contracted_pas', 'oncall_profile_id')
+CONTROLLED_FIELDS = ('timetable_activity_ids', 'objective_ids', 'contracted_pas', 'oncall_profile_id')
 PROPOSERS = [
     ('doctor', 'Doctor'),
     ('manager', 'Manager'),
@@ -64,19 +64,24 @@ class NhsJobPlan(models.Model):
         default='New',
         help="Job plan number, sequenced, e.g. 'JP/2026/0001'."
     )
-    doctor_name = fields.Char(
-        string='Doctor',
-        required=True,
-        tracking=True,
-        help="The doctor's name - always populated regardless of whether the"
-             " Training module is installed."
-    )
     doctor_user_id = fields.Many2one(
         'res.users',
         string='Doctor User',
+        required=True,
         tracking=True,
-        help="The doctor's login. Used for own-plan access scoping and for"
-             " sign-off/notification identity."
+        help="The doctor's login - single source of identity for the plan."
+             " Used for own-plan access scoping and sign-off/notification"
+             " identity. If the doctor has no user yet, create one directly"
+             " from this field (requires Users create rights)."
+    )
+    doctor_name = fields.Char(
+        string='Doctor',
+        related='doctor_user_id.name',
+        store=True,
+        index=True,
+        help="Doctor's display name, derived from Doctor User - not entered"
+             " by hand. Kept as a stored field so sorting, search, templates"
+             " and reports can keep referencing it unchanged."
     )
     doctor_member_ref = fields.Reference(
         selection=[('nhs.workforce.member', 'Workforce Member')],
@@ -84,6 +89,11 @@ class NhsJobPlan(models.Model):
         help="Optional soft link to a Training-module workforce member, stored as"
              " 'nhs.workforce.member,<id>'. Populated only when odoo_nhs_training"
              " happens to be installed; this module does not depend on it."
+             " nhs.workforce.member covers ALL staff, not just doctors, and"
+             " Reference fields don't support a domain (they're not a"
+             " relational field type to the view validator) - so the picker"
+             " itself can't be narrowed to medical posts. The check in"
+             " _check_doctor_member_ref() enforces it instead, at save time."
     )
     post_id = fields.Many2one(
         'nhs.establishment.post',
@@ -400,27 +410,45 @@ class NhsJobPlan(models.Model):
     @api.onchange('doctor_member_ref')
     def _onchange_doctor_member_ref(self):
         """When a Training workforce member is linked (soft link, only useful
-        if odoo_nhs_training is installed), pull their name/user/post across."""
+        if odoo_nhs_training is installed), pull their user/post across.
+        Doctor Name is no longer set here - it is derived from Doctor User."""
         member = self.doctor_member_ref
         if member and member._name == 'nhs.workforce.member':
-            self.doctor_name = member.name or self.doctor_name
             if member.user_id:
                 self.doctor_user_id = member.user_id
             if member.post_id:
                 self.post_id = member.post_id
 
-    @api.constrains('post_id', 'plan_year_id', 'state')
+    @api.constrains('doctor_member_ref')
+    def _check_doctor_member_ref(self):
+        """Workforce Member is a soft link into Training's staff roster, which
+        covers ALL staff (nurses, etc.), not just doctors. Reference fields
+        aren't a relational field type to the view validator, so they can't
+        take a domain to narrow the picker itself - enforce the same
+        medical-post/active rule that post_id's own domain applies, here."""
+        for plan in self:
+            member = plan.doctor_member_ref
+            if member and member._name == 'nhs.workforce.member':
+                post = member.post_id
+                if not post or not post.is_medical or post.status != 'active':
+                    raise ValidationError(
+                        "Workforce Member '%s' is not on an active medical"
+                        " post - only doctors on an active medical post can"
+                        " be linked to a job plan." % member.name
+                    )
+
+    @api.constrains('doctor_user_id', 'plan_year_id', 'state')
     def _check_one_active_plan_per_year(self):
-        """At most one non-superseded plan per doctor's post per plan year.
+        """At most one non-superseded plan per doctor per plan year.
         A business rule, not a DB uniqueness fact - revisions/rollover
-        legitimately leave multiple rows for the same post+year, only one of
+        legitimately leave multiple rows for the same doctor+year, only one of
         which may be 'live' (not revised/superseded) at a time."""
         for plan in self:
-            if plan.state == 'superseded':
+            if plan.state == 'superseded' or not plan.doctor_user_id:
                 continue
             other = self.search([
                 ('id', '!=', plan.id),
-                ('post_id', '=', plan.post_id.id),
+                ('doctor_user_id', '=', plan.doctor_user_id.id),
                 ('plan_year_id', '=', plan.plan_year_id.id),
                 ('state', '!=', 'superseded'),
                 ('state', '!=', 'revised'),
@@ -429,7 +457,7 @@ class NhsJobPlan(models.Model):
                 raise ValidationError(
                     "%s already has a job plan (%s) for %s. Revise that plan"
                     " instead of creating a second one." % (
-                        plan.post_id.display_name, other.reference, plan.plan_year_id.name))
+                        plan.doctor_user_id.name, other.reference, plan.plan_year_id.name))
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -440,19 +468,27 @@ class NhsJobPlan(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
-        """Block edits to the timetable/contracted PAs/on-call profile once a
-        plan is locked (signed/revised) - a locked plan must be revised via
-        action_start_revision, not edited in place. The internal context flag
-        lets action_start_revision itself populate the new draft's copied
-        fields without tripping this guard."""
+        """Block edits to the timetable/objectives/contracted PAs/on-call
+        profile once a plan has left Draft - Draft is the only state these
+        are built/adjusted in; from Proposed onward the plan's content is
+        under discussion/sign-off, not still being assembled, and a signed
+        plan must be revised via action_start_revision rather than edited in
+        place. The internal context flag lets action_start_revision itself
+        populate the new draft's copied fields without tripping this guard."""
         if any(field_name in vals for field_name in CONTROLLED_FIELDS) \
                 and not self.env.context.get('nhs_jobplan_revision_apply'):
             for plan in self:
-                if plan.is_locked:
+                if plan.state != 'draft':
+                    if plan.is_locked:
+                        raise UserError(
+                            "'%s' is signed and locked. Start an in-year"
+                            " revision to change its timetable, objectives,"
+                            " contracted PAs or on-call profile."
+                            % plan.display_name)
                     raise UserError(
-                        "'%s' is signed and locked. Start an in-year revision"
-                        " to change its timetable, contracted PAs or on-call"
-                        " profile." % plan.display_name)
+                        "'%s' is no longer in Draft. Reset it to Draft to"
+                        " change its timetable, objectives, contracted PAs"
+                        " or on-call profile." % plan.display_name)
         return super().write(vals)
 
     def action_propose(self, by='manager'):

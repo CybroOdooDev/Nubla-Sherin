@@ -51,6 +51,7 @@ class NhsJobPlanActivity(models.Model):
     _name = 'nhs.job.plan.activity'
     _description = 'Job Plan Timetable Activity'
     _order = 'weekday, sequence, time_start'
+    _rec_name = 'activity'
 
     plan_id = fields.Many2one(
         'nhs.job.plan',
@@ -150,7 +151,7 @@ class NhsJobPlanActivity(models.Model):
              " week-A/week-B lines, by 0.5. This is the figure summed into"
              " the job plan's DCC/SPA/Additional/External totals."
     )
-    notes = fields.Char(
+    notes = fields.Text(
         string='Notes',
         help="Free-text notes on this activity line."
     )
@@ -177,13 +178,10 @@ class NhsJobPlanActivity(models.Model):
 
     @api.onchange('session_category_id')
     def _onchange_session_category_id(self):
-        """Default the classification (and activity text if still blank) from
-        the picked session category."""
+        """Default the classification from the picked session category."""
         if self.session_category_id:
             if self.session_category_id.default_classification:
                 self.classification = self.session_category_id.default_classification
-            if not self.activity:
-                self.activity = self.session_category_id.name
 
     @api.constrains('time_start', 'time_end')
     def _check_times(self):

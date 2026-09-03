@@ -43,7 +43,7 @@
                     <button name="action_start_revision" type="object" string="Start Revision"
                             invisible="state != 'signed'"/>
                     <button name="action_reset_to_draft" type="object" string="Reset to Draft"
-                            invisible="state in ('signed', 'revised')"/>
+                            invisible="state in ('draft', 'signed', 'revised')"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,proposed,in_discussion,agreed,signed"/>
                 </header>
@@ -71,9 +71,8 @@
                     </div>
                     <group>
                         <group>
-                            <field name="doctor_name" readonly="is_locked"/>
                             <field name="doctor_user_id" readonly="is_locked"/>
-                            <field name="doctor_member_ref" widget="reference_single" readonly="is_locked"/>
+                            <field name="doctor_name" readonly="1"/>
                             <field name="post_id" readonly="is_locked"/>
                             <field name="specialty" readonly="is_locked"/>
                             <field name="org_unit_id" readonly="1"/>
@@ -103,7 +102,7 @@
                     </group>
                     <notebook>
                         <page string="Weekly Timetable" name="timetable">
-                            <field name="timetable_activity_ids" readonly="is_locked">
+                            <field name="timetable_activity_ids" readonly="state != 'draft'">
                                 <!-- No editable="bottom": "Add a line" (and clicking an
                                      existing row) opens the popup form below instead of an
                                      inline row. -->
@@ -140,7 +139,7 @@
                                         <group string="What">
                                             <field name="session_category_id"/>
                                             <field name="activity"/>
-                                            <field name="classification"/>
+                                            <field name="classification" widget="radio"/>
                                             <field name="location"/>
                                         </group>
                                     </group>
@@ -152,7 +151,7 @@
                                             <field name="effective_pa_value" readonly="1"/>
                                         </group>
                                         <group string="Notes">
-                                            <field name="notes" nolabel="1"/>
+                                            <field name="notes" nolabel="1" widget="text" placeholder="Add any additional notes here..."/>
                                         </group>
                                     </group>
                                 </form>
@@ -169,8 +168,11 @@
                             </p>
                         </page>
                         <page string="Objectives" name="objectives">
-                            <field name="objective_ids">
-                                <list editable="bottom">
+                            <field name="objective_ids" readonly="state != 'draft'">
+                                <!-- No editable="bottom": "Add a line" (and clicking an
+                                     existing row) opens the popup form below instead of an
+                                     inline row, matching the Weekly Timetable pattern. -->
+                                <list default_order="sequence">
                                     <field name="sequence" widget="handle"/>
                                     <field name="name"/>
                                     <field name="linked_service_objective"/>
@@ -179,9 +181,51 @@
                                     <field name="description" optional="hide"/>
                                     <field name="review_notes" optional="hide"/>
                                 </list>
+                                <form string="Objective">
+                                    <header>
+                                        <!-- type="object" buttons need the line saved to the DB
+                                             first to call a server method - a brand-new "Add a
+                                             line" popup isn't linked to its plan yet, so these
+                                             are hidden with invisible="not id" until the line has
+                                             been saved at least once. The statusbar stays
+                                             clickable throughout, so a brand-new line can still
+                                             have its status set before that first save. -->
+                                        <button name="action_set_status_not_started" type="object"
+                                                string="Reset to Not Started"
+                                                invisible="status not in ('achieved', 'not_achieved')"/>
+                                        <button name="action_set_status_on_track" type="object"
+                                                string="Mark On Track" class="btn-primary"
+                                                invisible="status not in ('not_started', 'at_risk')"/>
+                                        <button name="action_set_status_at_risk" type="object"
+                                                string="Mark At Risk"
+                                                invisible="status != 'on_track'"/>
+                                        <button name="action_set_status_achieved" type="object"
+                                                string="Mark Achieved" class="btn-success"
+                                                invisible="status not in ('on_track', 'at_risk')"/>
+                                        <button name="action_set_status_not_achieved" type="object"
+                                                string="Mark Not Achieved"
+                                                invisible="status not in ('on_track', 'at_risk')"/>
+                                        <field name="status" widget="statusbar" clickable="1"/>
+                                    </header>
+                                    <group>
+                                        <group>
+                                            <field name="plan_id" invisible="1" force_save="1"/>
+                                            <field name="name"/>
+                                            <field name="linked_service_objective"/>
+                                            <field name="target_date"/>
+                                        </group>
+                                    </group>
+                                    <group string="Description">
+                                        <field name="description" nolabel="1" rows="4"/>
+                                    </group>
+                                    <group string="Review Notes">
+                                        <field name="review_notes" nolabel="1" rows="4"/>
+                                    </group>
+                                </form>
                             </field>
                         </page>
-                        <page string="Sign-Off" name="signoff">
+                        <page string="Sign-Off" name="signoff"
+                              invisible="state not in ('agreed', 'signed', 'revised', 'superseded')">
                             <group>
                                 <group string="Doctor">
                                     <field name="doctor_signed_at" readonly="1"/>
@@ -245,6 +289,95 @@
         <field name="context">{'default_doctor_user_id': uid}</field>
     </record>
 
+    <!-- Record: view_nhs_job_plan_activity_list for ir.ui.view -->
+    <!-- Backs action_view_activities (the plan's "Activities" stat button) -
+         without this, Odoo falls back to an auto-generated list with only an
+         ID column, since the model has no name/_rec_name field to guess a
+         sensible default display from. Same columns as the Weekly Timetable
+         tab embedded on the Job Plan form. -->
+    <record id="view_nhs_job_plan_activity_list" model="ir.ui.view">
+        <field name="name">nhs.job.plan.activity.list</field>
+        <field name="model">nhs.job.plan.activity</field>
+        <field name="arch" type="xml">
+            <list default_order="weekday,sequence"
+                  decoration-info="classification == 'dcc'"
+                  decoration-success="classification == 'spa'"
+                  decoration-warning="classification == 'additional'"
+                  decoration-muted="classification == 'external'">
+                <field name="plan_id"/>
+                <field name="weekday"/>
+                <field name="week_pattern"/>
+                <field name="activity"/>
+                <field name="classification"/>
+                <field name="pa_value" sum="Total PA"/>
+                <field name="effective_pa_value" sum="Effective PA" optional="hide"/>
+                <field name="time_start" widget="float_time" optional="hide"/>
+                <field name="time_end" widget="float_time" optional="hide"/>
+                <field name="session_category_id" optional="hide"/>
+                <field name="location" optional="hide"/>
+                <field name="notes" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Record: view_nhs_job_plan_activity_form for ir.ui.view -->
+    <record id="view_nhs_job_plan_activity_form" model="ir.ui.view">
+        <field name="name">nhs.job.plan.activity.form</field>
+        <field name="model">nhs.job.plan.activity</field>
+        <field name="arch" type="xml">
+            <form string="Timetable Activity">
+                <sheet>
+                    <group>
+                        <group string="When">
+                            <field name="plan_id" force_save="1"/>
+                            <field name="weekday"/>
+                            <field name="week_pattern"/>
+                            <field name="time_start" widget="float_time"/>
+                            <field name="time_end" widget="float_time"/>
+                            <field name="is_premium_time" readonly="1"/>
+                        </group>
+                        <group string="What">
+                            <field name="session_category_id"/>
+                            <field name="activity"/>
+                            <field name="classification" widget="radio"/>
+                            <field name="location"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="PAs">
+                            <field name="pa_value"/>
+                            <field name="is_annualised"/>
+                            <field name="frequency_factor" invisible="not is_annualised"/>
+                            <field name="effective_pa_value" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1" widget="text" placeholder="Add any additional notes here..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Record: view_nhs_job_plan_activity_search for ir.ui.view -->
+    <record id="view_nhs_job_plan_activity_search" model="ir.ui.view">
+        <field name="name">nhs.job.plan.activity.search</field>
+        <field name="model">nhs.job.plan.activity</field>
+        <field name="arch" type="xml">
+            <search string="Search Timetable Activities">
+                <field name="activity"/>
+                <field name="plan_id"/>
+                <filter string="DCC" name="filter_dcc" domain="[('classification', '=', 'dcc')]"/>
+                <filter string="SPA" name="filter_spa" domain="[('classification', '=', 'spa')]"/>
+                <group>
+                    <filter string="Weekday" name="group_by_weekday" context="{'group_by': 'weekday'}"/>
+                    <filter string="Classification" name="group_by_classification" context="{'group_by': 'classification'}"/>
+                    <filter string="Job Plan" name="group_by_plan" context="{'group_by': 'plan_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <!-- Record: view_nhs_job_plan_objective_form for ir.ui.view -->
     <!-- Only reached directly in developer mode (e.g. "Open Form View" from
          a list row) - day to day, objectives are edited inline on the job
@@ -255,19 +388,38 @@
         <field name="model">nhs.job.plan.objective</field>
         <field name="arch" type="xml">
             <form string="Job Plan Objective">
+                <header>
+                    <!-- Same buttons/statusbar as the popup form on the Job
+                         Plan's Objectives tab - kept in sync with that one. -->
+                    <button name="action_set_status_not_started" type="object"
+                            string="Reset to Not Started"
+                            invisible="not id or status not in ('achieved', 'not_achieved')"/>
+                    <button name="action_set_status_on_track" type="object"
+                            string="Mark On Track" class="btn-primary"
+                            invisible="not id or status not in ('not_started', 'at_risk')"/>
+                    <button name="action_set_status_at_risk" type="object"
+                            string="Mark At Risk"
+                            invisible="not id or status != 'on_track'"/>
+                    <button name="action_set_status_achieved" type="object"
+                            string="Mark Achieved" class="btn-success"
+                            invisible="not id or status not in ('on_track', 'at_risk')"/>
+                    <button name="action_set_status_not_achieved" type="object"
+                            string="Mark Not Achieved"
+                            invisible="not id or status not in ('on_track', 'at_risk')"/>
+                    <field name="status" widget="statusbar" clickable="1"/>
+                </header>
                 <sheet>
                     <div class="oe_title">
                         <h1><field name="name" placeholder="Objective"/></h1>
                     </div>
                     <group>
                         <group>
-                            <field name="plan_id" readonly="1"/>
+                            <field name="plan_id" force_save="1"/>
                             <field name="linked_service_objective"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group>
                             <field name="target_date"/>
-                            <field name="status"/>
                         </group>
                     </group>
                     <group string="Description">
@@ -278,6 +430,51 @@
                     </group>
                 </sheet>
             </form>
+        </field>
+    </record>
+
+    <!-- Record: view_nhs_job_plan_objective_list for ir.ui.view -->
+    <record id="view_nhs_job_plan_objective_list" model="ir.ui.view">
+        <field name="name">nhs.job.plan.objective.list</field>
+        <field name="model">nhs.job.plan.objective</field>
+        <field name="arch" type="xml">
+            <list string="Job Plan Objectives">
+                <field name="sequence" widget="handle"/>
+                <field name="plan_id"/>
+                <field name="name"/>
+                <field name="target_date"/>
+                <field name="status" widget="badge" decoration-success="status == 'achieved'" decoration-warning="status == 'at_risk'" decoration-danger="status == 'not_achieved'" decoration-info="status == 'on_track'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Record: view_nhs_job_plan_objective_search for ir.ui.view -->
+    <record id="view_nhs_job_plan_objective_search" model="ir.ui.view">
+        <field name="name">nhs.job.plan.objective.search</field>
+        <field name="model">nhs.job.plan.objective</field>
+        <field name="arch" type="xml">
+            <search string="Search Objectives">
+                <field name="name"/>
+                <field name="plan_id"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter string="Status" name="group_by_status" context="{'group_by': 'status'}"/>
+                    <filter string="Job Plan" name="group_by_plan" context="{'group_by': 'plan_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Record: action_nhs_job_plan_objective for ir.actions.act_window -->
+    <record id="action_nhs_job_plan_objective" model="ir.actions.act_window">
+        <field name="name">Objectives</field>
+        <field name="res_model">nhs.job.plan.objective</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_nhs_job_plan_objective_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No objectives found.
+            </p>
         </field>
     </record>
 </odoo>

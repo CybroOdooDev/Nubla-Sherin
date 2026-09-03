@@ -11,7 +11,8 @@
                 <field name="date_end"/>
                 <field name="job_plan_count"/>
                 <field name="completeness_pct" widget="progressbar"/>
-                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="company_id" groups="base.group_multi_company"
+                       domain="[('id', 'in', allowed_company_ids)]"/>
                 <field name="state" widget="badge"/>
             </list>
         </field>
@@ -49,7 +50,8 @@
                             <field name="date_end"/>
                         </group>
                         <group>
-                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   domain="[('id', 'in', allowed_company_ids)]"/>
                             <field name="completeness_pct" widget="progressbar"/>
                         </group>
                     </group>

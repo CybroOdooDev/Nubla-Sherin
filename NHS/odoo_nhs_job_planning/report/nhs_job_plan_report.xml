@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Record: action_report_nhs_job_plan for ir.actions.report -->
+    <record id="action_report_nhs_job_plan" model="ir.actions.report">
+        <field name="name">Job Plan</field>
+        <field name="model">nhs.job.plan</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_job_planning.report_nhs_job_plan</field>
+        <field name="report_file">odoo_nhs_job_planning.report_nhs_job_plan</field>
+        <field name="print_report_name">'Job Plan - %s' % object.reference</field>
+        <field name="binding_model_id" ref="model_nhs_job_plan"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_nhs_job_plan">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="plan">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Job Plan - <span t-esc="plan.doctor_name"/></h2>
+                        <p>
+                            <strong>Reference:</strong> <span t-esc="plan.reference"/> &#160;|&#160;
+                            <strong>Post:</strong> <span t-esc="plan.post_id.display_name"/> &#160;|&#160;
+                            <strong>Specialty:</strong> <span t-esc="plan.specialty"/> &#160;|&#160;
+                            <strong>Plan Year:</strong> <span t-esc="plan.plan_year_id.name"/>
+                        </p>
+                        <p>
+                            <strong>Contracted PAs:</strong> <span t-esc="'%.2f' % plan.contracted_pas"/> &#160;|&#160;
+                            <strong>FTE:</strong> <span t-esc="'%.3f' % plan.fte"/> &#160;|&#160;
+                            <strong>Status:</strong> <span t-esc="plan.state"/>
+                        </p>
+
+                        <h3>Programmed Activities</h3>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>DCC</th><th>SPA</th><th>Additional</th><th>External</th>
+                                    <th>Total</th><th>Balance</th><th>DCC : SPA</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span t-esc="'%.2f' % plan.dcc_pas"/></td>
+                                    <td><span t-esc="'%.2f' % plan.spa_pas"/></td>
+                                    <td><span t-esc="'%.2f' % plan.additional_pas"/></td>
+                                    <td><span t-esc="'%.2f' % plan.external_pas"/></td>
+                                    <td><span t-esc="'%.2f' % plan.total_pas"/></td>
+                                    <td><span t-esc="'%.2f' % plan.pa_balance"/></td>
+                                    <td><span t-esc="plan.dcc_spa_ratio"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Weekly Timetable</h3>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Day</th><th>Week</th><th>Start</th><th>End</th>
+                                    <th>Activity</th><th>Classification</th><th>Location</th><th>PA</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="plan.timetable_activity_ids.sorted(lambda a: (a.weekday, a.sequence))" t-as="activity">
+                                    <td><span t-field="activity.weekday"/></td>
+                                    <td><span t-field="activity.week_pattern"/></td>
+                                    <td><span t-esc="activity.time_start"/></td>
+                                    <td><span t-esc="activity.time_end"/></td>
+                                    <td><span t-esc="activity.activity"/></td>
+                                    <td><span t-field="activity.classification"/></td>
+                                    <td><span t-esc="activity.location"/></td>
+                                    <td><span t-esc="'%.2f' % activity.effective_pa_value"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>On-Call</h3>
+                        <p t-if="plan.oncall_profile_id">
+                            <strong>Frequency:</strong> 1 in <span t-esc="plan.oncall_profile_id.frequency_n"/> &#160;|&#160;
+                            <strong>Category:</strong> <span t-field="plan.oncall_profile_id.category"/> &#160;|&#160;
+                            <strong>Supplement:</strong> <span t-esc="'%.2f' % plan.oncall_profile_id.supplement_pct"/>% &#160;|&#160;
+                            <strong>Predictable PAs:</strong> <span t-esc="'%.2f' % plan.oncall_profile_id.predictable_pas"/> &#160;|&#160;
+                            <strong>Unpredictable PAs:</strong> <span t-esc="'%.2f' % plan.oncall_profile_id.unpredictable_pas"/>
+                        </p>
+                        <p t-else="">No on-call profile.</p>
+
+                        <h3>Objectives</h3>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark"><th>Objective</th><th>Target Date</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="plan.objective_ids" t-as="objective">
+                                    <td><span t-esc="objective.name"/></td>
+                                    <td><span t-esc="objective.target_date"/></td>
+                                    <td><span t-field="objective.status"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Sign-Off</h3>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark"><th></th><th>Signed By</th><th>Signed At</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Doctor</td>
+                                    <td><span t-esc="plan.doctor_signed_by.name or 'Not yet signed'"/></td>
+                                    <td><span t-esc="plan.doctor_signed_at"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Clinical Manager</td>
+                                    <td><span t-esc="plan.manager_signed_by.name or 'Not yet signed'"/></td>
+                                    <td><span t-esc="plan.manager_signed_at"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

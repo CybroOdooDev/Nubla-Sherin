@@ -3,31 +3,36 @@
     <menuitem id="menu_nhs_job_planning_root" name="NHS Job Planning" sequence="58"
               groups="odoo_nhs_job_planning.group_nhs_jobplan_doctor,odoo_nhs_job_planning.group_nhs_jobplan_manager"/>
 
-    <!-- My Plan -->
-    <menuitem id="menu_nhs_jobplan_my_plan" name="My Plan" parent="menu_nhs_job_planning_root"
-              action="action_nhs_job_plan_my" sequence="10"/>
-
-    <!-- Plans (team) -->
+    <!-- Plans (My Plan + team) -->
     <menuitem id="menu_nhs_jobplan_team" name="Plans" parent="menu_nhs_job_planning_root"
-              sequence="20" groups="odoo_nhs_job_planning.group_nhs_jobplan_manager"/>
+              sequence="20"/>
+    <menuitem id="menu_nhs_jobplan_my_plan" name="My Plan" parent="menu_nhs_jobplan_team"
+              action="action_nhs_job_plan_my" sequence="5"
+              groups="odoo_nhs_job_planning.group_nhs_jobplan_doctor,odoo_nhs_job_planning.group_nhs_jobplan_manager"/>
     <menuitem id="menu_nhs_jobplan_team_list" name="All Plans" parent="menu_nhs_jobplan_team"
-              action="action_nhs_job_plan_team" sequence="10"/>
-    <menuitem id="menu_nhs_jobplan_gaps" name="Gaps" parent="menu_nhs_jobplan_team"
-              action="action_nhs_establishment_post_jobplan_gaps" sequence="20"/>
-    <menuitem id="menu_nhs_jobplan_rollover" name="Year Rollover" parent="menu_nhs_jobplan_team"
-              action="action_nhs_job_plan_rollover_wizard" sequence="30"/>
-    <menuitem id="menu_nhs_jobplan_reminders" name="Send Reminders" parent="menu_nhs_jobplan_team"
-              action="action_nhs_job_plan_reminder_wizard" sequence="40"/>
+              action="action_nhs_job_plan_team" sequence="10"
+              groups="odoo_nhs_job_planning.group_nhs_jobplan_manager"/>
+    <menuitem id="menu_nhs_jobplan_objectives_list" name="All Objectives" parent="menu_nhs_jobplan_team"
+              action="action_nhs_job_plan_objective" sequence="15"
+              groups="odoo_nhs_job_planning.group_nhs_jobplan_manager,odoo_nhs_job_planning.group_nhs_jobplan_doctor"/>
 
-    <!-- Capacity & Completeness -->
-    <menuitem id="menu_nhs_jobplan_reporting" name="Capacity &amp; Completeness" parent="menu_nhs_job_planning_root"
+    <!-- Plan Administration (running the job-planning cycle: gap-checking, year rollover, reminders) -->
+    <menuitem id="menu_nhs_jobplan_tools" name="Plan Administration" parent="menu_nhs_job_planning_root"
+              sequence="25" groups="odoo_nhs_job_planning.group_nhs_jobplan_manager"/>
+    <menuitem id="menu_nhs_jobplan_gaps" name="Gaps" parent="menu_nhs_jobplan_tools"
+              action="action_nhs_establishment_post_jobplan_gaps" sequence="10"/>
+    <menuitem id="menu_nhs_jobplan_rollover" name="Year Rollover" parent="menu_nhs_jobplan_tools"
+              action="action_nhs_job_plan_rollover_wizard" sequence="20"/>
+    <menuitem id="menu_nhs_jobplan_reminders" name="Send Reminders" parent="menu_nhs_jobplan_tools"
+              action="action_nhs_job_plan_reminder_wizard" sequence="30"/>
+
+    <!-- Reports -->
+    <menuitem id="menu_nhs_jobplan_reporting" name="Reports" parent="menu_nhs_job_planning_root"
               sequence="30" groups="odoo_nhs_job_planning.group_nhs_jobplan_manager"/>
     <menuitem id="menu_nhs_jobplan_dashboard" name="Dashboard" parent="menu_nhs_jobplan_reporting"
               action="action_nhs_job_plan_dashboard_client" sequence="10"/>
-    <menuitem id="menu_nhs_jobplan_analysis" name="Analysis" parent="menu_nhs_jobplan_reporting"
+    <menuitem id="menu_nhs_jobplan_analysis" name="Job Plan Analysis" parent="menu_nhs_jobplan_reporting"
               action="action_nhs_job_plan_analysis" sequence="20"/>
-    <menuitem id="menu_nhs_jobplan_plan_years" name="Plan Years" parent="menu_nhs_jobplan_reporting"
-              action="action_nhs_plan_year" sequence="30"/>
 
     <!-- Configuration -->
     <menuitem id="menu_nhs_jobplan_config" name="Configuration" parent="menu_nhs_job_planning_root"
@@ -38,6 +43,9 @@
               action="action_nhs_oncall_profile" sequence="20"/>
     <menuitem id="menu_nhs_jobplan_oncall_supplement_rate" name="On-Call Supplement Table" parent="menu_nhs_jobplan_config"
               action="action_nhs_oncall_supplement_rate" sequence="30"/>
-    <menuitem id="menu_nhs_jobplan_settings" name="Settings" parent="menu_nhs_jobplan_config"
-              action="action_nhs_job_planning_config_settings" sequence="40"/>
+    <menuitem id="menu_nhs_jobplan_plan_years" name="Plan Years" parent="menu_nhs_jobplan_config"
+              action="action_nhs_plan_year" sequence="40"/>
+        <menuitem id="menu_nhs_jobplan_settings" name="Settings" parent="menu_nhs_jobplan_config"
+              action="action_nhs_job_planning_config_settings" sequence="50"/>
+
 </odoo>
