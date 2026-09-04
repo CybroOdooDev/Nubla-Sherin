@@ -68,11 +68,7 @@ class NhsEstablishmentPost(models.Model):
         """Find the most recent non-superseded job plan for each post.
         'plan_year_id desc' alone doesn't determine recency when two plans
         share a year - exactly what an in-year revision produces (the old
-        plan flips to 'revised', a new draft is created in the same year).
-        'id desc' breaks that tie in favour of the newer row, so a post
-        mid-revision correctly shows its new unsigned draft as current
-        (job_plan_state back to 'draft') rather than the superseded-in-
-        spirit 'revised' row silently keeping it out of Gaps/completeness."""
+        plan flips to 'revised', a new draft is created in the same year)."""
         JobPlan = self.env['nhs.job.plan']
         for post in self:
             post.current_job_plan_id = JobPlan.search([

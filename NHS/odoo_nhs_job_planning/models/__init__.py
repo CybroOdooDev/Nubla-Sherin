@@ -25,6 +25,7 @@ from . import nhs_plan_year
 from . import nhs_job_plan_session_category
 from . import nhs_oncall_supplement_rate
 from . import nhs_oncall_profile
+from . import nhs_service_objective
 from . import nhs_job_plan
 from . import nhs_job_plan_activity
 from . import nhs_job_plan_objective

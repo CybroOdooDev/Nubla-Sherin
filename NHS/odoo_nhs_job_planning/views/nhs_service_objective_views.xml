@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Record: view_nhs_service_objective_list for ir.ui.view -->
+    <record id="view_nhs_service_objective_list" model="ir.ui.view">
+        <field name="name">nhs.service.objective.list</field>
+        <field name="model">nhs.service.objective</field>
+        <field name="arch" type="xml">
+            <!-- Not editable="bottom": Description doesn't appear in this list
+                 at all, so a row click needs to open the full form rather than
+                 hijacking it into an inline edit. -->
+            <list string="Service Objectives">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="org_unit_id"/>
+                <field name="company_id" groups="base.group_multi_company"
+                       domain="[('id', 'in', allowed_company_ids)]"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Record: view_nhs_service_objective_form for ir.ui.view -->
+    <record id="view_nhs_service_objective_form" model="ir.ui.view">
+        <field name="name">nhs.service.objective.form</field>
+        <field name="model">nhs.service.objective</field>
+        <field name="arch" type="xml">
+            <form string="Service Objective">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Reduce A&amp;E wait times"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="org_unit_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Record: action_nhs_service_objective for ir.actions.act_window -->
+    <record id="action_nhs_service_objective" model="ir.actions.act_window">
+        <field name="name">Service Objectives</field>
+        <field name="res_model">nhs.service.objective</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

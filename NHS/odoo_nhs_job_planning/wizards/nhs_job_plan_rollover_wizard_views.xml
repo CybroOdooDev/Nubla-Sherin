@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Record: view_nhs_job_plan_rollover_wizard_form for ir.ui.view -->
+    <record id="view_nhs_job_plan_rollover_wizard_form" model="ir.ui.view">
+        <field name="name">nhs.job.plan.rollover.wizard.form</field>
+        <field name="model">nhs.job.plan.rollover.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Job Plan Year Rollover">
+                <group>
+                    <field name="source_plan_year_id"/>
+                    <field name="target_plan_year_id"/>
+                    <field name="org_unit_ids" widget="many2many_tags"/>
+                    <field name="only_signed_source"/>
+                    <field name="plan_preview_count"/>
+                </group>
+                <footer>
+                    <button name="action_rollover" type="object" string="Roll Over" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Record: action_nhs_job_plan_rollover_wizard for ir.actions.act_window -->
+    <record id="action_nhs_job_plan_rollover_wizard" model="ir.actions.act_window">
+        <field name="name">Year Rollover</field>
+        <field name="res_model">nhs.job.plan.rollover.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

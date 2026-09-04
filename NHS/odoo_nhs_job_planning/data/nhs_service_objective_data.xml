@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Illustrative service objectives, named after real NHS England national
+         standards/programmes so the demo data reads as genuinely UK NHS rather
+         than generic placeholder text. Targets/percentages change over time
+         (e.g. RTT and UEC standards have been revised more than once) - verify
+         the current figure before quoting one in a trust's own objective. -->
+    <data noupdate="1">
+        <!-- Record: service_objective_rtt_18_weeks for nhs.service.objective -->
+        <record id="service_objective_rtt_18_weeks" model="nhs.service.objective">
+            <field name="name">18-Week RTT (Referral to Treatment) Compliance</field>
+            <field name="description">NHS Constitution access standard: patients should start consultant-led treatment within 18 weeks of referral. Improve the service's RTT compliance and reduce the long-waiter backlog.</field>
+            <field name="sequence">10</field>
+        </record>
+        <!-- Record: service_objective_uec_4hr for nhs.service.objective -->
+        <record id="service_objective_uec_4hr" model="nhs.service.objective">
+            <field name="name">Urgent &amp; Emergency Care (4-Hour) Standard</field>
+            <field name="description">NHS England's Urgent and Emergency Care Recovery Plan standard for time spent in A&amp;E from arrival to admission, transfer or discharge. Improve flow and reduce breaches.</field>
+            <field name="sequence">20</field>
+        </record>
+        <!-- Record: service_objective_girft_theatre for nhs.service.objective -->
+        <record id="service_objective_girft_theatre" model="nhs.service.objective">
+            <field name="name">GIRFT Theatre Productivity</field>
+            <field name="description">Getting It Right First Time (GIRFT) national programme priority: reduce unwarranted variation and improve theatre utilisation, on-time starts and list efficiency.</field>
+            <field name="sequence">30</field>
+        </record>
+        <!-- Record: service_objective_patient_safety_strategy for nhs.service.objective -->
+        <record id="service_objective_patient_safety_strategy" model="nhs.service.objective">
+            <field name="name">NHS Patient Safety Strategy</field>
+            <field name="description">Embed the national Patient Safety Strategy locally: incident reporting via LFPSE, Patient Safety Incident Response Framework (PSIRF) compliance, and learning from clinical audit.</field>
+            <field name="sequence">40</field>
+        </record>
+        <!-- Record: service_objective_discharge_delays for nhs.service.objective -->
+        <record id="service_objective_discharge_delays" model="nhs.service.objective">
+            <field name="name">Reduce Delayed Discharges (Discharge to Assess)</field>
+            <field name="description">National priority to reduce avoidable delayed transfers of care, supporting the Discharge to Assess model and patient flow out of acute beds.</field>
+            <field name="sequence">50</field>
+        </record>
+        <!-- Record: service_objective_workforce_plan for nhs.service.objective -->
+        <record id="service_objective_workforce_plan" model="nhs.service.objective">
+            <field name="name">NHS Long Term Workforce Plan: CPD &amp; Training</field>
+            <field name="description">Align local training, appraisal and revalidation activity with the NHS Long Term Workforce Plan's education and CPD commitments.</field>
+            <field name="sequence">60</field>
+        </record>
+        <!-- Record: service_objective_fft for nhs.service.objective -->
+        <record id="service_objective_fft" model="nhs.service.objective">
+            <field name="name">Patient Experience (Friends &amp; Family Test)</field>
+            <field name="description">Improve the service's Friends and Family Test (FFT) recommendation rate and act on patient feedback themes.</field>
+            <field name="sequence">70</field>
+        </record>
+        <!-- Record: service_objective_digital_transformation for nhs.service.objective -->
+        <record id="service_objective_digital_transformation" model="nhs.service.objective">
+            <field name="name">NHS Long Term Plan: Digital Transformation</field>
+            <field name="description">Adopt digital pathways (e-referrals, remote monitoring, the NHS App) in line with the NHS Long Term Plan's digital ambitions.</field>
+            <field name="sequence">80</field>
+        </record>
+    </data>
+</odoo>

@@ -1,8 +1,11 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nhs_plan_year_doctor,nhs.plan.year doctor,model_nhs_plan_year,group_nhs_jobplan_doctor,1,0,0,0
 access_nhs_plan_year_manager,nhs.plan.year manager,model_nhs_plan_year,group_nhs_jobplan_manager,1,0,0,0
 access_nhs_plan_year_admin,nhs.plan.year admin,model_nhs_plan_year,group_nhs_jobplan_admin,1,1,1,1
+access_nhs_job_plan_session_category_doctor,nhs.job.plan.session.category doctor,model_nhs_job_plan_session_category,group_nhs_jobplan_doctor,1,0,0,0
 access_nhs_job_plan_session_category_manager,nhs.job.plan.session.category manager,model_nhs_job_plan_session_category,group_nhs_jobplan_manager,1,0,0,0
 access_nhs_job_plan_session_category_admin,nhs.job.plan.session.category admin,model_nhs_job_plan_session_category,group_nhs_jobplan_admin,1,1,1,1
+access_nhs_oncall_supplement_rate_doctor,nhs.oncall.supplement.rate doctor,model_nhs_oncall_supplement_rate,group_nhs_jobplan_doctor,1,0,0,0
 access_nhs_oncall_supplement_rate_manager,nhs.oncall.supplement.rate manager,model_nhs_oncall_supplement_rate,group_nhs_jobplan_manager,1,0,0,0
 access_nhs_oncall_supplement_rate_admin,nhs.oncall.supplement.rate admin,model_nhs_oncall_supplement_rate,group_nhs_jobplan_admin,1,1,1,1
 access_nhs_oncall_profile_doctor,nhs.oncall.profile doctor,model_nhs_oncall_profile,group_nhs_jobplan_doctor,1,0,0,0
@@ -21,3 +24,12 @@ access_nhs_job_plan_rollover_wizard_manager,nhs.job.plan.rollover.wizard manager
 access_nhs_job_plan_rollover_wizard_admin,nhs.job.plan.rollover.wizard admin,model_nhs_job_plan_rollover_wizard,group_nhs_jobplan_admin,1,1,1,1
 access_nhs_job_plan_reminder_wizard_manager,nhs.job.plan.reminder.wizard manager,model_nhs_job_plan_reminder_wizard,group_nhs_jobplan_manager,1,1,1,1
 access_nhs_job_plan_reminder_wizard_admin,nhs.job.plan.reminder.wizard admin,model_nhs_job_plan_reminder_wizard,group_nhs_jobplan_admin,1,1,1,1
+access_nhs_service_objective_doctor,nhs.service.objective doctor,model_nhs_service_objective,group_nhs_jobplan_doctor,1,0,0,0
+access_nhs_service_objective_manager,nhs.service.objective manager,model_nhs_service_objective,group_nhs_jobplan_manager,1,0,0,0
+access_nhs_service_objective_admin,nhs.service.objective admin,model_nhs_service_objective,group_nhs_jobplan_admin,1,1,1,1
+access_nhs_establishment_post_doctor_jp,nhs.establishment.post doctor jp,odoo_nhs_establishment.model_nhs_establishment_post,group_nhs_jobplan_doctor,1,0,0,0
+access_nhs_establishment_post_manager_jp,nhs.establishment.post manager jp,odoo_nhs_establishment.model_nhs_establishment_post,group_nhs_jobplan_manager,1,0,0,0
+access_nhs_establishment_post_admin_jp,nhs.establishment.post admin jp,odoo_nhs_establishment.model_nhs_establishment_post,group_nhs_jobplan_admin,1,0,0,0
+access_nhs_org_unit_doctor_jp,nhs.org.unit doctor jp,odoo_nhs_establishment.model_nhs_org_unit,group_nhs_jobplan_doctor,1,0,0,0
+access_nhs_org_unit_manager_jp,nhs.org.unit manager jp,odoo_nhs_establishment.model_nhs_org_unit,group_nhs_jobplan_manager,1,0,0,0
+access_nhs_org_unit_admin_jp,nhs.org.unit admin jp,odoo_nhs_establishment.model_nhs_org_unit,group_nhs_jobplan_admin,1,0,0,0

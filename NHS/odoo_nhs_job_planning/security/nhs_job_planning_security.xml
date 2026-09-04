@@ -154,5 +154,12 @@
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
         </record>
+        <!-- Record Rule: service objectives visible if global (no company) or in the user's company/companies -->
+        <record id="rule_nhs_service_objective_company" model="ir.rule">
+            <field name="name">nhs.service.objective: company scope or global</field>
+            <field name="model_id" ref="model_nhs_service_objective"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
+        </record>
     </data>
 </odoo>

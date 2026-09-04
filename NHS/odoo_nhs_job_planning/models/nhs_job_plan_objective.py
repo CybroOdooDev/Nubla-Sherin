@@ -71,9 +71,11 @@ class NhsJobPlanObjective(models.Model):
         string='Description',
         help="Objective detail."
     )
-    linked_service_objective = fields.Char(
+    service_objective_id = fields.Many2one(
+        'nhs.service.objective',
         string='Linked Service Objective',
-        help="Free-text link to the wider service objective this supports."
+        help="The wider directorate/service objective this personal"
+             " objective supports."
     )
     target_date = fields.Date(
         string='Target Date',

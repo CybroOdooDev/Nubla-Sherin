@@ -99,7 +99,7 @@ class NhsJobPlan(models.Model):
         'nhs.establishment.post',
         string='Medical Post',
         required=True,
-        domain="[('is_medical', '=', True), ('status', '=', 'active')]",
+        domain=lambda self: self._domain_post_id(),
         tracking=True,
         index=True,
         help="The doctor's funded Establishment post."
@@ -401,6 +401,24 @@ class NhsJobPlan(models.Model):
             managers = OrgUnit.browse(ancestor_ids).mapped('manager_id')
             plan.manager_ids = [(6, 0, managers.ids)]
 
+    def _domain_post_id(self):
+        """Narrow the Medical Post picker to what the current user could
+        actually save a plan against - mirrors _compute_manager_ids'
+        ancestor-chain logic in reverse. A clinical manager only manages
+        their own directorate(s), so posts outside every unit they lead (and
+        its sub-units) would just fail the plan/activity create ir.rules
+        after the whole form is filled in; better to not offer them at all."""
+        base_domain = [('is_medical', '=', True), ('status', '=', 'active')]
+        user = self.env.user
+        if user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_admin'):
+            return base_domain
+        if user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_manager'):
+            managed_units = self.env['nhs.org.unit'].search([('manager_id', '=', user.id)])
+            if not managed_units:
+                return base_domain + [('id', '=', False)]
+            return base_domain + [('org_unit_id', 'child_of', managed_units.ids)]
+        return base_domain
+
     @api.onchange('post_id')
     def _onchange_post_id(self):
         """Default the specialty from the post's job title."""
@@ -473,8 +491,7 @@ class NhsJobPlan(models.Model):
         are built/adjusted in; from Proposed onward the plan's content is
         under discussion/sign-off, not still being assembled, and a signed
         plan must be revised via action_start_revision rather than edited in
-        place. The internal context flag lets action_start_revision itself
-        populate the new draft's copied fields without tripping this guard."""
+        place."""
         if any(field_name in vals for field_name in CONTROLLED_FIELDS) \
                 and not self.env.context.get('nhs_jobplan_revision_apply'):
             for plan in self:
@@ -578,10 +595,6 @@ class NhsJobPlan(models.Model):
         if self.state != 'signed':
             raise UserError("Only a signed plan can be revised.")
         with self.env.cr.savepoint():
-            # Flip this plan to 'revised' FIRST, before the new draft exists -
-            # otherwise _check_one_active_plan_per_year sees two live (non-
-            # revised/superseded) rows for the same post+year for the instant
-            # between creating the new draft and relabelling this one.
             self.write({'state': 'revised'})
             new_plan = self.with_context(nhs_jobplan_revision_apply=True).copy({
                 'reference': 'New',

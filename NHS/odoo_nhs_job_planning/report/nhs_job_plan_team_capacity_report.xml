@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Record: action_report_nhs_job_plan_team_capacity for ir.actions.report -->
+    <record id="action_report_nhs_job_plan_team_capacity" model="ir.actions.report">
+        <field name="name">Team Capacity</field>
+        <field name="model">nhs.org.unit</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_nhs_job_planning.report_nhs_job_plan_team_capacity</field>
+        <field name="report_file">odoo_nhs_job_planning.report_nhs_job_plan_team_capacity</field>
+        <field name="print_report_name">'Job Planning Team Capacity - %s' % object.display_name</field>
+        <field name="binding_model_id" ref="odoo_nhs_establishment.model_nhs_org_unit"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_nhs_job_plan_team_capacity">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="unit">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Job Planning Team Capacity - <span t-esc="unit.display_name"/></h2>
+                        <p>
+                            <strong>Doctors with a signed plan:</strong>
+                            <span t-esc="capacity_by_unit[unit.id]['doctor_count']"/>
+                        </p>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Activity / Category</th><th>Classification</th><th>Total PAs / Week</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="capacity_by_unit[unit.id]['rows']" t-as="row">
+                                    <td><span t-esc="row['label']"/></td>
+                                    <td><span t-esc="row['classification']"/></td>
+                                    <td><span t-esc="'%.2f' % row['pa']"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

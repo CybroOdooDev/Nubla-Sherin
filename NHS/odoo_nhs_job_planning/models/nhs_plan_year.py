@@ -20,7 +20,6 @@
 #
 #############################################################################
 from dateutil.relativedelta import relativedelta
-
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
@@ -203,9 +202,6 @@ class NhsPlanYear(models.Model):
             ('is_medical', '=', True), ('status', '=', 'active'), ('company_id', '=', company.id),
         ])
         plans = year.job_plan_ids if year else self.env['nhs.job.plan']
-        # Each post's CURRENT plan only (see _compute_completeness above for
-        # why "any plan that ever reached signed/revised" is wrong once a
-        # revision is in progress).
         signed_posts = posts.filtered(
             lambda p: p.current_job_plan_id.id in plans.ids and p.current_job_plan_id.state == 'signed')
         gap_posts = posts - signed_posts
@@ -258,11 +254,7 @@ class NhsPlanYear(models.Model):
         """Scheduled action: create next year's draft plan year roughly two
         months before the current open year ends, so rollover always has a
         target waiting for it. Idempotent - does nothing once next year
-        already exists. When the company's nhs_jobplan_auto_rollover setting
-        is on, also clones the open year's signed plans into the new year
-        immediately (nhs.job.plan._rollover_plans()) - the same routine the
-        manual rollover wizard uses - rather than leaving the new year empty
-        until someone runs the wizard by hand."""
+        already exists."""
         today = fields.Date.context_today(self)
         open_years = self.search([('state', '=', 'open')])
         for year in open_years:

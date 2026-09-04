@@ -168,16 +168,16 @@
                             </p>
                         </page>
                         <page string="Objectives" name="objectives">
-                            <field name="objective_ids" readonly="state != 'draft'">
+                            <field name="objective_ids" readonly="state != 'draft'" context="{'default_plan_id': id}">
                                 <!-- No editable="bottom": "Add a line" (and clicking an
                                      existing row) opens the popup form below instead of an
                                      inline row, matching the Weekly Timetable pattern. -->
                                 <list default_order="sequence">
                                     <field name="sequence" widget="handle"/>
                                     <field name="name"/>
-                                    <field name="linked_service_objective"/>
+                                    <field name="service_objective_id"/>
                                     <field name="target_date"/>
-                                    <field name="status"/>
+                                    <field name="status" widget="badge" decoration-success="status == 'achieved'" decoration-warning="status == 'at_risk'" decoration-danger="status == 'not_achieved'" decoration-info="status == 'on_track'"/>
                                     <field name="description" optional="hide"/>
                                     <field name="review_notes" optional="hide"/>
                                 </list>
@@ -195,32 +195,40 @@
                                                 invisible="status not in ('achieved', 'not_achieved')"/>
                                         <button name="action_set_status_on_track" type="object"
                                                 string="Mark On Track" class="btn-primary"
-                                                invisible="status not in ('not_started', 'at_risk')"/>
+                                                invisible="status != 'not_started'"/>
                                         <button name="action_set_status_at_risk" type="object"
                                                 string="Mark At Risk"
                                                 invisible="status != 'on_track'"/>
                                         <button name="action_set_status_achieved" type="object"
-                                                string="Mark Achieved" class="btn-success"
+                                                string="Mark Achieved" class="btn-primary"
                                                 invisible="status not in ('on_track', 'at_risk')"/>
                                         <button name="action_set_status_not_achieved" type="object"
-                                                string="Mark Not Achieved"
+                                                string="UnAchieved"
                                                 invisible="status not in ('on_track', 'at_risk')"/>
                                         <field name="status" widget="statusbar" clickable="1"/>
                                     </header>
-                                    <group>
+                                    <sheet>
+                                        <div class="oe_title">
+                                            <h1><field name="name" placeholder="Objective Name"/></h1>
+                                        </div>
                                         <group>
-                                            <field name="plan_id" invisible="1" force_save="1"/>
-                                            <field name="name"/>
-                                            <field name="linked_service_objective"/>
-                                            <field name="target_date"/>
+                                            <group>
+                                                <field name="plan_id" invisible="1" force_save="1"/>
+                                                <field name="service_objective_id"/>
+                                            </group>
+                                            <group>
+                                                <field name="target_date"/>
+                                            </group>
                                         </group>
-                                    </group>
-                                    <group string="Description">
-                                        <field name="description" nolabel="1" rows="4"/>
-                                    </group>
-                                    <group string="Review Notes">
-                                        <field name="review_notes" nolabel="1" rows="4"/>
-                                    </group>
+                                        <group>
+                                            <group string="Description">
+                                                <field name="description" nolabel="1" rows="4"/>
+                                            </group>
+                                            <group string="Review Notes">
+                                                <field name="review_notes" nolabel="1" rows="4"/>
+                                            </group>
+                                        </group>
+                                    </sheet>
                                 </form>
                             </field>
                         </page>
@@ -387,7 +395,7 @@
         <field name="name">nhs.job.plan.objective.form</field>
         <field name="model">nhs.job.plan.objective</field>
         <field name="arch" type="xml">
-            <form string="Job Plan Objective">
+            <form string="Job Plan Objective" create="false">
                 <header>
                     <!-- Same buttons/statusbar as the popup form on the Job
                          Plan's Objectives tab - kept in sync with that one. -->
@@ -396,15 +404,15 @@
                             invisible="not id or status not in ('achieved', 'not_achieved')"/>
                     <button name="action_set_status_on_track" type="object"
                             string="Mark On Track" class="btn-primary"
-                            invisible="not id or status not in ('not_started', 'at_risk')"/>
+                            invisible="not id or status != 'not_started'"/>
                     <button name="action_set_status_at_risk" type="object"
                             string="Mark At Risk"
                             invisible="not id or status != 'on_track'"/>
                     <button name="action_set_status_achieved" type="object"
-                            string="Mark Achieved" class="btn-success"
+                            string="Mark Achieved" class="btn-primary   "
                             invisible="not id or status not in ('on_track', 'at_risk')"/>
                     <button name="action_set_status_not_achieved" type="object"
-                            string="Mark Not Achieved"
+                            string="UnAchieved"
                             invisible="not id or status not in ('on_track', 'at_risk')"/>
                     <field name="status" widget="statusbar" clickable="1"/>
                 </header>
@@ -415,7 +423,7 @@
                     <group>
                         <group>
                             <field name="plan_id" force_save="1"/>
-                            <field name="linked_service_objective"/>
+                            <field name="service_objective_id"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group>
@@ -438,7 +446,7 @@
         <field name="name">nhs.job.plan.objective.list</field>
         <field name="model">nhs.job.plan.objective</field>
         <field name="arch" type="xml">
-            <list string="Job Plan Objectives">
+            <list string="Job Plan Objectives" create="false">
                 <field name="sequence" widget="handle"/>
                 <field name="plan_id"/>
                 <field name="name"/>

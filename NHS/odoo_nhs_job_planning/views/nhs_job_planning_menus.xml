@@ -45,6 +45,8 @@
               action="action_nhs_oncall_supplement_rate" sequence="30"/>
     <menuitem id="menu_nhs_jobplan_plan_years" name="Plan Years" parent="menu_nhs_jobplan_config"
               action="action_nhs_plan_year" sequence="40"/>
+    <menuitem id="menu_nhs_jobplan_service_objective" name="Service Objectives" parent="menu_nhs_jobplan_config"
+              action="action_nhs_service_objective" sequence="45"/>
         <menuitem id="menu_nhs_jobplan_settings" name="Settings" parent="menu_nhs_jobplan_config"
               action="action_nhs_job_planning_config_settings" sequence="50"/>
 
