@@ -135,6 +135,13 @@
             }
         }
 
+        // Plain display-only rows (e.g. Completeness Trend) - no click
+        // handler, so suppress the hover affordance other list-group-items
+        // get, which would otherwise falsely suggest they're clickable.
+        .nhs-list-static:hover {
+            background-color: transparent;
+        }
+
         table.table {
             tr {
                 cursor: pointer;

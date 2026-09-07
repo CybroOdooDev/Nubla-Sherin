@@ -71,7 +71,8 @@
                     </div>
                     <group>
                         <group>
-                            <field name="doctor_user_id" readonly="is_locked"/>
+                            <field name="can_edit_doctor_user_id" invisible="1"/>
+                            <field name="doctor_user_id" readonly="is_locked or not can_edit_doctor_user_id"/>
                             <field name="doctor_name" readonly="1"/>
                             <field name="post_id" readonly="is_locked"/>
                             <field name="specialty" readonly="is_locked"/>
@@ -79,7 +80,7 @@
                             <field name="company_id" groups="base.group_multi_company" readonly="1"/>
                         </group>
                         <group>
-                            <field name="plan_year_id" readonly="is_locked"/>
+                            <field name="plan_year_id" readonly="is_locked" domain="[('state', '=', 'open')]"/>
                             <field name="contracted_pas" readonly="is_locked"/>
                             <field name="fte" readonly="1"/>
                             <field name="oncall_profile_id" readonly="is_locked"/>
@@ -128,6 +129,9 @@
                                     <field name="notes" optional="hide"/>
                                 </list>
                                 <form string="Timetable Activity">
+                                    <div class="oe_title">
+                                        <h1><field name="activity" placeholder="e.g. Outpatient Clinic"/></h1>
+                                    </div>
                                     <group>
                                         <group string="When">
                                             <field name="weekday"/>
@@ -138,7 +142,6 @@
                                         </group>
                                         <group string="What">
                                             <field name="session_category_id"/>
-                                            <field name="activity"/>
                                             <field name="classification" widget="radio"/>
                                             <field name="location"/>
                                         </group>
@@ -424,19 +427,20 @@
                         <group>
                             <field name="plan_id" force_save="1"/>
                             <field name="service_objective_id"/>
-                            <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group>
                             <field name="target_date"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                     </group>
                     <group string="Description">
-                        <field name="description" nolabel="1"/>
+                        <field name="description" nolabel="1" colspan="2" rows="4"/>
                     </group>
                     <group string="Review Notes">
-                        <field name="review_notes" nolabel="1"/>
+                        <field name="review_notes" nolabel="1" colspan="2" rows="4"/>
                     </group>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -450,6 +454,7 @@
                 <field name="sequence" widget="handle"/>
                 <field name="plan_id"/>
                 <field name="name"/>
+                <field name="service_objective_id" optional="hide"/>
                 <field name="target_date"/>
                 <field name="status" widget="badge" decoration-success="status == 'achieved'" decoration-warning="status == 'at_risk'" decoration-danger="status == 'not_achieved'" decoration-info="status == 'on_track'"/>
             </list>
@@ -464,10 +469,16 @@
             <search string="Search Objectives">
                 <field name="name"/>
                 <field name="plan_id"/>
+                <field name="doctor_user_id"/>
+                <field name="service_objective_id"/>
                 <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
                 <group>
                     <filter string="Status" name="group_by_status" context="{'group_by': 'status'}"/>
+                    <filter string="Doctor" name="group_by_doctor" context="{'group_by': 'doctor_user_id'}"/>
                     <filter string="Job Plan" name="group_by_plan" context="{'group_by': 'plan_id'}"/>
+                    <filter string="Plan Year" name="group_by_plan_year" context="{'group_by': 'plan_year_id'}"/>
+                    <filter string="Linked Service Objective" name="group_by_service_objective" context="{'group_by': 'service_objective_id'}"/>
+                    <filter string="Target Date" name="group_by_target_date" context="{'group_by': 'target_date:month'}"/>
                 </group>
             </search>
         </field>
@@ -479,6 +490,7 @@
         <field name="res_model">nhs.job.plan.objective</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_nhs_job_plan_objective_search"/>
+        <field name="context">{'search_default_group_by_doctor': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No objectives found.

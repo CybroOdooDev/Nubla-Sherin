@@ -17,10 +17,31 @@ export class NhsJobPlanDashboard extends Component {
         });
 
         onWillStart(async () => {
-            this.state.metrics = await this.orm.call(
-                "nhs.plan.year", "get_capacity_dashboard_metrics", []);
+            await this.loadMetrics();
             this.state.loading = false;
         });
+    }
+
+    async loadMetrics(yearId) {
+        this.state.metrics = await this.orm.call(
+            "nhs.plan.year", "get_capacity_dashboard_metrics", [], { year_id: yearId || false });
+    }
+
+    async onChangeYear(ev) {
+        const yearId = ev.target.value ? parseInt(ev.target.value, 10) : false;
+        this.state.loading = true;
+        await this.loadMetrics(yearId);
+        this.state.loading = false;
+    }
+
+    activityBadgeClass(state) {
+        if (["signed", "revised"].includes(state)) {
+            return "nhs-badge-good";
+        }
+        if (["proposed", "in_discussion"].includes(state)) {
+            return "nhs-badge-warn";
+        }
+        return "nhs-badge-bad";
     }
 
     getRateLevel(rate) {
@@ -80,6 +101,69 @@ export class NhsJobPlanDashboard extends Component {
         this.openAction("nhs.job.plan", "list,form", [
             ["plan_year_id", "=", yearId], ["org_unit_id", "=", unitId], ["state", "in", COMPLETE_STATES],
         ]);
+    }
+
+    openReviewOverdue() {
+        const yearId = this.state.metrics.year_id;
+        this.openAction("nhs.job.plan", "list,form", [
+            ["plan_year_id", "=", yearId], ["state", "in", COMPLETE_STATES],
+            ["review_due_date", "<", this._today()],
+        ]);
+    }
+
+    openReviewDueSoon() {
+        const yearId = this.state.metrics.year_id;
+        const today = this._today();
+        const horizon = this._today(60);
+        this.openAction("nhs.job.plan", "list,form", [
+            ["plan_year_id", "=", yearId], ["state", "in", COMPLETE_STATES],
+            ["review_due_date", ">=", today], ["review_due_date", "<=", horizon],
+        ]);
+    }
+
+    openOncallGaps() {
+        const yearId = this.state.metrics.year_id;
+        this.openAction("nhs.job.plan", "list,form", [
+            ["plan_year_id", "=", yearId], ["state", "!=", "superseded"], ["oncall_profile_id", "=", false],
+        ]);
+    }
+
+    openDirectorateOncallGaps(unitId) {
+        const yearId = this.state.metrics.year_id;
+        this.openAction("nhs.job.plan", "list,form", [
+            ["plan_year_id", "=", yearId], ["org_unit_id", "=", unitId],
+            ["state", "!=", "superseded"], ["oncall_profile_id", "=", false],
+        ]);
+    }
+
+    _today(addDays = 0) {
+        const d = new Date();
+        d.setDate(d.getDate() + addDays);
+        return d.toISOString().slice(0, 10);
+    }
+
+    openPaOver() {
+        const yearId = this.state.metrics.year_id;
+        this.openAction("nhs.job.plan", "list,form", [
+            ["plan_year_id", "=", yearId], ["state", "!=", "superseded"], ["pa_balance", ">", 0.5],
+        ]);
+    }
+
+    openPaUnder() {
+        const yearId = this.state.metrics.year_id;
+        this.openAction("nhs.job.plan", "list,form", [
+            ["plan_year_id", "=", yearId], ["state", "!=", "superseded"], ["pa_balance", "<", -0.5],
+        ]);
+    }
+
+    openRecentPlan(planId) {
+        this.action.doAction({
+            type: "ir.actions.act_window",
+            res_model: "nhs.job.plan",
+            views: [[false, "form"]],
+            res_id: planId,
+            target: "current",
+        });
     }
 }
 

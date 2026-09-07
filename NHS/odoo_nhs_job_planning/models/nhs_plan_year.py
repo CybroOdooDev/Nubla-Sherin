@@ -31,6 +31,7 @@ YEAR_STATES = [
 
 COMPLETE_STATES = ('signed', 'revised')
 OPEN_ENDED_STATES = ('proposed', 'in_discussion')
+PA_BALANCE_TOLERANCE = 0.5  # same tolerance action_agree() uses to flag an unreconciled plan
 
 
 class NhsPlanYear(models.Model):
@@ -145,10 +146,25 @@ class NhsPlanYear(models.Model):
 
     @api.constrains('date_start', 'date_end')
     def _check_dates(self):
-        """The end date must fall after the start date."""
+        """The end date must fall after the start date, and the year must
+        span roughly a full 12 months. A plan year shorter than this
+        confuses the auto-rollover cron (which decides "create next year"
+        once fewer than 60 days remain - a short year would trigger that
+        almost immediately) and can push review_due_date (date_end minus
+        the review lead time, default 60 days) before date_start, silently
+        dropping the plan out of the review-reminder cron entirely."""
+        MIN_SPAN_DAYS = 300
         for year in self:
-            if year.date_start and year.date_end and year.date_end <= year.date_start:
+            if not (year.date_start and year.date_end):
+                continue
+            if year.date_end <= year.date_start:
                 raise ValidationError('The plan year end date must be after its start date!')
+            span = (year.date_end - year.date_start).days
+            if span < MIN_SPAN_DAYS:
+                raise ValidationError(
+                    'The plan year must span approximately 12 months (at least'
+                    ' %d days). "%s" to "%s" is only %d days.' % (
+                        MIN_SPAN_DAYS, year.date_start, year.date_end, span))
 
     def action_open(self):
         """Open the year so job plans can be created/rolled over into it."""
@@ -185,17 +201,30 @@ class NhsPlanYear(models.Model):
         }
 
     @api.model
-    def get_capacity_dashboard_metrics(self):
+    def get_capacity_dashboard_metrics(self, year_id=None):
         """Aggregate the figures behind the Capacity & Completeness dashboard:
-        the current company's open plan year completeness/gaps, unsigned and
-        stalled plan counts, and per-directorate completeness/capacity
-        breakdowns. Read-only, called from the dashboard client action."""
+        the selected (or, by default, the current open) plan year's
+        completeness/gaps, unsigned and stalled plan counts, per-directorate
+        completeness/capacity/on-call breakdowns, upcoming review-due plans,
+        PA balance, a cross-year completeness trend and recent plan
+        activity. Read-only, called from the dashboard client action.
+
+        year_id: optional nhs.plan.year id to view instead of the default
+        (current open year, or most recent if none is open) - powers the
+        dashboard's plan-year selector so past/draft years can be reviewed
+        too, not just whichever one is currently open."""
         company = self.env.company
-        year = self.search([
-            ('company_id', '=', company.id), ('state', '=', 'open'),
-        ], limit=1, order='date_start desc')
+        if year_id:
+            year = self.browse(year_id).exists().filtered(lambda y: y.company_id == company)
+        else:
+            year = self.env['nhs.plan.year']
+        if not year:
+            year = self.search([
+                ('company_id', '=', company.id), ('state', '=', 'open'),
+            ], limit=1, order='date_start desc')
         if not year:
             year = self.search([('company_id', '=', company.id)], limit=1, order='date_start desc')
+        year_options = self.search([('company_id', '=', company.id)], order='date_start desc')
 
         Post = self.env['nhs.establishment.post']
         posts = Post.search([
@@ -207,6 +236,7 @@ class NhsPlanYear(models.Model):
         gap_posts = posts - signed_posts
         unsigned = plans.filtered(lambda p: p.state not in COMPLETE_STATES + ('superseded',))
         stalled = plans.filtered(lambda p: p.state in OPEN_ENDED_STATES)
+        live_plans = plans.filtered(lambda p: p.state != 'superseded')
 
         by_unit = {}
         for post in posts:
@@ -236,9 +266,63 @@ class NhsPlanYear(models.Model):
             row['balance'] += plan.pa_balance
         capacity_rows = sorted(capacity_by_unit.values(), key=lambda r: r['name'])
 
+        # Review due: only signed/revised plans carry a meaningful
+        # review_due_date (see nhs_job_plan.py _compute_review_due_date).
+        today = fields.Date.context_today(self)
+        due_soon_horizon = today + relativedelta(days=60)
+        reviewable = plans.filtered(lambda p: p.state in COMPLETE_STATES and p.review_due_date)
+        review_overdue = reviewable.filtered(lambda p: p.review_due_date < today)
+        review_due_soon = reviewable.filtered(
+            lambda p: today <= p.review_due_date <= due_soon_horizon)
+
+        # On-call coverage by directorate: whether each live (non-superseded)
+        # plan has an on-call profile assigned.
+        oncall_by_unit = {}
+        for plan in live_plans:
+            unit = plan.org_unit_id
+            row = oncall_by_unit.setdefault(unit.id, {
+                'id': unit.id, 'name': unit.display_name or 'Unassigned', 'total': 0, 'covered': 0,
+            })
+            row['total'] += 1
+            if plan.oncall_profile_id:
+                row['covered'] += 1
+        oncall_rows = []
+        for row in oncall_by_unit.values():
+            row['rate'] = round(row['covered'] / row['total'] * 100, 2) if row['total'] else 0.0
+            oncall_rows.append(row)
+        oncall_rows.sort(key=lambda r: r['rate'])
+
+        # PA over/under-establishment: same +/-0.5 PA tolerance action_agree()
+        # already uses to flag an unreconciled plan, split by direction so
+        # over-committed (more PAs planned than contracted) and
+        # under-utilised capacity can be told apart at a glance.
+        pa_over = live_plans.filtered(lambda p: p.pa_balance > PA_BALANCE_TOLERANCE)
+        pa_under = live_plans.filtered(lambda p: p.pa_balance < -PA_BALANCE_TOLERANCE)
+
+        # Completeness trend: the (already stored) completeness_pct of every
+        # plan year for this company, oldest to newest, so the dashboard can
+        # show whether things are improving year over year rather than just
+        # one snapshot.
+        completeness_trend = [
+            {'id': y.id, 'name': y.name, 'completeness_pct': y.completeness_pct}
+            for y in year_options.sorted('date_start')
+        ]
+
+        # Recent activity: the most recently updated job plans for this
+        # company (not limited to the selected year - a manager wants to
+        # see momentum across the board, not just one year's worth).
+        recent_plans = self.env['nhs.job.plan'].search([
+            ('company_id', '=', company.id),
+        ], order='write_date desc', limit=8)
+        recent_activity = [{
+            'id': p.id, 'reference': p.reference, 'doctor_name': p.doctor_name,
+            'state': p.state, 'write_date': fields.Datetime.to_string(p.write_date),
+        } for p in recent_plans]
+
         return {
             'year_id': year.id if year else False,
             'year_name': year.name if year else 'No Plan Year',
+            'year_options': [{'id': y.id, 'name': y.name, 'state': y.state} for y in year_options],
             'completeness_pct': year.completeness_pct if year else 0.0,
             'post_count': len(posts),
             'signed_count': len(signed_posts),
@@ -247,6 +331,13 @@ class NhsPlanYear(models.Model):
             'stalled_count': len(stalled),
             'weakest_directorates': completeness_rows[:5],
             'capacity_rows': capacity_rows,
+            'review_overdue_count': len(review_overdue),
+            'review_due_soon_count': len(review_due_soon),
+            'oncall_rows': oncall_rows[:5],
+            'pa_over_count': len(pa_over),
+            'pa_under_count': len(pa_under),
+            'completeness_trend': completeness_trend,
+            'recent_activity': recent_activity,
         }
 
     @api.model
@@ -261,17 +352,17 @@ class NhsPlanYear(models.Model):
             if not year.date_end or (year.date_end - today).days > 60:
                 continue
             next_start = year.date_end + relativedelta(days=1)
-            existing = self.search([
+            target_year = self.search([
                 ('date_start', '=', next_start),
                 ('company_id', '=', year.company_id.id),
             ], limit=1)
-            if existing:
-                continue
-            next_year = self.create({
-                'date_start': next_start,
-                'date_end': next_start + relativedelta(years=1, days=-1),
-                'company_id': year.company_id.id,
-                'state': 'draft',
-            })
+            if not target_year:
+                target_year = self.create({
+                    'date_start': next_start,
+                    'date_end': next_start + relativedelta(years=1, days=-1),
+                    'company_id': year.company_id.id,
+                    'state': 'draft',
+                })
+            
             if year.company_id.nhs_jobplan_auto_rollover:
-                self.env['nhs.job.plan']._rollover_plans(year, next_year)
+                self.env['nhs.job.plan']._rollover_plans(year, target_year)

@@ -2,9 +2,7 @@
 <odoo>
     <!-- Illustrative service objectives, named after real NHS England national
          standards/programmes so the demo data reads as genuinely UK NHS rather
-         than generic placeholder text. Targets/percentages change over time
-         (e.g. RTT and UEC standards have been revised more than once) - verify
-         the current figure before quoting one in a trust's own objective. -->
+         than generic placeholder text. -->
     <data noupdate="1">
         <!-- Record: service_objective_rtt_18_weeks for nhs.service.objective -->
         <record id="service_objective_rtt_18_weeks" model="nhs.service.objective">

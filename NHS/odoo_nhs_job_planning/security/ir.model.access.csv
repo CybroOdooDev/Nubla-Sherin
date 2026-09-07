@@ -33,3 +33,6 @@ access_nhs_establishment_post_admin_jp,nhs.establishment.post admin jp,odoo_nhs_
 access_nhs_org_unit_doctor_jp,nhs.org.unit doctor jp,odoo_nhs_establishment.model_nhs_org_unit,group_nhs_jobplan_doctor,1,0,0,0
 access_nhs_org_unit_manager_jp,nhs.org.unit manager jp,odoo_nhs_establishment.model_nhs_org_unit,group_nhs_jobplan_manager,1,0,0,0
 access_nhs_org_unit_admin_jp,nhs.org.unit admin jp,odoo_nhs_establishment.model_nhs_org_unit,group_nhs_jobplan_admin,1,0,0,0
+access_nhs_staff_group_doctor_jp,nhs.staff.group doctor jp,odoo_nhs_establishment.model_nhs_staff_group,group_nhs_jobplan_doctor,1,0,0,0
+access_nhs_staff_group_manager_jp,nhs.staff.group manager jp,odoo_nhs_establishment.model_nhs_staff_group,group_nhs_jobplan_manager,1,0,0,0
+access_nhs_staff_group_admin_jp,nhs.staff.group admin jp,odoo_nhs_establishment.model_nhs_staff_group,group_nhs_jobplan_admin,1,0,0,0

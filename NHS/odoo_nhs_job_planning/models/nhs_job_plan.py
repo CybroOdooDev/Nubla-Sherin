@@ -68,6 +68,7 @@ class NhsJobPlan(models.Model):
         'res.users',
         string='Doctor User',
         required=True,
+        domain="[('share', '=', False)]",
         tracking=True,
         help="The doctor's login - single source of identity for the plan."
              " Used for own-plan access scoping and sign-off/notification"
@@ -83,6 +84,22 @@ class NhsJobPlan(models.Model):
              " by hand. Kept as a stored field so sorting, search, templates"
              " and reports can keep referencing it unchanged."
     )
+    can_edit_doctor_user_id = fields.Boolean(
+        string='Can Edit Doctor',
+        compute='_compute_can_edit_doctor_user_id',
+        help="Technical field for the view: only clinical managers/admins may"
+             " (re)point a plan at a different doctor. A plain doctor-group"
+             " user creating their own plan (e.g. via 'My Plan') would"
+             " otherwise still be able to change this Many2one to someone"
+             " else's user before saving, which then trips the 'own record"
+             " only' record rule with a confusing Access Error instead of"
+             " simply not being offered the choice."
+    )
+
+    def _compute_can_edit_doctor_user_id(self):
+        can_edit = self.env.user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_manager')
+        for plan in self:
+            plan.can_edit_doctor_user_id = can_edit
     doctor_member_ref = fields.Reference(
         selection=[('nhs.workforce.member', 'Workforce Member')],
         string='Workforce Member',
@@ -477,6 +494,26 @@ class NhsJobPlan(models.Model):
                     " instead of creating a second one." % (
                         plan.doctor_user_id.name, other.reference, plan.plan_year_id.name))
 
+    @api.constrains('plan_year_id')
+    def _check_plan_year_open(self):
+        """A new job plan may only be raised against an 'open' plan year -
+        not a still-draft one (nothing to plan against yet) or a closed one
+        (the cycle is finished). Skipped when
+        `nhs_jobplan_skip_year_state_check` is set in context: rollover
+        (_rollover_plans(), called by both the auto-create-next-year cron
+        and the manual rollover wizard) deliberately pre-stages next year's
+        plans into a still-draft year, by design, before anyone opens it -
+        that legitimate system flow must not be blocked by this check,
+        which exists to stop a person picking a draft/closed year by hand."""
+        if self.env.context.get('nhs_jobplan_skip_year_state_check'):
+            return
+        for plan in self:
+            if plan.plan_year_id.state != 'open':
+                raise ValidationError(
+                    "'%s' is %s, not Open. A job plan can only be created"
+                    " against an open plan year." % (
+                        plan.plan_year_id.name, plan.plan_year_id.state))
+
     @api.model_create_multi
     def create(self, vals_list):
         """Sequence the reference."""
@@ -663,7 +700,7 @@ class NhsJobPlan(models.Model):
             'context': {'default_plan_id': self.id},
         }
 
-    def _get_rollover_candidates(self, source_year, org_units=None, only_signed=True):
+    def _get_rollover_candidates(self, source_year, org_units=None, only_signed=True, target_year=None):
         """The source-year job plans eligible for rollover into another year.
         Shared by the manual rollover wizard (nhs.job.plan.rollover.wizard)
         and the automatic-rollover cron below, so both filter identically.
@@ -682,7 +719,20 @@ class NhsJobPlan(models.Model):
             domain.append(('state', '=', 'signed'))
         if org_units:
             domain.append(('org_unit_id', 'child_of', org_units.ids))
-        return self.search(domain)
+        
+        candidates = self.search(domain)
+        if target_year:
+            # Exclude doctors who already have an active/draft plan in the target year
+            target_plans = self.search([
+                ('plan_year_id', '=', target_year.id),
+                ('state', 'not in', ['superseded', 'revised']),
+                ('doctor_user_id', '!=', False)
+            ])
+            excluded_doctors = target_plans.mapped('doctor_user_id.id')
+            candidates = candidates.filtered(
+                lambda p: not p.doctor_user_id or p.doctor_user_id.id not in excluded_doctors
+            )
+        return candidates
 
     def _rollover_plans(self, source_year, target_year, org_units=None, only_signed=True):
         """Clone _get_rollover_candidates(source_year, ...) as fresh drafts in
@@ -690,8 +740,12 @@ class NhsJobPlan(models.Model):
         previous_plan_id is set, since rollover is a new-year restart, not an
         in-year revision of a signed plan. Returns the new plans."""
         new_plans = self.browse()
-        for plan in self._get_rollover_candidates(source_year, org_units, only_signed):
-            new_plans |= plan.copy({
+        for plan in self._get_rollover_candidates(source_year, org_units, only_signed, target_year):
+            # nhs_jobplan_skip_year_state_check: rollover deliberately
+            # pre-stages plans into target_year while it's still 'draft' -
+            # see _check_plan_year_open()'s docstring for why this must
+            # bypass that check rather than trip it.
+            new_plans |= plan.with_context(nhs_jobplan_skip_year_state_check=True).copy({
                 'reference': 'New',
                 'plan_year_id': target_year.id,
                 'state': 'draft',

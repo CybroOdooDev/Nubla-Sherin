@@ -68,9 +68,9 @@ class NhsJobPlanRolloverWizard(models.TransientModel):
         agree."""
         self.ensure_one()
         return self.env['nhs.job.plan']._get_rollover_candidates(
-            self.source_plan_year_id, self.org_unit_ids, self.only_signed_source)
+            self.source_plan_year_id, self.org_unit_ids, self.only_signed_source, self.target_plan_year_id)
 
-    @api.depends('source_plan_year_id', 'org_unit_ids', 'only_signed_source')
+    @api.depends('source_plan_year_id', 'org_unit_ids', 'only_signed_source', 'target_plan_year_id')
     def _compute_plan_preview_count(self):
         """Preview how many plans this rollover will create."""
         for wizard in self:

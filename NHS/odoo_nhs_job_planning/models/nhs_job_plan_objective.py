@@ -34,6 +34,7 @@ OBJECTIVE_STATUSES = [
 class NhsJobPlanObjective(models.Model):
     """A personal objective recorded on a job plan, with its review notes."""
     _name = 'nhs.job.plan.objective'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Job Plan Objective'
     _order = 'sequence, target_date'
 
@@ -52,6 +53,22 @@ class NhsJobPlanObjective(models.Model):
         store=True,
         help="Owning company, from the plan."
     )
+    doctor_user_id = fields.Many2one(
+        'res.users',
+        string='Doctor',
+        related='plan_id.doctor_user_id',
+        store=True,
+        help="Doctor, from the plan - lets the cross-plan Objectives list be"
+             " grouped/filtered by doctor."
+    )
+    plan_year_id = fields.Many2one(
+        'nhs.plan.year',
+        string='Plan Year',
+        related='plan_id.plan_year_id',
+        store=True,
+        help="Plan year, from the plan - lets the cross-plan Objectives list"
+             " be grouped/filtered by year."
+    )
     sequence = fields.Integer(
         string='Sequence',
         default=10,
@@ -65,6 +82,7 @@ class NhsJobPlanObjective(models.Model):
     name = fields.Char(
         string='Objective',
         required=True,
+        tracking=True,
         help="Objective title."
     )
     description = fields.Text(
@@ -74,17 +92,20 @@ class NhsJobPlanObjective(models.Model):
     service_objective_id = fields.Many2one(
         'nhs.service.objective',
         string='Linked Service Objective',
+        tracking=True,
         help="The wider directorate/service objective this personal"
              " objective supports."
     )
     target_date = fields.Date(
         string='Target Date',
+        tracking=True,
         help="When the objective is expected to be met."
     )
     status = fields.Selection(
         OBJECTIVE_STATUSES,
         string='Status',
         default='not_started',
+        tracking=True,
         help="Progress against the objective."
     )
     active = fields.Boolean(
@@ -96,6 +117,7 @@ class NhsJobPlanObjective(models.Model):
     )
     review_notes = fields.Text(
         string='Review Notes',
+        tracking=True,
         help="Notes recorded at annual review."
     )
 

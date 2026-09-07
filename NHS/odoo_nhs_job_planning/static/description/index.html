@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NHS Medical Job Planning</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+</head>
+<body style="font-family: &quot;Montserrat&quot;, sans-serif;background-color: #71639e08;">
+
+
+    <div class="container-fluid cmpad">
+        <div class="supports my-3 py-3" style="    border: 2px solid #71639e10;
+    padding: 0 35px;
+    border-radius: 10px;    border: 2px solid #e9ecef;background-color: white;">
+            <div class="row justify-content-between align-items-center">
+                <div class="col-lg-3">
+                    <div class="my-3 mx-auto mx-sm-0" style="width: 250px; ">
+                        <img src="//apps.odoocdn.com/apps/assets/17.0/theme_boec/images/Cybrosys.png?fcdde35"
+                            style="width: 100%;">
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="row">
+                        <div class="my-3 d-flex align-items-center justify-content-center justify-content-sm-end">
+                            <span class="me-3"><b>Supports: </b></span>
+                            <div class="text-center" style="
+                    background-color: #71639e !important;
+                    font-size: 1rem !important;
+                    color: #fff !important;
+                    font-weight: 500 !important;
+                    padding: 8px !important;
+                    margin: 0 3px !important;
+                    border-radius: 50px !important;
+                    min-width: 130px !important;
+                  ">
+                                Community
+                            </div>
+                            <!--                        <div class="text-center" style="-->
+                            <!--                    background-color: #9e6390 !important;-->
+                            <!--                    font-size: 1rem !important;-->
+                            <!--                    color: #fff !important;-->
+                            <!--                    font-weight: 500 !important;-->
+                            <!--                    padding: 8px !important;-->
+                            <!--                    margin: 0 3px !important;-->
+                            <!--                    border-radius: 50px !important;-->
+                            <!--                    min-width: 130px !important;-->
+                            <!--                  ">-->
+                            <!--                            Enterprise-->
+                            <!--                        </div>-->
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;display: flex;justify-content: end;float: right;">
+                        <div class="d-flex align-items-center justify-content-end flex-wrap gap-2">
+                            <span class="me-3"><b>Availability: </b></span>
+                            <div class="d-flex align-items-center justify-content-center gap-2 text-center col" style="
+                    border: 2px solid #ebebeb;
+    font-size: 1rem !important;
+    color: #333 !important;
+    font-weight: 500 !important;
+    padding: 8px !important;
+    margin: 0 3px !important;
+    border-radius: 20px !important;
+    min-width: 150px !important;
+
+                  ">
+
+                                <img src="./assets/icons/close.png" alt="" width="18" height="18">
+                                Odoo Online
+                            </div>
+                            <div class="d-flex align-items-center justify-content-center gap-2 text-center col" style="
+                    border: 2px solid #ebebeb;
+    font-size: 1rem !important;
+    color: #333 !important;
+    font-weight: 500 !important;
+    padding: 8px !important;
+    margin: 0 3px !important;
+    border-radius: 20px !important;
+    min-width: 150px !important;
+
+                  ">
+
+                                <img src="./assets/icons/close.png" alt="" width="18" height="18">
+                                Odoo.sh
+                            </div>
+                            <div class="d-flex align-items-center justify-content-center gap-2 text-center col" style="
+                   border: 2px solid #ebebeb;
+    font-size: 1rem !important;
+    color: #333 !important;
+    font-weight: 500 !important;
+    padding: 8px !important;
+    margin: 0 3px !important;
+    border-radius: 20px !important;
+    min-width: 150px !important;
+
+                  ">
+                                <img src="./assets/icons/tick.png" alt="" width="18" height="18">
+                                On Premise
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container-fluid cmpad text-center py-5 py-md-3">
+        <div class="row">
+            <div class="col-md-12">
+                <h3 class="mainhead" style="font-size: 2.3rem;padding-top: 1rem;font-weight: 700;color: black;">NHS Medical Job Planning</h3>
+                <p class="para mb-4" style="font-size: 20px;color: #6b7280;">Manage annual job plans for consultants and SAS doctors — programmed activities, DCC/SPA split, on-call, objectives and two-party doctor/manager sign-off, through to team capacity reporting.</p>
+
+                <div class="d-flex justify-content-center gap-1 flex-wrap">
+                    <a href="mailto:"
+                        class="contact-btn email-btn d-flex align-items-center gap-2 justify-content-center"
+                        style="position: relative;padding: 15px 25px;border: none;border-radius: 50px;font-size: 16px;font-weight: 600;text-decoration: none;color: white;cursor: pointer;min-width: 200px;justify-content: center;background-color: #4facfe">
+                        <img src="./assets/icons/mail.png" alt="" width="25" height="25">
+                        <span class="btn-text" style="font-size: 15px;letter-spacing: 0.5px;">Email Us</span>
+                    </a>
+
+
+
+                    <a href="https://wa.me/919074270811"
+                        class="contact-btn whatsapp-btn d-flex align-items-center gap-2 justify-content-center"
+                        style="position: relative;padding: 15px 25px;border: none;border-radius: 50px;font-size: 16px;font-weight: 600;text-decoration: none;color: white;cursor: pointer;min-width: 200px;justify-content: center;background-color: #25d366;">
+                        <img src="./assets/icons/whatsapp.png" alt="" width="25" height="25">
+                        <span class="btn-text" style="font-size: 15px;letter-spacing: 0.5px;">+91 9074270811</span>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container-fluid cmpad py-2 py-md-5">
+        <div class="row">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <!-- Blog Card -->
+                <div class="content-card blog-card h-100" style="    background-color: #8b5cf612;
+    border: 2px solid #8a5cf615;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                        style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #8B5CF6;">
+                        <img src="./assets/icons/document.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Read Blog</h3>
+                    <p class="card-description mb-3"
+                        style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Dive into our
+                        comprehensive blog posts covering the latest in
+                        cybersecurity
+                        trends and insights.</p>
+
+                    <a href="https://www.cybrosys.com/blog/what-are-the-key-features-of-odoo-18-full-accounting-kit-for-community"
+                        class="card-action video-action d-flex align-items-center justify-content-center gap-2"
+                        style="padding: 10px 20px;border-radius: 8px;font-weight: 500;font-size: 15px;text-decoration: none;border: none;width: max-content;background-color: #9e6390;color: white;transition: .3s;">
+                        <img src="./assets/icons/copy.png" alt="" width="18" height="18">
+                        Read Blog
+                    </a>
+
+
+                </div>
+            </div>
+            <div class="col-md-6">
+                <!-- Video Card -->
+                <div class="content-card video-card h-100" style="    background-color: #ef444421;
+    border: 2px solid #ef44441f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                        style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #EF4444;">
+                        <img src="./assets/icons/play.png" alt="" width="23px" height="23px">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Video Tutorial</h3>
+                    <p class="card-description mb-3"
+                        style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Watch our detailed
+                        video demonstrations and tutorials on YouTube
+                        for
+                        hands-on learning.</p>
+                    <a href="https://www.youtube.com/watch?v=ROhYgB35Sls"
+                        class="card-action video-action d-flex align-items-center justify-content-center gap-2"
+                        style="padding: 10px 20px;border-radius: 8px;font-weight: 500;font-size: 15px;text-decoration: none;border: none;width: max-content;background-color: #9e6390;color: white;transition: .3s;">
+                        <img src="./assets/icons/play.png" alt="" width="15px" height="15px">
+                        Watch Demo
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <div class="container-fluid cmpad py-2 py-md-5">
+        <div class="highlights-section">
+
+            <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Key
+                <span>Highlights</span>
+            </h2>
+
+            <div class="row" style="margin-top: 20px;">
+                <div class="col-md-4 mb-4">
+                    <div class="highlight-card h-100" style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                        <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                            style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                            <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                        </div>
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                            Two-Party Sign-Off Workflow</h3>
+                        <p class="card-description"
+                            style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Every job plan moves through Draft, Proposed, In Discussion, Agreed and Signed, requiring both the doctor and their clinical manager to sign before it locks.</p>
+
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="highlight-card h-100" style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                        <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                            style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                            <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                        </div>
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                            Programmed Activities &amp; DCC:SPA Split</h3>
+                        <p class="card-description"
+                            style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Build a weekly timetable of Programmed Activities, automatically split into Direct Clinical Care, Supporting Professional Activities, Additional Responsibility and External Duty totals.</p>
+
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="highlight-card h-100" style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                        <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                            style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                            <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                        </div>
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                            Configurable On-Call &amp; Supplement Table</h3>
+                        <p class="card-description"
+                            style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Capture each doctor's on-call rota frequency and category from a configurable supplement table, with predictable/unpredictable PAs rolled into the plan automatically.</p>
+
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="highlight-card h-100" style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                        <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                            style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                            <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                        </div>
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                            Team Capacity &amp; Completeness Dashboard</h3>
+                        <p class="card-description"
+                            style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Track signed-plan completeness, unsigned plans, stalled discussions and directorate capacity from one real-time dashboard.</p>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container-fluid cmpad py-2 py-md-5">
+        <div class="tabs-design1">
+
+
+            <ul class="nav nav-pills justify-content-start justify-content-md-center pb-4" style="    flex-flow: nowrap;
+    overflow: hidden;
+    overflow-x: auto;" id="pills1" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="screenshot-tab" data-bs-toggle="pill" data-bs-target="#screenshot"
+                        type="button" role="tab" style="width: max-content;border-radius: 50px;
+    margin: 0 5px;
+    padding: 12px 24px;
+    font-weight: 500;
+
+    border: 2px solid #e9ecef;
+    position: relative;
+
+    ">
+                        Screenshot
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="features-tab" data-bs-toggle="pill" data-bs-target="#features" type="button"
+                        role="tab" style="width: max-content;border-radius: 50px;
+    margin: 0 5px;
+    padding: 12px 24px;
+    font-weight: 500;
+
+    border: 2px solid #e9ecef;
+    position: relative;
+
+    ">
+                        Features
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="faq-tab" data-bs-toggle="pill" data-bs-target="#faq" type="button"
+                        role="tab" style="width: max-content;border-radius: 50px;
+    margin: 0 5px;
+    padding: 12px 24px;
+    font-weight: 500;
+
+    border: 2px solid #e9ecef;
+    position: relative;
+
+    ">
+                        Frequent Questions
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="latest-release-tab" data-bs-toggle="pill" data-bs-target="#latest-release"
+                        type="button" role="tab" style="width: max-content;border-radius: 50px;
+    margin: 0 5px;
+    padding: 12px 24px;
+    font-weight: 500;
+
+    border: 2px solid #e9ecef;
+    position: relative;
+
+    ">
+                        Latest Release
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content bg-white rounded-4" style="border: 2px solid #e9ecef;border-radius: 10px;"
+                id="pills1Content">
+                <div class="tab-pane fade show active" id="screenshot" role="tabpane2">
+                    <div class="p-3 py-md-5">
+
+
+                        <h2 class="mainhead text-center mb-2" style="font-size: 2rem;font-weight: 700;color: black;">
+                            Job Planning <span>Access Levels</span></h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Assign a Job Planning Access Level — No, Doctor, Clinical Manager or Medical Director/Admin — to each user directly from Settings, alongside their access to the other NHS suite modules.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/1.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">My
+                            <span> Plan</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Doctors see their own job plans at a glance — reference, plan year, contracted PAs, total
+    PAs, PA balance and DCC:SPA ratio — scoped to just their own record.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/2.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Signed &amp; Locked
+                            <span> Job Plan</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Once agreed and countersigned by both doctor and manager, a job plan is stamped Signed
+    and locked, with contracted PAs, FTE, on-call profile and the weekly
+    timetable all summarised on one page.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/3.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Weekly
+                            <span> Timetable Activity</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Add a timetable line with day, week pattern, start/end time and a premium-time flag, then
+    classify it via a reusable Session Category into Direct Clinical Care,
+    Supporting Professional Activities, Additional Responsibility or External Duty.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/4.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">On-Call
+                            <span> Commitment</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Link a configurable On-Call Profile to the plan to capture this doctor's rota frequency
+    and category, automatically rolling predictable and unpredictable
+    on-call PAs into the plan's Additional PAs total.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/5.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Personal
+                            <span> Objectives</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Record personal objectives with a target date, status (Not Started, On Track, At Risk,
+    Achieved, Not Achieved), description and review notes — each one
+    optionally linked to a wider trust Service Objective.</div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/6.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Two-Party
+                            <span> Sign-Off</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Both doctor and clinical manager sign independently, each timestamped and attributed,
+    with an Escalation/Mediation Note and Supporting Resources field for
+    when agreement doesn't come easily.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/7.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Team
+                            <span> Job Plans</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Clinical managers see every job plan across their directorate — grouped by unit, with
+    contracted PAs, total PAs, PA balance and DCC:SPA ratio compared side
+    by side.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/8.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Objectives Across
+                            <span> the Team</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Browse every doctor's objectives in one place, grouped by doctor, plan year, status,
+    target date or the Service Objective they support.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/9.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Objective
+                            <span> Detail View</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Open any objective directly to review its target date, linked service objective,
+    full description and review notes alongside its progress status.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/10.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Job Plan
+                            <span> Gaps</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                             The Gaps view lists every medical post without a current signed job plan, so
+    managers can chase the ones still stuck in Draft before the review
+    deadline.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/11.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Annual
+                            <span> Year Rollover</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Roll a doctor's signed plan forward into the new plan year in one action,
+    optionally scoped to specific directorates and limited to only
+    signed plans.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/12.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Bulk
+                            <span> Reminders</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Send review-due or plans-due reminders in bulk to every doctor and manager with
+    an outstanding job plan for the selected plan year.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/13.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Capacity &amp;
+                            <span> Completeness Dashboard</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            A real-time dashboard tracks completeness, gaps, unsigned plans and stalled
+    discussions for the current plan year, with a directorate-by-directorate
+    completeness breakdown.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/14.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Job Plan
+                            <span> Analysis</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Pivot and analyse DCC, SPA, Additional and External PAs, PA balance, FTE and
+    revision number across every job plan, grouped by status and
+    directorate.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/15.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                       <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Session
+                            <span>  Categories</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Maintain a reusable library of session categories — Outpatient Clinic, Theatre
+    List, Ward Round, MDT, CPD/Study and more — each with a default
+    DCC/SPA/Additional/External classification.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/16.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">On-Call
+                            <span> Profiles</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Build reusable on-call profiles combining a rota frequency and category with
+    predictable and unpredictable PA values, ready to attach to any
+    doctor's plan.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/17.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">On-Call Profile
+                            <span> Detail</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Each on-call profile shows its supplement rate, category, availability supplement
+    %, and the predictable/unpredictable PAs that make up its total
+    on-call PA contribution.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/18.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">On-Call
+                            <span> Supplement Table</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Configure the on-call supplement table — frequency code, rota frequency, category
+    and availability supplement % — that every On-Call Profile draws from.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/19.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Supplement Rate
+                            <span> Detail</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Each supplement rate record pairs a frequency (1 in N) and category with its
+    availability supplement percentage, kept active or archived as
+    trust policy changes.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/20.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Plan
+                            <span> Years</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Every job-planning year is listed with its date range, job plan count,
+    completeness % and status — Draft, Open or Closed.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/21.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Plan Year
+                            <span> Lifecycle</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Open a plan year to accept job plans, track its completeness live, then Close it
+    or Roll Over its signed plans into the next year when the cycle ends.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/22.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                        <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Service
+                            <span> Objectives</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Maintain the trust or directorate-level service objectives — like 18-Week RTT
+    Compliance or GIRFT Theatre Productivity — that individual doctors'
+    personal objectives can link back to.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/23.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                       <h2 class="mainhead text-center mb-2 mt-5"
+                            style="font-size: 2rem;font-weight: 700;color: black;">Job Planning
+                            <span>  Settings</span>
+                        </h2>
+                        <div class="para"
+                            style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                            Configure PAs per WTE, PA length, the evening premium-time threshold, annual
+    review lead days, stale-discussion threshold and automatic annual
+    rollover — all from one settings page.
+                        </div>
+
+                        <div style="border-radius: 10px;
+                        overflow: hidden;
+                        border: 2px solid #e7e7e7;">
+                            <img src="./assets/screenshots/24.png" alt="" style="max-width: 100%;height: auto;">
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="features" role="tabpanel">
+                    <div class="p-3 py-md-5">
+
+                        <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">Our
+                            <span>Features</span>
+                        </h2>
+                        <div class="row" style="
+    border-radius: 10px;">
+
+                            <div class="col-md-4">
+                                <div class="feature-item mb-4  d-flex flex-column align-items-center justify-content-center"
+                                    style="
+    padding: 25px;
+    background-color: #637eea0d;
+    border-radius: 10px;
+    text-align: left;">
+                                    <div class="feature-number d-flex align-items-center justify-content-center" style="    width: 45px;
+    height: 45px;
+    background-color: #7877c633;
+    border-radius: 50%;
+
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #71639e;
+    margin-bottom: 15px;
+    ">01
+                                    </div>
+                                    <h3 class="feature-title" style="font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: black;
+    line-height: 1.3;">Weekly timetable of Programmed Activities with automatic DCC / SPA / Additional / External classification and PA totals.</h3>
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="feature-item mb-4  d-flex flex-column align-items-center justify-content-center"
+                                    style="
+    padding: 25px;
+    background-color: #637eea0d;
+    border-radius: 10px;
+    text-align: left;">
+                                    <div class="feature-number d-flex align-items-center justify-content-center" style="    width: 45px;
+    height: 45px;
+    background-color: #7877c633;
+    border-radius: 50%;
+
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #71639e;
+    margin-bottom: 15px;
+    ">02
+                                    </div>
+                                    <h3 class="feature-title" style="font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: black;
+    line-height: 1.3;">Two-party doctor/manager sign-off workflow — Draft, Proposed, In Discussion, Agreed, Signed — with escalation/mediation notes.</h3>
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="feature-item mb-4  d-flex flex-column align-items-center justify-content-center"
+                                    style="
+    padding: 25px;
+    background-color: #637eea0d;
+    border-radius: 10px;
+    text-align: left;">
+                                    <div class="feature-number d-flex align-items-center justify-content-center" style="    width: 45px;
+    height: 45px;
+    background-color: #7877c633;
+    border-radius: 50%;
+
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #71639e;
+    margin-bottom: 15px;
+    ">03
+                                    </div>
+                                    <h3 class="feature-title" style="font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: black;
+    line-height: 1.3;">Configurable on-call profiles and supplement table capturing rota frequency, category and predictable/unpredictable PAs.</h3>
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="feature-item mb-4  d-flex flex-column align-items-center justify-content-center"
+                                    style="
+    padding: 25px;
+    background-color: #637eea0d;
+    border-radius: 10px;
+    text-align: left;">
+                                    <div class="feature-number d-flex align-items-center justify-content-center" style="    width: 45px;
+    height: 45px;
+    background-color: #7877c633;
+    border-radius: 50%;
+
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #71639e;
+    margin-bottom: 15px;
+    ">04
+                                    </div>
+                                    <h3 class="feature-title" style="font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: black;
+    line-height: 1.3;">Personal objectives with status tracking, review notes, and links to trust-wide Service Objectives.</h3>
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="feature-item mb-4  d-flex flex-column align-items-center justify-content-center"
+                                    style="
+    padding: 25px;
+    background-color: #637eea0d;
+    border-radius: 10px;
+    text-align: left;">
+                                    <div class="feature-number d-flex align-items-center justify-content-center" style="    width: 45px;
+    height: 45px;
+    background-color: #7877c633;
+    border-radius: 50%;
+
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #71639e;
+    margin-bottom: 15px;
+    ">05
+                                    </div>
+                                    <h3 class="feature-title" style="font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: black;
+    line-height: 1.3;">Annual Year Rollover and bulk reminder wizards to keep the job-planning cycle moving on schedule.</h3>
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="feature-item mb-4  d-flex flex-column align-items-center justify-content-center"
+                                    style="
+    padding: 25px;
+    background-color: #637eea0d;
+    border-radius: 10px;
+    text-align: left;">
+                                    <div class="feature-number d-flex align-items-center justify-content-center" style="    width: 45px;
+    height: 45px;
+    background-color: #7877c633;
+    border-radius: 50%;
+
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #71639e;
+    margin-bottom: 15px;
+    ">06
+                                    </div>
+                                    <h3 class="feature-title" style="font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: black;
+    line-height: 1.3;">Team capacity &amp; completeness dashboard plus pivot analysis across every directorate and plan year.</h3>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="faq" role="tabpane2 ">
+                    <div class="p-3 py-md-5">
+
+                        <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">
+                            Frequently Asked <span>Questions</span></h2>
+
+                        <div class="modern-accordion">
+                            <div class="accordion accordion-flush" id="accordionFlushExample">
+                                <div class="accordion-item loading-animation"
+                                    style="margin-bottom: 1rem;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                    <h2 class="accordion-header" style="border-radius: 10px;">
+                                        <a class="accordion-button  collapsed" type="button" style="box-shadow: unset;
+    border: none !important;
+    padding: 1.5rem 2rem !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem;
+
+    color: #71639e !important;
+    background-color: #e3e3f3a9 !important;
+    position: relative;
+    overflow: hidden;" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false"
+                                            aria-controls="flush-collapseOne"
+                                            style="font-size: 1.1rem;position: relative;overflow: hidden;background-color: white !important;border: none !important;padding: 1.5rem 2rem !important;font-weight: 600 !important;color: #1e293b !important;border-radius: 10px !important;">
+                                            What is a Programmed Activity (PA) and how is it split?
+                                        </a>
+                                    </h2>
+                                    <div id="flush-collapseOne" class="accordion-collapse collapse"
+                                        data-bs-parent="#accordionFlushExample" style="border-top: 1px solid #e2e8f0;">
+                                        <div class="accordion-body"
+                                            style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                            <p style="margin-bottom: 1rem;">A Programmed Activity is a nominal 4-hour session (configurable via PA Length in Settings). Every timetable line is classified as Direct Clinical Care (DCC), Supporting Professional Activities (SPA), Additional Responsibility or External Duty, and rolled up into the plan's DCC:SPA ratio and PA balance against contracted PAs.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="accordion-item loading-animation"
+                                    style="margin-bottom: 1rem;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                    <h2 class="accordion-header" style="border-radius: 10px;">
+                                        <a class="accordion-button  collapsed" type="button" style="box-shadow: unset;
+    border: none !important;
+    padding: 1.5rem 2rem !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem;
+
+    color: #71639e !important;
+    background-color: #e3e3f3a9 !important;
+    position: relative;
+    overflow: hidden;" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false"
+                                            aria-controls="flush-collapseTwo"
+                                            style="font-size: 1.1rem;position: relative;overflow: hidden;background-color: white !important;border: none !important;padding: 1.5rem 2rem !important;font-weight: 600 !important;color: #1e293b !important;border-radius: 10px !important;">
+                                            How does the two-party sign-off workflow work?
+                                        </a>
+                                    </h2>
+                                    <div id="flush-collapseTwo" class="accordion-collapse collapse"
+                                        data-bs-parent="#accordionFlushExample" style="border-top: 1px solid #e2e8f0;">
+                                        <div class="accordion-body"
+                                            style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                            <p style="margin-bottom: 1rem;">A job plan moves through Draft, Proposed, In Discussion and Agreed before both the doctor and their clinical manager sign it independently. Once both signatures are recorded, the plan is stamped Signed and locked, with an Escalation/Mediation Note available if agreement isn't reached.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="accordion-item loading-animation"
+                                    style="margin-bottom: 0;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                    <h2 class="accordion-header" style="border-radius: 10px;">
+                                        <a class="accordion-button  collapsed" type="button" style="box-shadow: unset;
+    border: none !important;
+    padding: 1.5rem 2rem !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem;
+
+    color: #71639e !important;
+    background-color: #e3e3f3a9 !important;
+    position: relative;
+    overflow: hidden;" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false"
+                                            aria-controls="flush-collapseThree"
+                                            style="font-size: 1.1rem;position: relative;overflow: hidden;background-color: white !important;border: none !important;padding: 1.5rem 2rem !important;font-weight: 600 !important;color: #1e293b !important;border-radius: 10px !important;">
+                                            How is on-call work captured on a job plan?
+                                        </a>
+                                    </h2>
+                                    <div id="flush-collapseThree" class="accordion-collapse collapse"
+                                        data-bs-parent="#accordionFlushExample" style="border-top: 1px solid #e2e8f0;">
+                                        <div class="accordion-body"
+                                            style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                            <p style="margin-bottom: 1rem;">Each plan can link to an On-Call Profile — combining a rota frequency and category from the configurable On-Call Supplement Table with predictable and unpredictable on-call PAs — which is automatically added into the plan's Additional PAs total.</p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="latest-release" role="tabpanel">
+                    <div class="p-3 py-md-5">
+                        <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">
+                            Latest <span>Releases</span></h2>
+                        <div class="row">
+
+                            <div class="col-md-4 mb-4">
+                                <div class="release-item h-100" style="    position: relative;
+                                padding: 30px;
+                                border: 2px solid #71639e24;
+                                border-radius: 15px;">
+                                    <div class="release-header d-flex align-items-center flex-wrap gap-3" style="
+                                    margin-bottom: 0.75rem;
+                                    ">
+                                        <div class="version" style="font-size: 1.25rem;
+                                        font-weight: 700;
+                                        color: #1a202c;">Latest Release 19.0.1.0.0
+                                        </div>
+                                        <div style="padding: 0.25rem 0.75rem;
+                                        border-radius: 20px;
+                                        font-size: 0.75rem;
+                                        font-weight: 600;
+                                        text-transform: uppercase;
+                                        letter-spacing: 0.5px;
+                                        position: relative;
+                                        overflow: hidden;    background-color: #9ae6b4;
+                                        color: #2d7d32;
+                                        border: 2px solid #68d391;" class=" add">Add
+                                        </div>
+                                        <div class="date" style="    color: #64748b;
+                                        font-size: 0.875rem;
+                                        font-weight: 500;
+
+                                        gap: 0.5rem;">
+                                            <img src="./assets/icons/calendar.png" alt="" width="16" height="16"
+                                                style="margin-right: 5px;">
+                                            8th June, 2026
+                                        </div>
+                                    </div>
+                                    <div class="feature-list">
+                                        <div class="feature-item p-3" style="border-radius: 5px;    display: flex;
+
+                                        align-items: center;
+                                        padding: 25px;
+                                        background-color: #f5f5f5e7;
+                                        border-radius: 10px;
+                                        text-align: left;">
+
+                                            <div class="feature-text" style="color: #6b7280;
+                                        line-height: 1.6;
+                                        font-size: 0.95rem;">Initial Commit
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+     <div class="container-fluid cmpad py-2 py-md-5">
+    <div class="highlights-section">
+
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Related
+            <span>Modules</span>
+        </h2>
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/base_accounting_kit"
+                   style="text-decoration: none;">
+                    <div class="highlight-card h-100 p-4" style="background-color: white;
+                       backdrop-filter: blur(20px);
+                       border-radius: 10px;
+                       padding: 32px;
+                       border: 2px solid #71639e1a;
+                       position: relative;
+                       overflow: hidden;">
+
+
+                        <div class="card-image" style="    border: 2px solid #71639e1c;
+                       margin-bottom: 1rem;
+                       border-radius: 10px;
+                       overflow: hidden;">
+                            <img src="./assets/modules/module1.gif" alt=""
+                                 style="width: 100%;border-radius: 10px;">
+                        </div>
+
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo 19 Full Accounting Kit for Community</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/hide_menu_user"
+                   style="text-decoration: none;">
+                    <div class="highlight-card h-100 p-4" style="background-color: white;
+                       backdrop-filter: blur(20px);
+                       border-radius: 10px;
+                       padding: 32px;
+                       border: 2px solid #71639e1a;
+                       position: relative;
+                       overflow: hidden;">
+
+
+                        <div class="card-image" style="    border: 2px solid #71639e1c;
+                       margin-bottom: 1rem;
+                       border-radius: 10px;
+                       overflow: hidden;">
+                            <img src="./assets/modules/module2.jpg" alt=""
+                                 style="width: 100%;border-radius: 10px;">
+                        </div>
+
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Hide Any Menu User Wise</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/base_account_budget"
+                   style="text-decoration: none;">
+                    <div class="highlight-card h-100 p-4" style="background-color: white;
+                       backdrop-filter: blur(20px);
+                       border-radius: 10px;
+                       padding: 32px;
+                       border: 2px solid #71639e1a;
+                       position: relative;
+                       overflow: hidden;">
+
+                        <div class="card-image" style="    border: 2px solid #71639e1c;
+                           margin-bottom: 1rem;
+                           border-radius: 10px;
+                           overflow: hidden;">
+                            <img src="./assets/modules/module3.jpg" alt=""
+                                 style="width: 100%;border-radius: 10px;">
+                        </div>
+
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo 19 Budget Management</h3>
+
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+    <div class="container-fluid cmpad py-2 py-md-5">
+        <div class="highlights-section">
+
+            <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Our
+                <span>Services</span>
+            </h2>
+
+            <div class="row">
+
+                <div class="col-md-3 mb-4">
+                    <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                        style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                        <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                            style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                            <img src="./assets/icons/setting.png" alt="" width="30" height="30">
+                        </div>
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo Customization</h3>
+
+
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                        style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                        <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                            style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                            <img src="./assets/icons/imple.png" alt="" width="30" height="30">
+                        </div>
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo Implementation</h3>
+
+
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                        style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                        <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                            style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                            <img src="./assets/icons/support.png" alt="" width="30" height="30">
+                        </div>
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo Support</h3>
+
+
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                        style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                        <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                            style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                            <img src="./assets/icons/transfer.png" alt="" width="30" height="30">
+                        </div>
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo Migration</h3>
+
+
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                        style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                        <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                            style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                            <img src="./assets/icons/idea.png" alt="" width="30" height="30">
+                        </div>
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo integration</h3>
+
+
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                        style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                        <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                            style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                            <img src="./assets/icons/chat.png" alt="" width="30" height="30">
+                        </div>
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo Consultancy</h3>
+
+
+                    </div>
+                </div>
+
+
+                <div class="col-md-3 mb-4">
+                    <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                        style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                        <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                            style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                            <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                        </div>
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo Licensing</h3>
+
+
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                        style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+
+                        <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                            style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                            <img src="./assets/icons/people.png" alt="" width="30" height="30">
+                        </div>
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Hire Odoo Developer</h3>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </div>
+</body>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+</html>
