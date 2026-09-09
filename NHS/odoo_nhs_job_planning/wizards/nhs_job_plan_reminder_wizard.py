@@ -66,8 +66,11 @@ class NhsJobPlanReminderWizard(models.TransientModel):
         else:
             domain.append(('plan_year_id.state', '=', 'open'))
         if self.target == 'due':
+            from datetime import timedelta
+            deadline = fields.Date.context_today(self) + timedelta(days=60)
             domain += [('state', 'not in', list(LOCKED_STATES) + ['superseded']),
-                       ('review_due_date', '!=', False)]
+                       ('review_due_date', '!=', False),
+                       ('review_due_date', '<=', deadline)]
         elif self.target == 'unsigned':
             domain += [('state', 'not in', list(LOCKED_STATES) + ['superseded'])]
         else:

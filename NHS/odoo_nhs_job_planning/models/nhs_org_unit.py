@@ -19,14 +19,16 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from . import res_config_settings
-from . import nhs_org_unit
-from . import nhs_establishment_post
-from . import nhs_plan_year
-from . import nhs_job_plan_session_category
-from . import nhs_oncall_supplement_rate
-from . import nhs_oncall_profile
-from . import nhs_service_objective
-from . import nhs_job_plan
-from . import nhs_job_plan_activity
-from . import nhs_job_plan_objective
+from odoo import models
+
+class NhsOrgUnit(models.Model):
+    """Extend Org Unit to trigger job plan recomputes when management changes."""
+    _inherit = 'nhs.org.unit'
+
+    def write(self, vals):
+        res = super().write(vals)
+        if 'manager_id' in vals or 'parent_id' in vals:
+            plans = self.env['nhs.job.plan'].search([('org_unit_id', 'child_of', self.ids)])
+            if plans:
+                plans._compute_manager_ids()
+        return res

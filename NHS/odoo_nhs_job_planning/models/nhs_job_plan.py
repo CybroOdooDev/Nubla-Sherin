@@ -70,11 +70,7 @@ class NhsJobPlan(models.Model):
         required=True,
         domain="[('share', '=', False)]",
         tracking=True,
-        help="The doctor's login - single source of identity for the plan."
-             " Used for own-plan access scoping and sign-off/notification"
-             " identity. If the doctor has no user yet, create one directly"
-             " from this field (requires Users create rights)."
-    )
+        help="The doctor's login - single source of identity for the plan.")
     doctor_name = fields.Char(
         string='Doctor',
         related='doctor_user_id.name',
@@ -88,35 +84,21 @@ class NhsJobPlan(models.Model):
         string='Can Edit Doctor',
         compute='_compute_can_edit_doctor_user_id',
         help="Technical field for the view: only clinical managers/admins may"
-             " (re)point a plan at a different doctor. A plain doctor-group"
-             " user creating their own plan (e.g. via 'My Plan') would"
-             " otherwise still be able to change this Many2one to someone"
-             " else's user before saving, which then trips the 'own record"
-             " only' record rule with a confusing Access Error instead of"
-             " simply not being offered the choice."
+             " (re)point a plan at a different doctor."
     )
 
-    def _compute_can_edit_doctor_user_id(self):
-        can_edit = self.env.user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_manager')
-        for plan in self:
-            plan.can_edit_doctor_user_id = can_edit
+
     doctor_member_ref = fields.Reference(
         selection=[('nhs.workforce.member', 'Workforce Member')],
         string='Workforce Member',
         help="Optional soft link to a Training-module workforce member, stored as"
-             " 'nhs.workforce.member,<id>'. Populated only when odoo_nhs_training"
-             " happens to be installed; this module does not depend on it."
-             " nhs.workforce.member covers ALL staff, not just doctors, and"
-             " Reference fields don't support a domain (they're not a"
-             " relational field type to the view validator) - so the picker"
-             " itself can't be narrowed to medical posts. The check in"
-             " _check_doctor_member_ref() enforces it instead, at save time."
+             " 'nhs.workforce.member,<id>'."
     )
     post_id = fields.Many2one(
         'nhs.establishment.post',
         string='Medical Post',
         required=True,
-        domain=lambda self: self._domain_post_id(),
+        domain="[('is_medical', '=', True), ('status', '=', 'active')]",
         tracking=True,
         index=True,
         help="The doctor's funded Establishment post."
@@ -346,6 +328,11 @@ class NhsJobPlan(models.Model):
         help="Archive flag."
     )
 
+    def _compute_can_edit_doctor_user_id(self):
+        can_edit = self.env.user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_manager')
+        for plan in self:
+            plan.can_edit_doctor_user_id = can_edit
+
     @api.depends('doctor_name', 'plan_year_id.name')
     def _compute_name(self):
         """Build the display name from doctor and plan year."""
@@ -418,23 +405,7 @@ class NhsJobPlan(models.Model):
             managers = OrgUnit.browse(ancestor_ids).mapped('manager_id')
             plan.manager_ids = [(6, 0, managers.ids)]
 
-    def _domain_post_id(self):
-        """Narrow the Medical Post picker to what the current user could
-        actually save a plan against - mirrors _compute_manager_ids'
-        ancestor-chain logic in reverse. A clinical manager only manages
-        their own directorate(s), so posts outside every unit they lead (and
-        its sub-units) would just fail the plan/activity create ir.rules
-        after the whole form is filled in; better to not offer them at all."""
-        base_domain = [('is_medical', '=', True), ('status', '=', 'active')]
-        user = self.env.user
-        if user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_admin'):
-            return base_domain
-        if user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_manager'):
-            managed_units = self.env['nhs.org.unit'].search([('manager_id', '=', user.id)])
-            if not managed_units:
-                return base_domain + [('id', '=', False)]
-            return base_domain + [('org_unit_id', 'child_of', managed_units.ids)]
-        return base_domain
+
 
     @api.onchange('post_id')
     def _onchange_post_id(self):
@@ -457,10 +428,7 @@ class NhsJobPlan(models.Model):
     @api.constrains('doctor_member_ref')
     def _check_doctor_member_ref(self):
         """Workforce Member is a soft link into Training's staff roster, which
-        covers ALL staff (nurses, etc.), not just doctors. Reference fields
-        aren't a relational field type to the view validator, so they can't
-        take a domain to narrow the picker itself - enforce the same
-        medical-post/active rule that post_id's own domain applies, here."""
+        covers ALL staff (nurses, etc.), not just doctors."""
         for plan in self:
             member = plan.doctor_member_ref
             if member and member._name == 'nhs.workforce.member':
@@ -477,18 +445,36 @@ class NhsJobPlan(models.Model):
         """At most one non-superseded plan per doctor per plan year.
         A business rule, not a DB uniqueness fact - revisions/rollover
         legitimately leave multiple rows for the same doctor+year, only one of
-        which may be 'live' (not revised/superseded) at a time."""
-        for plan in self:
-            if plan.state == 'superseded' or not plan.doctor_user_id:
-                continue
-            other = self.search([
-                ('id', '!=', plan.id),
-                ('doctor_user_id', '=', plan.doctor_user_id.id),
-                ('plan_year_id', '=', plan.plan_year_id.id),
-                ('state', '!=', 'superseded'),
-                ('state', '!=', 'revised'),
-            ], limit=1)
-            if other:
+        which may be 'live' (not revised/superseded) at a time. """
+        active_plans = self.filtered(
+            lambda p: p.state not in ('superseded', 'revised') and p.doctor_user_id
+        )
+        if not active_plans:
+            return
+
+        # 1. Check for duplicates within the current batch being saved
+        seen = set()
+        for plan in active_plans:
+            key = (plan.doctor_user_id.id, plan.plan_year_id.id)
+            if key in seen:
+                raise ValidationError(
+                    "Cannot have multiple active job plans for %s in %s in the same operation." % (
+                        plan.doctor_user_id.name, plan.plan_year_id.name))
+            seen.add(key)
+
+        # 2. Check against the database in a single query
+        existing_plans = self.search([
+            ('id', 'not in', self.ids),
+            ('doctor_user_id', 'in', active_plans.mapped('doctor_user_id.id')),
+            ('plan_year_id', 'in', active_plans.mapped('plan_year_id.id')),
+            ('state', 'not in', ('superseded', 'revised')),
+        ])
+        existing_dict = {(p.doctor_user_id.id, p.plan_year_id.id): p for p in existing_plans}
+
+        for plan in active_plans:
+            key = (plan.doctor_user_id.id, plan.plan_year_id.id)
+            if key in existing_dict:
+                other = existing_dict[key]
                 raise ValidationError(
                     "%s already has a job plan (%s) for %s. Revise that plan"
                     " instead of creating a second one." % (
@@ -498,13 +484,7 @@ class NhsJobPlan(models.Model):
     def _check_plan_year_open(self):
         """A new job plan may only be raised against an 'open' plan year -
         not a still-draft one (nothing to plan against yet) or a closed one
-        (the cycle is finished). Skipped when
-        `nhs_jobplan_skip_year_state_check` is set in context: rollover
-        (_rollover_plans(), called by both the auto-create-next-year cron
-        and the manual rollover wizard) deliberately pre-stages next year's
-        plans into a still-draft year, by design, before anyone opens it -
-        that legitimate system flow must not be blocked by this check,
-        which exists to stop a person picking a draft/closed year by hand."""
+        (the cycle is finished)."""
         if self.env.context.get('nhs_jobplan_skip_year_state_check'):
             return
         for plan in self:
@@ -703,13 +683,7 @@ class NhsJobPlan(models.Model):
     def _get_rollover_candidates(self, source_year, org_units=None, only_signed=True, target_year=None):
         """The source-year job plans eligible for rollover into another year.
         Shared by the manual rollover wizard (nhs.job.plan.rollover.wizard)
-        and the automatic-rollover cron below, so both filter identically.
-
-        superseded_by_id must be unset and state != 'superseded': a 'revised'
-        row is, by definition, an old version already replaced by a later row
-        for the same post+year (see action_start_revision) - including it
-        here would clone the same post twice into the target year and trip
-        the one-plan-per-year constraint on the second clone."""
+        and the automatic-rollover cron below, so both filter identically."""
         domain = [
             ('plan_year_id', '=', source_year.id),
             ('superseded_by_id', '=', False),
@@ -722,7 +696,6 @@ class NhsJobPlan(models.Model):
         
         candidates = self.search(domain)
         if target_year:
-            # Exclude doctors who already have an active/draft plan in the target year
             target_plans = self.search([
                 ('plan_year_id', '=', target_year.id),
                 ('state', 'not in', ['superseded', 'revised']),
@@ -741,10 +714,6 @@ class NhsJobPlan(models.Model):
         in-year revision of a signed plan. Returns the new plans."""
         new_plans = self.browse()
         for plan in self._get_rollover_candidates(source_year, org_units, only_signed, target_year):
-            # nhs_jobplan_skip_year_state_check: rollover deliberately
-            # pre-stages plans into target_year while it's still 'draft' -
-            # see _check_plan_year_open()'s docstring for why this must
-            # bypass that check rather than trip it.
             new_plans |= plan.with_context(nhs_jobplan_skip_year_state_check=True).copy({
                 'reference': 'New',
                 'plan_year_id': target_year.id,

@@ -160,16 +160,7 @@
                                 </form>
                             </field>
                         </page>
-                        <page string="On-Call" name="oncall">
-                            <group>
-                                <field name="oncall_profile_id" readonly="is_locked"/>
-                            </group>
-                            <p class="text-muted" invisible="oncall_profile_id">
-                                No on-call profile selected. Open the linked profile's internal
-                                link to view or edit its frequency, category, supplement % and
-                                predictable/unpredictable PAs.
-                            </p>
-                        </page>
+
                         <page string="Objectives" name="objectives">
                             <field name="objective_ids" readonly="state != 'draft'" context="{'default_plan_id': id}">
                                 <!-- No editable="bottom": "Add a line" (and clicking an
@@ -206,7 +197,7 @@
                                                 string="Mark Achieved" class="btn-primary"
                                                 invisible="status not in ('on_track', 'at_risk')"/>
                                         <button name="action_set_status_not_achieved" type="object"
-                                                string="UnAchieved"
+                                                string="Mark Not Achieved"
                                                 invisible="status not in ('on_track', 'at_risk')"/>
                                         <field name="status" widget="statusbar" clickable="1"/>
                                     </header>
@@ -412,10 +403,10 @@
                             string="Mark At Risk"
                             invisible="not id or status != 'on_track'"/>
                     <button name="action_set_status_achieved" type="object"
-                            string="Mark Achieved" class="btn-primary   "
+                            string="Mark Achieved" class="btn-primary"
                             invisible="not id or status not in ('on_track', 'at_risk')"/>
                     <button name="action_set_status_not_achieved" type="object"
-                            string="UnAchieved"
+                            string="Mark Not Achieved"
                             invisible="not id or status not in ('on_track', 'at_risk')"/>
                     <field name="status" widget="statusbar" clickable="1"/>
                 </header>
