@@ -7,8 +7,8 @@
         <field name="arch" type="xml">
             <form string="Job Plan Year Rollover">
                 <group>
-                    <field name="source_plan_year_id"/>
-                    <field name="target_plan_year_id"/>
+                    <field name="source_plan_year_id" domain="[('id', '!=', target_plan_year_id)]"/>
+                    <field name="target_plan_year_id" domain="[('id', '!=', source_plan_year_id)]"/>
                     <field name="org_unit_ids" widget="many2many_tags"/>
                     <field name="only_signed_source"/>
                     <field name="plan_preview_count"/>

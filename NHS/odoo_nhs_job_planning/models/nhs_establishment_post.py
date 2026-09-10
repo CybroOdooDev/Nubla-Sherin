@@ -65,10 +65,7 @@ class NhsEstablishmentPost(models.Model):
 
     @api.depends('job_plan_ids.state', 'job_plan_ids.plan_year_id')
     def _compute_current_job_plan_id(self):
-        """Find the most recent non-superseded job plan for each post.
-        'plan_year_id desc' alone doesn't determine recency when two plans
-        share a year - exactly what an in-year revision produces (the old
-        plan flips to 'revised', a new draft is created in the same year)."""
+        """Find the most recent non-superseded job plan for each post."""
         JobPlan = self.env['nhs.job.plan']
         for post in self:
             post.current_job_plan_id = JobPlan.search([

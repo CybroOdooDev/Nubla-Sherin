@@ -22,13 +22,19 @@
 from odoo import models
 
 class NhsOrgUnit(models.Model):
-    """Extend Org Unit to trigger job plan recomputes when management changes."""
+    """Extend Org Unit to trigger job plan (and workforce member) manager-set
+    recomputes when management changes."""
     _inherit = 'nhs.org.unit'
 
     def write(self, vals):
+        """Update org unit and trigger recomputes if management changes."""
         res = super().write(vals)
         if 'manager_id' in vals or 'parent_id' in vals:
             plans = self.env['nhs.job.plan'].search([('org_unit_id', 'child_of', self.ids)])
             if plans:
                 plans._compute_manager_ids()
+            members = self.env['nhs.workforce.member'].search(
+                [('org_unit_id', 'child_of', self.ids)])
+            if members:
+                members._compute_unit_manager_ids()
         return res

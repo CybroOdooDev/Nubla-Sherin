@@ -22,6 +22,7 @@
 from . import res_config_settings
 from . import nhs_org_unit
 from . import nhs_establishment_post
+from . import nhs_workforce_member
 from . import nhs_plan_year
 from . import nhs_job_plan_session_category
 from . import nhs_oncall_supplement_rate

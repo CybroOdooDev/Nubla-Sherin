@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Inherited form view for nhs.establishment.post: surfaces this post's
-         job-planning status and history directly on the post, so opening a
-         post from the Gaps list (or from the Establishment app) shows more
-         than raw establishment data - the point of drilling into a "gap"
-         is to see/act on its job plan, not just its vacancy figures. -->
+    <!-- Record: view_nhs_establishment_post_form_inherit_jobplan for ir.ui.view -->
     <record id="view_nhs_establishment_post_form_inherit_jobplan" model="ir.ui.view">
         <field name="name">nhs.establishment.post.form.inherit.jobplan</field>
         <field name="model">nhs.establishment.post</field>

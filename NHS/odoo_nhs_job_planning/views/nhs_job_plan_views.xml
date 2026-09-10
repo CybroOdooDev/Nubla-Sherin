@@ -49,6 +49,9 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_rostered_duties" icon="fa-clock-o">
+                            <field name="rostered_duties_count" widget="statinfo" string="Rostered Duties"/>
+                        </button>
                         <button class="oe_stat_button" type="object" name="action_view_activities" icon="fa-calendar">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">Activities</span>
@@ -69,11 +72,16 @@
                     <div class="oe_title">
                         <h1><field name="name" readonly="1"/></h1>
                     </div>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="allowed_post_ids or post_id">
+                        No Medical Posts available. You must be assigned as the Manager of a unit to see posts here. Please ask your administrator to assign you, or to give you Doctor access if you are creating your own job plan.
+                    </div>
                     <group>
                         <group>
                             <field name="can_edit_doctor_user_id" invisible="1"/>
                             <field name="doctor_user_id" readonly="is_locked or not can_edit_doctor_user_id"/>
                             <field name="doctor_name" readonly="1"/>
+                            <field name="allowed_post_ids" invisible="1"/>
                             <field name="post_id" readonly="is_locked"/>
                             <field name="specialty" readonly="is_locked"/>
                             <field name="org_unit_id" readonly="1"/>
@@ -99,6 +107,18 @@
                             <field name="external_pas" readonly="1"/>
                             <field name="total_pas" readonly="1"/>
                             <field name="pa_balance" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Roster Reconciliation (Total PAs)">
+                        <group>
+                            <field name="total_pas" readonly="1" string="Planned PAs"/>
+                            <field name="rostered_pas" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="rostered_pa_variance" readonly="1"
+                                   decoration-danger="rostered_pa_variance &gt; 0"
+                                   decoration-warning="rostered_pa_variance &lt; 0"
+                                   decoration-success="rostered_pa_variance == 0"/>
                         </group>
                     </group>
                     <notebook>
@@ -297,6 +317,7 @@
          ID column, since the model has no name/_rec_name field to guess a
          sensible default display from. Same columns as the Weekly Timetable
          tab embedded on the Job Plan form. -->
+    <!-- Record: view_nhs_job_plan_activity_list for ir.ui.view -->
     <record id="view_nhs_job_plan_activity_list" model="ir.ui.view">
         <field name="name">nhs.job.plan.activity.list</field>
         <field name="model">nhs.job.plan.activity</field>
@@ -381,10 +402,6 @@
     </record>
 
     <!-- Record: view_nhs_job_plan_objective_form for ir.ui.view -->
-    <!-- Only reached directly in developer mode (e.g. "Open Form View" from
-         a list row) - day to day, objectives are edited inline on the job
-         plan's Objectives tab. Given a proper layout anyway, since Odoo
-         falls back to an unstyled auto-generated form otherwise. -->
     <record id="view_nhs_job_plan_objective_form" model="ir.ui.view">
         <field name="name">nhs.job.plan.objective.form</field>
         <field name="model">nhs.job.plan.objective</field>

@@ -20,7 +20,7 @@
 #
 #############################################################################
 from odoo import api, fields, models
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import ValidationError
 
 OBJECTIVE_STATUSES = [
     ('not_started', 'Not Started'),
@@ -118,24 +118,31 @@ class NhsJobPlanObjective(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Create a new objective."""
         return super().create(vals_list)
 
     def write(self, vals):
+        """Update an existing objective."""
         return super().write(vals)
 
     def action_set_status_not_started(self):
+        """Set status to not started."""
         self.write({'status': 'not_started'})
 
     def action_set_status_on_track(self):
+        """Set status to on track."""
         self.write({'status': 'on_track'})
 
     def action_set_status_at_risk(self):
+        """Set status to at risk."""
         self.write({'status': 'at_risk'})
 
     def action_set_status_achieved(self):
+        """Set status to achieved."""
         self.write({'status': 'achieved'})
 
     def action_set_status_not_achieved(self):
+        """Set status to not achieved."""
         self.write({'status': 'not_achieved'})
 
     @api.constrains('target_date')

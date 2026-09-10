@@ -33,6 +33,7 @@
     <!-- Record: action_nhs_job_plan_analysis for ir.actions.act_window -->
     <!-- Raw pivot/graph drill-down, kept for ad-hoc analysis alongside the
          KPI dashboard client action below. -->
+    <!-- Record: action_nhs_job_plan_analysis for ir.actions.act_window -->
     <record id="action_nhs_job_plan_analysis" model="ir.actions.act_window">
         <field name="name">Job Plan Analysis</field>
         <field name="res_model">nhs.job.plan</field>

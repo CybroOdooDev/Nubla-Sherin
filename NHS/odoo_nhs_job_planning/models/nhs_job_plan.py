@@ -22,6 +22,7 @@
 from datetime import timedelta
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools.float_utils import float_round
 
 STATES = [
     ('draft', 'Draft'),
@@ -87,21 +88,25 @@ class NhsJobPlan(models.Model):
              " (re)point a plan at a different doctor."
     )
 
-
-    doctor_member_ref = fields.Reference(
-        selection=[('nhs.workforce.member', 'Workforce Member')],
-        string='Workforce Member',
-        help="Optional soft link to a Training-module workforce member, stored as"
-             " 'nhs.workforce.member,<id>'."
-    )
     post_id = fields.Many2one(
         'nhs.establishment.post',
         string='Medical Post',
         required=True,
-        domain="[('is_medical', '=', True), ('status', '=', 'active')]",
+        domain="[('is_medical', '=', True), ('status', '=', 'active'), ('id', 'in', allowed_post_ids)]",
         tracking=True,
         index=True,
         help="The doctor's funded Establishment post."
+    )
+    allowed_post_ids = fields.Many2many(
+        'nhs.establishment.post',
+        compute='_compute_allowed_post_ids',
+        help="Backs the Medical Post field's selection list: every active"
+             " medical post for an Admin, only those under the current"
+             " user's own Clinical Manager directorate scope otherwise (so a"
+             " manager can't accidentally raise a plan against an unrelated"
+             " directorate's post). A Doctor with no manager scope of their"
+             " own still sees every active medical post - there is no"
+             " post-to-holder link in this suite to narrow it further."
     )
     specialty = fields.Char(
         string='Specialty',
@@ -234,6 +239,23 @@ class NhsJobPlan(models.Model):
         compute='_compute_objective_count',
         help="Number of objectives on the plan."
     )
+    rostered_duties_count = fields.Integer(
+        string='Rostered Duties',
+        compute='_compute_rostered_metrics',
+        help="Number of rostered duties for this doctor in this plan year."
+    )
+    rostered_pas = fields.Float(
+        string='Rostered PAs',
+        compute='_compute_rostered_metrics',
+        digits=(16, 2),
+        help="Total Paid Hours from rostered duties converted to PAs (Paid Hours / 4.0)."
+    )
+    rostered_pa_variance = fields.Float(
+        string='PA Variance',
+        compute='_compute_rostered_metrics',
+        digits=(16, 2),
+        help="Rostered PAs minus Total Planned PAs."
+    )
     state = fields.Selection(
         STATES,
         string='Status',
@@ -242,7 +264,7 @@ class NhsJobPlan(models.Model):
         tracking=True,
         help="draft -> proposed -> in_discussion -> agreed -> signed ->"
              " (in-year revision) -> revised / superseded."
-    )
+    )   
     previous_plan_id = fields.Many2one(
         'nhs.job.plan',
         string='Previous Version',
@@ -405,7 +427,101 @@ class NhsJobPlan(models.Model):
             managers = OrgUnit.browse(ancestor_ids).mapped('manager_id')
             plan.manager_ids = [(6, 0, managers.ids)]
 
+    @api.depends('plan_year_id.date_start', 'plan_year_id.date_end', 'org_unit_id',
+                 'doctor_user_id', 'total_pas')
+    def _compute_rostered_metrics(self):
+        for plan in self:
+            count = 0
+            rostered_pas = 0.0
 
+            if plan.plan_year_id:
+                member_id = False
+                if plan.doctor_user_id:
+                    member = self.env['nhs.workforce.member'].search([('user_id', '=', plan.doctor_user_id.id)], limit=1)
+                    if member:
+                        member_id = member.id
+
+                if member_id:
+                    domain = [
+                        ('member_id', '=', member_id),
+                        ('duty_date', '>=', plan.plan_year_id.date_start),
+                        ('duty_date', '<=', plan.plan_year_id.date_end),
+                        ('state', 'not in', ('cancelled', 'dna')),
+                    ]
+                    if plan.org_unit_id:
+                        domain.append(('duty_id.unit_id.org_unit_id', '=', plan.org_unit_id.id))
+
+                    assignments = self.env['nhs.duty.assignment'].search(domain)
+                    count = len(assignments)
+
+                    total_hours = sum(assignments.mapped('paid_hours'))
+                    rostered_pas = float_round(total_hours / 4.0, precision_digits=2)
+
+            plan.rostered_duties_count = count
+            plan.rostered_pas = rostered_pas
+            plan.rostered_pa_variance = rostered_pas - plan.total_pas
+
+    def action_view_rostered_duties(self):
+        """Open the rostered duties view."""
+        self.ensure_one()
+        member_id = False
+        if self.doctor_user_id:
+            member = self.env['nhs.workforce.member'].search([('user_id', '=', self.doctor_user_id.id)], limit=1)
+            if member:
+                member_id = member.id
+                
+        if not member_id:
+            return
+
+        domain = [
+            ('member_id', '=', member_id),
+            ('duty_date', '>=', self.plan_year_id.date_start),
+            ('duty_date', '<=', self.plan_year_id.date_end),
+            ('state', 'not in', ('cancelled', 'dna')),
+        ]
+        if self.org_unit_id:
+            domain.append(('duty_id.unit_id.org_unit_id', '=', self.org_unit_id.id))
+        return {
+            'name': 'Rostered Duties',
+            'type': 'ir.actions.act_window',
+            'res_model': 'nhs.duty.assignment',
+            'view_mode': 'list,form',
+            'domain': domain,
+            'context': {
+                'default_member_id': member_id,
+                'create': False,
+                'edit': False,
+                'delete': False,
+            },
+
+        }
+
+    @api.depends_context('uid')
+    def _compute_allowed_post_ids(self):
+        """The reverse of _compute_manager_ids: instead of walking a plan's
+        unit up to its managers, walk the current user's own managed units
+        down to every post beneath them, so the Medical Post picker only
+        offers posts the current Clinical Manager actually has remit over."""
+        user = self.env.user
+        Post = self.env['nhs.establishment.post']
+        base_domain = [('is_medical', '=', True), ('status', '=', 'active')]
+        is_manager_only = (
+            user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_manager')
+            and not user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_doctor')
+            and not user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_admin')
+        )
+        if not is_manager_only:
+            allowed = Post.search(base_domain)
+        else:
+            managed_units = self.env['nhs.org.unit'].search([('manager_id', '=', user.id)])
+            unit_ids = set()
+            for unit in managed_units:
+                descendants = self.env['nhs.org.unit'].search(
+                    [('parent_path', '=like', unit.parent_path + '%')])
+                unit_ids.update(descendants.ids)
+            allowed = Post.search(base_domain + [('org_unit_id', 'in', list(unit_ids))])
+        for plan in self:
+            plan.allowed_post_ids = allowed
 
     @api.onchange('post_id')
     def _onchange_post_id(self):
@@ -413,72 +529,47 @@ class NhsJobPlan(models.Model):
         if self.post_id and not self.specialty:
             self.specialty = self.post_id.job_title
 
-    @api.onchange('doctor_member_ref')
-    def _onchange_doctor_member_ref(self):
-        """When a Training workforce member is linked (soft link, only useful
-        if odoo_nhs_training is installed), pull their user/post across.
-        Doctor Name is no longer set here - it is derived from Doctor User."""
-        member = self.doctor_member_ref
-        if member and member._name == 'nhs.workforce.member':
-            if member.user_id:
-                self.doctor_user_id = member.user_id
-            if member.post_id:
-                self.post_id = member.post_id
 
-    @api.constrains('doctor_member_ref')
-    def _check_doctor_member_ref(self):
-        """Workforce Member is a soft link into Training's staff roster, which
-        covers ALL staff (nurses, etc.), not just doctors."""
-        for plan in self:
-            member = plan.doctor_member_ref
-            if member and member._name == 'nhs.workforce.member':
-                post = member.post_id
-                if not post or not post.is_medical or post.status != 'active':
-                    raise ValidationError(
-                        "Workforce Member '%s' is not on an active medical"
-                        " post - only doctors on an active medical post can"
-                        " be linked to a job plan." % member.name
-                    )
-
-    @api.constrains('doctor_user_id', 'plan_year_id', 'state')
+    @api.constrains('doctor_user_id', 'plan_year_id', 'post_id', 'state')
     def _check_one_active_plan_per_year(self):
-        """At most one non-superseded plan per doctor per plan year.
+        """At most one non-superseded plan per doctor per post per plan year.
         A business rule, not a DB uniqueness fact - revisions/rollover
-        legitimately leave multiple rows for the same doctor+year, only one of
-        which may be 'live' (not revised/superseded) at a time. """
+        legitimately leave multiple rows for the same doctor+post+year, only
+        one of which may be 'live' (not revised/superseded) at a time."""
         active_plans = self.filtered(
             lambda p: p.state not in ('superseded', 'revised') and p.doctor_user_id
         )
         if not active_plans:
             return
-
-        # 1. Check for duplicates within the current batch being saved
         seen = set()
         for plan in active_plans:
-            key = (plan.doctor_user_id.id, plan.plan_year_id.id)
+            key = (plan.doctor_user_id.id, plan.plan_year_id.id, plan.post_id.id)
             if key in seen:
                 raise ValidationError(
-                    "Cannot have multiple active job plans for %s in %s in the same operation." % (
-                        plan.doctor_user_id.name, plan.plan_year_id.name))
+                    "Cannot have multiple active job plans for %s against '%s' in"
+                    " %s in the same operation." % (
+                        plan.doctor_user_id.name, plan.post_id.display_name,
+                        plan.plan_year_id.name))
             seen.add(key)
-
-        # 2. Check against the database in a single query
         existing_plans = self.search([
             ('id', 'not in', self.ids),
             ('doctor_user_id', 'in', active_plans.mapped('doctor_user_id.id')),
             ('plan_year_id', 'in', active_plans.mapped('plan_year_id.id')),
+            ('post_id', 'in', active_plans.mapped('post_id.id')),
             ('state', 'not in', ('superseded', 'revised')),
         ])
-        existing_dict = {(p.doctor_user_id.id, p.plan_year_id.id): p for p in existing_plans}
+        existing_dict = {
+            (p.doctor_user_id.id, p.plan_year_id.id, p.post_id.id): p for p in existing_plans}
 
         for plan in active_plans:
-            key = (plan.doctor_user_id.id, plan.plan_year_id.id)
+            key = (plan.doctor_user_id.id, plan.plan_year_id.id, plan.post_id.id)
             if key in existing_dict:
                 other = existing_dict[key]
                 raise ValidationError(
-                    "%s already has a job plan (%s) for %s. Revise that plan"
-                    " instead of creating a second one." % (
-                        plan.doctor_user_id.name, other.reference, plan.plan_year_id.name))
+                    "%s already has a job plan (%s) against '%s' for %s. Revise"
+                    " that plan instead of creating a second one." % (
+                        plan.doctor_user_id.name, other.reference,
+                        plan.post_id.display_name, plan.plan_year_id.name))
 
     @api.constrains('plan_year_id')
     def _check_plan_year_open(self):
@@ -500,7 +591,39 @@ class NhsJobPlan(models.Model):
         for vals in vals_list:
             if not vals.get('reference') or vals.get('reference') == 'New':
                 vals['reference'] = self.env['ir.sequence'].next_by_code('nhs.job.plan') or 'New'
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        records._check_creator_can_access()
+        return records
+
+    def _check_creator_can_access(self):
+        """Warn the creator up front, with a clear explanation, if they are
+        about to lose access to the plan they just created."""
+        user = self.env.user
+        if user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_admin'):
+            return
+        is_doctor = user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_doctor')
+        is_manager = user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_manager')
+        for plan in self:
+            owns_as_doctor = is_doctor and plan.doctor_user_id.id == user.id
+            owns_as_manager = is_manager and user in plan.manager_ids
+            if owns_as_doctor or owns_as_manager:
+                continue
+            unit_name = plan.org_unit_id.display_name if plan.org_unit_id else 'its org unit'
+            if is_manager and not is_doctor:
+                reason = (
+                    "you are not set as the Manager/Lead of '%s' (or any of its"
+                    " parent units) in the Org Structure, and you are not"
+                    " granted Doctor self-service access either" % unit_name)
+            elif is_doctor:
+                reason = "the plan's Doctor is not set to you"
+            else:
+                reason = "you hold neither Doctor nor Clinical Manager access for it"
+            raise UserError(
+                "You would not be able to open '%s' again after creating it:"
+                " %s.\n\nAsk your administrator to set you as Manager/Lead on"
+                " the relevant Org Structure unit, or to grant you the"
+                " appropriate Job Planning access level, before creating this"
+                " plan." % (plan.display_name, reason))
 
     def write(self, vals):
         """Block edits to the timetable/objectives/contracted PAs/on-call

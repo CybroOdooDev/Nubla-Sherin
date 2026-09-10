@@ -207,12 +207,7 @@ class NhsPlanYear(models.Model):
         completeness/gaps, unsigned and stalled plan counts, per-directorate
         completeness/capacity/on-call breakdowns, upcoming review-due plans,
         PA balance, a cross-year completeness trend and recent plan
-        activity. Read-only, called from the dashboard client action.
-
-        year_id: optional nhs.plan.year id to view instead of the default
-        (current open year, or most recent if none is open) - powers the
-        dashboard's plan-year selector so past/draft years can be reviewed
-        too, not just whichever one is currently open."""
+        activity. Read-only, called from the dashboard client action."""
         company = self.env.company
         if year_id:
             year = self.browse(year_id).exists().filtered(lambda y: y.company_id == company)
@@ -265,18 +260,12 @@ class NhsPlanYear(models.Model):
             row['total_pas'] += plan.total_pas
             row['balance'] += plan.pa_balance
         capacity_rows = sorted(capacity_by_unit.values(), key=lambda r: r['name'])
-
-        # Review due: only signed/revised plans carry a meaningful
-        # review_due_date (see nhs_job_plan.py _compute_review_due_date).
         today = fields.Date.context_today(self)
         due_soon_horizon = today + relativedelta(days=60)
         reviewable = plans.filtered(lambda p: p.state in COMPLETE_STATES and p.review_due_date)
         review_overdue = reviewable.filtered(lambda p: p.review_due_date < today)
         review_due_soon = reviewable.filtered(
             lambda p: today <= p.review_due_date <= due_soon_horizon)
-
-        # On-call coverage by directorate: whether each live (non-superseded)
-        # plan has an on-call profile assigned.
         oncall_by_unit = {}
         for plan in live_plans:
             unit = plan.org_unit_id
@@ -291,26 +280,12 @@ class NhsPlanYear(models.Model):
             row['rate'] = round(row['covered'] / row['total'] * 100, 2) if row['total'] else 0.0
             oncall_rows.append(row)
         oncall_rows.sort(key=lambda r: r['rate'])
-
-        # PA over/under-establishment: same +/-0.5 PA tolerance action_agree()
-        # already uses to flag an unreconciled plan, split by direction so
-        # over-committed (more PAs planned than contracted) and
-        # under-utilised capacity can be told apart at a glance.
         pa_over = live_plans.filtered(lambda p: p.pa_balance > PA_BALANCE_TOLERANCE)
         pa_under = live_plans.filtered(lambda p: p.pa_balance < -PA_BALANCE_TOLERANCE)
-
-        # Completeness trend: the (already stored) completeness_pct of every
-        # plan year for this company, oldest to newest, so the dashboard can
-        # show whether things are improving year over year rather than just
-        # one snapshot.
         completeness_trend = [
             {'id': y.id, 'name': y.name, 'completeness_pct': y.completeness_pct}
             for y in year_options.sorted('date_start')
         ]
-
-        # Recent activity: the most recently updated job plans for this
-        # company (not limited to the selected year - a manager wants to
-        # see momentum across the board, not just one year's worth).
         recent_plans = self.env['nhs.job.plan'].search([
             ('company_id', '=', company.id),
         ], order='write_date desc', limit=8)

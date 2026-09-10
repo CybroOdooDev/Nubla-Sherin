@@ -37,7 +37,7 @@ rollover, and team-level capacity and completeness reporting for the board.
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'depends': ['base', 'mail', 'odoo_nhs_establishment'],
+    'depends': ['base', 'mail', 'odoo_nhs_establishment', 'odoo_nhs_training', 'odoo_nhs_rostering'],
     'data': [
         'security/nhs_job_planning_security.xml',
         'security/ir.model.access.csv',
@@ -66,7 +66,6 @@ rollover, and team-level capacity and completeness reporting for the board.
     ],
     'assets': {
         'web.assets_backend': [
-            'odoo_nhs_job_planning/static/src/js/single_model_reference_field.js',
             'odoo_nhs_job_planning/static/src/dashboard/job_plan_dashboard.js',
             'odoo_nhs_job_planning/static/src/dashboard/job_plan_dashboard.xml',
             'odoo_nhs_job_planning/static/src/dashboard/job_plan_dashboard.scss',

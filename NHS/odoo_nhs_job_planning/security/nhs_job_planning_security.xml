@@ -20,6 +20,7 @@
              no portal controller (see 5.7/11.2 - self-service happens through the
              backend "My Plan" menu, record-rule scoped), so the Doctor group
              grants base.group_user rather than standing alone. -->
+        <!-- Record: group_nhs_jobplan_doctor for res.groups -->
         <record id="group_nhs_jobplan_doctor" model="res.groups">
             <field name="name">Doctor</field>
             <field name="privilege_id" ref="privilege_jobplan_access_level"/>
@@ -41,6 +42,7 @@
         </record>
 
         <!-- Security group: Medical Director / Admin - full control + configuration -->
+        <!-- Record: group_nhs_jobplan_admin for res.groups -->
         <record id="group_nhs_jobplan_admin" model="res.groups">
             <field name="name">Medical Director / Admin</field>
             <field name="privilege_id" ref="privilege_jobplan_access_level"/>
@@ -90,11 +92,13 @@
         </record>
 
         <!-- Directorate scope (clinical manager) -->
+        <!-- Record: rule_nhs_job_plan_manager for ir.rule -->
         <record id="rule_nhs_job_plan_manager" model="ir.rule">
             <field name="name">nhs.job.plan: own directorate (clinical manager)</field>
             <field name="model_id" ref="model_nhs_job_plan"/>
             <field name="domain_force">[('manager_ids', 'in', [user.id])]</field>
             <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
+            <field name="perm_create" eval="0"/>
         </record>
         <!-- Record: rule_nhs_job_plan_activity_manager for ir.rule -->
         <record id="rule_nhs_job_plan_activity_manager" model="ir.rule">
@@ -102,6 +106,7 @@
             <field name="model_id" ref="model_nhs_job_plan_activity"/>
             <field name="domain_force">[('plan_id.manager_ids', 'in', [user.id])]</field>
             <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
+            <field name="perm_create" eval="0"/>
         </record>
         <!-- Record: rule_nhs_job_plan_objective_manager for ir.rule -->
         <record id="rule_nhs_job_plan_objective_manager" model="ir.rule">
@@ -109,14 +114,17 @@
             <field name="model_id" ref="model_nhs_job_plan_objective"/>
             <field name="domain_force">[('plan_id.manager_ids', 'in', [user.id])]</field>
             <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
+            <field name="perm_create" eval="0"/>
         </record>
 
         <!-- Own record only (doctor) -->
+        <!-- Record: rule_nhs_job_plan_self for ir.rule -->
         <record id="rule_nhs_job_plan_self" model="ir.rule">
             <field name="name">nhs.job.plan: own record only (doctor)</field>
             <field name="model_id" ref="model_nhs_job_plan"/>
             <field name="domain_force">[('doctor_user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_jobplan_doctor'))]"/>
+            <field name="perm_create" eval="0"/>
         </record>
         <!-- Record: rule_nhs_job_plan_activity_self for ir.rule -->
         <record id="rule_nhs_job_plan_activity_self" model="ir.rule">
@@ -124,6 +132,7 @@
             <field name="model_id" ref="model_nhs_job_plan_activity"/>
             <field name="domain_force">[('plan_id.doctor_user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_jobplan_doctor'))]"/>
+            <field name="perm_create" eval="0"/>
         </record>
         <!-- Record: rule_nhs_job_plan_objective_self for ir.rule -->
         <record id="rule_nhs_job_plan_objective_self" model="ir.rule">
@@ -131,9 +140,11 @@
             <field name="model_id" ref="model_nhs_job_plan_objective"/>
             <field name="domain_force">[('plan_id.doctor_user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_jobplan_doctor'))]"/>
+            <field name="perm_create" eval="0"/>
         </record>
 
         <!-- Reference/config models (global-or-company-scoped, manager read access) -->
+        <!-- Record: rule_nhs_job_plan_session_category_company for ir.rule -->
         <record id="rule_nhs_job_plan_session_category_company" model="ir.rule">
             <field name="name">nhs.job.plan.session.category: company scope or global</field>
             <field name="model_id" ref="model_nhs_job_plan_session_category"/>
@@ -155,11 +166,65 @@
             <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
         </record>
         <!-- Record Rule: service objectives visible if global (no company) or in the user's company/companies -->
+        <!-- Record: rule_nhs_service_objective_company for ir.rule -->
         <record id="rule_nhs_service_objective_company" model="ir.rule">
             <field name="name">nhs.service.objective: company scope or global</field>
             <field name="model_id" ref="model_nhs_service_objective"/>
             <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
+        </record>
+
+        <!-- Job Planning's "Rostered Duties" feature reads nhs.workforce.member
+             and nhs.duty.assignment (both owned by odoo_nhs_training/
+             odoo_nhs_rostering), whose own ACL/rules only grant Rostering-
+             specific groups - a plain Job Planning Doctor/Clinical Manager
+             otherwise has zero access to either, which crashes the Job Plan
+             form the instant it loads (rostered_duties_count is a header
+             stat button, computed on every open). These mirror the same
+             self/directorate/company scoping already used for nhs.job.plan
+             itself, via nhs.workforce.member.unit_manager_ids. -->
+        <!-- Record: rule_nhs_workforce_member_jobplan_doctor for ir.rule -->
+        <record id="rule_nhs_workforce_member_jobplan_doctor" model="ir.rule">
+            <field name="name">nhs.workforce.member: own record only (job planning doctor)</field>
+            <field name="model_id" ref="odoo_nhs_training.model_nhs_workforce_member"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_doctor'))]"/>
+        </record>
+        <!-- Record: rule_nhs_workforce_member_jobplan_manager for ir.rule -->
+        <record id="rule_nhs_workforce_member_jobplan_manager" model="ir.rule">
+            <field name="name">nhs.workforce.member: own directorate (job planning clinical manager)</field>
+            <field name="model_id" ref="odoo_nhs_training.model_nhs_workforce_member"/>
+            <field name="domain_force">[('unit_manager_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
+        </record>
+        <!-- Record: rule_nhs_workforce_member_jobplan_admin for ir.rule -->
+        <record id="rule_nhs_workforce_member_jobplan_admin" model="ir.rule">
+            <field name="name">nhs.workforce.member: company scope (job planning admin)</field>
+            <field name="model_id" ref="odoo_nhs_training.model_nhs_workforce_member"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_admin'))]"/>
+        </record>
+
+        <!-- Record: rule_nhs_duty_assignment_jobplan_doctor for ir.rule -->
+        <record id="rule_nhs_duty_assignment_jobplan_doctor" model="ir.rule">
+            <field name="name">nhs.duty.assignment: own record only (job planning doctor)</field>
+            <field name="model_id" ref="odoo_nhs_rostering.model_nhs_duty_assignment"/>
+            <field name="domain_force">[('member_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_doctor'))]"/>
+        </record>
+        <!-- Record: rule_nhs_duty_assignment_jobplan_manager for ir.rule -->
+        <record id="rule_nhs_duty_assignment_jobplan_manager" model="ir.rule">
+            <field name="name">nhs.duty.assignment: own directorate (job planning clinical manager)</field>
+            <field name="model_id" ref="odoo_nhs_rostering.model_nhs_duty_assignment"/>
+            <field name="domain_force">[('member_id.unit_manager_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
+        </record>
+        <!-- Record: rule_nhs_duty_assignment_jobplan_admin for ir.rule -->
+        <record id="rule_nhs_duty_assignment_jobplan_admin" model="ir.rule">
+            <field name="name">nhs.duty.assignment: company scope (job planning admin)</field>
+            <field name="model_id" ref="odoo_nhs_rostering.model_nhs_duty_assignment"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_admin'))]"/>
         </record>
     </data>
 </odoo>
