@@ -53,10 +53,10 @@ class NhsJobPlanObjective(models.Model):
         store=True,
         help="Owning company, from the plan."
     )
-    doctor_user_id = fields.Many2one(
-        'res.users',
+    member_id = fields.Many2one(
+        'nhs.workforce.member',
         string='Doctor',
-        related='plan_id.doctor_user_id',
+        related='plan_id.member_id',
         store=True,
         help="Doctor, from the plan - lets the cross-plan Objectives list be"
              " grouped/filtered by doctor."

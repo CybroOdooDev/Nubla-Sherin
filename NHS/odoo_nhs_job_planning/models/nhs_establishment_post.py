@@ -67,11 +67,21 @@ class NhsEstablishmentPost(models.Model):
     def _compute_current_job_plan_id(self):
         """Find the most recent non-superseded job plan for each post."""
         JobPlan = self.env['nhs.job.plan']
+        # Fetch all candidate plans for all posts in one batch
+        all_plans = JobPlan.search([
+            ('post_id', 'in', self.ids),
+            ('state', 'in', CURRENT_PLAN_STATES),
+        ], order='plan_year_id desc, id desc')
+        
+        # Group by post_id. Because the search is ordered, the first plan
+        # we encounter for a post is the most recent (highest year, highest ID).
+        post_to_plan = {}
+        for plan in all_plans:
+            if plan.post_id.id not in post_to_plan:
+                post_to_plan[plan.post_id.id] = plan
+
         for post in self:
-            post.current_job_plan_id = JobPlan.search([
-                ('post_id', '=', post.id),
-                ('state', 'in', CURRENT_PLAN_STATES),
-            ], order='plan_year_id desc, id desc', limit=1)
+            post.current_job_plan_id = post_to_plan.get(post.id, False)
 
     def action_view_job_plans(self):
         """Open the job plans raised against this post."""

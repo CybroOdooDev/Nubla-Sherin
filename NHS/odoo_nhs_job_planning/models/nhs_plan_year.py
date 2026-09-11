@@ -31,7 +31,7 @@ YEAR_STATES = [
 
 COMPLETE_STATES = ('signed', 'revised')
 OPEN_ENDED_STATES = ('proposed', 'in_discussion')
-PA_BALANCE_TOLERANCE = 0.5  # same tolerance action_agree() uses to flag an unreconciled plan
+PA_BALANCE_TOLERANCE = 0.5
 
 
 class NhsPlanYear(models.Model):
@@ -147,12 +147,7 @@ class NhsPlanYear(models.Model):
     @api.constrains('date_start', 'date_end')
     def _check_dates(self):
         """The end date must fall after the start date, and the year must
-        span roughly a full 12 months. A plan year shorter than this
-        confuses the auto-rollover cron (which decides "create next year"
-        once fewer than 60 days remain - a short year would trigger that
-        almost immediately) and can push review_due_date (date_end minus
-        the review lead time, default 60 days) before date_start, silently
-        dropping the plan out of the review-reminder cron entirely."""
+        span roughly a full 12 months."""
         MIN_SPAN_DAYS = 300
         for year in self:
             if not (year.date_start and year.date_end):

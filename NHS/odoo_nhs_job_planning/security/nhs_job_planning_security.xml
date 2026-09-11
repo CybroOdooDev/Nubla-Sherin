@@ -15,11 +15,6 @@
             <field name="sequence">10</field>
         </record>
 
-        <!-- Security group: Doctor - own job plan self-service only. Unlike the
-             sibling rostering module's portal-style Staff group, this module has
-             no portal controller (see 5.7/11.2 - self-service happens through the
-             backend "My Plan" menu, record-rule scoped), so the Doctor group
-             grants base.group_user rather than standing alone. -->
         <!-- Record: group_nhs_jobplan_doctor for res.groups -->
         <record id="group_nhs_jobplan_doctor" model="res.groups">
             <field name="name">Doctor</field>
@@ -122,7 +117,7 @@
         <record id="rule_nhs_job_plan_self" model="ir.rule">
             <field name="name">nhs.job.plan: own record only (doctor)</field>
             <field name="model_id" ref="model_nhs_job_plan"/>
-            <field name="domain_force">[('doctor_user_id', '=', user.id)]</field>
+            <field name="domain_force">[('member_id.user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_jobplan_doctor'))]"/>
             <field name="perm_create" eval="0"/>
         </record>
@@ -130,7 +125,7 @@
         <record id="rule_nhs_job_plan_activity_self" model="ir.rule">
             <field name="name">nhs.job.plan.activity: own record only (doctor)</field>
             <field name="model_id" ref="model_nhs_job_plan_activity"/>
-            <field name="domain_force">[('plan_id.doctor_user_id', '=', user.id)]</field>
+            <field name="domain_force">[('plan_id.member_id.user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_jobplan_doctor'))]"/>
             <field name="perm_create" eval="0"/>
         </record>
@@ -138,7 +133,7 @@
         <record id="rule_nhs_job_plan_objective_self" model="ir.rule">
             <field name="name">nhs.job.plan.objective: own record only (doctor)</field>
             <field name="model_id" ref="model_nhs_job_plan_objective"/>
-            <field name="domain_force">[('plan_id.doctor_user_id', '=', user.id)]</field>
+            <field name="domain_force">[('plan_id.member_id.user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_jobplan_doctor'))]"/>
             <field name="perm_create" eval="0"/>
         </record>
@@ -174,15 +169,6 @@
             <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
         </record>
 
-        <!-- Job Planning's "Rostered Duties" feature reads nhs.workforce.member
-             and nhs.duty.assignment (both owned by odoo_nhs_training/
-             odoo_nhs_rostering), whose own ACL/rules only grant Rostering-
-             specific groups - a plain Job Planning Doctor/Clinical Manager
-             otherwise has zero access to either, which crashes the Job Plan
-             form the instant it loads (rostered_duties_count is a header
-             stat button, computed on every open). These mirror the same
-             self/directorate/company scoping already used for nhs.job.plan
-             itself, via nhs.workforce.member.unit_manager_ids. -->
         <!-- Record: rule_nhs_workforce_member_jobplan_doctor for ir.rule -->
         <record id="rule_nhs_workforce_member_jobplan_doctor" model="ir.rule">
             <field name="name">nhs.workforce.member: own record only (job planning doctor)</field>

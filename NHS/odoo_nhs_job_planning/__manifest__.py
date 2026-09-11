@@ -21,7 +21,7 @@
 #############################################################################
 {
     'name': 'NHS Medical Job Planning',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'category': 'Healthcare/NHS',
     'summary': 'Annual job planning for consultants and SAS doctors - programmed '
                'activities, DCC/SPA split, on-call, objectives, two-party sign-off, '

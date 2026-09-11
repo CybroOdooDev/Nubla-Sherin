@@ -22,6 +22,7 @@
 from datetime import timedelta
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
+from odoo.fields import Domain
 from odoo.tools.float_utils import float_round
 
 STATES = [
@@ -65,27 +66,37 @@ class NhsJobPlan(models.Model):
         default='New',
         help="Job plan number, sequenced, e.g. 'JP/2026/0001'."
     )
+    @api.model
+    def _default_member_id(self):
+        """Default to the current user's workforce member profile."""
+        member = self.env['nhs.workforce.member'].sudo().search([('user_id', '=', self.env.uid)], limit=1)
+        return member.id if member else False
+
+    member_id = fields.Many2one(
+        'nhs.workforce.member',
+        string='Doctor',
+        required=True,
+        tracking=True,
+        default=_default_member_id,
+        help="The doctor's workforce member record - single source of identity for the plan."
+    )
     doctor_user_id = fields.Many2one(
         'res.users',
-        string='Doctor User',
-        required=True,
-        domain="[('share', '=', False)]",
-        tracking=True,
-        help="The doctor's login - single source of identity for the plan.")
+        string='Legacy Doctor User',
+        required=False,
+        help="Deprecated. Use member_id instead."
+    )
     doctor_name = fields.Char(
-        string='Doctor',
-        related='doctor_user_id.name',
+        string='Doctor Name',
+        related='member_id.name',
         store=True,
         index=True,
-        help="Doctor's display name, derived from Doctor User - not entered"
-             " by hand. Kept as a stored field so sorting, search, templates"
-             " and reports can keep referencing it unchanged."
+        help="Doctor's display name, derived from member - not entered by hand."
     )
     can_edit_doctor_user_id = fields.Boolean(
         string='Can Edit Doctor',
         compute='_compute_can_edit_doctor_user_id',
-        help="Technical field for the view: only clinical managers/admins may"
-             " (re)point a plan at a different doctor."
+        help="Technical field for the view: only clinical managers/admins may (re)point a plan at a different doctor."
     )
 
     post_id = fields.Many2one(
@@ -255,6 +266,14 @@ class NhsJobPlan(models.Model):
         compute='_compute_rostered_metrics',
         digits=(16, 2),
         help="Rostered PAs minus Total Planned PAs."
+    )
+    rostered_data_available = fields.Boolean(
+        string='Rostered Data Available',
+        compute='_compute_rostered_metrics',
+        help="False when the doctor has no linked nhs.workforce.member record."
+             " In that case Rostered PAs/Duties and the PA Variance above are"
+             " not a genuine reading (they default to 0/fully-under-rostered) -"
+             " they simply mean rostering data could not be looked up."
     )
     state = fields.Selection(
         STATES,
@@ -427,73 +446,95 @@ class NhsJobPlan(models.Model):
             managers = OrgUnit.browse(ancestor_ids).mapped('manager_id')
             plan.manager_ids = [(6, 0, managers.ids)]
 
-    @api.depends('plan_year_id.date_start', 'plan_year_id.date_end', 'org_unit_id',
-                 'doctor_user_id', 'total_pas')
-    def _compute_rostered_metrics(self):
-        for plan in self:
-            count = 0
-            rostered_pas = 0.0
-
-            if plan.plan_year_id:
-                member_id = False
-                if plan.doctor_user_id:
-                    member = self.env['nhs.workforce.member'].search([('user_id', '=', plan.doctor_user_id.id)], limit=1)
-                    if member:
-                        member_id = member.id
-
-                if member_id:
-                    domain = [
-                        ('member_id', '=', member_id),
-                        ('duty_date', '>=', plan.plan_year_id.date_start),
-                        ('duty_date', '<=', plan.plan_year_id.date_end),
-                        ('state', 'not in', ('cancelled', 'dna')),
-                    ]
-                    if plan.org_unit_id:
-                        domain.append(('duty_id.unit_id.org_unit_id', '=', plan.org_unit_id.id))
-
-                    assignments = self.env['nhs.duty.assignment'].search(domain)
-                    count = len(assignments)
-
-                    total_hours = sum(assignments.mapped('paid_hours'))
-                    rostered_pas = float_round(total_hours / 4.0, precision_digits=2)
-
-            plan.rostered_duties_count = count
-            plan.rostered_pas = rostered_pas
-            plan.rostered_pa_variance = rostered_pas - plan.total_pas
-
-    def action_view_rostered_duties(self):
-        """Open the rostered duties view."""
-        self.ensure_one()
-        member_id = False
-        if self.doctor_user_id:
-            member = self.env['nhs.workforce.member'].search([('user_id', '=', self.doctor_user_id.id)], limit=1)
-            if member:
-                member_id = member.id
-                
-        if not member_id:
-            return
-
+    @api.model
+    def _build_rostered_duties_domain(self, member_id, date_start, date_end, org_unit_id=False):
+        """Domain for the nhs.duty.assignment records that reconcile against
+        a job plan: same workforce member, duty date within the plan year,
+        excluding cancelled/dna, optionally scoped to the plan's org unit.
+        Shared by _compute_rostered_metrics and action_view_rostered_duties
+        so the reconciliation rule can't drift between the two."""
         domain = [
             ('member_id', '=', member_id),
-            ('duty_date', '>=', self.plan_year_id.date_start),
-            ('duty_date', '<=', self.plan_year_id.date_end),
+            ('duty_date', '>=', date_start),
+            ('duty_date', '<=', date_end),
             ('state', 'not in', ('cancelled', 'dna')),
         ]
-        if self.org_unit_id:
-            domain.append(('duty_id.unit_id.org_unit_id', '=', self.org_unit_id.id))
+        if org_unit_id:
+            domain.append(('duty_id.unit_id.org_unit_id', '=', org_unit_id))
+        return domain
+
+    @api.depends('plan_year_id.date_start', 'plan_year_id.date_end', 'org_unit_id',
+                 'member_id', 'total_pas')
+    def _compute_rostered_metrics(self):
+        """Compare each plan's actual rostered nhs.duty.assignment records
+        against its planned Total PAs.
+        """
+        plan_domains = {}
+        or_domains = []
+        for plan in self:
+            if not plan.member_id or not plan.plan_year_id:
+                continue
+            domain = self._build_rostered_duties_domain(
+                plan.member_id.id, plan.plan_year_id.date_start, plan.plan_year_id.date_end, plan.org_unit_id.id)
+            plan_domains[plan.id] = domain
+            or_domains.append(domain)
+
+        # sudo(): To accurately calculate rostered metrics for a plan, we must fetch
+        # all assigned duties, even if the current user doesn't have read access to
+        # all duty assignment records across the system.
+        assignments = self.env['nhs.duty.assignment'].sudo()
+        if or_domains:
+            assignments = assignments.search(Domain.OR(or_domains))
+
+        for plan in self:
+            domain = plan_domains.get(plan.id)
+            if domain is None:
+                plan.rostered_data_available = False
+                plan.rostered_duties_count = 0
+                plan.rostered_pas = 0.0
+                plan.rostered_pa_variance = float_round(-plan.total_pas, precision_digits=2)
+                continue
+
+            matched = assignments.filtered_domain(domain)
+            total_hours = sum(matched.mapped('paid_hours'))
+            rostered_pas = float_round(total_hours / 4.0, precision_digits=2)
+
+            plan.rostered_data_available = True
+            plan.rostered_duties_count = len(matched)
+            plan.rostered_pas = rostered_pas
+            # Round the variance itself (not just rostered_pas) so that two
+            # amounts that display as equal don't fail an exact float ==
+            # comparison in the view's decoration due to residual precision.
+            plan.rostered_pa_variance = float_round(rostered_pas - plan.total_pas, precision_digits=2)
+
+    def action_view_rostered_duties(self):
+        """Open the rostered duties reconciled against this job plan."""
+        self.ensure_one()
+        
+        if not self.member_id:
+            raise UserError(
+                "No workforce member record is linked to this job plan, so their"
+                " rostered duties cannot be looked up. Please set the Doctor field.")
+
+        domain = self._build_rostered_duties_domain(
+            self.member_id.id, self.plan_year_id.date_start, self.plan_year_id.date_end, self.org_unit_id.id)
+        
+        # We evaluate the domain with sudo() to fetch the IDs directly, so the 
+        # client view doesn't try to traverse duty_id.unit_id which causes access errors.
+        matched_assignments = self.env['nhs.duty.assignment'].sudo().search(domain)
+        
         return {
             'name': 'Rostered Duties',
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.duty.assignment',
             'view_mode': 'list,form',
-            'domain': domain,
+            'domain': [('id', 'in', matched_assignments.ids)],
             'context': {
-                'default_member_id': member_id,
+                'default_member_id': self.member_id.id,
                 'create': False,
                 'edit': False,
                 'delete': False,
             },
-
         }
 
     @api.depends_context('uid')
@@ -529,46 +570,53 @@ class NhsJobPlan(models.Model):
         if self.post_id and not self.specialty:
             self.specialty = self.post_id.job_title
 
+    @api.constrains('member_id')
+    def _check_member_id_not_null(self):
+        """Prevent raw psycopg2 NotNullViolation crashes on programmatic creation."""
+        for plan in self:
+            if not plan.member_id:
+                raise ValidationError("A Job Plan cannot be created without assigning a Doctor (Workforce Member).")
 
-    @api.constrains('doctor_user_id', 'plan_year_id', 'post_id', 'state')
+
+    @api.constrains('member_id', 'plan_year_id', 'post_id', 'state')
     def _check_one_active_plan_per_year(self):
         """At most one non-superseded plan per doctor per post per plan year.
         A business rule, not a DB uniqueness fact - revisions/rollover
         legitimately leave multiple rows for the same doctor+post+year, only
         one of which may be 'live' (not revised/superseded) at a time."""
         active_plans = self.filtered(
-            lambda p: p.state not in ('superseded', 'revised') and p.doctor_user_id
+            lambda p: p.state not in ('superseded', 'revised') and p.member_id
         )
         if not active_plans:
             return
         seen = set()
         for plan in active_plans:
-            key = (plan.doctor_user_id.id, plan.plan_year_id.id, plan.post_id.id)
+            key = (plan.member_id.id, plan.plan_year_id.id, plan.post_id.id)
             if key in seen:
                 raise ValidationError(
                     "Cannot have multiple active job plans for %s against '%s' in"
                     " %s in the same operation." % (
-                        plan.doctor_user_id.name, plan.post_id.display_name,
+                        plan.member_id.name, plan.post_id.display_name,
                         plan.plan_year_id.name))
             seen.add(key)
         existing_plans = self.search([
             ('id', 'not in', self.ids),
-            ('doctor_user_id', 'in', active_plans.mapped('doctor_user_id.id')),
+            ('member_id', 'in', active_plans.mapped('member_id.id')),
             ('plan_year_id', 'in', active_plans.mapped('plan_year_id.id')),
             ('post_id', 'in', active_plans.mapped('post_id.id')),
             ('state', 'not in', ('superseded', 'revised')),
         ])
         existing_dict = {
-            (p.doctor_user_id.id, p.plan_year_id.id, p.post_id.id): p for p in existing_plans}
+            (p.member_id.id, p.plan_year_id.id, p.post_id.id): p for p in existing_plans}
 
         for plan in active_plans:
-            key = (plan.doctor_user_id.id, plan.plan_year_id.id, plan.post_id.id)
+            key = (plan.member_id.id, plan.plan_year_id.id, plan.post_id.id)
             if key in existing_dict:
                 other = existing_dict[key]
                 raise ValidationError(
                     "%s already has a job plan (%s) against '%s' for %s. Revise"
                     " that plan instead of creating a second one." % (
-                        plan.doctor_user_id.name, other.reference,
+                        plan.member_id.name, other.reference,
                         plan.post_id.display_name, plan.plan_year_id.name))
 
     @api.constrains('plan_year_id')
@@ -604,7 +652,7 @@ class NhsJobPlan(models.Model):
         is_doctor = user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_doctor')
         is_manager = user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_manager')
         for plan in self:
-            owns_as_doctor = is_doctor and plan.doctor_user_id.id == user.id
+            owns_as_doctor = is_doctor and plan.member_id.user_id.id == user.id
             owns_as_manager = is_manager and user in plan.manager_ids
             if owns_as_doctor or owns_as_manager:
                 continue
@@ -681,7 +729,7 @@ class NhsJobPlan(models.Model):
         for plan in self:
             if plan.state != 'agreed':
                 raise UserError("Only an agreed plan can be signed.")
-            if plan.doctor_user_id and self.env.user != plan.doctor_user_id \
+            if plan.member_id.user_id and self.env.user != plan.member_id.user_id \
                     and not self.env.user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_admin'):
                 raise UserError(
                     "Only the doctor named on this plan (or an administrator)"
@@ -822,11 +870,11 @@ class NhsJobPlan(models.Model):
             target_plans = self.search([
                 ('plan_year_id', '=', target_year.id),
                 ('state', 'not in', ['superseded', 'revised']),
-                ('doctor_user_id', '!=', False)
+                ('member_id', '!=', False)
             ])
-            excluded_doctors = target_plans.mapped('doctor_user_id.id')
+            excluded_doctors = target_plans.mapped('member_id.id')
             candidates = candidates.filtered(
-                lambda p: not p.doctor_user_id or p.doctor_user_id.id not in excluded_doctors
+                lambda p: not p.member_id or p.member_id.id not in excluded_doctors
             )
         return candidates
 
