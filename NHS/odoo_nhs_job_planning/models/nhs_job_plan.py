@@ -80,12 +80,6 @@ class NhsJobPlan(models.Model):
         default=_default_member_id,
         help="The doctor's workforce member record - single source of identity for the plan."
     )
-    doctor_user_id = fields.Many2one(
-        'res.users',
-        string='Legacy Doctor User',
-        required=False,
-        help="Deprecated. Use member_id instead."
-    )
     doctor_name = fields.Char(
         string='Doctor Name',
         related='member_id.name',
@@ -479,9 +473,6 @@ class NhsJobPlan(models.Model):
             plan_domains[plan.id] = domain
             or_domains.append(domain)
 
-        # sudo(): To accurately calculate rostered metrics for a plan, we must fetch
-        # all assigned duties, even if the current user doesn't have read access to
-        # all duty assignment records across the system.
         assignments = self.env['nhs.duty.assignment'].sudo()
         if or_domains:
             assignments = assignments.search(Domain.OR(or_domains))
@@ -502,9 +493,6 @@ class NhsJobPlan(models.Model):
             plan.rostered_data_available = True
             plan.rostered_duties_count = len(matched)
             plan.rostered_pas = rostered_pas
-            # Round the variance itself (not just rostered_pas) so that two
-            # amounts that display as equal don't fail an exact float ==
-            # comparison in the view's decoration due to residual precision.
             plan.rostered_pa_variance = float_round(rostered_pas - plan.total_pas, precision_digits=2)
 
     def action_view_rostered_duties(self):
@@ -518,9 +506,6 @@ class NhsJobPlan(models.Model):
 
         domain = self._build_rostered_duties_domain(
             self.member_id.id, self.plan_year_id.date_start, self.plan_year_id.date_end, self.org_unit_id.id)
-        
-        # We evaluate the domain with sudo() to fetch the IDs directly, so the 
-        # client view doesn't try to traverse duty_id.unit_id which causes access errors.
         matched_assignments = self.env['nhs.duty.assignment'].sudo().search(domain)
         
         return {

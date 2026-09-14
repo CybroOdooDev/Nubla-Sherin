@@ -189,3 +189,23 @@ class NhsJobPlanActivity(models.Model):
         for line in self:
             if line.time_start and line.time_end and line.time_end <= line.time_start:
                 raise ValidationError('End time must be after start time on a timetable line!')
+
+    @api.constrains('plan_id')
+    def _check_plan_id_access(self):
+        """Belt-and-braces ownership check: perm_create is disabled on the
+        doctor/manager 'own record'/'own directorate' ir.rules for this model
+        (see nhs_job_planning_security.xml), so creation isn't
+        domain-restricted on its own - this closes that gap the same way
+        nhs.job.plan.create()'s _check_creator_can_access() does for plans."""
+        user = self.env.user
+        if user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_admin'):
+            return
+        is_doctor = user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_doctor')
+        is_manager = user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_manager')
+        for line in self:
+            owns_as_doctor = is_doctor and line.plan_id.member_id.user_id.id == user.id
+            owns_as_manager = is_manager and user in line.plan_id.manager_ids
+            if not (owns_as_doctor or owns_as_manager):
+                raise ValidationError(
+                    "You cannot create or move a timetable activity onto a"
+                    " job plan that is not your own.")

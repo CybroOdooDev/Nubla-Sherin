@@ -153,6 +153,13 @@
             <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
         </record>
+        <!-- Record: rule_nhs_oncall_profile_manager for ir.rule -->
+        <record id="rule_nhs_oncall_profile_manager" model="ir.rule">
+            <field name="name">nhs.oncall.profile: company scope (clinical manager)</field>
+            <field name="model_id" ref="model_nhs_oncall_profile"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_nhs_jobplan_manager'))]"/>
+        </record>
         <!-- Record: rule_nhs_plan_year_manager for ir.rule -->
         <record id="rule_nhs_plan_year_manager" model="ir.rule">
             <field name="name">nhs.plan.year: company scope (clinical manager, read)</field>

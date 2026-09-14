@@ -116,37 +116,59 @@ class NhsJobPlanObjective(models.Model):
         help="Notes recorded at annual review."
     )
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        """Create a new objective."""
-        return super().create(vals_list)
+    @api.constrains('plan_id')
+    def _check_plan_id_access(self):
+        """Belt-and-braces ownership check: perm_create is disabled on the
+        doctor/manager 'own record'/'own directorate' ir.rules for this model
+        (see nhs_job_planning_security.xml), so creation isn't
+        domain-restricted on its own - this closes that gap the same way
+        nhs.job.plan.create()'s _check_creator_can_access() does for plans."""
+        user = self.env.user
+        if user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_admin'):
+            return
+        is_doctor = user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_doctor')
+        is_manager = user.has_group('odoo_nhs_job_planning.group_nhs_jobplan_manager')
+        for objective in self:
+            owns_as_doctor = is_doctor and objective.plan_id.member_id.user_id.id == user.id
+            owns_as_manager = is_manager and user in objective.plan_id.manager_ids
+            if not (owns_as_doctor or owns_as_manager):
+                raise ValidationError(
+                    "You cannot create or move an objective onto a job plan"
+                    " that is not your own.")
 
-    def write(self, vals):
-        """Update an existing objective."""
-        return super().write(vals)
+    def _set_status(self, status):
+        """Set status and, per the active field's documented behaviour,
+        archive the objective when (and only while) it is Achieved."""
+        self.write({'status': status, 'active': status != 'achieved'})
 
     def action_set_status_not_started(self):
         """Set status to not started."""
-        self.write({'status': 'not_started'})
+        self._set_status('not_started')
 
     def action_set_status_on_track(self):
         """Set status to on track."""
-        self.write({'status': 'on_track'})
+        self._set_status('on_track')
 
     def action_set_status_at_risk(self):
         """Set status to at risk."""
-        self.write({'status': 'at_risk'})
+        self._set_status('at_risk')
 
     def action_set_status_achieved(self):
         """Set status to achieved."""
-        self.write({'status': 'achieved'})
+        self._set_status('achieved')
 
     def action_set_status_not_achieved(self):
         """Set status to not achieved."""
-        self.write({'status': 'not_achieved'})
+        self._set_status('not_achieved')
 
     @api.constrains('target_date')
     def _check_target_date(self):
+        # Skip during system-driven copies (in-year revision, plan-year
+        # rollover): these legitimately carry an already-past target_date
+        # across onto the new draft plan, they're not a user mistyping a date.
+        if self.env.context.get('nhs_jobplan_revision_apply') \
+                or self.env.context.get('nhs_jobplan_skip_year_state_check'):
+            return
         today = fields.Date.context_today(self)
         for record in self:
             if record.target_date and record.target_date < today:
