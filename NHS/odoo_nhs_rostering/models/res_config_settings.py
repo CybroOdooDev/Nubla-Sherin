@@ -62,7 +62,6 @@ class ResCompany(models.Model):
         help="When on, the scheduled action pushes unfilled duties within a unit's"
              " escalation lead time to the Staff Bank (when installed) automatically."
     )
-
     def get_default_hours_basis(self):
         """Full-time weekly hours basis to compute FTE/paid-hours ratios against.
         Reuses the Establishment module's company setting rather than duplicating it."""

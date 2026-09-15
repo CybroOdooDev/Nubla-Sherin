@@ -55,6 +55,16 @@ member for agreed exceptions).</field>
             <field name="description">Maximum number of consecutive night duties (overridable per
 member for agreed exceptions).</field>
         </record>
+        <!-- Record: roster_rule_person_constraint for nhs.roster.rule -->
+    <record id="roster_rule_person_constraint" model="nhs.roster.rule">
+            <field name="code">PERSON_CONSTRAINT</field>
+            <field name="name">Person Constraints (No Nights / Fixed Days)</field>
+            <field name="severity">hard</field>
+            <field name="sequence">45</field>
+            <field name="description">A member flagged No Nights cannot be assigned a night shift;
+a member with Fixed Working Days set can only be assigned on those weekdays - personal
+working-pattern agreements recorded on the workforce member's Rostering tab.</field>
+        </record>
         <!-- Record: roster_rule_contract_hours for nhs.roster.rule -->
     <record id="roster_rule_contract_hours" model="nhs.roster.rule">
             <field name="code">CONTRACT_HOURS</field>

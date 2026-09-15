@@ -147,6 +147,7 @@ class NhsRosterRuleEngine(models.AbstractModel):
             'WEEKLY_REST': self._eval_weekly_rest,
             'MAX_CONSEC_DAYS': self._eval_max_consecutive_days,
             'MAX_CONSEC_NIGHTS': self._eval_max_consecutive_nights,
+            'PERSON_CONSTRAINT': self._eval_person_constraint,
             'CONTRACT_HOURS': self._eval_contract_hours,
             'SKILL_MIX': self._eval_skill_mix,
             'COMPLIANCE_GATE': self._eval_compliance_gate,
@@ -247,8 +248,6 @@ class NhsRosterRuleEngine(models.AbstractModel):
         bounds = sorted((a.duty_id.get_datetime_bounds() for a in assignments), key=lambda b: b[0])
         limit = rule.limit_value or 24.0
         if len(bounds) < 2:
-            # 0 or 1 duty in the trailing 7 days: nothing to compare, so there is
-            # necessarily an unbroken rest period around it - trivially passes.
             return True, ''
         max_gap = 0.0
         for i in range(1, len(bounds)):
@@ -297,6 +296,22 @@ class NhsRosterRuleEngine(models.AbstractModel):
         run = self._consecutive_run(member, duty.duty_date, only_nights=True)
         if run > limit:
             return False, 'Would be %d consecutive nights (limit %d).' % (run, limit)
+        return True, ''
+
+    def _eval_person_constraint(self, rule, assignment):
+        """Personal working-pattern agreements recorded on the workforce
+        member (build spec 2.2/4.1: 'fixed days, no-nights ... modelled as
+        person-level constraints the rules engine respects') - distinct from
+        MAX_CONSEC_DAYS/NIGHTS, which cap a run rather than forbid a
+        category of shift/day outright."""
+        member, duty = assignment.member_id, assignment.duty_id
+        if member.roster_no_nights and duty.shift_type_id.is_night:
+            return False, '%s does not work night shifts (No Nights constraint).' % member.name
+        if member.roster_fixed_weekday_ids and duty.duty_date:
+            allowed = set(member.roster_fixed_weekday_ids.mapped('index'))
+            if duty.duty_date.weekday() not in allowed:
+                days = ', '.join(member.roster_fixed_weekday_ids.sorted('sequence').mapped('name'))
+                return False, '%s only works %s (Fixed Working Days constraint).' % (member.name, days)
         return True, ''
 
     def _eval_contract_hours(self, rule, assignment):

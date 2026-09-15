@@ -31,7 +31,7 @@
                         <list editable="bottom">
                             <field name="week_number"/>
                             <field name="weekday"/>
-                            <field name="shift_type_id"/>
+                            <field name="shift_type_id" options="{'no_create': True, 'no_create_edit': True}"/>
                         </list>
                     </field>
                 </sheet>

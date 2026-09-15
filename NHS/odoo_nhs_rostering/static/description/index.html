@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>NHS e-Rostering</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+</head>
+
+
+<body style="font-family: &quot;Montserrat&quot;, sans-serif;background-color: #71639e08;">
+
+
+<div class="container-fluid cmpad">
+    <div class="supports my-3 py-3" style="    border: 2px solid #71639e10;
+    padding: 0 35px;
+    border-radius: 10px;    border: 2px solid #e9ecef;background-color: white;">
+        <div class="row justify-content-between align-items-center">
+            <div class="col-lg-3">
+                <div class="my-3 mx-auto mx-sm-0" style="width: 250px; ">
+                    <img src="//apps.odoocdn.com/apps/assets/17.0/theme_boec/images/Cybrosys.png?fcdde35"
+                         style="width: 100%;">
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="row">
+                    <div class="my-3 d-flex align-items-center justify-content-center justify-content-sm-end">
+                        <span class="me-3"><b>Supports: </b></span>
+                        <div class="text-center" style="
+                    background-color: #71639e !important;
+                    font-size: 1rem !important;
+                    color: #fff !important;
+                    font-weight: 500 !important;
+                    padding: 8px !important;
+                    margin: 0 3px !important;
+                    border-radius: 50px !important;
+                    min-width: 130px !important;
+                  ">
+                            Community
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 10px;display: flex;justify-content: end;float: right;">
+                    <div class="d-flex align-items-center justify-content-end flex-wrap gap-2">
+                        <span class="me-3"><b>Availability: </b></span>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-center col" style="
+                    border: 2px solid #ebebeb;
+    font-size: 1rem !important;
+    color: #333 !important;
+    font-weight: 500 !important;
+    padding: 8px !important;
+    margin: 0 3px !important;
+    border-radius: 20px !important;
+    min-width: 150px !important;
+                  ">
+                            <img src="./assets/icons/close.png" alt="" width="18" height="18">
+                            Odoo Online
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-center col" style="
+                    border: 2px solid #ebebeb;
+    font-size: 1rem !important;
+    color: #333 !important;
+    font-weight: 500 !important;
+    padding: 8px !important;
+    margin: 0 3px !important;
+    border-radius: 20px !important;
+    min-width: 150px !important;
+                  ">
+                            <img src="./assets/icons/close.png" alt="" width="18" height="18">
+                            Odoo.sh
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-center col" style="
+                   border: 2px solid #ebebeb;
+    font-size: 1rem !important;
+    color: #333 !important;
+    font-weight: 500 !important;
+    padding: 8px !important;
+    margin: 0 3px !important;
+    border-radius: 20px !important;
+    min-width: 150px !important;
+                  ">
+                            <img src="./assets/icons/tick.png" alt="" width="18" height="18">
+                            On Premise
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid cmpad text-center py-5 py-md-3">
+    <div class="row">
+        <div class="col-md-12">
+            <div style="overflow: hidden; border-radius: 24px; padding: 60px 24px;
+                        background-color: #f7f5ff;
+                        border: 2px solid #e9ecef;">
+
+                <div>
+                    <!-- Overline heading -->
+                    <div style="display:block; margin:0 auto 14px; font-size:1.05rem; font-weight:700;
+                                text-transform:uppercase; letter-spacing:2.5px; line-height:1.4;
+                                color:rgba(26,20,48,0.55);">
+                        Odoo for NHS Workforce Rostering
+                    </div>
+
+                    <h3 class="mainhead"
+                        style="font-size: 3rem; margin:0; font-weight: 800; letter-spacing:-1px; line-height:1.12;
+                               color:#1a1430;">
+                        NHS e-Rostering
+                <br/>Safe, Rule-Checked Staff Rostering
+                    </h3>
+
+                    <!-- Accent divider -->
+                    <div style="width:92px; height:5px; border-radius:50px; margin:20px auto 16px; background-color:#71639e;"></div>
+
+                    <p class="para mb-4"
+                       style="font-size: 20px; max-width:620px; margin:0 auto 30px; color: #6b7280; line-height:1.6;">
+                        Build demand-based rotas against the funded establishment, enforce working-time and skill-mix rules automatically, and escalate unfilled shifts to the Staff Bank and agency &mdash; all from one Odoo app.
+                    </p>
+
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <a href="https://cybrosys.easyinstance.com/instant-support"
+                           class="contact-btn support-btn d-flex align-items-center gap-2 justify-content-center"
+                           style="padding: 15px 28px; border: none; border-radius: 50px; font-size: 16px; font-weight: 600; text-decoration: none; color: white; cursor: pointer; min-width: 210px; justify-content: center; background-color: #71639e;">
+                            <img src="./assets/icons/support.png" alt="" width="25" height="25">
+                            <span class="btn-text" style="font-size: 15px; letter-spacing: 0.5px;">Instant Support</span>
+                        </a>
+
+                        <a href="mailto:odoo@cybrosys.com"
+                           class="contact-btn email-btn d-flex align-items-center gap-2 justify-content-center"
+                           style="padding: 15px 28px; border: none; border-radius: 50px; font-size: 16px; font-weight: 600; text-decoration: none; color: white; cursor: pointer; min-width: 210px; justify-content: center; background-color: #2f7cf6;">
+                            <img src="./assets/icons/mail.png" alt="" width="25" height="25">
+                            <span class="btn-text" style="font-size: 15px; letter-spacing: 0.5px;">Email Us</span>
+                        </a>
+
+                        <a href="https://wa.me/919074270811"
+                           class="contact-btn whatsapp-btn d-flex align-items-center gap-2 justify-content-center"
+                           style="padding: 15px 28px; border: none; border-radius: 50px; font-size: 16px; font-weight: 600; text-decoration: none; color: white; cursor: pointer; min-width: 210px; justify-content: center; background-color: #1fae57;">
+                            <img src="./assets/icons/whatsapp.png" alt="" width="25" height="25">
+                            <span class="btn-text" style="font-size: 15px; letter-spacing: 0.5px;">+91 9074270811</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="row">
+        <div class="col-md-6 mb-3 mb-md-0">
+            <div class="content-card blog-card h-100" style="    background-color: #8b5cf612;
+    border: 2px solid #8a5cf615;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    overflow: hidden;">
+                <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                     style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #8B5CF6;">
+                    <img src="./assets/icons/document.png" alt="" width="30" height="30">
+                </div>
+                <h3 class="card-title"
+                    style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                    Read Blog</h3>
+                <p class="card-description mb-3"
+                   style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Dive into our
+                    comprehensive blog posts covering the latest in
+                    cybersecurity
+                    trends and insights.</p>
+                <a href="https://www.cybrosys.com/blog/"
+                   class="card-action video-action d-flex align-items-center justify-content-center gap-2"
+                   style="padding: 10px 20px;border-radius: 8px;font-weight: 500;font-size: 15px;text-decoration: none;border: none;width: max-content;background-color: #9e6390;color: white;transition: .3s;">
+                    <img src="./assets/icons/copy.png" alt="" width="18" height="18">
+                    Read Blog
+                </a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="content-card video-card h-100" style="    background-color: #ef444421;
+    border: 2px solid #ef44441f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    overflow: hidden;">
+                <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                     style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #EF4444;">
+                    <img src="./assets/icons/play.png" alt="" width="23px" height="23px">
+                </div>
+                <h3 class="card-title"
+                    style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                    Video Tutorial</h3>
+                <p class="card-description mb-3"
+                   style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Watch our detailed
+                    video demonstrations and tutorials on YouTube
+                    for
+                    hands-on learning.</p>
+                <a href="https://www.youtube.com/c/CybrosysTechnologies"
+                   class="card-action video-action d-flex align-items-center justify-content-center gap-2"
+                   style="padding: 10px 20px;border-radius: 8px;font-weight: 500;font-size: 15px;text-decoration: none;border: none;width: max-content;background-color: #9e6390;color: white;transition: .3s;">
+                    <img src="./assets/icons/play.png" alt="" width="15px" height="15px">
+                    Watch Demo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="highlights-section">
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Key
+            <span>Highlights</span>
+        </h2>
+        <div class="row" style="margin-top: 20px;">
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100" style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Demand-Based Rota Generation</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Generates duty slots automatically from each unit's effective demand template, matching required headcount, band, role and skills to every shift, date and weekday across the roster period.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100" style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Rotation Template Rollout</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Rolls a repeating multi-week shift pattern across a roster period for chosen staff in a single action, skipping fixed bank holidays and honouring each rule check as it goes.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100" style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Automatic Rules Engine</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Checks every duty assignment against ten configurable hard and soft rules &mdash; 48-hour average week, 11-hour rest, skill mix, training compliance &mdash; blocking unsafe shifts before they are saved.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100" style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Gap Escalation to Bank &amp; Agency</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Pushes unfilled duties to the Staff Bank as open shifts within each unit's escalation lead time, tracking offers through to bank-filled or on to agency cover with cost recorded.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100" style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Leave Capacity Protection</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">Blocks leave approval once too many of a unit's team would be off on the same day, with an audited Force Approve override reserved for Workforce Admins with a logged reason.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="highlight-card h-100" style="background-color: #8d76d51f;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 32px;
+    border: 2px solid #71639e1a;
+    position: relative;
+    overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;margin-bottom: 12px;letter-spacing: -0.025em;">
+                        Interactive Roster Grid</h3>
+                    <p class="card-description"
+                       style="font-size: 16px;color: #6b7280;margin-bottom: 0;line-height: 1.6;">A staff-by-day grid for click-to-assign scheduling, showing live fill position, rule violations and shift coverage per day, with rules re-checked against the engine on every change.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="tabs-design1">
+        <ul class="nav nav-pills justify-content-start justify-content-md-center pb-4" style="    flex-flow: nowrap;
+    overflow: hidden;
+    overflow-x: auto;" id="pills1" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="screenshot-tab" data-bs-toggle="pill" data-bs-target="#screenshot"
+                   type="button" role="tab" style="width: max-content;border-radius: 50px;
+    margin: 0 5px;
+    padding: 12px 24px;
+    font-weight: 500;
+    border: 2px solid #e9ecef;
+    position: relative;">
+                    Screenshot
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="features-tab" data-bs-toggle="pill" data-bs-target="#features" type="button"
+                   role="tab" style="width: max-content;border-radius: 50px;
+    margin: 0 5px;
+    padding: 12px 24px;
+    font-weight: 500;
+    border: 2px solid #e9ecef;
+    position: relative;">
+                    Features
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="faq-tab" data-bs-toggle="pill" data-bs-target="#faq" type="button"
+                   role="tab" style="width: max-content;border-radius: 50px;
+    margin: 0 5px;
+    padding: 12px 24px;
+    font-weight: 500;
+    border: 2px solid #e9ecef;
+    position: relative;">
+                    Frequent Questions
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="latest-release-tab" data-bs-toggle="pill" data-bs-target="#latest-release"
+                   type="button" role="tab" style="width: max-content;border-radius: 50px;
+    margin: 0 5px;
+    padding: 12px 24px;
+    font-weight: 500;
+    border: 2px solid #e9ecef;
+    position: relative;">
+                    Latest Release
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content bg-white rounded-4" style="border: 2px solid #e9ecef;border-radius: 10px;"
+             id="pills1Content">
+
+            <!-- SCREENSHOT TAB -->
+            <div class="tab-pane fade show active" id="screenshot" role="tabpanel">
+                <div class="p-3 py-md-5">
+
+                    <h2 class="mainhead text-center mb-2" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Role-Based <span>Access Levels</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Grant each user a Rostering Access Level &mdash; No, Staff, Roster Manager or Workforce Admin &mdash; directly from their user profile, alongside the NHS suite's other module-level access controls.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/1.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Rostered Units <span>Overview</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        See every rostered unit at a glance &mdash; team size, shift types, roster periods, leave capacity percentage, escalation lead time and assigned Roster Managers &mdash; in one Rostered Units list.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/2.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Unit Configuration &amp; <span>Shift Types</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Configure a rostered unit's org unit, company, Roster Managers, leave capacity percentage, escalation lead time and auto-escalate-to-bank setting, then define its Early, Late, Long Day, Night and On-Call shift types.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/3.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Rotation <span>Template Builder</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Build a repeating multi-week shift pattern &mdash; here a 4-week nursing rotation &mdash; by mapping each week and weekday to a shift type, ready to be rolled across any roster period.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/4.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Demand <span>Template Setup</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Define the unit's demand template: required headcount, band, role/staff group and required skills for each weekday or specific override date, effective-dated so establishment changes never lose history.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/5.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Team &amp; <span>Periods Access</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Jump straight from a rostered unit to its Team or its Roster Periods using the stat buttons at the top of the form, alongside leave capacity, escalation and auto-escalate settings.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/6.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Unit Team &amp; <span>Compliance</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Review a unit's team roster with reference number, post, staff group, training compliance percentage, expired items, compliance status and leaver flag, pulled straight from the training compliance register.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/7.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Person-Level <span>Rostering Constraints</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        The Rostering tab added to every workforce member: contracted weekly hours and
+                        Agenda for Change band read from their post, personal constraints (No Nights,
+                        Fixed Working Days, per-person consecutive-day/night overrides) and held
+                        skills &mdash; all enforced live by the rules engine when a duty is assigned,
+                        not just recorded for reference.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/9.1.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Roster <span>Periods List</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Track every roster period's fill percentage, open gaps, hard violations and publish lead time alongside its Draft, In Progress or Published status, across every rostered unit in one list.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/8.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Roster Period <span>Workflow</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Move a roster period through Draft, In Progress, Checked, Approved, Published and Finalised using Generate Duties, Apply Rotation Template, Open Roster Grid and Check, with fill and violation counts always visible.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/9.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Apply <span>Rotation Template</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Roll a rotation template across the period in one action &mdash; choosing which template, which staff to apply it to, which pattern week to start at, and whether to skip fixed bank holidays.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/10.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Open <span>Roster Grid</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Launch the interactive roster grid directly from a roster period, alongside stat buttons for its duties, open rule violations and swap requests, and a live fill and headcount summary.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/11.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Interactive <span>Roster Grid</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Assign staff to shifts with a click on the staff-by-day roster grid, showing OK or short-staffed badges per day, colour-coded shift chips, and a live Open Violations panel with rule-check detail.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/12.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Printable <span>Rota Reports</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Print a Unit Rota or Fill &amp; Gaps report straight from a roster period's Print menu, alongside Duplicate, Copy Roster Period and Reset to Draft actions for managing the period.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/13.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Unit <span>Rota Report</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        The Unit Rota PDF lists every duty in the period by date, shift, required and assigned headcount, and the staff assigned &mdash; the ward-office print-out for the whole period at a glance.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/14.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Fill &amp; <span>Gaps Report</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        The Fill &amp; Gaps PDF lists every unfilled or escalated duty with required, assigned and short headcount plus escalation status and cost &mdash; the evidence trail for safe-staffing and CQC review.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/15.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Duty Gaps <span>by Unit</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        See every unfilled duty across every roster period, grouped by unit, with date, shift type, role/staff group, required band and required headcount &mdash; the starting point for escalation.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/16.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Escalation <span>Tracking List</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Track every escalation by reference, duty, headcount needed, urgency and status &mdash; Needed, Pushed to Bank, Offered, Bank-Filled &mdash; plus agency name, agency cost, pushed and filled dates.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/17.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Escalation to <span>Staff Bank</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Push an unfilled duty to the Staff Bank, sync its fill status back, mark it as manually covered, or send it to agency, following it through Needed, Pushed to Bank, Offered, Bank-Filled and Agency-Filled.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/18.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Leave <span>Requests List</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Review every leave request by member, leave type, from and to dates, hours and status, from Submitted requests awaiting a decision to those already approved or rejected.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/19.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Leave <span>Approval Workflow</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Approve, Force Approve, Reject or Cancel a leave request as it moves through Draft, Submitted and Approved &mdash; Force Approve is reserved for Workforce Admins overriding the unit's leave-capacity limit.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/20.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Leave <span>Entitlement Balances</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        See each member's entitlement, hours taken and hours remaining for every leave type and leave year, automatically decremented as their leave requests are approved.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/21.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Individual <span>Leave Balance</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Open a single leave entitlement to see one member's Annual Leave balance for the year &mdash; entitlement hours, hours taken and hours remaining &mdash; computed automatically from approved requests.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/22.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Duty <span>Swap Requests</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Track duty swap requests by requester, colleague, the duty each is offering and its current status, from proposed through Accepted by Colleague to fully approved.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/23.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Swap <span>Rule Validation</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Approve, reject or cancel a proposed duty swap only after the rules engine dry-runs both resulting assignments, flagging issues like daily rest overlaps or double-booking before the swap is confirmed.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/24.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Fill Rate &amp; <span>Gaps Dashboard</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Monitor fill rate, open gaps, in-flight escalations, average publish lead time, open hard and soft violations, pending swaps and leaves, and bank/agency-filled duties across every unit in one dashboard.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/25.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Rule <span>Violations Pivot</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Pivot open rule violations by roster period and rule &mdash; such as Contracted Hours Position &mdash; to spot which units and which rules are generating the most exceptions.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/26.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Duty <span>Assignments Analysis</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Chart duty assignments per staff member by shift type &mdash; Early, Late, Long Day and Night &mdash; to see each person's shift mix across the roster period at a glance.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/27.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Shift Type <span>Configuration</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Define each unit's shift types &mdash; Early, Late, Long Day, Night and On-Call &mdash; with their code, start and end time, break minutes and computed paid hours.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/29.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Clinical <span>Skills Register</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Maintain the rostering skills register &mdash; from Advanced Life Support and Catheterisation to Tracheostomy Care and Triage Competence &mdash; that the Skill Mix rule matches against each duty's requirements.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/30.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Rotation <span>Templates List</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Browse every rotation template by unit, template name, pattern length in weeks and line count, ready to be applied to any roster period in a single action.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/31.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        4-Week <span>Rotation Pattern</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Inspect a full rotation template line by line &mdash; week number, weekday and shift type &mdash; such as this 4-week nursing rotation cycling through Early, Late, Long Day, Night and On-Call shifts.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/32.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Demand <span>Templates List</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Browse every demand template by unit, name, effective-from and effective-to dates and line count, so establishment changes can be scheduled without losing the unit's demand history.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/33.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Weekday <span>Demand Detail</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        See a demand template's line-by-line requirement &mdash; weekday or specific override date, shift type, band, role/staff group, required headcount and required skills &mdash; for exact per-day staffing needs.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/34.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Configurable <span>Roster Rules</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Configure the rules engine's ten statutory-default rules &mdash; from the 48-Hour Average Week and 11-Hour Daily Rest to Skill Mix and the Compliance Gate &mdash; each with its own severity and limit.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/35.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Roster Rule  <span>detail</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        View and manage roster rules with their configuration, limits, severity, and compliance requirements.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/35.1.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Leave Type <span>Configuration</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Configure each leave type &mdash; Annual Leave, Study Leave, Maternity/Paternity/Parental, TOIL, Sickness and Other &mdash; with whether it's paid, counts as worked hours, and requires approval.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/36.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+                    <h2 class="mainhead text-center mb-2 mt-5" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Rostering <span>Settings Panel</span></h2>
+                    <div class="para"
+                         style="max-width: 80%;text-align: center;margin: auto;font-size: 18px;margin-bottom: 2rem;color: #6b7280;">
+                        Configure the WTR reference period, publication lead-time target, default leave capacity percentage, default escalation lead time and auto-escalate-unfilled-duties toggle from the Settings app's NHS e-Rostering section.
+                    </div>
+                    <div style="border-radius: 10px;overflow: hidden;border: 2px solid #e7e7e7;">
+                        <img src="./assets/screenshots/28.png" alt="" style="max-width: 100%;height: auto;">
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- FEATURES TAB -->
+            <div class="tab-pane fade" id="features" role="tabpanel">
+                <div class="p-3 py-md-5">
+                    <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">Our
+                        <span>Features</span>
+                    </h2>
+                    <div class="row" style="border-radius: 10px;">
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4 d-flex flex-column align-items-center justify-content-center"
+                                 style="padding: 25px;background-color: #637eea0d;border-radius: 10px;text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="width: 45px;height: 45px;background-color: #7877c633;border-radius: 50%;font-size: 1.2rem;font-weight: 600;color: #71639e;margin-bottom: 15px;">01</div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;font-weight: 600;margin-bottom: 0;color: black;line-height: 1.3;">Demand-Based Duty Generation</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4 d-flex flex-column align-items-center justify-content-center"
+                                 style="padding: 25px;background-color: #637eea0d;border-radius: 10px;text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="width: 45px;height: 45px;background-color: #7877c633;border-radius: 50%;font-size: 1.2rem;font-weight: 600;color: #71639e;margin-bottom: 15px;">02</div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;font-weight: 600;margin-bottom: 0;color: black;line-height: 1.3;">Multi-Week Rotation Templates</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4 d-flex flex-column align-items-center justify-content-center"
+                                 style="padding: 25px;background-color: #637eea0d;border-radius: 10px;text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="width: 45px;height: 45px;background-color: #7877c633;border-radius: 50%;font-size: 1.2rem;font-weight: 600;color: #71639e;margin-bottom: 15px;">03</div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;font-weight: 600;margin-bottom: 0;color: black;line-height: 1.3;">Rule-Checked Roster Grid</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4 d-flex flex-column align-items-center justify-content-center"
+                                 style="padding: 25px;background-color: #637eea0d;border-radius: 10px;text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="width: 45px;height: 45px;background-color: #7877c633;border-radius: 50%;font-size: 1.2rem;font-weight: 600;color: #71639e;margin-bottom: 15px;">04</div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;font-weight: 600;margin-bottom: 0;color: black;line-height: 1.3;">Training Compliance Gate</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4 d-flex flex-column align-items-center justify-content-center"
+                                 style="padding: 25px;background-color: #637eea0d;border-radius: 10px;text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="width: 45px;height: 45px;background-color: #7877c633;border-radius: 50%;font-size: 1.2rem;font-weight: 600;color: #71639e;margin-bottom: 15px;">05</div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;font-weight: 600;margin-bottom: 0;color: black;line-height: 1.3;">Staff Bank Escalation</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4 d-flex flex-column align-items-center justify-content-center"
+                                 style="padding: 25px;background-color: #637eea0d;border-radius: 10px;text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="width: 45px;height: 45px;background-color: #7877c633;border-radius: 50%;font-size: 1.2rem;font-weight: 600;color: #71639e;margin-bottom: 15px;">06</div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;font-weight: 600;margin-bottom: 0;color: black;line-height: 1.3;">Agency Cost Tracking</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4 d-flex flex-column align-items-center justify-content-center"
+                                 style="padding: 25px;background-color: #637eea0d;border-radius: 10px;text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="width: 45px;height: 45px;background-color: #7877c633;border-radius: 50%;font-size: 1.2rem;font-weight: 600;color: #71639e;margin-bottom: 15px;">07</div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;font-weight: 600;margin-bottom: 0;color: black;line-height: 1.3;">Leave Capacity Checks</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4 d-flex flex-column align-items-center justify-content-center"
+                                 style="padding: 25px;background-color: #637eea0d;border-radius: 10px;text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="width: 45px;height: 45px;background-color: #7877c633;border-radius: 50%;font-size: 1.2rem;font-weight: 600;color: #71639e;margin-bottom: 15px;">08</div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;font-weight: 600;margin-bottom: 0;color: black;line-height: 1.3;">Duty Swap Requests</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4 d-flex flex-column align-items-center justify-content-center"
+                                 style="padding: 25px;background-color: #637eea0d;border-radius: 10px;text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="width: 45px;height: 45px;background-color: #7877c633;border-radius: 50%;font-size: 1.2rem;font-weight: 600;color: #71639e;margin-bottom: 15px;">09</div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;font-weight: 600;margin-bottom: 0;color: black;line-height: 1.3;">Publish Approval Workflow</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4 d-flex flex-column align-items-center justify-content-center"
+                                 style="padding: 25px;background-color: #637eea0d;border-radius: 10px;text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="width: 45px;height: 45px;background-color: #7877c633;border-radius: 50%;font-size: 1.2rem;font-weight: 600;color: #71639e;margin-bottom: 15px;">10</div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;font-weight: 600;margin-bottom: 0;color: black;line-height: 1.3;">Rule Violation Tracking</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4 d-flex flex-column align-items-center justify-content-center"
+                                 style="padding: 25px;background-color: #637eea0d;border-radius: 10px;text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="width: 45px;height: 45px;background-color: #7877c633;border-radius: 50%;font-size: 1.2rem;font-weight: 600;color: #71639e;margin-bottom: 15px;">11</div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;font-weight: 600;margin-bottom: 0;color: black;line-height: 1.3;">Unit &amp; Personal Rota Reports</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item mb-4 d-flex flex-column align-items-center justify-content-center"
+                                 style="padding: 25px;background-color: #637eea0d;border-radius: 10px;text-align: left;">
+                                <div class="feature-number d-flex align-items-center justify-content-center" style="width: 45px;height: 45px;background-color: #7877c633;border-radius: 50%;font-size: 1.2rem;font-weight: 600;color: #71639e;margin-bottom: 15px;">12</div>
+                                <h3 class="feature-title" style="font-size: 1.2rem;font-weight: 600;margin-bottom: 0;color: black;line-height: 1.3;">Staff Self-Service Portal</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ TAB -->
+            <div class="tab-pane fade" id="faq" role="tabpanel">
+                <div class="p-3 py-md-5">
+                    <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Frequently Asked <span>Questions</span></h2>
+                    <div class="modern-accordion">
+                        <div class="accordion accordion-flush" id="accordionFlushExample">
+
+                            <div class="accordion-item loading-animation"
+                                 style="margin-bottom: 1rem;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                <h2 class="accordion-header" style="border-radius: 10px;">
+                                    <a class="accordion-button collapsed" type="button"
+                                       style="box-shadow: unset;border: none !important;padding: 1.5rem 2rem !important;font-weight: 600 !important;font-size: 1.1rem;color: #71639e !important;background-color: #e3e3f3a9 !important;position: relative;overflow: hidden;"
+                                       data-bs-toggle="collapse" data-bs-target="#flush-collapseOne"
+                                       aria-expanded="false" aria-controls="flush-collapseOne">
+                                        How does gap escalation to the Staff Bank and agency work?
+                                    </a>
+                                </h2>
+                                <div id="flush-collapseOne" class="accordion-collapse collapse"
+                                     data-bs-parent="#accordionFlushExample" style="border-top: 1px solid #e2e8f0;">
+                                    <div class="accordion-body"
+                                         style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                        <p style="margin-bottom: 1rem;">When a duty stays unfilled inside its unit's escalation lead time, NHS e-Rostering raises a Roster Escalation record and, if auto-escalation is on, pushes it to the Staff Bank as an open shift automatically. The escalation is tracked through Needed, Pushed to Bank, Offered and Bank-Filled; if the bank can't cover it, it can be sent to agency with the agency name and cost recorded, and a scheduled sync pulls bank-shift status back onto the roster.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item loading-animation"
+                                 style="margin-bottom: 1rem;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                <h2 class="accordion-header" style="border-radius: 10px;">
+                                    <a class="accordion-button collapsed" type="button"
+                                       style="box-shadow: unset;border: none !important;padding: 1.5rem 2rem !important;font-weight: 600 !important;font-size: 1.1rem;color: #71639e !important;background-color: #e3e3f3a9 !important;position: relative;overflow: hidden;"
+                                       data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo"
+                                       aria-expanded="false" aria-controls="flush-collapseTwo">
+                                        How does the rules/violations engine keep rosters safe?
+                                    </a>
+                                </h2>
+                                <div id="flush-collapseTwo" class="accordion-collapse collapse"
+                                     data-bs-parent="#accordionFlushExample" style="border-top: 1px solid #e2e8f0;">
+                                    <div class="accordion-body"
+                                         style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                        <p style="margin-bottom: 1rem;">Every duty assignment is checked against ten configurable rules covering the 48-hour average week, 11-hour daily rest, weekly rest, consecutive days/nights, skill mix, double-booking, leave conflicts and the training compliance gate. Hard rules block the assignment outright at the point of save; soft rules (like contracted-hours position) allow the save but open a logged violation a manager can resolve or justify with a reason.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item loading-animation"
+                                 style="margin-bottom: 0;overflow: hidden;background-color: white;border: 2px solid #e2e8f0 !important;border-radius: 10px !important;">
+                                <h2 class="accordion-header" style="border-radius: 10px;">
+                                    <a class="accordion-button collapsed" type="button"
+                                       style="box-shadow: unset;border: none !important;padding: 1.5rem 2rem !important;font-weight: 600 !important;font-size: 1.1rem;color: #71639e !important;background-color: #e3e3f3a9 !important;position: relative;overflow: hidden;"
+                                       data-bs-toggle="collapse" data-bs-target="#flush-collapseThree"
+                                       aria-expanded="false" aria-controls="flush-collapseThree">
+                                        Does it integrate with the Staff Bank module, and how does leave capacity work?
+                                    </a>
+                                </h2>
+                                <div id="flush-collapseThree" class="accordion-collapse collapse"
+                                     data-bs-parent="#accordionFlushExample" style="border-top: 1px solid #e2e8f0;">
+                                    <div class="accordion-body"
+                                         style="background-color: rgba(99, 102, 241, 0.02);line-height: 1.6;font-size: 1rem;padding: 2rem !important;">
+                                        <p style="margin-bottom: 1rem;">Yes &mdash; when the Staff Bank module is installed, escalations create real open shifts there and bank hours/bookings feed straight back into the 48-hour week and double-booking rule checks; without it, gaps simply track as unfilled or manually covered. Leave requests are checked against each unit's configured leave-capacity percentage before approval, blocking approval once too many staff would be off on the same day unless a Workforce Admin logs a reason and force-approves the exception.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LATEST RELEASE TAB -->
+            <div class="tab-pane fade" id="latest-release" role="tabpanel">
+                <div class="p-3 py-md-5">
+                    <h2 class="mainhead text-center mb-4" style="font-size: 2rem;font-weight: 700;color: black;">
+                        Latest <span>Releases</span></h2>
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="release-item h-100"
+                                 style="position: relative;padding: 30px;border: 2px solid #71639e24;border-radius: 15px;">
+                                <div class="release-header d-flex align-items-center flex-wrap gap-3"
+                                     style="margin-bottom: 0.75rem;">
+                                    <div class="version"
+                                         style="font-size: 1.25rem;font-weight: 700;color: #1a202c;">Latest Release 19.0.1.0.0
+                                    </div>
+                                    <div style="padding: 0.25rem 0.75rem;border-radius: 20px;font-size: 0.75rem;font-weight: 600;text-transform: uppercase;letter-spacing: 0.5px;background-color: #9ae6b4;color: #2d7d32;border: 2px solid #68d391;"
+                                         class="add">Add
+                                    </div>
+                                    <div class="date"
+                                         style="color: #64748b;font-size: 0.875rem;font-weight: 500;gap: 0.5rem;">
+                                        <img src="./assets/icons/calendar.png" alt="" width="16" height="16"
+                                             style="margin-right: 5px;">
+                                        2nd September, 2026
+                                    </div>
+                                </div>
+                                <div class="feature-list">
+                                    <div class="feature-item p-3"
+                                         style="border-radius: 5px;display: flex;align-items: center;padding: 25px;background-color: #f5f5f5e7;border-radius: 10px;text-align: left;">
+                                        <div class="feature-text"
+                                             style="color: #6b7280;line-height: 1.6;font-size: 0.95rem;">Demand-based roster periods with rotation-template rollout and a click-to-assign roster grid
+                                        </div>
+                                    </div>
+                                    <div class="feature-item p-3 mt-3"
+                                         style="border-radius: 5px;display: flex;align-items: center;padding: 25px;background-color: #f5f5f5e7;border-radius: 10px;text-align: left;">
+                                        <div class="feature-text"
+                                             style="color: #6b7280;line-height: 1.6;font-size: 0.95rem;">Ten-rule working-time, skill-mix and compliance engine with hard/soft violation tracking
+                                        </div>
+                                    </div>
+                                    <div class="feature-item p-3 mt-3"
+                                         style="border-radius: 5px;display: flex;align-items: center;padding: 25px;background-color: #f5f5f5e7;border-radius: 10px;text-align: left;">
+                                        <div class="feature-text"
+                                             style="color: #6b7280;line-height: 1.6;font-size: 0.95rem;">Automatic gap escalation to Staff Bank and agency, leave capacity checks, duty swaps and staff self-service portal
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="highlights-section">
+
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Related
+            <span>Modules</span>
+        </h2>
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/base_accounting_kit"
+                   style="text-decoration: none;">
+                    <div class="highlight-card h-100 p-4" style="background-color: white;
+                       backdrop-filter: blur(20px);
+                       border-radius: 10px;
+                       padding: 32px;
+                       border: 2px solid #71639e1a;
+                       position: relative;
+                       overflow: hidden;">
+
+
+                        <div class="card-image" style="    border: 2px solid #71639e1c;
+                       margin-bottom: 1rem;
+                       border-radius: 10px;
+                       overflow: hidden;">
+                            <img src="./assets/modules/module1.gif" alt=""
+                                 style="width: 100%;border-radius: 10px;">
+                        </div>
+
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo 19 Full Accounting Kit for Community</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/hide_menu_user"
+                   style="text-decoration: none;">
+                    <div class="highlight-card h-100 p-4" style="background-color: white;
+                       backdrop-filter: blur(20px);
+                       border-radius: 10px;
+                       padding: 32px;
+                       border: 2px solid #71639e1a;
+                       position: relative;
+                       overflow: hidden;">
+
+
+                        <div class="card-image" style="    border: 2px solid #71639e1c;
+                       margin-bottom: 1rem;
+                       border-radius: 10px;
+                       overflow: hidden;">
+                            <img src="./assets/modules/module2.jpg" alt=""
+                                 style="width: 100%;border-radius: 10px;">
+                        </div>
+
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Hide Any Menu User Wise</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="https://apps.odoo.com/apps/modules/19.0/base_account_budget"
+                   style="text-decoration: none;">
+                    <div class="highlight-card h-100 p-4" style="background-color: white;
+                       backdrop-filter: blur(20px);
+                       border-radius: 10px;
+                       padding: 32px;
+                       border: 2px solid #71639e1a;
+                       position: relative;
+                       overflow: hidden;">
+
+                        <div class="card-image" style="    border: 2px solid #71639e1c;
+                           margin-bottom: 1rem;
+                           border-radius: 10px;
+                           overflow: hidden;">
+                            <img src="./assets/modules/module3.jpg" alt=""
+                                 style="width: 100%;border-radius: 10px;">
+                        </div>
+
+                        <h3 class="card-title"
+                            style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                            Odoo 19 Budget Management</h3>
+
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid cmpad py-2 py-md-5">
+    <div class="highlights-section">
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Our
+            <span>Services</span>
+        </h2>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/setting.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                        Odoo Customization</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/imple.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                        Odoo Implementation</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/support.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                        Odoo Support</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/transfer.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                        Odoo Migration</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/idea.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                        Odoo Integration</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/chat.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                        Odoo Consultancy</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/chart.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                        Odoo Licensing</h3>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center text-center"
+                     style="background-color: #8d76d51f;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2"
+                         style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;">
+                        <img src="./assets/icons/people.png" alt="" width="30" height="30">
+                    </div>
+                    <h3 class="card-title"
+                        style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">
+                        Hire Odoo Developer</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</html>

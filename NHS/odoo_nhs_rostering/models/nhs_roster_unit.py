@@ -20,6 +20,7 @@
 #
 #############################################################################
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class NhsRosterUnit(models.Model):
@@ -45,6 +46,7 @@ class NhsRosterUnit(models.Model):
     roster_manager_ids = fields.Many2many(
         'res.users', 'nhs_roster_unit_manager_rel', 'roster_unit_id', 'user_id',
         string='Roster Managers',
+        domain=[('share', '=', False)],
         help="Users who can build/approve/publish rosters for this unit. Record"
              " rules scope Roster Manager access to the units listed here."
     )
@@ -87,6 +89,13 @@ class NhsRosterUnit(models.Model):
         'UNIQUE(org_unit_id)',
         'This org unit already has a rostered unit configured!'
     )
+
+    @api.constrains('shift_type_ids')
+    def _check_shift_types(self):
+        """ Method for check shift types """
+        for unit in self:
+            if not unit.shift_type_ids:
+                raise ValidationError("A rostered unit must have at least one Shift Type configured.")
 
     @api.depends('org_unit_id.complete_name')
     def _compute_display_name(self):

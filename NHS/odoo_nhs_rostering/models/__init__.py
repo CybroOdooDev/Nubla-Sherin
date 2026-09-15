@@ -20,6 +20,7 @@
 #
 #############################################################################
 from . import res_config_settings
+from . import res_users
 from . import nhs_roster_weekday
 from . import nhs_roster_skill
 from . import nhs_org_unit

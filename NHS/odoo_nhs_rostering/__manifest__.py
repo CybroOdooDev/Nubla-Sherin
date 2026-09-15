@@ -71,6 +71,7 @@ Staff Bank (and on to agency) with cost visibility.
         'views/nhs_roster_portal_templates.xml',
         'views/nhs_roster_config_views.xml',
         'views/nhs_roster_dashboard_views.xml',
+        'views/res_users_views.xml',
         'report/nhs_roster_unit_rota_report.xml',
         'report/nhs_roster_personal_rota_report.xml',
         'report/nhs_roster_fill_gaps_report.xml',

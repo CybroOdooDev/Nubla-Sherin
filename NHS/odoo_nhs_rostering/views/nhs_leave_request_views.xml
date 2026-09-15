@@ -64,7 +64,9 @@
                         <field name="capacity_override" invisible="1"/>
                         <field name="capacity_override_by_id" readonly="1" invisible="not capacity_override"/>
                     </group>
-                    <field name="reason"/>
+                    <group string="Reason">
+                        <field name="reason" nolabel="1"/>
+                    </group>
                 </sheet>
                 <chatter/>
             </form>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Record: view_users_form_nhs_rostering for ir.ui.view -->
+    <record id="view_users_form_nhs_rostering" model="ir.ui.view">
+        <field name="name">res.users.form.nhs.rostering</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <field name="nhs_has_roster_access" invisible="1"/>
+                <field name="nhs_workforce_member_id" invisible="1"/>
+                <button name="action_nhs_create_workforce_member" type="object"
+                        class="oe_stat_button" icon="fa-user-plus"
+                        invisible="not nhs_has_roster_access or nhs_workforce_member_id"
+                        help="This user has NHS e-Rostering access but no nhs.workforce.member links back to them - create one now.">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Create Workforce</span>
+                        <span class="o_stat_text">Member</span>
+                    </div>
+                </button>
+                <button name="action_nhs_view_workforce_member" type="object"
+                        class="oe_stat_button" icon="fa-user"
+                        invisible="not nhs_workforce_member_id">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Workforce</span>
+                        <span class="o_stat_text">Member</span>
+                    </div>
+                </button>
+            </div>
+        </field>
+    </record>
+</odoo>

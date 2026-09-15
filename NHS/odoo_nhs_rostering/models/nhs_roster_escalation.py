@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 ESCALATION_STATES = [
     ('needed', 'Needed'),
@@ -122,7 +122,7 @@ class NhsRosterEscalation(models.Model):
         failure line rather than piling on top of it - so a note about an
         issue that has since been fixed (e.g. a missing Role) doesn't linger
         and read as still-current after a later, different failure (or a
-        fix). The user's own free-text notes are left untouched."""
+        fix)."""
         self.ensure_one()
         first_line = str(message).splitlines()[0] if message else ''
         kept = [line for line in (self.notes or '').splitlines()
@@ -177,7 +177,7 @@ class NhsRosterEscalation(models.Model):
                 bank_shift = BankShift.create(vals)
                 if hasattr(bank_shift, 'action_open'):
                     bank_shift.action_open()
-            except Exception as exc:  # noqa: BLE001 - Staff Bank's own validation, not ours to predict
+            except Exception as exc:
                 escalation._log_push_failure(str(exc))
                 continue
             escalation.bank_shift_id = bank_shift.id
@@ -195,8 +195,8 @@ class NhsRosterEscalation(models.Model):
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
-                    'title': _('Staff Bank not installed'),
-                    'message': _('The Staff Bank module (odoo_nhs_staff_bank) isn\'t'
+                    'title': ('Staff Bank not installed'),
+                    'message': ('The Staff Bank module (odoo_nhs_staff_bank) isn\'t'
                                  ' installed, so nothing was pushed. Use "Mark Manual'
                                  ' Cover" instead, or install it to push gaps there.'),
                     'type': 'warning',

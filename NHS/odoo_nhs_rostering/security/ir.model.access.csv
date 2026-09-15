@@ -50,3 +50,7 @@ access_nhs_publish_wizard_manager,nhs.publish.wizard manager,model_nhs_publish_w
 access_nhs_publish_wizard_admin,nhs.publish.wizard admin,model_nhs_publish_wizard,group_nhs_workforce_admin,1,1,1,1
 access_nhs_escalate_wizard_manager,nhs.escalate.wizard manager,model_nhs_escalate_wizard,group_nhs_roster_manager,1,1,1,1
 access_nhs_escalate_wizard_admin,nhs.escalate.wizard admin,model_nhs_escalate_wizard,group_nhs_workforce_admin,1,1,1,1
+
+access_nhs_workforce_member_roster_staff,nhs.workforce.member roster staff,odoo_nhs_training.model_nhs_workforce_member,group_nhs_roster_staff,1,0,0,0
+access_nhs_workforce_member_roster_manager,nhs.workforce.member roster manager,odoo_nhs_training.model_nhs_workforce_member,group_nhs_roster_manager,1,1,0,0
+access_nhs_workforce_member_roster_admin,nhs.workforce.member roster admin,odoo_nhs_training.model_nhs_workforce_member,group_nhs_workforce_admin,1,1,1,1

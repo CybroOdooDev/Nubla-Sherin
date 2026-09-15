@@ -42,10 +42,7 @@ SHIFT_COLORS = {
 class NhsRosterShiftType(models.Model):
     """A kind of working day for one rostered unit: early / late / long day /
     night / twilight / on-call, with its times, break rule and paid hours.
-    One fixed-vocabulary field only (name) - an earlier revision split this
-    into a free-text name plus a separate Category driving the logic below,
-    but every unit just re-picked the same value in both, so it was pure
-    double-entry with no actual benefit; collapsed back to one field."""
+    One fixed-vocabulary field only (name) - an earlier revision split this"""
     _name = 'nhs.roster.shift.type'
     _description = 'Shift Type'
     _order = 'roster_unit_id, sequence, name'

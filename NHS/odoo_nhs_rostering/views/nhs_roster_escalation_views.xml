@@ -46,7 +46,8 @@
                     </div>
                     <group>
                         <group>
-                            <field name="duty_id"/>
+                            <field name="duty_id"
+                                   domain="[('state', 'in', ('unfilled', 'partially_filled'))]"/>
                             <field name="headcount"/>
                             <field name="urgency"/>
                         </group>

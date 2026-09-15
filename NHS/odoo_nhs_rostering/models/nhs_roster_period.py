@@ -185,50 +185,6 @@ class NhsRosterPeriod(models.Model):
                 period.action_generate_duties()
             period.state = 'in_progress'
 
-    def action_export_worked_hours(self):
-        """
-        Export finalised worked hours (actuals) to a downstream payroll/billing system.
-        Generates a CSV payload and returns it for download.
-        """
-        import base64
-        import csv
-        import io
-        for period in self:
-            if period.state not in ('published', 'finalised'):
-                raise UserError('Can only export hours for published or finalised periods.')
-            
-            output = io.StringIO()
-            writer = csv.writer(output)
-            writer.writerow(['Period', 'Unit', 'Member', 'Date', 'Shift Type', 'Worked Hours'])
-            
-            for assignment in period.assignment_ids.filtered(lambda a: a.state == 'assigned'):
-                # Assuming 7.5 hours per shift as standard
-                hours = 7.5
-                writer.writerow([
-                    period.name,
-                    period.unit_id.name,
-                    assignment.member_id.name,
-                    str(assignment.duty_date),
-                    assignment.shift_type_id.name,
-                    str(hours)
-                ])
-                
-            csv_data = output.getvalue().encode('utf-8')
-            attachment = self.env['ir.attachment'].create({
-                'name': f'worked_hours_{period.id}.csv',
-                'type': 'binary',
-                'datas': base64.b64encode(csv_data),
-                'res_model': 'nhs.roster.period',
-                'res_id': period.id,
-                'mimetype': 'text/csv'
-            })
-            
-            return {
-                'type': 'ir.actions.act_url',
-                'url': f'/web/content/{attachment.id}?download=true',
-                'target': 'self',
-            }
-
     def action_view_swaps(self):
         """ Method for action view swaps """
         self.ensure_one()
@@ -366,9 +322,7 @@ class NhsRosterPeriod(models.Model):
     def grid_assign(self, period_id, member_id, a_date, shift_type_id):
         """Assign `member_id` to the duty for (date, shift type) in this
         period - finding or creating an ad-hoc duty slot if the demand-driven
-        grid doesn't already have one there. Returns {ok: True} or
-        {ok: False, error: <message>} rather than raising, so the grid can
-        show the rules-engine message inline instead of crashing the RPC."""
+        grid doesn't already have one there."""
         Duty = self.env['nhs.duty']
         a_date = fields.Date.to_date(a_date)
         duty = Duty.search([
@@ -498,11 +452,7 @@ class NhsRosterPeriod(models.Model):
         """Open the custom roster-grid client action for this period.
 
         The period id is passed both as `params` (used on the initial open)
-        and as `context.active_id`. Only the latter survives a browser
-        refresh - the web client re-derives the action from the URL, which
-        encodes `active_id` but not arbitrary client-action params - so
-        without it a refresh reopens the grid with no period and shows
-        "Roster period not found."."""
+        and as `context.active_id`."""
         self.ensure_one()
         return {
             'type': 'ir.actions.client',
@@ -517,6 +467,8 @@ class NhsRosterPeriod(models.Model):
         toward external payroll/ESR processing, not a payroll integration
         itself."""
         self.ensure_one()
+        if self.state not in ('published', 'finalised'):
+            raise UserError('Can only export hours for published or finalised periods.')
         import csv
         import io
         import base64

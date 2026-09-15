@@ -40,9 +40,15 @@ class NhsOrgUnit(models.Model):
     )
 
     def _compute_is_rostered(self):
-        """ Method for compute is rostered """
+        """ Method for compute is rostered. sudo() deliberately - this is
+        just an existence check (is a roster unit configured, yes/no), not
+        exposing any nhs.roster.unit record data, and must not raise an
+        access error for viewers (e.g. job-planning's Clinical Manager) who
+        can see the org unit but have no rostering access at all; the
+        "Rostered Unit" button itself stays groups()-gated so those users
+        still can't drill into the actual roster records."""
         for unit in self:
-            unit.is_rostered = bool(unit.roster_unit_ids)
+            unit.is_rostered = bool(unit.sudo().roster_unit_ids)
 
     def action_view_roster_unit(self):
         """Open (or offer to create) the rostered unit for this org unit."""

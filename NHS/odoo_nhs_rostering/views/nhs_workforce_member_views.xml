@@ -10,19 +10,19 @@
                  only link that makes a member's rota/leave/swaps show on their portal
                  login, so e-Rostering exposes it, editable only by managers who should
                  be the ones deciding who a given login maps to. -->
-            <xpath expr="//field[@name='user_id']" position="attributes">
-                <attribute name="invisible">0</attribute>
-                <attribute name="string">Portal User</attribute>
-                <attribute name="groups">odoo_nhs_rostering.group_nhs_roster_manager</attribute>
+            <xpath expr="//field[@name='user_id']" position="replace"/>
+            <xpath expr="//field[@name='email']" position="before">
+                <field name="user_id" string="Portal User" invisible="0" groups="odoo_nhs_rostering.group_nhs_roster_manager"/>
             </xpath>
             <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
                 <button name="action_view_duty_assignments" type="object"
-                        class="oe_stat_button" icon="fa-calendar-check-o">
+                        class="oe_stat_button" icon="fa-calendar-check-o"
+                        groups="odoo_nhs_rostering.group_nhs_roster_staff,odoo_nhs_rostering.group_nhs_roster_manager,odoo_nhs_rostering.group_nhs_workforce_admin">
                     <field name="duty_assignment_count" widget="statinfo" string="Duties"/>
                 </button>
             </xpath>
             <xpath expr="//notebook" position="inside">
-                <page name="rostering" string="Rostering">
+                <page name="rostering" string="Rostering" groups="odoo_nhs_rostering.group_nhs_roster_staff,odoo_nhs_rostering.group_nhs_roster_manager,odoo_nhs_rostering.group_nhs_workforce_admin">
                     <group>
                         <group string="Contract">
                             <field name="contracted_weekly_hours" readonly="1"/>
@@ -36,9 +36,9 @@
                             <field name="roster_max_consecutive_nights_override"/>
                         </group>
                     </group>
-                    <group>
-                        <field name="roster_skill_ids" widget="many2many_tags"/>
-                        <field name="secondary_roster_unit_ids" widget="many2many_tags"/>
+                    <group string="Skills &amp; Availability">
+                        <field name="roster_skill_ids" widget="many2many_tags" colspan="2"/>
+                        <field name="secondary_roster_unit_ids" widget="many2many_tags" colspan="2"/>
                     </group>
                 </page>
             </xpath>

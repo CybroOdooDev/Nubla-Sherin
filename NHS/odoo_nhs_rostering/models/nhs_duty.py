@@ -62,9 +62,7 @@ class NhsDuty(models.Model):
         help="The demand requirement this slot exists to satisfy.")
     staff_group_id = fields.Many2one(
         'nhs.staff.group', string='Role / Staff Group',
-        help="Required by the Staff Bank when this duty is pushed there. Copied from"
-             " the demand line when generated from one; set it directly for a duty"
-             " added manually (e.g. via 'Add a line'), which has no demand line.")
+        help="Required by the Staff Bank when this duty is pushed there.")
     required_band_id = fields.Many2one('nhs.afc.band', string='Required Band', help="Required Band")
     required_skill_ids = fields.Many2many('nhs.roster.skill', string='Required Skills',
                                           help="Required Skills")
@@ -88,21 +86,13 @@ class NhsDuty(models.Model):
              " nhs.roster.escalation.bank_filled_count.")
     is_overstaffed = fields.Boolean(
         string='Overstaffed', compute='_compute_is_overstaffed',
-        help="True when direct roster assignments and the linked bank shift's confirmed"
-             " bookings, added together, exceed this duty's required headcount. The two"
-             " are filled independently and never reconciled automatically (Staff Bank is"
-             " only a soft link, refreshed by 'Sync from Bank' or its cron) - this flags an"
-             " overlap for a human to resolve, e.g. by reducing the bank shift's headcount"
-             " or standing down a bank offer.")
+        help="True when direct roster assignments and the linked bank shift's confirmed")
     notes = fields.Char(string='Notes', help="e.g. 'supervisory', 'supernumerary'.")
     display_name = fields.Char(compute='_compute_display_name', help="Detailed information about this field")
     eligible_member_ids = fields.Many2many(
         'nhs.workforce.member', compute='_compute_eligible_member_ids',
         help="This duty's unit's team (including secondary members), further narrowed to"
-             " those who actually meet this duty's Required Band and Required Skills, if"
-             " set - the same match the hard SKILL_MIX rule enforces at save time, just"
-             " applied here as the Member domain so a non-matching person never shows in"
-             " the picker in the first place.")
+             " those who actually meet this duty's Required Band and Required Skills")
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -114,7 +104,7 @@ class NhsDuty(models.Model):
                     raise ValidationError("You can only create duties when the Roster Period is 'Draft' or 'In Progress'.")
         return super().create(vals_list)
 
-    @api.depends('unit_id', 'required_band_id', 'required_skill_ids')
+    @api.depends('unit_id', 'required_band_id', 'required_skill_ids', 'shift_type_id.is_night', 'duty_date')
     def _compute_eligible_member_ids(self):
         """ Method for compute eligible member ids """
         for duty in self:
@@ -127,6 +117,13 @@ class NhsDuty(models.Model):
                 req_skill_ids = set(duty.required_skill_ids._origin.ids or duty.required_skill_ids.ids)
                 members = members.filtered(
                     lambda m: req_skill_ids.issubset(set(m.roster_skill_ids.ids)))
+            if duty.shift_type_id.is_night:
+                members = members.filtered(lambda m: not m.roster_no_nights)
+            if duty.duty_date:
+                weekday = duty.duty_date.weekday()
+                members = members.filtered(
+                    lambda m: not m.roster_fixed_weekday_ids
+                    or weekday in m.roster_fixed_weekday_ids.mapped('index'))
             duty.eligible_member_ids = members
 
     @api.depends('assignment_ids.state')
@@ -142,9 +139,6 @@ class NhsDuty(models.Model):
         """ Method for compute state """
         for duty in self:
             if not duty.id:
-                # Not saved yet (e.g. the "Create Duties" popup before the
-                # first save) - nothing has actually been created, so this
-                # isn't genuinely "Unfilled" yet.
                 duty.state = 'draft'
             elif duty.is_cancelled:
                 duty.state = 'cancelled'

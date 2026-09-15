@@ -20,6 +20,7 @@
 #
 #############################################################################
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 ASSIGNMENT_STATES = [
     ('assigned', 'Assigned'),
@@ -56,16 +57,6 @@ class NhsDutyAssignment(models.Model):
         help="This duty's unit's team, narrowed to those meeting its Required Band/Skills"
              " - mirrors nhs.duty's own eligible_member_ids so the two Member pickers"
              " (this standalone form, and the one nested under a duty) never disagree.")
-
-    @api.model_create_multi
-    def create(self, vals_list):
-        for vals in vals_list:
-            if 'duty_id' in vals:
-                duty = self.env['nhs.duty'].browse(vals['duty_id'])
-                if duty.period_id.state != 'in_progress':
-                    from odoo.exceptions import ValidationError
-                    raise ValidationError("You can only create assignments when the Roster Period is 'In Progress'.")
-        return super().create(vals_list)
 
     @api.depends('duty_id.eligible_member_ids')
     def _compute_eligible_member_ids(self):
@@ -117,15 +108,16 @@ class NhsDutyAssignment(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        # A hard-rule failure raises from inside _apply_rules() *after* the row
-        # already exists in the database. Without a savepoint here, a caller
-        # that catches the exception (a bulk wizard, a swap dry run) would
-        # leave that half-created row behind - a phantom assignment silently
-        # corrupting every rule check that follows in the same transaction.
-        # Wrapping the whole call in a savepoint makes "raises => nothing
-        # persisted" hold for every caller, not just ones that happen to
-        # wrap it themselves.
-        """ Method for create """
+        """Validate the roster period is still being built, then create and
+        run the rules engine. (Previously two separate create() overrides
+        that silently shadowed each other - only the second ever ran, so
+        the period-state validation below was dead code.)"""
+        for vals in vals_list:
+            if 'duty_id' in vals:
+                duty = self.env['nhs.duty'].browse(vals['duty_id'])
+                if duty.period_id.state != 'in_progress':
+                    raise ValidationError(
+                        "You can only create assignments when the Roster Period is 'In Progress'.")
         with self.env.cr.savepoint():
             assignments = super().create(vals_list)
             assignments._apply_rules(raise_on_hard=True)

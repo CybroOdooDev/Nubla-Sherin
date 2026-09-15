@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
-    <!-- Reference skills/competencies, used on demand lines (required skills) and
-         held by workforce members - a representative real-world NHS clinical
-         competency set, not tied to any specific unit (company_id left blank so
-         they're available everywhere). Trusts extend/trim this under
-         Configuration > Skills as needed. -->
     <!-- Record: roster_skill_iv_therapy for nhs.roster.skill -->
     <record id="roster_skill_iv_therapy" model="nhs.roster.skill">
         <field name="name">IV Therapy &amp; Cannulation</field>
