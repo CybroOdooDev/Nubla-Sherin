@@ -14,6 +14,10 @@
   border-radius: 50% !important;
 }
 
+header.o_navbar {
+  background: var(--primary-color) !important;
+}
+
 .navbar {
   background: var(--primary-color) !important;
   border-bottom: transparent;
@@ -21,7 +25,7 @@
 }
 
 .o_main_navbar {
-  background-color: var(--primary-color) !important;
+  background: var(--primary-color) !important;
   z-index: 1200 !important;
 }
 
@@ -34,7 +38,33 @@
 
 }
 
+.o_main_navbar .o_menu_brand:hover,
+.o_main_navbar .o_menu_brand:focus,
+.o_main_navbar .o_menu_brand.focus {
+  color: var(--white-color) !important;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+body.o_home_menu_active .o_menu_brand {
+  display: none !important;
+}
+
+body.o_home_menu_active header.o_navbar,
+body.o_home_menu_active .navbar,
+body.o_home_menu_active .o_main_navbar {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
 .o_control_panel {
+  padding-top: 56px !important;
+}
+
+// Custom dashboard client actions (e.g. Estate Register, Training Matrix) render
+// straight into .o_action_manager without Odoo's standard .o_control_panel, so
+// they never picked up the clearance above and get clipped under the fixed navbar.
+.o_nhs_dashboard_container,
+.o_nhs_training_matrix {
   padding-top: 56px !important;
 }
 
@@ -72,7 +102,7 @@
 .sidebar {
   height: 93vh;
   width: auto;
-  background: linear-gradient(180deg, #EAF4FB 0%, #F7FBFE 45%, #FFFFFF 100%);
+  background: var(--primary-color);
   box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.1);
   padding: 20px 20px;
   padding-left: 0;
@@ -108,10 +138,6 @@
   transition: all 0.4s;
 }
 
-.sidebar:hover span {
-  opacity: 1;
-  max-width: 200px;
-}
 
 .sidebar .sidebar_links {
   padding-left: 0;
@@ -136,15 +162,6 @@
   margin-top: -2px;
 }
 
-.sidebar #dropdown-toggle.active {
-  color: var(--white-color) !important;
-  background-color: rgba(0, 94, 184, 0.28);
-  border-radius: 15px;
-  padding: 15px 15px;
-  box-shadow: 0px 15px 35px 0px rgba(0, 94, 184, 0.26);
-  position: relative;
-}
-
 .sidebar #dropdown-toggle.active a {
   width: 100%;
   display: flex;
@@ -152,22 +169,6 @@
   column-gap: 15px;
   align-items: center;
   color: var(--white-color) !important;
-}
-
-.sidebar #dropdown-toggle.active svg path {
-  stroke: #ffffff;
-  transition: stroke 0.3s ease;
-}
-
-.sidebar #dropdown-toggle.active:before {
-  position: absolute;
-  content: "";
-  height: 100%;
-  width: 8px;
-  background-color: var(--primary-color);
-  left: -28px;
-  top: 0;
-  border-radius: 10px;
 }
 
 .sidebar .dropdown-content {
@@ -191,7 +192,7 @@
   justify-content: start;
   column-gap: 15px;
   align-items: center;
-  color: var(--secondary-color) !important;
+  color: var(--white-color) !important;
   padding-bottom: 10px;
   transition: all 0.3s ease;
 }
@@ -204,22 +205,15 @@
   transition: stroke 0.3s ease;
 }
 
-.sidebar .sidbar-item:hover a {
-  color: var(--primary-color) !important;
+.app_container {
+  background: var(--primary-color) !important;
+  background-image: none !important;
 }
 
-.sidebar .sidbar-item:hover svg path {
-  stroke: var(--primary-color);
-}
-
-.sidebar .sidbar-item:hover::before {
-  position: absolute;
-  content: "";
-  height: 100%;
-  width: 8px;
-  background-color: var(--primary-color);
-  left: -28px;
-  top: 0;
-  border-radius: 10px;
-  transition: all 0.3s ease;
+// Odoo core (navbar.scss) draws a yellow/black hazard-stripe border around the
+// navbar systray for the superuser account (body.o_is_superuser) — clashes with
+// the flat NHS Blue navbar, so restyle it in NHS colours instead of removing the
+// safety indicator outright.
+body.o_is_superuser .o_menu_systray {
+  border-image: repeating-linear-gradient(135deg, var(--nhs-dark-blue), var(--nhs-dark-blue) 10px, #41B6E6 10px, #41B6E6 20px) 2 !important;
 }

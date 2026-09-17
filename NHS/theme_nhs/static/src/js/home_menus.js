@@ -2,9 +2,7 @@
 
 import { Component, useRef } from "@odoo/owl";
 import { registry } from "@web/core/registry";
-import { computeAppsAndMenuItems } from "@web/webclient/menus/menu_helpers";
 import { useService } from "@web/core/utils/hooks";
-import { menuService } from "@web/webclient/menus/menu_service";
 
 export class HomeMenus extends Component {
     static template = "theme_nhs.home_menus";
@@ -44,14 +42,12 @@ export class HomeMenus extends Component {
             'Events': 'calendar-event',
             'Surveys': 'pencil-square',
             'Subscriptions': 'arrow-repeat',
-            'Discuss': 'chat-dots',
             'Documents': 'folder-fill',
             'Sign': 'pencil-fill',
             'Studio': 'layers-fill',
             'Settings': 'gear-fill',
             'Dashboards': 'speedometer2',
             'Point of Sale': 'pc-display-horizontal',
-            'Subscriptions': 'arrow-repeat',
             'Maintenance': 'tools',
             'Marketing Automation': 'megaphone-fill',
             'Email Marketing': 'envelope-paper-heart-fill',

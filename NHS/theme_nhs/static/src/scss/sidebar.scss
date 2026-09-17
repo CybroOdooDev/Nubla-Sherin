@@ -12,14 +12,13 @@
 }
 
 .sidebar_img {
-    width: 22px;
-    width: 22px;
-    height: 22px;
+    width: 34px;
+    height: 34px;
     border-radius: 0px;
 }
 
 html .o_web_client>.o_action_manager {
-    margin-left: 98px;
+    margin-left: 120px;
     transition: margin-left 0.4s ease-in-out;
 
     @media (max-width: 768px) {
@@ -27,11 +26,15 @@ html .o_web_client>.o_action_manager {
     }
 }
 
+// The sidebar is position: fixed and overlays the content on hover-expand
+// instead of pushing it, so this margin only needs to clear the collapsed
+// (rail) width and never changes on hover.
+
 .sidebar {
     height: 94vh;
     width: auto;
     position: fixed;
-    background: linear-gradient(180deg, #EAF4FB 0%, #F7FBFE 45%, #FFFFFF 100%);
+    background: var(--primary-color);
     box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.10);
     padding: 20px 20px;
     padding-left: 0;
@@ -95,13 +98,6 @@ html .o_web_client>.o_action_manager {
     }
 
     #dropdown-toggle.active {
-        color: var(--white-color) !important;
-        background-color: rgba(0, 94, 184, 0.28);
-        border-radius: 15px;
-        padding: 15px 15px;
-        box-shadow: 0px 15px 35px 0px rgba(0, 94, 184, 0.26);
-        position: relative;
-
         a {
             width: 100%;
             display: flex;
@@ -109,22 +105,6 @@ html .o_web_client>.o_action_manager {
             column-gap: 15px;
             align-items: center;
             color: var(--white-color) !important;
-        }
-
-        svg path {
-            stroke: #ffffff;
-            transition: stroke 0.3s ease;
-        }
-
-        &:before {
-            position: absolute;
-            content: "";
-            height: 100%;
-            width: 8px;
-            background-color: var(--primary-color);
-            left: -28px;
-            top: 0;
-            border-radius: 10px;
         }
     }
 
@@ -149,7 +129,7 @@ html .o_web_client>.o_action_manager {
             justify-content: start;
             column-gap: 15px;
             align-items: center;
-            color: var(--secondary-color) !important;
+            color: var(--white-color) !important;
             padding-bottom: 10px;
             transition: color 0.3s ease, background-color 0.3s ease;
 
@@ -159,28 +139,6 @@ html .o_web_client>.o_action_manager {
                 path {
                     transition: stroke 0.3s ease;
                 }
-            }
-        }
-
-        &:hover {
-            a {
-                color: var(--primary-color) !important;
-            }
-
-            svg path {
-                stroke: var(--primary-color);
-            }
-
-            ::before {
-                position: absolute;
-                content: "";
-                height: 100%;
-                width: 8px;
-                background-color: var(--primary-color);
-                left: -28px;
-                top: 0;
-                border-radius: 10px;
-                transition: all 0.3s ease;
             }
         }
     }
@@ -387,9 +345,4 @@ html .o_web_client>.o_action_manager {
 
 .sidebar .sidbar-item.active {
     color: var(--white-color) !important;
-    background-color: rgba(0, 94, 184, 0.28);
-    border-radius: 15px;
-    padding: 15px 15px;
-    box-shadow: 0px 15px 35px 0px rgba(0, 94, 184, 0.26);
-    position: relative;
 }

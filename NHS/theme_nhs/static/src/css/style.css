@@ -383,7 +383,7 @@ template {
 }
 
 .login .login_wrapper .form-group .form-control {
-  border-color: #F0EDF6;
+  border-color: var(--grey-color);
   height: 50px;
 }
 
@@ -419,10 +419,12 @@ template {
 
 
 .app_container {
-  background-image: linear-gradient(135deg, #003087 0%, #005EB8 55%, #41B6E6 100%);
+  background: var(--primary-color) !important;
   background-size: cover;
   height: 100vh;
   width: 100%;
+  position: relative;
+  z-index: 10;
 }
 
 .app_container .wrapper {
@@ -445,32 +447,43 @@ template {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  padding: 14px 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.app_container .app_list .app_wrapp:hover,
+.app_container .app_list .app_wrapp:focus-visible {
+  background-color: rgba(255, 255, 255, 0.14);
 }
 
 .app_container .app_list .app_wrapp .app {
-  background-color: var(--primary-color);
-  border-radius: 8px;
+  background-color: var(--white-color);
+  border-radius: 12px;
   height: 80px;
   width: 80px;
-  box-shadow: 0px 15px 35px 0px rgba(0, 94, 184, 0.26);
+  box-shadow: 0px 15px 35px 0px rgba(0, 48, 135, 0.35);
   display: flex;
-  transition: all transition:;
+  transition: all 0.3s ease;
+}
+
+.app_container .app_list .app_wrapp:hover .app,
+.app_container .app_list .app_wrapp:focus-visible .app {
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.45), 0px 15px 35px 0px rgba(0, 48, 135, 0.55);
+  transform: translateY(-5px) scale(1.05);
 }
 
 .app_container .app_list .app_wrapp .app i {
   font-size: 30px;
   margin: auto;
-  color: var(--white-color);
+  color: var(--primary-color);
   text-align: center;
   transition: transform 0.3s ease;
 }
 
-.app_container .app_list .app_wrapp .app:hover {
-  box-shadow: 0px 15px 35px 0px rgba(0, 94, 184, 0.5);
-  transform: translateY(-5px);
-}
-
-.app_container .app_list .app_wrapp .app:hover i {
+.app_container .app_list .app_wrapp:hover .app i,
+.app_container .app_list .app_wrapp:focus-visible .app i {
   transform: scale(1.1);
 }
 
@@ -482,6 +495,12 @@ template {
   text-align: center;
   line-height: 1.3;
   max-width: 130px;
+  transition: font-weight 0.2s ease;
+}
+
+.app_container .app_list .app_wrapp:hover span,
+.app_container .app_list .app_wrapp:focus-visible span {
+  font-weight: 600;
 }
 
 .btn {
@@ -490,7 +509,7 @@ template {
   transition: all 0.3s ease !important;
 }
 
-.btn-primary {
+html body .btn.btn-primary {
   border-radius: 5px;
   font-size: 16px !important;
   text-decoration: none;
@@ -504,7 +523,7 @@ template {
   gap: 3px !important;
 }
 
-.btn-outline-primary {
+html body .btn.btn-outline-primary {
   border-radius: 5px;
   font-size: 16px !important;
   text-decoration: none;
@@ -515,19 +534,25 @@ template {
   padding: 10px 30px 6px 30px;
 }
 
-.btn-primary:hover {
+html body .btn.btn-primary:hover,
+html body .btn.btn-primary:focus,
+html body .btn.btn-primary:active,
+html body .btn.btn-primary:focus-visible {
   background-color: rgba(0, 94, 184, 0.28);
   color: var(--primary-color) !important;
   border-color: rgba(0, 94, 184, 0.28) !important;
 }
 
-.btn-secondary {
+html body .btn.btn-secondary {
   background-color: rgba(141, 140, 153, 0.09);
   border-radius: 5px;
   border: 1px solid var(--primary-color) !important;
 }
 
-.btn-secondary:hover {
+html body .btn.btn-secondary:hover,
+html body .btn.btn-secondary:focus,
+html body .btn.btn-secondary:active,
+html body .btn.btn-secondary:focus-visible {
   background-color: var(--nhs-dark-blue);
   color: white !important;
   transition: all 0.3s;
@@ -669,7 +694,7 @@ template {
 .sidebar {
   height: 100%;
   width: auto;
-  background: linear-gradient(180deg, #EAF4FB 0%, #F7FBFE 45%, #FFFFFF 100%);
+  background: var(--primary-color);
   box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.1);
   padding: 20px 20px;
   padding-left: 0;
@@ -699,10 +724,6 @@ template {
   transition: all 0.4s;
 }
 
-.sidebar:hover span {
-  display: block;
-  transition: all 0.4s;
-}
 
 .sidebar .sidebar_links {
   padding-left: 0;
@@ -727,15 +748,6 @@ template {
   margin-top: -2px;
 }
 
-.sidebar #dropdown-toggle.active {
-  color: var(--white-color) !important;
-  background-color: rgba(0, 94, 184, 0.28);
-  border-radius: 15px;
-  padding: 15px 15px;
-  box-shadow: 0px 15px 35px 0px rgba(0, 94, 184, 0.26);
-  position: relative;
-}
-
 .sidebar #dropdown-toggle.active a {
   width: 100%;
   display: flex;
@@ -743,22 +755,6 @@ template {
   column-gap: 15px;
   align-items: center;
   color: var(--white-color) !important;
-}
-
-.sidebar #dropdown-toggle.active svg path {
-  stroke: #ffffff;
-  transition: stroke 0.3s ease;
-}
-
-.sidebar #dropdown-toggle.active:before {
-  position: absolute;
-  content: "";
-  height: 100%;
-  width: 8px;
-  background-color: var(--primary-color);
-  left: -28px;
-  top: 0;
-  border-radius: 10px;
 }
 
 .sidebar .dropdown-content {
@@ -784,7 +780,7 @@ template {
   justify-content: start;
   column-gap: 15px;
   align-items: center;
-  color: var(--secondary-color) !important;
+  color: var(--white-color) !important;
   padding-bottom: 0px;
 }
 
@@ -792,32 +788,15 @@ template {
   margin-top: -5px;
 }
 
-.sidebar .sidbar-item:hover {
-  transition: stroke 0.3s ease;
-}
-
-.sidebar .sidbar-item:hover a {
-  color: var(--primary-color) !important;
-}
-
-.sidebar .sidbar-item:hover svg path {
-  stroke: var(--primary-color);
-}
-
-.sidebar .sidbar-item:hover ::before {
-  position: absolute;
-  content: "";
-  height: 100%;
-  width: 8px;
-  background-color: var(--primary-color);
-  left: -28px;
-  top: 0;
-  border-radius: 10px;
-}
 
 .form-check-input:checked {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
+}
+
+.form-switch .form-check-input:checked {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
 }
 
 .dashboard_body {
@@ -950,24 +929,27 @@ template {
   margin-top: 20px;
 }
 
-.o-mail-Discuss{
-    margin-top: 50px !important;
+.o-mail-Discuss {
+  margin-top: 50px !important;
 }
 
-.o_form_sheet .badge, .o_action_manager .badge {
+.o_form_sheet .badge,
+.o_action_manager .badge {
   padding: 5px 8px !important;
 }
+
 .badge {
   padding: 10px 10px;
 }
 
 .bg-primary {
-  background-color: #D2E9F7 !important;
+  background-color: var(--primary-color) !important;
 
 }
 
 .text-bg-primary {
-  background-color: #D2E9F7 !important;
+  background-color: var(--primary-color) !important;
+  color: var(--white-color) !important;
 }
 
 .text-bg-secondary {
@@ -990,6 +972,7 @@ template {
 
 .text-bg-info {
   background-color: rgba(65, 182, 230, 0.35) !important;
+  color: var(--nhs-dark-blue) !important;
 }
 
 .text-bg-light {
@@ -998,6 +981,27 @@ template {
 
 .o-form-buttonbox .oe_stat_button .o_button_icon {
   color: var(--primary-color);
+}
+
+/* Smart buttons (StatInfo icon/value) read these CSS vars with a purple
+   fallback (Odoo's $o-brand-primary / $primary) - define them once here so
+   every smart button's icon and bold value text picks up NHS blue instead. */
+.o-form-buttonbox {
+  --o-stat-text-color: var(--primary-color);
+  --o-stat-button-color: var(--primary-color);
+}
+
+/* Focused field border/caret and the required-field underline both read these
+   vars, which Odoo sets directly to purple on these same selectors - redefine
+   them here so they resolve to NHS blue instead. */
+.o_required_modifier,
+.o_field_widget:focus-within {
+  --o-input-border-color: var(--primary-color) !important;
+  --o-caret-color: var(--primary-color) !important;
+}
+
+.o_m2o_dropdown_option>a {
+  color: var(--primary-color) !important;
 }
 
 :root {
@@ -1010,6 +1014,10 @@ template {
   --white-color: #ffff;
   --grey-color: #D8DDE0;
   --dark: #212B32;
+
+  /* Override Odoo default brand colors to remove purple globally */
+  --o-brand-odoo: var(--primary-color);
+  --o-brand-primary: var(--primary-color);
 }
 
 *:focus {
@@ -1116,7 +1124,8 @@ body {
 }
 
 .dropdown-item:hover,
-.dropdown-item:focus {
+.dropdown-item:focus,
+.dropdown-item.focus {
   background-color: rgba(0, 94, 184, 0.12) !important;
   color: var(--primary-color) !important;
 }
@@ -1152,6 +1161,38 @@ body {
   box-shadow: inset 2px 0 0 var(--primary-color) !important;
 }
 
+.dropdown-item.selected:before,
+.dropdown-item.active:before {
+  color: var(--primary-color) !important;
+}
+
+.o_bottom_sheet_body .dropdown-item.selected::after {
+  color: var(--primary-color) !important;
+}
+
+.o_breadcrumb a,
+.o_breadcrumb .o_back_button a,
+.o_last_breadcrumb_item {
+  color: var(--primary-color) !important;
+}
+
+.o_add_custom_group_menu {
+  color: var(--dark) !important;
+  background-color: var(--white-color) !important;
+}
+
+.o_add_custom_group_menu option {
+  color: var(--dark) !important;
+  background-color: var(--white-color) !important;
+}
+
+.dropdown-item.o_add_custom_group_menu:hover,
+.dropdown-item.o_add_custom_group_menu:focus,
+.dropdown-item.o_add_custom_group_menu.focus {
+  background-color: rgba(0, 94, 184, 0.12) !important;
+  color: var(--primary-color) !important;
+}
+
 .btn.active .fa {
   color: white !important;
 }
@@ -1160,8 +1201,59 @@ body {
   color: white !important;
 }
 
+.btn-link {
+  color: var(--primary-color) !important;
+}
+
+.btn-link:hover {
+  color: var(--nhs-dark-blue) !important;
+}
+
+.o_phone_form_link,
+.o_field_phone_sms {
+  color: var(--primary-color) !important;
+}
+
+.o_phone_form_link:hover,
+.o_field_phone_sms:hover {
+  color: var(--nhs-dark-blue) !important;
+}
+
+/* .btn-link never gets a solid fill, so the generic .btn.active white-icon
+   rule above leaves it invisible (e.g. the chatter Follow button). */
+.btn-link.active,
+.btn-link.active .fa,
+.btn-link.active .oi {
+  color: var(--primary-color) !important;
+  background-color: transparent !important;
+}
+
 .o_searchview_facet_label .fa {
   color: var(--white-color) !important;
+}
+
+.o_loading_indicator {
+  background-color: var(--primary-color) !important;
+}
+
+.o_notebook .nav-link {
+  color: var(--primary-color) !important;
+}
+
+.o_notebook .nav-link.active {
+  color: var(--dark) !important;
+}
+
+.o_field_x2many_list_row_add a {
+  color: var(--primary-color) !important;
+}
+
+.o_view_nocontent_smiling_face:before {
+  background-image: url(/theme_nhs/static/src/img/empty_state_smiling_face_nhs.svg) !important;
+}
+
+.o_view_nocontent_neutral_face:before {
+  background-image: url(/theme_nhs/static/src/img/empty_state_neutral_face_nhs.svg) !important;
 }
 
 .btn-outline-secondary {
@@ -1169,29 +1261,33 @@ body {
 }
 
 @media(max-width:990px) {
-    .app_container .app_list {
-        grid-template-columns: repeat(4, 1fr);
-    }
+  .app_container .app_list {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
+
 @media(max-width:1680px) {
-    .app_container .app_list {
-        margin-top: 20rem;
-    }
-    .app_container{
-        overflow: scroll;
-    }
+  .app_container .app_list {
+    margin-top: 20rem;
+  }
+
+  .app_container {
+    overflow: scroll;
+  }
 }
+
 @media(max-width:768px) {
-      .app_container .app_list {
-            margin-top: 40rem;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            width: auto;
-            gap: 20px;
-      }
-      .wrapper{
-        overflow: scroll;
-      }
+  .app_container .app_list {
+    margin-top: 40rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: auto;
+    gap: 20px;
+  }
+
+  .wrapper {
+    overflow: scroll;
+  }
 }
 
 .o_data_row td {
@@ -1231,4 +1327,17 @@ body {
 .bg-action,
 .text-bg-action {
   background-color: var(--nhs-dark-blue) !important;
+}
+
+/* The Group By facet's icon is "oi oi-group", not ".fa", so it was missed by
+   the .o_searchview_facet_label .fa rule below and stayed an unset/dark colour
+   on the dark-blue .text-bg-action pill above — effectively invisible. */
+.o_searchview_facet_label.text-bg-action,
+.o_searchview_facet_label.text-bg-action i {
+  color: var(--white-color) !important;
+}
+
+/* Override Odoo community loading indicator color */
+.o_loading {
+  background-color: var(--primary-color) !important;
 }
