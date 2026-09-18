@@ -383,7 +383,7 @@ template {
 }
 
 .login .login_wrapper .form-group .form-control {
-  border-color: var(--grey-color);
+  border-color: #F0EDF6;
   height: 50px;
 }
 
@@ -419,7 +419,7 @@ template {
 
 
 .app_container {
-  background: var(--primary-color) !important;
+  background: linear-gradient(180deg, var(--primary-color) 0%, var(--nhs-dark-blue) 45%, #41B6E6 100%) !important;
   background-size: cover;
   height: 100vh;
   width: 100%;
@@ -459,25 +459,25 @@ template {
 }
 
 .app_container .app_list .app_wrapp .app {
-  background-color: var(--white-color);
-  border-radius: 12px;
+  background-color: var(--primary-color);
+  border-radius: 8px;
   height: 80px;
   width: 80px;
-  box-shadow: 0px 15px 35px 0px rgba(0, 48, 135, 0.35);
+  box-shadow: 0px 15px 35px 0px rgba(0, 94, 184, 0.26);
   display: flex;
   transition: all 0.3s ease;
 }
 
 .app_container .app_list .app_wrapp:hover .app,
 .app_container .app_list .app_wrapp:focus-visible .app {
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.45), 0px 15px 35px 0px rgba(0, 48, 135, 0.55);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.35), 0px 15px 35px 0px rgba(0, 94, 184, 0.5);
   transform: translateY(-5px) scale(1.05);
 }
 
 .app_container .app_list .app_wrapp .app i {
   font-size: 30px;
   margin: auto;
-  color: var(--primary-color);
+  color: var(--white-color);
   text-align: center;
   transition: transform 0.3s ease;
 }
@@ -534,10 +534,7 @@ html body .btn.btn-outline-primary {
   padding: 10px 30px 6px 30px;
 }
 
-html body .btn.btn-primary:hover,
-html body .btn.btn-primary:focus,
-html body .btn.btn-primary:active,
-html body .btn.btn-primary:focus-visible {
+html body .btn.btn-primary:hover, html body .btn.btn-primary:focus, html body .btn.btn-primary:active, html body .btn.btn-primary:focus-visible {
   background-color: rgba(0, 94, 184, 0.28);
   color: var(--primary-color) !important;
   border-color: rgba(0, 94, 184, 0.28) !important;
@@ -549,10 +546,7 @@ html body .btn.btn-secondary {
   border: 1px solid var(--primary-color) !important;
 }
 
-html body .btn.btn-secondary:hover,
-html body .btn.btn-secondary:focus,
-html body .btn.btn-secondary:active,
-html body .btn.btn-secondary:focus-visible {
+html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html body .btn.btn-secondary:active, html body .btn.btn-secondary:focus-visible {
   background-color: var(--nhs-dark-blue);
   color: white !important;
   transition: all 0.3s;
@@ -694,7 +688,7 @@ html body .btn.btn-secondary:focus-visible {
 .sidebar {
   height: 100%;
   width: auto;
-  background: var(--primary-color);
+  background: linear-gradient(180deg, var(--primary-color) 0%, var(--nhs-dark-blue) 100%);
   box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.1);
   padding: 20px 20px;
   padding-left: 0;
@@ -724,6 +718,10 @@ html body .btn.btn-secondary:focus-visible {
   transition: all 0.4s;
 }
 
+.sidebar:hover span {
+  display: block;
+  transition: all 0.4s;
+}
 
 .sidebar .sidebar_links {
   padding-left: 0;
@@ -748,6 +746,15 @@ html body .btn.btn-secondary:focus-visible {
   margin-top: -2px;
 }
 
+.sidebar #dropdown-toggle.active {
+  color: var(--white-color) !important;
+  background-color: rgba(0, 94, 184, 0.28);
+  border-radius: 15px;
+  padding: 15px 15px;
+  box-shadow: 0px 15px 35px 0px rgba(0, 94, 184, 0.26);
+  position: relative;
+}
+
 .sidebar #dropdown-toggle.active a {
   width: 100%;
   display: flex;
@@ -755,6 +762,22 @@ html body .btn.btn-secondary:focus-visible {
   column-gap: 15px;
   align-items: center;
   color: var(--white-color) !important;
+}
+
+.sidebar #dropdown-toggle.active svg path {
+  stroke: #ffffff;
+  transition: stroke 0.3s ease;
+}
+
+.sidebar #dropdown-toggle.active:before {
+  position: absolute;
+  content: "";
+  height: 100%;
+  width: 8px;
+  background-color: var(--primary-color);
+  left: -28px;
+  top: 0;
+  border-radius: 10px;
 }
 
 .sidebar .dropdown-content {
@@ -788,6 +811,28 @@ html body .btn.btn-secondary:focus-visible {
   margin-top: -5px;
 }
 
+.sidebar .sidbar-item:hover {
+  transition: stroke 0.3s ease;
+}
+
+.sidebar .sidbar-item:hover a {
+  color: #41B6E6 !important;
+}
+
+.sidebar .sidbar-item:hover svg path {
+  stroke: #41B6E6;
+}
+
+.sidebar .sidbar-item:hover ::before {
+  position: absolute;
+  content: "";
+  height: 100%;
+  width: 8px;
+  background-color: var(--primary-color);
+  left: -28px;
+  top: 0;
+  border-radius: 10px;
+}
 
 .form-check-input:checked {
   background-color: var(--primary-color);
@@ -1000,7 +1045,7 @@ html body .btn.btn-secondary:focus-visible {
   --o-caret-color: var(--primary-color) !important;
 }
 
-.o_m2o_dropdown_option>a {
+.o_m2o_dropdown_option > a {
   color: var(--primary-color) !important;
 }
 
@@ -1014,7 +1059,7 @@ html body .btn.btn-secondary:focus-visible {
   --white-color: #ffff;
   --grey-color: #D8DDE0;
   --dark: #212B32;
-
+  
   /* Override Odoo default brand colors to remove purple globally */
   --o-brand-odoo: var(--primary-color);
   --o-brand-primary: var(--primary-color);
@@ -1328,15 +1373,6 @@ body {
 .text-bg-action {
   background-color: var(--nhs-dark-blue) !important;
 }
-
-/* The Group By facet's icon is "oi oi-group", not ".fa", so it was missed by
-   the .o_searchview_facet_label .fa rule below and stayed an unset/dark colour
-   on the dark-blue .text-bg-action pill above — effectively invisible. */
-.o_searchview_facet_label.text-bg-action,
-.o_searchview_facet_label.text-bg-action i {
-  color: var(--white-color) !important;
-}
-
 /* Override Odoo community loading indicator color */
 .o_loading {
   background-color: var(--primary-color) !important;

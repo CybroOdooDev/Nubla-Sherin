@@ -15,17 +15,17 @@
 }
 
 header.o_navbar {
-  background: var(--primary-color) !important;
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--nhs-dark-blue) 100%) !important;
 }
 
 .navbar {
-  background: var(--primary-color) !important;
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--nhs-dark-blue) 100%) !important;
   border-bottom: transparent;
   z-index: 1200 !important;
 }
 
 .o_main_navbar {
-  background: var(--primary-color) !important;
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--nhs-dark-blue) 100%) !important;
   z-index: 1200 !important;
 }
 
@@ -102,7 +102,7 @@ body.o_home_menu_active .o_main_navbar {
 .sidebar {
   height: 93vh;
   width: auto;
-  background: var(--primary-color);
+  background: linear-gradient(180deg, var(--primary-color) 0%, var(--nhs-dark-blue) 100%);
   box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.1);
   padding: 20px 20px;
   padding-left: 0;
@@ -138,6 +138,10 @@ body.o_home_menu_active .o_main_navbar {
   transition: all 0.4s;
 }
 
+.sidebar:hover span {
+  opacity: 1;
+  max-width: 200px;
+}
 
 .sidebar .sidebar_links {
   padding-left: 0;
@@ -162,6 +166,15 @@ body.o_home_menu_active .o_main_navbar {
   margin-top: -2px;
 }
 
+.sidebar #dropdown-toggle.active {
+  color: var(--white-color) !important;
+  background-color: var(--primary-color);
+  border-radius: 15px;
+  padding: 15px 15px;
+  box-shadow: 0px 15px 35px 0px rgba(0, 94, 184, 0.26);
+  position: relative;
+}
+
 .sidebar #dropdown-toggle.active a {
   width: 100%;
   display: flex;
@@ -169,6 +182,22 @@ body.o_home_menu_active .o_main_navbar {
   column-gap: 15px;
   align-items: center;
   color: var(--white-color) !important;
+}
+
+.sidebar #dropdown-toggle.active svg path {
+  stroke: #ffffff;
+  transition: stroke 0.3s ease;
+}
+
+.sidebar #dropdown-toggle.active:before {
+  position: absolute;
+  content: "";
+  height: 100%;
+  width: 8px;
+  background-color: var(--primary-color);
+  left: -28px;
+  top: 0;
+  border-radius: 10px;
 }
 
 .sidebar .dropdown-content {
@@ -205,15 +234,27 @@ body.o_home_menu_active .o_main_navbar {
   transition: stroke 0.3s ease;
 }
 
+.sidebar .sidbar-item:hover a {
+  color: #41B6E6 !important;
+}
+
+.sidebar .sidbar-item:hover svg path {
+  stroke: #41B6E6;
+}
+
+.sidebar .sidbar-item:hover::before {
+  position: absolute;
+  content: "";
+  height: 100%;
+  width: 8px;
+  background-color: var(--primary-color);
+  left: -28px;
+  top: 0;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
 .app_container {
   background: var(--primary-color) !important;
   background-image: none !important;
-}
-
-// Odoo core (navbar.scss) draws a yellow/black hazard-stripe border around the
-// navbar systray for the superuser account (body.o_is_superuser) — clashes with
-// the flat NHS Blue navbar, so restyle it in NHS colours instead of removing the
-// safety indicator outright.
-body.o_is_superuser .o_menu_systray {
-  border-image: repeating-linear-gradient(135deg, var(--nhs-dark-blue), var(--nhs-dark-blue) 10px, #41B6E6 10px, #41B6E6 20px) 2 !important;
 }

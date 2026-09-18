@@ -34,7 +34,50 @@ patch(NavBar.prototype, {
         onMounted(() => {
             this.applySidebarState();
             this.syncHomeMenuBodyClass();
+            this.setupSidebarHoverSpacing();
         });
+    },
+
+    setupSidebarHoverSpacing() {
+        const sidebarElement = this.sidebarRef.el;
+        if (!sidebarElement) {
+            return;
+        }
+        const actionManagerElement = document.querySelector(".o_action_manager");
+        // The sidebar's expanded width depends on each item's label length (short
+        // labels like "Apps" barely grow, long ones like "Trust Management" grow
+        // a lot), so a fixed margin-left guess either clips long labels or leaves
+        // a big gap for short ones. Measure the sidebar's true expanded width
+        // instantly - by briefly turning off its transition, forcing a reflow, then
+        // restoring it, all within this single synchronous handler so the browser
+        // never actually paints the untransitioned state - and apply the matching
+        // margin right away, so the content shifts in sync with the sidebar's own
+        // expand animation instead of lagging behind it.
+        sidebarElement.addEventListener("mouseenter", () => {
+            if (this.state.isSidebarHidden) {
+                return;
+            }
+            this.applyExpandedSidebarMargin();
+        });
+        sidebarElement.addEventListener("mouseleave", () => {
+            if (this.state.isSidebarHidden) {
+                return;
+            }
+            actionManagerElement?.style.setProperty("margin-left", "98px");
+        });
+    },
+
+    applyExpandedSidebarMargin() {
+        const sidebarElement = this.sidebarRef.el;
+        const actionManagerElement = document.querySelector(".o_action_manager");
+        if (!sidebarElement || !actionManagerElement) {
+            return;
+        }
+        sidebarElement.classList.add("o_measuring");
+        void sidebarElement.offsetWidth; // force a synchronous reflow at full width
+        const width = sidebarElement.getBoundingClientRect().width;
+        sidebarElement.classList.remove("o_measuring");
+        actionManagerElement.style.setProperty("margin-left", `${Math.ceil(width) + 20}px`);
     },
 
     syncHomeMenuBodyClass() {
@@ -64,7 +107,7 @@ patch(NavBar.prototype, {
             } else {
                 sidebarElement.classList.remove("o_hidden");
                 sectionsElement.classList.remove("o_hidden");
-                actionManagerElement?.style.setProperty("margin-left", "120px");
+                actionManagerElement?.style.setProperty("margin-left", "98px");
             }
         }
     },
@@ -79,10 +122,16 @@ patch(NavBar.prototype, {
         this.state.activeApp = app.id;
         sessionStorage.setItem("activeApp", this.state.activeApp);
         document.body.classList.remove("o_home_menu_active");
-        // The sidebar overlays the content (position: fixed) instead of pushing it,
-        // so the content margin always stays at the collapsed-rail width regardless
-        // of whether the sidebar is currently hover-expanded.
-        document.querySelector(".o_action_manager")?.style.setProperty("margin-left", "120px");
+        // Clicking an app happens with the mouse over the sidebar, so it's still
+        // visually expanded via :hover at this point. Match the content margin to
+        // that expanded state instead of always snapping back to the collapsed
+        // baseline underneath it - otherwise switching apps without the mouse
+        // leaving the sidebar first leaves the content clipped behind it.
+        if (sidebarElement && sidebarElement.matches(":hover")) {
+            this.applyExpandedSidebarMargin();
+        } else {
+            document.querySelector(".o_action_manager")?.style.setProperty("margin-left", "98px");
+        }
         this.onNavBarDropdownItemSelection(app);
     },
 
@@ -128,7 +177,7 @@ patch(NavBar.prototype, {
             }
             sidebarElement?.classList.remove("o_hidden");
             sectionsElement?.classList.remove("o_hidden");
-            actionManagerElement?.style.setProperty("margin-left", "120px");
+            actionManagerElement?.style.setProperty("margin-left", "98px");
             this.state.isSidebarHidden = false;
             sessionStorage.setItem("isSidebarHidden", "false");
             document.body.classList.remove("o_home_menu_active");
