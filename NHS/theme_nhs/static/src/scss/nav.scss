@@ -1,32 +1,105 @@
 :root {
-  --primary-color: #005EB8;
-  --secondary-color: #768692;
-  --danger-color: #DA291C;
-  --nhs-dark-blue: #003087;
-  --text-blue: #0072CE;
+  --primary-color: #2E6DA4;
+  --secondary-color: #5A6B7A;
+  --danger-color: #da291c;
+  --primary-dark: #14314D; // Dark Blue
+  --bg-gradient: linear-gradient(135deg, #6FA0C4 0%, #2E6DA4 50%, #14314D 100%);
+  --accent-color: #3C8FC7;
   --text-color: #425563;
   --white-color: #ffff;
-  --grey-color: #D8DDE0;
-  --dark: #212B32;
+  --grey-color: #d8dde0;
+  --dark: #212b32;
 }
 
 .o_user_menu .dropdown-toggle .o_user_avatar {
   border-radius: 50% !important;
 }
 
-header.o_navbar {
-  background: linear-gradient(90deg, var(--primary-color) 0%, var(--nhs-dark-blue) 100%) !important;
+// Discuss's channel "..." menu (Invite People / Notification Settings /
+// Advanced Settings / Leave Channel-Unpin Conversation): Odoo's dropdown
+// items don't rely on the :hover/:focus pseudo-classes alone — mouseover and
+// keyboard navigation both toggle an actual ".focus" CLASS via JS (see core
+// mail/action_list.scss and the theme's own ".dropdown-item.focus" rule).
+// Kept each action's colour fixed at its resting value across :hover,
+// :focus AND the .focus class, so hovering only ever changes the
+// background tint, never the text colour.
+.o-mail-ActionList .btn-danger,
+.o-mail-ActionList .btn-danger:hover,
+.o-mail-ActionList .btn-danger:focus,
+.o-mail-ActionList .btn-danger.focus {
+  color: var(--danger-color) !important;
+  background-color: transparent !important;
 }
 
-.navbar {
-  background: linear-gradient(90deg, var(--primary-color) 0%, var(--nhs-dark-blue) 100%) !important;
-  border-bottom: transparent;
-  z-index: 1200 !important;
+.o-mail-ActionList .btn-secondary,
+.o-mail-ActionList .btn-secondary:hover,
+.o-mail-ActionList .btn-secondary:focus,
+.o-mail-ActionList .btn-secondary.focus {
+  color: var(--dark) !important;
+  background-color: transparent !important;
+}
+
+// "View all activities" uses Bootstrap's .text-primary, which is still
+// Odoo's default purple ($o-community-color) in this checkout — nhs_backend_theme
+// only overrides its own --primary-color custom property, not Bootstrap's
+// $primary. Recolour explicitly to this theme's primary colour here.
+.o-mail-ActivityMenu .text-primary {
+  color: var(--accent-color) !important;
+}
+
+// Same root cause in the search bar's autocomplete dropdown: the matched
+// search term ("Search Name for: <b class="text-primary">ass</b>") and the
+// "Custom Filter..."/"Search more..." links ("text-action") are both tied to
+// Odoo's default purple ($o-action == $o-brand-primary), not this theme's
+// primary colour. Recolour both within the search dropdown.
+.o_searchview_autocomplete .text-primary,
+.o_searchview_autocomplete .text-action {
+  color: var(--accent-color) !important;
+}
+
+// Same root cause again in the "Custom Filter" dialog (core web
+// tree_editor.xml): the "any"/"all" match-type toggle uses ".text-primary",
+// and "New Rule" is a plain default-styled <a> — Bootstrap's own default
+// link colour ($o-main-link-color) is also derived from the same Odoo
+// purple, not this theme's primary colour.
+.o_tree_editor .text-primary,
+.o_tree_editor a {
+  color: var(--accent-color) !important;
+}
+
+// Same root cause again in "Need Help? Import FAQ" (the import dialog's
+// empty state) and any other "Documentation"/FAQ link built from core web's
+// reusable DocumentationLink component (always carries .o_doc_link) —
+// unstyled default <a> colour is the same Odoo purple, not this theme's
+// primary colour. Scoped
+// to the component's own class rather than the dialog, since this same link
+// appears in several places across the app.
+.o_doc_link {
+  color: var(--accent-color) !important;
+}
+
+// Same root cause again in Discuss's "@ Search a conversation" quick-create
+// palette: "Create Channel"/"Create Chat" use mail's own ".o-action" class
+// (discuss_command_palette.scss: "color: lighten($o-action, 5%)"), and the
+// palette's generic "TIP — search for /menus and @conversations" footer
+// (core web command_items.xml) uses ".text-primary" — both still the Odoo
+// purple, not this theme's primary colour.
+.o-mail-DiscussCommand .o-action {
+  color: var(--accent-color) !important;
+}
+
+.o_command_palette .text-primary {
+  color: var(--accent-color) !important;
+}
+
+header.o_navbar {
+  background: var(--bg-gradient) !important;
 }
 
 .o_main_navbar {
-  background: linear-gradient(90deg, var(--primary-color) 0%, var(--nhs-dark-blue) 100%) !important;
-  z-index: 1200 !important;
+  background: var(--bg-gradient) !important;
+  border-bottom: transparent;
+  z-index: 1040 !important;
 }
 
 .o_main_navbar .navbar-brand {
@@ -35,7 +108,6 @@ header.o_navbar {
 
 .o_main_navbar .oe_topbar_name {
   color: var(--white-color) !important;
-
 }
 
 .o_main_navbar .o_menu_brand:hover,
@@ -56,15 +128,76 @@ body.o_home_menu_active .o_main_navbar {
   box-shadow: none !important;
 }
 
-.o_control_panel {
-  padding-top: 56px !important;
+// The navbar is normal document flow (not position:fixed), so even fully
+// transparent it still reserves its own height, pushing .app_container's box
+// down and making its background gradient restart its 0%-100% stops from that
+// lower position instead of continuing the one behind the navbar - a visible
+// seam right at the navbar's bottom edge. Taking it out of flow here (overlay,
+// like Odoo's own default Home Menu navbar) lets .app_container's box - and
+// its gradient - start at the true viewport top with no seam.
+body.o_home_menu_active header.o_navbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+// Overlaying the navbar (above) means it now sits on top of the app grid
+// instead of pushing it down, so its own box - transparent background aside -
+// still intercepts mouse/wheel input over roughly its top ~46-90px strip,
+// even where there's nothing visually there. With enough installed apps that
+// the grid needs to scroll (.app_container's overflow:scroll further down),
+// that strip lands right over the app grid's top row - so wheel-scrolling
+// while hovering that row silently did nothing (hit-tested to the navbar, a
+// sibling of .app_container rather than an ancestor, which has nothing of its
+// own to scroll). Let input pass straight through the navbar's own empty area
+// to whatever's beneath, and only re-enable it on the actual controls still
+// live in this state (back-arrow button, systray icons on the right).
+body.o_home_menu_active header.o_navbar {
+  pointer-events: none;
+}
+
+body.o_home_menu_active header.o_navbar button,
+body.o_home_menu_active header.o_navbar .o_menu_systray,
+body.o_home_menu_active header.o_navbar .o_menu_systray * {
+  pointer-events: auto;
+}
+
+// Odoo core spaces the control panel's pager/switch-view buttons apart with
+// Bootstrap's `gap-1 gap-xl-3` utility classes (control_panel.xml). This build
+// only ever generates `.gap-1` (the small ~4px mobile gap) - `.gap-xl-3` isn't
+// present in the compiled bundle at all, core-side, nothing to do with this
+// theme - so the wider gap meant for screens >=1200px never kicks in and the
+// pager sits pressed right up against the view-switcher icons. Restoring just
+// that missing breakpoint override (gap-3 = 1rem, same value Bootstrap itself
+// would have used) rather than touching gap-1, so the compact mobile spacing
+// stays exactly as-is.
+// Doubled-up class selector (.o_control_panel_navigation.o_control_panel_navigation)
+// is a specificity bump, not a typo: Odoo's own asset pipeline re-generates a
+// second copy of ".gap-1{gap: 3px !important}" further down this same bundle
+// (right after this theme's own style.css content), and with equal (0,1,0)
+// specificity a same-specificity !important rule that comes LATER in the
+// bundle wins regardless of which one "looks" more specific to a reader -
+// so a plain single-class selector here would keep losing that tie-break.
+@media (min-width: 1200px) {
+  .o_control_panel_navigation.o_control_panel_navigation {
+    gap: 1rem !important;
+  }
 }
 
 // Custom dashboard client actions (e.g. Estate Register, Training Matrix) render
 // straight into .o_action_manager without Odoo's standard .o_control_panel, so
 // they never picked up the clearance above and get clipped under the fixed navbar.
 .o_nhs_dashboard_container,
-.o_nhs_training_matrix {
+.o_nhs_training_matrix,
+.nhs-dashboard,
+.o_nhs_roster_dashboard,
+.o_nhs_jobplan_dashboard,
+.o_nhs_dspt_dashboard,
+.o_nhs_recruitment_dashboard,
+.o_nhs_bank_dashboard,
+.o_nhs_governance_dashboard,
+.o_nhs_training_dashboard {
   padding-top: 56px !important;
 }
 
@@ -97,13 +230,11 @@ body.o_home_menu_active .o_main_navbar {
   color: var(--white-color) !important;
 }
 
-
-
 .sidebar {
   height: 93vh;
   width: auto;
-  background: linear-gradient(180deg, var(--primary-color) 0%, var(--nhs-dark-blue) 100%);
-  box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.1);
+  background: var(--bg-gradient);
+  box-shadow: 0 2px 4px 0px rgba(46, 109, 164, 0.1);
   padding: 20px 20px;
   padding-left: 0;
   padding-top: 40px;
@@ -111,15 +242,13 @@ body.o_home_menu_active .o_main_navbar {
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
   transition: all 0.4s;
-  z-index: 1100;
+  // Kept below Bootstrap's $zindex-modal-backdrop (1050), same reasoning as
+  // .navbar/.o_main_navbar above.
+  z-index: 1035;
 }
 
 .sidebar ::-webkit-scrollbar {
   display: none;
-}
-
-.sidebar:hover::-webkit-scrollbar {
-  display: block;
 }
 
 .sidebar span {
@@ -128,19 +257,15 @@ body.o_home_menu_active .o_main_navbar {
   overflow: hidden;
   white-space: nowrap;
   padding-right: 15px;
-  transition: opacity 0.4s ease, max-width 0.4s ease;
+  transition:
+    opacity 0.4s ease,
+    max-width 0.4s ease;
   display: inline-block;
   vertical-align: middle;
 }
 
 .sidebar:hover {
-  scrollbar-color: rgb(219, 219, 219) rgb(218, 218, 218);
   transition: all 0.4s;
-}
-
-.sidebar:hover span {
-  opacity: 1;
-  max-width: 200px;
 }
 
 .sidebar .sidebar_links {
@@ -166,15 +291,6 @@ body.o_home_menu_active .o_main_navbar {
   margin-top: -2px;
 }
 
-.sidebar #dropdown-toggle.active {
-  color: var(--white-color) !important;
-  background-color: var(--primary-color);
-  border-radius: 15px;
-  padding: 15px 15px;
-  box-shadow: 0px 15px 35px 0px rgba(0, 94, 184, 0.26);
-  position: relative;
-}
-
 .sidebar #dropdown-toggle.active a {
   width: 100%;
   display: flex;
@@ -182,22 +298,6 @@ body.o_home_menu_active .o_main_navbar {
   column-gap: 15px;
   align-items: center;
   color: var(--white-color) !important;
-}
-
-.sidebar #dropdown-toggle.active svg path {
-  stroke: #ffffff;
-  transition: stroke 0.3s ease;
-}
-
-.sidebar #dropdown-toggle.active:before {
-  position: absolute;
-  content: "";
-  height: 100%;
-  width: 8px;
-  background-color: var(--primary-color);
-  left: -28px;
-  top: 0;
-  border-radius: 10px;
 }
 
 .sidebar .dropdown-content {
@@ -234,27 +334,57 @@ body.o_home_menu_active .o_main_navbar {
   transition: stroke 0.3s ease;
 }
 
-.sidebar .sidbar-item:hover a {
-  color: #41B6E6 !important;
-}
-
-.sidebar .sidbar-item:hover svg path {
-  stroke: #41B6E6;
-}
-
-.sidebar .sidbar-item:hover::before {
-  position: absolute;
-  content: "";
-  height: 100%;
-  width: 8px;
-  background-color: var(--primary-color);
-  left: -28px;
-  top: 0;
-  border-radius: 10px;
-  transition: all 0.3s ease;
-}
-
 .app_container {
-  background: var(--primary-color) !important;
-  background-image: none !important;
+  background: radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 45%), var(--bg-gradient) !important;
+}
+
+// Odoo core (navbar.scss) draws a yellow/black hazard-stripe border around the
+// navbar systray for the superuser account (body.o_is_superuser) — clashes with
+// the flat navy navbar, so restyle it in theme colours instead of removing the
+// safety indicator outright.
+body.o_is_superuser .o_menu_systray {
+  border-image: repeating-linear-gradient(
+      135deg,
+      var(--primary-dark),
+      var(--primary-dark) 10px,
+      var(--accent-color) 10px,
+      var(--accent-color) 20px
+    )
+    2 !important;
+}
+
+// Recolour Odoo's own tooltip service (used via [data-tooltip], e.g. the
+// sidebar app icons) from its default dark-grey/black to the theme's colours.
+.o-tooltip {
+  --tooltip-bg: var(--primary-dark);
+  --tooltip-color: var(--white-color);
+}
+
+// The arrow is a sibling element, not a descendant, and Bootstrap's own
+// tooltip.scss hardcodes its --popover-bg to the compile-time $tooltip-bg
+// (independent of the --tooltip-bg override above) — override it separately
+// so the arrow matches the recoloured tooltip body instead of staying black.
+.o-tooltip + .popover-arrow {
+  --popover-bg: var(--primary-dark);
+}
+
+.o-tooltip + .popover-arrow {
+  --popover-bg: var(--primary-dark);
+}
+
+// Kanban view activity (clock) icon color override
+.o_kanban_record .o-mail-ActivityButton.text-muted,
+.o_kanban_record .o-mail-ActivityButton .text-muted,
+.o_kanban_record .o-mail-ActivityButton i,
+.o_kanban_record .o-mail-ActivityButton svg,
+.o_kanban_record .o-mail-ActivityButton path,
+.o_kanban_record .fa-clock-o,
+.o_kanban_record [name="activity_ids"] i,
+.o_kanban_record [name="activity_ids"] button,
+.o_kanban_record [name="activity_ids"] span,
+.o_kanban_record [name="activity_ids"] .text-muted,
+.o_kanban_record .o_activity_btn i,
+.o_kanban_record .o_activity_btn {
+  color: var(--accent-color) !important;
+  fill: var(--accent-color) !important;
 }

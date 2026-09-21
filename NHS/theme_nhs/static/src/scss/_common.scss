@@ -22,12 +22,12 @@
 
 *::selection {
     color: #ffffff;
-    background-color: #005EB8;
+    background-color: var(--accent-color);
 }
 
 *a,
 a:visited {
-    color: #003899;
+    color: var(--accent-color);
     text-decoration: none;
 }
 
@@ -44,4 +44,17 @@ body {
     top: 0;
     width: 100%;
     z-index: 9999 !important;
+}
+// Kanban view activity (clock) icon color override
+.o_kanban_record .o-mail-ActivityButton i,
+.o_kanban_record .o-mail-ActivityButton,
+.o_kanban_record .o_activity_btn i,
+.o_kanban_record .o_activity_btn,
+.o_kanban_record_bottom .fa-clock-o {
+    color: var(--accent-color) !important;
+}
+
+.o_home_menu_background, body.o_home_menu_active {
+    background-color: var(--primary-dark) !important;
+    background: var(--bg-gradient) !important;
 }

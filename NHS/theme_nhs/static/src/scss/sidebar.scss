@@ -14,11 +14,15 @@
 .sidebar_img {
     width: 34px;
     height: 34px;
-    border-radius: 0px;
+    padding: 4px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    background-color: var(--white-color);
+    object-fit: contain;
 }
 
 html .o_web_client>.o_action_manager {
-    margin-left: 98px;
+    margin-left: 120px;
     transition: margin-left 0.4s ease-in-out;
 
     @media (max-width: 768px) {
@@ -26,17 +30,16 @@ html .o_web_client>.o_action_manager {
     }
 }
 
-// The hover-expanded margin is now set dynamically in JS (search_apps.js,
-// setupSidebarHoverSpacing) based on the sidebar's actual measured width,
-// since a fixed value here either clips long labels or leaves a big gap
-// for short ones.
+// The sidebar is position: fixed and overlays the content on hover-expand
+// instead of pushing it, so this margin only needs to clear the collapsed
+// (rail) width and never changes on hover.
 
 .sidebar {
     height: 94vh;
     width: auto;
     position: fixed;
-    background: linear-gradient(180deg, var(--primary-color) 0%, var(--nhs-dark-blue) 100%);
-    box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.10);
+    background: var(--bg-gradient);
+    box-shadow: 0 2px 4px 0px rgba(46, 109, 164, 0.10);
     padding: 20px 20px;
     padding-left: 0;
     padding-top: 40px;
@@ -44,14 +47,13 @@ html .o_web_client>.o_action_manager {
     scrollbar-width: thin;
     scrollbar-color: transparent transparent;
     transition: all .4s;
-    z-index: 1100;
+    // Kept below Bootstrap's $zindex-modal-backdrop (1050) so popovers/
+    // tooltips (Odoo's overlay layer, z-index 1055+) paint above the sidebar
+    // instead of being hidden underneath it.
+    z-index: 1035;
 
     ::-webkit-scrollbar {
         display: none;
-    }
-
-    &:hover::-webkit-scrollbar {
-        display: block;
     }
 
     span {
@@ -65,15 +67,7 @@ html .o_web_client>.o_action_manager {
         vertical-align: middle;
     }
 
-    // Briefly applied by JS (setupSidebarHoverSpacing) to measure the true
-    // expanded width instantly instead of waiting out the transition above.
-    &.o_measuring,
-    &.o_measuring span {
-        transition: none !important;
-    }
-
     &:hover {
-        scrollbar-color: rgb(219, 219, 219) rgb(218, 218, 218);
         transition: all 0.4s;
 
         span {
@@ -106,13 +100,6 @@ html .o_web_client>.o_action_manager {
     }
 
     #dropdown-toggle.active {
-        color: var(--white-color) !important;
-        background-color: rgba(0, 94, 184, 0.28);
-        border-radius: 15px;
-        padding: 15px 15px;
-        box-shadow: 0px 15px 35px 0px rgba(0, 94, 184, 0.26);
-        position: relative;
-
         a {
             width: 100%;
             display: flex;
@@ -120,22 +107,6 @@ html .o_web_client>.o_action_manager {
             column-gap: 15px;
             align-items: center;
             color: var(--white-color) !important;
-        }
-
-        svg path {
-            stroke: #ffffff;
-            transition: stroke 0.3s ease;
-        }
-
-        &:before {
-            position: absolute;
-            content: "";
-            height: 100%;
-            width: 8px;
-            background-color: var(--primary-color);
-            left: -28px;
-            top: 0;
-            border-radius: 10px;
         }
     }
 
@@ -172,28 +143,6 @@ html .o_web_client>.o_action_manager {
                 }
             }
         }
-
-        &:hover {
-            a {
-                color: #41B6E6 !important;
-            }
-
-            svg path {
-                stroke: #41B6E6;
-            }
-
-            ::before {
-                position: absolute;
-                content: "";
-                height: 100%;
-                width: 8px;
-                background-color: var(--primary-color);
-                left: -28px;
-                top: 0;
-                border-radius: 10px;
-                transition: all 0.3s ease;
-            }
-        }
     }
 }
 
@@ -219,7 +168,7 @@ html .o_web_client>.o_action_manager {
         border-color: transparent;
         width: 100%;
         height: 45px;
-        box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.10);
+        box-shadow: 0 2px 4px 0px rgba(46, 109, 164, 0.10);
 
 
         &::placeholder {
@@ -236,7 +185,7 @@ html .o_web_client>.o_action_manager {
 .control_panelnavigation {
     background-color: var(--white-color);
     border-radius: 5px;
-    box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.10);
+    box-shadow: 0 2px 4px 0px rgba(46, 109, 164, 0.10);
     padding: 3px 3px;
     display: flex;
     height: 43px;
@@ -253,7 +202,7 @@ html .o_web_client>.o_action_manager {
     cursor: pointer;
     background-color: #ffffff;
     padding: 10px 20px;
-    box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.10);
+    box-shadow: 0 2px 4px 0px rgba(46, 109, 164, 0.10);
     border-radius: 5px;
     color: var(--text-color);
     // height: 42px;
@@ -267,7 +216,7 @@ html .o_web_client>.o_action_manager {
 .panel_dropdown_content {
     background-color: var(--white-color);
     padding: 15px 15px;
-    box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.10);
+    box-shadow: 0 2px 4px 0px rgba(46, 109, 164, 0.10);
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
 
@@ -293,7 +242,7 @@ html .o_web_client>.o_action_manager {
     cursor: pointer;
     background-color: #ffffff;
     padding: 10px 20px;
-    box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.10);
+    box-shadow: 0 2px 4px 0px rgba(46, 109, 164, 0.10);
     border-radius: 5px;
     width: 400px;
 
@@ -315,7 +264,7 @@ html .o_web_client>.o_action_manager {
 
 
     &:hover {
-        box-shadow: 0 4px 4px 0px rgba(0, 94, 184, 0.25);
+        box-shadow: 0 4px 4px 0px rgba(46, 109, 164, 0.25);
         transition: box-shadow 0.3s ease;
         transform: translateY(calc(-1.5rem / 5));
         transition: all .4s;
@@ -325,14 +274,14 @@ html .o_web_client>.o_action_manager {
 
 
 .table_wrapper {
-    box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.10);
+    box-shadow: 0 2px 4px 0px rgba(46, 109, 164, 0.10);
     margin-bottom: 20px;
 
 }
 
 .thead-light {
     th {
-        background-color: #005eb817 !important;
+        background-color: #2E6DA417 !important;
         font-weight: 500;
     }
 }
@@ -388,7 +337,7 @@ html .o_web_client>.o_action_manager {
     }
 
     &-info {
-        background-color: #41b6e656 !important;
+        background-color: #3C8FC756 !important;
     }
 
     &-light {
@@ -398,9 +347,4 @@ html .o_web_client>.o_action_manager {
 
 .sidebar .sidbar-item.active {
     color: var(--white-color) !important;
-    background-color: var(--primary-color);
-    border-radius: 15px;
-    padding: 15px 15px;
-    box-shadow: 0px 15px 35px 0px rgba(0, 94, 184, 0.26);
-    position: relative;
 }

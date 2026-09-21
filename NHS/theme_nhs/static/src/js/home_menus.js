@@ -2,15 +2,18 @@
 
 import { Component, useRef } from "@odoo/owl";
 import { registry } from "@web/core/registry";
-import { computeAppsAndMenuItems } from "@web/webclient/menus/menu_helpers";
 import { useService } from "@web/core/utils/hooks";
-import { menuService } from "@web/webclient/menus/menu_service";
+import { ensureAppIcon } from "./app_icon_fallback";
 
 export class HomeMenus extends Component {
-    static template = "theme_nhs.home_menus";
+    static template = "nhs_backend_theme.home_menus";
     setup() {
         this.menu = useService("menu");
         this.sidebarRef = useRef("sidebar");
+        // Same fallback as the sidebar (search_apps.js) - kept here too since the
+        // Home Menu grid can be reached before the navbar's own patch has run
+        // (e.g. a direct deep link straight into this action).
+        this.menu.getApps().forEach(ensureAppIcon);
     }
 
     getIconClass(appName) {
@@ -44,14 +47,12 @@ export class HomeMenus extends Component {
             'Events': 'calendar-event',
             'Surveys': 'pencil-square',
             'Subscriptions': 'arrow-repeat',
-            'Discuss': 'chat-dots',
             'Documents': 'folder-fill',
             'Sign': 'pencil-fill',
             'Studio': 'layers-fill',
             'Settings': 'gear-fill',
             'Dashboards': 'speedometer2',
             'Point of Sale': 'pc-display-horizontal',
-            'Subscriptions': 'arrow-repeat',
             'Maintenance': 'tools',
             'Marketing Automation': 'megaphone-fill',
             'Email Marketing': 'envelope-paper-heart-fill',
@@ -64,4 +65,4 @@ export class HomeMenus extends Component {
         this.menu.selectMenu(app);
     }
 }
-registry.category("actions").add("theme_nhs.homemenus", HomeMenus);
+registry.category("actions").add("nhs_backend_theme.homemenus", HomeMenus);

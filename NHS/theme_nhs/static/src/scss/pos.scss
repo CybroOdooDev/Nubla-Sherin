@@ -1,0 +1,102 @@
+:root {
+    --primary-color: #2E6DA4;
+    --primary-dark: #14314D;
+    
+    /* Override standard Odoo Community colors */
+    --o-color-primary: var(--primary-color) !important;
+    --bs-primary: var(--primary-color) !important;
+    --color-primary: var(--primary-color) !important;
+}
+
+.pos {
+    /* Override primary buttons */
+    .btn-primary, 
+    .button.pay, 
+    .button.highlight,
+    .pay-btn {
+        background-color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+        color: white !important;
+    }
+
+    .btn-primary:hover, 
+    .button.pay:hover, 
+    .button.highlight:hover,
+    .pay-btn:hover {
+        background-color: var(--primary-dark) !important;
+        border-color: var(--primary-dark) !important;
+    }
+
+    /* Override text/bg classes that use primary color */
+    .text-primary, 
+    .text-odoo {
+        color: var(--primary-color) !important;
+    }
+
+    .bg-primary {
+        background-color: var(--primary-color) !important;
+    }
+
+    /* Light primary elements (like Qty button in numpad when selected) */
+    .numpad button.selected-mode,
+    .mode-button.selected-mode {
+        background-color: rgba(46, 109, 164, 0.2) !important;
+        color: var(--primary-dark) !important;
+        border-color: var(--primary-color) !important;
+    }
+
+    /* Radio buttons and checkboxes */
+    .form-check-input:checked,
+    input[type="radio"]:checked,
+    input[type="checkbox"]:checked {
+        background-color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+    }
+
+    /* Debug bug icon and standard links in forms */
+    .fa-bug,
+    .btn-link,
+    .o_form_uri,
+    .o_kanban_record.o_kanban_ghost a,
+    .o_kanban_record .btn-link,
+    .o_field_x2many_list_row_add a,
+    .o_form_view .o_horizontal_separator,
+    .button.set-partner,
+    .button.set-customer,
+    .text-action {
+        color: var(--primary-color) !important;
+    }
+
+    /* Selected rows in POS (Partners and Order Lines) */
+    .partner-line.selected,
+    .partner-info.selected,
+    .partner-line.selected td,
+    .orderline.selected,
+    .order-line.selected {
+        background-color: rgba(46, 109, 164, 0.08) !important;
+        color: var(--primary-dark) !important;
+    }
+    
+    .partner-line.selected .fa {
+        color: var(--primary-color) !important;
+    }
+    
+    /* Active Numpad Buttons */
+    .numpad-button.active,
+    .mode-button.active {
+        background-color: rgba(46, 109, 164, 0.15) !important;
+        color: var(--primary-dark) !important;
+    }
+
+    /* Focused field borders in POS forms */
+    .o_required_modifier,
+    .o_field_widget:focus-within,
+    .o_field_widget .o_input:focus,
+    .o_field_widget .o_input:focus-within,
+    input:focus,
+    textarea:focus {
+        --o-input-border-color: var(--primary-color) !important;
+        --o-caret-color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+    }
+}

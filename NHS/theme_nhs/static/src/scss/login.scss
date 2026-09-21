@@ -1,10 +1,34 @@
 
-body {
+// login.scss lives in the web.assets_frontend bundle, a separate compiled
+// bundle from web.assets_backend (where nav.scss's :root block lives), so
+// the theme's colour variables aren't otherwise available on /web/login.
+:root {
+    --primary-color: #2E6DA4;
+    --secondary-color: #5A6B7A;
+    --danger-color: #DA291C;
+    --primary-dark: #14314D;
+    --bg-gradient: linear-gradient(135deg, #6FA0C4 0%, #2E6DA4 50%, #14314D 100%);
+    --accent-color: #3C8FC7;
+    --text-color: #425563;
+    --white-color: #ffff;
+    --grey-color: #D8DDE0;
+    --dark: #212B32;
+}
+
+body,
+.card.o_database_list,
+.oe_login_form,
+.o_user_switch,
+input,
+button {
   font-family: "League Spartan", sans-serif;
 }
 a {
-    color: #005EB8;
+    color: var(--primary-color);
     font-weight: 600;
+}
+a:hover {
+    color: var(--primary-dark);
 }
 
 .card.o_database_list .card-body {
@@ -31,12 +55,12 @@ a {
 
 
 .oe_login_form button.btn-link {
-    color: #005EB8;
+    color: var(--primary-color);
     font-weight: 600;
 }
 
 .btn-sm{
-   color: #005EB8;
+   color: var(--primary-color);
     font-weight: 600;
 }
 
@@ -45,18 +69,51 @@ a {
   font-size: 16px !important;
   text-decoration: none;
   position: relative;
-  border: 1px solid #005EB8!important;
-  background-color: #005EB8!important;
-  color: #ffff !important;
+  border: 1px solid var(--primary-color) !important;
+  background-color: var(--primary-color) !important;
+  color: var(--white-color) !important;
   padding: 10px 30px 6px 30px;
 }
 .btn-primary:hover {
-  background-color: #003087!important;
+  background-color: var(--primary-dark) !important;
   transition: all 0.3s;
-  color: #ffff !important;
-  border-color: #003087 !important;
+  color: var(--white-color) !important;
+  border-color: var(--primary-dark) !important;
+}
+
+// "Use a Passkey" (and any other auth_btns entry, e.g. OAuth providers)
+.list-group-item-action {
+  border-color: var(--grey-color) !important;
+  color: var(--text-color);
+}
+.list-group-item-action .fa {
+  color: var(--primary-color);
+}
+.list-group-item-action:hover,
+.list-group-item-action:focus {
+  background-color: rgba(46, 109, 164, 0.08) !important;
+  color: var(--primary-dark) !important;
+  border-color: var(--primary-color) !important;
+}
+.list-group-item-action:hover .fa,
+.list-group-item-action:focus .fa {
+  color: var(--primary-dark);
 }
 
 
+// Footer link colors for frontend pages
+footer a,
+.o_footer a,
+footer .text-muted,
+.o_footer .text-muted,
+footer li a,
+.o_footer li a {
+    color: var(--primary-color) !important;
+}
 
-
+footer a:hover,
+.o_footer a:hover,
+footer li a:hover,
+.o_footer li a:hover {
+    color: var(--primary-dark) !important;
+}

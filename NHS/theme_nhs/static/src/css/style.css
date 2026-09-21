@@ -2,347 +2,6 @@
 /* Bootstrap Icons */
 @import url("https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.4.0/font/bootstrap-icons.min.css");
 
-/*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
-/* Document
-   ========================================================================== */
-/**
- * 1. Correct the line height in all browsers.
- * 2. Prevent adjustments of font size after orientation changes in iOS.
- */
-html {
-  line-height: 1.15;
-  /* 1 */
-  -webkit-text-size-adjust: 100%;
-  /* 2 */
-}
-
-/* Sections
-   ========================================================================== */
-/**
- * Remove the margin in all browsers.
- */
-body {
-  margin: 0;
-}
-
-/**
- * Render the `main` element consistently in IE.
- */
-main {
-  display: block;
-}
-
-/**
- * Correct the font size and margin on `h1` elements within `section` and
- * `article` contexts in Chrome, Firefox, and Safari.
- */
-h1 {
-  font-size: 2em;
-  margin: 0.67em 0;
-}
-
-/* Grouping content
-   ========================================================================== */
-/**
- * 1. Add the correct box sizing in Firefox.
- * 2. Show the overflow in Edge and IE.
- */
-hr {
-  box-sizing: content-box;
-  /* 1 */
-  height: 0;
-  /* 1 */
-  overflow: visible;
-  /* 2 */
-}
-
-/**
- * 1. Correct the inheritance and scaling of font size in all browsers.
- * 2. Correct the odd `em` font sizing in all browsers.
- */
-pre {
-  font-family: monospace, monospace;
-  /* 1 */
-  font-size: 1em;
-  /* 2 */
-}
-
-/* Text-level semantics
-   ========================================================================== */
-/**
- * Remove the gray background on active links in IE 10.
- */
-a {
-  background-color: transparent;
-}
-
-/**
- * 1. Remove the bottom border in Chrome 57-
- * 2. Add the correct text decoration in Chrome, Edge, IE, Opera, and Safari.
- */
-abbr[title] {
-  border-bottom: none;
-  /* 1 */
-  text-decoration: underline;
-  /* 2 */
-  text-decoration: underline dotted;
-  /* 2 */
-}
-
-/**
- * Add the correct font weight in Chrome, Edge, and Safari.
- */
-b,
-strong {
-  font-weight: bolder;
-}
-
-/**
- * 1. Correct the inheritance and scaling of font size in all browsers.
- * 2. Correct the odd `em` font sizing in all browsers.
- */
-code,
-kbd,
-samp {
-  font-family: monospace, monospace;
-  /* 1 */
-  font-size: 1em;
-  /* 2 */
-}
-
-/**
- * Add the correct font size in all browsers.
- */
-small {
-  font-size: 80%;
-}
-
-/**
- * Prevent `sub` and `sup` elements from affecting the line height in
- * all browsers.
- */
-sub,
-sup {
-  font-size: 75%;
-  line-height: 0;
-  position: relative;
-  vertical-align: baseline;
-}
-
-sub {
-  bottom: -0.25em;
-}
-
-sup {
-  top: -0.5em;
-}
-
-/* Embedded content
-   ========================================================================== */
-/**
- * Remove the border on images inside links in IE 10.
- */
-img {
-  border-style: none;
-}
-
-/* Forms
-   ========================================================================== */
-/**
- * 1. Change the font styles in all browsers.
- * 2. Remove the margin in Firefox and Safari.
- */
-button,
-input,
-optgroup,
-select,
-textarea {
-  font-family: inherit;
-  /* 1 */
-  font-size: 100%;
-  /* 1 */
-  line-height: 1.15;
-  /* 1 */
-  margin: 0;
-  /* 2 */
-}
-
-
-/**
- * Show the overflow in IE.
- * 1. Show the overflow in Edge.
- */
-button,
-input {
-  /* 1 */
-  overflow: visible;
-}
-
-/**
- * Remove the inheritance of text transform in Edge, Firefox, and IE.
- * 1. Remove the inheritance of text transform in Firefox.
- */
-button,
-select {
-  /* 1 */
-  text-transform: none;
-}
-
-/**
- * Correct the inability to style clickable types in iOS and Safari.
- */
-button,
-[type=button],
-[type=reset],
-[type=submit] {
-  -webkit-appearance: button;
-  appearance: button;
-}
-
-/**
- * Remove the inner border and padding in Firefox.
- */
-button::-moz-focus-inner,
-[type=button]::-moz-focus-inner,
-[type=reset]::-moz-focus-inner,
-[type=submit]::-moz-focus-inner {
-  border-style: none;
-  padding: 0;
-}
-
-/**
- * Restore the focus styles unset by the previous rule.
- */
-button:-moz-focusring,
-[type=button]:-moz-focusring,
-[type=reset]:-moz-focusring,
-[type=submit]:-moz-focusring {
-  outline: 1px dotted ButtonText;
-}
-
-/**
- * Correct the padding in Firefox.
- */
-fieldset {
-  padding: 0.35em 0.75em 0.625em;
-}
-
-/**
- * 1. Correct the text wrapping in Edge and IE.
- * 2. Correct the color inheritance from `fieldset` elements in IE.
- * 3. Remove the padding so developers are not caught out when they zero out
- *    `fieldset` elements in all browsers.
- */
-legend {
-  box-sizing: border-box;
-  /* 1 */
-  color: inherit;
-  /* 2 */
-  display: table;
-  /* 1 */
-  max-width: 100%;
-  /* 1 */
-  padding: 0;
-  /* 3 */
-  white-space: normal;
-  /* 1 */
-}
-
-/**
- * Add the correct vertical alignment in Chrome, Firefox, and Opera.
- */
-progress {
-  vertical-align: baseline;
-}
-
-/**
- * Remove the default vertical scrollbar in IE 10+.
- */
-textarea {
-  overflow: auto;
-}
-
-/**
- * 1. Add the correct box sizing in IE 10.
- * 2. Remove the padding in IE 10.
- */
-[type=checkbox],
-[type=radio] {
-  box-sizing: border-box;
-  /* 1 */
-  padding: 0;
-  /* 2 */
-}
-
-/**
- * Correct the cursor style of increment and decrement buttons in Chrome.
- */
-[type=number]::-webkit-inner-spin-button,
-[type=number]::-webkit-outer-spin-button {
-  height: auto;
-}
-
-/**
- * 1. Correct the odd appearance in Chrome and Safari.
- * 2. Correct the outline style in Safari.
- */
-[type=search] {
-  -webkit-appearance: textfield;
-  /* 1 */
-  outline-offset: -2px;
-  /* 2 */
-}
-
-/**
- * Remove the inner padding in Chrome and Safari on macOS.
- */
-[type=search]::-webkit-search-decoration {
-  -webkit-appearance: none;
-}
-
-/**
- * 1. Correct the inability to style clickable types in iOS and Safari.
- * 2. Change font properties to `inherit` in Safari.
- */
-::-webkit-file-upload-button {
-  -webkit-appearance: button;
-  /* 1 */
-  appearance: button;
-  font: inherit;
-  /* 2 */
-}
-
-/* Interactive
-   ========================================================================== */
-/*
- * Add the correct display in Edge, IE 10+, and Firefox.
- */
-details {
-  display: block;
-}
-
-/*
- * Add the correct display in all browsers.
- */
-summary {
-  display: list-item;
-}
-
-/* Misc
-   ========================================================================== */
-/**
- * Add the correct display in IE 10+.
- */
-template {
-  display: none;
-}
-
-/**
- * Add the correct display in IE 10.
- */
-[hidden] {
-  display: none;
-}
 
 .login {
   display: flex;
@@ -383,12 +42,12 @@ template {
 }
 
 .login .login_wrapper .form-group .form-control {
-  border-color: #F0EDF6;
+  border-color: var(--grey-color);
   height: 50px;
 }
 
 .login .login_wrapper .forgot {
-  color: var(--text-blue);
+  color: var(--accent-color);
   font-size: 16px;
   text-align: right;
   padding-top: 5px;
@@ -412,26 +71,32 @@ template {
 }
 
 .login .login_wrapper .login-with a {
-  color: var(--nhs-dark-blue);
+  color: var(--primary-dark);
   font-weight: 600;
 }
 
 
 
 .app_container {
-  background: linear-gradient(180deg, var(--primary-color) 0%, var(--nhs-dark-blue) 45%, #41B6E6 100%) !important;
+  background: radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 45%), var(--bg-gradient) !important;
   background-size: cover;
   height: 100vh;
   width: 100%;
   position: relative;
   z-index: 10;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.app_container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }
 
 .app_container .wrapper {
   display: flex;
   justify-content: space-around;
-  align-items: center;
-  height: 100vh;
+  min-height: 100vh;
+  padding: 60px 0;
 }
 
 .app_container .app_list {
@@ -440,6 +105,7 @@ template {
   align-items: start;
   grid-template-columns: repeat(5, 1fr);
   width: 60%;
+  margin: auto 0;
 }
 
 .app_container .app_list .app_wrapp {
@@ -459,25 +125,25 @@ template {
 }
 
 .app_container .app_list .app_wrapp .app {
-  background-color: var(--primary-color);
-  border-radius: 8px;
+  background-color: #DCE9F3;
+  border-radius: 12px;
   height: 80px;
   width: 80px;
-  box-shadow: 0px 15px 35px 0px rgba(0, 94, 184, 0.26);
+  box-shadow: 0px 15px 35px 0px rgba(20, 49, 77, 0.35);
   display: flex;
   transition: all 0.3s ease;
 }
 
 .app_container .app_list .app_wrapp:hover .app,
 .app_container .app_list .app_wrapp:focus-visible .app {
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.35), 0px 15px 35px 0px rgba(0, 94, 184, 0.5);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.45), 0px 15px 35px 0px rgba(20, 49, 77, 0.55);
   transform: translateY(-5px) scale(1.05);
 }
 
 .app_container .app_list .app_wrapp .app i {
   font-size: 30px;
   margin: auto;
-  color: var(--white-color);
+  color: var(--primary-color);
   text-align: center;
   transition: transform 0.3s ease;
 }
@@ -534,10 +200,13 @@ html body .btn.btn-outline-primary {
   padding: 10px 30px 6px 30px;
 }
 
-html body .btn.btn-primary:hover, html body .btn.btn-primary:focus, html body .btn.btn-primary:active, html body .btn.btn-primary:focus-visible {
-  background-color: rgba(0, 94, 184, 0.28);
+html body .btn.btn-primary:hover,
+html body .btn.btn-primary:focus,
+html body .btn.btn-primary:active,
+html body .btn.btn-primary:focus-visible {
+  background-color: rgba(46, 109, 164, 0.28);
   color: var(--primary-color) !important;
-  border-color: rgba(0, 94, 184, 0.28) !important;
+  border-color: rgba(46, 109, 164, 0.28) !important;
 }
 
 html body .btn.btn-secondary {
@@ -546,11 +215,14 @@ html body .btn.btn-secondary {
   border: 1px solid var(--primary-color) !important;
 }
 
-html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html body .btn.btn-secondary:active, html body .btn.btn-secondary:focus-visible {
-  background-color: var(--nhs-dark-blue);
-  color: white !important;
+html body .btn.btn-secondary:hover,
+html body .btn.btn-secondary:focus,
+html body .btn.btn-secondary:active,
+html body .btn.btn-secondary:focus-visible {
+  background-color: #6FA0C4;
+  color: var(--dark) !important;
   transition: all 0.3s;
-  border-color: var(--nhs-dark-blue) !important;
+  border-color: #6FA0C4 !important;
 }
 
 .btn-danger {
@@ -579,7 +251,7 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
 }
 
 .btn-navigation:hover {
-  background-color: rgba(0, 94, 184, 0.28);
+  background-color: rgba(46, 109, 164, 0.28);
 }
 
 .btn-navigation:hover svg path {
@@ -606,53 +278,53 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
   border-radius: 50%;
 }
 
-.navbar {
+.o_main_navbar {
   padding-top: 10px;
 }
 
-.navbar .back_btn {
+.o_main_navbar .back_btn {
   position: absolute;
   left: 20px;
 }
 
-.navbar .back_btn:hover {
+.o_main_navbar .back_btn:hover {
   margin-left: -5px;
 }
 
-.navbar .navbar-brand {
+.o_main_navbar .navbar-brand {
   margin-right: 10px;
   padding-left: 70px;
 }
 
-.navbar .navbar-brand img {
+.o_main_navbar .navbar-brand img {
   width: 80px;
 }
 
-.navbar .navbar-nav .nav-item .nav-link {
+.o_main_navbar .navbar-nav .nav-item .nav-link {
   color: var(--text-color);
   padding-bottom: 0;
 }
 
-.navbar .navbar_right_form {
+.o_main_navbar .navbar_right_form {
   width: 35%;
   justify-content: space-between;
   align-items: baseline;
 }
 
-.navbar .navbar_right_form .input_wrapper {
+.o_main_navbar .navbar_right_form .input_wrapper {
   width: 60%;
 }
 
-.navbar .navbar_right_form .form-control {
+.o_main_navbar .navbar_right_form .form-control {
   border-color: transparent;
   width: 100%;
 }
 
-.navbar .navbar_right_form .form-control:focus {
+.o_main_navbar .navbar_right_form .form-control:focus {
   border-color: var(--grey-color);
 }
 
-.navbar .right_menu ul {
+.o_main_navbar .right_menu ul {
   display: flex;
   gap: 30px;
   padding-left: 0;
@@ -660,15 +332,15 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
   padding-right: 15px;
 }
 
-.navbar .right_menu ul li a img {
+.o_main_navbar .right_menu ul li a img {
   width: 20px;
 }
 
-.navbar .right_menu ul .notification {
+.o_main_navbar .right_menu ul .notification {
   position: relative;
 }
 
-.navbar .right_menu ul .notification .count {
+.o_main_navbar .right_menu ul .notification .count {
   position: absolute;
   top: -10px;
   right: -5px;
@@ -681,30 +353,44 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
   text-align: center;
 }
 
-.navbar .right_menu ul .user img {
+.o_main_navbar .right_menu ul .user img {
   border-radius: 50%;
 }
 
 .sidebar {
   height: 100%;
   width: auto;
-  background: linear-gradient(180deg, var(--primary-color) 0%, var(--nhs-dark-blue) 100%);
-  box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.1);
+  background: var(--bg-gradient);
+  box-shadow: 0 2px 4px 0px rgba(46, 109, 164, 0.10);
   padding: 20px 20px;
   padding-left: 0;
-  padding-top: 60px;
+  padding-top: 40px;
   overflow: auto;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
   transition: all 0.4s;
 }
 
-.sidebar ::-webkit-scrollbar {
-  display: none;
+.o_home_menu_background,
+body.o_home_menu_active {
+  background-color: var(--primary-dark) !important;
+  background: var(--bg-gradient) !important;
 }
 
-.sidebar:hover::-webkit-scrollbar {
-  display: block;
+body.o_home_menu_active .o_menu_brand,
+body.o_home_menu_active .o_menu_sections {
+  display: none !important;
+}
+
+body.o_home_menu_active header.o_navbar,
+body.o_home_menu_active .o_main_navbar {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.sidebar ::-webkit-scrollbar {
+  display: none;
 }
 
 .sidebar span {
@@ -714,14 +400,9 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
 }
 
 .sidebar:hover {
-  scrollbar-color: rgb(219, 219, 219) rgb(218, 218, 218);
   transition: all 0.4s;
 }
 
-.sidebar:hover span {
-  display: block;
-  transition: all 0.4s;
-}
 
 .sidebar .sidebar_links {
   padding-left: 0;
@@ -746,15 +427,6 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
   margin-top: -2px;
 }
 
-.sidebar #dropdown-toggle.active {
-  color: var(--white-color) !important;
-  background-color: rgba(0, 94, 184, 0.28);
-  border-radius: 15px;
-  padding: 15px 15px;
-  box-shadow: 0px 15px 35px 0px rgba(0, 94, 184, 0.26);
-  position: relative;
-}
-
 .sidebar #dropdown-toggle.active a {
   width: 100%;
   display: flex;
@@ -762,22 +434,6 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
   column-gap: 15px;
   align-items: center;
   color: var(--white-color) !important;
-}
-
-.sidebar #dropdown-toggle.active svg path {
-  stroke: #ffffff;
-  transition: stroke 0.3s ease;
-}
-
-.sidebar #dropdown-toggle.active:before {
-  position: absolute;
-  content: "";
-  height: 100%;
-  width: 8px;
-  background-color: var(--primary-color);
-  left: -28px;
-  top: 0;
-  border-radius: 10px;
 }
 
 .sidebar .dropdown-content {
@@ -811,28 +467,6 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
   margin-top: -5px;
 }
 
-.sidebar .sidbar-item:hover {
-  transition: stroke 0.3s ease;
-}
-
-.sidebar .sidbar-item:hover a {
-  color: #41B6E6 !important;
-}
-
-.sidebar .sidbar-item:hover svg path {
-  stroke: #41B6E6;
-}
-
-.sidebar .sidbar-item:hover ::before {
-  position: absolute;
-  content: "";
-  height: 100%;
-  width: 8px;
-  background-color: var(--primary-color);
-  left: -28px;
-  top: 0;
-  border-radius: 10px;
-}
 
 .form-check-input:checked {
   background-color: var(--primary-color);
@@ -863,7 +497,7 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
   border-color: transparent;
   width: 100%;
   height: 45px;
-  box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.1);
+  box-shadow: 0 2px 4px 0px rgba(46, 109, 164, 0.1);
 }
 
 .control_panel .form-control::placeholder {
@@ -877,7 +511,7 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
 .control_panelnavigation {
   background-color: var(--white-color);
   border-radius: 5px;
-  box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.1);
+  box-shadow: 0 2px 4px 0px rgba(46, 109, 164, 0.1);
   padding: 3px 3px;
   display: flex;
   height: 43px;
@@ -887,7 +521,7 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
   cursor: pointer;
   background-color: #ffffff;
   padding: 10px 20px;
-  box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.1);
+  box-shadow: 0 2px 4px 0px rgba(46, 109, 164, 0.1);
   border-radius: 5px;
   color: var(--text-color);
 }
@@ -899,7 +533,7 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
 .panel_dropdown_content {
   background-color: var(--white-color);
   padding: 15px 15px;
-  box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.1);
+  box-shadow: 0 2px 4px 0px rgba(46, 109, 164, 0.1);
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }
@@ -923,7 +557,7 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
   cursor: pointer;
   background-color: #ffffff;
   padding: 10px 20px;
-  box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.10);
+  box-shadow: 0 2px 4px 0px rgba(46, 109, 164, 0.10);
   border-radius: 5px;
   width: 400px;
   transition: all 0.3s ease-in-out;
@@ -944,17 +578,17 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
 }
 
 .card_1:hover {
-  box-shadow: 0 8px 16px 0px rgba(0, 94, 184, 0.2);
+  box-shadow: 0 8px 16px 0px rgba(46, 109, 164, 0.2);
   transform: translateY(-5px);
 }
 
 .table_wrapper {
-  box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.1);
+  box-shadow: 0 2px 4px 0px rgba(46, 109, 164, 0.1);
   margin-bottom: 20px;
 }
 
 .thead-light th {
-  background-color: rgba(0, 94, 184, 0.0901960784) !important;
+  background-color: rgba(46, 109, 164, 0.0901960784) !important;
   font-weight: 500;
 }
 
@@ -972,10 +606,6 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
 
 .tag_group {
   margin-top: 20px;
-}
-
-.o-mail-Discuss {
-  margin-top: 50px !important;
 }
 
 .o_form_sheet .badge,
@@ -1016,8 +646,8 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
 }
 
 .text-bg-info {
-  background-color: rgba(65, 182, 230, 0.35) !important;
-  color: var(--nhs-dark-blue) !important;
+  background-color: rgba(46, 109, 164, 0.35) !important;
+  color: var(--primary-dark) !important;
 }
 
 .text-bg-light {
@@ -1030,7 +660,7 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
 
 /* Smart buttons (StatInfo icon/value) read these CSS vars with a purple
    fallback (Odoo's $o-brand-primary / $primary) - define them once here so
-   every smart button's icon and bold value text picks up NHS blue instead. */
+   every smart button's icon and bold value text picks up the theme's primary colour instead. */
 .o-form-buttonbox {
   --o-stat-text-color: var(--primary-color);
   --o-stat-button-color: var(--primary-color);
@@ -1038,28 +668,29 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
 
 /* Focused field border/caret and the required-field underline both read these
    vars, which Odoo sets directly to purple on these same selectors - redefine
-   them here so they resolve to NHS blue instead. */
+   them here so they resolve to the theme's primary colour instead. */
 .o_required_modifier,
 .o_field_widget:focus-within {
   --o-input-border-color: var(--primary-color) !important;
   --o-caret-color: var(--primary-color) !important;
 }
 
-.o_m2o_dropdown_option > a {
+.o_m2o_dropdown_option>a {
   color: var(--primary-color) !important;
 }
 
 :root {
-  --primary-color: #005EB8;
-  --secondary-color: #768692;
+  --primary-color: #2E6DA4;
+  --secondary-color: #5A6B7A;
   --danger-color: #DA291C;
-  --nhs-dark-blue: #003087;
-  --text-blue: #0072CE;
+  --primary-dark: #14314D;
+  --bg-gradient: linear-gradient(135deg, #6FA0C4 0%, #2E6DA4 50%, #14314D 100%);
+  --accent-color: #3C8FC7;
   --text-color: #425563;
   --white-color: #ffff;
   --grey-color: #D8DDE0;
   --dark: #212B32;
-  
+
   /* Override Odoo default brand colors to remove purple globally */
   --o-brand-odoo: var(--primary-color);
   --o-brand-primary: var(--primary-color);
@@ -1089,7 +720,7 @@ html body .btn.btn-secondary:hover, html body .btn.btn-secondary:focus, html bod
 
 *::selection {
   color: #ffffff;
-  background-color: #005EB8;
+  background-color: var(--accent-color);
 }
 
 body {
@@ -1110,23 +741,16 @@ body {
 /* Search */
 .o_searchview {
   border-color: transparent;
-
 }
 
 .o_cp_searchview {
   border-color: transparent;
-  width: 100%;
-  height: 45px;
-  box-shadow: 0 2px 4px 0px rgba(0, 94, 184, 0.1);
+  box-shadow: 0 2px 4px 0px rgba(46, 109, 164, 0.1);
   transition: box-shadow 0.3s ease;
 }
 
-.o_cp_searchview {
-  box-shadow: 0 6px 72px 7px rgba(0, 94, 184, 0.1);
-}
-
-.o_action_manager .o_website_preview {
-  margin-top: 50px;
+.o_cp_searchview:focus-within {
+  box-shadow: 0 6px 72px 7px rgba(46, 109, 164, 0.1);
 }
 
 @media (max-width: 768px) {
@@ -1137,10 +761,6 @@ body {
   .o_main_navbar .navbar-brand {
     margin-right: 0px;
     padding-left: 0px;
-  }
-
-  .o_action_manager .o-mail-Discuss {
-    margin-top: 50px;
   }
 
   .o_main_navbar {
@@ -1171,7 +791,7 @@ body {
 .dropdown-item:hover,
 .dropdown-item:focus,
 .dropdown-item.focus {
-  background-color: rgba(0, 94, 184, 0.12) !important;
+  background-color: rgba(46, 109, 164, 0.12) !important;
   color: var(--primary-color) !important;
 }
 
@@ -1181,28 +801,32 @@ body {
   color: var(--white-color) !important;
 }
 
-.o-mail-ImStatus .text-success {
+.o-mail-ImStatus .text-success,
+.o-mail-ImStatusDropdown .text-success {
   color: #008818 !important;
 }
 
-.o-mail-ImStatus .o-yellow {
+.o-mail-ImStatus .o-yellow,
+.o-mail-ImStatusDropdown .o-yellow {
   color: #ffc107 !important;
 }
 
-.o-mail-ImStatus .text-danger {
+.o-mail-ImStatus .text-danger,
+.o-mail-ImStatusDropdown .text-danger {
   color: #d23f3a !important;
 }
 
-.o-mail-ImStatus .text-700 {
+.o-mail-ImStatus .text-700,
+.o-mail-ImStatusDropdown .text-700 {
   color: var(--secondary-color) !important;
 }
 
 .o_base_settings_view .o_form_renderer {
-  --settings__tab-bg--active: rgba(0, 94, 184, 0.12);
+  --settings__tab-bg--active: rgba(46, 109, 164, 0.12);
 }
 
 .o_setting_container .settings_tab .selected {
-  background-color: rgba(0, 94, 184, 0.12) !important;
+  background-color: rgba(46, 109, 164, 0.12) !important;
   box-shadow: inset 2px 0 0 var(--primary-color) !important;
 }
 
@@ -1234,7 +858,7 @@ body {
 .dropdown-item.o_add_custom_group_menu:hover,
 .dropdown-item.o_add_custom_group_menu:focus,
 .dropdown-item.o_add_custom_group_menu.focus {
-  background-color: rgba(0, 94, 184, 0.12) !important;
+  background-color: rgba(46, 109, 164, 0.12) !important;
   color: var(--primary-color) !important;
 }
 
@@ -1251,17 +875,43 @@ body {
 }
 
 .btn-link:hover {
-  color: var(--nhs-dark-blue) !important;
+  color: var(--primary-dark) !important;
 }
 
-.o_phone_form_link,
-.o_field_phone_sms {
+.o_maintenance_team_kanban .o_kanban_record .fs-4.fw-bold {
+  color: var(--primary-color) !important;
+}
+
+/* Custom State Badge Colors */
+td[name="state"] .badge.text-bg-success,
+[name="state"].badge.text-bg-success {
+  /* Sales Order -> Solid Blue */
+  background-color: var(--primary-color) !important;
+  color: var(--white-color) !important;
+}
+
+td[name="state"] .badge.text-bg-primary,
+[name="state"].badge.text-bg-primary {
+  /* Quotation Sent -> Light Blue */
+  background-color: rgba(46, 109, 164, 0.35) !important;
+  color: var(--primary-dark) !important;
+}
+
+td[name="state"] .badge.text-bg-info,
+[name="state"].badge.text-bg-info {
+  /* Quotation -> Green */
+  background-color: rgb(204, 245, 231) !important;
+  color: #007f3b !important;
+}
+
+.o_form_uri {
   color: var(--primary-color) !important;
 }
 
 .o_phone_form_link:hover,
-.o_field_phone_sms:hover {
-  color: var(--nhs-dark-blue) !important;
+.o_field_phone_sms:hover,
+.o_form_uri:hover {
+  color: var(--primary-dark) !important;
 }
 
 /* .btn-link never gets a solid fill, so the generic .btn.active white-icon
@@ -1271,6 +921,17 @@ body {
 .btn-link.active .oi {
   color: var(--primary-color) !important;
   background-color: transparent !important;
+}
+
+/* Same issue for .btn-link.btn-primary combos (e.g. the chatter Activity
+   "Info" toggle): no background fill, so the generic .btn-primary .fa
+   white-icon rule leaves it invisible against a white panel. */
+.btn-link.btn-primary .fa {
+  color: var(--primary-color) !important;
+}
+
+.btn-link.btn-primary:hover .fa {
+  color: var(--primary-dark) !important;
 }
 
 .o_searchview_facet_label .fa {
@@ -1294,11 +955,19 @@ body {
 }
 
 .o_view_nocontent_smiling_face:before {
-  background-image: url(/theme_nhs/static/src/img/empty_state_smiling_face_nhs.svg) !important;
+  background-image: url(/nhs_backend_theme/static/src/img/empty_state_smiling_face_nhs.svg?v=2) !important;
 }
 
 .o_view_nocontent_neutral_face:before {
-  background-image: url(/theme_nhs/static/src/img/empty_state_neutral_face_nhs.svg) !important;
+  background-image: url(/nhs_backend_theme/static/src/img/empty_state_neutral_face_nhs.svg?v=2) !important;
+}
+
+#developer_tool a {
+  color: var(--primary-color) !important;
+}
+
+.o_web_settings_compact_subtitle a {
+  color: var(--primary-color) !important;
 }
 
 .btn-outline-secondary {
@@ -1371,8 +1040,17 @@ body {
 
 .bg-action,
 .text-bg-action {
-  background-color: var(--nhs-dark-blue) !important;
+  background-color: var(--primary-dark) !important;
 }
+
+/* The Group By facet's icon is "oi oi-group", not ".fa", so it was missed by
+   the .o_searchview_facet_label .fa rule below and stayed an unset/dark colour
+   on the dark-blue .text-bg-action pill above — effectively invisible. */
+.o_searchview_facet_label.text-bg-action,
+.o_searchview_facet_label.text-bg-action i {
+  color: var(--white-color) !important;
+}
+
 /* Override Odoo community loading indicator color */
 .o_loading {
   background-color: var(--primary-color) !important;

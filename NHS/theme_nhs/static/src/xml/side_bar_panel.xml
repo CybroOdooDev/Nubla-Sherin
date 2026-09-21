@@ -14,19 +14,19 @@
                                    t-att-data-id="app.id"
                                    t-att-data-menu-xmlid="app.xmlid"
                                    t-att-data-section="app.id"
+                                   t-att-data-tooltip="app.name"
+                                   data-tooltip-position="right"
                                    t-on-click="() => this.onAppClick(app)">
                                     <!-- Handle PNG icons -->
                                     <t t-if="app.webIcon and app.webIcon.includes('.png')">
                                         <img class="sidebar_img"
                                              t-att-src="app.webIconData"
-                                             t-att-title="app.name"
                                              t-att-alt="app.name"/>
                                     </t>
                                     <!-- Handle SVG icons -->
                                     <t t-if="app.webIcon and app.webIcon.includes('.svg')">
                                         <img class="sidebar_img"
                                              t-att-src="app.webIconData"
-                                             t-att-title="app.name"
                                              t-att-alt="app.name"/>
                                     </t>
                                     <!-- Handle Bootstrap icons fallback -->

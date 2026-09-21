@@ -1,5 +1,5 @@
 <templates id="template" xml:space="preserve">
-    <t t-name="theme_nhs.home_menus" owl="1">
+    <t t-name="nhs_backend_theme.home_menus" owl="1">
         <section class="app_container">
             <div class="container">
                 <div class="wrapper">
