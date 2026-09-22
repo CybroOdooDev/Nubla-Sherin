@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Re-sequence the existing Depreciation Schedule columns to make room for
+         the Analytic Account (before Acquisition Date) and Not Depreciable Value
+         (between the Assets and Depreciation groups) columns added below. -->
+    <record id="account_asset_custom.assets_report_acquisition_date" model="account.report.column">
+        <field name="sequence">20</field>
+    </record>
+    <record id="account_asset_custom.assets_report_first_depreciation" model="account.report.column">
+        <field name="sequence">30</field>
+    </record>
+    <record id="account_asset_custom.assets_report_first_method" model="account.report.column">
+        <field name="sequence">40</field>
+    </record>
+    <record id="account_asset_custom.assets_report_duration_rate" model="account.report.column">
+        <field name="sequence">50</field>
+    </record>
+    <record id="account_asset_custom.assets_report_date_from" model="account.report.column">
+        <field name="sequence">60</field>
+    </record>
+    <record id="account_asset_custom.assets_report_assets_plus" model="account.report.column">
+        <field name="sequence">70</field>
+    </record>
+    <record id="account_asset_custom.assets_report_assets_minus" model="account.report.column">
+        <field name="sequence">80</field>
+    </record>
+    <record id="account_asset_custom.assets_report_assets_date_to" model="account.report.column">
+        <field name="sequence">90</field>
+    </record>
+    <record id="account_asset_custom.assets_report_depre_date_from" model="account.report.column">
+        <field name="sequence">110</field>
+    </record>
+    <record id="account_asset_custom.assets_report_depre_plus" model="account.report.column">
+        <field name="sequence">120</field>
+    </record>
+    <record id="account_asset_custom.assets_report_depre_minus" model="account.report.column">
+        <field name="sequence">130</field>
+    </record>
+    <record id="account_asset_custom.assets_report_depre_date_to" model="account.report.column">
+        <field name="sequence">140</field>
+    </record>
+    <record id="account_asset_custom.assets_report_balance" model="account.report.column">
+        <field name="sequence">150</field>
+    </record>
+
+    <record id="assets_report_analytic_account" model="account.report.column">
+        <field name="name">Analytic Account</field>
+        <field name="expression_label">analytic_account</field>
+        <field name="figure_type">none</field>
+        <field name="sequence">10</field>
+        <field name="report_id" ref="account_asset_custom.assets_report"/>
+    </record>
+    <record id="assets_report_not_depreciable_value" model="account.report.column">
+        <field name="name">Not Depreciable Value</field>
+        <field name="expression_label">not_depreciable_value</field>
+        <field name="figure_type">monetary</field>
+        <field name="sequence">100</field>
+        <field name="report_id" ref="account_asset_custom.assets_report"/>
+    </record>
+</odoo>
