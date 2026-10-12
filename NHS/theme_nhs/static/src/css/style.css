@@ -955,11 +955,11 @@ td[name="state"] .badge.text-bg-info,
 }
 
 .o_view_nocontent_smiling_face:before {
-  background-image: url(/nhs_backend_theme/static/src/img/empty_state_smiling_face_nhs.svg?v=2) !important;
+  background-image: url(/theme_nhs/static/src/img/empty_state_smiling_face_nhs.svg?v=2) !important;
 }
 
 .o_view_nocontent_neutral_face:before {
-  background-image: url(/nhs_backend_theme/static/src/img/empty_state_neutral_face_nhs.svg?v=2) !important;
+  background-image: url(/theme_nhs/static/src/img/empty_state_neutral_face_nhs.svg?v=2) !important;
 }
 
 #developer_tool a {

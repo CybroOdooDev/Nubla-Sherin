@@ -11,10 +11,11 @@
 // set web_icon, derive the same path Odoo would have used from the app's own
 // xmlid ("module_name.menu_xxx_id") whenever it's missing.
 export function ensureAppIcon(app) {
-    if (app.webIcon || !app.xmlid) {
+    const xmlId = app.xmlid || app.xmlID;
+    if (app.webIcon || !xmlId) {
         return;
     }
-    const moduleName = app.xmlid.split(".")[0];
+    const moduleName = xmlId.split(".")[0];
     app.webIcon = `${moduleName},static/description/icon.png`;
     app.webIconData = `/${moduleName}/static/description/icon.png`;
 }

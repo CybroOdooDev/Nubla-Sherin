@@ -32,7 +32,6 @@ a:hover {
 }
 
 .card.o_database_list .card-body {
-        width: 30vw;
         background: rgba(255, 255, 255, 0.2);
         border-radius: 15px;
         padding: 40px 50px;
@@ -41,17 +40,7 @@ a:hover {
         border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.card.o_database_list {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.py-5 {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+
 
 
 .oe_login_form button.btn-link {
