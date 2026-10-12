@@ -19,9 +19,8 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import api, fields, models
+from odoo import fields, models
 from odoo.exceptions import UserError
-
 
 class NhsEricNewYearWizard(models.TransientModel):
     """
@@ -55,21 +54,6 @@ class NhsEricNewYearWizard(models.TransientModel):
         readonly=True,
         help='The newly created data set.'
     )
-    copy_sections = fields.Boolean(
-        string='Copy Sections',
-        default=True,
-        help='If checked, copies all sections from the source data set.'
-    )
-    copy_items = fields.Boolean(
-        string='Copy Items',
-        default=True,
-        help='If checked, copies all items from the source data set.'
-    )
-    copy_mappings = fields.Boolean(
-        string='Copy Mappings',
-        default=True,
-        help='If checked, copies all source key mappings.'
-    )
     set_change_flags = fields.Boolean(
         string='Set Change Flags',
         default=True,
@@ -79,11 +63,9 @@ class NhsEricNewYearWizard(models.TransientModel):
     def action_clone(self):
         """
         Execute the clone operation.
-
         Creates a new data set for the new year and copies all sections and
         items from the source data set. Updates change flags based on
         differences between the two years.
-
         Returns:
             dict: Action to open the newly created data set
         """
@@ -100,35 +82,43 @@ class NhsEricNewYearWizard(models.TransientModel):
             'prior_dataset_id': self.dataset_id.id,
             'notes': f'Cloned from {self.dataset_id.name} on {fields.Date.today()}'
         })
-        if self.copy_sections:
-            for section in self.dataset_id.section_ids:
-                new_section = self.env['nhs.eric.section'].create({
-                    'name': section.name,
-                    'dataset_id': new_dataset.id,
-                    'sequence': section.sequence,
-                    'code': section.code,
+        item_map = {}
+        for section in self.dataset_id.section_ids:
+            new_section = self.env['nhs.eric.section'].create({
+                'name': section.name,
+                'dataset_id': new_dataset.id,
+                'sequence': section.sequence,
+                'code': section.code,
+            })
+            for item_def in section.item_def_ids:
+                if item_def.change_flag == 'removed':
+                    continue
+                new_item = self.env['nhs.eric.item.def'].create({
+                    'name': item_def.name,
+                    'code': item_def.code,
+                    'section_id': new_section.id,
+                    'sequence': item_def.sequence,
+                    'data_type': item_def.data_type,
+                    'reporting_level': item_def.reporting_level,
+                    'unit': item_def.unit,
+                    'source_type': item_def.source_type,
+                    'source_key': item_def.source_key,
+                    'computation_operator': item_def.computation_operator,
+                    'computed_input_ids': item_def.computed_input_ids.ids,
+                    'required': item_def.required,
+                    'min_value': item_def.min_value,
+                    'max_value': item_def.max_value,
+                    'allowed_values': item_def.allowed_values,
+                    'help_text': item_def.help_text,
+                    'change_flag': 'unchanged' if self.set_change_flags else 'new',
                 })
-                if self.copy_items:
-                    for item_def in section.item_def_ids:
-                        if item_def.change_flag == 'removed':
-                            continue
-                        self.env['nhs.eric.item.def'].create({
-                            'name': item_def.name,
-                            'code': item_def.code,
-                            'section_id': new_section.id,
-                            'sequence': item_def.sequence,
-                            'data_type': item_def.data_type,
-                            'reporting_level': item_def.reporting_level,
-                            'unit': item_def.unit,
-                            'source_type': item_def.source_type,
-                            'source_key': item_def.source_key if self.copy_mappings else False,
-                            'required': item_def.required,
-                            'min_value': item_def.min_value,
-                            'max_value': item_def.max_value,
-                            'allowed_values': item_def.allowed_values,
-                            'help_text': item_def.help_text,
-                            'change_flag': 'unchanged' if self.set_change_flags else 'new',
-                        })
+                item_map[item_def.id] = new_item
+        for old_id, new_item in item_map.items():
+            old_item = self.env['nhs.eric.item.def'].browse(old_id)
+            if old_item.source_type == 'computed' and old_item.computed_input_ids:
+                new_input_ids = [item_map[inp.id].id for inp in old_item.computed_input_ids if inp.id in item_map]
+                if new_input_ids:
+                    new_item.write({'computed_input_ids': [(6, 0, new_input_ids)]})
         self.write({'new_dataset_id': new_dataset.id})
         return {
             'type': 'ir.actions.act_window',

@@ -49,7 +49,6 @@ export class NhsEricDashboard extends Component {
     renderCharts() {
         const metrics = this.state.metrics;
 
-        // Destroy existing charts
         Object.values(this.chartInstances).forEach(chart => {
             if (chart) chart.destroy();
         });
@@ -67,7 +66,6 @@ export class NhsEricDashboard extends Component {
             weight: 'bold'
         };
 
-        // 1. Data-Source Coverage Doughnut Chart
         if (this.coverageChartRef.el) {
             const coverage = metrics.coverage || {};
             const auto = coverage.auto || 0;
@@ -126,7 +124,6 @@ export class NhsEricDashboard extends Component {
             });
         }
 
-        // 2. Section Completeness Bar Chart
         if (this.sectionProgressChartRef.el && metrics.section_lines) {
             const sections = metrics.section_lines;
             
@@ -191,7 +188,6 @@ export class NhsEricDashboard extends Component {
             });
         }
 
-        // 3. YoY GIA & Backlog Trend Chart
         if (this.trendGiaBacklogChartRef.el && metrics.trends && metrics.trends.length > 0) {
             const trends = metrics.trends;
             
@@ -211,14 +207,10 @@ export class NhsEricDashboard extends Component {
                         {
                             label: 'Backlog Cost (£)',
                             data: trends.map(t => t.backlog),
-                            borderColor: '#DA291C',
-                            backgroundColor: 'rgba(218, 41, 28, 0.1)',
-                            borderWidth: 3,
-                            pointBackgroundColor: '#DA291C',
-                            pointRadius: 4,
-                            type: 'line',
+                            backgroundColor: '#DA291C',
                             yAxisID: 'yBacklog',
-                            tension: 0.25
+                            borderRadius: 4,
+                            maxBarThickness: 25
                         }
                     ]
                 },
@@ -274,7 +266,6 @@ export class NhsEricDashboard extends Component {
             });
         }
 
-        // 4. YoY Cost per m² & Compliance Trend Chart
         if (this.trendCostComplianceChartRef.el && metrics.trends && metrics.trends.length > 0) {
             const trends = metrics.trends;
 
@@ -286,24 +277,34 @@ export class NhsEricDashboard extends Component {
                         {
                             label: 'Cost per m² (£/m²)',
                             data: trends.map(t => t.cost_per_m2),
+                            type: 'line',
                             borderColor: '#CE7B11',
-                            backgroundColor: 'transparent',
+                            backgroundColor: 'rgba(206, 123, 17, 0.25)',
+                            fill: true,
                             borderWidth: 3,
                             pointBackgroundColor: '#CE7B11',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 1.5,
                             pointRadius: 4,
+                            pointHoverRadius: 6,
                             yAxisID: 'yCost',
-                            tension: 0.2
+                            tension: 0.4
                         },
                         {
                             label: 'Compliance %',
                             data: trends.map(t => t.compliance_pct),
+                            type: 'line',
                             borderColor: '#009639',
-                            backgroundColor: 'transparent',
+                            backgroundColor: 'rgba(0, 150, 57, 0.25)',
+                            fill: true,
                             borderWidth: 3,
                             pointBackgroundColor: '#009639',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 1.5,
                             pointRadius: 4,
+                            pointHoverRadius: 6,
                             yAxisID: 'yComp',
-                            tension: 0.2
+                            tension: 0.4
                         }
                     ]
                 },

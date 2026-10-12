@@ -4,7 +4,7 @@
     <menuitem id="menu_nhs_eric_root"
               name="ERIC Returns"
               sequence="10"
-              groups="odoo_nhs_eric.group_nhs_eric_user"/>
+              web_icon="odoo_nhs_eric,static/description/icon.png"/>
 
     <menuitem id="menu_nhs_eric_dashboard"
               name="Dashboard"
@@ -48,18 +48,6 @@
               action="action_nhs_eric_year_on_year"
               sequence="20"/>
 
-<!--    <menuitem id="menu_nhs_eric_return_pdf"-->
-<!--              name="ERIC Return Report"-->
-<!--              parent="menu_nhs_eric_reporting"-->
-<!--              action="report_nhs_eric_return_pdf"-->
-<!--              sequence="30"/>-->
-
-<!--    <menuitem id="menu_nhs_eric_gap_report"-->
-<!--              name="Gap Report"-->
-<!--              parent="menu_nhs_eric_reporting"-->
-<!--              action="report_nhs_eric_gap_pdf"-->
-<!--              sequence="40"/>-->
-
     <!-- Configuration Menu (Manager Only) -->
     <menuitem id="menu_nhs_eric_config"
               name="Configuration"
@@ -90,5 +78,4 @@
               parent="menu_nhs_eric_config"
               action="action_nhs_eric_config_settings"
               sequence="50"/>
-
 </odoo>

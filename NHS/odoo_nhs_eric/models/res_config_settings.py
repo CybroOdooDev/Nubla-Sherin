@@ -19,9 +19,14 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import api, fields, models
+from odoo import fields, models
 
 class ResConfigSettings(models.TransientModel):
+    """
+    Model for NHS ERIC Configuration Settings. Extends Odoo settings with
+    ERIC-specific parameters for validation policies, auto-population,
+    carry-forward rules, and anomaly detection thresholds.
+    """
     _inherit = 'res.config.settings'
 
     eric_validation_policy = fields.Selection(
@@ -53,4 +58,3 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='odoo_nhs_eric.anomaly_threshold_pct',
         help="Percentage threshold above which a value is flagged as anomalous (0-100)."
     )
-

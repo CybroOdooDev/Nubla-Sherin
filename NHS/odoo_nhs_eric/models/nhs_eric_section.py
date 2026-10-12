@@ -20,8 +20,15 @@
 #
 #############################################################################
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 class NhsEricSection(models.Model):
+    """
+        Model for ERIC Sections. This models the section groupings within an
+        ERIC data set definition. Each section contains a logical grouping of
+        related item definitions and represents a major category within the
+        ERIC return structure.
+    """
     _name = 'nhs.eric.section'
     _description = 'ERIC Section'
     _order = 'sequence, name'
@@ -78,3 +85,17 @@ class NhsEricSection(models.Model):
             'view_mode': 'list,form',
             'domain': [('id', 'in', self.item_def_ids.ids)],
         }
+
+    @api.constrains('code', 'section_id')
+    def _check_unique_code_in_section(self):
+        """Ensure section code is unique within a dataset."""
+        for record in self:
+            existing = self.search([
+                ('code', '=', record.code),
+                ('dataset_id', '=', record.dataset_id.id),
+                ('id', '!=', record.id)
+            ])
+            if existing:
+                raise ValidationError(
+                    'Section code must be unique within a dataset !'
+                )

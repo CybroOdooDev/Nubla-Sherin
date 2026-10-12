@@ -23,6 +23,12 @@ from odoo import fields, models
 from odoo.exceptions import UserError
 
 class NhsEricReturnSection(models.Model):
+    """
+    Model for NHS ERIC Return Section Status. This models the status,
+    ownership, and review workflow for individual sections within an
+    ERIC return. Each section tracks its own workflow state, assigned
+    owner and reviewer, and sign-off status.
+    """
     _name = 'nhs.eric.return.section'
     _description = 'NHS ERIC Return Section Status'
     _inherit = ['mail.thread']
@@ -45,7 +51,8 @@ class NhsEricReturnSection(models.Model):
     sequence = fields.Integer(
         related='section_id.sequence',
         store=True,
-        string='Sequence'
+        string='Sequence',
+        help="Order of section in the return",
     )
     owner_id = fields.Many2one(
         'res.users',
@@ -64,21 +71,27 @@ class NhsEricReturnSection(models.Model):
         ('in_progress', 'In Progress'),
         ('ready_for_review', 'Ready for Review'),
         ('signed_off', 'Signed Off')
-    ], string='Status', default='draft', required=True, tracking=True)
-
+    ], string='Status', default='draft', required=True, tracking=True,help="Status of this section.")
     signed_off_by_id = fields.Many2one(
         'res.users',
         string='Signed Off By',
         tracking=True,
-        readonly=True
+        readonly=True,
+        help="The person who signed off this section."
     )
     signed_off_at = fields.Datetime(
         string='Signed Off At',
         tracking=True,
-        readonly=True
+        readonly=True,
+        help="The date and time at which the section was signed off."
     )
 
     def write(self, vals):
+        """
+        Prevent editing section when the return is finalised or submitted.
+        Raises:
+            UserError: If attempting to modify a section in a locked return.
+        """
         for record in self:
             if record.return_id.state in ('finalised', 'submitted'):
                 raise UserError('This return has been finalised/submitted and is locked for editing.')
@@ -90,11 +103,12 @@ class NhsEricReturnSection(models.Model):
         if not self.reviewer_id:
             raise UserError('Please assign a Section Reviewer before signing off.')
         required_gaps = self.return_id.value_ids.filtered(
-            lambda v: v.section_id == self.section_id and v.item_def_id.required and v.status == 'gap'
+            lambda v: v.section_id == self.section_id and v.item_def_id.required and
+                      v.status == 'gap'
         )
         if required_gaps:
-            raise UserError('Cannot submit for review: there are required fields in this section that have not been populated.')
-
+            raise UserError('Cannot submit for review: there are required fields in this section that '
+                            'have not been populated.')
         self.write({'state': 'ready_for_review'})
         return True
 
@@ -103,13 +117,10 @@ class NhsEricReturnSection(models.Model):
         self.ensure_one()
         if self.env.user != self.reviewer_id:
             raise UserError('Only the assigned Section Reviewer is allowed to sign off this section.')
-
-        # Sign off all values in this section on the return
         values = self.return_id.value_ids.filtered(lambda v: v.section_id == self.section_id)
         for val in values:
             if not val.signed_off:
                 val.action_sign_off()
-
         self.write({
             'state': 'signed_off',
             'signed_off_by_id': self.env.user.id,
@@ -120,12 +131,10 @@ class NhsEricReturnSection(models.Model):
     def action_reopen(self):
         """Reopen the section for editing."""
         self.ensure_one()
-        # Unsign all values in this section
         values = self.return_id.value_ids.filtered(lambda v: v.section_id == self.section_id)
         for val in values:
             if val.signed_off:
                 val.action_unsign()
-
         self.write({
             'state': 'in_progress',
             'signed_off_by_id': False,

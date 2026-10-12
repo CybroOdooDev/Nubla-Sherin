@@ -2,8 +2,6 @@
 <templates xml:space="preserve">
     <t t-name="odoo_nhs_eric.NhsEricDashboard">
         <div class="o_nhs_dashboard_container" style="background-color: #F0F4F5; padding: 24px; box-sizing: border-box; overflow-y: auto; overflow-x: hidden; position: relative; height: 100%;">
-
-            <!-- Custom CSS block for optimized typography and larger charts -->
             <style>
                 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap');
 
@@ -77,7 +75,6 @@
                         grid-template-columns: 1fr;
                     }
                 }
-
                 .o_nhs_kpi_card {
                     background-color: #ffffff;
                     border: 1px solid #D8DDE0;
@@ -281,8 +278,6 @@
                     border-radius: 4px;
                 }
             </style>
-
-            <!-- Loading Spinner -->
             <t t-if="state.loading">
                 <div class="d-flex justify-content-center align-items-center" style="height: 350px;">
                     <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem; color: #005EB8 !important;">
@@ -290,11 +285,7 @@
                     </div>
                 </div>
             </t>
-
-            <!-- Main Dashboard Content -->
             <t t-else="">
-                
-                <!-- Header Control Box -->
                 <div class="o_nhs_dashboard_header">
                     <span class="o_nhs_header_title">
                         <i class="fa fa-tachometer"/>
@@ -311,7 +302,6 @@
                         </select>
                     </div>
                 </div>
-
                 <t t-if="!state.metrics.has_data">
                     <div class="text-center py-5 bg-white border rounded-3">
                         <i class="fa fa-info-circle fa-3x text-muted mb-3"/>
@@ -320,11 +310,7 @@
                     </div>
                 </t>
                 <t t-else="">
-                    
-                    <!-- 1. KPI Cards Grid (4 progress stats) -->
                     <div class="o_nhs_kpi_grid">
-                        
-                        <!-- Completeness -->
                         <div class="o_nhs_kpi_card kpi-green" t-on-click="openReturn">
                             <div class="o_nhs_kpi_content">
                                 <span class="o_nhs_kpi_title">Completeness %</span>
@@ -336,8 +322,6 @@
                                 <i class="fa fa-check-circle-o"/>
                             </div>
                         </div>
-
-                        <!-- Sections Outstanding -->
                         <div class="o_nhs_kpi_card kpi-orange" t-on-click="openReturn">
                             <div class="o_nhs_kpi_content">
                                 <span class="o_nhs_kpi_title">Sections Outstanding</span>
@@ -349,8 +333,6 @@
                                 <i class="fa fa-list-ol"/>
                             </div>
                         </div>
-
-                        <!-- Validation Errors -->
                         <div class="o_nhs_kpi_card kpi-red" t-on-click="openReturn">
                             <div class="o_nhs_kpi_content">
                                 <span class="o_nhs_kpi_title">Validation Errors</span>
@@ -362,8 +344,6 @@
                                 <i class="fa fa-exclamation-circle"/>
                             </div>
                         </div>
-
-                        <!-- Gaps -->
                         <div class="o_nhs_kpi_card kpi-blue" t-on-click="() => this.openAction('nhs.eric.value', 'list,form', [['return_id', '=', state.metrics.selected_return_id], ['status', '=', 'gap']])">
                             <div class="o_nhs_kpi_content">
                                 <span class="o_nhs_kpi_title">Required Gaps</span>
@@ -375,10 +355,7 @@
                                 <i class="fa fa-folder-open-o"/>
                             </div>
                         </div>
-
                     </div>
-
-                    <!-- 2. Headline Estate Metrics Ribbon -->
                     <div class="o_nhs_headline_ribbon">
                         <div class="o_nhs_ribbon_item">
                             <span class="o_nhs_ribbon_label">Total GIA (m²)</span>
@@ -405,11 +382,7 @@
                             </span>
                         </div>
                     </div>
-
-                    <!-- 3. Charts Section -->
                     <div class="o_nhs_charts_grid">
-                        
-                        <!-- Chart 1: Data-Source Coverage -->
                         <div class="o_nhs_card">
                             <div class="o_nhs_card_header">
                                 <span class="o_nhs_card_title">
@@ -424,8 +397,6 @@
                                 <canvas t-ref="coverageChart"></canvas>
                             </div>
                         </div>
-
-                        <!-- Chart 2: Section Completeness -->
                         <div class="o_nhs_card">
                             <div class="o_nhs_card_header">
                                 <span class="o_nhs_card_title">
@@ -437,12 +408,10 @@
                                 <canvas t-ref="sectionProgressChart"></canvas>
                             </div>
                         </div>
-
-                        <!-- Chart 3: YoY GIA & Backlog Trend -->
                         <div class="o_nhs_card">
                             <div class="o_nhs_card_header">
                                 <span class="o_nhs_card_title">
-                                    <i class="fa fa-line-chart"/>
+                                    <i class="fa fa-bar-chart"/>
                                     YoY GIA &amp; Backlog Trends
                                 </span>
                             </div>
@@ -450,8 +419,6 @@
                                 <canvas t-ref="trendGiaBacklogChart"></canvas>
                             </div>
                         </div>
-
-                        <!-- Chart 4: YoY Cost & Compliance Trend -->
                         <div class="o_nhs_card">
                             <div class="o_nhs_card_header">
                                 <span class="o_nhs_card_title">
@@ -463,10 +430,7 @@
                                 <canvas t-ref="trendCostComplianceChart"></canvas>
                             </div>
                         </div>
-
                     </div>
-
-                    <!-- 4. Operational Progress Table -->
                     <div class="o_nhs_table_card">
                         <div class="o_nhs_card_header">
                             <span class="o_nhs_card_title">
@@ -511,9 +475,7 @@
                             </tbody>
                         </table>
                     </div>
-
                 </t>
-
             </t>
         </div>
     </t>

@@ -60,7 +60,7 @@
                                readonly="source_type == 'computed' or data_type != 'text'"/>
                         <field name="value_bool" invisible="item_def_id.data_type != 'boolean'"
                                readonly="source_type == 'computed' or data_type != 'boolean'"/>
-                        <field name="attachment_ids" widget="many2many_binary"/>
+                        <field name="attachment_ids" widget="many2many_binary" invisible="id == 0"/>
                     </group>
                     <group string="Auto Value" groups="odoo_nhs_eric.group_nhs_eric_officer">
                         <field name="auto_value"/>
@@ -74,13 +74,17 @@
                     </group>
                     <footer>
                         <button name="action_sign_off" string="Sign Off" type="object"
-                                groups="odoo_nhs_eric.group_nhs_eric_officer" invisible="status != 'populated'"/>
+                                groups="odoo_nhs_eric.group_nhs_eric_officer,odoo_nhs_eric.group_nhs_eric_manager"
+                                invisible="status != 'populated'"/>
                         <button name="action_unsign" string="Unsign" type="object"
-                                groups="odoo_nhs_eric.group_nhs_eric_officer" invisible="status != 'populated'"/>
+                                groups="odoo_nhs_eric.group_nhs_eric_officer,odoo_nhs_eric.group_nhs_eric_manager"
+                                invisible="status != 'populated'"/>
                         <button name="action_override" string="Override" type="object"
-                                groups="odoo_nhs_eric.group_nhs_eric_officer" invisible="status != 'populated'"/>
+                                groups="odoo_nhs_eric.group_nhs_eric_officer,odoo_nhs_eric.group_nhs_eric_manager"
+                                invisible="status != 'populated'"/>
                         <button name="action_clear_override" string="Clear Override" type="object"
-                                groups="odoo_nhs_eric.group_nhs_eric_officer" invisible="not is_overridden"/>
+                                groups="odoo_nhs_eric.group_nhs_eric_officer,odoo_nhs_eric.group_nhs_eric_manager"
+                                invisible="not is_overridden"/>
                     </footer>
                 </sheet>
                 <chatter/>
@@ -132,7 +136,7 @@
                 <field name="override_reason" required="is_overridden" invisible="not is_overridden"/>
                 <field name="is_anomaly" readonly="1"/>
                 <field name="anomaly_reason" readonly="1"/>
-                <field name="attachment_ids" widget="many2many_binary"/>
+                <field name="attachment_ids" widget="many2many_binary" invisible="id == 0"/>
                 <field name="status" readonly="1" widget="badge" decoration-success="status == 'populated'"
                        decoration-warning="status == 'gap'" decoration-danger="status == 'invalid'"/>
                 <field name="signed_off"/>
@@ -151,13 +155,10 @@
     <record id="action_nhs_eric_value_gaps_validation" model="ir.actions.act_window">
         <field name="name">Gaps and Invalid Values</field>
         <field name="res_model">nhs.eric.value</field>
-        <field name="view_mode">list</field>
+        <field name="view_mode">list,form</field>
         <field name="view_id" ref="view_nhs_eric_value_gaps_validation_list"/>
         <field name="search_view_id" ref="view_nhs_eric_value_search"/>
         <field name="domain">[('status', 'in', ['gap', 'invalid'])]</field>
         <field name="context">{'search_default_manual_only': 1, 'search_default_group_section': 1}</field>
     </record>
-
-
-
 </odoo>

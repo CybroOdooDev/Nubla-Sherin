@@ -22,11 +22,21 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_draft" string="Set to Draft" type="object" invisible="state in ['draft']" class="oe_highlight" />
-                    <button name="action_activate" string="Activate" type="object" invisible="state in ['active']" class="oe_highlight" />
-                    <button name="action_archive" string="Archive" type="object" invisible="state in ['archived','draft']" class="oe_highlight" />
-                    <button name="action_clone_year" string="Clone to New Year" type="object" invisible="state in ['archived','draft']" class="oe_highlight" />
-                    <button name="action_compare_with_prior" string="Recalculate Changes" type="object" invisible="not prior_dataset_id" class="oe_highlight" />
+                    <button name="action_draft" string="Set to Draft" type="object" invisible="state in ['draft']"
+                            groups="odoo_nhs_eric.group_nhs_eric_manager"
+                            class="oe_highlight"/>
+                    <button name="action_activate" string="Activate" type="object" invisible="state in ['active']"
+                            groups="odoo_nhs_eric.group_nhs_eric_manager"
+                            class="oe_highlight"/>
+                    <button name="action_archive" string="Archive" type="object"
+                            groups="odoo_nhs_eric.group_nhs_eric_manager"
+                            invisible="state in ['archived','draft']" class="oe_highlight"/>
+                    <button name="action_clone_year" string="Clone to New Year" type="object"
+                            groups="odoo_nhs_eric.group_nhs_eric_manager"
+                            invisible="state in ['archived','draft']" class="oe_highlight"/>
+                    <button name="action_compare_with_prior" string="Recalculate Changes" type="object"
+                            groups="odoo_nhs_eric.group_nhs_eric_manager"
+                            invisible="not prior_dataset_id" class="oe_highlight"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,active,archived"/>
                 </header>
                 <sheet>
@@ -124,7 +134,10 @@
                                     <field name="required"/>
                                     <field name="min_value" optional="hide"/>
                                     <field name="max_value" optional="hide"/>
-                                    <field name="change_flag" decoration-success="change_flag == 'new'" decoration-warning="change_flag == 'changed'" decoration-danger="change_flag == 'removed'" decoration-info="change_flag == 'unchanged'" widget="badge"/>
+                                    <field name="change_flag" decoration-success="change_flag == 'new'"
+                                           decoration-warning="change_flag == 'changed'"
+                                           decoration-danger="change_flag == 'removed'"
+                                           decoration-info="change_flag == 'unchanged'" widget="badge"/>
                                 </list>
                             </field>
                         </page>
@@ -165,7 +178,9 @@
                 <field name="required"/>
                 <field name="min_value" optional="hide"/>
                 <field name="max_value" optional="hide"/>
-                <field name="change_flag" decoration-success="change_flag == 'new'" decoration-warning="change_flag == 'changed'" decoration-danger="change_flag == 'removed'" decoration-info="change_flag == 'unchanged'" widget="badge"/>
+                <field name="change_flag" decoration-success="change_flag == 'new'"
+                       decoration-warning="change_flag == 'changed'" decoration-danger="change_flag == 'removed'"
+                       decoration-info="change_flag == 'unchanged'" widget="badge"/>
             </list>
         </field>
     </record>
@@ -188,27 +203,44 @@
                             <field name="code"/>
                             <field name="section_id"/>
                             <field name="sequence"/>
-                            <field name="change_flag" decoration-success="change_flag == 'new'" decoration-warning="change_flag == 'changed'" decoration-danger="change_flag == 'removed'" decoration-info="change_flag == 'unchanged'" widget="badge"/>
+                            <field name="change_flag" decoration-success="change_flag == 'new'"
+                                   decoration-warning="change_flag == 'changed'"
+                                   decoration-danger="change_flag == 'removed'"
+                                   decoration-info="change_flag == 'unchanged'" widget="badge"/>
                         </group>
                         <group string="Data Configuration">
                             <field name="data_type"/>
                             <field name="reporting_level"/>
-                            <field name="site_id" invisible="reporting_level != 'site'"/>
                             <field name="unit"/>
                         </group>
                     </group>
                     <group>
                         <group string="Source Mapping">
+                            <field name="dataset_id" invisible="1"/>
                             <field name="source_type"/>
                             <field name="selection_source_key" invisible="source_type != 'auto'"/>
-                            <field name="computation_operator" invisible="source_type != 'computed'" required="source_type == 'computed'"/>
-                            <field name="computed_input_ids" widget="many2many_tags" invisible="source_type != 'computed'" required="source_type == 'computed'"/>
+                            <div class="alert alert-info mb-2" role="status"
+                                 invisible="source_type != 'computed' or dataset_id">
+                                <i class="fa fa-info-circle me-1" title="Info"/>
+                                <strong>Dataset Save Required:</strong>
+                                Please save the dataset first. Computed items can only reference existing numeric items
+                                within the same dataset.
+                            </div>
+                            <field name="computation_operator" invisible="source_type != 'computed' or not dataset_id"
+                                   required="source_type == 'computed' and dataset_id"/>
+                            <field name="computed_input_ids" widget="many2many_tags"
+                                   invisible="source_type != 'computed' or not dataset_id"
+                                   required="source_type == 'computed' and dataset_id"
+                                   domain="[('id', '!=', id), ('data_type', 'in', ['integer', 'float', 'currency', 'percent']), ('dataset_id', '=', dataset_id), ('dataset_id', '!=', False)]"/>
                         </group>
                         <group string="Validation Rules">
                             <field name="required"/>
-                            <field name="min_value" invisible="data_type not in ['integer', 'float', 'currency', 'percent']"/>
-                            <field name="max_value" invisible="data_type not in ['integer', 'float', 'currency', 'percent']"/>
-                            <field name="allowed_values" placeholder="e.g. Yes, No, Partial" invisible="data_type == 'boolean'"/>
+                            <field name="min_value"
+                                   invisible="data_type not in ['integer', 'float', 'currency', 'percent']"/>
+                            <field name="max_value"
+                                   invisible="data_type not in ['integer', 'float', 'currency', 'percent']"/>
+                            <field name="allowed_values" placeholder="e.g. Yes, No, Partial"
+                                   invisible="data_type == 'boolean'"/>
                         </group>
                     </group>
                     <group string="Guidance">

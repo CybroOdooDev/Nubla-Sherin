@@ -21,18 +21,21 @@
 #############################################################################
 {
     'name': 'NHS ERIC Returns',
+    'version': '19.0.1.0.0',
+    'category': 'Healthcare/NHS',
     'summary': 'Generate the mandatory annual Estates Returns Information Collection '
                '(ERIC) automatically from the NHS Estate Register and Estates '
                'Compliance — versioned to the NHS England data set, validated and export-ready.',
-    'version': '19.0.1.0.0',
-    'category': 'Healthcare/NHS',
+    'description': """
+    Automatically generates the mandatory annual Estates Returns Information Collection (ERIC) for NHS trusts by pulling 
+    data directly from the Estate Register and Estates Compliance modules. Replaces manual spreadsheet assembly with a 
+    streamlined workflow including validation, gap analysis, and year-on-year comparison. Features a versioned data-set 
+    definition that adapts to NHS England's annual changes without code modifications.
+    """,
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'license': 'LGPL-3',
-    'price': 0,
-    'currency': 'EUR',
     'depends': [
         'odoo_nhs_estate',
         'odoo_nhs_estate_compliance',
@@ -40,6 +43,7 @@
     'data': [
         'security/nhs_eric_security.xml',
         'security/ir.model.access.csv',
+        'data/nhs_eric_dataset_2025_26_data.xml',
         'views/nhs_eric_dataset_views.xml',
         'views/nhs_eric_return_views.xml',
         'views/nhs_eric_value_views.xml',
@@ -56,8 +60,10 @@
             'odoo_nhs_eric/static/src/dashboard/dashboard.xml',
         ],
     },
-    'application': True,
+    'images': ['static/description/banner.jpg'],
+    'license': 'LGPL-3',
     'installable': True,
     'auto_install': False,
-}
+    'application': True,
 
+}

@@ -23,6 +23,12 @@ from odoo import api, fields, models
 from odoo.exceptions import ValidationError, UserError
 
 class NhsEricValue(models.Model):
+    """
+    Model for ERIC Values. This models the populated data values for
+    individual ERIC items within a return. Each value record represents
+    a specific data point collected for an ERIC return, supporting
+    auto-population, manual entry, computed values, and validation.
+    """
     _name = 'nhs.eric.value'
     _description = 'ERIC Value (a populated item on a return)'
     _inherit = ['mail.thread']
@@ -63,13 +69,15 @@ class NhsEricValue(models.Model):
     source_type = fields.Selection(
         related='item_def_id.source_type',
         string='Source Type',
-        readonly=True
+        readonly=True,
+        help="Source type of the item linked."
     )
     data_type = fields.Selection(
         related='item_def_id.data_type',
         string='Data Type',
         readonly=True,
-        store=True
+        store=True,
+        help="Data type of the item."
     )
     value_number = fields.Float(
         string='Value (Number)',
@@ -186,7 +194,6 @@ class NhsEricValue(models.Model):
     def _check_override_reason(self):
         """Enforce that overridden values must have an override reason."""
         for record in self:
-            # Only enforce if the item is actually an auto item
             if record.is_overridden and record.item_def_id.source_type == 'auto' and not record.override_reason:
                 raise ValidationError(
                     'An override reason must be provided when overriding an auto-populated value.'
@@ -194,28 +201,24 @@ class NhsEricValue(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        """ Override create to handle data type-specific value clearing and status setting. """
         for vals in vals_list:
             if 'item_def_id' in vals:
                 item_def = self.env['nhs.eric.item.def'].sudo().browse(vals['item_def_id'])
                 if item_def:
                     dt = item_def.data_type
                     source_type = item_def.source_type
-
                     if source_type == 'computed' and not self.env.context.get('bypass_is_overridden_set'):
                         has_value_write = any(f in vals for f in ['value_number', 'value_text', 'value_bool'])
                         if has_value_write:
                             raise UserError("Computed items are read-only and automatically calculated.")
-
-                    # For AUTO items: clear typed fields, only auto_value should be set
                     if source_type == 'auto':
                         vals['value_number'] = False
                         vals['value_text'] = False
                         vals['value_bool'] = False
-                        # Set default status to gap until populated
                         if 'status' not in vals:
                             vals['status'] = 'gap'
                     else:
-                        # For MANUAL/COMPUTED items: clear only non-matching typed fields
                         has_value_write = any(f in vals for f in ['value_number', 'value_text', 'value_bool'])
                         if has_value_write:
                             if dt in ('integer', 'float', 'currency', 'percent'):
@@ -227,8 +230,6 @@ class NhsEricValue(models.Model):
                             elif dt == 'boolean':
                                 vals['value_number'] = False
                                 vals['value_text'] = False
-
-                        # Check if any value was actually set
                         has_value = False
                         if dt in ('integer', 'float', 'currency', 'percent'):
                             has_value = vals.get('value_number') is not None
@@ -236,127 +237,97 @@ class NhsEricValue(models.Model):
                             has_value = bool(vals.get('value_text'))
                         elif dt == 'boolean':
                             has_value = vals.get('value_bool') is not None
-
                         if 'status' not in vals:
                             vals['status'] = 'populated' if has_value else 'gap'
-
         records = super(NhsEricValue, self).create(vals_list)
         if not self.env.context.get('bypass_status_update'):
             records.with_context(bypass_status_update=True)._update_status()
-
-        # Trigger dependents recalculation if value changed
         any_val = False
         for vals in vals_list:
-            if any(f in vals for f in ['value_number', 'value_text', 'value_bool', 'auto_value', 'auto_value_text', 'auto_value_bool', 'auto_value_populated']):
+            if any(f in vals for f in ['value_number', 'value_text', 'value_bool', 'auto_value',
+                                       'auto_value_text', 'auto_value_bool', 'auto_value_populated']):
                 any_val = True
                 break
         if any_val:
             records._recalculate_dependents()
-
         return records
 
     def write(self, vals):
+        """ Override write to enforce permissions, locking, and data type constraints. """
         if not self.env.context.get('bypass_owner_check') and self.env.uid != 1:
             for record in self:
-                # Find if there is an owner assigned on the return section
-                sec_line = record.return_id.section_line_ids.filtered(lambda s: s.section_id == record.section_id)
-                if sec_line and sec_line.owner_id and self.env.user != sec_line.owner_id and not self.env.user.has_group(
-                        'odoo_nhs_eric.group_nhs_eric_manager'):
+                sec_line = record.return_id.section_line_ids.filtered(lambda s:
+                                                                      s.section_id == record.section_id)
+                if (sec_line and sec_line.owner_id and self.env.user != sec_line.owner_id and not
+                self.env.user.has_group('odoo_nhs_eric.group_nhs_eric_manager')):
                     raise UserError(
-                        f"Only the assigned owner ({sec_line.owner_id.name}) or an Estates Manager can modify values in the section '{record.section_id.name}'.")
-
+                        f"Only the assigned owner ({sec_line.owner_id.name}) or an Estates Manager can modify values "
+                        f"in the section '{record.section_id.name}'.")
         for record in self:
             if record.return_id.state in ('finalised', 'submitted'):
                 raise UserError('This return has been finalised/submitted and is locked for editing.')
-
             source_type = record.item_def_id.source_type
             if source_type == 'computed' and not self.env.context.get('bypass_is_overridden_set'):
                 has_value_write = any(f in vals for f in ['value_number', 'value_text', 'value_bool'])
                 if has_value_write:
                     raise UserError("Computed items are read-only and automatically calculated.")
-
         for record in self:
             dt = record.item_def_id.data_type
             source_type = record.item_def_id.source_type
             record_vals = vals.copy()
-
-            # For AUTO items: ONLY update auto_value, not typed fields
             if source_type == 'auto':
-                # Check if user is trying to write to typed fields (this would be an override)
                 has_value_write = any(f in vals for f in ['value_number', 'value_text', 'value_bool'])
-
                 if has_value_write and not self.env.context.get('bypass_is_overridden_set'):
-                    # This is an override - mark it as overridden
                     if 'is_overridden' not in record_vals:
                         record_vals['is_overridden'] = True
                     if not record_vals.get('override_reason') and not record.override_reason:
                         record_vals['override_reason'] = 'Manual override applied'
-
-                    # Only keep the matching typed field, clear others
                     if dt in ('integer', 'float', 'currency', 'percent'):
-                        # Keep value_number, clear others
                         if 'value_number' in vals:
-                            # Keep the value as is
                             pass
                         record_vals['value_text'] = False
                         record_vals['value_bool'] = False
                     elif dt == 'text':
-                        # Keep value_text, clear others
                         if 'value_text' in vals:
-                            # Keep the value as is
                             pass
                         record_vals['value_number'] = False
                         record_vals['value_bool'] = False
                     elif dt == 'boolean':
-                        # Keep value_bool, clear others
                         if 'value_bool' in vals:
-                            # Keep the value as is
                             pass
                         record_vals['value_number'] = False
                         record_vals['value_text'] = False
-
-                # If auto fields are being written, keep them
                 if 'auto_value' in vals:
                     pass
-
             else:
-                # For MANUAL/COMPUTED items: clear only non-matching typed fields
                 has_value_write = any(f in vals for f in ['value_number', 'value_text', 'value_bool'])
                 if has_value_write:
                     if dt in ('integer', 'float', 'currency', 'percent'):
                         if 'value_number' in vals:
-                            # Keep the value as is
                             pass
                         record_vals['value_text'] = False
                         record_vals['value_bool'] = False
                     elif dt == 'text':
                         if 'value_text' in vals:
-                            # Keep the value as is
                             pass
                         record_vals['value_number'] = False
                         record_vals['value_bool'] = False
                     elif dt == 'boolean':
                         if 'value_bool' in vals:
-                            # Keep the value as is
                             pass
                         record_vals['value_number'] = False
                         record_vals['value_text'] = False
-
             super(NhsEricValue, record).write(record_vals)
-
         if not self.env.context.get('bypass_status_update'):
             self.with_context(bypass_status_update=True)._update_status()
-
-        # Trigger dependents recalculation if value changed
-        value_changed = any(f in vals for f in ['value_number', 'value_text', 'value_bool', 'auto_value', 'auto_value_text', 'auto_value_bool', 'auto_value_populated'])
-        if value_changed:
+        value_changed = any(f in vals for f in ['value_number', 'value_text', 'value_bool', 'auto_value',
+                                                'auto_value_text', 'auto_value_bool', 'auto_value_populated'])
+        if value_changed and not self.env.context.get('bypass_recalculate_dependents'):
             self._recalculate_dependents()
-
         return True
 
     def _update_status(self):
         """Validate and update the status of this value record."""
-        # Pre-fetch min/max values from DB
         item_def_ids = self.mapped('item_def_id').ids
         db_min_max = {}
         if item_def_ids:
@@ -365,22 +336,15 @@ class NhsEricValue(models.Model):
                 (item_def_ids,)
             )
             db_min_max = {row[0]: (row[1], row[2]) for row in self.env.cr.fetchall()}
-
         for record in self:
             if not record.item_def_id or record.item_def_id.change_flag == 'removed':
                 continue
-
-            # Get the active value based on source type
             source_type = record.item_def_id.source_type
             data_type = record.item_def_id.data_type
-
-            # Determine the value to validate
             val = None
             has_value = record._has_value()
-
             if has_value:
                 if source_type == 'auto':
-                    # For AUTO: use auto fields (or typed fields if overridden)
                     if record.is_overridden:
                         if data_type in ('integer', 'float', 'currency', 'percent'):
                             val = record.value_number
@@ -396,38 +360,23 @@ class NhsEricValue(models.Model):
                         elif data_type == 'boolean':
                             val = record.auto_value_bool
                 else:
-                    # For MANUAL/COMPUTED: use the typed field
                     if data_type in ('integer', 'float', 'currency', 'percent'):
                         val = record.value_number
                     elif data_type == 'text':
                         val = record.value_text
                     elif data_type == 'boolean':
                         val = record.value_bool
-
-            # Check required fields - if required and no value, mark as gap
-            if record.item_def_id.required and not has_value:
-                record.status = 'gap'
-                continue
-
-            # If the item has no value, mark as gap (regardless of required or not)
             if not has_value:
                 record.status = 'gap'
                 continue
-
-            # At this point, we have a value. Check validation rules.
-
-            # Check range for numeric types - ONLY if min_value or max_value are explicitly set
             if data_type in ('integer', 'float', 'currency', 'percent'):
                 if val is not None:
-                    # Check integer type constraint
                     if data_type == 'integer' and val % 1 != 0:
                         record.status = 'invalid'
                         continue
                     db_min, db_max = db_min_max.get(record.item_def_id.id, (None, None))
-                    # Clean up database float defaults (False/None/0.0)
                     has_min = db_min is not None and db_min is not False and (db_min != 0.0 or (db_max and db_max > 0.0))
                     has_max = db_max is not None and db_max is not False and db_max != 0.0
-                    
                     if has_min:
                         if val < db_min:
                             record.status = 'invalid'
@@ -436,14 +385,14 @@ class NhsEricValue(models.Model):
                         if val > db_max:
                             record.status = 'invalid'
                             continue
-
-            # Check allowed values - ONLY if allowed_values is set
             if record.item_def_id.allowed_values:
                 allowed_vals = [v.strip().lower() for v in record.item_def_id.allowed_values.split(',') if v.strip()]
                 if allowed_vals:
-                    val_str = ''
                     if data_type == 'text':
                         val_str = str(val or '').strip().lower()
+                        if val_str not in allowed_vals:
+                            record.status = 'invalid'
+                            continue
                     elif data_type in ('integer', 'float', 'currency', 'percent'):
                         if val is not None:
                             if isinstance(val, (int, float)) and hasattr(val, 'is_integer') and val.is_integer():
@@ -451,46 +400,49 @@ class NhsEricValue(models.Model):
                             else:
                                 val_str = str(val)
                             val_str = val_str.lower()
+                            if val_str not in allowed_vals:
+                                record.status = 'invalid'
+                                continue
                     elif data_type == 'boolean':
-                        val_str = str(val).lower()
-
-                    if val_str not in allowed_vals:
-                        record.status = 'invalid'
-                        continue
-
-            # Check data type consistency - text fields are special
+                        b_val = bool(val)
+                        matches_yes = b_val and any(x in allowed_vals for x in ('yes', 'true', '1', 'y', 't'))
+                        matches_no = (not b_val) and any(x in allowed_vals for x in ('no', 'false', '0', 'n', 'f'))
+                        if not (matches_yes or matches_no):
+                            record.status = 'invalid'
+                            continue
             if data_type == 'text':
-                # For text fields, we already validated has_value above
-                # If we got here, there is a value, so it's valid
-                # No additional validation needed for text
                 pass
             elif data_type == 'boolean' and val is None:
                 record.status = 'invalid'
                 continue
-
-            # Check cross-field errors
+            elif data_type == 'currency' and (val is None or val < 0):
+                record.status = 'invalid'
+                continue
+            elif data_type == 'percent' and (val is None or not (0 <= val <= 100)):
+                record.status = 'invalid'
+                continue
             if record.return_id:
                 cross_errors = record.return_id._perform_cross_field_checks()
                 if any(err[0] == record or err[0].id == record.id for err in cross_errors):
                     record.status = 'invalid'
                     continue
-
-            # Mark as valid
             record.status = 'populated'
 
     def unlink(self):
+        """ Prevent deletion of values in finalised or submitted returns. """
         for record in self:
             if record.return_id.state in ('finalised', 'submitted'):
                 raise UserError('This return has been finalised/submitted and is locked for editing.')
         return super(NhsEricValue, self).unlink()
 
-    @api.depends('item_def_id', 'auto_value', 'auto_value_text', 'auto_value_bool', 'auto_value_populated', 'return_id.company_id', 'return_id.dataset_id.year', 'site_id', 'item_def_id.site_id')
+    @api.depends('item_def_id', 'auto_value', 'auto_value_text', 'auto_value_bool', 'auto_value_populated',
+                 'return_id.company_id', 'return_id.dataset_id.year', 'site_id')
     def _compute_source_note(self):
         """Compute human-readable source note with traceability details."""
         resolver = self.env['nhs.eric.source.resolver'].sudo()
         for record in self:
             if record.item_def_id.source_type == 'auto' and record.auto_value_populated:
-                site = record.item_def_id.site_id or record.site_id if record.item_def_id.reporting_level == 'site' else None
+                site = record.site_id if record.item_def_id.reporting_level == 'site' else None
                 record.source_note = resolver.get_traceability_note(
                     record.item_def_id.source_key,
                     record.return_id.company_id,
@@ -507,11 +459,9 @@ class NhsEricValue(models.Model):
         self.ensure_one()
         if not self.item_def_id:
             return
-
         self = self.with_context(bypass_is_overridden_set=True)
         data_type = self.item_def_id.data_type
         source_type = self.item_def_id.source_type
-
         vals = {}
         if source_type == 'auto':
             if data_type in ('integer', 'float', 'currency', 'percent'):
@@ -525,7 +475,6 @@ class NhsEricValue(models.Model):
             elif data_type == 'boolean':
                 vals['auto_value_bool'] = bool(value) if value is not None else False
                 vals['auto_value'] = 1.0 if vals['auto_value_bool'] else 0.0
-
         if data_type in ('integer', 'float', 'currency', 'percent'):
             try:
                 vals['value_number'] = float(value) if value is not None else 0.0
@@ -541,7 +490,6 @@ class NhsEricValue(models.Model):
             vals['value_bool'] = bool(value) if value is not None else False
             vals['value_number'] = False
             vals['value_text'] = False
-
         self.write(vals)
 
     def _get_value_display(self):
@@ -549,11 +497,8 @@ class NhsEricValue(models.Model):
         self.ensure_one()
         if not self.item_def_id:
             return ''
-
         data_type = self.item_def_id.data_type
         source_type = self.item_def_id.source_type
-
-        # For AUTO items: show auto fields (or typed fields if overridden)
         if source_type == 'auto':
             if self.is_overridden:
                 if data_type in ('integer', 'float', 'currency', 'percent'):
@@ -569,15 +514,31 @@ class NhsEricValue(models.Model):
                     return self.auto_value_text or ''
                 elif data_type == 'boolean':
                     return 'Yes' if self.auto_value_bool else 'No'
-
-        # For MANUAL/COMPUTED items: show the typed field
         if data_type in ('integer', 'float', 'currency', 'percent'):
             return str(self.value_number) if self.value_number is not None else ''
         elif data_type == 'text':
             return self.value_text or ''
         elif data_type == 'boolean':
             return 'Yes' if self.value_bool else 'No'
-        return ''
+
+    def _get_numeric_value(self):
+        """Get active numeric value for record based on source type and data type."""
+        self.ensure_one()
+        dt = self.item_def_id.data_type
+        source_type = self.item_def_id.source_type
+        if dt in ('integer', 'float', 'currency', 'percent'):
+            if source_type == 'auto' and not self.is_overridden:
+                return self.auto_value if (self.auto_value_populated or self.auto_value) else (self.value_number or 0.0)
+            return self.value_number or 0.0
+        elif dt == 'boolean':
+            val = self.auto_value_bool if (source_type == 'auto' and not self.is_overridden) else self.value_bool
+            return 1.0 if val else 0.0
+        else:
+            val = self.auto_value_text if (source_type == 'auto' and not self.is_overridden) else self.value_text
+            try:
+                return float(val or 0.0)
+            except (ValueError, TypeError):
+                return 0.0
 
     def _has_value(self):
         """
@@ -586,15 +547,12 @@ class NhsEricValue(models.Model):
         self.ensure_one()
         if not self.item_def_id:
             return False
-
         data_type = self.item_def_id.data_type
         source_type = self.item_def_id.source_type
-
-        # For AUTO items not overridden, we rely on auto_value_populated
         if source_type == 'auto' and not self.is_overridden:
             return self.auto_value_populated
-
-        # For MANUAL/COMPUTED items or overridden AUTO items: check the typed field in the database
+        if source_type == 'computed':
+            return self.status == 'populated'
         if self.id and isinstance(self.id, int):
             self.flush_recordset(['value_number', 'value_text', 'value_bool'])
             self.env.cr.execute(
@@ -611,8 +569,6 @@ class NhsEricValue(models.Model):
                 elif data_type == 'boolean':
                     return db_bool is not None
             return False
-
-        # Fallback for new/unsaved records
         if data_type in ('integer', 'float', 'currency', 'percent'):
             return self.value_number is not None
         elif data_type == 'text':
@@ -626,11 +582,8 @@ class NhsEricValue(models.Model):
         self.ensure_one()
         if self.return_id.state in ('finalised', 'submitted'):
             raise UserError('Cannot override a finalised or submitted return.')
-
-        # Only AUTO items can be overridden
         if self.item_def_id.source_type != 'auto':
             raise UserError('Only auto-populated items can be overridden.')
-
         self.is_overridden = True
         if not self.override_reason:
             self.override_reason = "Manual override applied"
@@ -641,11 +594,8 @@ class NhsEricValue(models.Model):
         self.ensure_one()
         if self.return_id.state in ('finalised', 'submitted'):
             raise UserError('Cannot clear override on a finalised or submitted return.')
-
-        # Only AUTO items can have override cleared
         if self.item_def_id.source_type != 'auto':
             raise UserError('Only auto-populated items can have override cleared.')
-
         self.is_overridden = False
         val_to_restore = None
         if self.auto_value_populated:
@@ -691,54 +641,98 @@ class NhsEricValue(models.Model):
         return True
 
     def _calculate_computed_value(self, visited=None):
+        """ Calculate the computed value based on input definitions and operator. """
         self.ensure_one()
+        if visited is None:
+            visited = set()
+        if self.id in visited:
+            return
+        visited.add(self.id)
         input_defs = self.item_def_id.computed_input_ids
         op = self.item_def_id.computation_operator
         if not input_defs or not op:
             return
 
         def get_value_number_from_record(val_rec):
+            """
+            Extract numeric value from a value record based on its data type.
+            Handles different data types (integer, float, currency, percent,
+            boolean, text) and source types (auto, manual) to return a
+            consistent numeric representation.
+            Args:
+                val_rec (recordset): A single nhs.eric.value record.
+            Returns:
+                float: Numeric representation of the value (0.0 if invalid).
+            """
             if not val_rec:
                 return 0.0
             val_rec = val_rec[0]
             dt = val_rec.item_def_id.data_type
+            source_type = val_rec.item_def_id.source_type
             if dt in ('integer', 'float', 'currency', 'percent'):
-                val = val_rec.value_number
-                if (val is None or val is False) and val_rec.item_def_id.source_type == 'auto':
-                    val = val_rec.auto_value
-                return val or 0.0
+                if source_type == 'auto' and not val_rec.is_overridden:
+                    return val_rec.auto_value if (val_rec.auto_value_populated or val_rec.auto_value) \
+                        else (val_rec.value_number or 0.0)
+                return val_rec.value_number or 0.0
             elif dt == 'boolean':
-                return 1.0 if val_rec.value_bool else 0.0
+                val = val_rec.auto_value_bool if (source_type == 'auto' and not val_rec.is_overridden) \
+                    else val_rec.value_bool
+                return 1.0 if val else 0.0
             else:
+                val = val_rec.auto_value_text if (source_type == 'auto' and not val_rec.is_overridden) \
+                    else val_rec.value_text
                 try:
-                    return float(val_rec.value_text or 0.0)
+                    return float(val or 0.0)
                 except (ValueError, TypeError):
                     return 0.0
 
         def get_input_value(input_def):
+            """
+            Retrieve and resolve the value for a specific input definition.
+            Handles different reporting levels (organisational vs site-level)
+            and recursively resolves computed dependencies. Ensures all
+            required inputs are valid and available before returning a value.
+            Args:
+                input_def (recordset): An nhs.eric.item.def record.
+            Returns:
+                float or None: The resolved numeric value, or None if
+                              the input value is missing or invalid.
+            """
             dep_vals = self.return_id.value_ids.filtered(lambda v: v.item_def_id == input_def)
             if not dep_vals:
-                return 0.0
-            
-            # 1. Computed is site-level, Input is site-level: match the site
+                return None
+            for dv in dep_vals:
+                if dv.item_def_id.source_type == 'computed' and dv.id not in visited:
+                    dv._calculate_computed_value(visited=visited)
+
             if self.item_def_id.reporting_level == 'site' and input_def.reporting_level == 'site':
                 dep_val = dep_vals.filtered(lambda v: v.site_id == self.site_id)
+                if not dep_val or dep_val.status == 'gap' or not dep_val[0]._has_value():
+                    return None
                 return get_value_number_from_record(dep_val)
-                
-            # 2. Input is trust-level: match site_id = False/None
             if input_def.reporting_level == 'organisational':
                 dep_val = dep_vals.filtered(lambda v: not v.site_id)
+                if not dep_val or dep_val.status == 'gap' or not dep_val[0]._has_value():
+                    return None
                 return get_value_number_from_record(dep_val)
-                
-            # 3. Computed is trust-level, Input is site-level: sum all sites
             if self.item_def_id.reporting_level == 'organisational' and input_def.reporting_level == 'site':
-                return sum(get_value_number_from_record(v) for v in dep_vals if v.site_id)
-                
-            return 0.0
-
-        # Get float/numeric values of the inputs
+                site_vals = dep_vals.filtered(lambda v: v.site_id)
+                valid_site_vals = [v for v in site_vals if v.status != 'gap' and v._has_value()]
+                if not valid_site_vals or len(valid_site_vals) < len(site_vals):
+                    return None
+                return sum(get_value_number_from_record(v) for v in valid_site_vals)
+            return None
         input_vals = [get_input_value(inp) for inp in input_defs]
-        
+        if any(v is None for v in input_vals):
+            vals = {
+                'status': 'gap',
+                'value_number': 0.0,
+                'value_text': False,
+                'value_bool': False,
+            }
+            self.with_context(bypass_status_update=True, bypass_is_overridden_set=True,
+                              bypass_recalculate_dependents=True).write(vals)
+            return
         result = 0.0
         if op == 'sum':
             result = sum(input_vals)
@@ -763,51 +757,43 @@ class NhsEricValue(models.Model):
                 result = sum(input_vals) / len(input_vals)
         elif op == 'pct':
             if len(input_vals) >= 2:
-                num = input_vals[0]
-                den = input_vals[1]
+                den = input_vals[0]
+                num = input_vals[1]
                 result = (num / den) * 100.0 if den != 0.0 else 0.0
             elif input_vals:
                 result = input_vals[0]
-
-        # Write the calculated result to the appropriate field
         dt = self.item_def_id.data_type
-        vals = {}
+        vals = {'value_number': 0.0, 'value_text': False, 'value_bool': False}
         if dt in ('integer', 'float', 'currency', 'percent'):
             try:
-                vals['value_number'] = float(result)
+                vals['value_number'] = float(int(round(result))) if dt == 'integer' else float(result)
             except (ValueError, TypeError):
                 vals['value_number'] = 0.0
         elif dt == 'boolean':
             vals['value_bool'] = bool(result)
         else:
             vals['value_text'] = str(result) if result is not None else False
-            
         vals['status'] = 'populated'
-        
-        self.with_context(bypass_status_update=True, bypass_is_overridden_set=True).write(vals)
-        # Re-run _update_status to correctly evaluate ranges and allowed values
+        self.with_context(bypass_status_update=True, bypass_is_overridden_set=True,
+                          bypass_recalculate_dependents=True).write(vals)
         self.with_context(bypass_status_update=True)._update_status()
 
     def _recalculate_dependents(self, visited=None):
+        """ Recalculate dependent computed values when this value changes. """
         if visited is None:
             visited = set()
-        
         for record in self:
             if record.id in visited:
                 continue
             visited.add(record.id)
-            
-            # Find all computed items on the return
             computed_vals = record.return_id.value_ids.filtered(
                 lambda v: v.item_def_id.source_type == 'computed'
             )
-            
             for comp_val in computed_vals:
-                # Check site scoping: if both are site-level, they must match
+                if comp_val.id in visited:
+                    continue
                 if record.site_id and comp_val.site_id and comp_val.site_id != record.site_id:
                     continue
-                
-                # Check if record's item is in the computed_input_ids of the computed item definition
                 if record.item_def_id in comp_val.item_def_id.computed_input_ids:
-                    # Recalculate this computed value
                     comp_val._calculate_computed_value(visited=visited)
+                    comp_val._recalculate_dependents(visited=visited)

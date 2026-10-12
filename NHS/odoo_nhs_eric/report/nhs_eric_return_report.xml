@@ -13,12 +13,11 @@
 
     <!-- Report Template -->
     <template id="report_nhs_eric_return_template">
-        <t t-foreach="docs" t-as="doc">
-            <t t-call="web.html_container">
+        <t t-call="web.html_container">
+            <t t-if="docs">
                 <t t-foreach="docs" t-as="doc">
                     <t t-call="web.external_layout">
                         <div class="page">
-                            <!-- Custom styles for better PDF formatting -->
                             <style type="text/css">
                                 .report-header {
                                 border-bottom: 3px solid #005EB8;
@@ -230,8 +229,6 @@
                                 margin-left: 2px;
                                 }
                             </style>
-
-                            <!-- Report Header -->
                             <div class="report-header">
                                 <div class="row">
                                     <div class="col-8">
@@ -248,8 +245,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Organisation Information -->
                             <table class="info-table">
                                 <tr>
                                     <th class="p-3">Organisation</th>
@@ -295,8 +290,6 @@
                                     </td>
                                 </tr>
                             </table>
-
-                            <!-- Summary Statistics - SIDE BY SIDE -->
                             <t t-set="total_values" t-value="len(doc.value_ids)"/>
                             <t t-set="populated_values"
                                t-value="len(doc.value_ids.filtered(lambda v: v.status == 'populated'))"/>
@@ -307,7 +300,6 @@
                                t-value="len(doc.value_ids.filtered(lambda v: v.item_def_id.source_type == 'auto'))"/>
                             <t t-set="manual_values"
                                t-value="len(doc.value_ids.filtered(lambda v: v.item_def_id.source_type == 'manual'))"/>
-
                             <div class="row summary-stats">
                                 <div class="col summary-stat-item">
                                     <div class="label">Total Items</div>
@@ -348,10 +340,7 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Values by Section -->
                             <div class="section-title">Values by Section</div>
-
                             <t t-set="sections" t-value="doc.dataset_id.section_ids.sorted('sequence')"/>
                             <t t-foreach="sections" t-as="section">
                                 <t t-set="section_values"
@@ -369,11 +358,12 @@
                                     <table class="values-table">
                                         <thead>
                                             <tr>
-                                                <th style="width: 25%;">Item</th>
-                                                <th style="width: 20%;">Value</th>
-                                                <th style="width: 15%;">Auto Value</th>
-                                                <th style="width: 20%;">Source</th>
-                                                <th style="width: 20%;">Status</th>
+                                                <th style="width: 24%;">Item</th>
+                                                <th style="width: 16%;">Value</th>
+                                                <th style="width: 13%;">Auto Value</th>
+                                                <th style="width: 15%;">Source</th>
+                                                <th style="width: 18%;">Site</th>
+                                                <th style="width: 14%;">Status</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -419,20 +409,22 @@
                                                         </t>
                                                     </td>
                                                     <td>
+                                                        <t t-if="value.item_def_id.reporting_level == 'site' and value.site_id">
+                                                            <t t-esc="value.site_id.name"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span class="text-muted">-</span>
+                                                        </t>
+                                                    </td>
+                                                    <td>
                                                         <span t-attf-class="status-badge status-#{value.status}">
                                                             <t t-if="value.status == 'populated'">Populated</t>
                                                             <t t-elif="value.status == 'gap'">Gap</t>
                                                             <t t-elif="value.status == 'invalid'">Invalid</t>
-                                                            <t t-elif="value.status == 'overridden'">Overridden</t>
                                                             <t t-else="">
                                                                 <t t-esc="value.status"/>
                                                             </t>
                                                         </span>
-                                                        <t t-if="value.status == 'overridden'">
-                                                            <span style="display: block; font-size: 9px; color: #00A3E0;">
-                                                                (Manual Override)
-                                                            </span>
-                                                        </t>
                                                     </td>
                                                 </tr>
                                             </t>
@@ -440,8 +432,6 @@
                                     </table>
                                 </t>
                             </t>
-
-                            <!-- Footer -->
                             <div class="table-footer">
                                 <p>
                                     <strong>NHS ERIC Return Report</strong>
@@ -451,10 +441,6 @@
                                 </p>
                                 <p style="margin-top: 5px; font-size: 9px; color: #A9B3B9;">
                                     This report is auto-generated from the NHS ERIC Return Management System.
-                                    <t t-if="doc.state != 'signed_off'">
-                                        <br/>
-                                        <span style="color: #CE7B11;">⚠ This return is not yet signed off.</span>
-                                    </t>
                                     <t t-if="doc.gap_count > 0">
                                         <br/>
                                         <span style="color: #DA291C;">⚠ This return has
@@ -463,16 +449,21 @@
                                         </span>
                                     </t>
                                 </p>
-                                <p style="margin-top: 5px;">
-                                    <span style="font-size: 8px; color: #A9B3B9;">
-                                        <span class="page-number"/>
-                                        of
-                                        <span class="topage"/>
-                                    </span>
-                                </p>
                             </div>
                         </div>
                     </t>
+                </t>
+            </t>
+            <t t-else="">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: Arial, sans-serif;">
+                        <div style="border-bottom: 3px solid #005EB8; padding-bottom: 10px; margin-bottom: 20px;">
+                            <h2 style="color: #005EB8; margin: 0;">NHS ERIC Return Report</h2>
+                        </div>
+                        <div style="padding: 20px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; text-align: center;">
+                            <p style="color: #6c757d; margin: 0; font-size: 14px;">No ERIC return records found to display in the report.</p>
+                        </div>
+                    </div>
                 </t>
             </t>
         </t>

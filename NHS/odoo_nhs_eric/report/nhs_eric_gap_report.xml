@@ -13,12 +13,11 @@
 
     <!-- Report Template -->
     <template id="report_nhs_eric_gap_template">
-        <t t-foreach="docs" t-as="doc">
-            <t t-call="web.html_container">
+        <t t-call="web.html_container">
+            <t t-if="docs">
                 <t t-foreach="docs" t-as="doc">
                     <t t-call="web.external_layout">
                         <div class="page">
-                            <!-- Custom styles for better PDF formatting -->
                             <style>
                                 .report-header {
                                 border-bottom: 3px solid #005EB8;
@@ -159,7 +158,6 @@
                                 color: #009639;
                                 }
                             </style>
-
                             <div class="report-header">
                                 <div class="row">
                                     <div class="col-8">
@@ -176,8 +174,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Organisation Information -->
                             <table class="info-table">
                                 <tr>
                                     <th class="p-3">Organisation</th>
@@ -212,25 +208,31 @@
                                     </td>
                                 </tr>
                             </table>
-
-                            <!-- Gaps and Invalid Items Table -->
                             <t t-set="gaps" t-value="doc.value_ids.filtered(lambda v: v.status in ['gap', 'invalid'])"/>
                             <div class="section-title">Gaps and Invalid Items</div>
-
                             <t t-if="gaps">
                                 <table class="gap-table">
                                     <thead>
                                         <tr>
-                                            <th style="width: 20%;">Section</th>
-                                            <th style="width: 25%;">Item</th>
-                                            <th style="width: 15%;">Status</th>
-                                            <th style="width: 20%;">Owner</th>
-                                            <th style="width: 20%;">Action Required</th>
+                                            <th style="width: 16%;">Site</th>
+                                            <th style="width: 18%;">Section</th>
+                                            <th style="width: 24%;">Item</th>
+                                            <th style="width: 14%;">Status</th>
+                                            <th style="width: 14%;">Owner</th>
+                                            <th style="width: 14%;">Action Required</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <t t-foreach="gaps" t-as="value">
                                             <tr>
+                                                <td>
+                                                    <t t-if="value.item_def_id.reporting_level == 'site' and value.site_id">
+                                                        <t t-esc="value.site_id.name"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="text-muted">-</span>
+                                                    </t>
+                                                </td>
                                                 <td>
                                                     <strong>
                                                         <t t-esc="value.section_id.name"/>
@@ -262,8 +264,6 @@
                                         </t>
                                     </tbody>
                                 </table>
-
-                                <!-- Pagination/Grouping by Section -->
                                 <t t-set="sections" t-value="set(gaps.mapped('section_id'))"/>
                                 <t t-if="len(sections) > 1">
                                     <div style="margin-top: 20px; padding: 10px; background-color: #F0F4F5; border-radius: 4px; font-size: 11px;">
@@ -292,8 +292,6 @@
                                     No gaps or invalid items found. The return is complete!
                                 </div>
                             </t>
-
-                            <!-- Footer -->
                             <div class="table-footer">
                                 <p>
                                     <strong>NHS ERIC Gap Report</strong>
@@ -313,6 +311,18 @@
                             </div>
                         </div>
                     </t>
+                </t>
+            </t>
+            <t t-else="">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: Arial, sans-serif;">
+                        <div style="border-bottom: 3px solid #005EB8; padding-bottom: 10px; margin-bottom: 20px;">
+                            <h2 style="color: #005EB8; margin: 0;">NHS ERIC Gap Report</h2>
+                        </div>
+                        <div style="padding: 20px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; text-align: center;">
+                            <p style="color: #6c757d; margin: 0; font-size: 14px;">No ERIC return records found to display in the report.</p>
+                        </div>
+                    </div>
                 </t>
             </t>
         </t>

@@ -24,6 +24,11 @@ from odoo.exceptions import ValidationError
 import re
 
 class NhsEricDataset(models.Model):
+    """
+        Model for ERIC Data Set Definitions. Manages versioned ERIC data
+        collection templates by financial year, with sections and item
+        definitions for NHS estate returns and reporting.
+    """
     _name = 'nhs.eric.dataset'
     _description = 'A versioned ERIC data-set definition for a collection year'
     _order = 'year desc'
@@ -47,7 +52,7 @@ class NhsEricDataset(models.Model):
         string='Status',
         required=True,
         default='draft',
-        help='Only one active per year.'
+        help='State of the dataset (whether draft, or active).'
     )
     section_ids = fields.One2many(
         'nhs.eric.section',
@@ -102,32 +107,23 @@ class NhsEricDataset(models.Model):
         self.ensure_one()
         if not self.prior_dataset_id:
             return True
-
-        # Map prior items by code
         prior_items = {}
         for section in self.prior_dataset_id.section_ids:
             for item in section.item_def_ids:
                 if item.code:
                     prior_items[item.code] = item
-
-        # Map current items by code
         current_items = {}
         for section in self.section_ids:
             for item in section.item_def_ids:
                 if item.code:
                     current_items[item.code] = item
-
-        # Fields to compare to detect "changed" items
         fields_to_compare = [
             'name', 'data_type', 'unit', 'source_type', 'source_key',
             'required', 'min_value', 'max_value', 'allowed_values'
         ]
-
-        # 1. Update current items (new, changed, unchanged)
         for code, item in current_items.items():
             if item.change_flag == 'removed':
                 continue
-
             if code not in prior_items:
                 item.write({'change_flag': 'new'})
             else:
@@ -137,41 +133,30 @@ class NhsEricDataset(models.Model):
                     if getattr(item, field) != getattr(prior_item, field):
                         changed = True
                         break
-                
-                # Also check section code
                 if item.section_id.code != prior_item.section_id.code:
                     changed = True
-
                 if changed:
                     item.write({'change_flag': 'changed'})
                 else:
                     item.write({'change_flag': 'unchanged'})
-
-        # 2. Identify removed items and create/update placeholder records with change_flag = 'removed'
         for code, prior_item in prior_items.items():
             if code not in current_items:
-                # Need to find or create the matching section in the current dataset
                 prior_section = prior_item.section_id
                 current_section = self.section_ids.filtered(lambda s: s.code == prior_section.code)
                 if not current_section:
                     current_section = self.section_ids.filtered(lambda s: s.name == prior_section.name)
-                
                 if not current_section:
-                    # Create the section in current dataset
                     current_section = self.env['nhs.eric.section'].create({
                         'name': prior_section.name,
                         'code': prior_section.code,
                         'sequence': prior_section.sequence,
                         'dataset_id': self.id
                     })
-                
-                # Check if we already have a record for this code marked as removed
                 existing_removed = self.env['nhs.eric.item.def'].search([
                     ('section_id', 'in', self.section_ids.ids),
                     ('code', '=', code),
                     ('change_flag', '=', 'removed')
                 ])
-
                 if not existing_removed:
                     self.env['nhs.eric.item.def'].create({
                         'name': prior_item.name,
@@ -189,7 +174,6 @@ class NhsEricDataset(models.Model):
                         'help_text': prior_item.help_text,
                         'change_flag': 'removed'
                     })
-
         return True
 
     @api.constrains('year')
@@ -197,7 +181,6 @@ class NhsEricDataset(models.Model):
         """Validate year format is YYYY/YY."""
         for record in self:
             if record.year:
-                # Pattern: 1-4 digits before '/', 2 digits after
                 pattern = r'^\d{1,4}/\d{2}$'
                 if not re.match(pattern, record.year):
                     raise ValidationError(

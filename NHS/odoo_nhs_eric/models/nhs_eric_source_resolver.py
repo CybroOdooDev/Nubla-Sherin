@@ -22,6 +22,11 @@
 from odoo import api, models
 
 class NhsEricSourceResolver(models.Model):
+    """
+    Model for ERIC Source Resolver. Service model that resolves source keys
+    to values from estate and compliance modules, providing a unified data
+    retrieval interface for ERIC data collection.
+    """
     _name = 'nhs.eric.source.resolver'
     _description = 'ERIC Source Resolver (service model)'
     _transient = True
@@ -30,43 +35,35 @@ class NhsEricSourceResolver(models.Model):
     def resolve(self, source_key, company, year=None, site=None):
         """
         Resolve a source key to a value from the estate/compliance modules.
-
         Args:
             source_key (str): The source key to resolve, e.g. "estate.total_gia"
             company (recordset): The company/organisation to scope the data
             year (str, optional): The financial year for data scoping
             site (recordset, optional): Specific site for site-level aggregation
-
         Returns:
             The resolved value (float, dict, or None if not found)
         """
         if not source_key:
             return None
-
         self.env.flush_all()
-
         self = self.sudo()
         if company:
             self = self.with_company(company)
             company = company.sudo()
         if site:
             site = site.sudo()
-
         try:
             parts = source_key.split('.')
             if len(parts) < 2:
                 return None
-
             module = parts[0]
             key = '.'.join(parts[1:])
-
             if module == 'estate':
                 return self._resolve_estate(key, company, year, site=site)
             elif module == 'compliance':
                 return self._resolve_compliance(key, company, year, site=site)
             elif module == 'energy':
-                # Placeholder for future energy module
-                return None
+                return self._resolve_energy(key, company, year, site=site)
             else:
                 return None
         except Exception:
@@ -125,6 +122,15 @@ class NhsEricSourceResolver(models.Model):
             return self._get_overdue_count(company, site=site)
         else:
             return self._get_compliance_percentage(company, key, site=site)
+
+    def _resolve_energy(self, key, company, year, site=None):
+        """Resolve energy-related keys from Energy & Net Zero module."""
+        if 'nhs.energy.eric.resolver' in self.env:
+            return self.env['nhs.energy.eric.resolver'].resolve_energy_key(
+                key, company, year=year, site=site
+            )
+        return None
+
 
     def _get_total_gia(self, company, site=None):
         """
@@ -188,7 +194,8 @@ class NhsEricSourceResolver(models.Model):
         Risk levels: high, significant, moderate, low
         """
         Backlog = self.env['nhs.estate.backlog']
-        domain = [('risk_category', '=', risk_level), ('active', '=', True), ('status', '!=', 'resolved'), ('building_id.active', '=', True)]
+        domain = [('risk_category', '=', risk_level), ('active', '=', True), ('status', '!=', 'resolved'),
+                  ('building_id.active', '=', True)]
         if site:
             domain.append(('building_id.site_id', '=', site.id))
         else:
@@ -221,13 +228,11 @@ class NhsEricSourceResolver(models.Model):
         if site:
             domain.append(('site_id', '=', site.id))
         buildings = Building.search(domain)
-
         age_bands = {
             'pre_1980': 0,
             '1980_2000': 0,
             'post_2000': 0
         }
-
         for building in buildings:
             if not building.build_year:
                 continue
@@ -237,7 +242,6 @@ class NhsEricSourceResolver(models.Model):
                 age_bands['1980_2000'] += 1
             else:
                 age_bands['post_2000'] += 1
-
         return age_bands
 
     def _get_age_bands_pct(self, company, band, site=None):
@@ -250,12 +254,10 @@ class NhsEricSourceResolver(models.Model):
         if site:
             domain.append(('site_id', '=', site.id))
         buildings = Building.search(domain)
-        
         buildings_with_year = buildings.filtered(lambda b: b.build_year > 0)
         total_gia = sum(buildings_with_year.mapped('gia') or [])
         if not total_gia:
             return 0.0
-
         band_buildings = self.env['nhs.estate.building']
         for building in buildings_with_year:
             if building.build_year < 1980:
@@ -266,7 +268,6 @@ class NhsEricSourceResolver(models.Model):
                 b_band = 'post_2000'
             if b_band == band:
                 band_buildings |= building
-
         band_gia = sum(band_buildings.mapped('gia') or [])
         return (band_gia / total_gia) * 100.0
 
@@ -280,21 +281,17 @@ class NhsEricSourceResolver(models.Model):
         domain = [('company_id', '=', company.id), ('active', '=', True)]
         if site:
             domain.append(('site_id', '=', site.id))
-
         buildings = Building.search(domain)
         buildings_with_tenure = buildings.filtered(lambda b: b.tenure_type)
         total_area = sum(buildings_with_tenure.mapped('gia') or [])
         if not total_area:
             return 0.0
-
         if tenure_type == 'owned':
             allowed_types = ['freehold']
-        else:  # leased
+        else:
             allowed_types = ['leasehold', 'licence', 'pfi', 'lift', 'nhsps', 'chp']
-
         tenure_buildings = buildings_with_tenure.filtered(lambda b: b.tenure_type in allowed_types)
         tenure_area = sum(tenure_buildings.mapped('gia') or [])
-
         return (tenure_area / total_area) * 100.0
 
     def _get_condition(self, company, site=None):
@@ -308,16 +305,13 @@ class NhsEricSourceResolver(models.Model):
         if site:
             domain.append(('site_id', '=', site.id))
         buildings = Building.search(domain)
-
         if not buildings:
             return 0.0
-
         grade_map = {'A': 4.0, 'B': 3.0, 'C': 2.0, 'D': 1.0}
         grades = [grade_map.get(b.latest_condition_grade, 0.0) for b in buildings if
                   b.latest_condition_grade in grade_map]
         if not grades:
             return 0.0
-
         return sum(grades) / len(grades)
 
     def _get_condition_percentage(self, company, grade, site=None):
@@ -331,13 +325,11 @@ class NhsEricSourceResolver(models.Model):
         if site:
             domain.append(('site_id', '=', site.id))
         buildings = Building.search(domain)
-        
         buildings_with_grade = buildings.filtered(lambda b: b.latest_condition_grade)
         total_gia = sum(buildings_with_grade.mapped('gia') or [])
         if not total_gia:
             return 0.0
-
-        grade_buildings = buildings_with_grade.filtered(lambda b: b.latest_condition_grade == grade)
+        grade_buildings = buildings_with_grade.filtered(lambda b: b.latest_condition_grade==grade)
         grade_gia = sum(grade_buildings.mapped('gia') or [])
         return (grade_gia / total_gia) * 100.0
 
@@ -366,7 +358,6 @@ class NhsEricSourceResolver(models.Model):
             domain.append('|')
             domain.append(('building_id.site_id', '=', site.id))
             domain.append(('space_id.building_id.site_id', '=', site.id))
-
         if discipline:
             mapping = {
                 'fire': 'FIRE',
@@ -384,12 +375,10 @@ class NhsEricSourceResolver(models.Model):
             }
             mapped_code = mapping.get(discipline, discipline.upper())
             dis_domain = ['|', ('code', '=', mapped_code), ('name', '=ilike', discipline.replace('_', ' '))]
-
             discipline_rec = self.env['nhs.compliance.discipline'].search(dis_domain, limit=1)
             if not discipline_rec:
                 return self.env['nhs.compliance.item']
             domain.append(('discipline_id', '=', discipline_rec.id))
-
         return self.env['nhs.compliance.item'].search(domain)
 
     def _get_compliance_percentage(self, company, discipline, site=None):
@@ -434,32 +423,38 @@ class NhsEricSourceResolver(models.Model):
         """
         if not source_key:
             return "Manual entry"
-
         self.env.flush_all()
-
         self = self.sudo()
         if company:
             self = self.with_company(company)
             company = company.sudo()
         if site:
             site = site.sudo()
-
         try:
             parts = source_key.split('.')
             if len(parts) < 2:
                 return f"Auto from {source_key}"
-
             module = parts[0]
             key = '.'.join(parts[1:])
-
             if module == 'estate':
                 return self._get_estate_traceability(key, company, year, site)
             elif module == 'compliance':
                 return self._get_compliance_traceability(key, company, year, site)
+            elif module == 'energy':
+                return self._get_energy_traceability(key, company, year, site)
             else:
                 return f"Auto from {source_key}"
         except Exception as e:
             return f"Auto from {source_key} (Error generating details: {str(e)})"
+
+    def _get_energy_traceability(self, key, company, year, site=None):
+        """Generate traceability note for energy-related keys."""
+        if 'nhs.energy.eric.resolver' in self.env:
+            return self.env['nhs.energy.eric.resolver'].get_energy_traceability_note(
+                key, company, year=year, site=site
+            )
+        return f"Energy & Net Zero — {key}"
+
 
     def _get_estate_traceability(self, key, company, year, site=None):
         """
@@ -468,8 +463,6 @@ class NhsEricSourceResolver(models.Model):
         """
         notes = []
         source_name = "Estate Register"
-
-        # Site count, building count and GIA
         if key == 'total_gia':
             if site:
                 notes.append(f"Site: {site.name} ({site.code or 'No Code'}) - GIA: {site.total_gia or 0.0} m²")
@@ -478,7 +471,6 @@ class NhsEricSourceResolver(models.Model):
                 for s in sites:
                     notes.append(f"Site: {s.name} ({s.code or 'No Code'}) - GIA: {s.total_gia or 0.0} m²")
             return f"{source_name} — Total GIA. Details:\n" + "\n".join(notes)
-
         elif key == 'site_count':
             if site:
                 notes.append(f"Site: {site.name} ({site.code or 'No Code'})")
@@ -487,7 +479,6 @@ class NhsEricSourceResolver(models.Model):
                 for s in sites:
                     notes.append(f"Site: {s.name} ({s.code or 'No Code'})")
             return f"{source_name} — Site Count. Details:\n" + "\n".join(notes)
-
         elif key == 'building_count':
             domain = [('company_id', '=', company.id), ('active', '=', True)]
             if site:
@@ -496,8 +487,6 @@ class NhsEricSourceResolver(models.Model):
             for b in buildings:
                 notes.append(f"Building: {b.name} ({b.code or 'No Code'}) [Site: {b.site_id.name}]")
             return f"{source_name} — Building Count. Details:\n" + "\n".join(notes)
-
-        # Land area and occupied floor area
         elif key == 'land_area':
             if site:
                 notes.append(f"Site: {site.name} ({site.code or 'No Code'}) - Land Area: {site.land_area_ha or 0.0} ha")
@@ -506,17 +495,15 @@ class NhsEricSourceResolver(models.Model):
                 for s in sites:
                     notes.append(f"Site: {s.name} ({s.code or 'No Code'}) - Land Area: {s.land_area_ha or 0.0} ha")
             return f"{source_name} — Land Area. Details:\n" + "\n".join(notes)
-
         elif key == 'occupied_floor_area':
             domain = [('company_id', '=', company.id), ('active', '=', True)]
             if site:
                 domain.append(('site_id', '=', site.id))
             buildings = self.env['nhs.estate.building'].search(domain)
             for b in buildings:
-                notes.append(f"Building: {b.name} ({b.code or 'No Code'}) - Occupied Area: {b.occupied_area or 0.0} m²")
+                notes.append(f"Building: {b.name} ({b.code or 'No Code'}) - Occupied Area: "
+                             f"{b.occupied_area or 0.0} m²")
             return f"{source_name} — Occupied Floor Area. Details:\n" + "\n".join(notes)
-
-        # Backlog maintenance cost by risk category
         elif key.startswith('backlog.'):
             risk_level = key.split('.')[1]
             Backlog = self.env['nhs.estate.backlog']
@@ -530,11 +517,10 @@ class NhsEricSourceResolver(models.Model):
             backlog_items = Backlog.search(domain)
             for item in backlog_items:
                 notes.append(
-                    f"Backlog Item: {item.name or 'Unnamed'} [Building: {item.building_id.name}] - Cost: £{item.cost_estimate or 0.0} (Risk: {item.risk_category})")
+                    f"Backlog Item: {item.name or 'Unnamed'} [Building: {item.building_id.name}] - Cost: "
+                    f"£{item.cost_estimate or 0.0} (Risk: {item.risk_category})")
             return f"{source_name} — Backlog Cost ({risk_level}). Details:\n" + (
                 "\n".join(notes) if notes else "No backlog records found.")
-
-        # Building age profile from build years
         elif key.startswith('age_bands'):
             band = key.split('.')[1] if '.' in key else None
             domain = [('company_id', '=', company.id), ('active', '=', True)]
@@ -550,14 +536,12 @@ class NhsEricSourceResolver(models.Model):
                     b_band = '1980_2000'
                 else:
                     b_band = 'post_2000'
-
                 if not band or b_band == band:
                     notes.append(
-                        f"Building: {b.name} ({b.code or 'No Code'}) - Built: {b.build_year or 'Unknown'} (GIA: {b.gia or 0.0} m²)")
+                        f"Building: {b.name} ({b.code or 'No Code'}) - Built: {b.build_year or 'Unknown'} "
+                        f"(GIA: {b.gia or 0.0} m²)")
             return f"{source_name} — Building Age Profile ({band or 'all'}). Details:\n" + (
                 "\n".join(notes) if notes else "No matching buildings found.")
-
-        # Tenure/ownership split
         elif key.startswith('tenure.'):
             tenure_type = key.split('.')[1]
             domain = [('company_id', '=', company.id), ('active', '=', True)]
@@ -573,11 +557,10 @@ class NhsEricSourceResolver(models.Model):
             for b in buildings:
                 if b.tenure_type in allowed_types:
                     notes.append(
-                        f"Building: {b.name} ({b.code or 'No Code'}) - Tenure: {b.tenure_type or 'Unknown'} (GIA: {b.gia or 0.0} m²)")
+                        f"Building: {b.name} ({b.code or 'No Code'}) - Tenure: {b.tenure_type or 'Unknown'} "
+                        f"(GIA: {b.gia or 0.0} m²)")
             return f"{source_name} — Tenure Split ({label}). Details:\n" + (
                 "\n".join(notes) if notes else "No matching buildings found.")
-
-        # Estate condition (Six Facet-derived)
         elif key.startswith('condition'):
             grade = None
             if key == 'condition':
@@ -590,7 +573,6 @@ class NhsEricSourceResolver(models.Model):
                 label = f"Percentage of Grade {grade}"
             else:
                 label = "Condition"
-
             domain = [('company_id', '=', company.id), ('active', '=', True)]
             if site:
                 domain.append(('site_id', '=', site.id))
@@ -598,10 +580,10 @@ class NhsEricSourceResolver(models.Model):
             for b in buildings:
                 if not grade or b.latest_condition_grade == grade:
                     notes.append(
-                        f"Building: {b.name} ({b.code or 'No Code'}) - Condition: {b.latest_condition_grade or 'None'} (GIA: {b.gia or 0.0} m²)")
+                        f"Building: {b.name} ({b.code or 'No Code'}) - Condition: {b.latest_condition_grade or 'None'} "
+                        f"(GIA: {b.gia or 0.0} m²)")
             return f"{source_name} — Condition Rating ({label}). Details:\n" + (
                 "\n".join(notes) if notes else "No matching buildings found.")
-
         return f"{source_name} — {key}"
 
     def _get_compliance_traceability(self, key, company, year, site=None):
@@ -611,14 +593,12 @@ class NhsEricSourceResolver(models.Model):
         """
         notes = []
         source_name = "Estates Compliance"
-
         if key == 'pct':
             items = self._get_compliance_items(company, site=site)
             for item in items:
                 notes.append(f"Item: {item.name} [Discipline: {item.discipline_id.name}] - Status: {item.status}")
             return f"{source_name} — Overall Compliance %. Details:\n" + (
                 "\n".join(notes) if notes else "No compliance items found.")
-
         elif key == 'overdue_count':
             items = self._get_compliance_items(company, site=site)
             overdue = items.filtered(lambda i: i.status in ('overdue', 'failed'))
@@ -627,9 +607,7 @@ class NhsEricSourceResolver(models.Model):
                     f"Overdue Item: {item.name} [Discipline: {item.discipline_id.name}] - Status: {item.status}")
             return f"{source_name} — Overdue Count. Details:\n" + (
                 "\n".join(notes) if notes else "No overdue items found.")
-
         else:
-            # key is a discipline
             items = self._get_compliance_items(company, site=site, discipline=key)
             for item in items:
                 notes.append(f"Item: {item.name} - Status: {item.status} (Next Test: {item.next_due_date or 'None'})")
@@ -640,30 +618,24 @@ class NhsEricSourceResolver(models.Model):
     def available_keys(self):
         """List all available source keys for configuration."""
         return [
-            # Site count, building count and GIA
             'estate.total_gia',
             'estate.site_count',
             'estate.building_count',
-            # Land area and occupied floor area
             'estate.land_area',
             'estate.occupied_floor_area',
-            # Backlog maintenance cost by risk category
             'estate.backlog.high',
             'estate.backlog.significant',
             'estate.backlog.moderate',
             'estate.backlog.low',
             'estate.backlog.total',
-            # Building age profile
             'estate.age_bands.pre_1980',
             'estate.age_bands.1980_2000',
             'estate.age_bands.post_2000',
             'estate.age_bands_pct.pre_1980',
             'estate.age_bands_pct.1980_2000',
             'estate.age_bands_pct.post_2000',
-            # Tenure/ownership split
             'estate.tenure.owned',
             'estate.tenure.leased',
-            # Estate condition (Six Facet-derived)
             'estate.condition',
             'estate.condition.A',
             'estate.condition.B',
@@ -673,7 +645,6 @@ class NhsEricSourceResolver(models.Model):
             'estate.condition.count.B',
             'estate.condition.count.C',
             'estate.condition.count.D',
-            # Statutory-compliance status by discipline
             'compliance.fire',
             'compliance.water',
             'compliance.electrical',
@@ -688,11 +659,24 @@ class NhsEricSourceResolver(models.Model):
             'compliance.working_at_height',
             'compliance.pct',
             'compliance.overdue_count',
-            # Placeholders for future modules
             'energy.electricity',
             'energy.gas',
-            'energy.carbon',
             'energy.water',
+            'energy.heat',
+            'energy.oil',
+            'energy.lpg',
+            'energy.cost',
+            'energy.cost.electricity',
+            'energy.cost.gas',
+            'energy.cost.water',
+            'energy.cost.heat',
+            'energy.cost.oil',
+            'energy.cost.lpg',
+            'energy.carbon',
+            'energy.carbon.scope_1',
+            'energy.carbon.scope_2',
+            'energy.carbon.scope_3',
+            'energy.site_breakdown',
         ]
 
     @api.model
@@ -740,5 +724,24 @@ class NhsEricSourceResolver(models.Model):
             'compliance.working_at_height' : 'Working at Height (%) - Estates Compliance',
             'compliance.pct': 'Overall Compliance (%) - Estates Compliance ',
             'compliance.overdue_count': 'Number of Overdue Compliance Items - Estates Compliance',
+            'energy.electricity': 'Electricity Consumption (kWh) - Energy & Net Zero',
+            'energy.gas': 'Gas Consumption (kWh) - Energy & Net Zero',
+            'energy.water': 'Water Consumption (m³) - Energy & Net Zero',
+            'energy.heat': 'Steam / Thermal Heat Consumption (kWh) - Energy & Net Zero',
+            'energy.oil': 'Fuel Oil Consumption (litres) - Energy & Net Zero',
+            'energy.lpg': 'LPG Consumption (kWh) - Energy & Net Zero',
+            'energy.cost': 'Total Utility Spend (£) - Energy & Net Zero',
+            'energy.cost.electricity': 'Electricity Spend (£) - Energy & Net Zero',
+            'energy.cost.gas': 'Gas Spend (£) - Energy & Net Zero',
+            'energy.cost.water': 'Water Spend (£) - Energy & Net Zero',
+            'energy.cost.heat': 'Heat Spend (£) - Energy & Net Zero',
+            'energy.cost.oil': 'Oil Spend (£) - Energy & Net Zero',
+            'energy.cost.lpg': 'LPG Spend (£) - Energy & Net Zero',
+            'energy.carbon': 'Total Estates Carbon Footprint (kg CO2e) - Energy & Net Zero',
+            'energy.carbon.scope_1': 'Scope 1 Direct Carbon Footprint (kg CO2e) - Energy & Net Zero',
+            'energy.carbon.scope_2': 'Scope 2 Indirect Carbon Footprint (kg CO2e) - Energy & Net Zero',
+            'energy.carbon.scope_3': 'Scope 3 Other Carbon Footprint (kg CO2e) - Energy & Net Zero',
+            'energy.site_breakdown': 'Per-site figures for site-level ERIC reporting - Energy & Net Zero',
         }
         return descriptions.get(source_key, source_key)
+

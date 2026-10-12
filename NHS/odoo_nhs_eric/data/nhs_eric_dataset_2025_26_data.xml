@@ -1,0 +1,674 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Dataset Definition for ERIC 2025/26 -->
+        <record id="dataset_eric_2025_26" model="nhs.eric.dataset">
+            <field name="name">ERIC 2025/26</field>
+            <field name="year">2025/26</field>
+            <field name="state">active</field>
+            <field name="notes">Official Estates Returns Information Collection (ERIC) 2025/26 dataset definition for
+                NHS Trusts.
+            </field>
+        </record>
+
+        <!-- SECTION 1: Site & Building Profile  -->
+        <record id="sec_site_profile" model="nhs.eric.section">
+            <field name="name">Site &amp; Building Profile</field>
+            <field name="code">SITE_PROFILE</field>
+            <field name="dataset_id" ref="dataset_eric_2025_26"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="item_site_count" model="nhs.eric.item.def">
+            <field name="name">Site Count</field>
+            <field name="code">S_COUNT</field>
+            <field name="section_id" ref="sec_site_profile"/>
+            <field name="sequence">10</field>
+            <field name="data_type">integer</field>
+            <field name="reporting_level">organisational</field>
+            <field name="unit">count</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.site_count</field>
+            <field name="required">1</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Total number of active NHS sites operated by the trust.</field>
+        </record>
+
+        <record id="item_building_count" model="nhs.eric.item.def">
+            <field name="name">Building Count</field>
+            <field name="code">B_COUNT</field>
+            <field name="section_id" ref="sec_site_profile"/>
+            <field name="sequence">20</field>
+            <field name="data_type">integer</field>
+            <field name="reporting_level">organisational</field>
+            <field name="unit">count</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.building_count</field>
+            <field name="required">1</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Total number of active buildings across all trust sites.</field>
+        </record>
+
+        <record id="item_total_gia" model="nhs.eric.item.def">
+            <field name="name">Total Gross Internal Area (GIA)</field>
+            <field name="code">S_GIA</field>
+            <field name="section_id" ref="sec_site_profile"/>
+            <field name="sequence">30</field>
+            <field name="data_type">float</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">m²</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.total_gia</field>
+            <field name="required">1</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Total Gross Internal Area in square metres.</field>
+        </record>
+
+        <record id="item_age_pre_1980" model="nhs.eric.item.def">
+            <field name="name">Age Profile: Pre-1980 Area</field>
+            <field name="code">AGE_PRE1980</field>
+            <field name="section_id" ref="sec_site_profile"/>
+            <field name="sequence">40</field>
+            <field name="data_type">float</field>
+            <field name="reporting_level">organisational</field>
+            <field name="unit">m²</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.age_bands.pre_1980</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Gross internal floor area of buildings constructed prior to 1980.</field>
+        </record>
+
+        <record id="item_age_1980_2000" model="nhs.eric.item.def">
+            <field name="name">Age Profile: 1980-2000 Area</field>
+            <field name="code">AGE_1980_2000</field>
+            <field name="section_id" ref="sec_site_profile"/>
+            <field name="sequence">50</field>
+            <field name="data_type">float</field>
+            <field name="reporting_level">organisational</field>
+            <field name="unit">m²</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.age_bands.1980_2000</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Gross internal floor area of buildings constructed between 1980 and 2000.</field>
+        </record>
+
+        <record id="item_age_post_2000" model="nhs.eric.item.def">
+            <field name="name">Age Profile: Post-2000 Area</field>
+            <field name="code">AGE_POST2000</field>
+            <field name="section_id" ref="sec_site_profile"/>
+            <field name="sequence">60</field>
+            <field name="data_type">float</field>
+            <field name="reporting_level">organisational</field>
+            <field name="unit">m²</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.age_bands.post_2000</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Gross internal floor area of buildings constructed after 2000.</field>
+        </record>
+
+        <record id="item_tenure_owned" model="nhs.eric.item.def">
+            <field name="name">Freehold / Owned Floor Area</field>
+            <field name="code">TEN_OWNED</field>
+            <field name="section_id" ref="sec_site_profile"/>
+            <field name="sequence">70</field>
+            <field name="data_type">percent</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">m²</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.tenure.owned</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Floor area owned outright / freehold by the Trust.</field>
+        </record>
+
+        <record id="item_tenure_leased" model="nhs.eric.item.def">
+            <field name="name">Leasehold / Rented Floor Area</field>
+            <field name="code">TEN_LEASED</field>
+            <field name="section_id" ref="sec_site_profile"/>
+            <field name="sequence">80</field>
+            <field name="data_type">percent</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">m²</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.tenure.leased</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Floor area occupied under leasehold / rental agreement.</field>
+        </record>
+
+        <!-- SECTION 2: Land & Space  -->
+        <record id="sec_land_space" model="nhs.eric.section">
+            <field name="name">Land &amp; Space</field>
+            <field name="code">LAND_SPACE</field>
+            <field name="dataset_id" ref="dataset_eric_2025_26"/>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="item_land_area" model="nhs.eric.item.def">
+            <field name="name">Total Land Area</field>
+            <field name="code">S_LAND_AREA</field>
+            <field name="section_id" ref="sec_land_space"/>
+            <field name="sequence">10</field>
+            <field name="data_type">float</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">ha</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.land_area</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Total land area owned or leased in hectares.</field>
+        </record>
+
+        <record id="item_occupied_floor_area" model="nhs.eric.item.def">
+            <field name="name">Occupied Floor Area</field>
+            <field name="code">S_OCCUPIED_GIA</field>
+            <field name="section_id" ref="sec_land_space"/>
+            <field name="sequence">20</field>
+            <field name="data_type">float</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">m²</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.occupied_floor_area</field>
+            <field name="required">1</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Total occupied floor area currently in operational use.</field>
+        </record>
+
+        <record id="item_unallocated_floor_area" model="nhs.eric.item.def">
+            <field name="name">Unallocated / Vacant Floor Area</field>
+            <field name="code">S_UNALLOCATED_GIA</field>
+            <field name="section_id" ref="sec_land_space"/>
+            <field name="sequence">30</field>
+            <field name="data_type">float</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">m²</field>
+            <field name="source_type">manual</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Unallocated or vacant floor area not currently utilised.</field>
+        </record>
+
+        <record id="item_space_utilisation_pct" model="nhs.eric.item.def">
+            <field name="name">Space Utilisation Percentage</field>
+            <field name="code">SPACE_UTIL_PCT</field>
+            <field name="section_id" ref="sec_land_space"/>
+            <field name="sequence">40</field>
+            <field name="data_type">percent</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">%</field>
+            <field name="source_type">computed</field>
+            <field name="computation_operator">pct</field>
+            <field name="computed_input_ids" eval="[(6, 0, [ref('item_occupied_floor_area'), ref('item_total_gia')])]"/>
+            <field name="required">1</field>
+            <field name="min_value">0.0</field>
+            <field name="max_value">100.0</field>
+            <field name="help_text">Percentage of total GIA currently occupied (Occupied GIA / Total GIA * 100).</field>
+        </record>
+
+        <!-- SECTION 3: Backlog Maintenance  -->
+        <record id="sec_backlog_maint" model="nhs.eric.section">
+            <field name="name">Backlog Maintenance</field>
+            <field name="code">BACKLOG_MAINT</field>
+            <field name="dataset_id" ref="dataset_eric_2025_26"/>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="item_backlog_high" model="nhs.eric.item.def">
+            <field name="name">High Risk Backlog Cost</field>
+            <field name="code">BACKLOG_HIGH</field>
+            <field name="section_id" ref="sec_backlog_maint"/>
+            <field name="sequence">10</field>
+            <field name="data_type">currency</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">£</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.backlog.high</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Estimated cost to clear high risk backlog maintenance.</field>
+        </record>
+
+        <record id="item_backlog_significant" model="nhs.eric.item.def">
+            <field name="name">Significant Risk Backlog Cost</field>
+            <field name="code">BACKLOG_SIGNIFICANT</field>
+            <field name="section_id" ref="sec_backlog_maint"/>
+            <field name="sequence">20</field>
+            <field name="data_type">currency</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">£</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.backlog.significant</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Estimated cost to clear significant risk backlog maintenance.</field>
+        </record>
+
+        <record id="item_backlog_moderate" model="nhs.eric.item.def">
+            <field name="name">Moderate Risk Backlog Cost</field>
+            <field name="code">BACKLOG_MODERATE</field>
+            <field name="section_id" ref="sec_backlog_maint"/>
+            <field name="sequence">30</field>
+            <field name="data_type">currency</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">£</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.backlog.moderate</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Estimated cost to clear moderate risk backlog maintenance.</field>
+        </record>
+
+        <record id="item_backlog_low" model="nhs.eric.item.def">
+            <field name="name">Low Risk Backlog Cost</field>
+            <field name="code">BACKLOG_LOW</field>
+            <field name="section_id" ref="sec_backlog_maint"/>
+            <field name="sequence">40</field>
+            <field name="data_type">currency</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">£</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.backlog.low</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Estimated cost to clear low risk backlog maintenance.</field>
+        </record>
+
+        <record id="item_backlog_total" model="nhs.eric.item.def">
+            <field name="name">Total Backlog Maintenance Cost</field>
+            <field name="code">BACKLOG_TOTAL</field>
+            <field name="section_id" ref="sec_backlog_maint"/>
+            <field name="sequence">50</field>
+            <field name="data_type">currency</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">£</field>
+            <field name="source_type">computed</field>
+            <field name="computation_operator">sum</field>
+            <field name="computed_input_ids"
+                   eval="[(6, 0, [ref('item_backlog_high'), ref('item_backlog_significant'), ref('item_backlog_moderate'), ref('item_backlog_low')])]"/>
+            <field name="required">1</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Total estimated backlog maintenance cost (Sum of High, Significant, Moderate, and
+                Low risk backlog costs).
+            </field>
+        </record>
+
+        <!-- SECTION 4: Statutory Compliance  -->
+        <record id="sec_stat_compliance" model="nhs.eric.section">
+            <field name="name">Statutory Compliance</field>
+            <field name="code">STAT_COMPLIANCE</field>
+            <field name="dataset_id" ref="dataset_eric_2025_26"/>
+            <field name="sequence">40</field>
+        </record>
+
+        <record id="item_compliance_fire" model="nhs.eric.item.def">
+            <field name="name">Fire Safety Compliance</field>
+            <field name="code">COMP_FIRE</field>
+            <field name="section_id" ref="sec_stat_compliance"/>
+            <field name="sequence">10</field>
+            <field name="data_type">percent</field>
+            <field name="reporting_level">organisational</field>
+            <field name="unit">%</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">compliance.fire</field>
+            <field name="min_value">0.0</field>
+            <field name="max_value">100.0</field>
+            <field name="help_text">Compliance rate for statutory Fire Safety assets and inspections.</field>
+        </record>
+
+        <record id="item_compliance_water" model="nhs.eric.item.def">
+            <field name="name">Water &amp; Legionella Compliance</field>
+            <field name="code">COMP_WATER</field>
+            <field name="section_id" ref="sec_stat_compliance"/>
+            <field name="sequence">20</field>
+            <field name="data_type">percent</field>
+            <field name="reporting_level">organisational</field>
+            <field name="unit">%</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">compliance.water</field>
+            <field name="min_value">0.0</field>
+            <field name="max_value">100.0</field>
+            <field name="help_text">Compliance rate for statutory Water Safety &amp; Legionella control.</field>
+        </record>
+
+        <record id="item_compliance_electrical" model="nhs.eric.item.def">
+            <field name="name">Electrical Safety Compliance</field>
+            <field name="code">COMP_ELEC</field>
+            <field name="section_id" ref="sec_stat_compliance"/>
+            <field name="sequence">30</field>
+            <field name="data_type">percent</field>
+            <field name="reporting_level">organisational</field>
+            <field name="unit">%</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">compliance.electrical</field>
+            <field name="min_value">0.0</field>
+            <field name="max_value">100.0</field>
+            <field name="help_text">Compliance rate for Fixed Electrical Systems and Portable Appliance Testing.</field>
+        </record>
+
+        <record id="item_compliance_asbestos" model="nhs.eric.item.def">
+            <field name="name">Asbestos Management Compliance</field>
+            <field name="code">COMP_ASBESTOS</field>
+            <field name="section_id" ref="sec_stat_compliance"/>
+            <field name="sequence">40</field>
+            <field name="data_type">percent</field>
+            <field name="reporting_level">organisational</field>
+            <field name="unit">%</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">compliance.asbestos</field>
+            <field name="min_value">0.0</field>
+            <field name="max_value">100.0</field>
+            <field name="help_text">Compliance rate for statutory Asbestos Management inspections.</field>
+        </record>
+
+        <record id="item_compliance_gas" model="nhs.eric.item.def">
+            <field name="name">Gas Safety Compliance</field>
+            <field name="code">COMP_GAS</field>
+            <field name="section_id" ref="sec_stat_compliance"/>
+            <field name="sequence">50</field>
+            <field name="data_type">percent</field>
+            <field name="reporting_level">organisational</field>
+            <field name="unit">%</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">compliance.gas</field>
+            <field name="min_value">0.0</field>
+            <field name="max_value">100.0</field>
+            <field name="help_text">Compliance rate for statutory Gas Safety inspections.</field>
+        </record>
+
+        <record id="item_compliance_overall_pct" model="nhs.eric.item.def">
+            <field name="name">Overall Statutory Compliance Percentage</field>
+            <field name="code">COMP_OVERALL_PCT</field>
+            <field name="section_id" ref="sec_stat_compliance"/>
+            <field name="sequence">60</field>
+            <field name="data_type">percent</field>
+            <field name="reporting_level">organisational</field>
+            <field name="unit">%</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">compliance.pct</field>
+            <field name="required">1</field>
+            <field name="min_value">0.0</field>
+            <field name="max_value">100.0</field>
+            <field name="help_text">Overall Estates Compliance percentage across all statutory disciplines.</field>
+        </record>
+
+        <!-- SECTION 5: Estate Condition  -->
+        <record id="sec_estate_condition" model="nhs.eric.section">
+            <field name="name">Estate Condition</field>
+            <field name="code">ESTATE_CONDITION</field>
+            <field name="dataset_id" ref="dataset_eric_2025_26"/>
+            <field name="sequence">50</field>
+        </record>
+
+        <record id="item_condition_facet_a" model="nhs.eric.item.def">
+            <field name="name">Condition Grade A (% As New)</field>
+            <field name="code">COND_A_PCT</field>
+            <field name="section_id" ref="sec_estate_condition"/>
+            <field name="sequence">10</field>
+            <field name="data_type">percent</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">%</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.condition.A</field>
+            <field name="min_value">0.0</field>
+            <field name="max_value">100.0</field>
+            <field name="help_text">Percentage of estate in Condition Grade A (As new / excellent condition).</field>
+        </record>
+
+        <record id="item_condition_facet_b" model="nhs.eric.item.def">
+            <field name="name">Condition Grade B (% Operational)</field>
+            <field name="code">COND_B_PCT</field>
+            <field name="section_id" ref="sec_estate_condition"/>
+            <field name="sequence">20</field>
+            <field name="data_type">percent</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">%</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.condition.B</field>
+            <field name="min_value">0.0</field>
+            <field name="max_value">100.0</field>
+            <field name="help_text">Percentage of estate in Condition Grade B (Sound / operationally acceptable
+                condition).
+            </field>
+        </record>
+
+        <record id="item_condition_facet_c" model="nhs.eric.item.def">
+            <field name="name">Condition Grade C (% Substandard)</field>
+            <field name="code">COND_C_PCT</field>
+            <field name="section_id" ref="sec_estate_condition"/>
+            <field name="sequence">30</field>
+            <field name="data_type">percent</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">%</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.condition.C</field>
+            <field name="min_value">0.0</field>
+            <field name="max_value">100.0</field>
+            <field name="help_text">Percentage of estate in Condition Grade C (Operational but requires major repair).
+            </field>
+        </record>
+
+        <record id="item_condition_facet_d" model="nhs.eric.item.def">
+            <field name="name">Condition Grade D (% Below Standards)</field>
+            <field name="code">COND_D_PCT</field>
+            <field name="section_id" ref="sec_estate_condition"/>
+            <field name="sequence">40</field>
+            <field name="data_type">percent</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">%</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">estate.condition.D</field>
+            <field name="min_value">0.0</field>
+            <field name="max_value">100.0</field>
+            <field name="help_text">Percentage of estate in Condition Grade D (Seriously defective / in danger of
+                breakdown).
+            </field>
+        </record>
+
+        <!-- SECTION 6: Occupancy & Financial Costs -->
+        <record id="sec_financial_costs" model="nhs.eric.section">
+            <field name="name">Occupancy &amp; Financial Costs</field>
+            <field name="code">FINANCIAL_COSTS</field>
+            <field name="dataset_id" ref="dataset_eric_2025_26"/>
+            <field name="sequence">60</field>
+        </record>
+
+        <record id="item_cost_rent" model="nhs.eric.item.def">
+            <field name="name">Property Rent Costs</field>
+            <field name="code">COST_RENT</field>
+            <field name="section_id" ref="sec_financial_costs"/>
+            <field name="sequence">10</field>
+            <field name="data_type">currency</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">£</field>
+            <field name="source_type">manual</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Annual rent expenditure paid for leased property.</field>
+        </record>
+
+        <record id="item_cost_rates" model="nhs.eric.item.def">
+            <field name="name">Business Rates Costs</field>
+            <field name="code">COST_RATES</field>
+            <field name="section_id" ref="sec_financial_costs"/>
+            <field name="sequence">20</field>
+            <field name="data_type">currency</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">£</field>
+            <field name="source_type">manual</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Annual non-domestic business rates paid to local authorities.</field>
+        </record>
+
+        <record id="item_cost_building_running" model="nhs.eric.item.def">
+            <field name="name">Building Running &amp; Maintenance Costs</field>
+            <field name="code">COST_BUILDING_RUNNING</field>
+            <field name="section_id" ref="sec_financial_costs"/>
+            <field name="sequence">30</field>
+            <field name="data_type">currency</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">£</field>
+            <field name="source_type">manual</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Annual expenditure on building maintenance and operational running costs.</field>
+        </record>
+
+        <record id="item_cost_total_occupancy" model="nhs.eric.item.def">
+            <field name="name">Total Occupancy Costs</field>
+            <field name="code">COST_TOTAL_OCCUPANCY</field>
+            <field name="section_id" ref="sec_financial_costs"/>
+            <field name="sequence">40</field>
+            <field name="data_type">currency</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">£</field>
+            <field name="source_type">computed</field>
+            <field name="computation_operator">sum</field>
+            <field name="computed_input_ids"
+                   eval="[(6, 0, [ref('item_cost_rent'), ref('item_cost_rates'), ref('item_cost_building_running')])]"/>
+            <field name="required">1</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Total annual property occupancy costs (Sum of Rent, Rates, and Building Running
+                Costs).
+            </field>
+        </record>
+
+        <record id="item_cost_per_m2" model="nhs.eric.item.def">
+            <field name="name">Occupancy Cost per m²</field>
+            <field name="code">COST_PER_M2</field>
+            <field name="section_id" ref="sec_financial_costs"/>
+            <field name="sequence">50</field>
+            <field name="data_type">currency</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">£/m²</field>
+            <field name="source_type">computed</field>
+            <field name="computation_operator">div</field>
+            <field name="computed_input_ids"
+                   eval="[(6, 0, [ref('item_cost_total_occupancy'), ref('item_total_gia')])]"/>
+            <field name="required">1</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Average occupancy cost per square metre of Gross Internal Area (Total Occupancy Cost
+                / Total GIA).
+            </field>
+        </record>
+
+        <!-- SECTION 7: Energy & Environment  -->
+        <record id="sec_energy_env" model="nhs.eric.section">
+            <field name="name">Energy &amp; Environment</field>
+            <field name="code">ENERGY_ENV</field>
+            <field name="dataset_id" ref="dataset_eric_2025_26"/>
+            <field name="sequence">70</field>
+        </record>
+
+        <record id="item_energy_elec_kwh" model="nhs.eric.item.def">
+            <field name="name">Electricity Consumption</field>
+            <field name="code">ENERGY_ELEC_KWH</field>
+            <field name="section_id" ref="sec_energy_env"/>
+            <field name="sequence">10</field>
+            <field name="data_type">float</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">kWh</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">energy.electricity</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Total annual electricity consumption in kWh.</field>
+        </record>
+
+        <record id="item_energy_gas_kwh" model="nhs.eric.item.def">
+            <field name="name">Gas Consumption</field>
+            <field name="code">ENERGY_GAS_KWH</field>
+            <field name="section_id" ref="sec_energy_env"/>
+            <field name="sequence">20</field>
+            <field name="data_type">float</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">kWh</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">energy.gas</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Total annual natural gas consumption in kWh.</field>
+        </record>
+
+        <record id="item_energy_carbon_tonnes" model="nhs.eric.item.def">
+            <field name="name">Total Carbon Emissions</field>
+            <field name="code">ENERGY_CARBON</field>
+            <field name="section_id" ref="sec_energy_env"/>
+            <field name="sequence">30</field>
+            <field name="data_type">float</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">Tonnes CO2e</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">energy.carbon</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Total carbon emissions generated in Tonnes CO2 equivalent.</field>
+        </record>
+
+        <record id="item_water_consumption_m3" model="nhs.eric.item.def">
+            <field name="name">Water Consumption</field>
+            <field name="code">WATER_M3</field>
+            <field name="section_id" ref="sec_energy_env"/>
+            <field name="sequence">40</field>
+            <field name="data_type">float</field>
+            <field name="reporting_level">site</field>
+            <field name="unit">m³</field>
+            <field name="source_type">auto</field>
+            <field name="source_key">energy.water</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Total annual mains water consumption in cubic metres.</field>
+        </record>
+
+        <!-- SECTION 8: Soft FM & Operational Services  -->
+        <record id="sec_soft_fm" model="nhs.eric.section">
+            <field name="name">Soft FM &amp; Operational Services</field>
+            <field name="code">SOFT_FM</field>
+            <field name="dataset_id" ref="dataset_eric_2025_26"/>
+            <field name="sequence">80</field>
+        </record>
+
+        <record id="item_cost_cleaning" model="nhs.eric.item.def">
+            <field name="name">Cleaning Services Cost</field>
+            <field name="code">COST_CLEANING</field>
+            <field name="section_id" ref="sec_soft_fm"/>
+            <field name="sequence">10</field>
+            <field name="data_type">currency</field>
+            <field name="reporting_level">organisational</field>
+            <field name="unit">£</field>
+            <field name="source_type">manual</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Annual expenditure on hospital cleaning and hygiene services.</field>
+        </record>
+
+        <record id="item_cost_catering" model="nhs.eric.item.def">
+            <field name="name">Catering Services Cost</field>
+            <field name="code">COST_CATERING</field>
+            <field name="section_id" ref="sec_soft_fm"/>
+            <field name="sequence">20</field>
+            <field name="data_type">currency</field>
+            <field name="reporting_level">organisational</field>
+            <field name="unit">£</field>
+            <field name="source_type">manual</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Annual expenditure on patient and retail catering services.</field>
+        </record>
+
+        <record id="item_cost_portering" model="nhs.eric.item.def">
+            <field name="name">Portering Services Cost</field>
+            <field name="code">COST_PORTERING</field>
+            <field name="section_id" ref="sec_soft_fm"/>
+            <field name="sequence">30</field>
+            <field name="data_type">currency</field>
+            <field name="reporting_level">organisational</field>
+            <field name="unit">£</field>
+            <field name="source_type">manual</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Annual expenditure on internal patient and goods portering services.</field>
+        </record>
+
+        <record id="item_cost_soft_fm_total" model="nhs.eric.item.def">
+            <field name="name">Total Soft FM Expenditure</field>
+            <field name="code">COST_SOFT_FM_TOTAL</field>
+            <field name="section_id" ref="sec_soft_fm"/>
+            <field name="sequence">40</field>
+            <field name="data_type">currency</field>
+            <field name="reporting_level">organisational</field>
+            <field name="unit">£</field>
+            <field name="source_type">computed</field>
+            <field name="computation_operator">sum</field>
+            <field name="computed_input_ids"
+                   eval="[(6, 0, [ref('item_cost_cleaning'), ref('item_cost_catering'), ref('item_cost_portering')])]"/>
+            <field name="required">1</field>
+            <field name="min_value">0.0</field>
+            <field name="help_text">Total annual expenditure on Soft FM operational services (Sum of Cleaning, Catering,
+                and Portering Costs).
+            </field>
+        </record>
+    </data>
+</odoo>
