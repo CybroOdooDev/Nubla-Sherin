@@ -1,20 +1,19 @@
 /** @odoo-module */
 
 import { NavBar } from "@web/webclient/navbar/navbar";
-import { registry } from "@web/core/registry";
 import { computeAppsAndMenuItems } from "@web/webclient/menus/menu_helpers";
 import { useBus, useService } from "@web/core/utils/hooks";
-import { useRef, onMounted, useState } from "@odoo/owl";
+import { useRef, onMounted } from "@odoo/owl";
 import { patch } from "@web/core/utils/patch";
 import { ensureAppIcon } from "./app_icon_fallback";
 
 patch(NavBar.prototype, {
     // To modify the Navbar properties and functions.
     setup() {
-        super.setup()
+        super.setup();
         const isSidebarHidden = sessionStorage.getItem("isSidebarHidden") === "true";
         this.sidebarRef = useRef("sidebar");
-        this.menu_sectionsRef = useRef("menu_sections")
+        this.menu_sectionsRef = useRef("menu_sections");
         this.busService = useService("bus_service");
         // Patches the raw, shared menu objects in place - menuService.getApps()
         // always returns the same underlying references, so this also fixes the
@@ -23,7 +22,7 @@ patch(NavBar.prototype, {
         const { apps } = computeAppsAndMenuItems(this.menuService.getMenuAsTree("root"));
         this._apps = apps;
         Object.assign(this.state, {
-            activeApp: parseInt(sessionStorage.getItem("activeApp")) || null,
+            activeApp: parseInt(sessionStorage.getItem("activeApp"), 10) || null,
             isSidebarHidden: isSidebarHidden,
         });
         useBus(this.env.bus, "app-selected", (event) => {
@@ -151,11 +150,11 @@ patch(NavBar.prototype, {
         // the app grid so it doesn't look like a leftover page title.
         document.body.classList.add("o_home_menu_active");
         await this.actionService.doAction({
-            type: 'ir.actions.client',
-            tag: 'nhs_backend_theme.homemenus',
+            type: "ir.actions.client",
+            tag: "nhs_backend_theme.homemenus",
             params: {
                 apps: this._apps,
             },
         });
-    }
-})
+    },
+});

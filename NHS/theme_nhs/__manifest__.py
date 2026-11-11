@@ -9,7 +9,7 @@
 #    You can modify it under the terms of the GNU LESSER
 #    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
 #
-#    This program is distributed in the hope that it will be useful,
+#    This program is distributed in the hope it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
@@ -26,12 +26,9 @@
     "summary": "NHS Backend Theme is the official theme for NHS modules in Odoo",
     "description": """Minimalist and elegant backend theme tailored for NHS Trust Management and other NHS apps""",
     "author": "Cybrosys Techno Solutions",
-    "company": "Cybrosys Techno Solutions",
     "maintainer": "Cybrosys Techno Solutions",
     "website": "https://www.cybrosys.com",
     "depends": ["web", "mail"],
-    "data": [
-    ],
     "assets": {
         "web.assets_backend": [
             "theme_nhs/static/src/xml/menu_panels.xml",
@@ -51,10 +48,17 @@
         "point_of_sale._assets_pos": [
             "theme_nhs/static/src/scss/pos.scss",
         ],
+        "web.assets_tests": [
+            "theme_nhs/static/tests/tours/**/*",
+        ],
+        "web.assets_unit_tests": [
+            "theme_nhs/static/tests/**/*.test.js",
+        ],
     },
     "images": [
         "static/description/banner.jpg",
         "static/description/theme_screenshot.jpg",
+        "static/description/icon.png",
     ],
     "license": "LGPL-3",
     "installable": True,

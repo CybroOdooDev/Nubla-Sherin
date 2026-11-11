@@ -4,8 +4,8 @@
         <xpath expr="//div[hasclass('o_navbar_apps_menu')]" position="replace">
             <t t-if="!isScopedApp">
                 <button data-hotkey="h" title="Home Menu" t-on-click="_onClickMenusPanel" style="background-color: transparent; border: transparent;">
-                 <img t-att-src="'/theme_nhs/static/src/img/icon/topbar/left-arrow.svg'" alt="Back"/>
-              </button>
+                    <img t-att-src="'/theme_nhs/static/src/img/icon/topbar/left-arrow.svg'" alt="Back"/>
+                </button>
             </t>
         </xpath>
     </t>

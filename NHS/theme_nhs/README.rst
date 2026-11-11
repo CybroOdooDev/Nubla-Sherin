@@ -4,7 +4,7 @@
 
 NHS Theme
 =========
-* NHS Backend Theme module for Odoo 19 community editions. This is a Minimalist and Elegant Backend Theme for Odoo 18. This theme will change your Old Experience to a New Experience with Odoo.
+* NHS Backend Theme module for Odoo 19 community editions. This is a Minimalist and Elegant Backend Theme for Odoo 19. This theme will change your Old Experience to a New Experience with Odoo.
 
 Configuration
 -------------
@@ -35,14 +35,14 @@ Bug Tracker
 Bugs are tracked on GitHub Issues. In case of trouble, please check there if your issue has already been reported.
 
 Maintainer
---------
+----------
 This module is maintained by Cybrosys Technologies.
 
 For support and more information, please visit https://www.cybrosys.com
 
 .. image:: https://cybrosys.com/images/logo.png
-   :target: https://cybrosys.com"
+   :target: https://cybrosys.com/
 
 Further information
------------------
+-------------------
 HTML Description: `<static/description/index.html>`__
