@@ -59,7 +59,6 @@ class NHSComplianceRegisterExcelWizard(models.TransientModel):
         items = items.filtered(lambda i: i.create_date.date() <= as_at_date)
         if not items:
             raise UserError("No value")
-        # Handle Logo Extraction
         company = self.env.company
         logo_path = False
         if company.logo:

@@ -56,7 +56,7 @@
                         <page string="Spaces">
                             <field name="space_ids"/>
                         </page>
-                        <page string="Floor Plans">
+                        <page string="Floor Plans" invisible="id == 0">
                             <field name="floor_plan" widget="many2many_binary"/>
                         </page>
                     </notebook>

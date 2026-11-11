@@ -72,7 +72,7 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Documents">
+                        <page string="Documents" invisible="id == 0">
                             <group>
                                 <field name="attachment_ids" widget="many2many_binary" help="Photo Evidence"/>
                             </group>

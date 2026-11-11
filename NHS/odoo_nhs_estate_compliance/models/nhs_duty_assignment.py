@@ -29,8 +29,8 @@ class NHSDutyAssignment(models.Model):
     _description = 'Person ↔ Role ↔ Discipline ↔ Location'
     _order = 'person_id, duty_role_id'
 
-    person_id = fields.Many2one('res.users', string='Person', required=True,
-                                 help='The user assigned to this duty role.')
+    person_id = fields.Many2one('res.partner', string='Person', required=True,
+                                 help='The person assigned to this duty role.')
     duty_role_id = fields.Many2one('nhs.duty.role', string='Duty Role', required=True,
                                 help='The statutory duty role being assigned (e.g. Duty Holder, Responsible Person).')
     discipline_id = fields.Many2one('nhs.compliance.discipline', string='Discipline',
@@ -107,11 +107,7 @@ class NHSDutyAssignment(models.Model):
 
     @api.model
     def _send_authorisation_expiry_reminders(self):
-        """Scheduled action to send email reminders for duty role authorisations expiring within 30 days.
-        For each expiring or expired assignment, sends the appropriate email
-        template (expiring-soon or already-expired) and creates a to-do activity
-        for the assigned person.
-        """
+        """Scheduled action to send email reminders for duty role authorisations expiring within 30 days."""
         from datetime import timedelta
         today = fields.Date.today()
         warning_limit = today + timedelta(days=30)
@@ -123,6 +119,13 @@ class NHSDutyAssignment(models.Model):
                                        raise_if_not_found=False)
         template_expired = self.env.ref('odoo_nhs_estate_compliance.mail_template_authorisation_expired',
                                         raise_if_not_found=False)
+        manager_group = self.env.ref('odoo_nhs_estate_compliance.group_nhs_compliance_manager',
+                                     raise_if_not_found=False)
+        if manager_group:
+            manager_user = manager_group.user_ids.filtered(lambda u: u.active)[:1]
+            VALID_USER_ID = manager_user.id if manager_user else self.env.user.id
+        else:
+            VALID_USER_ID = self.env.user.id
         for assignment in expiring_assignments:
             is_expired = assignment.authorised_to < today
             if is_expired:
@@ -131,22 +134,23 @@ class NHSDutyAssignment(models.Model):
             else:
                 if template_expiry:
                     template_expiry.send_mail(assignment.id, force_send=True)
+
             existing = self.env['mail.activity'].search([
                 ('res_model', '=', 'nhs.duty.assignment'),
                 ('res_id', '=', assignment.id),
-                ('user_id', '=', assignment.person_id.id),
+                ('user_id', '=', VALID_USER_ID),
             ])
             if not existing:
                 activity_type = self.env.ref('mail.mail_activity_data_todo', raise_if_not_found=False)
                 summary = "Duty Role Authorisation EXPIRED" if is_expired else "Duty Role Assignment Expiring soon"
                 note = (f"Your authorisation for the role {assignment.duty_role_id.name} has EXPIRED on "
                         f"{assignment.authorised_to}.") if is_expired else (f"Your authorisation for the role "
-                        f"{assignment.duty_role_id.name} expires on {assignment.authorised_to}.")
+                                            f"{assignment.duty_role_id.name} expires on {assignment.authorised_to}.")
                 self.env['mail.activity'].create({
                     'activity_type_id': activity_type.id if activity_type else False,
                     'res_model_id': self.env['ir.model']._get_id('nhs.duty.assignment'),
                     'res_id': assignment.id,
-                    'user_id': assignment.person_id.id,
+                    'user_id': VALID_USER_ID,
                     'summary': summary,
                     'note': note,
                     'date_deadline': assignment.authorised_to or today,
@@ -158,7 +162,6 @@ class NHSDutyAssignment(models.Model):
         Calls authorisation expiry reminders, contractor insurance/accreditation
         checks, and test certificate expiry checks in sequence.
         """
-        # Delegate to the respective models/methods
         self._send_authorisation_expiry_reminders()
         self.env['nhs.compliance.contractor']._check_contractor_expiry()
         self.env['nhs.compliance.test']._check_test_certificate_expiry()

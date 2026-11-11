@@ -23,6 +23,11 @@ from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 class NHSESBuilding(models.Model):
+    """
+        Model for NHS Estate Buildings. This models the buildings or blocks within an NHS estate site.
+        Each building record represents a physical structure with its characteristics, condition,
+        area metrics, and associated maintenance backlog items.
+    """
     _name = 'nhs.estate.building'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Building or block within a site'
@@ -38,6 +43,7 @@ class NHSESBuilding(models.Model):
         string='Building Reference',
         required=True,
         tracking=True,
+        copy=False,
         help="Unique reference code or identifier for the building (e.g., asset code)"
     )
     site_id = fields.Many2one(
@@ -81,6 +87,7 @@ class NHSESBuilding(models.Model):
         'nhs.estate.tenure',
         string='Tenure',
         domain="[('building_id', '=', id)]",
+        copy=False,
         help="Land/property tenure arrangement for the building"
     )
     tenure_type = fields.Selection(
@@ -220,7 +227,7 @@ class NHSESBuilding(models.Model):
 
     _unique_code = models.Constraint(
         'UNIQUE(code)',
-        'The code must be unique!'
+        'The building code must be unique !'
     )
 
     @api.depends('floor_ids.space_ids.area', 'floor_ids.space_ids.is_clinical',
@@ -449,7 +456,7 @@ class NHSESBuilding(models.Model):
         """
         return [{
             'label': 'Import Template for Building',
-            'template': '/odoo_nhs_estate/static/import_templates/building.xlsx',
+            'template': '/odoo_nhs_estate/static/import_templates/buildings.xlsx',
         }]
 
     def action_operational(self):

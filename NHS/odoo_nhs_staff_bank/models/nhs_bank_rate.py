@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 
@@ -105,7 +105,7 @@ class NhsBankRate(models.Model):
         for rate in self:
             if rate.effective_to and rate.effective_from and rate.effective_to < rate.effective_from:
                 raise ValidationError(
-                    "The 'Effective To' date cannot be before 'Effective From'.")
+                    _("The 'Effective To' date cannot be before 'Effective From'."))
 
     @api.model
     def _find_rate(self, band_id=False, role_id=False, shift_type_id=False, date=None, company_id=False):

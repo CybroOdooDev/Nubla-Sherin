@@ -29,5 +29,4 @@ from . import nhs_registration
 from . import nhs_establishment_post
 from . import nhs_org_unit
 from . import nhs_staff_group
-from . import res_users
 from . import res_config_settings

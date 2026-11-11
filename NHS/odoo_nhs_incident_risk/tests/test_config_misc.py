@@ -72,3 +72,21 @@ class TestConfigMisc(NhsCommon):
         token2 = self.company._get_public_form_token()
         self.assertTrue(token1)
         self.assertEqual(token1, token2)
+
+    def test_res_config_incident_actions(self):
+        """Ensure settings action methods regenerate token and construct the correct public form URL."""
+        settings = self.env['res.config.settings'].create({
+            'company_id': self.company.id,
+        })
+        # Test regenerate token
+        old_token = self.company._get_public_form_token()
+        reload_action = settings.action_incident_regenerate_token()
+        self.assertEqual(reload_action.get('tag'), 'reload')
+        new_token = self.company.public_form_token
+        self.assertNotEqual(old_token, new_token)
+
+        # Test open public form URL
+        url_action = settings.action_incident_open_public_form()
+        self.assertEqual(url_action.get('type'), 'ir.actions.act_url')
+        self.assertTrue(url_action.get('url', '').endswith(f'/incident/report/{new_token}'))
+

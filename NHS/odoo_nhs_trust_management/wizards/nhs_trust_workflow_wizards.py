@@ -156,5 +156,4 @@ class NhsTrustDissolveWizard(models.TransientModel):
             message += "All associated sites have been archived.\n"
         message += f"Reason: {self.reason}"
         trust.message_post(body=message)
-
         return {'type': 'ir.actions.act_window_close'}

@@ -38,7 +38,7 @@ class NhsDutyAssignment(models.Model):
     compliance gate first, then the configured hard/soft rules. A hard
     failure blocks the write outright; a soft failure is allowed and opens
     a logged nhs.rule.violation."""
-    _name = 'nhs.duty.assignment'
+    _name = 'nhs.roster.assignment'
     _inherit = ['mail.thread']
     _description = 'Duty Assignment'
     _order = 'duty_date, id'

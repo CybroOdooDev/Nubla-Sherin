@@ -161,14 +161,7 @@ class NhsApplication(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         """Assigns each application its sequence reference and creates its
-        segregated equality-monitoring record, kept off the main form.
-
-        Also re-checks each vacancy is actually open for applications: the
-        vacancy_id field's UI domain only filters the picker, so it does
-        nothing when a vacancy is pre-filled via context (e.g. the "+" on
-        the vacancy's own Applications kanban, or the public portal submit
-        route) — this is the one place every creation path passes through,
-        so it's enforced here rather than relying on the domain alone."""
+        segregated equality-monitoring record, kept off the main form."""
         vacancy_ids = {vals['vacancy_id'] for vals in vals_list if vals.get('vacancy_id')}
         if vacancy_ids:
             for vacancy in self.env['nhs.vacancy'].browse(vacancy_ids):

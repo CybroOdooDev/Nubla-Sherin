@@ -27,16 +27,17 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_start_progress" type="object" string="Start Progress"
-                            class="oe_highlight"
+                    <button name="action_start_progress" type="object" string="Start Progress" class="oe_highlight"
+                            groups="odoo_nhs_estate_compliance.group_nhs_compliance_officer,odoo_nhs_estate_compliance.group_nhs_compliance_manager"
                             invisible="state != 'open'"/>
                     <button name="action_await_parts" type="object" string="Await Parts"
+                            groups="odoo_nhs_estate_compliance.group_nhs_compliance_officer,odoo_nhs_estate_compliance.group_nhs_compliance_manager"
                             invisible="state not in ['open','in_progress']"/>
-                    <button name="action_complete" type="object" string="Complete"
-                            class="oe_highlight"
+                    <button name="action_complete" type="object" string="Complete" class="oe_highlight"
+                            groups="odoo_nhs_estate_compliance.group_nhs_compliance_officer,odoo_nhs_estate_compliance.group_nhs_compliance_manager"
                             invisible="state not in ['open','in_progress','awaiting_parts']"/>
-                    <button name="action_verify" type="object" string="Verify"
-                            class="oe_highlight"
+                    <button name="action_verify" type="object" string="Verify" class="oe_highlight"
+                            groups="odoo_nhs_estate_compliance.group_nhs_compliance_manager"
                             invisible="state != 'completed'"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="open,in_progress,awaiting_parts,completed,verified"/>

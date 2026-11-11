@@ -284,8 +284,13 @@ class NhsEstablishmentPost(models.Model):
             post.indicative_pay = base_salary * post.funded_fte * on_cost_factor
 
     def _compute_change_count(self):
-        """Count change requests raised against each post."""
-        change_data = self.env['nhs.establishment.change']._read_group(
+        """Count change requests raised against each post. sudo() deliberately -
+        this is just a count, not exposing individual change records, and it
+        must not raise an access error for viewers (e.g. job-planning's
+        Clinical Manager) who can see a post but have no nhs.establishment.change
+        access at all; the "Changes" button itself stays groups()-gated so
+        those users still can't drill into the actual records."""
+        change_data = self.env['nhs.establishment.change'].sudo()._read_group(
             [('post_id', 'in', self.ids)],
             ['post_id'], ['__count'],
         )

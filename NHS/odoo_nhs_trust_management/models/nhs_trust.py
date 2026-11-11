@@ -463,8 +463,16 @@ class NhsTrust(models.Model):
         Callers should go through the State Change Wizard instead of writing
         `state` directly. Also raises ValidationError if the Trust is already
         'dissolved' (a terminal state with no further transitions).
+
+        Exempt when Odoo's own module-data loader is doing the writing (context
+        key 'install_module', set by convert.py for every record loaded from an
+        XML data file): seed/reference data — this module's own, or a dependent
+        module's like odoo_nhs_uk_regions' Wales/NI trust records — sets `state`
+        directly as reference data and re-runs this write path on every
+        reinstall/upgrade once the xmlid already exists. That is authoritative
+        data loading, not a user-driven workflow transition.
         """
-        if 'state' in vals:
+        if 'state' in vals and not self.env.context.get('install_module'):
             new_state = vals['state']
             allowed_transitions = {
                 'draft': ['under_review'],

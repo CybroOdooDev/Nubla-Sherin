@@ -66,7 +66,7 @@
                             <field name="lessons_learned" nolabel="1" placeholder="Learning identified — feeds corrective actions and board pack…"/>
                         </page>
                         <page string="Actions">
-                            <field name="action_ids" readonly="state == 'complete'" context="{'default_complaint_id': complaint_id}">
+                            <field name="action_ids" readonly="state == 'complete'" context="{'default_complaint_id': complaint_id, 'default_complaint_investigation_id': id}">
                                 <list>
                                     <field name="name"/>
                                     <field name="owner_id"/>

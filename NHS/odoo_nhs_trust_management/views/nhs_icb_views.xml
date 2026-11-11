@@ -5,7 +5,7 @@
     ================================================================ -->
 
     <!-- List View -->
-    <record id="view_nhs_icb_tree" model="ir.ui.view">
+    <record id="view_nhs_icb_ztree" model="ir.ui.view">
         <field name="name">nhs.icb.list</field>
         <field name="model">nhs.icb</field>
         <field name="arch" type="xml">

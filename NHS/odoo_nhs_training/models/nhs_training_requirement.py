@@ -29,6 +29,7 @@ OVERRIDE_TYPES = [
 
 
 class NhsTrainingRequirement(models.Model):
+    """A training requirement linking a subject to a profile, staff group or member."""
     _name = 'nhs.training.requirement'
     _description = 'Training requirement — subject+level required by a profile, staff group or individual'
     _order = 'subject_id'

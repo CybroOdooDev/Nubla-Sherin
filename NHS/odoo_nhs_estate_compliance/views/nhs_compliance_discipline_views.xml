@@ -50,7 +50,7 @@
                     <group>
                         <field name="description"/>
                     </group>
-                    <notebook>
+                    <notebook invisible="id == 0">
                         <page name="types" string="Compliance Types">
                             <field name="type_ids"/>
                         </page>

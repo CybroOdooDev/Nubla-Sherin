@@ -187,12 +187,12 @@
                         <setting  help="Share this URL with staff for incident reporting.">
                             <field name="public_form_token" readonly="1"/>
                             <!-- Regenerating the token invalidates the previously shared public form URL -->
-                            <button name="action_regenerate_token" string="Regenerate Token"
+                            <button name="action_incident_regenerate_token" string="Regenerate Token"
                                     type="object" class="btn-primary btn-sm"/>
                         </setting>
                         <setting string="Open Public Form" help="Open the public incident reporting form in a new browser tab.">
                             <!-- Convenience shortcut to preview the token-based anonymous reporting form -->
-                            <button name="action_open_public_form" string="Open Public Form"
+                            <button name="action_incident_open_public_form" string="Open Public Form"
                                     type="object" class="btn-primary btn-sm"
                                     invisible="not public_form_enabled"/>
                         </setting>

@@ -104,11 +104,13 @@
             <field name="domain_force">[('user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_bank_member'))]"/>
         </record>
-        <!-- Record Rule: a bank member can read their own partner record (prevents 403 in portal layout if base.group_portal is missing) -->
+        <!-- Record Rule: a bank member can read their own partner record (prevents 403 in portal layout if base.group_portal is missing).
+             Gated on user.share: only an actual portal-style bank member is narrowed to
+             their own partner. -->
         <record id="rule_nhs_bank_member_partner" model="ir.rule">
-            <field name="name">res.partner: bank member reads own partner</field>
+            <field name="name">res.partner: bank member reads own partner (portal only)</field>
             <field name="model_id" ref="base.model_res_partner"/>
-            <field name="domain_force">[('id', 'child_of', user.commercial_partner_id.id)]</field>
+            <field name="domain_force">[('id', 'child_of', user.commercial_partner_id.id)] if user.share else [(1, '=', 1)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_bank_member'))]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
@@ -159,7 +161,7 @@
             <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_bank_officer'))]"/>
         </record>
-    
+
         <!-- Fix: Give Admins and Officers access to all partners so they aren't blocked by the Bank Member rule if they have both roles -->
         <record id="rule_res_partner_bank_officer" model="ir.rule">
             <field name="name">res.partner: bank officer reads all</field>

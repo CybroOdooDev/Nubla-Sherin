@@ -22,10 +22,11 @@
 from odoo import api, models
 
 class ReportEstateRegister(models.AbstractModel):
-    """Abstract model for custom estate register report data loading.
-    Loads the dataset for the Estate Register PDF report. If no specific
-    IDs are provided (e.g. when run from the Reporting menu), it defaults
-    to loading all active sites in the system.
+    """
+        Abstract model for custom estate register report data loading.
+        Loads the dataset for the Estate Register PDF report. If no specific
+        IDs are provided (e.g. when run from the Reporting menu), it defaults
+        to loading all active sites in the system.
     """
     _name = 'report.odoo_nhs_estate.report_estate_register'
     _description = 'Estate Register Report'

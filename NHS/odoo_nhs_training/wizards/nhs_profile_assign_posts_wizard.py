@@ -23,6 +23,7 @@ from odoo import api, fields, models
 
 
 class NhsProfileAssignPostsWizard(models.TransientModel):
+    """Wizard for linking active posts to a requirement profile."""
     _name = 'nhs.profile.assign.posts.wizard'
     _description = 'Assign existing posts to a training requirement profile'
 
@@ -49,10 +50,6 @@ class NhsProfileAssignPostsWizard(models.TransientModel):
 
     def action_confirm(self):
         """Assign the selected posts to the profile and unlink any deselected ones.
-
-        Posts previously assigned to the profile but no longer in `post_ids` are
-        cleared back to no profile; posts kept or newly added in `post_ids` are
-        set to point at `profile_id`.
         """
         self.ensure_one()
         previous = self.profile_id.post_ids

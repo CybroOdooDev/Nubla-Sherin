@@ -107,17 +107,17 @@
                                 Performance by Compliance Discipline
                             </h5>
                             <table class="table table-sm align-middle table-hover" style="border: 1px solid #E2E8F0;">
-                                <thead style="background-color: #005EB8; color: white;">
+                                <thead style="background-color: #005EB8; ">
                                     <tr>
-                                        <th style="padding: 10px; font-weight: 600;">Discipline Name</th>
-                                        <th style="padding: 10px; font-weight: 600;">HTM Reference</th>
-                                        <th class="text-center" style="padding: 10px; font-weight: 600;">Total
+                                        <th style="padding: 10px; font-weight: 600;color: white;">Discipline Name</th>
+                                        <th style="padding: 10px; font-weight: 600;color: white;">HTM Reference</th>
+                                        <th class="text-center" style="padding: 10px; font-weight: 600;color: white;">Total
                                             Obligations
                                         </th>
-                                        <th class="text-center" style="padding: 10px; font-weight: 600;">Compliant</th>
-                                        <th class="text-center" style="padding: 10px; font-weight: 600;">Compliance %
+                                        <th class="text-center" style="padding: 10px; font-weight: 600;color: white;">Compliant</th>
+                                        <th class="text-center" style="padding: 10px; font-weight: 600;color: white;">Compliance %
                                         </th>
-                                        <th class="text-center" style="padding: 10px; font-weight: 600;">RAG Status</th>
+                                        <th class="text-center" style="padding: 10px; font-weight: 600;color: white;">RAG Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -169,15 +169,15 @@
                                 </h5>
                                 <table class="table table-sm align-middle table-hover"
                                        style="border: 1px solid #E2E8F0;">
-                                    <thead style="background-color:grey; color: white;">
+                                    <thead style="background-color:grey;">
                                         <tr>
-                                            <th style="padding: 10px; font-weight: 600;">Site Name</th>
-                                            <th class="text-center" style="padding: 10px; font-weight: 600;">Total
+                                            <th style="padding: 10px; font-weight: 600;color: white;">Site Name</th>
+                                            <th class="text-center" style="padding: 10px; font-weight: 600;color: white;">Total
                                                 Obligations
                                             </th>
-                                            <th class="text-center" style="padding: 10px; font-weight: 600;">Compliant
+                                            <th class="text-center" style="padding: 10px; font-weight: 600;color: white;">Compliant
                                             </th>
-                                            <th class="text-center" style="padding: 10px; font-weight: 600;">Compliance
+                                            <th class="text-center" style="padding: 10px; font-weight: 600;color: white;">Compliance
                                                 %
                                             </th>
                                         </tr>
@@ -215,15 +215,15 @@
                                 </p>
                                 <table class="table table-sm align-middle table-hover"
                                        style="border: 1px solid #FCA5A5;">
-                                    <thead style="background-color: #DC2626; color: white;">
+                                    <thead style="background-color: #DC2626;">
                                         <tr>
-                                            <th style="padding: 10px; font-weight: 600;">Reference</th>
-                                            <th style="padding: 10px; font-weight: 600;">Obligation Name</th>
-                                            <th style="padding: 10px; font-weight: 600;">Criticality</th>
-                                            <th style="padding: 10px; font-weight: 600;">Location</th>
-                                            <th class="text-center" style="padding: 10px; font-weight: 600;">Status</th>
-                                            <th style="padding: 10px; font-weight: 600;">Target Date</th>
-                                            <th style="padding: 10px; font-weight: 600;">Accountable Person</th>
+                                            <th style="padding: 10px; font-weight: 600;color: white;">Reference</th>
+                                            <th style="padding: 10px; font-weight: 600;color: white;">Obligation Name</th>
+                                            <th style="padding: 10px; font-weight: 600;color: white;">Criticality</th>
+                                            <th style="padding: 10px; font-weight: 600;color: white;">Location</th>
+                                            <th class="text-center" style="padding: 10px; font-weight: 600;color: white;">Status</th>
+                                            <th style="padding: 10px; font-weight: 600;color: white;">Target Date</th>
+                                            <th style="padding: 10px; font-weight: 600;color: white;">Accountable Person</th>
                                         </tr>
                                     </thead>
                                     <tbody>

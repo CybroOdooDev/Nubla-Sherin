@@ -70,7 +70,7 @@ class NhsCopyPeriodWizard(models.TransientModel):
                             lambda a: a.member_id == assignment.member_id):
                         continue
                     try:
-                        self.env['nhs.duty.assignment'].create({
+                        self.env['nhs.roster.assignment'].create({
                             'duty_id': target_duty.id, 'member_id': assignment.member_id.id})
                     except ValidationError:
                         continue

@@ -16,7 +16,7 @@
                     <field name="notes"/>
                 </group>
                 <footer>
-                    <button name="action_decommission" string="Decommission Device" type="object" class="btn-primary"/>
+                    <button name="action_decommission_dispose" string="Decommission / Dispose Device" type="object" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>

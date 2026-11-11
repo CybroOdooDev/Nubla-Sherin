@@ -46,20 +46,22 @@ class ResPartner(models.Model):
         index=True,
         help="Trust this person sits on the board of. Required if is_nhs_board_member=True (enforced by view)."
     )
-    nhs_board_role = fields.Selection(
-        selection='_selection_nhs_board_role',
-        string='Board Role',
+    nhs_board_role = fields.Selection([
+        ('chair', 'Chair'),
+        ('ceo', 'Chief Executive Officer (CEO)'),
+        ('medical_director', 'Medical Director'),
+        ('nursing_director', 'Director of Nursing'),
+        ('finance_director', 'Director of Finance'),
+        ('exec', 'Executive Director'),
+        ('non_exec', 'Non-Executive Director'),
+        ('other', 'Other Board Member'),
+    ], 
+        string='Board Role', 
         index=True,
-        help="chair / ceo / medical_director / nursing_director / finance_director / exec / "
-             "non_exec / other. NED = Non-Executive Director (independent oversight role). "
-             "The available labels are configurable under Settings > Users & Companies > "
-             "NHS > Board Roles."
+        help="Selection: chair / vice_chair / ceo / medical_director / director_of_nursing / "
+             "finance_director / coo / exec_director / ned / associate_ned / governor / other."
+             " NED = Non-Executive Director (independent oversight role)."
     )
-
-    @api.model
-    def _selection_nhs_board_role(self):
-        roles = self.env['nhs.board.role'].sudo().search([])
-        return [(role.code, role.name) for role in roles]
     is_voting_member = fields.Boolean(
         string='Voting Member', 
         default=True,
@@ -177,9 +179,7 @@ class ResPartner(models.Model):
                         'trust': partner.nhs_trust_id,
                         'role': partner.nhs_board_role,
                     }
-
         result = super().write(vals)
-
         if needs_sync and old_states:
             for partner in self:
                 old = old_states.get(partner.id)
@@ -197,7 +197,6 @@ class ResPartner(models.Model):
                 # Set new statutory field on the (possibly new) trust
                 if partner.is_nhs_board_member:
                     partner._sync_trust_governance()
-
         return result
 
     def unlink(self):
@@ -235,7 +234,6 @@ class ResPartner(models.Model):
     @api.depends('term_start_date', 'term_end_date', 'is_nhs_board_member')
     def _compute_is_term_active(self):
         """Compute whether today falls within [term_start_date, term_end_date] for board members.
-
         Non board members are always False. An open-ended start or end date
         is treated as active from/until that bound; with neither bound set,
         an active board member defaults to True.

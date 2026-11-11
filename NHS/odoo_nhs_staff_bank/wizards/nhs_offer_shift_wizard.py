@@ -21,7 +21,7 @@
 #############################################################################
 from datetime import timedelta
 from markupsafe import Markup
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
 
@@ -85,11 +85,11 @@ class NhsOfferShiftWizard(models.TransientModel):
             targets = self.line_ids.filtered(lambda l: l.selected and not l.already_offered)
             ineligible = targets.filtered(lambda l: not l.eligible)
             if ineligible:
-                raise UserError((
-                    "Cannot offer to ineligible member(s): %s") % ', '.join(
-                    ineligible.mapped('member_id.name')))
+                raise UserError(
+                    _("Cannot offer to ineligible member(s): %s") % ', '.join(
+                        ineligible.mapped('member_id.name')))
         if not targets:
-            raise UserError(("No eligible candidates to offer this shift to."))
+            raise UserError(_("No eligible candidates to offer this shift to."))
         expiry = fields.Datetime.now() + timedelta(hours=self.expiry_hours or 24)
         offers = self.env['nhs.shift.offer']
         for line in targets:

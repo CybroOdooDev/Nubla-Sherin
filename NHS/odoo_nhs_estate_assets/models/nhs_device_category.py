@@ -35,12 +35,6 @@ class NHSDeviceCategory(models.Model):
         required=True,
         help='Category name, e.g. "Infusion Pump", "Patient Monitor", "Imaging".'
     )
-    complete_name = fields.Char(
-        string='Complete Name',
-        compute='_compute_complete_name',
-        store=True,
-        help='Full hierarchical name including parent categories.'
-    )
     parent_id = fields.Many2one(
         'nhs.device.category',
         string='Parent Category',
@@ -58,6 +52,13 @@ class NHSDeviceCategory(models.Model):
         string='Parent Path',
         index=True,
         help='Materialized path for efficient hierarchical queries.'
+    )
+    complete_name = fields.Char(
+        string='Complete Name',
+        compute='_compute_complete_name',
+        store=True,
+        help='Full hierarchical name including parent categories.',
+        recursive=True
     )
     default_life_years = fields.Integer(
         string='Default Life (Years)',

@@ -22,6 +22,11 @@
 from odoo import api, fields, models
 
 class NHSESite(models.Model):
+    """
+        Model for NHS Estate Sites/Campuses. This models the primary locations within the NHS estate hierarchy.
+        Each site record represents a hospital campus, health centre, or facility location that contains buildings,
+        floors, and spaces across the estate portfolio.
+    """
     _name = 'nhs.estate.site'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'NHS estate site / campus'
@@ -40,6 +45,7 @@ class NHSESite(models.Model):
         required=True,
         tracking=True,
         index=True,
+        copy=False,
         help="Unique reference code for the site (e.g., NHS site code or internal identifier)"
     )
     parent_id = fields.Many2one(
@@ -205,29 +211,13 @@ class NHSESite(models.Model):
     virtual_space_type = fields.Char(compute='_compute_virtual_info')
     virtual_operational_status = fields.Char(compute='_compute_virtual_info')
     site_clinical_area = fields.Float(
-        string='Clinical Area (m²)',
-        compute='_compute_site_analysis',
-        store=True,
-        help='Total clinical area on site'
-    )
-    site_non_clinical_area = fields.Float(
-        string='Non-Clinical Area (m²)',
-        compute='_compute_site_analysis',
-        store=True,
-        help='Total non-clinical area on site'
-    )
-    site_occupied_area = fields.Float(
-        string='Occupied Area (m²)',
-        compute='_compute_site_analysis',
-        store=True,
-        help='Total occupied area on site'
-    )
-    site_vacant_area = fields.Float(
-        string='Vacant Area (m²)',
-        compute='_compute_site_analysis',
-        store=True,
-        help='Total vacant area on site'
-    )
+        string='Clinical Area (m²)',compute='_compute_site_analysis',store=True, help='Total clinical area on site')
+    site_non_clinical_area = fields.Float(string='Non-Clinical Area (m²)',compute='_compute_site_analysis',
+                    store=True,help='Total non-clinical area on site')
+    site_occupied_area = fields.Float(string='Occupied Area (m²)',compute='_compute_site_analysis',
+                    store=True,help='Total occupied area on site')
+    site_vacant_area = fields.Float(string='Vacant Area (m²)',compute='_compute_site_analysis',
+                    store=True,help='Total vacant area on site')
 
     _name_uniq = models.Constraint(
         'unique(code)',
@@ -377,7 +367,6 @@ class NHSESite(models.Model):
         """
         if vals.get('code'):
             vals['code'] = vals['code'].upper()
-
         def is_real(r):
             if not r.id:
                 return True
@@ -385,7 +374,6 @@ class NHSESite(models.Model):
                 return int(r.id) < 100000
             except (ValueError, TypeError):
                 return True
-
         real_records = self.filtered(is_real)
         virtual_records = self.filtered(lambda r: not is_real(r))
         res = True
@@ -891,7 +879,7 @@ class NHSESite(models.Model):
         """
         return [{
             'label': 'Import Template for Site',
-            'template': '/odoo_nhs_estate/static/import_templates/site_template.xlsx',
+            'template': '/odoo_nhs_estate/static/import_templates/sites.xlsx',
         }]
 
     def _prepare_code(self, vals):
@@ -1171,7 +1159,6 @@ class NHSESite(models.Model):
             buildings_of_type = self.env['nhs.estate.building'].search([('tenure_type', '=', t_type)])
             tenure_breakdown[t_type] = {
                 'count': len(buildings_of_type),
-                'gia': sum(buildings_of_type.mapped('gia'))
             }
         metrics['tenure_breakdown'] = tenure_breakdown
         gia_by_function = {}

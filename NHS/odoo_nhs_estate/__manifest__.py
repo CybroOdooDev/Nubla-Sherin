@@ -42,10 +42,9 @@ dashboards.
     'data': [
         'security/nhs_estate_security.xml',
         'security/ir.model.access.csv',
-        'data/nhs_estate_sequence_data.xml',
-        'data/nhs_estate_tenure_data.xml',
-        'data/nhs_estate_condition_data.xml',
+        'data/ir_sequence_data.xml',
         'data/nhs_estate_function_data.xml',
+        'data/ir_cron_data.xml',
         'views/nhs_estate_site_views.xml',
         'views/nhs_estate_building_views.xml',
         'views/nhs_estate_floor_views.xml',

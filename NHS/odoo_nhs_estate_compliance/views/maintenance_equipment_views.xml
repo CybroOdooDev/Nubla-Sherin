@@ -14,6 +14,12 @@
                     <field name="compliance_item_count" widget="statinfo" string="Compliance Items"/>
                 </button>
             </div>
+            <xpath expr="//sheet/group" position="inside">
+                <group string="NHS Location">
+                    <field name="estate_building_id"/>
+                    <field name="estate_space_id"/>
+                </group>
+            </xpath>
         </field>
     </record>
 </odoo>

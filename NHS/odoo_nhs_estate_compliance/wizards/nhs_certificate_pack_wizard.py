@@ -23,10 +23,11 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 class NHSCertificatePackWizard(models.TransientModel):
-    """Transient wizard for generating a certificate pack PDF report.
-    Filters active compliance tests that have a certificate reference by site,
-    building, discipline, and date range.  Triggers the QWeb certificate pack
-    report action for the matching test records.
+    """
+        Transient wizard for generating a certificate pack PDF report.
+        Filters active compliance tests that have a certificate reference by site,
+        building, discipline, and date range.  Triggers the QWeb certificate pack
+        report action for the matching test records.
     """
     _name = 'nhs.certificate.pack.wizard'
     _description = 'Certificate Pack Wizard'

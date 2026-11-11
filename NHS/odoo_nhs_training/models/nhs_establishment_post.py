@@ -23,6 +23,8 @@ from odoo import fields, models
 
 
 class NhsEstablishmentPost(models.Model):
+    """Adds training requirement profile and member tracking to posts."""
+
     _inherit = 'nhs.establishment.post'
 
     training_requirement_profile_id = fields.Many2one(

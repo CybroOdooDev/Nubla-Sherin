@@ -154,7 +154,8 @@
                             invisible="vacancy_status != 'over_established'"/>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_view_changes" type="object" class="oe_stat_button" icon="fa-history">
+                        <button name="action_view_changes" type="object" class="oe_stat_button" icon="fa-history"
+                                groups="odoo_nhs_establishment.group_nhs_workforce_user">
                             <field name="change_count" widget="statinfo" string="Changes"/>
                         </button>
                     </div>

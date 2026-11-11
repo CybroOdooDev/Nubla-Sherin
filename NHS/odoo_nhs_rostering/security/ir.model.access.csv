@@ -20,9 +20,9 @@ access_nhs_roster_period_admin,nhs.roster.period admin,model_nhs_roster_period,g
 access_nhs_duty_manager,nhs.duty manager,model_nhs_duty,group_nhs_roster_manager,1,1,1,1
 access_nhs_duty_admin,nhs.duty admin,model_nhs_duty,group_nhs_workforce_admin,1,1,1,1
 access_nhs_duty_staff,nhs.duty staff,model_nhs_duty,group_nhs_roster_staff,1,0,0,0
-access_nhs_duty_assignment_manager,nhs.duty.assignment manager,model_nhs_duty_assignment,group_nhs_roster_manager,1,1,1,1
-access_nhs_duty_assignment_admin,nhs.duty.assignment admin,model_nhs_duty_assignment,group_nhs_workforce_admin,1,1,1,1
-access_nhs_duty_assignment_staff,nhs.duty.assignment staff,model_nhs_duty_assignment,group_nhs_roster_staff,1,0,0,0
+access_nhs_duty_assignment_manager,nhs.roster.assignment manager,model_nhs_roster_assignment,group_nhs_roster_manager,1,1,1,1
+access_nhs_duty_assignment_admin,nhs.roster.assignment admin,model_nhs_roster_assignment,group_nhs_workforce_admin,1,1,1,1
+access_nhs_duty_assignment_staff,nhs.roster.assignment staff,model_nhs_roster_assignment,group_nhs_roster_staff,1,0,0,0
 access_nhs_roster_rule_manager,nhs.roster.rule manager,model_nhs_roster_rule,group_nhs_roster_manager,1,0,0,0
 access_nhs_roster_rule_admin,nhs.roster.rule admin,model_nhs_roster_rule,group_nhs_workforce_admin,1,1,1,1
 access_nhs_rule_violation_manager,nhs.rule.violation manager,model_nhs_rule_violation,group_nhs_roster_manager,1,1,0,0

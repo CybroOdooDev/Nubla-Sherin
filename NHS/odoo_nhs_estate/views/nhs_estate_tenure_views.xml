@@ -77,7 +77,7 @@
                                 </group>
                             </group>
                         </page>
-                        <page string="Documents" invisible="tenure_type in ['freehold','licence']">
+                        <page string="Documents" invisible="id == 0 or tenure_type in ['freehold','licence']" >
                             <group>
                                 <field name="document_ids" widget="many2many_binary" help="Lease/Contract Documents"/>
                             </group>

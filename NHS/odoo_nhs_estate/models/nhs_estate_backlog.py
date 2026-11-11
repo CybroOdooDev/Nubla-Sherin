@@ -24,6 +24,11 @@ from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 class NHSESBacklog(models.Model):
+    """
+        Model for NHS Estate Backlog Maintenance Items. This models the maintenance backlog for
+        NHS estate management. Each backlog item represents an outstanding maintenance, repair,
+        or refurbishment issue identified within a healthcare facility.
+    """
     _name = 'nhs.estate.backlog'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Backlog Maintenance Item'
@@ -96,7 +101,7 @@ class NHSESBacklog(models.Model):
         help="Reference number or code linking to associated works or projects"
     )
     notes = fields.Text(string='Notes',
-                    help="Additional information, observations, or special considerations about the maintenance issue")
+                        help="Additional information, observations, or special considerations about the maintenance issue")
     currency_id = fields.Many2one(
         'res.currency',
         string='Currency',
@@ -132,12 +137,12 @@ class NHSESBacklog(models.Model):
         """
         current_year = fields.Date.today().year
         for record in self:
-            if record.target_year and record.target_year > 0 :
-                if record.target_year < current_year :
+            if record.target_year and record.target_year > 0:
+                if record.target_year < current_year:
                     raise ValidationError(
                         "Target rectification year cannot be years in the past."
                     )
-            else :
+            else:
                 raise ValidationError(
                     "Provide a valid target rectification year."
                 )
@@ -223,4 +228,3 @@ class NHSESBacklog(models.Model):
                 'default_res_id': self.id,
             }
         }
-    

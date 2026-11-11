@@ -22,6 +22,11 @@
 from odoo import models, fields
 
 class ResConfigSettings(models.TransientModel):
+    """
+        Model for NHS Estate System Configuration Settings. This extends the Odoo configuration settings
+        with NHS estate-specific parameters for controlling condition survey roll-up rules and other system-wide
+        configuration options.
+    """
     _inherit = 'res.config.settings'
 
     condition_rollup = fields.Selection([

@@ -30,6 +30,7 @@ STATUSES = [
 
 
 class NhsRegistration(models.Model):
+    """A member's professional registration with a regulator."""
     _name = 'nhs.registration'
     _inherit = ['mail.thread']
     _description = 'Professional Registration'

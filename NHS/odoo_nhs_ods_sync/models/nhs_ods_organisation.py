@@ -23,6 +23,7 @@ import json
 import logging
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -172,11 +173,31 @@ class NhsOdsOrganisation(models.Model):
     def refresh_from_ods(self):
         """Fetch latest organisation details from Spine API and refresh cache."""
         self.ensure_one()
-        from ..services.ods_api_client import OdsApiClient
+        from ..services.ods_api_client import (
+            OdsApiClient, OdsNotFoundError, OdsAuthError, OdsApiError,
+        )
 
         from ..services.ods_payload_parser import parse_ods_payload
         client = OdsApiClient(self.env)
-        raw = client.get_organisation(self.ods_code)
+        try:
+            raw = client.get_organisation(self.ods_code)
+        except OdsNotFoundError:
+            raise UserError(
+                "ODS code '%s' was not found in the NHS ODS registry. "
+                "Please check the code is correct — it may be a code that "
+                "was entered manually and never existed in the live NHS "
+                "directory, or it may have since been retired." % self.ods_code
+            )
+        except OdsAuthError:
+            raise UserError(
+                "Could not authenticate with the NHS ODS API. Please check "
+                "the ODS sync configuration and try again."
+            )
+        except OdsApiError as exc:
+            raise UserError(
+                "The NHS ODS API is currently unavailable or timed out. "
+                "Please try again in a few minutes.\n\nDetails: %s" % exc
+            )
         org_data = raw.get('Organisation', raw)
         parsed = parse_ods_payload(org_data)
         write_vals = {

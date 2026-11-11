@@ -30,6 +30,11 @@ class MaintenanceEquipment(models.Model):
                                           help='Compliance items linked to this piece of equipment.')
     compliance_item_count = fields.Integer(string='Compliance Item Count', compute='_compute_compliance_item_count',
                                            help='Total number of compliance items associated with this equipment.')
+    estate_building_id = fields.Many2one('nhs.estate.building', string='Estate Building',
+                                         help='Estate building where this equipment resides.')
+    estate_space_id = fields.Many2one('nhs.estate.space', string='Estate Space',
+                                      domain="[('building_id', '=', estate_building_id)]",
+                                      help='Estate space where this equipment resides.')
 
     @api.depends('compliance_item_ids')
     def _compute_compliance_item_count(self):

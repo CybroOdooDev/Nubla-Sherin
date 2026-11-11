@@ -23,6 +23,8 @@ from odoo import fields, models
 
 
 class NhsStaffGroup(models.Model):
+    """Adds training requirements tracking to staff groups."""
+
     _inherit = 'nhs.staff.group'
 
     requirement_ids = fields.One2many(
@@ -38,9 +40,15 @@ class NhsStaffGroup(models.Model):
     )
 
     def _compute_requirement_count(self):
-        """Count the training requirements defined on this staff group."""
+        """Count the training requirements defined on this staff group.
+        sudo() deliberately - this is just a count, not exposing individual
+        requirement records, and must not raise an access error for viewers
+        (e.g. job-planning's Clinical Manager) who can see the staff group
+        but have no training-module access at all; the "Requirements"
+        button/tab themselves stay groups()-gated so those users still
+        can't drill into the actual requirement records."""
         for record in self:
-            record.requirement_count = len(record.requirement_ids)
+            record.requirement_count = len(record.sudo().requirement_ids)
 
     def action_view_training_requirements(self):
         """Open the training requirements defined on this staff group."""

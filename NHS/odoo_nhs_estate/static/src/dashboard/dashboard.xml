@@ -349,7 +349,7 @@
                             </div>
                         </div>
                         <div class="o_nhs_chart_canvas_wrapper">
-                            <canvas t-ref="display_name"></canvas>
+                            <canvas t-ref="tenureChart"></canvas>
                         </div>
                     </div>
                     <div class="o_nhs_card">

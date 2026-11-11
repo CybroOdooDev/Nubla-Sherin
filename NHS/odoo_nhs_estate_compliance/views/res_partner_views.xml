@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_partner_view_form" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.duty.details</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_view_assignment_roles"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-users">
+                    <field name="assignment_roles_count" widget="statinfo" string="Assigned Roles"/>
+                </button>
+            </div>
+        </field>
+    </record>
+
+</odoo>

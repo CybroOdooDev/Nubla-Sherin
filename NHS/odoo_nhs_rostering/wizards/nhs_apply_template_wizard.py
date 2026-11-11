@@ -70,7 +70,7 @@ class NhsApplyTemplateWizard(models.TransientModel):
         template = self.rotation_template_id
         weeks = template.weeks or 1
         Duty = self.env['nhs.duty']
-        Assignment = self.env['nhs.duty.assignment']
+        Assignment = self.env['nhs.roster.assignment']
         created, skipped = 0, []
         a_date = self.period_id.date_start
         while a_date <= self.period_id.date_end:

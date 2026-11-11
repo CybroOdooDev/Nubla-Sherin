@@ -25,7 +25,7 @@
         <!-- Record: mail_template_duty_changed for mail.template -->
     <record id="mail_template_duty_changed" model="mail.template">
             <field name="name">Roster: Duty Changed</field>
-            <field name="model_id" ref="model_nhs_duty_assignment"/>
+            <field name="model_id" ref="model_nhs_roster_assignment"/>
             <field name="subject">A duty on your roster has changed</field>
             <field name="email_from">{{ (object.company_id.email or user.email) }}</field>
             <field name="auto_delete" eval="True"/>

@@ -28,6 +28,7 @@ STATUS_LABELS = {
 
 
 class ReportIndividualRecord(models.AbstractModel):
+    """Report parser for the individual training record PDF."""
     _name = 'report.odoo_nhs_training.report_nhs_individual_record_view'
     _description = 'Individual Training Record QWeb PDF Report Parser'
 

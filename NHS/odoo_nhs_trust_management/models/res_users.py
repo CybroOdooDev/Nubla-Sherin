@@ -40,3 +40,4 @@ class ResUsers(models.Model):
         string='Allowed Health Boards (Scotland)',
         help='Users will only be able to see NHS Trusts associated with these Scottish Health Boards.'
     )
+

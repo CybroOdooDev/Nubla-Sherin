@@ -11,9 +11,14 @@
     <!-- Menu: full vacancies list, under Vacancies -->
     <menuitem id="menu_nhs_vacancy" name="Vacancies"
               parent="menu_nhs_recruitment_vacancies" action="action_nhs_vacancy" sequence="10"/>
-    <!-- Menu: vacancies for the current hiring manager, under Vacancies -->
+    <!-- Menu: vacancies for the current hiring manager, under Vacancies.
+         Officer+ only — for a pure Viewer this is nearly always identical
+         to the main Vacancies list (which is already scoped to their own
+         vacancies/panels), so the extra entry only adds real value once
+         "Vacancies" can show more than "yours" (Officer and above). -->
     <menuitem id="menu_nhs_vacancy_my" name="My Vacancies"
-              parent="menu_nhs_recruitment_vacancies" action="action_nhs_vacancy_my" sequence="20"/>
+              parent="menu_nhs_recruitment_vacancies" action="action_nhs_vacancy_my" sequence="20"
+              groups="odoo_nhs_recruitment.group_nhs_recruit_officer"/>
     <!-- Menu: vacancies awaiting approval, under Vacancies -->
     <menuitem id="menu_nhs_vacancy_approvals" name="Approvals"
               parent="menu_nhs_recruitment_vacancies" action="action_nhs_vacancy_approvals" sequence="30"

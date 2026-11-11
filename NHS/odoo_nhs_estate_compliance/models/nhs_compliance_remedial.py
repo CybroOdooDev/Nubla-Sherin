@@ -47,14 +47,14 @@ class NHSComplianceRemedial(models.Model):
         ('high', 'High'),
         ('urgent', 'Urgent')
     ], string='Priority', default='medium',
-       help='The urgency of this remedial action; Urgent items must be addressed immediately.')
+        help='The urgency of this remedial action; Urgent items must be addressed immediately.')
     risk_rating = fields.Selection([
         ('low', 'Low'),
         ('medium', 'Medium'),
         ('high', 'High'),
         ('critical', 'Critical')
     ], string='Risk Rating', default='medium',
-       help='The assessed risk level if this remedial action is not completed.')
+        help='The assessed risk level if this remedial action is not completed.')
     owner_id = fields.Many2one('res.users', string='Owner', required=True,
                                help='The person responsible for completing this remedial action.')
     due_date = fields.Date(string='Due Date', required=True,
@@ -66,19 +66,25 @@ class NHSComplianceRemedial(models.Model):
         ('completed', 'Completed'),
         ('verified', 'Verified')
     ], string='State', default='open', required=True,
-       help='Current workflow state of the remedial action.')
+        help='Current workflow state of the remedial action.')
     completion_evidence = fields.Text(string='Completion Evidence',
                                 help='Description of the evidence confirming that the remedial work has been completed '
-                                     '(e.g. inspection photos, contractor report reference).')
+                                           '(e.g. inspection photos, contractor report reference).')
     verified_by_id = fields.Many2one('res.users', string='Verified By',
-                help='The person who independently verified that the remedial action was completed satisfactorily.')
+                    help='The person who independently verified that the remedial action was completed satisfactorily.')
     verified_at = fields.Datetime(string='Verified At',
                                   help='The date and time at which the remedial action was formally verified.')
-    backlog_ref = fields.Many2one('nhs.estate.backlog',string='Backlog Reference',
-                               help='Optional link to an Estate Register backlog item')
+    building_id = fields.Many2one('nhs.estate.building',related='item_id.building_id',string='Building')
+    backlog_ref = fields.Many2one(
+        'nhs.estate.backlog',
+        string='Backlog Reference',
+        domain="[('building_id', '=', building_id)]",
+        help='Optional link to an Estate Register backlog item'
+    )
 
     @api.constrains('state')
     def _check_completion_evidence(self):
+        """Ensure completion evidence is provided when marking a remedial action as completed."""
         for remedial in self:
             if remedial.state == 'completed' and not remedial.completion_evidence:
                 raise ValidationError('Completion evidence is required when marking as completed.')
@@ -154,15 +160,16 @@ class NHSComplianceRemedial(models.Model):
                                                                        limit=1)
             if not dh_assignment and item.building_id:
                 dh_assignment = self.env['nhs.duty.assignment'].search(dh_domain +
-                                                                [('building_id', '=', item.building_id.id)], limit=1)
+                                                                       [('building_id', '=', item.building_id.id)],
+                                                                       limit=1)
             if not dh_assignment:
                 dh_assignment = self.env['nhs.duty.assignment'].search(dh_domain, limit=1)
             dh_user_id = dh_assignment.person_id.id if dh_assignment else False
             dh_email = dh_assignment.person_id.email if dh_assignment else False
             days_overdue = (today - remedial.due_date).days
             escalation_msg = (
-                "ESCALATION ALERT: Remedial Action '%s' is OVERDUE by %s days (Due: %s). Assigned to: %s."
-            ) % (remedial.name, days_overdue, remedial.due_date, remedial.owner_id.name)
+                            "ESCALATION ALERT: Remedial Action '%s' is OVERDUE by %s days (Due: %s). Assigned to: %s."
+                             ) % (remedial.name, days_overdue, remedial.due_date, remedial.owner_id.name)
             if days_overdue > escalation_threshold and dh_user_id:
                 escalation_msg += " Escalated to Duty Holder."
             item.message_post(body=escalation_msg)
@@ -211,6 +218,18 @@ class NHSComplianceRemedial(models.Model):
                     })
 
     def write(self, vals):
+        """Update remedial actions and trigger re-test workflow when verified.
+
+        When a remedial action changes to the ``verified`` state, this method
+        checks whether all remedial actions associated with the compliance item
+        have been completed or verified. If no open remedial actions remain, any
+        related open corrective maintenance requests are moved to an in-progress
+        stage, a notification is posted to the compliance item's chatter, and a
+        re-test activity is created for the responsible user.
+
+        The workflow is triggered only when the remedial action actually changes
+        to ``verified`` and avoids creating duplicate re-test activities.
+        """
         original_states = {}
         if 'state' in vals and vals.get('state') == 'verified':
             self.env.cr.execute(
@@ -228,7 +247,21 @@ class NHSComplianceRemedial(models.Model):
                             lambda r: r.state not in ['completed', 'verified']
                         )
                         if not open_remedials:
-                            item._sync_maintenance_records()
+                            awaiting_stage = self.env['maintenance.stage'].search(
+                                [('name', 'ilike', 'In Progress')], limit=1)
+                            if not awaiting_stage:
+                                awaiting_stage = self.env['maintenance.stage'].search([('done', '=', False)],
+                                                                                      order='sequence desc', limit=1)
+                            if awaiting_stage:
+                                open_corr_requests = self.env['maintenance.request'].search([
+                                    ('compliance_item_id', '=', item.id),
+                                    ('maintenance_type', '=', 'corrective'),
+                                    ('stage_id.done', '=', False),
+                                ])
+                                if open_corr_requests:
+                                    open_corr_requests.with_context(skip_maintenance_sync=True).write({
+                                        'stage_id': awaiting_stage.id,
+                                    })
                             chatter_msg = (
                                 "All remedial actions have been verified. "
                                 "A re-test is required before the item can return to a compliant state."

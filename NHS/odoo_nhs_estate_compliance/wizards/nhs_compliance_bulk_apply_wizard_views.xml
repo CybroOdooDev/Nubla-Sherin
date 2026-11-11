@@ -11,14 +11,32 @@
                         <group>
                             <field name="discipline_id"/>
                             <field name="compliance_type_ids" widget="many2many_tags"/>
-                            <field name="site_ids" widget="many2many_tags" required="1"/>
+                            <field name="site_ids" widget="many2many_tags" />
                             <field name="building_ids" widget="many2many_tags"
                                    domain="site_ids and [('site_id', 'in', site_ids)] or []"/>
                             <field name="start_date"/>
                         </group>
                     </group>
+                    <div class="mb-3">
+                        <button name="action_preview" string="Preview Items" type="object" class="btn-info"/>
+                    </div>
+                    <notebook invisible="not line_ids">
+                        <page string="Items Preview">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="selected" widget="boolean"/>
+                                    <field name="site_id"/>
+                                    <field name="building_id"/>
+                                    <field name="compliance_type_id"/>
+                                    <field name="item_name"/>
+                                    <field name="start_date"/>
+                                    <field name="next_due_date"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
                     <footer>
-                        <button name="action_apply" string="Apply" type="object" class="btn-primary"/>
+                        <button name="action_apply" string="Generate Compliance Items" type="object" class="btn-primary"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>
                 </sheet>

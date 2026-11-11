@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Contractor Visit Complete Items Wizard Form View -->
+    <record id="view_nhs_contractor_visit_complete_wizard" model="ir.ui.view">
+        <field name="name">nhs.contractor.visit.complete.wizard.form</field>
+        <field name="model">nhs.contractor.visit.complete.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Complete Compliance Items">
+                <sheet>
+                    <group string="Visit &amp; Contractor Details">
+                        <group>
+                            <field name="visit_id"/>
+                            <field name="contractor_id"/>
+                            <field name="visit_date"/>
+                        </group>
+                        <group string="Common Test &amp; Certificate Defaults">
+                            <field name="common_outcome"/>
+                            <field name="common_certificate_ref"/>
+                            <field name="common_certificate_date"/>
+                            <field name="common_certificate_expiry"/>
+                            <field name="common_issuing_body"/>
+                            <field name="common_certificate_file" filename="common_certificate_filename"/>
+                            <field name="common_certificate_filename" invisible="1"/>
+                        </group>
+                    </group>
+                    <separator string="Compliance Items Covered"/>
+                    <field name="line_ids" >
+                        <list create="0" editable="bottom">
+                            <field name="selected" widget="boolean"/>
+                            <field name="item_id" readonly="1"/>
+                            <field name="discipline_id" readonly="1"/>
+                            <field name="outcome" widget="badge" readonly="1"/>
+                            <field name="certificate_ref" readonly="1"/>
+                            <field name="certificate_date" readonly="1"/>
+                            <field name="certificate_expiry" readonly="1"/>
+                            <field name="issuing_body" readonly="1"/>
+                            <field name="certificate_file"
+                                   filename="certificate_filename"
+                                   widget="binary"
+                                   readonly="1"/>
+                            <field name="certificate_filename" invisible="1"/>
+                            <field name="notes" readonly="1"/>
+                        </list>
+                    </field>
+                    <footer>
+                        <button name="action_complete_items" string="Complete Items &amp; Roll Forward" type="object"
+                                class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Contractor Visit Complete Items Wizard Action -->
+    <record id="action_nhs_contractor_visit_complete_wizard" model="ir.actions.act_window">
+        <field name="name">Complete Compliance Items</field>
+        <field name="res_model">nhs.contractor.visit.complete.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

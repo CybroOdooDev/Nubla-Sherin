@@ -20,9 +20,9 @@
 #
 #############################################################################
 from . import nhs_alert_match_wizard
-from . import nhs_device_service_wizard
 from . import nhs_device_bulk_schedule_wizard
 from . import nhs_device_decommission_wizard
 from . import nhs_device_passport_wizard
 from . import nhs_alert_response_wizard
+from . import nhs_device_service_wizard
 

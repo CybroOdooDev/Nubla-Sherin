@@ -57,7 +57,7 @@ class NhsRosterPeriod(models.Model):
     duty_ids = fields.One2many('nhs.duty', 'period_id', string='Duties', help="Duties")
     duty_count = fields.Integer(compute='_compute_counts', store=True, help="Detailed information about this field")
     assignment_ids = fields.One2many(
-        'nhs.duty.assignment', 'period_id', string='Assignments', help="Assignments")
+        'nhs.roster.assignment', 'period_id', string='Assignments', help="Assignments")
     violation_ids = fields.One2many('nhs.rule.violation', 'period_id', string='Violations',
                                     help="Violations")
     open_violation_count = fields.Integer(compute='_compute_counts', store=True,
@@ -341,7 +341,7 @@ class NhsRosterPeriod(models.Model):
         if existing:
             return {'ok': True}
         try:
-            self.env['nhs.duty.assignment'].create({'duty_id': duty.id, 'member_id': member_id})
+            self.env['nhs.roster.assignment'].create({'duty_id': duty.id, 'member_id': member_id})
             return {'ok': True}
         except ValidationError as exc:
             if created_duty:
@@ -352,7 +352,7 @@ class NhsRosterPeriod(models.Model):
     def grid_unassign(self, period_id, member_id, a_date, shift_type_id):
         """Cancel `member_id`'s assignment for (date, shift type) in this period."""
         a_date = fields.Date.to_date(a_date)
-        assignments = self.env['nhs.duty.assignment'].search([
+        assignments = self.env['nhs.roster.assignment'].search([
             ('period_id', '=', period_id), ('member_id', '=', member_id),
             ('duty_date', '=', a_date), ('shift_type_id', '=', shift_type_id),
             ('state', '!=', 'cancelled'),

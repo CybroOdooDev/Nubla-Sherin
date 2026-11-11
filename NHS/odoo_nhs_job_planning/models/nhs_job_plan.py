@@ -442,7 +442,7 @@ class NhsJobPlan(models.Model):
 
     @api.model
     def _build_rostered_duties_domain(self, member_id, date_start, date_end, org_unit_id=False):
-        """Domain for the nhs.duty.assignment records that reconcile against
+        """Domain for the nhs.roster.assignment records that reconcile against
         a job plan: same workforce member, duty date within the plan year,
         excluding cancelled/dna, optionally scoped to the plan's org unit.
         Shared by _compute_rostered_metrics and action_view_rostered_duties
@@ -460,7 +460,7 @@ class NhsJobPlan(models.Model):
     @api.depends('plan_year_id.date_start', 'plan_year_id.date_end', 'org_unit_id',
                  'member_id', 'total_pas')
     def _compute_rostered_metrics(self):
-        """Compare each plan's actual rostered nhs.duty.assignment records
+        """Compare each plan's actual rostered nhs.roster.assignment records
         against its planned Total PAs.
         """
         plan_domains = {}
@@ -473,7 +473,7 @@ class NhsJobPlan(models.Model):
             plan_domains[plan.id] = domain
             or_domains.append(domain)
 
-        assignments = self.env['nhs.duty.assignment'].sudo()
+        assignments = self.env['nhs.roster.assignment'].sudo()
         if or_domains:
             assignments = assignments.search(Domain.OR(or_domains))
 
@@ -506,12 +506,12 @@ class NhsJobPlan(models.Model):
 
         domain = self._build_rostered_duties_domain(
             self.member_id.id, self.plan_year_id.date_start, self.plan_year_id.date_end, self.org_unit_id.id)
-        matched_assignments = self.env['nhs.duty.assignment'].sudo().search(domain)
+        matched_assignments = self.env['nhs.roster.assignment'].sudo().search(domain)
         
         return {
             'name': 'Rostered Duties',
             'type': 'ir.actions.act_window',
-            'res_model': 'nhs.duty.assignment',
+            'res_model': 'nhs.roster.assignment',
             'view_mode': 'list,form',
             'domain': [('id', 'in', matched_assignments.ids)],
             'context': {

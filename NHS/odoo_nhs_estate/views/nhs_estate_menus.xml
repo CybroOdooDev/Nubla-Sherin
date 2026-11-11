@@ -4,7 +4,7 @@
     <menuitem id="menu_nhs_estate_root"
               name="Estate Register"
               sequence="10"
-              web_icon="odoo_nhs_estate/static/description/icon.png"/>
+              web_icon="odoo_nhs_estate,static/description/icon.png"/>
 
     <!-- Estate Dashboard Menu -->
     <menuitem id="menu_estate_dashboard"
@@ -102,7 +102,7 @@
               name="Configuration"
               parent="menu_nhs_estate_root"
               sequence="50"
-              groups="group_nhs_estate_manager"/>
+              groups="odoo_nhs_estate.group_nhs_estate_manager"/>
     <menuitem id="menu_nhs_estate_function"
               name="Functions"
               parent="menu_nhs_estate_config"

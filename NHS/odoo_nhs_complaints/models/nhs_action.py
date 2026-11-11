@@ -39,26 +39,106 @@ class NhsActionComplaintsExtension(models.Model):
                               ondelete='restrict',
                               help='PHSO recommendation this action was raised from (complaint_id still set for rollup).')
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Auto-populate complaint_id from complaint_investigation_id or phso_id if not explicitly provided."""
+        for vals in vals_list:
+            if vals.get('complaint_investigation_id') and not vals.get('complaint_id'):
+                inv = self.env['nhs.complaint.investigation'].browse(vals['complaint_investigation_id'])
+                if inv.complaint_id:
+                    vals['complaint_id'] = inv.complaint_id.id
+            elif vals.get('phso_id') and not vals.get('complaint_id'):
+                phso = self.env['nhs.complaint.phso'].browse(vals['phso_id'])
+                if phso.complaint_id:
+                    vals['complaint_id'] = phso.complaint_id.id
+        return super().create(vals_list)
+
+    @api.model
+    def default_get(self, fields_list):
+        """Pre-fill complaint_id when creating in a complaint investigation or PHSO context."""
+        res = super().default_get(fields_list)
+        inv_id = res.get('complaint_investigation_id') or self.env.context.get('default_complaint_investigation_id')
+        if inv_id and not res.get('complaint_id'):
+            inv = self.env['nhs.complaint.investigation'].browse(inv_id)
+            if inv.complaint_id:
+                res['complaint_id'] = inv.complaint_id.id
+        phso_id = res.get('phso_id') or self.env.context.get('default_phso_id')
+        if phso_id and not res.get('complaint_id'):
+            phso = self.env['nhs.complaint.phso'].browse(phso_id)
+            if phso.complaint_id:
+                res['complaint_id'] = phso.complaint_id.id
+        return res
+
+    @api.onchange('complaint_investigation_id')
+    def _onchange_complaint_investigation_id(self):
+        """Pre-fill complaint_id when complaint_investigation_id is selected."""
+        if self.complaint_investigation_id and not self.complaint_id:
+            self.complaint_id = self.complaint_investigation_id.complaint_id
+
+    @api.onchange('phso_id')
+    def _onchange_phso_id(self):
+        """Pre-fill complaint_id when phso_id is selected."""
+        if self.phso_id and not self.complaint_id:
+            self.complaint_id = self.phso_id.complaint_id
+
+    @api.onchange('complaint_id')
+    def _onchange_complaint_id(self):
+        """Clear mismatched complaint investigation or PHSO record when complaint_id changes."""
+        if self.complaint_investigation_id and self.complaint_investigation_id.complaint_id != self.complaint_id:
+            self.complaint_investigation_id = False
+        if self.phso_id and self.phso_id.complaint_id != self.complaint_id:
+            self.phso_id = False
+
     @api.constrains('incident_id', 'investigation_id', 'risk_id', 'complaint_id',
-                    'complaint_investigation_id')
+                    'complaint_investigation_id', 'phso_id')
     def _check_single_parent(self):
-        """Ensure an action is linked to at most one parent source record, allowing an investigation linked to its own incident."""
+        """Ensure an action is linked to at most one parent source domain/record hierarchy.
+
+        - Incident side: allows incident + linked investigation (+ optional linked risk).
+        - Complaint side: allows complaint + linked complaint_investigation OR complaint + linked phso.
+        - Cross-linking between incident side and complaint side is strictly forbidden.
+        """
         for rec in self:
-            parents = (
-                bool(rec.incident_id)
-                + bool(getattr(rec, 'investigation_id', False))
-                + bool(rec.risk_id)
-                + bool(rec.complaint_id)
-                + bool(rec.complaint_investigation_id)
-            )
-            if parents > 1:
-                # Allow investigation linked to its own incident
-                if (rec.incident_id and getattr(rec, 'investigation_id', False)
-                        and not rec.risk_id and not rec.complaint_id
-                        and not rec.complaint_investigation_id):
+            incident_side = bool(rec.incident_id) or bool(getattr(rec, 'investigation_id', False)) or bool(rec.risk_id)
+            complaint_side = bool(rec.complaint_id) or bool(rec.complaint_investigation_id) or bool(rec.phso_id)
+
+            if incident_side and complaint_side:
+                raise ValidationError('An action can only be linked to one parent source record.')
+
+            if incident_side:
+                # incident + investigation (no risk): allowed if investigation belongs to that incident
+                if rec.incident_id and getattr(rec, 'investigation_id', False) and not rec.risk_id:
                     if rec.investigation_id.incident_id == rec.incident_id:
                         continue
-                raise ValidationError('An action can only be linked to one parent source record.')
+                # incident + investigation + risk: allowed when all three form a consistent chain
+                if rec.incident_id and getattr(rec, 'investigation_id', False) and rec.risk_id:
+                    if (rec.investigation_id.incident_id == rec.incident_id
+                            and rec.risk_id in rec.incident_id.risk_ids):
+                        continue
+                incident_parents = (
+                    bool(rec.incident_id)
+                    + bool(getattr(rec, 'investigation_id', False))
+                    + bool(rec.risk_id)
+                )
+                if incident_parents > 1:
+                    raise ValidationError('An action can only be linked to one parent source record.')
+
+            if complaint_side:
+                # Cannot link to both complaint investigation and PHSO
+                if rec.complaint_investigation_id and rec.phso_id:
+                    raise ValidationError('An action can only be linked to one parent source record.')
+
+                # If linked to both complaint and investigation, they must match
+                if rec.complaint_id and rec.complaint_investigation_id:
+                    if rec.complaint_investigation_id.complaint_id != rec.complaint_id:
+                        raise ValidationError('An action can only be linked to one parent source record.')
+                    continue
+
+                # If linked to both complaint and PHSO, they must match
+                if rec.complaint_id and rec.phso_id:
+                    if rec.phso_id.complaint_id != rec.complaint_id:
+                        raise ValidationError('An action can only be linked to one parent source record.')
+                    continue
 
     @api.constrains('complaint_id', 'phso_id', 'complaint_investigation_id')
     def _check_parent_record_state(self):

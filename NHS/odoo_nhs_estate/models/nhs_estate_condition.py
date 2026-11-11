@@ -23,6 +23,12 @@ from datetime import timedelta
 from odoo import api, fields, models
 
 class NHSESCondition(models.Model):
+    """
+        Model for Six Facet Condition Surveys. This models the comprehensive condition assessment of
+        NHS estate buildings and spaces using the six-facet methodology (Physical, Statutory, Functional,
+        Utilisation,Quality, Energy). Each survey captures detailed ratings across all facets and calculates
+        an overall condition grade.
+    """
     _name = 'nhs.estate.condition'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Six Facet Condition Survey'
@@ -31,6 +37,7 @@ class NHSESCondition(models.Model):
     name = fields.Char(
         string='Survey Reference',
         required=True,
+        copy=False,
         default=lambda self: 'New Survey',
         help="Unique reference identifier for the survey (auto-generates 'New Survey' by default)"
     )
@@ -307,7 +314,7 @@ class NHSESCondition(models.Model):
                         'res_model_id': self.env['ir.model']._get_id('nhs.estate.condition'),
                         'res_id': survey.id,
                         'activity_type_id': activity_type.id,
-                        'summary': f'📋 Survey Due: {survey.building_id.name}',
+                        'summary': f' Survey Due: {survey.building_id.name}',
                         'note': f'Next survey due for {survey.building_id.name} on {survey.next_survey_date}',
                         'date_deadline': survey.next_survey_date - timedelta(days=10),
                         'user_id': survey.surveyor_id.id or survey.create_uid.id or self.env.user.id,
@@ -342,7 +349,7 @@ class NHSESCondition(models.Model):
                         'res_model_id': self.env['ir.model']._get_id('nhs.estate.condition'),
                         'res_id': survey.id,
                         'activity_type_id': activity_type.id,
-                        'summary': f'⚠️ OVERDUE Survey: {survey.building_id.name}',
+                        'summary': f'OVERDUE Survey: {survey.building_id.name}',
                         'note': f'SURVEY OVERDUE! Next survey was due on {survey.next_survey_date}',
                         'date_deadline': today,
                         'user_id': survey.surveyor_id.id or survey.create_uid.id or self.env.user.id,

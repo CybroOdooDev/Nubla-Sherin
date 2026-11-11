@@ -65,9 +65,9 @@ class NhsSwapRequest(models.Model):
             rec.is_target_user = (rec.target_member_id.user_id.id == self.env.uid)
 
     requester_assignment_id = fields.Many2one(
-        'nhs.duty.assignment', string='Requester Duty', required=True, tracking=True, help="Requester Duty")
+        'nhs.roster.assignment', string='Requester Duty', required=True, tracking=True, help="Requester Duty")
     target_assignment_id = fields.Many2one(
-        'nhs.duty.assignment', string='Colleague Duty', required=True, tracking=True, help="Colleague Duty")
+        'nhs.roster.assignment', string='Colleague Duty', required=True, tracking=True, help="Colleague Duty")
     requester_member_id = fields.Many2one(
         'nhs.workforce.member', related='requester_assignment_id.member_id',
         store=True, string='Requester', help="Requester")
@@ -138,7 +138,7 @@ class NhsSwapRequest(models.Model):
     def _run_rule_check(self):
         """Simulate the swap inside a savepoint that is always rolled back,
         capturing whether every rule would still pass for both parties.
-        Reuses nhs.duty.assignment.write() - and therefore the real rule
+        Reuses nhs.roster.assignment.write() - and therefore the real rule
         engine - so there is exactly one code path for 'would this
         assignment be valid', not a parallel copy."""
         self.ensure_one()

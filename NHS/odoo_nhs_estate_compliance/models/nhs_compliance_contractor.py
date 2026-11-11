@@ -254,6 +254,7 @@ class NHSComplianceContractor(models.Model):
         }
 
 class NHSComplianceContractorAccreditation(models.Model):
+    """Model to manage contractor accreditation types."""
     _name = 'nhs.compliance.contractor.accreditation'
     _description = 'Contractor Accreditation'
     _order = 'name'
@@ -291,6 +292,7 @@ class NHSComplianceContractorAccreditation(models.Model):
     )
 
 class NHSContractorAccreditationLine(models.Model):
+    """Model to manage contractor accreditation details and expiry dates."""
     _name = 'nhs.contractor.accreditation.line'
     _description = 'Contractor Accreditation Line'
     _order = 'expiry_date'

@@ -23,13 +23,13 @@ from odoo import api, fields, models
 
 class NHSDeviceServiceWizard(models.TransientModel):
     _name = 'nhs.device.service.wizard'
-    _description = 'Log Service Wizard'
+    _description = 'Bulk Service Creation Wizard'
 
-    device_id = fields.Many2one(
+    device_ids = fields.Many2many(
         'nhs.device',
-        string='Device',
+        string='Devices',
         required=True,
-        help='Device to log service for.'
+        help='Devices to create service records for.'
     )
     service_type = fields.Selection(
         selection=[
@@ -48,18 +48,17 @@ class NHSDeviceServiceWizard(models.TransientModel):
         string='Service Date',
         required=True,
         default=fields.Date.today,
-        help='Date the service was performed.'
+        help='When performed. Cannot be set in the future.'
     )
-    schedule_type_id = fields.Many2one(
-        'nhs.device.schedule.type',
-        string='Schedule Type',
-        help='Schedule type this service fulfils. '
-             'Selecting a schedule type will update the corresponding schedule.'
+    performed_by_id = fields.Many2one(
+        'res.users',
+        string='Performed By (In-House)',
+        default=lambda self: self.env.user,
+        help='In-house engineer who performed the service.'
     )
-    warranty_id = fields.Many2one(
-        'nhs.device.warranty',
-        string='Covering Warranty / Contract',
-        help='Select covering warranty or service contract if applicable.'
+    contractor = fields.Char(
+        string='Contractor',
+        help='External contractor name (if service was outsourced).'
     )
     outcome = fields.Selection(
         selection=[
@@ -73,27 +72,14 @@ class NHSDeviceServiceWizard(models.TransientModel):
         default='pass',
         help='Result of the service.'
     )
-    performed_by_id = fields.Many2one(
-        'res.users',
-        string='Performed By (In-House)',
-        help='In-house engineer who performed the service.'
-    )
-    contractor = fields.Char(
-        string='Contractor',
-        help='External contractor name (if outsourced).'
-    )
     downtime_hours = fields.Float(
         string='Downtime (Hours)',
-        help='Number of hours the device was out of service.'
+        help='Out-of-service time in hours (for repairs).'
     )
     cost = fields.Monetary(
         string='Service Cost',
         currency_field='currency_id',
-        help='Cost of the service.'
-    )
-    parts_used = fields.Text(
-        string='Parts Used',
-        help='Spare parts, replacement components, or materials consumed during service.'
+        help='Service cost.'
     )
     currency_id = fields.Many2one(
         'res.currency',
@@ -103,47 +89,51 @@ class NHSDeviceServiceWizard(models.TransientModel):
     )
     certificate_ref = fields.Char(
         string='Certificate Reference',
-        help='Reference number for calibration or service certificate.'
+        help='Calibration/service certificate reference number.'
+    )
+    parts_used = fields.Text(
+        string='Parts Used',
+        help='Spare parts, replacement components, or materials consumed.'
     )
     notes = fields.Text(
         string='Notes',
-        help='Findings or additional details about the service.'
+        help='Findings, observations, or additional details about the service.'
     )
 
     @api.model
     def default_get(self, fields_list):
+        """Pre-fill device_ids with active NHS device(s) when wizard is opened."""
         res = super(NHSDeviceServiceWizard, self).default_get(fields_list)
-        if self.env.context.get('active_model') == 'nhs.device' and self.env.context.get('active_id'):
-            res['device_id'] = self.env.context.get('active_id')
+        if self.env.context.get('active_model') == 'nhs.device' and self.env.context.get('active_ids'):
+            res['device_ids'] = [(6, 0, self.env.context.get('active_ids'))]
         return res
 
-    def action_log_service(self):
+    def action_create_services(self):
         """
-        Create service record for the selected device.
-        If a schedule_type_id is selected, the first matching schedule
-        on the device will be updated.
+        Create service records for all selected devices.
         """
-        device = self.device_id
-        schedule = None
-        if self.schedule_type_id:
+        Service = self.env['nhs.device.service']
+        for device in self.device_ids:
             schedule = device.schedule_ids.filtered(
-                lambda s: s.schedule_type_id == self.schedule_type_id
-            ).sorted('last_done_date', reverse=True)[:1]
-        service_vals = {
-            'device_id': device.id,
-            'service_type': self.service_type,
-            'service_date': self.service_date,
-            'outcome': self.outcome,
-            'performed_by_id': self.performed_by_id.id if self.performed_by_id else False,
-            'contractor': self.contractor,
-            'downtime_hours': self.downtime_hours,
-            'cost': self.cost,
-            'parts_used': self.parts_used,
-            'certificate_ref': self.certificate_ref,
-            'notes': self.notes,
-            'warranty_id': self.warranty_id.id if self.warranty_id and self.warranty_id.device_id == device else False,
+                lambda s: s.schedule_type_id.code == self.service_type
+            )
+            schedule_id = schedule[0].id if schedule else False
+
+            vals = {
+                'device_id': device.id,
+                'schedule_id': schedule_id,
+                'service_type': self.service_type,
+                'service_date': self.service_date,
+                'performed_by_id': self.performed_by_id.id if self.performed_by_id else False,
+                'contractor': self.contractor,
+                'outcome': self.outcome,
+                'downtime_hours': self.downtime_hours,
+                'cost': self.cost,
+                'certificate_ref': self.certificate_ref,
+                'parts_used': self.parts_used,
+                'notes': self.notes,
+            }
+            Service.create(vals)
+        return {
+            'type': 'ir.actions.act_window_close',
         }
-        if schedule:
-            service_vals['schedule_id'] = schedule.id
-        self.env['nhs.device.service'].create(service_vals)
-        return {'type': 'ir.actions.act_window_close'}

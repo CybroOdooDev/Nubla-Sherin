@@ -12,7 +12,7 @@ access_nhs_estate_space_user,nhs.estate.space.user,model_nhs_estate_space,group_
 access_nhs_estate_space_officer,nhs.estate.space.officer,model_nhs_estate_space,group_nhs_estate_officer,1,1,1,0
 access_nhs_estate_space_manager,nhs.estate.space.manager,model_nhs_estate_space,group_nhs_estate_manager,1,1,1,1
 access_nhs_estate_function_user,nhs.estate.function.user,model_nhs_estate_function,group_nhs_estate_user,1,0,0,0
-access_nhs_estate_function_officer,nhs.estate.function.officer,model_nhs_estate_function,group_nhs_estate_officer,1,1,1,0
+access_nhs_estate_function_officer,nhs.estate.function.officer,model_nhs_estate_function,group_nhs_estate_officer,1,0,0,0
 access_nhs_estate_function_manager,nhs.estate.function.manager,model_nhs_estate_function,group_nhs_estate_manager,1,1,1,1
 access_nhs_estate_tenure_user,nhs.estate.tenure.user,model_nhs_estate_tenure,group_nhs_estate_user,1,0,0,0
 access_nhs_estate_tenure_officer,nhs.estate.tenure.officer,model_nhs_estate_tenure,group_nhs_estate_officer,1,1,1,0

@@ -55,7 +55,7 @@
                                     </div>
                                     <div class="o_kanban_record_body mt-2">
                                         <div class="d-flex justify-content-between mb-2">
-                                            <span class="badge text-bg-primary">
+                                            <span class="badge" style="background-color: #6f42c1; color: #ffffff;">
                                                 <field name="site_type"/>
                                             </span>
                                             <span t-attf-class="badge #{record.operational_status.raw_value == 'operational' ? 'text-bg-success' : record.operational_status.raw_value == 'partial' ? 'text-bg-warning' : 'text-bg-danger'}">
@@ -128,13 +128,16 @@
                 </div>
                 <header>
                     <button name="action_operational" type="object" string="Operational" class="oe_highlight"
+                            groups="odoo_nhs_estate.group_nhs_estate_officer,odoo_nhs_estate.group_nhs_estate_manager"
                             invisible="operational_status in ['operational','closed','disposed']"/>
-                    <button name="action_partial_operational" type="object" string="Partially Operational"
-                            class="oe_highlight"
+                    <button name="action_partial_operational" type="object" string="Partially Operational" class="oe_highlight"
+                            groups="odoo_nhs_estate.group_nhs_estate_officer,odoo_nhs_estate.group_nhs_estate_manager"
                             invisible="operational_status in ['partial','closed','disposed']"/>
                     <button name="action_closed" type="object" string="Closed" class="oe_highlight"
+                            groups="odoo_nhs_estate.group_nhs_estate_officer,odoo_nhs_estate.group_nhs_estate_manager"
                             invisible="operational_status in ['closed','disposed']"/>
                     <button name="action_disposed" type="object" string="Disposed" class="oe_highlight"
+                            groups="odoo_nhs_estate.group_nhs_estate_officer,odoo_nhs_estate.group_nhs_estate_manager"
                             invisible="operational_status in ['disposed']"/>
                     <field name="operational_status" widget="statusbar"
                            statusbar_visible="operational,partial,closed,disposed"/>
@@ -219,7 +222,7 @@
                         <page string="Buildings" name="buildings_tab" invisible="id == 0">
                             <field name="building_ids" context="{'default_site_id': id}" readonly="operational_status in ['closed', 'disposed']" />
                         </page>
-                        <page string="Site Photo" name="photo_tab">
+                        <page string="Site Photo" name="photo_tab" invisible="id == 0">
                             <field name="image" widget="many2many_binary" help="Site Photo"/>
                         </page>
                     </notebook>

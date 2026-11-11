@@ -32,7 +32,7 @@
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
     'license': 'LGPL-3',
-    'depends': [ 'base','mail','contacts',],
+    'depends': ['base', 'web', 'mail', 'contacts'],
     'data': [
         'security/odoo_nhs_trust_management_security.xml',
         'security/ir.model.access.csv',
@@ -40,7 +40,6 @@
         'data/nhs_trust_type_data.xml',
         'data/nhs_icb_data.xml',
         'data/nhs_health_board_data.xml',
-        'data/nhs_board_role_data.xml',
         'wizards/nhs_trust_state_change_wizard_views.xml',
         'wizards/nhs_trust_workflow_wizards_views.xml',
         'views/nhs_region_views.xml',
@@ -48,7 +47,6 @@
         'views/nhs_icb_views.xml',
         'views/nhs_ics_views.xml',
         'views/nhs_health_board_views.xml',
-        'views/nhs_board_role_views.xml',
         'views/nhs_trust_state_log_views.xml',
         'views/res_partner_views.xml',
         'views/res_users_views.xml',
@@ -56,6 +54,7 @@
         'views/nhs_trust_menus.xml',
         'views/nhs_settings_menu.xml',
     ],
+
     'images': ['static/description/banner.jpg'],
     'installable': True,
     'application': True,

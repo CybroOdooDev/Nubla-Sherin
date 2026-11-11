@@ -67,7 +67,7 @@ class NhsDuty(models.Model):
     required_skill_ids = fields.Many2many('nhs.roster.skill', string='Required Skills',
                                           help="Required Skills")
     required_headcount = fields.Integer(string='Required Headcount', default=1, help="Required Headcount")
-    assignment_ids = fields.One2many('nhs.duty.assignment', 'duty_id', string='Assignments',
+    assignment_ids = fields.One2many('nhs.roster.assignment', 'duty_id', string='Assignments',
                                      help="Assignments")
     assigned_count = fields.Integer(
         string='Assigned', compute='_compute_assigned_count', store=True, help="Assigned")

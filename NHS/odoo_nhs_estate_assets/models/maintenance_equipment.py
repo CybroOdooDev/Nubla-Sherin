@@ -65,7 +65,7 @@ class MaintenanceEquipment(models.Model):
         for record in records:
             if record.nhs_device_id:
                 if not record.name or record.name == 'New':
-                    record.name = record.nhs_device_id.display_name
+                    record.name = record.nhs_device_id.asset_tag
                 if record.nhs_device_id.responsible_user_id and not record.owner_user_id:
                     record.owner_user_id = record.nhs_device_id.responsible_user_id.id
                 if not record.category_id:

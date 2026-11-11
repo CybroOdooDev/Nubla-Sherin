@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
 
@@ -31,8 +31,6 @@ class NhsShiftOffer(models.Model):
     _description = 'Shift Offer'
     _order = 'offered_at desc'
     _rec_name = 'member_id'
-
-
 
     shift_id = fields.Many2one(
         'nhs.bank.shift',
@@ -161,8 +159,8 @@ class NhsShiftOffer(models.Model):
         for shift in shifts:
             if shift.state not in ('open', 'partially_filled'):
                 raise ValidationError(
-                    "An offer can only be made for an open or partially-filled shift. "
-                    "'%s' is currently '%s'." % (shift.display_name, shift.state)
+                    _("An offer can only be made for an open or partially-filled shift. "
+                      "'%s' is currently '%s'.") % (shift.display_name, shift.state)
                 )
         for vals in vals_list:
             if vals.get('shift_id') and vals.get('member_id'):
@@ -176,9 +174,9 @@ class NhsShiftOffer(models.Model):
                 ])
                 if overlapping:
                     raise ValidationError(
-                        "%s already has a booking that overlaps this shift. "
-                        "An offer can't be made to a member who's already booked "
-                        "on it." % member.name
+                        _("%s already has a booking that overlaps this shift. "
+                          "An offer can't be made to a member who's already booked "
+                          "on it.") % member.name
                     )
         for vals in vals_list:
             if 'eligible' not in vals and vals.get('shift_id') and vals.get('member_id'):
@@ -193,7 +191,7 @@ class NhsShiftOffer(models.Model):
         """Member accepts: confirm/book the shift, preventing double-booking."""
         for offer in self:
             if offer.response != 'pending':
-                raise UserError(("This offer has already been responded to."))
+                raise UserError(_("This offer has already been responded to."))
             existing = self.env['nhs.shift.booking'].search([
                 ('member_id', '=', offer.member_id.id),
                 ('state', 'in', ('booked', 'worked')),
@@ -201,10 +199,10 @@ class NhsShiftOffer(models.Model):
                 ('shift_end', '>', offer.shift_id.shift_start),
             ])
             if existing:
-                raise UserError((
-                    "%s already has a booking that overlaps this shift.") % offer.member_id.name)
+                raise UserError(
+                    _("%s already has a booking that overlaps this shift.") % offer.member_id.name)
             if offer.shift_id.filled_count >= offer.shift_id.headcount:
-                raise UserError(("This shift is already fully booked."))
+                raise UserError(_("This shift is already fully booked."))
             offer.write({'response': 'accepted', 'responded_at': fields.Datetime.now()})
 
             if offer.company_id.nhs_bank_booking_mode != 'manager_allocated':
@@ -216,12 +214,12 @@ class NhsShiftOffer(models.Model):
     def action_allocate_booking(self):
         """Manager allocates an accepted offer to a booking (Manager-Allocated mode)."""
         if not self.env.user.has_group('odoo_nhs_staff_bank.group_nhs_bank_manager'):
-            raise UserError("Only Bank Managers can manually allocate shifts.")
+            raise UserError(_("Only Bank Managers can manually allocate shifts."))
         for offer in self:
             if offer.response != 'accepted':
-                raise UserError(("Can only allocate offers that have been accepted by the member."))
+                raise UserError(_("Can only allocate offers that have been accepted by the member."))
             if offer.booking_id:
-                raise UserError(("This offer has already been allocated to a booking."))
+                raise UserError(_("This offer has already been allocated to a booking."))
             existing = self.env['nhs.shift.booking'].search([
                 ('member_id', '=', offer.member_id.id),
                 ('state', 'in', ('booked', 'worked')),
@@ -229,10 +227,10 @@ class NhsShiftOffer(models.Model):
                 ('shift_end', '>', offer.shift_id.shift_start),
             ])
             if existing:
-                raise UserError((
-                    "%s already has a booking that overlaps this shift.") % offer.member_id.name)
+                raise UserError(
+                    _("%s already has a booking that overlaps this shift.") % offer.member_id.name)
             if offer.shift_id.filled_count >= offer.shift_id.headcount:
-                raise UserError(("This shift is already fully booked."))
+                raise UserError(_("This shift is already fully booked."))
 
             offer.booking_id = self.env['nhs.shift.booking'].create({
                 'shift_id': offer.shift_id.id,
@@ -246,10 +244,10 @@ class NhsShiftOffer(models.Model):
         why an offer was turned down."""
         for offer in self:
             if offer.response != 'pending':
-                raise UserError(("This offer has already been responded to."))
+                raise UserError(_("This offer has already been responded to."))
             reason = reason or offer.decline_reason
             if not reason:
-                raise UserError(("A reason is required to decline this offer."))
+                raise UserError(_("A reason is required to decline this offer."))
             offer.write({
                 'response': 'declined',
                 'responded_at': fields.Datetime.now(),

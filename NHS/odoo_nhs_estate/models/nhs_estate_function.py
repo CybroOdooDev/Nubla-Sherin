@@ -22,6 +22,11 @@
 from odoo import api, fields, models
 
 class NHSESFunction(models.Model):
+    """
+        Model for NHS Estate Functions/Use Types. This models the building function and use classifications
+        aligned with ERIC (Estates Returns Information Collection) standards. Each function record represents a
+        use type or activity category for NHS estate buildings and spaces.
+    """
     _name = 'nhs.estate.function'
     _description = 'Estate function / use (ERIC-aligned)'
     _parent_store = True
@@ -62,6 +67,11 @@ class NHSESFunction(models.Model):
     active = fields.Boolean(
         default=True,
         help="Whether this function record is active and available for selection"
+    )
+
+    _unique_function = models.Constraint(
+        'UNIQUE(name, parent_id)',
+        'A function with this name and parent function already exists.!'
     )
 
     @api.depends('name', 'parent_id.complete_name')

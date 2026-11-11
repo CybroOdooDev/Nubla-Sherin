@@ -30,13 +30,16 @@
             <form string="Building">
                 <header>
                     <button name="action_operational" type="object" string="Operational" class="oe_highlight"
+                            groups="odoo_nhs_estate.group_nhs_estate_officer,odoo_nhs_estate.group_nhs_estate_manager"
                             invisible="operational_status in ['operational','closed','disposed']"/>
-                    <button name="action_partial_operational" type="object" string="Partially Operational"
-                            class="oe_highlight"
+                    <button name="action_partial_operational" type="object" string="Partially Operational" class="oe_highlight"
+                            groups="odoo_nhs_estate.group_nhs_estate_officer,odoo_nhs_estate.group_nhs_estate_manager"
                             invisible="operational_status in ['partial','closed','disposed']"/>
                     <button name="action_closed" type="object" string="Closed" class="oe_highlight"
+                            groups="odoo_nhs_estate.group_nhs_estate_officer,odoo_nhs_estate.group_nhs_estate_manager"
                             invisible="operational_status in ['closed','disposed']"/>
                     <button name="action_disposed" type="object" string="Disposed" class="oe_highlight"
+                            groups="odoo_nhs_estate.group_nhs_estate_officer,odoo_nhs_estate.group_nhs_estate_manager"
                             invisible="operational_status in ['disposed']"/>
                     <field name="operational_status" widget="statusbar"
                            statusbar_visible="operational,partial,closed,disposed"/>
@@ -145,7 +148,7 @@
                         <page string="Backlog" invisible="id == 0">
                             <field name="backlog_ids" readonly="operational_status in ['closed', 'disposed']"/>
                         </page>
-                        <page string="Photos &amp; Plans">
+                        <page string="Photos &amp; Plans" invisible="id == 0">
                             <field name="image" widget="many2many_binary" help="Building Photo and Floor Plan"/>
                         </page>
                     </notebook>

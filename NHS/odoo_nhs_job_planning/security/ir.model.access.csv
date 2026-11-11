@@ -39,9 +39,9 @@ access_nhs_staff_group_admin_jp,nhs.staff.group admin jp,odoo_nhs_establishment.
 access_nhs_workforce_member_doctor_jp,nhs.workforce.member doctor jp,odoo_nhs_training.model_nhs_workforce_member,group_nhs_jobplan_doctor,1,0,0,0
 access_nhs_workforce_member_manager_jp,nhs.workforce.member manager jp,odoo_nhs_training.model_nhs_workforce_member,group_nhs_jobplan_manager,1,0,0,0
 access_nhs_workforce_member_admin_jp,nhs.workforce.member admin jp,odoo_nhs_training.model_nhs_workforce_member,group_nhs_jobplan_admin,1,0,0,0
-access_nhs_duty_assignment_doctor_jp,nhs.duty.assignment doctor jp,odoo_nhs_rostering.model_nhs_duty_assignment,group_nhs_jobplan_doctor,1,0,0,0
-access_nhs_duty_assignment_manager_jp,nhs.duty.assignment manager jp,odoo_nhs_rostering.model_nhs_duty_assignment,group_nhs_jobplan_manager,1,0,0,0
-access_nhs_duty_assignment_admin_jp,nhs.duty.assignment admin jp,odoo_nhs_rostering.model_nhs_duty_assignment,group_nhs_jobplan_admin,1,0,0,0
+access_nhs_duty_assignment_doctor_jp,nhs.roster.assignment doctor jp,odoo_nhs_rostering.model_nhs_roster_assignment,group_nhs_jobplan_doctor,1,0,0,0
+access_nhs_duty_assignment_manager_jp,nhs.roster.assignment manager jp,odoo_nhs_rostering.model_nhs_roster_assignment,group_nhs_jobplan_manager,1,0,0,0
+access_nhs_duty_assignment_admin_jp,nhs.roster.assignment admin jp,odoo_nhs_rostering.model_nhs_roster_assignment,group_nhs_jobplan_admin,1,0,0,0
 access_nhs_duty_doctor_jp,nhs.duty doctor jp,odoo_nhs_rostering.model_nhs_duty,group_nhs_jobplan_doctor,1,0,0,0
 access_nhs_duty_manager_jp,nhs.duty manager jp,odoo_nhs_rostering.model_nhs_duty,group_nhs_jobplan_manager,1,0,0,0
 access_nhs_duty_admin_jp,nhs.duty admin jp,odoo_nhs_rostering.model_nhs_duty,group_nhs_jobplan_admin,1,0,0,0

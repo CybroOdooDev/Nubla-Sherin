@@ -23,6 +23,8 @@ from odoo import fields, models
 
 
 class ResConfigSettings(models.TransientModel):
+    """Configuration settings for training compliance monitoring."""
+
     _inherit = 'res.config.settings'
 
     training_due_soon_days = fields.Integer(

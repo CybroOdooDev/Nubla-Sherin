@@ -77,7 +77,7 @@ class NhsWorkforceMember(models.Model):
              " double-booking is possible between units either."
     )
     duty_assignment_ids = fields.One2many(
-        'nhs.duty.assignment', 'member_id', string='Duty Assignments',
+        'nhs.roster.assignment', 'member_id', string='Duty Assignments',
         help="Duty Assignments")
     duty_assignment_count = fields.Integer(
         string='Duty Count', compute='_compute_duty_assignment_count', help="Duty Count")
@@ -99,7 +99,7 @@ class NhsWorkforceMember(models.Model):
         return {
             'name': 'Duty Assignments',
             'type': 'ir.actions.act_window',
-            'res_model': 'nhs.duty.assignment',
+            'res_model': 'nhs.roster.assignment',
             'view_mode': 'list,form',
             'domain': [('member_id', '=', self.id)],
             'context': {'default_member_id': self.id},

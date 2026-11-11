@@ -96,13 +96,17 @@ class ResConfigSettings(models.TransientModel):
     board_pack_recipient_ids = fields.Many2many(
         related='company_id.board_pack_recipient_ids', readonly=False)
 
-    def action_regenerate_token(self):
+    def action_incident_regenerate_token(self):
         """Regenerate the public incident report form's security token and reload the view."""
         self.company_id.sudo().write(
             {'public_form_token': str(uuid.uuid4()).replace('-', '')[:20]})
         return {'type': 'ir.actions.client', 'tag': 'reload'}
 
-    def action_open_public_form(self):
+    def action_regenerate_token(self):
+        """Fallback method for backwards compatibility."""
+        return self.action_incident_regenerate_token()
+
+    def action_incident_open_public_form(self):
         """Open the public incident report form URL in a new browser tab."""
         self.ensure_one()
         token = self.company_id._get_public_form_token()
@@ -112,3 +116,8 @@ class ResConfigSettings(models.TransientModel):
             'url': '%s/incident/report/%s' % (base_url, token),
             'target': 'new',
         }
+
+    def action_open_public_form(self):
+        """Fallback method for backwards compatibility."""
+        return self.action_incident_open_public_form()
+

@@ -21,10 +21,10 @@
         <record id="group_nhs_training_user" model="res.groups">
             <field name="name">Training User</field>
             <field name="privilege_id" ref="privilege_training_access_level"/>
-            <field name="comment">Read-only training compliance for their own scope. A user who
-                manages one or more org units (Establishment "Manager / Lead") sees that
-                unit's subtree; a user who manages none sees nothing under this group alone —
-                assign org-wide read-only reviewers (e.g. CQC-prep) to Training Officer instead.</field>
+            <field name="comment">Read-only access to their OWN training record and compliance
+                status only — does not see other staff. Requires the user to be linked to a
+                Workforce Member via its User field. Assign org-wide/team-wide reviewers
+                (e.g. CQC-prep, line managers) to Training Officer instead.</field>
         </record>
 
         <!-- Security group: Training Officer / L&D -->
@@ -47,52 +47,52 @@
                 profiles, regulators and the compliance target; manage all members and records.</field>
         </record>
 
-        <!-- Record rule: nhs.workforce.member restricted to the user's companies -->
+        <!-- Record rule: nhs.workforce.member restricted to the user's companies (Officer+) -->
         <record id="rule_nhs_workforce_member_company" model="ir.rule">
             <field name="name">nhs.workforce.member: company scope</field>
             <field name="model_id" ref="model_nhs_workforce_member"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-            <field name="groups" eval="[(4, ref('group_nhs_training_user'))]"/>
+            <field name="groups" eval="[(4, ref('group_nhs_training_officer'))]"/>
         </record>
 
-        <!-- Record rule: nhs.training.record restricted to the user's companies -->
+        <!-- Record rule: nhs.training.record restricted to the user's companies (Officer+) -->
         <record id="rule_nhs_training_record_company" model="ir.rule">
             <field name="name">nhs.training.record: company scope</field>
             <field name="model_id" ref="model_nhs_training_record"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-            <field name="groups" eval="[(4, ref('group_nhs_training_user'))]"/>
+            <field name="groups" eval="[(4, ref('group_nhs_training_officer'))]"/>
         </record>
 
-        <!-- Record rule: nhs.registration restricted to the user's companies -->
+        <!-- Record rule: nhs.registration restricted to the user's companies (Officer+) -->
         <record id="rule_nhs_registration_company" model="ir.rule">
             <field name="name">nhs.registration: company scope</field>
             <field name="model_id" ref="model_nhs_registration"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-            <field name="groups" eval="[(4, ref('group_nhs_training_user'))]"/>
+            <field name="groups" eval="[(4, ref('group_nhs_training_officer'))]"/>
         </record>
 
 
-        <!-- Record rule: nhs.workforce.member limited to the line manager's org unit tree -->
+        <!-- Record rule: nhs.workforce.member — Training User sees only their own record -->
         <record id="rule_nhs_workforce_member_manager_scope" model="ir.rule">
-            <field name="name">nhs.workforce.member: line-manager team scope</field>
+            <field name="name">nhs.workforce.member: self-view only</field>
             <field name="model_id" ref="model_nhs_workforce_member"/>
-            <field name="domain_force">[('org_unit_id', 'child_of', user.nhs_managed_unit_ids.ids)]</field>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_training_user'))]"/>
         </record>
 
-        <!-- Record rule: nhs.training.record limited to the line manager's org unit tree -->
+        <!-- Record rule: nhs.training.record — Training User sees only their own records -->
         <record id="rule_nhs_training_record_manager_scope" model="ir.rule">
-            <field name="name">nhs.training.record: line-manager team scope</field>
+            <field name="name">nhs.training.record: self-view only</field>
             <field name="model_id" ref="model_nhs_training_record"/>
-            <field name="domain_force">[('org_unit_id', 'child_of', user.nhs_managed_unit_ids.ids)]</field>
+            <field name="domain_force">[('member_id.user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_training_user'))]"/>
         </record>
 
-        <!-- Record rule: nhs.registration limited to the line manager's org unit tree -->
+        <!-- Record rule: nhs.registration — Training User sees only their own registrations -->
         <record id="rule_nhs_registration_manager_scope" model="ir.rule">
-            <field name="name">nhs.registration: line-manager team scope</field>
+            <field name="name">nhs.registration: self-view only</field>
             <field name="model_id" ref="model_nhs_registration"/>
-            <field name="domain_force">[('member_id.org_unit_id', 'child_of', user.nhs_managed_unit_ids.ids)]</field>
+            <field name="domain_force">[('member_id.user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhs_training_user'))]"/>
         </record>
 

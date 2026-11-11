@@ -23,6 +23,7 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 class NHSCompliancePositionReportWizard(models.TransientModel):
+    """Wizard for generating filtered NHS compliance position reports."""
     _name = 'nhs.compliance.position.report.wizard'
     _description = 'Compliance Position Report Wizard'
 
@@ -41,6 +42,7 @@ class NHSCompliancePositionReportWizard(models.TransientModel):
 
     @api.onchange('scope')
     def _onchange_scope(self):
+        """On change function to select the scope of the report."""
         if self.scope == 'whole':
             self.site_id = False
             self.discipline_id = False
@@ -50,6 +52,7 @@ class NHSCompliancePositionReportWizard(models.TransientModel):
             self.site_id = False
 
     def action_print_pdf(self):
+        """Action to generate PDF report."""
         domain = [('active', '=', True)]
         if self.scope == 'site':
             if not self.site_id:
@@ -72,3 +75,4 @@ class NHSCompliancePositionReportWizard(models.TransientModel):
             discard_logo_check=True,
             till_date=as_at_date
         ).report_action(items)
+

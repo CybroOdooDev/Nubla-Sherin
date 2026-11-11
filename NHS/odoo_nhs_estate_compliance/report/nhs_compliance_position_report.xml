@@ -32,8 +32,6 @@
                                 <img t-if="doc.company_id.logo" t-att-src="image_data_uri(doc.company_id.logo)" style="max-height: 50px;" alt="Company Logo"/>
                             </div>
                         </div>
-
-                        <!-- Item Details -->
                         <div class="row mb-4" style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 15px; margin: 0;">
                             <div class="col-6">
                                 <div style="padding: 4px 0;"><strong>Reference:</strong> <span t-field="doc.reference"/></div>
@@ -67,22 +65,20 @@
                                 <div style="padding: 4px 0;"><strong>Open Remedials:</strong> <span t-field="doc.open_remedial_count"/></div>
                             </div>
                         </div>
-
-                        <!-- Historical Tests -->
                         <div class="row">
                             <div class="col-12">
                                 <h5 style="color: #005EB8; font-weight: bold; border-bottom: 2px solid #dee2e6; padding-bottom: 6px;">Historical Inspections / Tests</h5>
                                 <t t-if="doc.test_ids.filtered(lambda t: t.active)">
                                     <table class="table table-sm" style="border: 1px solid #dee2e6; width: 100%; border-collapse: collapse;">
-                                        <thead style="background-color: #005EB8; color: white;">
+                                        <thead style="background-color: #005EB8; ">
                                             <tr>
-                                                <th style="padding: 8px; text-align: left;">Reference</th>
-                                                <th style="padding: 8px; text-align: left;">Date</th>
-                                                <th style="padding: 8px; text-align: left;">Performed By</th>
-                                                <th style="padding: 8px; text-align: left;">Contractor</th>
-                                                <th style="padding: 8px; text-align: center;">Outcome</th>
-                                                <th style="padding: 8px; text-align: left;">Certificate</th>
-                                                <th style="padding: 8px; text-align: left;">Expiry</th>
+                                                <th style="padding: 8px; text-align: left;color: white;">Reference</th>
+                                                <th style="padding: 8px; text-align: left;color: white;">Date</th>
+                                                <th style="padding: 8px; text-align: left;color: white;">Performed By</th>
+                                                <th style="padding: 8px; text-align: left;color: white;">Contractor</th>
+                                                <th style="padding: 8px; text-align: center;color: white;">Outcome</th>
+                                                <th style="padding: 8px; text-align: left;color: white;">Certificate</th>
+                                                <th style="padding: 8px; text-align: left;color: white;">Expiry</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -115,8 +111,6 @@
                                 </t>
                             </div>
                         </div>
-
-                        <!-- Footer -->
                         <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid #dee2e6; font-size: 0.7rem; color: #6c757d; text-align: center;">
                             <p>Report generated on <t t-esc="datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')"/></p>
                         </div>

@@ -446,6 +446,10 @@
                             <t t-out="object.name or ''">Ref</t>
                         </li>
                         <li>
+                            <strong>Certificate Reference :</strong>
+                            <t t-out="object.certificate_ref or ''">Ref</t>
+                        </li>
+                        <li>
                             <strong>Certificate Expiry Date:</strong>
                             <t t-out="object.certificate_expiry or ''">Date</t>
                         </li>

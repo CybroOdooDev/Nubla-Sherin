@@ -39,7 +39,7 @@
                         <group>
                             <field name="insurance_expiry"/>
                             <field name="is_insurance_expired"/>
-                            <field name="is_accreditation_expired"/>
+                            <field name="is_accreditation_expired" invisible="id == 0"/>
                         </group>
                     </group>
                     <notebook invisible="id == 0">
@@ -51,7 +51,7 @@
                                 <list>
                                     <field name="accreditation_id" widget="many2one"/>
                                     <field name="expiry_date"/>
-                                    <field name="days_remaining" />
+                                    <field name="days_remaining"/>
                                     <field name="is_expired"/>
                                 </list>
                             </field>
@@ -103,6 +103,12 @@
         <field name="model">nhs.contractor.visit</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <button name="action_open_complete_wizard" string="Complete Items / Record Outcomes" type="object"
+                            class="btn-primary"
+                            groups="odoo_nhs_estate_compliance.group_nhs_compliance_officer,odoo_nhs_estate_compliance.group_nhs_compliance_manager"
+                            invisible="id == 0"/>
+                </header>
                 <sheet>
                     <group>
                         <group>
@@ -119,10 +125,10 @@
                     <group>
                         <field name="notes"/>
                     </group>
-                    <notebook>
+                    <notebook invisible="id == 0">
                         <page name="items" string="Compliance Items Covered">
                             <field name="item_ids">
-                                <list>
+                                <list create="0">
                                     <field name="reference"/>
                                     <field name="name"/>
                                     <field name="next_due_date"/>
@@ -132,7 +138,7 @@
                         </page>
                         <page name="tests" string="Tests Completed">
                             <field name="test_ids">
-                                <list>
+                                <list create="0">
                                     <field name="name"/>
                                     <field name="item_id"/>
                                     <field name="test_date"/>

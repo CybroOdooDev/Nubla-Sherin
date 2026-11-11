@@ -141,6 +141,50 @@ class TestConstraints(NhsComplaintCommon):
             'complaint_investigation_id': inv.id,
         })
         self.assertIn(action, inv.action_ids)
+        self.assertIn(action, complaint.action_ids)
+
+    def test_action_creation_from_investigation_with_complaint(self):
+        """Action created with both complaint_id and complaint_investigation_id succeeds and links both."""
+        complaint = self._new_complaint()
+        complaint.action_acknowledge()
+        complaint.action_start_investigation()
+        inv = complaint.investigation_id
+        action = self.env['nhs.action'].create({
+            'name': 'Investigation learning action',
+            'due_date': fields.Date.today(),
+            'complaint_id': complaint.id,
+            'complaint_investigation_id': inv.id,
+        })
+        self.assertIn(action, inv.action_ids)
+        self.assertIn(action, complaint.action_ids)
+
+    def test_action_investigation_mismatched_complaint_blocked(self):
+        """Action cannot link an investigation to a different complaint."""
+        complaint1 = self._new_complaint()
+        complaint1.action_acknowledge()
+        complaint1.action_start_investigation()
+        complaint2 = self._new_complaint()
+        with self.assertRaises(ValidationError):
+            self.env['nhs.action'].create({
+                'name': 'Mismatched action',
+                'due_date': fields.Date.today(),
+                'complaint_id': complaint2.id,
+                'complaint_investigation_id': complaint1.investigation_id.id,
+            })
+
+    def test_action_investigation_and_incident_blocked(self):
+        """Action cannot link both a complaint investigation and an incident."""
+        complaint = self._new_complaint()
+        complaint.action_acknowledge()
+        complaint.action_start_investigation()
+        incident = self._make_incident()
+        with self.assertRaises(ValidationError):
+            self.env['nhs.action'].create({
+                'name': 'Cross domain action',
+                'due_date': fields.Date.today(),
+                'complaint_investigation_id': complaint.investigation_id.id,
+                'incident_id': incident.id,
+            })
 
     def test_action_blocked_on_completed_investigation(self):
         """Actions cannot be created against a completed complaint investigation."""
@@ -155,6 +199,7 @@ class TestConstraints(NhsComplaintCommon):
                 'due_date': fields.Date.today(),
                 'complaint_investigation_id': inv.id,
             })
+
 
     # ── helper ────────────────────────────────────────────────────────────
     def _make_incident(self):

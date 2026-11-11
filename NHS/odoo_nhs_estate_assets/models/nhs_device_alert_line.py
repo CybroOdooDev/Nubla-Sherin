@@ -111,7 +111,7 @@ class NHSDeviceAlertLine(models.Model):
         """
         for record in self:
             alert_name = record.alert_id.reference or record.alert_id.name or 'Unknown Alert'
-            device_name = record.device_id.display_name or record.device_id.name or 'Unknown Device'
+            device_name = record.device_id.name or 'Unknown Device'
             record.display_name = '%s - %s' % (alert_name, device_name)
 
     @api.model_create_multi

@@ -29,10 +29,13 @@
             <form string="Backlog Item">
                 <header>
                     <button name="action_mark_planned" string="Plan" type="object" class="oe_highlight"
+                            groups="odoo_nhs_estate.group_nhs_estate_officer,odoo_nhs_estate.group_nhs_estate_manager"
                             invisible="status in ['planned','in_progress','resolved']"/>
                     <button name="action_mark_start" string="Start" type="object" class="oe_highlight"
+                            groups="odoo_nhs_estate.group_nhs_estate_officer,odoo_nhs_estate.group_nhs_estate_manager"
                             invisible="status in ['identified','in_progress','resolved']"/>
                     <button name="action_mark_resolved" string="Done" type="object" class="oe_highlight"
+                            groups="odoo_nhs_estate.group_nhs_estate_officer,odoo_nhs_estate.group_nhs_estate_manager"
                             invisible="status in ['identified','planned','resolved']"/>
                     <field name="status" widget="statusbar"
                            statusbar_visible="identified,planned,in_progress,resolved"/>

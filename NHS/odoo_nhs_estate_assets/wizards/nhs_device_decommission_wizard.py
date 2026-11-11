@@ -80,7 +80,7 @@ class NHSDeviceDecommissionWizard(models.TransientModel):
             res['device_id'] = self.env.context.get('active_id')
         return res
 
-    def action_decommission(self):
+    def action_decommission_dispose(self):
         """
         Apply decommissioning / disposal to the selected device and archive it,
         retaining full historical maintenance, calibration, alert, and warranty records.

@@ -37,7 +37,6 @@ spreadsheet into a live, role-driven compliance system.
     'website': 'https://www.cybrosys.com',
     'depends': [
         'odoo_nhs_establishment','mail',
-
     ],
     'data': [
         'security/nhs_training_security.xml',

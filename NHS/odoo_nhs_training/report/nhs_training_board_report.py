@@ -23,6 +23,7 @@ from odoo import api, fields, models
 
 
 class ReportTrainingBoard(models.AbstractModel):
+    """Report parser for the board assurance PDF."""
     _name = 'report.odoo_nhs_training.report_nhs_training_board_view'
     _description = 'Board Assurance QWeb PDF Report Parser'
 

@@ -2,8 +2,8 @@
 <odoo>
     <!-- Record: view_nhs_duty_assignment_list for ir.ui.view -->
     <record id="view_nhs_duty_assignment_list" model="ir.ui.view">
-        <field name="name">nhs.duty.assignment.list</field>
-        <field name="model">nhs.duty.assignment</field>
+        <field name="name">nhs.roster.assignment.list</field>
+        <field name="model">nhs.roster.assignment</field>
         <field name="arch" type="xml">
             <list string="Duty Assignments" decoration-muted="state == 'cancelled'"
                   decoration-danger="state == 'dna'">
@@ -20,8 +20,8 @@
 
     <!-- Record: view_nhs_duty_assignment_form for ir.ui.view -->
     <record id="view_nhs_duty_assignment_form" model="ir.ui.view">
-        <field name="name">nhs.duty.assignment.form</field>
-        <field name="model">nhs.duty.assignment</field>
+        <field name="name">nhs.roster.assignment.form</field>
+        <field name="model">nhs.roster.assignment</field>
         <field name="arch" type="xml">
             <form string="Duty Assignment">
                 <header>
@@ -58,8 +58,8 @@
 
     <!-- Record: view_nhs_duty_assignment_calendar for ir.ui.view -->
     <record id="view_nhs_duty_assignment_calendar" model="ir.ui.view">
-        <field name="name">nhs.duty.assignment.calendar</field>
-        <field name="model">nhs.duty.assignment</field>
+        <field name="name">nhs.roster.assignment.calendar</field>
+        <field name="model">nhs.roster.assignment</field>
         <field name="arch" type="xml">
             <calendar string="Duty Assignments" date_start="duty_date" color="shift_type_id" mode="month">
                 <field name="member_id"/>
@@ -70,8 +70,8 @@
 
     <!-- Record: view_nhs_duty_assignment_graph for ir.ui.view -->
     <record id="view_nhs_duty_assignment_graph" model="ir.ui.view">
-        <field name="name">nhs.duty.assignment.graph</field>
-        <field name="model">nhs.duty.assignment</field>
+        <field name="name">nhs.roster.assignment.graph</field>
+        <field name="model">nhs.roster.assignment</field>
         <field name="arch" type="xml">
             <graph string="Duty Assignments">
                 <field name="member_id"/>
@@ -82,8 +82,8 @@
 
     <!-- Record: view_nhs_duty_assignment_pivot for ir.ui.view -->
     <record id="view_nhs_duty_assignment_pivot" model="ir.ui.view">
-        <field name="name">nhs.duty.assignment.pivot</field>
-        <field name="model">nhs.duty.assignment</field>
+        <field name="name">nhs.roster.assignment.pivot</field>
+        <field name="model">nhs.roster.assignment</field>
         <field name="arch" type="xml">
             <pivot string="Duty Assignments">
                 <field name="member_id" type="row"/>
@@ -95,7 +95,7 @@
     <!-- Record: action_nhs_duty_assignment for ir.actions.act_window -->
     <record id="action_nhs_duty_assignment" model="ir.actions.act_window">
         <field name="name">Duty Assignments</field>
-        <field name="res_model">nhs.duty.assignment</field>
+        <field name="res_model">nhs.roster.assignment</field>
         <field name="view_mode">graph,pivot,list,form,calendar</field>
     </record>
 </odoo>

@@ -119,7 +119,7 @@ export class NhsDeviceDashboard extends Component {
             });
         }
 
-        // 2. Devices by Status (Pie / Doughnut Chart)
+        // 2. Devices by Status (Doughnut Chart)
         if (this.statusChartRef.el && metrics.devices_by_status) {
             const statusData = metrics.devices_by_status;
             const labels = ['In Service', 'Awaiting Repair', 'Out of Service', 'Decommissioned', 'Disposed'];
@@ -424,68 +424,6 @@ export class NhsDeviceDashboard extends Component {
                 }
             });
         }
-
-        // 7. Indicative Register Value by Category (Horizontal Bar Chart)
-        if (this.valueCategoryChartRef.el && metrics.register_value && metrics.register_value.by_category) {
-            const sortedCats = [...metrics.register_value.by_category]
-                .sort((a, b) => b.indicative_value - a.indicative_value)
-                .slice(0, 7);
-
-            const labels = sortedCats.map(c => c.name);
-            const values = sortedCats.map(c => c.indicative_value);
-
-            this.chartInstances.valueCategory = new window.Chart(this.valueCategoryChartRef.el, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Indicative Value (£)',
-                        data: values,
-                        backgroundColor: '#003087',
-                        borderRadius: 6,
-                        maxBarThickness: 25
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    onClick: (e, elements) => {
-                        if (elements && elements.length > 0) {
-                            const idx = elements[0].index;
-                            const cat = sortedCats[idx];
-                            if (cat && cat.id) {
-                                this.openAction('nhs.device', 'list,form', [['category_id', '=', cat.id]], `Indicative Value - ${cat.name}`);
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            bodyFont: labelFont,
-                            callbacks: {
-                                label: (context) => ` Indicative Value: £${context.parsed.x.toLocaleString()}`
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            grid: { color: '#E8EDEE' },
-                            ticks: {
-                                font: labelFont,
-                                callback: (val) => {
-                                    if (val >= 1000000) return '£' + (val / 1000000).toFixed(1) + 'M';
-                                    if (val >= 1000) return '£' + (val / 1000).toFixed(0) + 'k';
-                                    return '£' + val;
-                                }
-                            }
-                        },
-                        y: { grid: { display: false }, ticks: { font: labelFont } }
-                    }
-                }
-            });
-        }
     }
 
     openAction(resModel, viewMode = 'list,form', domain = [], name = 'Details') {
@@ -515,6 +453,14 @@ export class NhsDeviceDashboard extends Component {
         this.openAction('nhs.device', 'list,form', [['active', '=', true]], 'All Registered Devices');
     }
 
+    openInServiceDevices() {
+        this.openAction('nhs.device', 'list,form', [['status', '=', 'in_service']], 'In-Service Devices');
+    }
+
+    openAwaitingRepairDevices() {
+        this.openAction('nhs.device', 'list,form', [['status', '=', 'awaiting_repair']], 'Devices Awaiting Repair');
+    }
+
     openDueSoonSchedules() {
         this.openAction('nhs.device.schedule', 'list,form', [['status', '=', 'due_soon']], 'Schedules Due Soon');
     }
@@ -542,30 +488,6 @@ export class NhsDeviceDashboard extends Component {
 
     openIndicativeRegisterValue() {
         this.openAction('nhs.device', 'list,pivot,graph,form', [['active', '=', true]], 'Indicative Register Valuation');
-    }
-
-    openReplacementForecast() {
-        this.action.doAction('odoo_nhs_estate_assets.action_nhs_device_replacement_forecast');
-    }
-
-    createNewDevice() {
-        this.action.doAction({
-            type: 'ir.actions.act_window',
-            name: 'New Device',
-            res_model: 'nhs.device',
-            views: [[false, 'form']],
-            target: 'current',
-        });
-    }
-
-    logService() {
-        this.action.doAction({
-            type: 'ir.actions.act_window',
-            name: 'Log Service',
-            res_model: 'nhs.device.service.wizard',
-            views: [[false, 'form']],
-            target: 'new',
-        });
     }
 
     formatCurrency(value) {

@@ -20,6 +20,7 @@
 #
 #############################################################################
 from . import nhs_compliance_bulk_apply_wizard
+from . import nhs_contractor_visit_complete_wizard
 from . import nhs_compliance_eric_export_wizard
 from . import nhs_compliance_reschedule_wizard
 from . import nhs_compliance_position_report_wizard

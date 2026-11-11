@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='equipment_id']" position="after">
                 <field name="compliance_item_id" invisible="not compliance_item_id" />
+                <field name="compliance_test_id" invisible="not compliance_test_id" />
             </xpath>
         </field>
     </record>
@@ -20,6 +21,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='stage_id']" position="after">
                 <field name="compliance_item_id" readonly="1" invisible="not compliance_item_id" />
+                <field name="compliance_test_id" readonly="1" invisible="not compliance_test_id" />
             </xpath>
         </field>
     </record>

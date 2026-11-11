@@ -23,6 +23,7 @@ from odoo import api, fields, models
 
 
 class ReportTrainingCertificate(models.AbstractModel):
+    """Report parser for the certificate of completion PDF."""
     _name = 'report.odoo_nhs_training.report_nhs_training_certificate_view'
     _description = 'Certificate of Completion QWeb PDF Report Parser'
 

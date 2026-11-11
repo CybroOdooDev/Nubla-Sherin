@@ -29,7 +29,7 @@ class NHSDevice(models.Model):
     _description = 'NHS Medical Device / Equipment'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'name'
-    _rec_name = 'display_name'
+    _rec_name = 'asset_tag'
 
     name = fields.Char(
         string='Device Name',
@@ -37,12 +37,6 @@ class NHSDevice(models.Model):
         store=True,
         help='Display name of the device, automatically generated from '
              'category, model, and serial number.'
-    )
-    display_name = fields.Char(
-        string='Display Name',
-        compute='_compute_display_name',
-        store=True,
-        help='User-friendly display name for the device.'
     )
     asset_tag = fields.Char(
         string='Asset Tag',
@@ -97,6 +91,7 @@ class NHSDevice(models.Model):
     )
     serial_number = fields.Char(
         string='Serial Number',
+        copy=False,
         help='Unique serial number from the manufacturer.'
     )
     device_class = fields.Selection(
@@ -149,7 +144,7 @@ class NHSDevice(models.Model):
     )
     responsible_user_id = fields.Many2one(
         'res.users',
-        string='Responsible User',
+        string='Assigned User',
         help='Person responsible for the device (usually EBME/Clinical Engineering staff).'
     )
     status = fields.Selection(
@@ -164,6 +159,7 @@ class NHSDevice(models.Model):
         required=True,
         default='in_service',
         tracking=True,
+        copy=False,
         help='Current lifecycle status of the device.\n'
              '- In Service: Normal operational use\n'
              '- Awaiting Repair: Removed from use awaiting repair\n'
@@ -264,6 +260,7 @@ class NHSDevice(models.Model):
     )
     decommission_date = fields.Date(
         string='Decommission Date',
+        copy=False,
         help='Date the device was decommissioned from service.'
     )
     disposal_method = fields.Selection(
@@ -274,11 +271,13 @@ class NHSDevice(models.Model):
             ('returned', 'Returned to Manufacturer'),
         ],
         string='Disposal Method',
+        copy=False,
         help='Method by which the device was disposed of.'
     )
     disposal_value = fields.Monetary(
         string='Disposal Value',
         currency_field='currency_id',
+        copy=False,
         help='Value recovered from disposal (if any).'
     )
     account_asset_id = fields.Integer(
@@ -311,6 +310,12 @@ class NHSDevice(models.Model):
         string='Warranties & Contracts',
         help='Warranty and service contract records for this device.'
     )
+    maintenance_request_ids = fields.One2many(
+        'maintenance.request',
+        'nhs_device_id',
+        string='Maintenance Requests',
+        help='Maintenance request records for this device.'
+    )
     next_due_date = fields.Date(
         string='Next Due Date',
         compute='_compute_next_due_date',
@@ -326,6 +331,7 @@ class NHSDevice(models.Model):
         string='Maintenance Status',
         compute='_compute_maintenance_status',
         store=True,
+        group_expand=True,
         help='Overall maintenance status based on all schedules:\n'
              '- OK: All schedules up to date\n'
              '- Due Soon: Schedules approaching their due date\n'
@@ -340,6 +346,7 @@ class NHSDevice(models.Model):
     active = fields.Boolean(
         string='Active',
         default=True,
+        copy=False,
         help='Archiving flag. Decommissioned/disposed devices are archived '
              'to hide them from most views while retaining full history.'
     )
@@ -358,17 +365,6 @@ class NHSDevice(models.Model):
             if record.serial_number:
                 parts.append('SN' + record.serial_number)
             record.name = ' - '.join(parts) if parts else 'New Device'
-
-    @api.depends('name', 'asset_tag')
-    def _compute_display_name(self):
-        """
-        Compute the display name including asset tag.
-        """
-        for record in self:
-            if record.asset_tag and record.asset_tag != 'New':
-                record.display_name = record.asset_tag
-            else:
-                record.display_name = record.name or ''
 
     @api.depends('asset_tag')
     def _compute_barcode(self):
@@ -508,11 +504,11 @@ class NHSDevice(models.Model):
         return {
             'name': 'Log Service',
             'type': 'ir.actions.act_window',
-            'res_model': 'nhs.device.service.wizard',
+            'res_model': 'nhs.device.service',
             'view_mode': 'form',
             'target': 'new',
             'context': {
-                'default_device_id': [(6, 0, self.id)],
+                'default_device_id': self.id ,
             }
         }
 
@@ -526,6 +522,9 @@ class NHSDevice(models.Model):
             'res_model': 'nhs.device.schedule',
             'view_mode': 'list,form',
             'domain': [('device_id', '=', self.id)],
+            'context': {
+                'default_device_id': self.id,
+            },
         }
 
     def action_view_services(self):
@@ -538,6 +537,9 @@ class NHSDevice(models.Model):
             'res_model': 'nhs.device.service',
             'view_mode': 'list,form',
             'domain': [('device_id', '=', self.id)],
+            'context': {
+                'default_device_id': self.id,
+            },
         }
 
     def action_view_alerts(self):
@@ -547,9 +549,12 @@ class NHSDevice(models.Model):
         return {
             'name': 'Safety Alerts',
             'type': 'ir.actions.act_window',
-            'res_model': 'nhs.device.alert',
+            'res_model': 'nhs.device.alert.line',
             'view_mode': 'list,form',
-            'domain': [('line_ids.device_id', '=', self.id)],
+            'domain': [('device_id', '=', self.id)],
+            'context': {
+                'default_device_id': self.id,
+            },
         }
 
     def action_view_warranties(self):
@@ -561,16 +566,19 @@ class NHSDevice(models.Model):
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.device.warranty',
             'view_mode': 'list,form',
-            'domain': [('device_id', 'in', self.ids)],
+            'domain': [('device_id', '=', self.id)],
+            'context': {
+                'default_device_id': self.id,
+            },
         }
 
-    def action_decommission(self):
+    def action_decommission_dispose(self):
         """
         Decommission the selected device(s).
         """
         today = date.today()
         return {
-            'name': 'Decommission Device',
+            'name': 'Decommission / Dispose Device',
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.device.decommission.wizard',
             'view_mode': 'form',
@@ -862,7 +870,7 @@ class NHSDevice(models.Model):
                     if not team:
                         team = Team.create({'name': 'NHS Technician Team'})
                     Equipment.create({
-                        'name': record.display_name or record.name or 'NHS Device',
+                        'name': record.name or 'NHS Device',
                         'category_id': category.id,
                         'maintenance_team_id': team.id,
                         'nhs_device_id': record.id,
@@ -1118,7 +1126,7 @@ class NHSDevice(models.Model):
             overdue_records.append({
                 'id': s.id,
                 'device_id': s.device_id.id,
-                'device_name': s.device_id.display_name or s.device_id.name,
+                'device_name': s.device_id.name,
                 'asset_tag': s.device_id.asset_tag,
                 'schedule_type': type_label,
                 'schedule_type_code': type_code,
@@ -1133,8 +1141,10 @@ class NHSDevice(models.Model):
                                                            ('active', '=', True)])
         open_alert_lines = self.env['nhs.device.alert.line'].search([
             ('alert_id.state', 'in', ['open', 'in_progress']),
-            ('action_status', 'in', ['pending', 'quarantined'])
+            ('action_status', 'in', ['pending', 'quarantined']),
+            ('active', '=', True),
         ])
+        unique_device_ids = set(open_alert_lines.mapped('device_id').ids)
         source_exposure = {'mhra': 0, 'cas': 0, 'manufacturer_fsn': 0, 'other': 0}
         source_dict = dict(self.env['nhs.device.alert']._fields['source'].selection)
         for a in open_alerts:
@@ -1177,14 +1187,51 @@ class NHSDevice(models.Model):
                                                                           d.acquisition_cost or 0.0)
                     replacement_years[target_year]['acquisition_cost'] += d.acquisition_cost or 0.0
         replacement_by_year = list(replacement_years.values())
-        total_forecast_cost = sum(item['indicative_cost'] for item in replacement_by_year)
         total_indicative_value = sum(d.indicative_value or 0.0 for d in devices)
-        total_acquisition_cost = sum(d.acquisition_cost or 0.0 for d in devices)
+
+        due_soon_records = []
+        for s in due_soon_schedules[:15]:
+            due_soon_records.append({
+                'id': s.id,
+                'device_id': s.device_id.id,
+                'device_name': s.device_id.name,
+                'asset_tag': s.device_id.asset_tag,
+                'schedule_type': s.schedule_type_id.name if s.schedule_type_id else '',
+                'next_due_date': s.next_due_date.strftime('%Y-%m-%d') if s.next_due_date else '',
+                'building_name': s.device_id.building_id.name if s.device_id.building_id else (s.device_id.site_id.name if s.device_id.site_id else 'N/A'),
+            })
+
+        eol_records = []
+        for d in eol_devices[:15]:
+            eol_records.append({
+                'id': d.id,
+                'name': d.name,
+                'asset_tag': d.asset_tag,
+                'site_name': d.site_id.name if d.site_id else 'N/A',
+                'building_name': d.building_id.name if d.building_id else 'N/A',
+                'replacement_year': d.replacement_year or '',
+            })
+
+        awaiting_repair_devices = devices.filtered(lambda d: d.status == 'awaiting_repair')
+        awaiting_repair_records = []
+        for d in awaiting_repair_devices[:15]:
+            awaiting_repair_records.append({
+                'id': d.id,
+                'name': d.name,
+                'asset_tag': d.asset_tag,
+                'site_name': d.site_id.name if d.site_id else 'N/A',
+                'building_name': d.building_id.name if d.building_id else 'N/A',
+                'category_name': d.category_id.name if d.category_id else '',
+            })
+
         return {
             'total_devices': total_devices,
             'devices_by_status': status_counts,
             'devices_by_category': devices_by_category,
             'devices_by_location': devices_by_location,
+            'due_soon_records': due_soon_records,
+            'eol_records': eol_records,
+            'awaiting_repair_records': awaiting_repair_records,
             'maintenance_planner': {
                 'total_schedules': len(schedules),
                 'due_soon_count': len(due_soon_schedules),
@@ -1202,7 +1249,7 @@ class NHSDevice(models.Model):
             },
             'safety_alerts': {
                 'open_alerts_count': len(open_alerts),
-                'affected_devices_count': len(open_alert_lines),
+                'affected_devices_count': len(unique_device_ids),
                 'overdue_alerts_count': len(open_alerts.filtered(lambda a: a.is_overdue)),
                 'source_exposure': source_exposure,
                 'top_alerts': top_alerts_data,
@@ -1210,11 +1257,9 @@ class NHSDevice(models.Model):
             'replacement_forecast': {
                 'end_of_life_count': eol_count,
                 'by_year': replacement_by_year,
-                'total_forecast_cost': total_forecast_cost,
             },
             'register_value': {
                 'total_indicative_value': total_indicative_value,
-                'total_acquisition_cost': total_acquisition_cost,
                 'by_category': devices_by_category,
             }
         }
@@ -1271,13 +1316,13 @@ class NHSDevice(models.Model):
             status_display = dict(sched._fields.get('status', {}).selection or []).get(sched.status,
                                                     sched.status) if hasattr(sched,'status') else sched.status
             if is_escalated:
-                summary = "[ESCALATED OVERDUE] %s Due - %s" % (schedule_type_display, device.display_name)
+                summary = "[ESCALATED OVERDUE] %s Due - %s" % (schedule_type_display, device.asset_tag)
                 note = ("Device asset tag %s has a %s schedule overdue by %s days (exceeds escalation "
                         "threshold of %s days).") % (
                     device.asset_tag, schedule_type_display, days_overdue, overdue_escalation_days
                 )
             else:
-                summary = "[%s] %s Due - %s" % (status_display, schedule_type_display, device.display_name)
+                summary = "[%s] %s Due - %s" % (status_display, schedule_type_display, device.asset_tag)
                 note = "Device asset tag %s has a %s schedule (%s) due on %s." % (
                     device.asset_tag, schedule_type_display, status_display, sched.next_due_date
                 )
@@ -1299,7 +1344,7 @@ class NHSDevice(models.Model):
         eol_devices = self.search([('is_end_of_life', '=', True)])
         for device in eol_devices:
             assignee = device._get_responsible_or_manager_user()
-            summary = "[End of Life] Replacement Due - %s" % device.display_name
+            summary = "[End of Life] Replacement Due - %s" % device.asset_tag
             note = ("Device asset tag %s reached replacement year (%s). Please review for replacement/decommissioning."
                     % (device.asset_tag, device.replacement_year
             ))
@@ -1363,7 +1408,7 @@ class NHSDevice(models.Model):
         "<tr><td style='padding:8px;border:1px solid #ddd;'>%s</td><td style='padding:8px;border:1px solid #ddd;'>"
         "%s</td><td style='padding:8px;border:1px solid #ddd;'>%s</td><td style='padding:8px;border:1px solid #ddd;'>"
         "%s</td></tr>" % (
-                s.device_id.display_name or 'N/A',
+                s.device_id.asset_tag or 'N/A',
                 s.schedule_type_id.display_name or s.schedule_type_id.name or 'N/A',
                 s.next_due_date or 'N/A',
                 s.device_id._get_responsible_or_manager_user().name or 'Unassigned'
@@ -1374,7 +1419,7 @@ class NHSDevice(models.Model):
         "<tr><td style='padding:8px;border:1px solid #ddd;'>%s</td><td style='padding:8px;border:1px solid #ddd;'>"
         "%s</td><td style='padding:8px;border:1px solid #ddd;'>%s</td><td style='padding:8px;border:1px solid #ddd;'>"
         "%s</td></tr>" % (
-                s.device_id.display_name or 'N/A',
+                s.device_id.asset_tag or 'N/A',
                 s.schedule_type_id.display_name or s.schedule_type_id.name or 'N/A',
                 s.next_due_date or 'N/A',
                 s.device_id._get_responsible_or_manager_user().name or 'Unassigned'
@@ -1385,7 +1430,7 @@ class NHSDevice(models.Model):
         "<tr><td style='padding:8px;border:1px solid #ddd;'>%s</td><td style='padding:8px;border:1px solid #ddd;'>"
         "%s</td><td style='padding:8px;border:1px solid #ddd;'>%s</td><td style='padding:8px;border:1px solid #ddd;'>"
         "%s</td></tr>" % (
-                w.device_id.display_name or 'N/A',
+                w.device_id.asset_tag or 'N/A',
                 w.get_cover_type_display(),
                 w.provider or 'N/A',
                 w.expiry_date or 'N/A'
@@ -1407,7 +1452,7 @@ class NHSDevice(models.Model):
         "<tr><td style='padding:8px;border:1px solid #ddd;'>%s</td><td style='padding:8px;border:1px solid #ddd;'>"
         "%s</td><td style='padding:8px;border:1px solid #ddd;'>%s</td><td style='padding:8px;border:1px solid #ddd;'>"
         "£%.2f</td></tr>" % (
-                d.display_name or 'N/A',
+                d.asset_tag or 'N/A',
                 d.category_id.display_name or d.category_id.name or 'N/A',
                 d.replacement_year or 'N/A',
                 d.estimated_replacement_cost or 0.0

@@ -65,16 +65,16 @@ class NHSComplianceTest(models.Model):
         ('remedial_required', 'Remedial Required')
     ], string='Outcome', required=True,
        help='The result of the test: Pass, Pass with Observations, Fail, or Remedial Required.')
-    certificate_ref = fields.Char(string='Certificate Reference',
+    certificate_ref = fields.Char(string='Certificate Reference',copy=False,
                                    help='The unique reference number of the certificate issued for this test.')
-    issuing_body = fields.Char(string='Issuing Body',
+    issuing_body = fields.Char(string='Issuing Body',copy=False,
                                help='The organisation or body that issued the test certificate.')
-    certificate_date = fields.Date(string='Certificate Date',
+    certificate_date = fields.Date(string='Certificate Date',copy=False,
                                    help='The date the certificate was issued.')
-    certificate_expiry = fields.Date(string='Certificate Expiry',
+    certificate_expiry = fields.Date(string='Certificate Expiry',copy=False,
                                      help='The date on which the certificate expires and must be renewed.')
-    readings = fields.Text(string='Readings', help='Readings like water temperatures, EICR codes C1/C2/C3/FI.')
-    notes = fields.Text(string='Notes', help='Observations / findings')
+    readings = fields.Text(string='Readings', help='Readings like water temperatures, EICR codes C1/C2/C3/FI.',copy=False)
+    notes = fields.Text(string='Notes', help='Observations / findings',copy=False)
 
     attachment_ids = fields.Many2many('ir.attachment', string='Attachments',
                                        help='Certificate, report, photos')
@@ -171,17 +171,11 @@ class NHSComplianceTest(models.Model):
         return result
 
     def _update_parent_item(self):
-        """Synchronise the parent compliance item's status and next due date based on this test's outcome.
-        For passing outcomes ('pass' or 'pass_with_observations'), the method
-        recomputes the last_completed_date, applies any grace-period tolerance
-        so that tests performed slightly early lock on to the original schedule,
-        calculates the next_due_date from the frequency settings, and closes
-        any open preventive maintenance requests linked to the item.
-        For failing outcomes ('fail' or 'remedial_required'), the parent item's
-        status is set to 'failed'.
-        """
+        """Synchronise the parent compliance item's status and next due date based on this test's outcome."""
         for test in self:
             item = test.item_id
+            if not item:
+                continue
             if test.outcome in ['pass', 'pass_with_observations']:
                 prev_due_date = item.next_due_date
                 item._compute_last_completed_date()
@@ -203,18 +197,19 @@ class NHSComplianceTest(models.Model):
                 raw_due_date = base_date + delta
                 item.next_due_date = item._adjust_to_working_day(raw_due_date)
                 if not self.env.context.get('skip_maintenance_sync'):
-                    active_requests = self.env['maintenance.request'].search([
-                        ('equipment_id', '=', item.equipment_id.id),
-                        ('maintenance_type', '=', 'preventive'),
-                        ('stage_id.done', '=', False)
+                    open_requests = self.env['maintenance.request'].search([
+                        ('compliance_item_id', '=', item.id),
+                        ('stage_id.done', '=', False),
                     ])
-                    if active_requests:
+                    if open_requests:
                         done_stage = self.env['maintenance.stage'].search([('done', '=', True)], limit=1)
                         if done_stage:
-                            active_requests.with_context(skip_maintenance_sync=True).write({
+                            open_requests.with_context(skip_maintenance_sync=True).write({
                                 'stage_id': done_stage.id,
                                 'close_date': fields.Date.today(),
+                                'compliance_test_id': test.id,
                             })
+                    item._create_maintenance_request()
             elif test.outcome in ['fail', 'remedial_required']:
                 item.status = 'failed'
 
@@ -632,7 +627,7 @@ class NHSComplianceTest(models.Model):
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>📋 Estates Compliance Weekly Test Digest</h1>
+                    <h1>Estates Compliance Weekly Test Digest</h1>
                     <div class="subtitle">Test Summary & Certificate Expiry Report</div>
                     <div class="date">Week Ending {today.strftime('%B %d, %Y')}</div>
                 </div>
@@ -656,11 +651,11 @@ class NHSComplianceTest(models.Model):
                         </div>
                         <div class="summary-card passed">
                             <span class="number">{passed_tests}</span>
-                            <span class="label">✅ Passed</span>
+                            <span class="label">Passed</span>
                         </div>
                         <div class="summary-card failed">
                             <span class="number">{failed_tests}</span>
-                            <span class="label">❌ Failed / Remedial Required</span>
+                            <span class="label">Failed / Remedial Required</span>
                         </div>
                     </div>
                     <div class="section-title">
@@ -669,7 +664,7 @@ class NHSComplianceTest(models.Model):
                     </div>
                     {expiring_html}
                     <div class="login-link">
-                        <a href="{base_url}/web">🔑 Log in to Odoo to view detailed compliance records</a>
+                        <a href="{base_url}/web">Log in to Odoo to view detailed compliance records</a>
                     </div>
                 </div>
 

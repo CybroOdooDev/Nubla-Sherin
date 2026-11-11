@@ -3,9 +3,6 @@ access_nhs_region_user,access_nhs_region_user,model_nhs_region,group_nhs_trust_u
 access_nhs_region_manager,access_nhs_region_manager,model_nhs_region,group_nhs_trust_manager,1,0,0,0
 access_nhs_region_admin,access_nhs_region_admin,model_nhs_region,group_nhs_trust_admin,1,1,1,1
 
-access_nhs_board_role_base,access_nhs_board_role_base,model_nhs_board_role,base.group_user,1,0,0,0
-access_nhs_board_role_admin,access_nhs_board_role_admin,model_nhs_board_role,group_nhs_trust_admin,1,1,1,1
-
 access_nhs_trust_type_user,access_nhs_trust_type_user,model_nhs_trust_type,group_nhs_trust_user,1,0,0,0
 access_nhs_trust_type_manager,access_nhs_trust_type_manager,model_nhs_trust_type,group_nhs_trust_manager,1,0,0,0
 access_nhs_trust_type_admin,access_nhs_trust_type_admin,model_nhs_trust_type,group_nhs_trust_admin,1,1,1,1

@@ -23,6 +23,7 @@ from odoo import fields, models
 
 
 class NhsRequirementProfile(models.Model):
+    """A bundle of training requirements assignable to posts and members."""
     _name = 'nhs.requirement.profile'
     _description = 'Requirement Profile — bundle of training requirements for a role'
     _order = 'name'

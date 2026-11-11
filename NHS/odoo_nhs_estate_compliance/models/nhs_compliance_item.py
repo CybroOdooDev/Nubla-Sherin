@@ -21,7 +21,7 @@
 #############################################################################
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
-from datetime import  timedelta
+from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 
 class NHSComplianceItem(models.Model):
@@ -37,7 +37,8 @@ class NHSComplianceItem(models.Model):
     reference = fields.Char(string='Reference', required=True, readonly=True, copy=False, default=lambda self: 'New',
                             help='Auto-generated unique sequence reference for this compliance item.')
     company_id = fields.Many2one('res.company', string='Company', required=True,
-                    default=lambda self: self.env.company,help='The company this compliance item belongs to.')
+                                 default=lambda self: self.env.company,
+                                 help='The company this compliance item belongs to.')
     compliance_type_id = fields.Many2one('nhs.compliance.type', string='Compliance Type', required=True,
                                          help='The type of statutory test or inspection this item schedules.')
     discipline_id = fields.Many2one('nhs.compliance.discipline', string='Discipline',
@@ -49,8 +50,8 @@ class NHSComplianceItem(models.Model):
                                   domain="site_id and [('site_id', '=', site_id)] or []",
                                   help='The specific building within the site for this compliance obligation.')
     space_id = fields.Many2one('nhs.estate.space', string='Space',
-        domain="building_id and [('building_id', '=', building_id)] or site_id and [('site_id', '=', site_id)] or []",
-        help='The specific space or room within the building for this compliance obligation.')
+       domain="building_id and [('building_id', '=', building_id)] or site_id and [('site_id', '=', site_id)] or []",
+       help='The specific space or room within the building for this compliance obligation.')
     equipment_id = fields.Many2one('maintenance.equipment', string='Equipment',
                                    help='Optional specific asset (a named lift, calorifier, generator)')
     responsible_person_id = fields.Many2one('res.users', string='Responsible Person',
@@ -61,7 +62,7 @@ class NHSComplianceItem(models.Model):
         ('in_house', 'In-House Team'),
         ('contractor', 'External Contractor')
     ], string='Delivery Method', default='in_house',
-       help='Whether the test is performed by in-house staff or an external contractor.')
+        help='Whether the test is performed by in-house staff or an external contractor.')
     contractor_id = fields.Many2one('nhs.compliance.contractor', string='Contractor',
                                     domain="discipline_id and [('discipline_ids', 'in', discipline_id)] or []",
                                     help='Contractor delivering')
@@ -73,16 +74,17 @@ class NHSComplianceItem(models.Model):
         ('month', 'Month'),
         ('year', 'Year')
     ], string='Frequency Unit', required=True,
-       help='The time unit for the recurrence interval (day, week, month, or year).')
-    lead_days = fields.Integer(string='Lead Days', store=True, readonly=False,
+        help='The time unit for the recurrence interval (day, week, month, or year).')
+    lead_days = fields.Integer(string='Lead Days', store=True, readonly=False,compute="_compute_lead_days",
                         help='Number of days before the due date at which the item transitions to "due soon" status.')
     calendar_id = fields.Many2one('resource.calendar', string='Working Calendar',
                                   default=lambda self: self.env.company.resource_calendar_id,
                                   help='The working calendar used to adjust due dates to working days.')
     grace_days = fields.Integer(string='Grace Days', default=5,
                 help='Number of days before the due date within which a completed test preserves the scheduled cycle.')
-    last_completed_date = fields.Date(string='Last Completed Date',compute='_compute_last_completed_date', store=True,
-                            readonly=False, help='The date of the most recent passing test for this compliance item.')
+    last_completed_date = fields.Date(string='Last Completed Date', compute='_compute_last_completed_date', store=True,
+                                      readonly=False,
+                                      help='The date of the most recent passing test for this compliance item.')
     next_due_date = fields.Date(string='Next Due Date', compute='_compute_next_due', store=True, readonly=False,
                                 help='The calculated date on which the next test or inspection is due.')
     status = fields.Selection([
@@ -92,15 +94,15 @@ class NHSComplianceItem(models.Model):
         ('failed', 'Failed'),
         ('not_applicable', 'Not Applicable')
     ], string='Status', compute='_compute_status', store=True, tracking=True,
-       help='The current compliance status: Compliant, Due Soon, Overdue, Failed, or Not Applicable.')
+        help='The current compliance status: Compliant, Due Soon, Overdue, Failed, or Not Applicable.')
     criticality = fields.Selection(related='compliance_type_id.criticality', store=True,
                                    help='The risk criticality level inherited from the compliance type.')
     test_ids = fields.One2many('nhs.compliance.test', 'item_id', string='Tests',
-                              help='All compliance tests recorded against this item.')
+                               help='All compliance tests recorded against this item.')
     test_count = fields.Integer(string='Test Count', compute='_compute_test_count',
                                 help='Total number of tests recorded for this compliance item.')
     remedial_ids = fields.One2many('nhs.compliance.remedial', 'item_id', string='Remedials',
-                                  help='All remedial actions raised against this compliance item.')
+                                   help='All remedial actions raised against this compliance item.')
     open_remedial_count = fields.Integer(string='Open Remedial', compute='_compute_open_remedial_count',
                                     help='Number of remedial actions that are still open (not completed or verified).')
     active = fields.Boolean(string='Active', default=True,
@@ -113,7 +115,7 @@ class NHSComplianceItem(models.Model):
             if item.compliance_type_id:
                 item.frequency_value = item.compliance_type_id.default_frequency_value
                 item.frequency_unit = item.compliance_type_id.default_frequency_unit
-                item.lead_days = item.compliance_type_id.default_lead_days
+                item._compute_lead_days()
 
     @api.onchange('compliance_type_id', 'discipline_id')
     def _onchange_discipline_id_set_contractor(self):
@@ -155,9 +157,23 @@ class NHSComplianceItem(models.Model):
                         if item.space_id.site_id != item.site_id:
                             item.space_id = False
 
+    @api.onchange('space_id')
+    def _onchange_space_id(self):
+        """Auto-populate site_id and building_id when space_id is selected."""
+        for item in self:
+            if item.space_id:
+                if not item.site_id or item.site_id != item.space_id.site_id:
+                    item.site_id = item.space_id.site_id
+                if item.space_id.building_id:
+                    if not item.building_id or item.building_id != item.space_id.building_id:
+                        item.building_id = item.space_id.building_id
+            else:
+                pass
+
     @api.depends('discipline_id', 'site_id', 'building_id', 'compliance_type_id')
     def _compute_responsible_person_id(self):
-        """Auto-assign a responsible person from duty assignments, prioritising location-specific matches."""
+        """Auto-assign a responsible person from duty assignments, prioritising location-specific matches.
+        Only users who are authorised or responsible persons (RP/AP) will be assigned."""
         for item in self:
             discipline = item.discipline_id
             if not discipline:
@@ -176,18 +192,47 @@ class NHSComplianceItem(models.Model):
             assignments = self.env['nhs.duty.assignment']
             if loc_conditions:
                 if len(loc_conditions) == 2:
-                    assignments = self.env['nhs.duty.assignment'].search(domain + ['|'] + loc_conditions)
+                    assignments = self.env['nhs.duty.assignment'].search(
+                        domain + ['|'] + loc_conditions
+                    )
                 else:
-                    assignments = self.env['nhs.duty.assignment'].search(domain + loc_conditions)
-            if assignments:
-                item.responsible_person_id = assignments[0].person_id
+                    assignments = self.env['nhs.duty.assignment'].search(
+                        domain + loc_conditions
+                    )
             else:
+                assignments = self.env['nhs.duty.assignment'].search(domain)
+            responsible_user = False
+            for assignment in assignments:
+                partner = assignment.person_id
+                if partner and partner.user_ids:
+                    user = partner.user_ids[0]
+                    user_assignments = self.env['nhs.duty.assignment'].search([
+                        ('person_id', '=', partner.id),
+                        ('duty_role_id.code', 'in', ['RP', 'AP']),
+                        ('discipline_id', '=', discipline.id)
+                    ])
+                    if user_assignments:
+                        responsible_user = user
+                        break
+            if not responsible_user:
                 all_assignments = self.env['nhs.duty.assignment'].search(domain)
-                if all_assignments:
-                    item.responsible_person_id = all_assignments[0].person_id
-                else:
-                    if not item.responsible_person_id:
-                        item.responsible_person_id = False
+                for assignment in all_assignments:
+                    partner = assignment.person_id
+                    if partner and partner.user_ids:
+                        user = partner.user_ids[0]
+                        user_assignments = self.env['nhs.duty.assignment'].search([
+                            ('person_id', '=', partner.id),
+                            ('duty_role_id.code', 'in', ['RP', 'AP']),
+                            ('discipline_id', '=', discipline.id)
+                        ])
+                        if user_assignments:
+                            responsible_user = user
+                            break
+            if responsible_user:
+                item.responsible_person_id = responsible_user
+            else:
+                if not item.responsible_person_id:
+                    item.responsible_person_id = False
 
     @api.depends('compliance_type_id', 'site_id', 'building_id', 'space_id')
     def _compute_name(self):
@@ -202,9 +247,9 @@ class NHSComplianceItem(models.Model):
         due_soon_days = int(self.env['ir.config_parameter'].sudo().get_param(
             'odoo_nhs_estate_compliance.due_soon_days', 14))
         for item in self:
-            if item.discipline_id and item.discipline_id.lead_days:
+            if item.discipline_id and item.discipline_id.lead_days is not None and item.discipline_id.lead_days > 0:
                 item.lead_days = item.discipline_id.lead_days
-            elif item.compliance_type_id and item.compliance_type_id.default_lead_days:
+            elif item.compliance_type_id and item.compliance_type_id.default_lead_days is not None and item.compliance_type_id.default_lead_days > 0:
                 item.lead_days = item.compliance_type_id.default_lead_days
             else:
                 item.lead_days = due_soon_days
@@ -229,7 +274,8 @@ class NHSComplianceItem(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        """Override create to auto-generate a sequence reference, apply type defaults, and sync maintenance records."""
+        """Override create to auto-generate a sequence reference, apply type defaults.
+        NO maintenance request is created on item creation."""
         for vals in vals_list:
             if vals.get('reference', 'New') == 'New':
                 seq = self.env['ir.sequence'].next_by_code('nhs.compliance.item') or 'New'
@@ -247,21 +293,52 @@ class NHSComplianceItem(models.Model):
                                 'odoo_nhs_estate_compliance.due_soon_days', 14))
                         vals['lead_days'] = comp_type.default_lead_days or due_soon_days
         items = super(NHSComplianceItem, self).create(vals_list)
-        items._sync_maintenance_records()
         return items
 
     def write(self, vals):
-        """Override write to re-sync linked maintenance records when key scheduling or location fields change."""
+        """Override write to handle maintenance requests based on status changes."""
         res = super(NHSComplianceItem, self).write(vals)
         if not self.env.context.get('skip_maintenance_sync'):
             if any(field in vals for field in
-                   ['name', 'active', 'next_due_date', 'frequency_value', 'frequency_unit', 'responsible_person_id',
-                 'site_id', 'building_id', 'space_id', 'compliance_type_id', 'discipline_id', 'equipment_id','status']):
-                self._sync_maintenance_records()
+                   ['name', 'active', 'next_due_date', 'frequency_value', 'frequency_unit',
+                    'responsible_person_id', 'site_id', 'building_id', 'space_id',
+                    'compliance_type_id', 'discipline_id', 'equipment_id', 'status']):
+                for item in self:
+                    if item.status == 'not_applicable' or not item.active:
+                        item._close_maintenance_requests()
+                    elif item.next_due_date and item.active:
+                        item._create_maintenance_request()
+                    elif not item.next_due_date:
+                        item._close_maintenance_requests()
         return res
 
-    def _sync_maintenance_records(self):
-        """Create or update maintenance requests based on compliance item status"""
+    def _close_maintenance_requests(self):
+        """Close all open maintenance requests for this compliance item."""
+        repaired_stage = self.env['maintenance.stage'].search([('name', 'ilike', 'Repaired')], limit=1)
+        scrap_stage = self.env['maintenance.stage'].search([('name', 'ilike', 'Scrap')], limit=1)
+        open_requests = self.env['maintenance.request'].search([
+            ('compliance_item_id', '=', self.id),
+            ('stage_id.done', '=', False),
+        ])
+        if open_requests:
+            team = self.env['maintenance.team'].sudo().search([('name', '=', 'Compliance Team')], limit=1)
+            if not team:
+                team = self.env['maintenance.team'].sudo().create({
+                    'name': 'Compliance Team',
+                    'company_id': False,
+                })
+            open_requests.with_context(skip_maintenance_sync=True).write({
+                'stage_id': repaired_stage.id if repaired_stage else scrap_stage.id,
+                'close_date': fields.Date.today(),
+                'maintenance_team_id': team.id,
+            })
+
+    def _create_maintenance_request(self):
+        """Create a preventive maintenance request for the next scheduled statutory test.
+        This is called when a test passes and the schedule needs to roll forward."""
+
+        if not self.next_due_date or not self.active:
+            return
         team = self.env['maintenance.team'].sudo().search([('name', '=', 'Compliance Team')], limit=1)
         if not team:
             team = self.env['maintenance.team'].sudo().create({
@@ -269,174 +346,125 @@ class NHSComplianceItem(models.Model):
                 'company_id': False,
             })
         new_request_stage = self.env['maintenance.stage'].search([('name', 'ilike', 'New Request')], limit=1)
-        in_progress_stage = self.env['maintenance.stage'].search([('name', 'ilike', 'In Progress')], limit=1)
-        repaired_stage = self.env['maintenance.stage'].search([('name', 'ilike', 'Repaired')], limit=1)
-        scrap_stage = self.env['maintenance.stage'].search([('name', 'ilike', 'Scrap')], limit=1)
-        for item in self:
-            if not item.active:
-                continue
-            equipment = item.equipment_id
-            if not equipment:
-                continue
-            open_requests = self.env['maintenance.request'].search([
-                ('equipment_id', '=', equipment.id),
-                ('stage_id.done', '=', False),
-                ('compliance_item_id', '=', item.id),
-            ])
-            open_remedials = item.remedial_ids.filtered(
-                lambda r: r.state not in ['completed', 'verified', 'cancelled']
-            )
-            item_identifier = item.reference or item.name
-            if open_remedials:
-                if open_requests:
-                    open_requests.with_context(skip_maintenance_sync=True).write({
-                        'stage_id': in_progress_stage.id,
-                        'schedule_date': False,
-                        'priority': '3',
-                        'description': f"BLOCKED: Open remedials exist.\n\n"
-                                       f"Compliance Item: {item_identifier}\n"
-                                       f"Discipline: {item.discipline_id.name}\n"
-                                       f"Open Remedials: {', '.join(open_remedials.mapped('name'))}",
-                        'maintenance_team_id': team.id,
-                    })
-                else:
-                    request_name = f"BLOCKED: {item_identifier}"
-                    existing_request = self.env['maintenance.request'].search([
-                        ('name', '=', request_name),
-                        ('equipment_id', '=', equipment.id),
-                        ('compliance_item_id', '=', item.id),
-                    ], limit=1)
-                    if existing_request:
-                        print("4. existing request - ",existing_request)
-                        existing_request.with_context(skip_maintenance_sync=True).write({
-                            'stage_id': in_progress_stage.id,
-                            'schedule_date': False,
-                            'priority': '3',
-                            'description': f"BLOCKED: Open remedials exist.\n\n"
-                                           f"Compliance Item: {item_identifier}\n"
-                                           f"Discipline: {item.discipline_id.name}\n"
-                                           f"Open Remedials: {', '.join(open_remedials.mapped('name'))}",
-                            'maintenance_team_id': team.id,
-                        })
-                    else:
-                        self.env['maintenance.request'].with_context(skip_maintenance_sync=True).create({
-                            'name': request_name,
-                            'equipment_id': equipment.id,
-                            'maintenance_type': 'preventive',
-                            'recurring_maintenance': True,
-                            'repeat_interval': item.frequency_value or 1,
-                            'repeat_unit': item.frequency_unit or 'month',
-                            'schedule_date': False,
-                            'company_id': item.company_id.id,
-                            'compliance_item_id': item.id,
-                            'user_id': item.responsible_person_id.id if item.responsible_person_id else False,
-                            'stage_id': in_progress_stage.id,
-                            'priority': '3',
-                            'description': f"BLOCKED: Open remedials exist.\n\n"
-                                           f"Compliance Item: {item_identifier}\n"
-                                           f"Discipline: {item.discipline_id.name}\n"
-                                           f"Open Remedials: {', '.join(open_remedials.mapped('name'))}",
-                            'maintenance_team_id': team.id,
-                        })
-                continue
-            if item.status == 'not_applicable':
-                if open_requests:
-                    open_requests.with_context(skip_maintenance_sync=True).write({
-                        'stage_id': repaired_stage.id if repaired_stage else scrap_stage.id,
-                        'close_date': fields.Date.today(),
-                        'maintenance_team_id': team.id,
-                    })
-                continue
-            if item.status in ['compliant', 'due_soon']:
-                stage = new_request_stage
-                priority = '1'
-                name_prefix = "Statutory Test"
-                description = (f"Scheduled statutory compliance test.\n"
-                               f"\nCompliance Item: {item_identifier}"
-                               f"\nDiscipline: {item.discipline_id.name}"
-                               f"\nType: {item.compliance_type_id.name}"
-                               f"\nDue: {item.next_due_date or 'Immediate'}")
-                schedule_date = item.next_due_date or fields.Date.today()
-            elif item.status == 'overdue':
-                stage = new_request_stage
-                priority = '3'
-                name_prefix = "OVERDUE"
-                days_overdue = (fields.Date.today() - item.next_due_date).days if item.next_due_date else 0
-                description = (f"OVERDUE STATUTORY TEST!\n"
-                               f"\nCompliance Item: {item_identifier}"
-                               f"\nDiscipline: {item.discipline_id.name}"
-                               f"\nType: {item.compliance_type_id.name}"
-                               f"\nDue: {item.next_due_date or 'Immediate'}"
-                               f"\nDays Overdue: {days_overdue}")
-                schedule_date = fields.Date.today()
-            elif item.status == 'failed':
-                stage = new_request_stage
-                priority = '3'
-                name_prefix = "FAILED"
-                description = (f"FAILED STATUTORY TEST!\n"
-                               f"\nCompliance Item: {item_identifier}"
-                               f"\nDiscipline: {item.discipline_id.name}"
-                               f"\nType: {item.compliance_type_id.name}\n"
-                               f"\nFAILURE DETECTED - Remedial action required before re-testing.")
-                schedule_date = fields.Date.today()
-            else:
-                stage = new_request_stage
-                priority = '1'
-                name_prefix = "Statutory Test"
-                description = (f"Statutory compliance test.\n"
-                               f"\nCompliance Item: {item_identifier}"
-                               f"\nDiscipline: {item.discipline_id.name}"
-                               f"\nType: {item.compliance_type_id.name}")
-                schedule_date = item.next_due_date or fields.Date.today()
-            request_name = f"{name_prefix}: {item_identifier}"
-            request_vals = {
-                'stage_id': stage.id if stage else False,
+        equipment = self.equipment_id
+        item_identifier = self.reference or self.name
+        if self.status == 'overdue':
+            priority = '3'
+            name_prefix = "OVERDUE"
+            days_overdue = (fields.Date.today() - self.next_due_date).days if self.next_due_date else 0
+            description = f"""OVERDUE STATUTORY TEST!
+
+            Compliance Item: {item_identifier}
+            Discipline: {self.discipline_id.name if self.discipline_id else 'N/A'}
+            Type: {self.compliance_type_id.name if self.compliance_type_id else 'N/A'}
+            Due Date: {self.next_due_date}
+            Days Overdue: {days_overdue}
+            
+            IMMEDIATE ACTION REQUIRED: This statutory test is overdue."""
+            schedule_date = fields.Date.today()
+        elif self.status == 'due_soon':
+            priority = '1'
+            name_prefix = "DUE SOON"
+            description = f"""SCHEDULED STATUTORY TEST (Due Soon)
+
+            Compliance Item: {item_identifier}
+            Discipline: {self.discipline_id.name if self.discipline_id else 'N/A'}
+            Type: {self.compliance_type_id.name if self.compliance_type_id else 'N/A'}
+            Due Date: {self.next_due_date}
+            
+            Please complete the scheduled statutory compliance test."""
+            schedule_date = self.next_due_date
+        elif self.status == 'failed':
+            priority = '3'
+            name_prefix = "FAILED - RETEST REQUIRED"
+            description = f"""FAILED STATUTORY TEST - RETEST REQUIRED!
+            
+            Compliance Item: {item_identifier}
+            Discipline: {self.discipline_id.name if self.discipline_id else 'N/A'}
+            Type: {self.compliance_type_id.name if self.compliance_type_id else 'N/A'}
+            
+            This compliance item has failed. Please investigate the failure,
+            complete required remedial actions, and perform a re-test.
+
+            Failure Details:
+            {self._get_latest_failure_details()}"""
+            schedule_date = fields.Date.today()
+        else:
+            priority = '1'
+            name_prefix = "STATUTORY TEST"
+            description = f"""SCHEDULED STATUTORY TEST
+
+            Compliance Item: {item_identifier}
+            Discipline: {self.discipline_id.name if self.discipline_id else 'N/A'}
+            Type: {self.compliance_type_id.name if self.compliance_type_id else 'N/A'}
+            Due Date: {self.next_due_date}
+
+            Please complete the scheduled statutory compliance test."""
+            schedule_date = self.next_due_date
+
+        request_name = f"{name_prefix}: {item_identifier}"
+
+        existing_request = self.env['maintenance.request'].search([
+            ('compliance_item_id', '=', self.id),
+            ('stage_id.done', '=', False),
+        ], limit=1)
+
+        if existing_request:
+            existing_request.with_context(skip_maintenance_sync=True).write({
+                'stage_id': new_request_stage.id if new_request_stage else False,
                 'maintenance_type': 'preventive',
+                'recurring_maintenance': True,
                 'priority': priority,
                 'schedule_date': schedule_date,
                 'description': description,
-                'user_id': item.responsible_person_id.id if item.responsible_person_id else False,
-                'recurring_maintenance': True,
-                'repeat_interval': item.frequency_value or 1,
-                'repeat_unit': item.frequency_unit or 'month',
+                'user_id': self.responsible_person_id.id if self.responsible_person_id else False,
+                'repeat_interval': self.frequency_value or 1,
+                'repeat_unit': self.frequency_unit or 'month',
                 'maintenance_team_id': team.id,
-            }
-            if open_requests:
-                update_vals = request_vals.copy()
-                if not open_requests[0].name.startswith(name_prefix):
-                    update_vals['name'] = request_name
-                open_requests.with_context(skip_maintenance_sync=True).write(update_vals)
-            else:
-                existing_request = self.env['maintenance.request'].search([
-                    ('name', '=', request_name),
-                    ('equipment_id', '=', equipment.id),
-                    ('compliance_item_id', '=', item.id),
-                ], limit=1)
-                if existing_request:
-                    if existing_request.stage_id.id in [repaired_stage.id, scrap_stage.id]:
-                        existing_requests_count = self.env['maintenance.request'].search_count([
-                            ('name', 'ilike', f"{name_prefix}: {item_identifier}"),
-                            ('equipment_id', '=', equipment.id),
-                            ('compliance_item_id', '=', item.id),
-                        ])
-                        new_name = f"{name_prefix}: {item_identifier} ({existing_requests_count + 1})"
-                        request_vals.update({
-                            'name': new_name,
-                            'equipment_id': equipment.id,
-                            'company_id': item.company_id.id,
-                            'compliance_item_id': item.id,
-                        })
-                        self.env['maintenance.request'].with_context(skip_maintenance_sync=True).create(request_vals)
-                    else:
-                        existing_request.with_context(skip_maintenance_sync=True).write(request_vals)
-                else:
-                    request_vals.update({
-                        'name': request_name,
-                        'equipment_id': equipment.id,
-                        'company_id': item.company_id.id,
-                        'compliance_item_id': item.id,
-                    })
-                    self.env['maintenance.request'].with_context(skip_maintenance_sync=True).create(request_vals)
+                'equipment_id': equipment.id if equipment else False,
+            })
+        else:
+            closed_requests = self.env['maintenance.request'].search([
+                ('name', 'ilike', request_name),
+                ('compliance_item_id', '=', self.id),
+                ('stage_id.done', '=', True),
+            ])
+            if closed_requests:
+                count = self.env['maintenance.request'].search_count([
+                    ('name', 'ilike', request_name),
+                    ('compliance_item_id', '=', self.id),
+                ])
+                request_name = f"{request_name} ({count + 1})"
+            self.env['maintenance.request'].with_context(skip_maintenance_sync=True).create({
+                'name': request_name,
+                'equipment_id': equipment.id if equipment else False,
+                'maintenance_type': 'preventive',
+                'recurring_maintenance': True,
+                'repeat_interval': self.frequency_value or 1,
+                'repeat_unit': self.frequency_unit or 'month',
+                'schedule_date': schedule_date,
+                'company_id': self.company_id.id,
+                'compliance_item_id': self.id,
+                'user_id': self.responsible_person_id.id if self.responsible_person_id else False,
+                'stage_id': new_request_stage.id if new_request_stage else False,
+                'priority': priority,
+                'description': description,
+                'maintenance_team_id': team.id,
+            })
+
+    def _get_latest_failure_details(self):
+        """Get details of the latest failed test for this compliance item."""
+        latest_failed_test = self.test_ids.filtered(
+            lambda t: t.outcome in ['fail', 'remedial_required']
+        ).sorted('test_date', reverse=True)[:1]
+        if latest_failed_test:
+            test = latest_failed_test
+            return f"""
+            Test Reference: {test.name}
+            Test Date: {test.test_date}
+            Outcome: {dict(test._fields['outcome'].selection).get(test.outcome, test.outcome)}
+            Readings/Notes: {test.notes or test.readings or 'N/A'}"""
+        return "No failure details available."
 
     @api.depends('test_ids', 'test_ids.test_date', 'test_ids.outcome', 'test_ids.active')
     def _compute_last_completed_date(self):
@@ -557,7 +585,7 @@ class NHSComplianceItem(models.Model):
         due_date = fields.Date.today() + relativedelta(days=10)
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Log Test',
+            'name': 'Log Remedial',
             'res_model': 'nhs.compliance.remedial',
             'view_mode': 'form',
             'context': {
@@ -680,8 +708,8 @@ class NHSComplianceItem(models.Model):
                         'res_id': item.id,
                         'user_id': dh_user.id,
                         'summary': f"CRITICAL ESCALATION: Item {item.reference} overdue - {threshold} days",
-                        'note':f"The compliance item {item.name} is critically overdue (Due since {item.next_due_date})."
-                               f" Please resolve immediately.",
+                        'note': f"The compliance item {item.name} is critically overdue (Due since {item.next_due_date})."
+                                f" Please resolve immediately.",
                         'date_deadline': today,
                     })
 
@@ -828,7 +856,7 @@ class NHSComplianceItem(models.Model):
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🏛️ Estates Compliance Weekly Report</h1>
+                    <h1>Estates Compliance Weekly Report</h1>
                     <div class="subtitle">Week Ending {today.strftime('%B %d, %Y')}</div>
                 </div>
 
@@ -840,8 +868,8 @@ class NHSComplianceItem(models.Model):
                             <span>{compliance_rate:.0f}%</span>
                         </div>
                         <div class="compliance-bar">
-                            <div class="fill {('low' if compliance_rate < 60 else 'medium' if compliance_rate < 80 
-                                    else '')}" 
+                            <div class="fill {('low' if compliance_rate < 60 else 'medium' if compliance_rate < 80
+        else '')}" 
                                  style="width: {compliance_rate:.0f}%;">
                                 {compliance_rate:.0f}%
                             </div>
@@ -860,21 +888,21 @@ class NHSComplianceItem(models.Model):
                         </div>
                         <div class="summary-card due-soon">
                             <span class="number">{due_soon_count}</span>
-                            <span class="label">⏰ Due Soon</span>
+                            <span class="label">Due Soon</span>
                         </div>
                         <div class="summary-card overdue">
                             <span class="number">{overdue_count}</span>
-                            <span class="label">🚨 Overdue</span>
+                            <span class="label">Overdue</span>
                         </div>
                         <div class="summary-card failed">
                             <span class="number">{failed_count}</span>
-                            <span class="label">❌ Failed</span>
+                            <span class="label">Failed</span>
                         </div>
                     </div>
 
                     <!-- Login Link -->
                     <div class="login-link">
-                        <a href="{base_url}/web">🔑 Log in to Odoo to view detailed compliance records</a>
+                        <a href="{base_url}/web">Log in to Odoo to view detailed compliance records</a>
                     </div>
                 </div>
 

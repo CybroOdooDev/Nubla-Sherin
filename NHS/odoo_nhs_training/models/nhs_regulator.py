@@ -23,6 +23,8 @@ from odoo import fields, models
 
 
 class NhsRegulator(models.Model):
+    """Reference data for a professional regulatory body."""
+
     _name = 'nhs.regulator'
     _description = 'Professional Regulator Reference'
     _order = 'sequence, name'

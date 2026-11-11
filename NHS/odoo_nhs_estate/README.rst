@@ -2,12 +2,10 @@
     :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
     :alt: License: LGPL-3
 
-NHS Recruitment Pipeline
+NHS Estate Register
 =========================
-Vacancy-to-hire recruitment for the NHS — vacancy approval against funded
-posts, adverts, portal applications, shortlisting, interviews, offers and the
-NHS Employment Check Standards, with onboarding into the establishment, for
-both Community and Enterprise editions of Odoo 19.
+A complete master register of sites, buildings, floors and functional spaces with estate
+condition, tenure, backlog maintenance and area management.
 
 Configuration
 =============
@@ -24,7 +22,7 @@ General Public License, Version 3 (LGPL v3).
 
 Credits
 =======
-Developer: (V19) Nubla Sherin K ,
+Developer: (V19) Ciya Sithara K P ,
 
 Contact: odoo@cybrosys.com
 

@@ -22,6 +22,11 @@
 from odoo import api, fields, models
 
 class NHSESFloor(models.Model):
+    """
+        Model for NHS Estate Floors/Levels. This models the individual floors or levels within an
+        NHS estate building. Each floor record represents a specific level within a building,
+         containing spaces and rooms with area calculations and functional information.
+    """
     _name = 'nhs.estate.floor'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Floor / Level'
@@ -95,6 +100,11 @@ class NHSESFloor(models.Model):
         help="Whether this floor record is active and visible in the system"
     )
 
+    _unique_floor = models.Constraint(
+        'UNIQUE(building_id, sequence)',
+        'A floor with this order already exists in this building!'
+    )
+
     @api.depends('space_ids')
     def _compute_space_count(self):
         """Compute the total count of spaces defined on this floor.
@@ -152,5 +162,5 @@ class NHSESFloor(models.Model):
         """
         return [{
             'label': 'Import Template for Floor',
-            'template': '/odoo_nhs_estate/static/import_templates/floor.xlsx',
+            'template': '/odoo_nhs_estate/static/import_templates/floors.xlsx',
         }]

@@ -21,7 +21,7 @@
 #############################################################################
 from datetime import timedelta
 from markupsafe import Markup
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
 
@@ -177,9 +177,9 @@ class NhsShiftBooking(models.Model):
         therefore a negative payable amount."""
         for booking in self:
             if booking.shift_start and booking.shift_end and booking.shift_end <= booking.shift_start:
-                raise ValidationError("'End' must be after 'Start'.")
+                raise ValidationError(_("'End' must be after 'Start'."))
             if booking.actual_start and booking.actual_end and booking.actual_end <= booking.actual_start:
-                raise ValidationError("'Actual End' must be after 'Actual Start'.")
+                raise ValidationError(_("'Actual End' must be after 'Actual Start'."))
 
     @api.depends('shift_start', 'shift_end', 'actual_start', 'actual_end',
                  'rate_id', 'rate_override')
@@ -234,9 +234,9 @@ class NhsShiftBooking(models.Model):
                 compliant, _reason = gate.is_member_compliant_with_reason(member)
                 new_vals['compliant_at_booking'] = compliant
                 if not compliant and hard_gate:
-                    raise UserError((
-                        "%(member)s cannot be booked: %(reason)s") % {
-                        'member': member.name, 'reason': _reason})
+                    raise UserError(
+                        _("%(member)s cannot be booked: %(reason)s") % {
+                            'member': member.name, 'reason': _reason})
             new_vals_list.append(new_vals)
         records = super().create(new_vals_list)
         records._send_booking_confirmation()
@@ -303,7 +303,7 @@ class NhsShiftBooking(models.Model):
 
     def unlink(self):
         """Block hard deletion of bookings; cancel instead to preserve the audit trail."""
-        raise UserError((
+        raise UserError(_(
             "Bookings cannot be deleted, to preserve the pay and compliance audit"
             " trail. Cancel the booking instead."))
 

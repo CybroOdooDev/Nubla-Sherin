@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.orm.identifiers import NewId
 
 COMPLIANCE_STATUSES = [
@@ -39,6 +39,7 @@ STATUS_LABELS = {
 
 
 class NhsWorkforceMemberComplianceLine(models.Model):
+    """Per-subject compliance status line for a workforce member."""
     _name = 'nhs.workforce.member.compliance.line'
     _description = 'Workforce Member Compliance Line'
     _order = 'subject_name'
@@ -79,6 +80,7 @@ class NhsWorkforceMemberComplianceLine(models.Model):
 
 
 class NhsWorkforceMember(models.Model):
+    """Light staff record for training-compliance tracking."""
     _name = 'nhs.workforce.member'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'A member of staff for training-compliance purposes (data-minimised)'
@@ -336,8 +338,8 @@ class NhsWorkforceMember(models.Model):
         for member in self:
             member.activity_schedule(
                 activity_type_id=activity_type.id,
-                summary=_('New starter — arrange induction training'),
-                note=_('Arrange induction/mandatory training for %s (%s).') % (
+                summary=('New starter — arrange induction training'),
+                note=('Arrange induction/mandatory training for %s (%s).') % (
                     member.name, ', '.join(induction_subjects.mapped('name'))),
             )
 
@@ -543,7 +545,7 @@ class NhsWorkforceMember(models.Model):
         """Doc."""
         self.ensure_one()
         return {
-            'name': _('Record Training'),
+            'name': ('Record Training'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.training.record',
             'view_mode': 'form',
@@ -558,7 +560,7 @@ class NhsWorkforceMember(models.Model):
         """Doc."""
         self.ensure_one()
         return {
-            'name': _('Training Records'),
+            'name': ('Training Records'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.training.record',
             'view_mode': 'list,form',
@@ -570,7 +572,7 @@ class NhsWorkforceMember(models.Model):
         """Doc."""
         self.ensure_one()
         return {
-            'name': _('Professional Registrations'),
+            'name': ('Professional Registrations'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.registration',
             'view_mode': 'list,form',

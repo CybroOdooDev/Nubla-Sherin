@@ -37,13 +37,13 @@ class NHSContractorVisit(models.Model):
                               help='The NHS estate site where the visit was conducted.')
     building_id = fields.Many2one('nhs.estate.building', string='Building',
                                   help='The specific building within the site where the visit occurred.')
-    permit_ref = fields.Char(string='Permit Reference', help='Permit-to-work reference (MGPS, HV, hot works)')
+    permit_ref = fields.Char(string='Permit Reference',copy=False,help='Permit-to-work reference (MGPS, HV, hot works)')
     test_ids = fields.One2many('nhs.compliance.test', 'visit_id', string='Tests Completed',
                                help='Compliance tests completed during this contractor visit.')
     item_ids = fields.Many2many('nhs.compliance.item', string='Compliance Items Covered',
                                 compute='_compute_item_ids', store=True,
                                 help='Compliance items that were serviced or inspected during this visit.')
-    notes = fields.Text(string='Visit Summary',
+    notes = fields.Text(string='Visit Summary', copy=False,
                         help='Free-text summary of work performed, observations, and any follow-up actions.')
 
     @api.depends('test_ids', 'test_ids.item_id')
@@ -69,7 +69,7 @@ class NHSContractorVisit(models.Model):
                 visit.item_ids.write({'next_due_date': visit.visit_date})
                 for item in visit.item_ids:
                     open_requests = self.env['maintenance.request'].search([
-                        ('equipment_id', '=', item.equipment_id.id),
+                        ('compliance_item_id', '=', item.id),
                         ('maintenance_type', '=', 'preventive'),
                         ('stage_id.done', '=', False)
                     ])
@@ -92,7 +92,7 @@ class NHSContractorVisit(models.Model):
                     visit.item_ids.write({'next_due_date': visit.visit_date})
                     for item in visit.item_ids:
                         open_requests = self.env['maintenance.request'].search([
-                            ('equipment_id', '=', item.equipment_id.id),
+                            ('compliance_item_id', '=', item.id),
                             ('maintenance_type', '=', 'preventive'),
                             ('stage_id.done', '=', False)
                         ])
@@ -101,3 +101,51 @@ class NHSContractorVisit(models.Model):
                                 'schedule_date': visit.visit_date
                             })
         return res
+
+    def action_open_complete_wizard(self):
+        """Open the wizard to complete multiple compliance items covered in this contractor visit."""
+        self.ensure_one()
+        contractor = self.contractor_id
+        contractor_disciplines = contractor.discipline_ids if contractor else False
+        domain = [('delivery_method', '=', 'contractor')]
+        if contractor:
+            if contractor_disciplines:
+                domain.append(('discipline_id', 'in', contractor_disciplines.ids))
+            domain.extend(['|', ('contractor_id', '=', False), ('contractor_id', '=', contractor.id)])
+        if self.building_id:
+            domain.append(('building_id', '=', self.building_id.id))
+        elif self.site_id:
+            domain.append(('site_id', '=', self.site_id.id))
+        candidate_items = self.env['nhs.compliance.item'].search(domain)
+        if not candidate_items and contractor:
+            fallback_domain = [('delivery_method', '=', 'contractor')]
+            if contractor_disciplines:
+                fallback_domain.append(('discipline_id', 'in', contractor_disciplines.ids))
+            fallback_domain.extend(['|', ('contractor_id', '=', False), ('contractor_id', '=', contractor.id)])
+            candidate_items = self.env['nhs.compliance.item'].search(fallback_domain)
+        wizard = self.env['nhs.contractor.visit.complete.wizard'].create({
+            'visit_id': self.id,
+            'common_outcome': 'pass',
+            'common_certificate_date': fields.Date.today(),
+            'common_issuing_body': contractor.name if contractor else False,
+        })
+        line_vals = []
+        for item in candidate_items:
+            line_vals.append({
+                'wizard_id': wizard.id,
+                'item_id': item.id,
+                'selected': True,
+                'outcome': 'pass',
+                'certificate_date': fields.Date.today(),
+                'issuing_body': contractor.name if contractor else False,
+            })
+        if line_vals:
+            self.env['nhs.contractor.visit.complete.wizard.line'].create(line_vals)
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Complete Multiple Compliance Items',
+            'res_model': 'nhs.contractor.visit.complete.wizard',
+            'res_id': wizard.id,
+            'view_mode': 'form',
+            'target': 'new',
+        }

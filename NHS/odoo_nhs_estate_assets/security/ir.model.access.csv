@@ -26,8 +26,8 @@ access_nhs_device_alert_line_manager,nhs.device.alert.line.manager,model_nhs_dev
 access_nhs_device_warranty_user,nhs.device.warranty.user,model_nhs_device_warranty,group_nhs_equipment_user,1,0,0,0
 access_nhs_device_warranty_ebme,nhs.device.warranty.ebme,model_nhs_device_warranty,group_nhs_ebme_officer,1,1,1,1
 access_nhs_device_warranty_manager,nhs.device.warranty.manager,model_nhs_device_warranty,group_nhs_equipment_manager,1,1,1,1
-access_nhs_device_service_wizard,nhs.device.service.wizard,model_nhs_device_service_wizard,group_nhs_ebme_officer,1,1,1,1
 access_nhs_device_bulk_schedule_wizard,nhs.device.bulk.schedule.wizard,model_nhs_device_bulk_schedule_wizard,group_nhs_ebme_officer,1,1,1,1
+access_nhs_device_service_wizard,nhs.device.service.wizard,model_nhs_device_service_wizard,group_nhs_ebme_officer,1,1,1,1
 access_nhs_alert_match_wizard,nhs.alert.match.wizard,model_nhs_alert_match_wizard,group_nhs_ebme_officer,1,1,1,1
 access_nhs_device_decommission_wizard,nhs.device.decommission.wizard,model_nhs_device_decommission_wizard,group_nhs_ebme_officer,1,1,1,1
 access_nhs_device_passport_wizard,nhs.device.passport.wizard,model_nhs_device_passport_wizard,group_nhs_equipment_user,1,1,1,1

@@ -70,7 +70,7 @@
                         <page string="Certificate &amp; Attachments">
                             <group>
                                 <field name="certificate_ref"/>
-                                <field name="attachment_ids" widget="many2many_binary"/>
+                                <field name="attachment_ids" widget="many2many_binary" invisible="id == 0"/>
                             </group>
                         </page>
                     </notebook>

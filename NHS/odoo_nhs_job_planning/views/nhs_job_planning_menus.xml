@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <menuitem id="menu_nhs_job_planning_root" name="NHS Job Planning" sequence="58"
+              web_icon="odoo_nhs_job_planning,static/description/icon.png"
               groups="odoo_nhs_job_planning.group_nhs_jobplan_doctor,odoo_nhs_job_planning.group_nhs_jobplan_manager"/>
 
     <!-- Plans (My Plan + team) -->

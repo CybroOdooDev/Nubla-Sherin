@@ -61,6 +61,11 @@ class NHSComplianceType(models.Model):
     item_count = fields.Integer(string='Live Items', compute='_compute_item_count',
                                 help='The number of active compliance items using this test type.')
 
+    _unique_type = models.Constraint(
+        'UNIQUE(name, discipline_id)',
+        'A compliance type with this name and discipline already exists !'
+    )
+
     @api.depends('item_ids')
     def _compute_item_count(self):
         """Compute the number of active compliance items linked to this type."""

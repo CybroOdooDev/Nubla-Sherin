@@ -32,11 +32,31 @@
                 <header>
                     <field name="status" widget="statusbar" statusbar_visible="compliant,due_soon,overdue,failed"/>
                     <button name="action_log_test" type="object" string="Log Test" class="oe_highlight"
+                            groups="odoo_nhs_estate_compliance.group_nhs_compliance_officer,odoo_nhs_estate_compliance.group_nhs_compliance_manager"
                             invisible="id == 0"/>
                     <button name="action_log_remedial" type="object" string="Log Remedial" class="oe_highlight"
+                            groups="odoo_nhs_estate_compliance.group_nhs_compliance_officer,odoo_nhs_estate_compliance.group_nhs_compliance_manager"
                             invisible="id == 0"/>
                 </header>
                 <sheet>
+                    <widget name="web_ribbon"
+                            title="COMPLIANT"
+                            bg_color="text-bg-success"
+                            invisible="status != 'compliant'">
+                        <i class="fa fa-star"/>
+                    </widget>
+                    <widget name="web_ribbon"
+                            title="DUE SOON"
+                            bg_color="text-bg-warning"
+                            invisible="status != 'due_soon'">
+                        <i class="fa fa-exclamation-triangle"/>
+                    </widget>
+                    <widget name="web_ribbon"
+                            title="OVERDUE / FAILED"
+                            bg_color="text-bg-danger"
+                            invisible="status not in ['overdue','failed']">
+                        <i class="fa fa-exclamation-triangle"/>
+                    </widget>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_maintenance" type="object"
                                 class="oe_stat_button" icon="fa-wrench">
@@ -88,19 +108,19 @@
                     </group>
                     <notebook invisible="id == 0">
                         <page name="tests" string="Tests">
-                            <field name="test_ids" readonly="1">
-                                <list>
+                            <field name="test_ids">
+                                <list create="0">
                                     <field name="name"/>
                                     <field name="test_date"/>
                                     <field name="outcome" widget="badge"/>
                                     <field name="performed_by_id"/>
-                                    <field name="contractor_id"/>
                                 </list>
                             </field>
                         </page>
                         <page name="remedials" string="Remedials">
-                            <field name="remedial_ids" readonly="1" >
-                                <list decoration-danger="state in ['open']"
+                            <field name="remedial_ids">
+                                <list create="0"
+                                      decoration-danger="state in ['open']"
                                       decoration-warning="state in ['in_progress','awaiting_parts']">
                                     <field name="name"/>
                                     <field name="priority" widget="badge"/>
@@ -264,7 +284,7 @@
         <field name="res_model">nhs.compliance.item</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('status', '=', 'overdue')]</field>
-        <field name="context">{'search_default_group_criticality': 1}</field>
+        <field name="context">{'search_default_group_criticality': 1,'create': False}</field>
     </record>
 
     <!-- Compliance Item  Failed Action -->
@@ -273,6 +293,7 @@
         <field name="res_model">nhs.compliance.item</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('status', '=', 'failed')]</field>
+        <field name="context">{'create': False}</field>
     </record>
 
     <!-- Compliance Item  Pivot View -->

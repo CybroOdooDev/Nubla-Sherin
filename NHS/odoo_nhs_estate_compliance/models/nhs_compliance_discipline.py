@@ -20,7 +20,6 @@
 #
 #############################################################################
 from odoo import api, fields, models
-from odoo.exceptions import ValidationError
 
 class NHSComplianceDiscipline(models.Model):
     """Model representing statutory compliance disciplines such as Fire, Water, Electrical, etc."""
@@ -65,13 +64,6 @@ class NHSComplianceDiscipline(models.Model):
             discipline.contractor_count = self.env['nhs.compliance.contractor'].search_count([
                 ('discipline_ids', 'in', discipline.id)
             ])
-
-    @api.constrains('code')
-    def _check_code_unique(self):
-        """Validate that the discipline code is unique across all records."""
-        existing = self.search([('code', '=', self.code), ('id', '!=', self.id)])
-        if existing:
-            raise ValidationError('Code must be unique')
 
     def action_view_compliance_item(self):
         """Open a list/form view of all compliance items belonging to this discipline."""

@@ -70,7 +70,7 @@
                         <td style="width: 50%; padding: 4px;">
                             <strong>State:</strong>
                             <span t-att-class="'badge badge-success' if alert.state == 'closed' else 'badge badge-warning' if alert.state == 'in_progress' else 'badge badge-danger'">
-                                <t t-esc="alert.state.upper()"/>
+                                <t t-esc="alert.state.replace('_', ' ').title()"/>
                             </span>
                         </td>
                     </tr>

@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Portal home card: links into the Staff Bank self-service pages. Same
-         category row and card classes as portal.portal_docs_entry (used by
-         the built-in Addresses/Connection &amp; Security cards), but with a
-         Font Awesome icon instead of portal_docs_entry's image-only icon
-         slot — no static image file to keep in sync/ship. -->
+         category row and card classes as portal.-->
     <template id="portal_my_home_nhs_staff_bank" inherit_id="portal.portal_my_home" customize_show="True">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
             <t t-set="portal_service_category_enable" t-value="True"/>

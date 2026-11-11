@@ -120,14 +120,14 @@ class NHSDeviceWarranty(models.Model):
         'Cost must be a positive number.',
     )
 
-    @api.depends('device_id', 'cover_type', 'device_id.asset_tag', 'device_id.display_name')
+    @api.depends('device_id', 'cover_type', 'device_id.asset_tag', 'device_id.asset_tag')
     def _compute_display_name(self):
         """
         Compute display name from device name, asset tag, and warranty type.
         Example: "[NHS-0001] Infusion Pump - Warranty"
         """
         for record in self:
-            device_name = record.device_id.display_name or record.device_id.name or 'Unknown Device'
+            device_name = record.device_id.asset_tag or record.device_id.name or 'Unknown Device'
             cover_type_label = dict(self._fields['cover_type'].selection).get(
                 record.cover_type, record.cover_type or ''
             )
@@ -195,6 +195,10 @@ class NHSDeviceWarranty(models.Model):
             'res_model': 'nhs.device.service',
             'view_mode': 'list,form',
             'domain': [('warranty_id', '=', self.id)],
+            'context': {
+                'default_warranty_id': self.id,
+                'default_device_id': self.device_id.id,
+            },
         }
 
     def get_cover_type_display(self):
@@ -224,7 +228,7 @@ class NHSDeviceWarranty(models.Model):
             device = w.device_id
             assignee = device._get_responsible_or_manager_user()
             summary = "[Expiring %s] %s - %s" % (
-                w.get_cover_type_display(), w.provider or 'Contractor', device.display_name
+                w.get_cover_type_display(), w.provider or 'Contractor', device.asset_tag
             )
             note = "%s (reference - %s) for device %s expires on %s." % (
                 w.get_cover_type_display(), w.reference or 'N/A', device.asset_tag, w.expiry_date

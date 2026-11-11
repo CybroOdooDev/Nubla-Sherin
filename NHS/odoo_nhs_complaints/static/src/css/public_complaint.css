@@ -1,5 +1,14 @@
 /* NHS Public Complaint Submission Form Styles - Premium Theme */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* Semicolons in the weight list are percent-encoded (%3B) rather than literal -
+   Odoo's asset bundler hoists @import rules to the top of the bundle using the
+   naive regex `@import[^;{]+;?` (assetsbundle.py), which truncates at the FIRST
+   semicolon it finds. A literal ";" inside this URL (wght@400;500;600;700) cuts
+   the import off mid-string and corrupts the entire web.assets_frontend bundle
+   for every page on the site, not just this form - confirmed by inspecting the
+   actually-served bundle, which stopped parsing after 2 rules. %3B is decoded
+   identically by both browsers and the Google Fonts API, so this requests the
+   exact same font weights without tripping that regex. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400%3B500%3B600%3B700&display=swap');
 
 body {
     background-color: #f8fafc;

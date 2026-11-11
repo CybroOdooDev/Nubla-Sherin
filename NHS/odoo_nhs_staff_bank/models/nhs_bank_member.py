@@ -19,7 +19,9 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import  api, fields, models
+from datetime import datetime, timedelta
+
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
 MEMBER_TYPES = [
@@ -246,10 +248,10 @@ class NhsBankMember(models.Model):
         help="Archive flag. Leavers are archived, retaining their history."
     )
 
-    _sql_constraints = [
-        ('user_id_unique', 'unique(user_id)',
-         'This user is already linked to another bank member.'),
-    ]
+    _user_id_unique = models.Constraint(
+        'UNIQUE(user_id)',
+        'This user is already linked to another bank member.'
+    )
 
     @api.onchange('workforce_member_id')
     def _onchange_workforce_member_id_sync_department(self):
@@ -355,7 +357,6 @@ class NhsBankMember(models.Model):
         """True if this member has declared availability spanning the whole
         of [shift_start, shift_end] and no overlapping blackout."""
         self.ensure_one()
-        from datetime import datetime, timedelta
 
         def _overlaps(a):
             if not a.recurring:
@@ -476,10 +477,10 @@ class NhsBankMember(models.Model):
         the contact and portal user manually."""
         self.ensure_one()
         if self.user_id:
-            raise UserError(("%s is already linked to a portal user (%s).")
-                             % (self.name, self.user_id.name))
+            raise UserError(_("%s is already linked to a portal user (%s).")
+                            % (self.name, self.user_id.name))
         if not self.email:
-            raise UserError(("Set an email address before creating a portal user."))
+            raise UserError(_("Set an email address before creating a portal user."))
 
         partner = self.partner_id
         if not partner:
@@ -500,9 +501,9 @@ class NhsBankMember(models.Model):
         })
         wizard_user = wizard.user_ids
         if wizard_user.is_internal:
-            raise UserError(("A user with the email %s already exists as an"
-                               " internal user — link them manually instead.")
-                             % self.email)
+            raise UserError(_("A user with the email %s already exists as an"
+                              " internal user — link them manually instead.")
+                            % self.email)
         if wizard_user.is_portal:
             wizard_user.action_invite_again()
         else:

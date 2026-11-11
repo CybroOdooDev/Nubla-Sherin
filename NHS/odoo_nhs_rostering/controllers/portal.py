@@ -41,7 +41,7 @@ class NhsRosterPortal(CustomerPortal):
         values = super()._prepare_home_portal_values(counters)
         member = self._get_member()
         if member:
-            values['roster_duty_count'] = request.env['nhs.duty.assignment'].sudo().search_count([
+            values['roster_duty_count'] = request.env['nhs.roster.assignment'].sudo().search_count([
                 ('member_id', '=', member.id), ('state', '=', 'published'),
                 ('duty_date', '>=', fields.Date.context_today(member)),
             ])
@@ -56,7 +56,7 @@ class NhsRosterPortal(CustomerPortal):
         if not member:
             return request.render('odoo_nhs_rostering.portal_roster_not_member', {})
         today = fields.Date.context_today(member)
-        upcoming = request.env['nhs.duty.assignment'].sudo().search([
+        upcoming = request.env['nhs.roster.assignment'].sudo().search([
             ('member_id', '=', member.id), ('state', '=', 'published'), ('duty_date', '>=', today),
         ], order='duty_date', limit=10)
         pending_swaps = request.env['nhs.swap.request'].sudo().search([
@@ -75,7 +75,7 @@ class NhsRosterPortal(CustomerPortal):
         member = self._get_member()
         if not member:
             return request.redirect('/my/roster')
-        duties = request.env['nhs.duty.assignment'].sudo().search([
+        duties = request.env['nhs.roster.assignment'].sudo().search([
             ('member_id', '=', member.id), ('state', 'in', ('published', 'worked', 'dna')),
         ], order='duty_date desc')
         values = {'member': member, 'duties': duties, 'page_name': 'roster_duties'}
@@ -134,7 +134,7 @@ class NhsRosterPortal(CustomerPortal):
         swaps = request.env['nhs.swap.request'].sudo().search([
             '|', ('requester_member_id', '=', member.id), ('target_member_id', '=', member.id),
         ], order='create_date desc')
-        own_duties = request.env['nhs.duty.assignment'].sudo().search([
+        own_duties = request.env['nhs.roster.assignment'].sudo().search([
             ('member_id', '=', member.id), ('state', '=', 'published'),
         ], order='duty_date')
         values = {
@@ -149,9 +149,9 @@ class NhsRosterPortal(CustomerPortal):
         member = self._get_member()
         if member:
             try:
-                own_assignment = request.env['nhs.duty.assignment'].sudo().browse(
+                own_assignment = request.env['nhs.roster.assignment'].sudo().browse(
                     int(kw.get('requester_assignment_id'))).exists()
-                target_assignment = request.env['nhs.duty.assignment'].sudo().browse(
+                target_assignment = request.env['nhs.roster.assignment'].sudo().browse(
                     int(kw.get('target_assignment_id'))).exists()
                 if not own_assignment or own_assignment.member_id != member:
                     raise UserError('Choose one of your own published duties to offer.')

@@ -21,7 +21,7 @@
 #############################################################################
 from datetime import datetime
 import pytz
-from odoo import http, fields
+from odoo import http, fields, _
 from odoo.addons.portal.controllers.portal import CustomerPortal
 from odoo.exceptions import UserError, ValidationError
 from odoo.http import request
@@ -151,7 +151,7 @@ class NhsStaffBankPortal(CustomerPortal):
                 except (ValidationError, UserError) as exc:
                     error = str(exc)
             else:
-                error = "You're no longer eligible for this shift."
+                error = _("You're no longer eligible for this shift.")
         if error:
             open_shifts = request.env['nhs.bank.shift'].sudo().search(
                 [('state', 'in', ('open', 'partially_filled'))], order='shift_start')

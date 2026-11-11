@@ -108,7 +108,8 @@
             <form>
                 <header>
                     <button name="action_record_training" type="object" string="Record Training"
-                            class="oe_highlight"/>
+                            class="oe_highlight"
+                            groups="odoo_nhs_training.group_nhs_training_officer"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">

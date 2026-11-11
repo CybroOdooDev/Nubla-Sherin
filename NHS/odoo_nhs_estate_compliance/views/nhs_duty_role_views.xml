@@ -89,7 +89,7 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Competency Evidence">
+                        <page string="Competency Evidence" invisible="id == 0">
                             <group>
                                 <field name="competency_evidence_ids" widget="many2many_binary"/>
                             </group>

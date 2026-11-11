@@ -63,7 +63,7 @@ class NhsRosterRule(models.Model):
 
 
 class NhsRosterRuleEngine(models.AbstractModel):
-    """Service model: evaluates one nhs.duty.assignment against every active
+    """Service model: evaluates one nhs.roster.assignment against every active
     rule, raising on hard failures (interactive path) and keeping
     nhs.rule.violation records in sync for both severities (recompute path)."""
     _name = 'nhs.roster.rule.engine'
@@ -85,7 +85,7 @@ class NhsRosterRuleEngine(models.AbstractModel):
             ('duty_date', '<=', date_to),
             ('state', 'not in', ('cancelled', 'dna')),
         ]
-        assignments = self.env['nhs.duty.assignment'].search(domain)
+        assignments = self.env['nhs.roster.assignment'].search(domain)
         if exclude:
             assignments -= exclude
         return assignments

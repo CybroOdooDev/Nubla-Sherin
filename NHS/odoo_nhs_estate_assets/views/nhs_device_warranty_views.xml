@@ -46,7 +46,7 @@
                         <group>
                             <field name="device_id" options="{'no_create': True}"/>
                             <field name="cover_type"/>
-                            <field name="provider" invisible="cover_type == 'warranty'"/>
+                            <field name="provider" />
                             <field name="reference" invisible="cover_type == 'warranty'"/>
                         </group>
                         <group>
@@ -56,7 +56,7 @@
                             <field name="active"/>
                         </group>
                     </group>
-                    <group string="Financial Information">
+                    <group string="Financial Information" >
                         <group>
                             <field name="cost"/>
                         </group>

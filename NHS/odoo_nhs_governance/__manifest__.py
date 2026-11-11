@@ -23,13 +23,11 @@
     'name': 'NHS Governance Management',
     'version': '19.0.1.0.0',
     'category': 'Healthcare/NHS',
-    'summary': 'Board & committee management for the NHS — terms of reference, '
-               'meeting cycles, agendas, papers, minutes, actions, declarations of '
-               'interest and the Board Assurance Framework, linked to the risk register.',
-    'description': """NHS Governance Management is the corporate-governance layer of the Nubla NHS suite.
-    It manages the committee structure and terms of reference, the meeting cycle (agendas, papers,
-    minutes), the actions arising, declarations of interest, and the Board Assurance Framework (BAF)
-    that links the organisation's strategic risks to their controls and assurances.
+    'summary': 'NHS board, committee and governance management with meetings, actions and assurance.',
+    'description': """NHS Governance Management provides a centralised platform for managing NHS boards and committees,
+including terms of reference, membership, meeting schedules, agendas, papers, minutes, and actions.
+It also supports declarations of interest and the Board Assurance Framework (BAF), linking strategic
+risks, controls, assurances, and actions to support effective governance and oversight.
     """,
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',

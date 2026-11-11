@@ -40,6 +40,7 @@ STATUSES = [
 
 
 class NhsTrainingRecord(models.Model):
+    """A completed training event and its expiry."""
     _name = 'nhs.training.record'
     _inherit = ['mail.thread']
     _description = 'A completed training event and its expiry'

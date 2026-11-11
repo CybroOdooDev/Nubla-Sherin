@@ -68,7 +68,7 @@ Extensible to NHS Wales and NHS Northern Ireland via add-on modules
 
 Configuration
 =============
-No configuration
+No configuration needed.
 
 Company
 -------

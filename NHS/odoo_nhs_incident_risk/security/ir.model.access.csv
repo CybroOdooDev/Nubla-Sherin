@@ -44,8 +44,16 @@ access_nhs_risk_register_quality,nhs.risk.register quality,model_nhs_risk_regist
 access_nhs_risk_register_handler,nhs.risk.register handler,model_nhs_risk_register,group_hc_handler,1,0,0,0
 access_nhs_risk_category_risk_manager,nhs.risk.category risk manager,model_nhs_risk_category,group_hc_risk_manager,1,0,0,0
 access_nhs_risk_category_quality,nhs.risk.category quality,model_nhs_risk_category,group_hc_quality_lead,1,1,1,1
+access_nhs_risk_control_reporter,nhs.risk.control reporter,model_nhs_risk_control,group_hc_reporter,1,0,0,0
 access_nhs_risk_control_risk_manager,nhs.risk.control risk manager,model_nhs_risk_control,group_hc_risk_manager,1,1,1,1
+access_nhs_risk_control_handler,nhs.risk.control handler,model_nhs_risk_control,group_hc_handler,1,0,0,0
+access_nhs_risk_control_quality,nhs.risk.control quality,model_nhs_risk_control,group_hc_quality_lead,1,1,1,1
+access_nhs_risk_assurance_reporter,nhs.risk.assurance reporter,model_nhs_risk_assurance,group_hc_reporter,1,0,0,0
 access_nhs_risk_assurance_risk_manager,nhs.risk.assurance risk manager,model_nhs_risk_assurance,group_hc_risk_manager,1,1,1,1
+access_nhs_risk_assurance_handler,nhs.risk.assurance handler,model_nhs_risk_assurance,group_hc_handler,1,0,0,0
+access_nhs_risk_assurance_quality,nhs.risk.assurance quality,model_nhs_risk_assurance,group_hc_quality_lead,1,1,1,1
+access_nhs_risk_review_reporter,nhs.risk.review reporter,model_nhs_risk_review,group_hc_reporter,1,0,0,0
+access_nhs_risk_review_handler,nhs.risk.review handler,model_nhs_risk_review,group_hc_handler,1,0,0,0
 access_nhs_risk_review_risk_manager,nhs.risk.review risk manager,model_nhs_risk_review,group_hc_risk_manager,1,1,1,0
 access_nhs_risk_review_quality,nhs.risk.review quality,model_nhs_risk_review,group_hc_quality_lead,1,1,1,0
 access_nhs_holiday_handler,nhs.holiday handler,model_nhs_holiday,group_hc_handler,1,0,0,0

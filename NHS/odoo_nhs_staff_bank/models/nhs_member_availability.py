@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 WEEKDAYS = [
@@ -102,8 +102,8 @@ class NhsMemberAvailability(models.Model):
         for member in members:
             if member.state != 'active':
                 raise ValidationError(
-                    "Availability can only be added for an active bank member. "
-                    "'%s' is currently '%s'." % (member.name, state_labels.get(member.state, member.state))
+                    _("Availability can only be added for an active bank member. "
+                      "'%s' is currently '%s'.") % (member.name, state_labels.get(member.state, member.state))
                 )
         return super().create(vals_list)
 
@@ -115,12 +115,12 @@ class NhsMemberAvailability(models.Model):
         now = fields.Datetime.now()
         for record in self:
             if record.date_to <= record.date_from:
-                raise ValidationError("'To' must be after 'From'.")
+                raise ValidationError(_("'To' must be after 'From'."))
             if record.date_from < now:
-                raise ValidationError("'From' cannot be in the past.")
+                raise ValidationError(_("'From' cannot be in the past."))
             if record.recurring and record.recurrence_end_date:
                 if record.recurrence_end_date < record.date_from.date():
-                    raise ValidationError("'Recurs Until' date cannot be before the 'From' date.")
+                    raise ValidationError(_("'Recurs Until' date cannot be before the 'From' date."))
 
     @api.constrains('member_id', 'date_from', 'date_to', 'active', 'recurring')
     def _check_no_overlap(self):
@@ -142,8 +142,8 @@ class NhsMemberAvailability(models.Model):
             ], limit=1)
             if overlapping:
                 raise ValidationError(
-                    "%s already has an availability window (%s, %s → %s) "
-                    "that overlaps this one." % (
+                    _("%s already has an availability window (%s, %s → %s) "
+                      "that overlaps this one.") % (
                         record.member_id.name,
                         dict(overlapping._fields['availability_type'].selection).get(
                             overlapping.availability_type, overlapping.availability_type),

@@ -338,7 +338,7 @@ class NHSDeviceAlert(models.Model):
                                                                                          line.action_status)
                 if is_expiring_soon:
                     summary = "[SAFETY ALERT EXPIRING REMINDER] %s - %s" % (alert.reference or alert.name,
-                                                                            device.display_name)
+                                                                            device.asset_tag)
                     note = (
                         "URGENT ALERT EXPIRING REMINDER: Safety Alert '%s' (%s) deadline is %s (%s day(s) remaining).\n"
                         "Device: %s (Asset Tag: %s)\n"
@@ -346,19 +346,19 @@ class NHSDeviceAlert(models.Model):
                         "Required Action: %s"
                     ) % (
                         alert.name, alert.reference or 'N/A', alert.action_deadline, days_remaining,
-                        device.display_name, device.asset_tag, status_display,
+                        device.name, device.asset_tag, status_display,
                         line.action_required or alert.required_action or 'N/A'
                     )
                 else:
                     summary = "[SAFETY ALERT ACTION REQUIRED] %s - %s" % (alert.reference or alert.name,
-                                                                          device.display_name)
+                                                                          device.asset_tag)
                     note = (
                         "Safety Alert '%s' (%s) requires action for device %s (Asset Tag: %s).\n"
                         "Current Status: %s\n"
                         "Required Action: %s\n"
                         "Action Deadline: %s"
                     ) % (
-                        alert.name, alert.reference or 'N/A', device.display_name, device.asset_tag,
+                        alert.name, alert.reference or 'N/A', device.name, device.asset_tag,
                         status_display, line.action_required or alert.required_action or 'N/A',
                         alert.action_deadline or 'N/A'
                     )

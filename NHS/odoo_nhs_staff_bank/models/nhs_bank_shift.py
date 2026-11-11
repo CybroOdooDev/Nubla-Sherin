@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
 REASONS = [
@@ -367,16 +367,16 @@ class NhsBankShift(models.Model):
         now = fields.Datetime.now()
         for shift in self:
             if shift.shift_end <= shift.shift_start:
-                raise ValidationError("The shift end time must be after the start time.")
+                raise ValidationError(_("The shift end time must be after the start time."))
             if shift.shift_start < now:
-                raise ValidationError("The shift start time cannot be in the past.")
+                raise ValidationError(_("The shift start time cannot be in the past."))
 
     @api.constrains('headcount')
     def _check_headcount(self):
         """Reject a shift with a headcount below 1."""
         for shift in self:
             if shift.headcount < 1:
-                raise ValidationError("Headcount must be at least 1.")
+                raise ValidationError(_("Headcount must be at least 1."))
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -438,7 +438,7 @@ class NhsBankShift(models.Model):
         if the confirmation itself was wrong."""
         for shift in self:
             if shift.state != 'to_agency':
-                raise UserError(("Only a shift that is escalated to agency can be"
+                raise UserError(_("Only a shift that is escalated to agency can be"
                                   " confirmed as agency-filled."))
             shift.write({
                 'state': 'agency_filled',
@@ -446,7 +446,7 @@ class NhsBankShift(models.Model):
                 'agency_confirmed_by_id': self.env.user.id,
                 'agency_confirmed_at': fields.Datetime.now(),
             })
-            shift.message_post(body=("Agency booking confirmed as completed."))
+            shift.message_post(body=_("Agency booking confirmed as completed."))
 
     def action_open(self):
         """Confirm a draft shift, opening it for offering to the bank and
@@ -471,7 +471,7 @@ class NhsBankShift(models.Model):
         a mistake to undo; cancel the shift instead if the confirmation
         itself was wrong."""
         if any(shift.state == 'agency_filled' for shift in self):
-            raise UserError(("Cannot reopen: the agency booking has already been"
+            raise UserError(_("Cannot reopen: the agency booking has already been"
                               " confirmed as completed."))
         self.write({'state': 'open'})
 

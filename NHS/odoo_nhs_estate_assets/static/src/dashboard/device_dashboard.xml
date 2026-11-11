@@ -1,346 +1,611 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    <t t-name="odoo_nhs_estate_assets.NhsDeviceDashboard" owl="1">
-        <div class="o_nhs_device_dashboard">
-            <div t-if="state.loading" class="o_nhs_dashboard_loading">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading NHS Device Dashboard...</span>
+    <t t-name="odoo_nhs_estate_assets.NhsDeviceDashboard">
+        <div class="o_nhs_dashboard_container" style="background-color: #F0F4F5; padding: 24px; box-sizing: border-box; overflow-y: auto; overflow-x: hidden; position: relative; height: 100%;">
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap');
+
+                .o_nhs_dashboard_container,
+                .o_nhs_dashboard_container * {
+                    box-sizing: border-box;
+                }
+                .o_nhs_dashboard_container {
+                    font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+                    color: #212B32;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 24px;
+                    overflow-y: auto !important;
+                    overflow-x: hidden !important;
+                    height: 100% !important;
+                    position: relative !important;
+                    width: 100%;
+                }
+                /* KPI Card Section (3 cards per row on desktop) */
+                .o_nhs_kpi_grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                    gap: 24px;
+                }
+                @media (max-width: 992px) {
+                    .o_nhs_kpi_grid {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
+                }
+                @media (max-width: 576px) {
+                    .o_nhs_kpi_grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                .o_nhs_kpi_card {
+                    background-color: #ffffff;
+                    border: 1px solid #D8DDE0;
+                    border-radius: 8px;
+                    padding: 20px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                    border-left: 6px solid #005EB8;
+                    transition: transform 0.15s ease, box-shadow 0.15s ease;
+                    cursor: pointer;
+                    height: 100px;
+                }
+                .o_nhs_kpi_card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+                }
+                .o_nhs_kpi_card.kpi-red { border-left-color: #DA291C; }
+                .o_nhs_kpi_card.kpi-orange { border-left-color: #CE7B11; }
+                .o_nhs_kpi_card.kpi-green { border-left-color: #009639; }
+                .o_nhs_kpi_content {
+                    display: flex;
+                    flex-direction: column;
+                }
+                .o_nhs_kpi_title {
+                    font-size: 0.85rem;
+                    text-transform: uppercase;
+                    font-weight: 700;
+                    color: #505A5F;
+                    letter-spacing: 0.6px;
+                }
+                .o_nhs_kpi_value {
+                    font-size: 1.85rem;
+                    font-weight: 800;
+                    color: #212B32;
+                    margin-top: 4px;
+                    line-height: 1.2;
+                }
+                .o_nhs_kpi_icon_wrapper {
+                    background-color: #F0F4F5;
+                    color: #005EB8;
+                    width: 52px;
+                    height: 52px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.35rem;
+                }
+                .o_nhs_kpi_card.kpi-red .o_nhs_kpi_icon_wrapper { color: #DA291C; background-color: #FFE6E6; }
+                .o_nhs_kpi_card.kpi-orange .o_nhs_kpi_icon_wrapper { color: #CE7B11; background-color: #FFF2E6; }
+                .o_nhs_kpi_card.kpi-green .o_nhs_kpi_icon_wrapper { color: #009639; background-color: #E6F3E6; }
+
+                /* Analytics Grid (2 charts per row on desktop) */
+                .o_nhs_charts_grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    gap: 24px;
+                }
+                @media (max-width: 992px) {
+                    .o_nhs_charts_grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                .o_nhs_card {
+                    background-color: #ffffff;
+                    border: 1px solid #D8DDE0;
+                    border-radius: 8px;
+                    padding: 24px;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                    display: flex;
+                    flex-direction: column;
+                    height: 420px;
+                }
+                .o_nhs_card_header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-bottom: 2px solid #F0F4F5;
+                    padding-bottom: 12px;
+                    margin-bottom: 20px;
+                }
+                .o_nhs_card_title {
+                    font-size: 1.15rem;
+                    font-weight: 700;
+                    color: #005EB8;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+                .o_nhs_chart_canvas_wrapper {
+                    flex: 1;
+                    min-height: 0;
+                    position: relative;
+                }
+
+                /* Operational Section Grid (3 columns on desktop) */
+                .o_nhs_ops_grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                    gap: 24px;
+                }
+                @media (max-width: 1200px) {
+                    .o_nhs_ops_grid {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
+                }
+                @media (max-width: 768px) {
+                    .o_nhs_ops_grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                .o_nhs_ops_card {
+                    background-color: #ffffff;
+                    border: 1px solid #D8DDE0;
+                    border-radius: 8px;
+                    padding: 24px;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                    display: flex;
+                    flex-direction: column;
+                    min-height: 280px;
+                    box-sizing: border-box;
+                }
+                .o_nhs_list_table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 0.95rem;
+                }
+                .o_nhs_list_table th {
+                    text-align: left;
+                    color: #505A5F;
+                    font-weight: 700;
+                    padding: 10px 12px;
+                    border-bottom: 2px solid #E8EDEE;
+                }
+                .o_nhs_list_table td {
+                    padding: 12px 12px;
+                    border-bottom: 1px solid #F0F4F5;
+                    color: #212B32;
+                    vertical-align: middle;
+                }
+                .o_nhs_list_table tr:last-child td {
+                    border-bottom: none;
+                }
+                .o_nhs_list_table tr:hover td {
+                    background-color: rgba(0, 94, 184, 0.03);
+                    cursor: pointer;
+                }
+                .badge-compact {
+                    font-size: 0.75rem;
+                    padding: 0.25rem 0.60rem;
+                    border-radius: 4px;
+                    font-weight: 700;
+                    text-align: center;
+                    white-space: nowrap;
+                    display: inline-block;
+                }
+                .badge-high-risk { background-color: #FFE6E6; color: #DA291C; }
+                .badge-sig-risk { background-color: #FFF2E6; color: #CE7B11; }
+                .badge-mod-risk { background-color: #E6F8FF; color: #005EB8; }
+                .badge-low-risk { background-color: #E6F3E6; color: #009639; }
+            </style>
+            <t t-if="state.loading">
+                <div class="d-flex justify-content-center align-items-center" style="height: 350px;">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem; color: #005EB8 !important;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
                 </div>
-                <span class="ms-2 fw-bold text-muted">Loading Device Register Analytics...</span>
-            </div>
-            <div t-else="" class="o_nhs_dashboard_content">
-                <div class="o_nhs_dashboard_section mb-4">
-                    <div class="row g-3">
-                        <div class="col-12 col-sm-6 col-md-4 col-xl-2">
-                            <div class="o_nhs_kpi_card card h-100 shadow-sm border-0 cursor-pointer" t-on-click="openTotalDevices" title="Click to view all devices">
-                                <div class="card-body p-3">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div class="o_nhs_kpi_icon bg-primary-light text-primary rounded-circle me-2">
-                                            <i class="fa fa-cube fa-lg"></i>
-                                        </div>
-                                        <div class="text-uppercase text-muted fw-bold extra-small text-truncate">Total Devices</div>
-                                    </div>
-                                    <div class="h3 mb-1 fw-bold text-dark" t-out="state.metrics.total_devices"/>
-                                    <div class="small text-success text-truncate">
-                                        <i class="fa fa-check-circle me-1"></i>
-                                        <t t-out="state.metrics.devices_by_status.in_service || 0"/> In Service
-                                    </div>
-                                </div>
-                            </div>
+            </t>
+            <t t-else="">
+                <!-- KPI Section (3x3 Grid) -->
+                <div class="o_nhs_kpi_grid">
+                    <div class="o_nhs_kpi_card" t-on-click="openTotalDevices">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">Total Devices</span>
+                            <span class="o_nhs_kpi_value" t-esc="state.metrics.total_devices"/>
                         </div>
-                        <div class="col-12 col-sm-6 col-md-4 col-xl-2">
-                            <div class="o_nhs_kpi_card card h-100 shadow-sm border-0 cursor-pointer" t-on-click="openDueSoonSchedules" title="Click to view schedules due soon">
-                                <div class="card-body p-3">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div class="o_nhs_kpi_icon bg-warning-light text-warning rounded-circle me-2">
-                                            <i class="fa fa-calendar-check-o fa-lg"></i>
-                                        </div>
-                                        <div class="text-uppercase text-muted fw-bold extra-small text-truncate">Due Maintenance</div>
-                                    </div>
-                                    <div class="h3 mb-1 fw-bold text-warning" t-out="state.metrics.maintenance_planner.due_soon_count"/>
-                                    <div class="small text-muted text-truncate">
-                                        PPM: <strong t-out="state.metrics.maintenance_planner.due_soon_ppm"/> | Cal: <strong t-out="state.metrics.maintenance_planner.due_soon_calib"/>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-cube"/>
                         </div>
-                        <div class="col-12 col-sm-6 col-md-4 col-xl-2">
-                            <div class="o_nhs_kpi_card card h-100 shadow-sm border-0 cursor-pointer" t-on-click="openOverdueSchedules" title="Click to view overdue schedules">
-                                <div class="card-body p-3">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div t-attf-class="o_nhs_kpi_icon rounded-circle me-2 #{state.metrics.overdue_register.total_overdue > 0 ? 'bg-danger-light text-danger' : 'bg-success-light text-success'}">
-                                            <i class="fa fa-exclamation-triangle fa-lg"></i>
-                                        </div>
-                                        <div class="text-uppercase text-muted fw-bold extra-small text-truncate">Overdue Maintenance</div>
-                                    </div>
-                                    <div t-attf-class="h3 mb-1 fw-bold #{state.metrics.overdue_register.total_overdue > 0 ? 'text-danger' : 'text-success'}" t-out="state.metrics.overdue_register.total_overdue"/>
-                                    <div class="small text-muted text-truncate">
-                                        PPM: <strong t-out="state.metrics.overdue_register.overdue_ppm_count"/> | Cal: <strong t-out="state.metrics.overdue_register.overdue_calib_count"/>
-                                    </div>
-                                </div>
-                            </div>
+                    </div>
+                    <div class="o_nhs_kpi_card kpi-green" t-on-click="openInServiceDevices">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">In Service</span>
+                            <span class="o_nhs_kpi_value" t-esc="state.metrics.devices_by_status.in_service || 0"/>
                         </div>
-                        <div class="col-12 col-sm-6 col-md-4 col-xl-2">
-                            <div class="o_nhs_kpi_card card h-100 shadow-sm border-0 cursor-pointer" t-on-click="openSafetyAlerts" title="Click to view open safety alerts">
-                                <div class="card-body p-3">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div t-attf-class="o_nhs_kpi_icon rounded-circle me-2 #{state.metrics.safety_alerts.open_alerts_count > 0 ? 'bg-danger-light text-danger' : 'bg-success-light text-success'}">
-                                            <i class="fa fa-shield fa-lg"></i>
-                                        </div>
-                                        <div class="text-uppercase text-muted fw-bold extra-small text-truncate">Open Safety Alerts</div>
-                                    </div>
-                                    <div class="h3 mb-1 fw-bold text-dark" t-out="state.metrics.safety_alerts.open_alerts_count"/>
-                                    <div class="small text-muted text-truncate">
-                                        <strong class="text-danger" t-out="state.metrics.safety_alerts.affected_devices_count"/> Affected Devices
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-check-circle-o"/>
                         </div>
-                        <div class="col-12 col-sm-6 col-md-4 col-xl-2">
-                            <div class="o_nhs_kpi_card card h-100 shadow-sm border-0 cursor-pointer" t-on-click="openEndOfLifeDevices" title="Click to view end-of-life devices">
-                                <div class="card-body p-3">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div class="o_nhs_kpi_icon bg-secondary-light text-secondary rounded-circle me-2">
-                                            <i class="fa fa-recycle fa-lg"></i>
-                                        </div>
-                                        <div class="text-uppercase text-muted fw-bold extra-small text-truncate">End-of-Life Devices</div>
-                                    </div>
-                                    <div class="h3 mb-1 fw-bold text-dark" t-out="state.metrics.replacement_forecast.end_of_life_count"/>
-                                    <div class="small text-muted text-truncate">
-                                        Est. Cost: <strong t-out="formatCurrency(state.metrics.replacement_forecast.total_forecast_cost)"/>
-                                    </div>
-                                </div>
-                            </div>
+                    </div>
+                    <div class="o_nhs_kpi_card kpi-orange" t-on-click="openAwaitingRepairDevices">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">Awaiting Repair</span>
+                            <span class="o_nhs_kpi_value" t-esc="state.metrics.devices_by_status.awaiting_repair || 0"/>
                         </div>
-                        <div class="col-12 col-sm-6 col-md-4 col-xl-2">
-                            <div class="o_nhs_kpi_card card h-100 shadow-sm border-0 cursor-pointer" t-on-click="openIndicativeRegisterValue" title="Click to view register valuation">
-                                <div class="card-body p-3">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div class="o_nhs_kpi_icon bg-info-light text-info rounded-circle me-2">
-                                            <i class="fa fa-gbp fa-lg"></i>
-                                        </div>
-                                        <div class="text-uppercase text-muted fw-bold extra-small text-truncate">Indicative Value</div>
-                                    </div>
-                                    <div class="h4 mb-1 fw-bold text-primary text-truncate" t-out="formatCurrency(state.metrics.register_value.total_indicative_value)"/>
-                                    <div class="small text-muted text-truncate">
-                                        Cost: <t t-out="formatCurrency(state.metrics.register_value.total_acquisition_cost)"/>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-wrench"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_kpi_card kpi-orange" t-on-click="openDueSoonSchedules">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">Due Maintenance</span>
+                            <span class="o_nhs_kpi_value" t-esc="state.metrics.maintenance_planner.due_soon_count"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-clock-o"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_kpi_card kpi-red" t-on-click="openOverdueSchedules">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">Overdue Maintenance</span>
+                            <span class="o_nhs_kpi_value" t-esc="state.metrics.overdue_register.total_overdue"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-exclamation-triangle"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_kpi_card kpi-red" t-on-click="openSafetyAlerts">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">Open Safety Alerts</span>
+                            <span class="o_nhs_kpi_value" t-esc="state.metrics.safety_alerts.open_alerts_count"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-shield"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_kpi_card kpi-orange" t-on-click="openAffectedDevices">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">Affected Devices</span>
+                            <span class="o_nhs_kpi_value" t-esc="state.metrics.safety_alerts.affected_devices_count"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-bullhorn"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_kpi_card kpi-red" t-on-click="openEndOfLifeDevices">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">End-of-Life Devices</span>
+                            <span class="o_nhs_kpi_value" t-esc="state.metrics.replacement_forecast.end_of_life_count"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-hourglass-end"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_kpi_card kpi-green" t-on-click="openIndicativeRegisterValue">
+                        <div class="o_nhs_kpi_content">
+                            <span class="o_nhs_kpi_title">Indicative Value</span>
+                            <span class="o_nhs_kpi_value" t-esc="formatCurrency(state.metrics.register_value.total_indicative_value)"/>
+                        </div>
+                        <div class="o_nhs_kpi_icon_wrapper">
+                            <i class="fa fa-gbp"/>
                         </div>
                     </div>
                 </div>
-                <div class="o_nhs_dashboard_section mb-4">
-                    <div class="o_nhs_section_header border-primary-accent">
-                        <div>
-                            <h5 class="o_nhs_section_title">
-                                <i class="fa fa-pie-chart me-2 text-primary"></i> Equipment Breakdown &amp; Location Analytics
-                            </h5>
-                            <small class="text-muted">Categorical distribution, operational status, and site location density</small>
+
+                <!-- Charts Section (2x3 Grid) -->
+                <div class="o_nhs_charts_grid">
+                    <div class="o_nhs_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title">
+                                <i class="fa fa-pie-chart"/>Devices by Category
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.device', 'graph')" title="Open Native Graph"><i class="fa fa-bar-chart text-primary"/></button>
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.device', 'pivot')" title="Open Native Pivot"><i class="fa fa-table text-primary"/></button>
+                            </div>
                         </div>
-                        <button class="btn btn-outline-primary btn-sm rounded-pill" t-on-click="openTotalDevices">
-                            <i class="fa fa-list me-1"></i> Device Register
-                        </button>
+                        <div class="o_nhs_chart_canvas_wrapper">
+                            <canvas t-ref="categoryChart"/>
+                        </div>
                     </div>
-                    <div class="row g-3">
-                        <div class="col-12 col-lg-4">
-                            <div class="card shadow-sm border-0 h-100">
-                                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                                    <h6 class="card-title fw-bold mb-0 text-dark">
-                                        <i class="fa fa-pie-chart text-primary me-2"></i> Devices by Category
-                                    </h6>
-                                    <button class="btn btn-link btn-xs text-muted" t-on-click="openTotalDevices">View List</button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="o_nhs_chart_container" style="height: 220px;">
-                                        <canvas t-ref="categoryChart"/>
-                                    </div>
-                                </div>
+                    <div class="o_nhs_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title">
+                                <i class="fa fa-tasks"/>Operational Status
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.device', 'graph')" title="Open Native Graph"><i class="fa fa-bar-chart text-primary"/></button>
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.device', 'pivot')" title="Open Native Pivot"><i class="fa fa-table text-primary"/></button>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-4">
-                            <div class="card shadow-sm border-0 h-100">
-                                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                                    <h6 class="card-title fw-bold mb-0 text-dark">
-                                        <i class="fa fa-tasks text-success me-2"></i> Operational Status
-                                    </h6>
-                                    <button class="btn btn-link btn-xs text-muted" t-on-click="openTotalDevices">View List</button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="o_nhs_chart_container" style="height: 220px;">
-                                        <canvas t-ref="statusChart"/>
-                                    </div>
-                                </div>
+                        <div class="o_nhs_chart_canvas_wrapper">
+                            <canvas t-ref="statusChart"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title">
+                                <i class="fa fa-bar-chart"/>Maintenance Due vs Overdue
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.device.schedule', 'graph')" title="Open Native Graph"><i class="fa fa-bar-chart text-primary"/></button>
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.device.schedule', 'pivot')" title="Open Native Pivot"><i class="fa fa-table text-primary"/></button>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-4">
-                            <div class="card shadow-sm border-0 h-100">
-                                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                                    <h6 class="card-title fw-bold mb-0 text-dark">
-                                        <i class="fa fa-hospital-o text-info me-2"></i> Top Locations (Sites)
-                                    </h6>
-                                    <button class="btn btn-link btn-xs text-muted" t-on-click="openTotalDevices">View List</button>
-                                </div>
-                                <div class="card-body overflow-auto p-3" style="max-height: 240px;">
-                                    <t t-if="!state.metrics.devices_by_location or state.metrics.devices_by_location.length == 0">
-                                        <div class="text-muted text-center py-4">No location data available</div>
+                        <div class="o_nhs_chart_canvas_wrapper">
+                            <canvas t-ref="dueVsOverdueChart"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title">
+                                <i class="fa fa-calendar"/>Maintenance &amp; Calibration Planner
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.device.schedule', 'graph')" title="Open Native Graph"><i class="fa fa-bar-chart text-primary"/></button>
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.device.schedule', 'pivot')" title="Open Native Pivot"><i class="fa fa-table text-primary"/></button>
+                            </div>
+                        </div>
+                        <div class="o_nhs_chart_canvas_wrapper">
+                            <canvas t-ref="plannerChart"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title">
+                                <i class="fa fa-shield"/>Safety Alert Exposure by Source
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.device.alert', 'graph')" title="Open Native Graph"><i class="fa fa-bar-chart text-primary"/></button>
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.device.alert', 'pivot')" title="Open Native Pivot"><i class="fa fa-table text-primary"/></button>
+                            </div>
+                        </div>
+                        <div class="o_nhs_chart_canvas_wrapper">
+                            <canvas t-ref="alertSourceChart"/>
+                        </div>
+                    </div>
+                    <div class="o_nhs_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title">
+                                <i class="fa fa-line-chart"/>Replacement Forecast
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.device', 'graph')" title="Open Native Graph"><i class="fa fa-bar-chart text-primary"/></button>
+                                <button class="btn btn-sm btn-light border p-1" t-on-click="() => this.openAction('nhs.device', 'pivot')" title="Open Native Pivot"><i class="fa fa-table text-primary"/></button>
+                            </div>
+                        </div>
+                        <div class="o_nhs_chart_canvas_wrapper">
+                            <canvas t-ref="replacementChart"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Operational Tables Section (3x2 Grid) -->
+                <div class="o_nhs_ops_grid">
+                    <!-- Table 1: Overdue Maintenance -->
+                    <div class="o_nhs_ops_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title" style="color: #DA291C;">
+                                <i class="fa fa-exclamation-triangle text-danger"/>Overdue Maintenance
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-danger rounded-pill text-white" t-esc="state.metrics.overdue_register.total_overdue"/>
+                                <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.8rem; border-color: #005EB8; color: #005EB8; font-weight: bold;" t-on-click="openOverdueSchedules">View All</button>
+                            </div>
+                        </div>
+                        <t t-if="state.metrics.overdue_register.records.length == 0">
+                            <div class="text-muted text-center py-4 my-auto">No overdue maintenance schedules.</div>
+                        </t>
+                        <t t-else="">
+                            <table class="o_nhs_list_table">
+                                <thead>
+                                    <tr>
+                                        <th>Device</th>
+                                        <th>Type</th>
+                                        <th>Overdue</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.metrics.overdue_register.records.slice(0, 3)" t-as="item" t-key="item.id">
+                                        <tr t-on-click="() => this.openRecord('nhs.device.schedule', item.id)">
+                                            <td class="fw-bold" t-esc="item.device_name"/>
+                                            <td t-esc="item.schedule_type"/>
+                                            <td>
+                                                <span class="badge-compact badge-high-risk">
+                                                    <t t-esc="item.days_overdue"/> days
+                                                </span>
+                                            </td>
+                                        </tr>
                                     </t>
-                                    <t t-else="">
-                                        <ul class="list-group list-group-flush">
-                                            <t t-foreach="state.metrics.devices_by_location" t-as="loc" t-key="loc.name">
-                                                <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-bottom-dashed">
-                                                    <span class="fw-semibold text-dark text-truncate me-2" t-out="loc.name"/>
-                                                    <span class="badge bg-secondary rounded-pill" t-out="loc.count + ' devices'"/>
-                                                </li>
-                                            </t>
-                                        </ul>
+                                </tbody>
+                            </table>
+                        </t>
+                    </div>
+
+                    <!-- Table 2: Maintenance Due Soon -->
+                    <div class="o_nhs_ops_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title" style="color: #CE7B11;">
+                                <i class="fa fa-clock-o text-warning"/>Upcoming Maintenance
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-warning text-dark rounded-pill" t-esc="state.metrics.due_soon_records.length"/>
+                                <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.8rem; border-color: #005EB8; color: #005EB8; font-weight: bold;" t-on-click="openDueSoonSchedules">View All</button>
+                            </div>
+                        </div>
+                        <t t-if="state.metrics.due_soon_records.length == 0">
+                            <div class="text-muted text-center py-4 my-auto">No upcoming maintenance due soon.</div>
+                        </t>
+                        <t t-else="">
+                            <table class="o_nhs_list_table">
+                                <thead>
+                                    <tr>
+                                        <th>Device</th>
+                                        <th>Type</th>
+                                        <th>Due Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.metrics.due_soon_records.slice(0, 3)" t-as="item" t-key="item.id">
+                                        <tr t-on-click="() => this.openRecord('nhs.device.schedule', item.id)">
+                                            <td class="fw-bold" t-esc="item.device_name"/>
+                                            <td t-esc="item.schedule_type"/>
+                                            <td t-esc="item.next_due_date"/>
+                                        </tr>
                                     </t>
-                                </div>
+                                </tbody>
+                            </table>
+                        </t>
+                    </div>
+
+                    <!-- Table 3: Active Safety Alerts -->
+                    <div class="o_nhs_ops_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title" style="color: #DA291C;">
+                                <i class="fa fa-shield text-danger"/>Active Safety Alerts
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-danger text-white rounded-pill" t-esc="state.metrics.safety_alerts.open_alerts_count"/>
+                                <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.8rem; border-color: #005EB8; color: #005EB8; font-weight: bold;" t-on-click="openSafetyAlerts">View All</button>
                             </div>
                         </div>
+                        <t t-if="state.metrics.safety_alerts.top_alerts.length == 0">
+                            <div class="text-muted text-center py-4 my-auto">No active safety alerts.</div>
+                        </t>
+                        <t t-else="">
+                            <table class="o_nhs_list_table">
+                                <thead>
+                                    <tr>
+                                        <th>Reference</th>
+                                        <th>Title</th>
+                                        <th>Pending</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.metrics.safety_alerts.top_alerts.slice(0, 3)" t-as="alert" t-key="alert.id">
+                                        <tr t-on-click="() => this.openRecord('nhs.device.alert', alert.id)">
+                                            <td class="fw-bold" t-esc="alert.reference"/>
+                                            <td t-esc="alert.title"/>
+                                            <td>
+                                                <span class="badge-compact badge-high-risk" t-esc="alert.pending_count + ' / ' + alert.affected_count"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+                    </div>
+
+                    <!-- Table 4: End-of-Life Devices -->
+                    <div class="o_nhs_ops_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title" style="color: #DA291C;">
+                                <i class="fa fa-hourglass-end text-danger"/>End-of-Life Devices
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-danger rounded-pill text-white" t-esc="state.metrics.replacement_forecast.end_of_life_count"/>
+                                <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.8rem; border-color: #005EB8; color: #005EB8; font-weight: bold;" t-on-click="openEndOfLifeDevices">View All</button>
+                            </div>
+                        </div>
+                        <t t-if="state.metrics.eol_records.length == 0">
+                            <div class="text-muted text-center py-4 my-auto">No end-of-life devices.</div>
+                        </t>
+                        <t t-else="">
+                            <table class="o_nhs_list_table">
+                                <thead>
+                                    <tr>
+                                        <th>Tag</th>
+                                        <th>Device</th>
+                                        <th>Year</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.metrics.eol_records.slice(0, 3)" t-as="item" t-key="item.id">
+                                        <tr t-on-click="() => this.openRecord('nhs.device', item.id)">
+                                            <td class="fw-bold" t-esc="item.asset_tag"/>
+                                            <td t-esc="item.name"/>
+                                            <td t-esc="item.replacement_year"/>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+                    </div>
+
+                    <!-- Table 5: Devices Awaiting Repair -->
+                    <div class="o_nhs_ops_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title" style="color: #CE7B11;">
+                                <i class="fa fa-wrench text-warning"/>Awaiting Repair
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-warning text-dark rounded-pill" t-esc="state.metrics.devices_by_status.awaiting_repair || 0"/>
+                                <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.8rem; border-color: #005EB8; color: #005EB8; font-weight: bold;" t-on-click="openAwaitingRepairDevices">View All</button>
+                            </div>
+                        </div>
+                        <t t-if="state.metrics.awaiting_repair_records.length == 0">
+                            <div class="text-muted text-center py-4 my-auto">No devices awaiting repair.</div>
+                        </t>
+                        <t t-else="">
+                            <table class="o_nhs_list_table">
+                                <thead>
+                                    <tr>
+                                        <th>Tag</th>
+                                        <th>Device</th>
+                                        <th>Site</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.metrics.awaiting_repair_records.slice(0, 3)" t-as="item" t-key="item.id">
+                                        <tr t-on-click="() => this.openRecord('nhs.device', item.id)">
+                                            <td class="fw-bold" t-esc="item.asset_tag"/>
+                                            <td t-esc="item.name"/>
+                                            <td t-esc="item.site_name"/>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+                    </div>
+
+                    <!-- Table 6: Top Site Locations -->
+                    <div class="o_nhs_ops_card">
+                        <div class="o_nhs_card_header">
+                            <span class="o_nhs_card_title" style="color: #005EB8;">
+                                <i class="fa fa-hospital-o text-primary"/>Top Locations
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary rounded-pill text-white" t-esc="state.metrics.devices_by_location.length"/>
+                                <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.8rem; border-color: #005EB8; color: #005EB8; font-weight: bold;" t-on-click="openTotalDevices">View All</button>
+                            </div>
+                        </div>
+                        <t t-if="state.metrics.devices_by_location.length == 0">
+                            <div class="text-muted text-center py-4 my-auto">No location data.</div>
+                        </t>
+                        <t t-else="">
+                            <table class="o_nhs_list_table">
+                                <thead>
+                                    <tr>
+                                        <th>Site</th>
+                                        <th>Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.metrics.devices_by_location.slice(0, 3)" t-as="loc" t-key="loc.name">
+                                        <tr t-on-click="openTotalDevices">
+                                            <td class="fw-bold" t-esc="loc.name"/>
+                                            <td>
+                                                <span class="badge-compact badge-mod-risk" t-esc="loc.count + ' devices'"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
                     </div>
                 </div>
-                <div class="o_nhs_dashboard_section mb-4">
-                    <div class="o_nhs_section_header border-warning-accent">
-                        <div>
-                            <h5 class="o_nhs_section_title">
-                                <i class="fa fa-calendar me-2 text-warning"></i> Maintenance &amp; Calibration Planner
-                            </h5>
-                            <small class="text-muted">Schedule due vs overdue analysis and 6-month PPM / calibration timeline forecast</small>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-outline-warning btn-sm rounded-pill" t-on-click="openDueSoonSchedules">
-                                <i class="fa fa-clock-o me-1"></i> Due Soon (<t t-out="state.metrics.maintenance_planner.due_soon_count"/>)
-                            </button>
-                            <button class="btn btn-outline-primary btn-sm rounded-pill" t-on-click="() => this.openAction('nhs.device.schedule', 'list,pivot,graph,form', [], 'All Maintenance Schedules')">
-                                <i class="fa fa-list me-1"></i> All Schedules
-                            </button>
-                        </div>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-12 col-lg-4">
-                            <div class="card shadow-sm border-0 h-100">
-                                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                                    <h6 class="card-title fw-bold mb-0 text-dark">
-                                        <i class="fa fa-bar-chart text-warning me-2"></i> Maintenance Due vs Overdue
-                                    </h6>
-                                    <button class="btn btn-link btn-xs text-muted" t-on-click="() => this.openAction('nhs.device.schedule', 'list,pivot,graph,form', [], 'Maintenance Schedules')">Pivot / Graph</button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="o_nhs_chart_container" style="height: 240px;">
-                                        <canvas t-ref="dueVsOverdueChart"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-8">
-                            <div class="card shadow-sm border-0 h-100">
-                                <div class="card-header bg-white border-0 py-3 d-flex flex-wrap justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="card-title fw-bold mb-0 text-dark">
-                                            <i class="fa fa-calendar-check-o text-primary me-2"></i>
-                                            Maintenance &amp; Calibration Planner (Next 6 Months)
-                                        </h6>
-                                        <small class="text-muted">Forecasted PPM, calibration, and safety test schedules</small>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="o_nhs_chart_container" style="height: 240px;">
-                                        <canvas t-ref="plannerChart"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="o_nhs_dashboard_section mb-4">
-                    <div class="o_nhs_section_header border-danger-accent">
-                        <div>
-                            <h5 class="o_nhs_section_title">
-                                <i class="fa fa-shield me-2 text-danger"></i> MHRA Safety Alerts Exposure &amp; Action Tracking
-                            </h5>
-                            <small class="text-muted">Open alerts breakdown by source and active notice exposure across devices</small>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-outline-secondary btn-sm rounded-pill" t-on-click="() => this.openAction('nhs.device.alert', 'list,pivot,graph,form', [['state', 'in', ['open', 'in_progress']]], 'Safety Alerts Pivot / Graph')">
-                                <i class="fa fa-table me-1"></i> Pivot / Graph View
-                            </button>
-                            <button class="btn btn-outline-warning btn-sm rounded-pill" t-on-click="openAffectedDevices">
-                                Affected Devices (<t t-out="state.metrics.safety_alerts.affected_devices_count"/>)
-                            </button>
-                        </div>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-12 col-lg-5">
-                            <div class="card shadow-sm border-0 h-100">
-                                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                                    <h6 class="card-title fw-bold mb-0 text-dark">
-                                        <i class="fa fa-shield text-warning me-2"></i> Safety Alerts Exposure by Source
-                                    </h6>
-                                    <button class="btn btn-link btn-xs text-muted" t-on-click="openSafetyAlerts">View Alerts</button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="o_nhs_chart_container" style="height: 230px;">
-                                        <canvas t-ref="alertSourceChart"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-7">
-                            <div class="card shadow-sm border-0 h-100">
-                                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                                    <h6 class="card-title fw-bold mb-0 text-dark">
-                                        <i class="fa fa-bullhorn text-danger me-2"></i> Active MHRA / CAS Safety Alerts
-                                    </h6>
-                                </div>
-                                <div class="card-body p-0 overflow-auto" style="max-height: 260px;">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover align-middle mb-0">
-                                            <thead class="bg-light text-muted small text-uppercase">
-                                                <tr>
-                                                    <th class="ps-3">Reference</th>
-                                                    <th>Alert Title</th>
-                                                    <th>Source</th>
-                                                    <th>Pending Devices</th>
-                                                    <th>Deadline</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <t t-if="!state.metrics.safety_alerts.top_alerts or state.metrics.safety_alerts.top_alerts.length == 0">
-                                                    <tr>
-                                                        <td colspan="5" class="text-center py-4 text-success fw-bold">
-                                                            <i class="fa fa-check-circle me-1"></i> No open safety alerts.
-                                                        </td>
-                                                    </tr>
-                                                </t>
-                                                <t t-else="">
-                                                    <t t-foreach="state.metrics.safety_alerts.top_alerts" t-as="alert" t-key="alert.id">
-                                                        <tr class="cursor-pointer" t-on-click="() => this.openRecord('nhs.device.alert', alert.id)">
-                                                            <td class="ps-3 fw-bold text-primary" t-out="alert.reference"/>
-                                                            <td class="small fw-semibold text-dark text-truncate me-2" style="max-width: 220px;" t-out="alert.title"/>
-                                                            <td>
-                                                                <span class="badge bg-secondary" t-out="alert.source"/>
-                                                            </td>
-                                                            <td>
-                                                                <span t-attf-class="badge #{alert.pending_count > 0 ? 'bg-danger' : 'bg-success'}" t-out="alert.pending_count + ' / ' + alert.affected_count"/>
-                                                            </td>
-                                                            <td t-attf-class="small #{alert.is_overdue ? 'text-danger fw-bold' : 'text-muted'}" t-out="alert.deadline"/>
-                                                        </tr>
-                                                    </t>
-                                                </t>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="o_nhs_dashboard_section mb-4">
-                    <div class="o_nhs_section_header border-success-accent">
-                        <div>
-                            <h5 class="o_nhs_section_title">
-                                <i class="fa fa-gbp me-2 text-success"></i> Indicative Register Valuation
-                            </h5>
-                            <small class="text-muted">Straight-line depreciation valuation broken down by equipment category</small>
-                        </div>
-                        <span class="badge bg-primary-light text-primary fs-6">
-                            Total: <t t-out="formatCurrency(state.metrics.register_value.total_indicative_value)"/>
-                        </span>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <div class="card shadow-sm border-0">
-                                <div class="card-body">
-                                    <div class="o_nhs_chart_container" style="height: 250px;">
-                                        <canvas t-ref="valueCategoryChart"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </t>
         </div>
     </t>
 </templates>

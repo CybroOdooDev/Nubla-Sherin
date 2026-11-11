@@ -176,7 +176,7 @@ class NHSDeviceSchedule(models.Model):
     def _compute_display_name(self):
         """Compute display name from device and schedule type."""
         for record in self:
-            device_name = record.device_id.display_name or 'Unknown Device'
+            device_name = record.device_id.asset_tag or 'Unknown Device'
             schedule_type_name = record.schedule_type_id.name if record.schedule_type_id else 'No Type'
             record.display_name = '%s - %s' % (device_name, schedule_type_name)
 
@@ -269,7 +269,7 @@ class NHSDeviceSchedule(models.Model):
                         'company_id': record.company_id.id,
                     })
                 request = self.env['maintenance.request'].create({
-                    'name': '%s - %s' % (record.device_id.display_name, type_name),
+                    'name': '%s - %s' % (record.device_id.asset_tag, type_name),
                     'request_date': fields.Date.today(),
                     'schedule_date': record.next_due_date or fields.Date.today(),
                     'maintenance_type': 'preventive',

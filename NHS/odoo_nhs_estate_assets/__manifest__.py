@@ -21,21 +21,20 @@
 #############################################################################
 {
     'name': 'NHS Medical Devices and Equipment Management',
+    'version': '19.0.1.0.0',
+    'category': 'Healthcare/NHS',
     'summary': 'Medical-device & equipment register for the NHS — inventory, PPM & '
                'calibration scheduling, lifecycle & replacement planning, and MHRA/CAS '
                'safety-alert handling. Community-first: no Enterprise (account_asset) dependency.',
-    'description': """NHS Medical Devices & Equipment Management provides a complete register for medical devices and 
+    'description': """
+    NHS Medical Devices & Equipment Management provides a complete register for medical devices and 
     equipment, covering maintenance, calibration, lifecycle, replacement planning, warranties, and service contracts. 
     It also manages MHRA/CAS safety alerts with affected-device tracking and action history. Includes dashboards, 
-    reporting, reminders, and audit-ready records for NHS estates and EBME teams.""",
-    'version': '19.0.1.0.0',
-    'category': 'Healthcare/NHS',
+    reporting, reminders, and audit-ready records for NHS estates and EBME teams.
+    """,
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'license': 'LGPL-3',
-    'price': 0,
-    'currency': 'EUR',
     'depends': [
         'odoo_nhs_estate',
         'maintenance',
@@ -43,7 +42,7 @@
     'data': [
         'security/nhs_estate_assets_security.xml',
         'security/ir.model.access.csv',
-        'data/nhs_device_sequence_data.xml',
+        'data/ir_sequence_data.xml',
         'data/nhs_schedule_type_data.xml',
         'data/nhs_device_category_data.xml',
         'data/ir_cron_data.xml',
@@ -61,7 +60,7 @@
         'report/nhs_replacement_forecast_report.xml',
         'report/nhs_alert_response_report.xml',
         'wizards/nhs_device_bulk_schedule_wizard_views.xml',
-        'wizards/nhs_device_service_wizard_views.xml',
+        'wizards/nhs_device_service_wizard.xml',
         'wizards/nhs_alert_match_wizard_views.xml',
         'wizards/nhs_device_decommission_wizard_views.xml',
         'wizards/nhs_device_passport_wizard_views.xml',
@@ -76,7 +75,8 @@
         ],
     },
     'images': ['static/description/banner.jpg'],
-    'application': True,
+    'license': 'LGPL-3',
     'installable': True,
     'auto_install': False,
+    'application': True,
 }

@@ -100,9 +100,15 @@ class NhsCommittee(models.Model):
         ('dormant', 'Dormant'),
         ('disbanded', 'Disbanded'),
     ], string='Status', default='draft', required=True, tracking=True,
+       group_expand='_read_group_state',
        help='Committee status. New committees start as Draft until confirmed. '
             'Changes are tracked on the chatter for a full history.')
     active = fields.Boolean(string='Active', default=True, help='Archive flag.')
+
+    @api.model
+    def _read_group_state(self, states, domain, order=None, **kwargs):
+        """Enforce the kanban column order for the state field."""
+        return ['draft', 'active', 'dormant', 'disbanded']
 
     @api.depends('name', 'parent_id.complete_name')
     def _compute_complete_name(self):

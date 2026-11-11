@@ -22,10 +22,17 @@
 import logging
 from datetime import timedelta
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
 
+
 class NHSESTenure(models.Model):
+    """
+        Model for NHS Estate Tenure & Lease Details. This models the property tenure arrangements, leases,
+        and occupancy agreements for NHS estate buildings. Each tenure record represents a specific property
+        arrangement including freehold, leasehold, PFI, LIFT, NHSPS, or CHP agreements.
+    """
     _name = 'nhs.estate.tenure'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Tenure & Lease Detail'
@@ -187,6 +194,26 @@ class NHSESTenure(models.Model):
                 else:
                     vals['name'] = 'New Tenure'
         return super().create(vals_list)
+
+    @api.constrains('lease_start', 'lease_end')
+    def _check_lease_dates(self):
+        """Ensure the lease start dates are before the lease end dates """
+        for record in self:
+            if record.lease_start and record.lease_end:
+                if record.lease_end < record.lease_start:
+                    raise ValidationError(
+                        "Lease End Date cannot be earlier than Lease Start Date."
+                    )
+
+    @api.constrains('contract_start', 'contract_end')
+    def _check_contract_dates(self):
+        """Ensure the contract start dates are before the contract end dates """
+        for record in self:
+            if record.contract_start and record.contract_end:
+                if record.contract_end < record.contract_start:
+                    raise ValidationError(
+                        "Contract End Date cannot be earlier than Contract Start Date."
+                    )
 
     def write(self, vals):
         """Override write to update the record name if building or tenure type changes.

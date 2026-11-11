@@ -9,13 +9,14 @@
             <xpath expr="//sheet/group" position="before">
                 <div class="oe_button_box" name="button_box">
                     <button name="action_view_training_requirements" type="object"
-                            class="oe_stat_button" icon="fa-graduation-cap">
+                            class="oe_stat_button" icon="fa-graduation-cap"
+                            groups="odoo_nhs_training.group_nhs_training_user">
                         <field name="requirement_count" widget="statinfo" string="Requirements"/>
                     </button>
                 </div>
             </xpath>
             <xpath expr="//sheet/group" position="after">
-                <notebook>
+                <notebook groups="odoo_nhs_training.group_nhs_training_user">
                     <page name="training_requirements" string="Training Requirements">
                         <field name="requirement_ids">
                             <list editable="bottom">

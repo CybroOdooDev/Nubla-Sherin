@@ -36,3 +36,8 @@ class NHSDutyRole(models.Model):
                                              help='Whether the role needs a formal, expiring authorisation')
     active = fields.Boolean(string='Active', default=True,
                             help='Uncheck to archive this duty role without deleting it.')
+
+    _unique_code = models.Constraint(
+        'UNIQUE(code)',
+        'The code must be unique!'
+    )

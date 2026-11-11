@@ -20,7 +20,7 @@
 #
 #############################################################################
 from datetime import datetime, timedelta
-from odoo import fields, models
+from odoo import fields, models, _
 from odoo.exceptions import UserError
 
 
@@ -65,10 +65,10 @@ class NhsBulkShiftWizard(models.TransientModel):
         """Create one nhs.bank.shift per matching weekday in the date range."""
         self.ensure_one()
         if self.date_to < self.date_from:
-            raise UserError(("'To Date' cannot be before 'From Date'."))
+            raise UserError(_("'To Date' cannot be before 'From Date'."))
         active_weekdays = set(self.weekday_ids.mapped('index'))
         if not active_weekdays:
-            raise UserError(("Select at least one day of the week."))
+            raise UserError(_("Select at least one day of the week."))
 
         start_h, start_m = self._float_to_time(self.start_time)
         end_h, end_m = self._float_to_time(self.end_time)
@@ -96,10 +96,10 @@ class NhsBulkShiftWizard(models.TransientModel):
                 })
             current += timedelta(days=1)
         if not vals_list:
-            raise UserError(("No dates in range matched the selected weekdays."))
+            raise UserError(_("No dates in range matched the selected weekdays."))
         shifts = self.env['nhs.bank.shift'].create(vals_list)
         return {
-            'name': ('Created Shifts'),
+            'name': _('Created Shifts'),
             'type': 'ir.actions.act_window',
             'res_model': 'nhs.bank.shift',
             'view_mode': 'list,form',

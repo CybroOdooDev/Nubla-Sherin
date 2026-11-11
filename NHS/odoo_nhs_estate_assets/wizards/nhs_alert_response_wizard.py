@@ -58,9 +58,7 @@ class NHSAlertResponseWizard(models.TransientModel):
         domain = []
         if self.category_ids:
             domain.extend([
-                '|',
                 ('affected_category_id', 'in', self.category_ids.ids),
-                ('line_ids.device_id.category_id', 'in', self.category_ids.ids)
             ])
         if self.state and self.state != 'all':
             domain.append(('state', '=', self.state))

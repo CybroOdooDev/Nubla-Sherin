@@ -25,14 +25,11 @@ STATUS_LABELS = {
     'compliant': 'Compliant', 'due_soon': 'Due Soon', 'expired': 'Expired',
     'failed': 'Failed', 'not_done': 'Not Done', 'exempt': 'Exempt',
 }
-
-# Subject columns per printed page. A landscape A4 page is wide enough for the
-# Member/Team columns plus about this many status columns before content would
-# run past the printable margin and get silently clipped by the PDF engine.
 MATRIX_SUBJECTS_PER_PAGE = 8
 
 
 class ReportTrainingMatrix(models.AbstractModel):
+    """Report parser for the team training matrix PDF."""
     _name = 'report.odoo_nhs_training.report_nhs_training_matrix_view'
     _description = 'Team Training Matrix QWeb PDF Report Parser'
 

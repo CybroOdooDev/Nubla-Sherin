@@ -40,7 +40,6 @@ class ReportComplianceBoard(models.AbstractModel):
         as_at_date = self.env.context.get('till_date') or fields.Date.today()
         if isinstance(as_at_date, str):
             as_at_date = fields.Date.to_date(as_at_date)
-        # Filter docs created on or before as_at_date
         docs = docs.filtered(lambda i: i.create_date.date() <= as_at_date)
         total_items = len(docs)
         item_statuses = {i.id: i.get_status_as_of(as_at_date) for i in docs}

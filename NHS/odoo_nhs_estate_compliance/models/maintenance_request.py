@@ -30,7 +30,14 @@ class MaintenanceRequest(models.Model):
         string='Compliance Item',
         ondelete='set null',
         help='The compliance item linked to this maintenance request.',
-        index=True  # Add index for better performance
+        index=True
+    )
+    compliance_test_id = fields.Many2one(
+        'nhs.compliance.test',
+        string='Compliance Test',
+        ondelete='set null',
+        help='The compliance test record that triggered this maintenance request.',
+        index=True
     )
 
     @api.model_create_multi

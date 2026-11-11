@@ -19,12 +19,12 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from . import nhs_estate_site
-from . import nhs_estate_building
-from . import nhs_estate_floor
-from . import nhs_estate_space
-from . import nhs_estate_function
-from . import nhs_estate_tenure
-from . import nhs_estate_condition
 from . import nhs_estate_backlog
+from . import nhs_estate_building
+from . import nhs_estate_condition
+from . import nhs_estate_floor
+from . import nhs_estate_function
+from . import nhs_estate_site
+from . import nhs_estate_space
+from . import nhs_estate_tenure
 from . import res_config_settings

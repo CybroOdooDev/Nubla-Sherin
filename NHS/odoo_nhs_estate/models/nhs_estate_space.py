@@ -22,6 +22,11 @@
 from odoo import api, fields, models
 
 class NHSESSpace(models.Model):
+    """
+        Model for NHS Estate Functional Spaces/Rooms. This models the individual rooms, spaces, and
+        functional areas within NHS estate buildings. Each space record represents a specific room or
+        area with its characteristics,function, occupancy status, and area metrics.
+    """
     _name = 'nhs.estate.space'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Functional space / room'
@@ -36,6 +41,7 @@ class NHSESSpace(models.Model):
     code = fields.Char(
         string='Space Reference',
         tracking=True,
+        copy=False,
         help="Unique reference code or identifier for the space (e.g., room number, asset code)"
     )
     floor_id = fields.Many2one(
@@ -143,6 +149,11 @@ class NHSESSpace(models.Model):
         help='True if space is currently occupied'
     )
 
+    _name_uniq = models.Constraint(
+        'unique(code)',
+        'Space code must be unique!',
+    )
+
     @api.depends('utilisation')
     def _compute_occupancy_status(self):
         """Auto-determine occupancy from utilisation field"""
@@ -227,5 +238,5 @@ class NHSESSpace(models.Model):
         """
         return [{
             'label': 'Import Template for Space',
-            'template': '/odoo_nhs_estate/static/import_templates/space.xlsx',
+            'template': '/odoo_nhs_estate/static/import_templates/spaces.xlsx',
         }]

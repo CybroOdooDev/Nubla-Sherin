@@ -11,11 +11,11 @@
                         string="Create Service Record"
                         type="object"
                         class="btn-primary"
-                        invisible="not is_final_stage or service_record_created"/>
+                        invisible="not is_final_stage or service_record_created or not nhs_device_id"/>
             </header>
             <field name="equipment_id" position="after">
-                <field name="nhs_device_id" />
-                <field name="nhs_schedule_id" />
+                <field name="nhs_device_id" invisible="not nhs_device_id"/>
+                <field name="nhs_schedule_id" invisible="not nhs_device_id"/>
                 <field name="nhs_service_id" readonly="1" invisible="not service_record_created"/>
                 <field name="service_record_created" invisible="1"/>
                 <field name="is_final_stage" invisible="1"/>

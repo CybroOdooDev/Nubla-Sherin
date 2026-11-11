@@ -30,6 +30,7 @@ TRAINING_CLASSES = [
 
 
 class NhsTrainingSubject(models.Model):
+    """A statutory/mandatory training subject, optionally levelled."""
     _name = 'nhs.training.subject'
     _description = 'A statutory/mandatory training subject (optionally levelled)'
     _order = 'name, level'

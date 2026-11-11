@@ -22,12 +22,13 @@
 from odoo import fields, models
 
 class NHSComplianceRescheduleWizard(models.TransientModel):
-    """Transient wizard for bulk-rescheduling compliance item due dates.
-    Allows a compliance officer to select a new due date and provide a
-    rescheduling reason for a batch of compliance items selected from the
-    list view.  Each selected item's next_due_date is updated and the change
-    is logged in the item's chatter.  Open preventive maintenance requests
-    linked to the item are also rescheduled to match.
+    """
+        Transient wizard for bulk-rescheduling compliance item due dates.
+        Allows a compliance officer to select a new due date and provide a
+        rescheduling reason for a batch of compliance items selected from the
+        list view.  Each selected item's next_due_date is updated and the change
+        is logged in the item's chatter.  Open preventive maintenance requests
+        linked to the item are also rescheduled to match.
     """
     _name = 'nhs.compliance.reschedule.wizard'
     _description = 'Bulk Reschedule Compliance Items'
@@ -52,7 +53,7 @@ class NHSComplianceRescheduleWizard(models.TransientModel):
             msg = "Rescheduled next due date to %s. Reason: %s" % (self.new_due_date, self.reason)
             item.message_post(body=msg)
             open_requests = self.env['maintenance.request'].search([
-                ('equipment_id', '=', item.equipment_id.id),
+                ('compliance_item_id', '=', item.id),
                 ('maintenance_type', '=', 'preventive'),
                 ('stage_id.done', '=', False)
             ])

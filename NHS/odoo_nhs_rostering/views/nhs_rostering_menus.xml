@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <menuitem id="menu_nhs_rostering_root" name="NHS e-Rostering" sequence="57"
+              web_icon="odoo_nhs_rostering,static/description/icon.png"
               groups="odoo_nhs_rostering.group_nhs_roster_manager,odoo_nhs_rostering.group_nhs_roster_staff"/>
 
     <!-- Rosters -->

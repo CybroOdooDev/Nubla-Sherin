@@ -186,7 +186,7 @@
                             <div class="o_kanban_record_body">
                                 <div class="text-muted"><i class="fa fa-building-o me-2" title="Unit"/><field name="unit_id"/></div>
                                 <div class="text-muted"><i class="fa fa-calendar me-2" title="Dates"/>
-                                    <field name="date_start"/> <i class="fa fa-arrow-right mx-1"/> <field name="date_end"/>
+                                    <field name="date_start"/> <i class="fa fa-arrow-right mx-1" title="To" aria-label="To"/> <field name="date_end"/>
                                 </div>
                                 <div class="progress mt-2" style="height: 6px;" t-att-title="record.fill_pct.value + '% filled'">
                                     <div class="progress-bar"

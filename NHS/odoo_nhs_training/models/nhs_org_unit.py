@@ -23,6 +23,7 @@ from odoo import api, fields, models
 
 
 class NhsOrgUnit(models.Model):
+    """Adds workforce member counts and training compliance roll-ups to org units."""
     _inherit = 'nhs.org.unit'
 
     member_ids = fields.One2many(
@@ -60,9 +61,15 @@ class NhsOrgUnit(models.Model):
     )
 
     def _compute_member_count(self):
-        """Count live (non-leaver) members in the unit and its descendants."""
+        """Count live (non-leaver) members in the unit and its descendants.
+        sudo() deliberately - this is just a count, not exposing individual
+        member records, and must not raise an access error for viewers
+        (e.g. job-planning's Clinical Manager) who can see the org unit but
+        have no training-module access at all; the "Training Members"
+        button itself stays groups()-gated so those users still can't drill
+        into the actual member records."""
         for unit in self:
-            unit.member_count = self.env['nhs.workforce.member'].search_count([
+            unit.member_count = self.env['nhs.workforce.member'].sudo().search_count([
                 ('org_unit_id', 'child_of', unit.id), ('is_leaver', '=', False),
             ])
 

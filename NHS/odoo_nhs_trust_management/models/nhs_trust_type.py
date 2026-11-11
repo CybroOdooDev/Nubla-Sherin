@@ -69,8 +69,6 @@ class NhsTrustType(models.Model):
         default=True,
         help="Archive flag."
     )
-
-
     _code_unique = models.Constraint(
         'UNIQUE(code)',
         'The NHS Trust Type code must be unique!'
